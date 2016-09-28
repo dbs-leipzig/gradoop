@@ -28,30 +28,18 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         GRAPH_1,
         PATH_PATTERN_0,
         new String[] {"expected1", "expected2", "expected3"},
-        "expected1[" +
-          "(v1)-[e2]->(v6)" +
-        "]" +
-        "expected2[" +
-          "(v2)-[e3]->(v6)" +
-        "]" +
-        "expected3[" +
-          "(v5)-[e6]->(v4)" +
-        "]"
+        "expected1[(v1)-[e2]->(v6)]" +
+        "expected2[(v2)-[e3]->(v6)]" +
+        "expected3[(v5)-[e6]->(v4)]"
       },
       {
         "Graph1_Path2",
         GRAPH_1,
         PATH_PATTERN_2,
         new String[] {"expected1", "expected2", "expected3"},
-        "expected1[" +
-          "(v1)" +
-        "]" +
-        "expected2[" +
-          "(v2)" +
-        "]" +
-        "expected3[" +
-          "(v5)" +
-        "]"
+        "expected1[(v1)]" +
+        "expected2[(v2)]" +
+        "expected3[(v5)]"
       },
       {
         "Graph2_Path3",
@@ -65,9 +53,7 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         GRAPH_2,
         LOOP_PATTERN_0,
         new String[] {"expected1"},
-        "expected1[" +
-          "(v9)-[e15]->(v9)" +
-        "]"
+        "expected1[(v9)-[e15]->(v9)]"
       },
       {
         "Graph1_Cycle2",
@@ -85,42 +71,62 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         GRAPH_1,
         CYCLE_PATTERN_4,
         new String[] {"expected1", "expected2"},
-        "expected1[" +
-          "(v1)-[e2]->(v6)-[e8]->(v5)-[e6]->(v4)-[e4]->(v1)" +
-        "]" +
-        "expected2[" +
-          "(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)" +
-        "]"
+        "expected1[(v1)-[e2]->(v6)-[e8]->(v5)-[e6]->(v4)-[e4]->(v1)]" +
+        "expected2[(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)]"
       },
       {
         "Graph2_Cycle5",
         GRAPH_2,
         CYCLE_PATTERN_5,
         new String[]{"expected1", "expected2"},
-        "expected1[" +
-          "(v0)-[e1]->(v4)<-[e2]-(v0)" +
-        "]" +
-        "expected2[" +
-          "(v5)-[e9]->(v4)<-[e10]-(v5)" +
-        "]"
+        "expected1[(v0)-[e1]->(v4)<-[e2]-(v0)]" +
+        "expected2[(v5)-[e9]->(v4)<-[e10]-(v5)]"
       },
       {
         "Graph4_Path4",
         GRAPH_4,
         PATH_PATTERN_4,
         new String[] {"expected1", "expected2", "expected3", "expected4"},
-        "expected1[" +
-          "(v0)-[e0]->(v1)-[e1]->(v2)" +
-        "]" +
-        "expected2[" +
-          "(v0)-[e0]->(v1)-[e2]->(v2)" +
-        "]" +
-        "expected3[" +
-          "(v1)-[e1]->(v2)-[e3]->(v3)" +
-        "]" +
-        "expected4[" +
-          "(v1)-[e2]->(v2)-[e3]->(v3)" +
-        "]"
+        "expected1[(v0)-[e0]->(v1)-[e1]->(v2)]" +
+        "expected2[(v0)-[e0]->(v1)-[e2]->(v2)]" +
+        "expected3[(v1)-[e1]->(v2)-[e3]->(v3)]" +
+        "expected4[(v1)-[e2]->(v2)-[e3]->(v3)]"
+      },
+      {
+        "Graph3_Unlabeled0",
+        GRAPH_3,
+        UNLABELED_PATTERN_0,
+        new String[] {"expected1", "expected2", "expected3", "expected4"},
+        "expected1[(v0)]" +
+        "expected2[(v1)]" +
+        "expected3[(v2)]" +
+        "expected4[(v3)]"
+      },
+      {
+        "Graph3_Unlabeled1",
+        GRAPH_3,
+        UNLABELED_PATTERN_1,
+        new String[] {"expected1", "expected2", "expected3"},
+        "expected1[(v0)-[e0]->(v1)]" +
+        "expected2[(v1)-[e1]->(v2)]" +
+        "expected3[(v2)-[e2]->(v3)]"
+      },
+      {
+        "Graph1_Unlabeled2",
+        GRAPH_1,
+        UNLABELED_PATTERN_2,
+        new String[] {"expected1", "expected2"},
+        "expected1[(v4)-[e5]->(v3)]" +
+        "expected2[(v6)-[e9]->(v7)]"
+      },
+      {
+        "Graph1_Unlabeled3",
+        GRAPH_1,
+        UNLABELED_PATTERN_3,
+        new String[] {"expected1", "expected2", "expected3"},
+        "expected1[(v1)-[e2]->(v6)]" +
+        "expected2[(v5)-[e6]->(v4)]" +
+        "expected3[(v2)-[e3]->(v6)]"
       }
     });
   }
