@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Contains methods to match query and data graph entities.
+ * Contains methods to match query and data graph elements.
  */
-public class EntityMatcher {
+public class ElementMatcher {
 
   /**
    * Matches the given data graph element against all given query elements.

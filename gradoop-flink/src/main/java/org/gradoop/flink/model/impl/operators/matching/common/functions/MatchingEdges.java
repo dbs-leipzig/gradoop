@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.operators.matching.common.matching.EntityMatcher;
+import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 
 import java.util.Collection;
 
@@ -61,6 +61,6 @@ public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
 
   @Override
   public boolean filter(E e) throws Exception {
-    return EntityMatcher.matchAll(e, queryEdges, DEFAULT_EDGE_LABEL);
+    return ElementMatcher.matchAll(e, queryEdges, DEFAULT_EDGE_LABEL);
   }
 }
