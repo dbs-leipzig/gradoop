@@ -19,14 +19,16 @@ package org.gradoop.flink.algorithms.fsm.ccs;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSubgraphOnly;
+import org.gradoop.flink.algorithms.fsm.ccs.functions
+  .CCSWrapInSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryFrequent;
-import org.gradoop.flink.algorithms.fsm.ccs.functions
-  .CategoryFrequentAndInteresting;
+import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryFrequentAndInteresting;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryGraphCounts;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryMinFrequencies;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryVertexLabels;
@@ -41,17 +43,17 @@ import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
 import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .JoinMultiEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .JoinSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .WithoutInfrequentEdgeLabels;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMWrapInSubgraphEmbeddings;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.First;
@@ -137,88 +139,32 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
   /**
    * Core mining method.
    *
-   * @param graphs search space
+   * @param fsmGraphs search space
    * @param gradoopConfig Gradoop Flink configuration
    *
    * @return frequent subgraphs
    */
   public DataSet<GraphTransaction> execute(
-    DataSet<CCSGraph> graphs, GradoopFlinkConfig gradoopConfig) {
+    DataSet<CCSGraph> fsmGraphs, GradoopFlinkConfig gradoopConfig) {
 
-    categoryCounts = graphs
-      .map(new CategoryWithCount())
-      .groupBy(0)
-      .sum(1)
-      .reduceGroup(new CategoryGraphCounts());
+    setCategoryCounts(fsmGraphs);
 
-    categoryMinFrequencies = categoryCounts
-      .map(new CategoryMinFrequencies(fsmConfig));
+    setMinFrequencies();
 
     if (fsmConfig.usePreprocessing()) {
-      DataSet<String> frequentVertexLabels = graphs
-        .flatMap(new CategoryVertexLabels())
-        .groupBy(0, 1)
-        .sum(2)
-        .filter(new CategoryFrequent())
-        .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
-        .map(new LabelOnly())
-        .distinct();
-
-      graphs = graphs
-        .map(new WithoutInfrequentVertexLabels<CCSGraph>())
-        .withBroadcastSet(
-          frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
-
-      DataSet<String> frequentEdgeLabels = graphs
-        .flatMap(new CategoryEdgeLabels())
-        .groupBy(0, 1)
-        .sum(2)
-        .filter(new CategoryFrequent())
-        .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
-        .map(new LabelOnly())
-        .distinct();
-
-      graphs = graphs
-        .map(new WithoutInfrequentEdgeLabels<CCSGraph>())
-        .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+      fsmGraphs = preprocess(fsmGraphs);
     }
 
     DataSet<CCSSubgraphEmbeddings>
-      embeddings = graphs
+      embeddings = fsmGraphs
       .flatMap(new CCSSingleEdgeEmbeddings(fsmConfig));
 
-    DataSet<CCSSubgraph> frequentSubgraphs =
-      getCategoryFrequentSubgraphs(embeddings);
+    DataSet<CCSSubgraph> characteristicSubgraphs;
 
-    DataSet<CCSSubgraph> characteristicSubgraphs =
-      getCharacteristicSubgraphs(frequentSubgraphs);
-
-    if (fsmConfig.getMaxEdgeCount() > 1) {
-      embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-      embeddings = embeddings
-        .groupBy(0)
-        .reduceGroup(
-          new JoinSingleEdgeEmbeddings<CCSSubgraphEmbeddings>(fsmConfig));
-
-      frequentSubgraphs = getCategoryFrequentSubgraphs(embeddings);
-
-      characteristicSubgraphs = characteristicSubgraphs
-        .union(getCharacteristicSubgraphs(frequentSubgraphs));
-
-      if (fsmConfig.getMaxEdgeCount() > 2) {
-
-        for (int i = 0; i < getMaxIterations(); i++) {
-          embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-          embeddings = embeddings.groupBy(0, 1).reduceGroup(
-            new JoinMultiEdgeEmbeddings<CCSSubgraphEmbeddings>(fsmConfig));
-
-          frequentSubgraphs = getCategoryFrequentSubgraphs(embeddings);
-          characteristicSubgraphs = characteristicSubgraphs
-            .union(getCharacteristicSubgraphs(frequentSubgraphs));
-        }
-      }
+    if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
+      characteristicSubgraphs = executeLoopUnrolling(embeddings, fsmGraphs);
+    } else {
+      characteristicSubgraphs = executeBulkIteration(fsmGraphs, embeddings);
     }
 
     if (fsmConfig.getMinEdgeCount() > 1) {
@@ -228,6 +174,132 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
 
     return characteristicSubgraphs
       .map(new CCSSubgraphDecoder(gradoopConfig));
+  }
+
+  private DataSet<CCSSubgraph> executeBulkIteration(
+    DataSet<CCSGraph> fsmGraphs, DataSet<CCSSubgraphEmbeddings> embeddings) {
+
+    // ITERATION HEAD
+    IterativeDataSet<CCSSubgraphEmbeddings> iterative = embeddings
+      .iterate(fsmConfig.getMaxEdgeCount());
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+    DataSet<CCSSubgraphEmbeddings> parentEmbeddings = iterative
+      .filter(new IsResult<CCSSubgraphEmbeddings>(false));
+
+    DataSet<CCSSubgraph> frequentSubgraphs =
+      getCategoryFrequentSubgraphs(parentEmbeddings);
+
+    parentEmbeddings =
+      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
+
+    DataSet<CCSSubgraphEmbeddings> childEmbeddings =
+      growEmbeddingsOfFrequentSubgraphs(
+        fsmGraphs, parentEmbeddings, frequentSubgraphs
+      );
+
+    DataSet<CCSSubgraphEmbeddings> resultIncrement =
+      getCharacteristicSubgraphs(frequentSubgraphs)
+      .map(new CCSWrapInSubgraphEmbeddings());
+
+    DataSet<CCSSubgraphEmbeddings> resultAndEmbeddings = iterative
+      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
+      .union(resultIncrement)
+      .union(childEmbeddings);
+
+    // ITERATION FOOTER
+
+    return iterative
+      .closeWith(resultAndEmbeddings, childEmbeddings)
+      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
+      .map(new CCSSubgraphOnly());
+  }
+
+  private DataSet<CCSSubgraph> executeLoopUnrolling(
+    DataSet<CCSSubgraphEmbeddings> embeddings, DataSet<CCSGraph> fsmGraphs) {
+    
+    DataSet<CCSSubgraph> frequentSubgraphs =
+      getCategoryFrequentSubgraphs(embeddings);
+
+    DataSet<CCSSubgraph> characteristicSubgraphs =
+      getCharacteristicSubgraphs(frequentSubgraphs);
+
+    if (fsmConfig.getMaxEdgeCount() > 1) {
+      for (int k=fsmConfig.getMinEdgeCount(); 
+           k<fsmConfig.getMaxEdgeCount(); k++) {
+          
+        embeddings = growEmbeddingsOfFrequentSubgraphs(
+          fsmGraphs, embeddings, frequentSubgraphs);
+        
+        frequentSubgraphs = getCategoryFrequentSubgraphs(embeddings);
+        characteristicSubgraphs = characteristicSubgraphs
+          .union(getCharacteristicSubgraphs(frequentSubgraphs));
+      }
+      
+    }
+    return characteristicSubgraphs;
+  }
+
+  private DataSet<CCSSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
+    DataSet<CCSGraph> fsmGraphs, DataSet<CCSSubgraphEmbeddings> embeddings,
+    DataSet<CCSSubgraph> frequentSubgraphs) {
+    
+    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+    embeddings = embeddings
+      .groupBy(0)
+      .reduceGroup(new MergeEmbeddings<CCSSubgraphEmbeddings>());
+
+    embeddings = embeddings
+      .join(fsmGraphs)
+      .where(0).equalTo(new GraphId<CCSGraph>())
+      .with(new PatternGrowth<CCSGraph, CCSSubgraphEmbeddings>(fsmConfig));
+    return embeddings;
+  }
+  
+  private void setMinFrequencies() {
+    categoryMinFrequencies = categoryCounts
+      .map(new CategoryMinFrequencies(fsmConfig));
+  }
+
+  private void setCategoryCounts(DataSet<CCSGraph> graphs) {
+    categoryCounts = graphs
+      .map(new CategoryWithCount())
+      .groupBy(0)
+      .sum(1)
+      .reduceGroup(new CategoryGraphCounts());
+  }
+
+  private DataSet<CCSGraph> preprocess(DataSet<CCSGraph> graphs) {
+    DataSet<String> frequentVertexLabels = graphs
+      .flatMap(new CategoryVertexLabels())
+      .groupBy(0, 1)
+      .sum(2)
+      .filter(new CategoryFrequent())
+      .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
+      .map(new LabelOnly())
+      .distinct();
+
+    graphs = graphs
+      .map(new WithoutInfrequentVertexLabels<CCSGraph>())
+      .withBroadcastSet(
+        frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+
+    DataSet<String> frequentEdgeLabels = graphs
+      .flatMap(new CategoryEdgeLabels())
+      .groupBy(0, 1)
+      .sum(2)
+      .filter(new CategoryFrequent())
+      .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
+      .map(new LabelOnly())
+      .distinct();
+
+    graphs = graphs
+      .map(new WithoutInfrequentEdgeLabels<CCSGraph>())
+      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+    return graphs;
   }
 
   /**

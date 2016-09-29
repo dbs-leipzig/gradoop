@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.algorithms.fsm.common.pojos;
 
+import org.gradoop.common.model.impl.id.GradoopId;
+
 import java.util.Map;
 
 /**
@@ -37,4 +39,6 @@ public interface FSMGraph {
    * @return id-edge map
    */
   Map<Integer, FSMEdge> getEdges();
+
+  GradoopId getId();
 }

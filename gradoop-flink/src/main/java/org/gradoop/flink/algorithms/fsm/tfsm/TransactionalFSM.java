@@ -28,18 +28,12 @@ import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
 import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
 import org.gradoop.flink.algorithms.fsm.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .JoinMultiEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .JoinSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
 import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.VertexLabels;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .WithoutInfrequentEdgeLabels;
-import org.gradoop.flink.algorithms.fsm.common.functions
-  .WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
@@ -48,7 +42,7 @@ import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphOnly;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.ToTFSMGraph;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.WrapInSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMWrapInSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.pojos.TFSMGraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
@@ -140,11 +134,13 @@ public class TransactionalFSM extends TransactionalFSMBase {
 
     if (fsmConfig.getImplementation() == TFSMImplementation.BULK_ITERATION) {
       allFrequentSubgraphs = executeBulkIteration(fsmGraphs, embeddings);
-    } else if (fsmConfig.getImplementation() == TFSMImplementation
-      .LOOP_UNROLLING) {
+    } else  {
       allFrequentSubgraphs = executeLoopUnrolling(fsmGraphs, embeddings);
-    } else {
-      allFrequentSubgraphs = executeQuadraticLoopUnrolling(embeddings);
+    }
+
+    if (fsmConfig.getMinEdgeCount() > 1) {
+      allFrequentSubgraphs = allFrequentSubgraphs
+        .filter(new MinEdgeCount<TFSMSubgraph>(fsmConfig));
     }
 
     return allFrequentSubgraphs
@@ -176,7 +172,7 @@ public class TransactionalFSM extends TransactionalFSMBase {
     );
 
     DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
-      .map(new WrapInSubgraphEmbeddings());
+      .map(new TFSMWrapInSubgraphEmbeddings());
 
     DataSet<TFSMSubgraphEmbeddings> resultAndEmbeddings = iterative
       .filter(new IsResult(true))
@@ -219,54 +215,13 @@ public class TransactionalFSM extends TransactionalFSMBase {
 
     embeddings = embeddings
       .groupBy(0)
-      .reduceGroup(new MergeEmbeddings());
+      .reduceGroup(new MergeEmbeddings<TFSMSubgraphEmbeddings>());
 
     embeddings = embeddings
       .join(fsmGraphs)
-      .where(0).equalTo(new GraphId())
-      .with(new PatternGrowth(fsmConfig));
+      .where(0).equalTo(new GraphId<TFSMGraph>())
+      .with(new PatternGrowth<TFSMGraph, TFSMSubgraphEmbeddings>(fsmConfig));
     return embeddings;
-  }
-
-  private DataSet<TFSMSubgraph> executeQuadraticLoopUnrolling(
-    DataSet<TFSMSubgraphEmbeddings> embeddings) {
-
-    DataSet<TFSMSubgraph> frequentSubgraphs =
-      getFrequentSubgraphs(embeddings);
-
-    DataSet<TFSMSubgraph> allFrequentSubgraphs =
-      frequentSubgraphs;
-
-    if (fsmConfig.getMaxEdgeCount() > 1) {
-      embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-      embeddings = embeddings
-        .groupBy(0)
-        .reduceGroup(
-          new JoinSingleEdgeEmbeddings<TFSMSubgraphEmbeddings>(fsmConfig));
-
-      frequentSubgraphs = getFrequentSubgraphs(embeddings);
-      allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
-
-      if (fsmConfig.getMaxEdgeCount() > 2) {
-
-        for (int i = 0; i <= getMaxIterations(); i++) {
-          embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-          embeddings = embeddings.groupBy(0, 1).reduceGroup(
-            new JoinMultiEdgeEmbeddings<TFSMSubgraphEmbeddings>(fsmConfig));
-
-          frequentSubgraphs = getFrequentSubgraphs(embeddings);
-          allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
-        }
-      }
-    }
-
-    if (fsmConfig.getMinEdgeCount() > 1) {
-      allFrequentSubgraphs = allFrequentSubgraphs
-        .filter(new MinEdgeCount<TFSMSubgraph>(fsmConfig));
-    }
-    return allFrequentSubgraphs;
   }
 
   private void setMinFrequency(DataSet<TFSMGraph> fsmGraphs) {

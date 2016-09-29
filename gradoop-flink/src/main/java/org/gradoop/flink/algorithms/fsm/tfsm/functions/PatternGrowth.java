@@ -9,26 +9,25 @@ import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.JoinEmbeddings;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.common.pojos.FSMGraph;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Union;
-import org.gradoop.flink.algorithms.fsm.tfsm.pojos.TFSMGraph;
-import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 
-public class PatternGrowth extends JoinEmbeddings<TFSMSubgraphEmbeddings>
-  implements
-  FlatJoinFunction<TFSMSubgraphEmbeddings, TFSMGraph, TFSMSubgraphEmbeddings> {
+public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
+  extends JoinEmbeddings<SE> implements FlatJoinFunction<SE, G, SE> {
 
   public PatternGrowth(FSMConfig fsmConfig) {
     super(fsmConfig);
   }
 
   @Override
-  public void join(TFSMSubgraphEmbeddings embeddings,
-    TFSMGraph graph, Collector<TFSMSubgraphEmbeddings> out) throws
+  public void join(SE embeddings,
+    G graph, Collector<SE> out) throws
     Exception {
 
     Set<Union> unions = Sets.newHashSet();

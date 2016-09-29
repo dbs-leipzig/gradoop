@@ -2,21 +2,21 @@ package org.gradoop.flink.algorithms.fsm.tfsm.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
 import java.util.Iterator;
 
 
-public class MergeEmbeddings implements
-  GroupReduceFunction<TFSMSubgraphEmbeddings, TFSMSubgraphEmbeddings> {
+public class MergeEmbeddings<SE extends SubgraphEmbeddings>
+  implements GroupReduceFunction<SE, SE> {
 
   @Override
-  public void reduce(Iterable<TFSMSubgraphEmbeddings> iterable,
-    Collector<TFSMSubgraphEmbeddings> collector) throws Exception {
+  public void reduce(Iterable<SE> iterable,
+    Collector<SE> collector) throws Exception {
 
-    Iterator<TFSMSubgraphEmbeddings> iterator = iterable.iterator();
+    Iterator<SE> iterator = iterable.iterator();
 
-    TFSMSubgraphEmbeddings out = iterator.next();
+    SE out = iterator.next();
     out.setCanonicalLabel("");
 
     while (iterator.hasNext()) {

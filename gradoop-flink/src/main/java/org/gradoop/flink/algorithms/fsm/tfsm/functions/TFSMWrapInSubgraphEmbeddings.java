@@ -6,12 +6,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
 
-public class WrapInSubgraphEmbeddings implements
+public class TFSMWrapInSubgraphEmbeddings implements
   MapFunction<TFSMSubgraph, TFSMSubgraphEmbeddings> {
 
   private final TFSMSubgraphEmbeddings reuseTuple;
 
-  public WrapInSubgraphEmbeddings() {
+  public TFSMWrapInSubgraphEmbeddings() {
     this.reuseTuple = new TFSMSubgraphEmbeddings();
     this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);
     this.reuseTuple.setSize(0);

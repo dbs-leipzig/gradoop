@@ -19,9 +19,6 @@ package org.gradoop.flink.algorithms.fsm.common.config;
 
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 
-
-
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.cam.CAMLabeler;
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan
   .MinDFSLabeler;
 

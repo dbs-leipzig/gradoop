@@ -2,9 +2,10 @@ package org.gradoop.flink.algorithms.fsm.tfsm.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
-public class IsResult implements FilterFunction<TFSMSubgraphEmbeddings> {
+public class IsResult<SE extends SubgraphEmbeddings> 
+  implements FilterFunction<SE> {
 
   private final boolean shouldBeCollector;
 
@@ -13,7 +14,7 @@ public class IsResult implements FilterFunction<TFSMSubgraphEmbeddings> {
   }
 
   @Override
-  public boolean filter(TFSMSubgraphEmbeddings embeddings) throws Exception {
+  public boolean filter(SE embeddings) throws Exception {
     boolean isCollector = embeddings.getGraphId().equals(GradoopId.NULL_VALUE);
 
     return shouldBeCollector == isCollector;

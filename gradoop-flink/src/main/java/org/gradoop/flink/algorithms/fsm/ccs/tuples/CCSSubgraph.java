@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.ccs.tuples;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
 /**
  * Representation of a subgraph.
