@@ -117,7 +117,7 @@ public class FrequentLossPatterns
     // (3) aggregate financial result
     btgs = btgs.apply(new ApplyAggregation(new Result()));
 
-    // (4) filter by loss (negative financialResult)
+    // (4) select by loss (negative financialResult)
     btgs = btgs.select(new Loss());
 
     // (5) relabel vertices and remove vertex and edge properties

@@ -3,6 +3,7 @@ package org.gradoop.flink.algorithms.fsm;
 import com.google.common.collect.Maps;
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.api
   .CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.cam.CAMLabeler;
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan
   .MinDFSLabeler;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
@@ -179,4 +180,48 @@ public class MinDFSLabelerTest {
 
     assertEquals(expectation, label);
   }
+
+  /**
+   * Creation of paper examples
+   */
+//  @Test
+//  public void test() {
+//    Map<Integer, String> vertices = Maps.newHashMap();
+//
+//    vertices.put(0, "A");
+//    vertices.put(1, "A");
+//    vertices.put(2, "A");
+//
+//    Map<Integer, FSMEdge> edges = Maps.newHashMap();
+//
+//    edges.put(0, new FSMEdge(0, "a", 1));
+//    edges.put(1, new FSMEdge(0, "a", 1));
+//    edges.put(2, new FSMEdge(1, "a", 2));
+//    edges.put(3, new FSMEdge(1, "a", 2));
+//
+//    Embedding embedding = new Embedding(vertices, edges);
+//
+//    System.out.println(new MinDFSLabeler(true).label(embedding));
+//    System.out.println(new MinDFSLabeler(false).label(embedding));
+//    System.out.println(new CAMLabeler(true).label(embedding));
+//    System.out.println(new CAMLabeler(false).label(embedding));
+//
+//    vertices = Maps.newHashMap();
+//
+//    vertices.put(0, "A");
+//    vertices.put(1, "B");
+//
+//    edges = Maps.newHashMap();
+//
+//    edges.put(0, new FSMEdge(0, "b", 1));
+//    edges.put(1, new FSMEdge(0, "b", 1));
+//    edges.put(2, new FSMEdge(1, "a", 0));
+//
+//    embedding = new Embedding(vertices, edges);
+//
+//    System.out.println(new MinDFSLabeler(true).label(embedding));
+//    System.out.println(new MinDFSLabeler(false).label(embedding));
+//    System.out.println(new CAMLabeler(true).label(embedding));
+//    System.out.println(new CAMLabeler(false).label(embedding));
+//  }
 }

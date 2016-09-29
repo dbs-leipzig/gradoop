@@ -48,7 +48,7 @@ public class CAMLabeler implements CanonicalLabeler {
   /**
    * separator among adjacency list entries
    */
-  private static final char NEW_ENTRY = ';';
+  private static final char NEW_ENTRY = ',';
   /**
    * edge separator indicating an outgoing edge
    */
