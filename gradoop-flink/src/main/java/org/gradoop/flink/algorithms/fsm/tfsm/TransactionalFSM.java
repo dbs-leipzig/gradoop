@@ -18,6 +18,7 @@
 package org.gradoop.flink.algorithms.fsm.tfsm;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
@@ -40,12 +41,14 @@ import org.gradoop.flink.algorithms.fsm.common.functions
 import org.gradoop.flink.algorithms.fsm.common.functions
   .WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphOnly;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.ToTFSMGraph;
+import org.gradoop.flink.algorithms.fsm.tfsm.functions.WrapInSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.pojos.TFSMGraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
@@ -135,7 +138,10 @@ public class TransactionalFSM extends TransactionalFSMBase {
     DataSet<TFSMSubgraphEmbeddings> embeddings = fsmGraphs
       .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));
 
-    if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
+    if (fsmConfig.getImplementation() == TFSMImplementation.BULK_ITERATION) {
+      allFrequentSubgraphs = executeBulkIteration(fsmGraphs, embeddings);
+    } else if (fsmConfig.getImplementation() == TFSMImplementation
+      .LOOP_UNROLLING) {
       allFrequentSubgraphs = executeLoopUnrolling(fsmGraphs, embeddings);
     } else {
       allFrequentSubgraphs = executeQuadraticLoopUnrolling(embeddings);
@@ -143,6 +149,46 @@ public class TransactionalFSM extends TransactionalFSMBase {
 
     return allFrequentSubgraphs
       .map(new TFSMSubgraphDecoder(gradoopConfig));
+  }
+
+  private DataSet<TFSMSubgraph> executeBulkIteration(
+    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
+
+    // ITERATION HEAD
+    IterativeDataSet<TFSMSubgraphEmbeddings> iterative = embeddings
+      .iterate(fsmConfig.getMaxEdgeCount());
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+    DataSet<TFSMSubgraphEmbeddings> parentEmbeddings = iterative
+      .filter(new IsResult(false));
+
+    DataSet<TFSMSubgraph> frequentSubgraphs =
+      getFrequentSubgraphs(parentEmbeddings);
+
+    parentEmbeddings =
+      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
+
+    DataSet<TFSMSubgraphEmbeddings> childEmbeddings =
+      growEmbeddingsOfFrequentSubgraphs(
+        fsmGraphs, parentEmbeddings, frequentSubgraphs
+    );
+
+    DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
+      .map(new WrapInSubgraphEmbeddings());
+
+    DataSet<TFSMSubgraphEmbeddings> resultAndEmbeddings = iterative
+      .filter(new IsResult(true))
+      .union(resultIncrement)
+      .union(childEmbeddings);
+
+    // ITERATION FOOTER
+
+    return iterative
+      .closeWith(resultAndEmbeddings, childEmbeddings)
+      .filter(new IsResult(true))
+      .map(new TFSMSubgraphOnly());
   }
 
   private DataSet<TFSMSubgraph> executeLoopUnrolling(
@@ -155,16 +201,8 @@ public class TransactionalFSM extends TransactionalFSMBase {
       for (int k=fsmConfig.getMinEdgeCount();
            k<fsmConfig.getMaxEdgeCount(); k++) {
 
-        embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-        embeddings = embeddings
-          .groupBy(0)
-          .reduceGroup(new MergeEmbeddings());
-
-        embeddings = embeddings
-          .join(fsmGraphs)
-          .where(0).equalTo(new GraphId())
-          .with(new PatternGrowth(fsmConfig));
+        embeddings = growEmbeddingsOfFrequentSubgraphs(fsmGraphs, embeddings,
+          frequentSubgraphs);
 
         frequentSubgraphs = getFrequentSubgraphs(embeddings);
         allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
@@ -172,6 +210,22 @@ public class TransactionalFSM extends TransactionalFSMBase {
     }
 
     return allFrequentSubgraphs;
+  }
+
+  private DataSet<TFSMSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
+    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings,
+    DataSet<TFSMSubgraph> frequentSubgraphs) {
+    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+    embeddings = embeddings
+      .groupBy(0)
+      .reduceGroup(new MergeEmbeddings());
+
+    embeddings = embeddings
+      .join(fsmGraphs)
+      .where(0).equalTo(new GraphId())
+      .with(new PatternGrowth(fsmConfig));
+    return embeddings;
   }
 
   private DataSet<TFSMSubgraph> executeQuadraticLoopUnrolling(

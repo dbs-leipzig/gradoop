@@ -20,7 +20,10 @@ package org.gradoop.flink.algorithms.fsm.common.config;
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 
 
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan.MinDFSLabeler;
+
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.cam.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan
+  .MinDFSLabeler;
 
 import java.io.Serializable;
 
@@ -63,6 +66,11 @@ public class FSMConfig implements Serializable {
    * Strategy used to filter embeddings by frequent subgraphs
    */
   private final FilterStrategy filterStrategy;
+
+  public void setImplementation(TFSMImplementation implementation) {
+    this.implementation = implementation;
+  }
+
   private TFSMImplementation implementation;
 
   /**
@@ -78,7 +86,7 @@ public class FSMConfig implements Serializable {
     this.canonicalLabeler =  new MinDFSLabeler(directed);
     this.preprocessing = true;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
-    this.implementation = TFSMImplementation.QUADRATIC_UNROLLING;
+    this.implementation = TFSMImplementation.BULK_ITERATION;
   }
 
   public float getMinSupport() {
