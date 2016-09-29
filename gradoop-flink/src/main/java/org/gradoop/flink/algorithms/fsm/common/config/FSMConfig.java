@@ -102,6 +102,28 @@ public class FSMConfig implements Serializable {
    * @param minSupport minimum relative support of a subgraph
    * @param directed direction mode
    */
+  public FSMConfig(
+    float minSupport,
+    boolean directed,
+    int minEdgeCount,
+    int maxEdgeCount
+  ) {
+    this.minSupport = minSupport;
+    this.directed = directed;
+    this.minEdgeCount = minEdgeCount;
+    this.maxEdgeCount = maxEdgeCount;
+    this.preprocessing = true;
+    this.canonicalLabel = CanonicalLabel.MIN_DFS;
+    this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
+    this.growthStrategy = GrowthStrategy.FUSION;
+    this.iterationStrategy = IterationStrategy.BULK_ITERATION;
+  }
+
+  /**
+   * valued constructor
+   * @param minSupport minimum relative support of a subgraph
+   * @param directed direction mode
+   */
   public FSMConfig(float minSupport, boolean directed) {
     this.minSupport = minSupport;
     this.directed = directed;
@@ -113,6 +135,7 @@ public class FSMConfig implements Serializable {
     this.growthStrategy = GrowthStrategy.FUSION;
     this.iterationStrategy = IterationStrategy.BULK_ITERATION;
   }
+
 
   public float getMinSupport() {
     return minSupport;

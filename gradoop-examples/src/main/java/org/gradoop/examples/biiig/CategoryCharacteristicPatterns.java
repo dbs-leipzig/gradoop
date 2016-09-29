@@ -87,8 +87,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     out.add("Business Transaction Graphs after Transformation", btgs);
 
-    FSMConfig fsmConfig = new FSMConfig(0.8f, true);
-    fsmConfig.setMaxEdgeCount(3);
+    FSMConfig fsmConfig = new FSMConfig(0.8f, true, 1, 3);
 
     GraphCollection patterns = btgs
       .callForCollection(new CategoryCharacteristicSubgraphs(fsmConfig, 2.0f));

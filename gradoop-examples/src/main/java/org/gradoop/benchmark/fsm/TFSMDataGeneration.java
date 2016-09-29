@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.datagen;
+package org.gradoop.benchmark.fsm;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
@@ -29,7 +29,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * Class to run the PredictableTransactionGenerator with console parameters
  */
-public class PredictableTransactionsGeneratorRunner extends AbstractRunner
+public class TFSMDataGeneration extends AbstractRunner
   implements ProgramDescription {
   /**
    * Option to declare path to output graph
@@ -68,7 +68,7 @@ public class PredictableTransactionsGeneratorRunner extends AbstractRunner
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args,
-      PredictableTransactionsGeneratorRunner.class.getName());
+      TFSMDataGeneration.class.getName());
     if (cmd == null) {
       return;
     }
@@ -129,6 +129,6 @@ public class PredictableTransactionsGeneratorRunner extends AbstractRunner
    */
   @Override
   public String getDescription() {
-    return PredictableTransactionsGeneratorRunner.class.getName();
+    return TFSMDataGeneration.class.getName();
   }
 }

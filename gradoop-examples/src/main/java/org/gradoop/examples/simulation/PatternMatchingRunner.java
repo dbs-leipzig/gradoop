@@ -83,7 +83,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
   /**
    * Attach original data true/false
    */
-  private static final String OPTION_ATTACH_DATA = "d";
+  private static final String OPTION_ATTACH_DATA = "dir";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
@@ -102,7 +102,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
   /**
    * Runs the simulation.
    *
-   * @param args args[0]: input dir, args[1]: output dir
+   * @param args args[0]: input directed, args[1]: output directed
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -126,7 +126,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
 
     writeGraphCollection(result, outputDir);
 
-    System.out.println(String.format("Net runtime [s]: %d",
+    System.out.println(String.format("Net runtime [s]: %directed",
       getExecutionEnvironment()
         .getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS)));

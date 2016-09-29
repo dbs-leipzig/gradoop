@@ -32,7 +32,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * A program to duplicate TLF data sets.
  */
-public class TLFDataDuplicator extends AbstractRunner implements
+public class TFSMDataDuplicator extends AbstractRunner implements
   ProgramDescription {
 
   /**
@@ -59,7 +59,7 @@ public class TLFDataDuplicator extends AbstractRunner implements
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, TLFDataDuplicator.class.getName());
+    CommandLine cmd = parseArguments(args, TFSMDataDuplicator.class.getName());
     if (cmd == null) {
       return;
     }
@@ -107,6 +107,6 @@ public class TLFDataDuplicator extends AbstractRunner implements
 
   @Override
   public String getDescription() {
-    return TLFDataDuplicator.class.getName();
+    return TFSMDataDuplicator.class.getName();
   }
 }

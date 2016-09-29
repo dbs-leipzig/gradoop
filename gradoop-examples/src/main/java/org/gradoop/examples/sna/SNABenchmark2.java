@@ -88,7 +88,7 @@ public class SNABenchmark2 extends AbstractRunner implements
    * 1K    -   350,000
    * 10K   - 2,450,000
    *
-   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
+   * @param args args[0]: input directed, args[1]: output directed, args[2]: threshold
    * @throws Exception
    */
   @SuppressWarnings({
@@ -110,13 +110,13 @@ public class SNABenchmark2 extends AbstractRunner implements
   /**
    * Runs the benchmark program with external data (e.g. from HDFS)
    *
-   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
+   * @param args args[0]: input directed, args[1]: output directed, args[2]: threshold
    * @throws Exception
    */
   @SuppressWarnings("unchecked")
   private static void executeWithExternalData(String[] args) throws Exception {
     Preconditions.checkArgument(
-      args.length == 3, "input dir, output dir and threshold required");
+      args.length == 3, "input directed, output directed and threshold required");
     String inputDir  = args[0];
     String outputDir = args[1];
     int threshold    = Integer.parseInt(args[2]);
