@@ -95,8 +95,6 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
       .sum(1)
       .collect();
 
-    System.out.println(categoryLabels);
-
     assertEquals(2, categoryLabels.size());
 
     for (WithCount<Tuple2<String, String>> x : categoryLabels) {

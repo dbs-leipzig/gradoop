@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.tfsm.functions;
+package org.gradoop.flink.algorithms.fsm.common.functions;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;

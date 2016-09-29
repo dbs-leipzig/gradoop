@@ -18,12 +18,14 @@
 package org.gradoop.benchmark.fsm;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
 import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -33,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,19 +64,26 @@ public class TransactionalFSMBenchmark extends AbstractRunner
    */
   private static final String OPTION_IMPLEMENTATION = "impl";
 
+  private static final Map<String, TFSMImplementation> IMPLEMENTATIONS =
+    Maps.newHashMap();
+
+  static {
+    IMPLEMENTATIONS.put("bulk", TFSMImplementation.BULK_ITERATION);
+    IMPLEMENTATIONS.put("unroll", TFSMImplementation.LOOP_UNROLLING);
+  }
+
   /**
    * implementation parameter values
    */
   private static final Collection<String> VALUES_IMPLEMENTATION =
-    Lists.newArrayList(
-      "it", // iterative
-      "fr" // filter refinement
-    );
+    IMPLEMENTATIONS.keySet();
 
   /**
    * Minimum support threshold
    */
   private static final String OPTION_THRESHOLD = "t";
+
+
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH,
@@ -120,9 +130,10 @@ public class TransactionalFSMBenchmark extends AbstractRunner
     // create input dataset
     GraphTransactions graphs = tlfSource.getGraphTransactions();
 
-
     // set config for synthetic or real world dataset
     FSMConfig fsmConfig = new FSMConfig(threshold, directed);
+
+    fsmConfig.setImplementation(IMPLEMENTATIONS.get(implementation));
 
     // mine
     GraphTransactions frequentSubgraphs =

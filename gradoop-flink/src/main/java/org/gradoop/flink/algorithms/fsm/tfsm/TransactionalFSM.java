@@ -23,21 +23,15 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
 import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
-import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
 import org.gradoop.flink.algorithms.fsm.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
-import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.VertexLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentVertexLabels;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm.common.functions.IsResult;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMSubgraphOnly;
@@ -49,7 +43,6 @@ import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -59,7 +52,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * abstract superclass of different implementations of the gSpan frequent
  * subgraph mining algorithm as Gradoop operator
  */
-public class TransactionalFSM extends TransactionalFSMBase {
+public class TransactionalFSM
+  extends TransactionalFSMBase<TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings>
+{
 
   /**
    * minimum frequency for subgraphs to be considered to be frequent
@@ -267,22 +262,6 @@ public class TransactionalFSM extends TransactionalFSMBase {
       .map(new TFSMSubgraphOnly());
   }
 
-  private DataSet<TFSMSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<TFSMGraph> graphs, DataSet<TFSMSubgraphEmbeddings> embeddings,
-    DataSet<TFSMSubgraph> frequentSubgraphs) {
-    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-    embeddings = embeddings
-      .groupBy(0)
-      .reduceGroup(new MergeEmbeddings<TFSMSubgraphEmbeddings>());
-
-    embeddings = embeddings
-      .join(graphs)
-      .where(0).equalTo(new GraphId<TFSMGraph>())
-      .with(new PatternGrowth<TFSMGraph, TFSMSubgraphEmbeddings>(fsmConfig));
-    return embeddings;
-  }
-
   /**
    * Determines frequent subgraphs in a set of embeddings.
    *
@@ -297,39 +276,6 @@ public class TransactionalFSM extends TransactionalFSMBase {
         .sum(1)
         .filter(new Frequent<TFSMSubgraph>())
         .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
-  }
-
-  /**
-   * Filter a set of embeddings to such representing a frequent subgraph.
-   *
-   * @param embeddings set of embeddings
-   * @param frequentSubgraphs frequent subgraphs
-   *
-   * @return embeddings representing frequent subgraphs
-   */
-  private DataSet<TFSMSubgraphEmbeddings> filterByFrequentSubgraphs(
-    DataSet<TFSMSubgraphEmbeddings> embeddings,
-    DataSet<TFSMSubgraph> frequentSubgraphs) {
-
-    if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_FILTER) {
-      return embeddings
-        .filter(new SubgraphIsFrequent<TFSMSubgraphEmbeddings>())
-        .withBroadcastSet(
-          frequentSubgraphs
-            .map(new CanonicalLabelOnly<TFSMSubgraph>()),
-          Constants.FREQUENT_SUBGRAPHS
-        );
-    } else if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_JOIN) {
-      return embeddings
-        .joinWithTiny(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<TFSMSubgraphEmbeddings, TFSMSubgraph>());
-    } else {
-      return embeddings
-        .join(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<TFSMSubgraphEmbeddings, TFSMSubgraph>());
-    }
   }
 
   @Override

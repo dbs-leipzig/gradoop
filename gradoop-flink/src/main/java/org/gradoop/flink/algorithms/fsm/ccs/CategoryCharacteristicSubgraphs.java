@@ -41,21 +41,13 @@ import org.gradoop.flink.algorithms.fsm.ccs.tuples.CCSSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
 import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
-import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinEdgeCount;
-import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.WithoutInfrequentVertexLabels;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm.common.functions.IsResult;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.functions.utils.First;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -65,7 +57,8 @@ import java.util.Map;
  * abstract superclass of different implementations of the gSpan frequent
  * subgraph mining algorithm as Gradoop operator
  */
-public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
+public class CategoryCharacteristicSubgraphs
+  extends TransactionalFSMBase<CCSGraph, CCSSubgraph, CCSSubgraphEmbeddings> {
 
   /**
    * Property key to store a category association.
@@ -313,24 +306,6 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
       .map(new CCSSubgraphOnly());
   }
 
-
-  private DataSet<CCSSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<CCSGraph> graphs, DataSet<CCSSubgraphEmbeddings> embeddings,
-    DataSet<CCSSubgraph> frequentSubgraphs) {
-    
-    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-    embeddings = embeddings
-      .groupBy(0)
-      .reduceGroup(new MergeEmbeddings<CCSSubgraphEmbeddings>());
-
-    embeddings = embeddings
-      .join(graphs)
-      .where(0).equalTo(new GraphId<CCSGraph>())
-      .with(new PatternGrowth<CCSGraph, CCSSubgraphEmbeddings>(fsmConfig));
-    return embeddings;
-  }
-
   /**
    * Returns characteristic from category frequent subgraphs.
    *
@@ -359,43 +334,6 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
       .reduceGroup(new CategoryFrequentAndInteresting(minInterestingness))
       .withBroadcastSet(categoryCounts, Constants.GRAPH_COUNT)
       .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY);
-  }
-
-  /**
-   * Filter a set of embeddings to such representing a frequent subgraph.
-   *
-   * @param embeddings set of embeddings
-   * @param frequentSubgraphs frequent subgraphs
-   *
-   * @return embeddings representing frequent subgraphs
-   */
-  private DataSet<CCSSubgraphEmbeddings> filterByFrequentSubgraphs(
-    DataSet<CCSSubgraphEmbeddings> embeddings,
-    DataSet<CCSSubgraph> frequentSubgraphs) {
-
-    frequentSubgraphs = frequentSubgraphs
-      .groupBy(0)
-      .reduceGroup(new First<CCSSubgraph>());
-
-    if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_FILTER) {
-      return embeddings
-        .filter(new SubgraphIsFrequent<CCSSubgraphEmbeddings>())
-        .withBroadcastSet(
-          frequentSubgraphs
-            .map(new CanonicalLabelOnly<CCSSubgraph>()),
-          Constants.FREQUENT_SUBGRAPHS
-        );
-    } else if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_JOIN) {
-      return embeddings
-        .joinWithTiny(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<CCSSubgraphEmbeddings, CCSSubgraph>());
-    } else {
-      return embeddings
-        .join(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<CCSSubgraphEmbeddings, CCSSubgraph>());
-    }
   }
 
   @Override
