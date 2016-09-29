@@ -98,14 +98,14 @@ public class TransactionalFSM extends TransactionalFSMBase {
    * @return frequent subgraphs as Gradoop graph transactions
    */
   public GraphTransactions execute(GraphTransactions transactions) {
-    DataSet<TFSMGraph> fsmGraphs = transactions
+    DataSet<TFSMGraph> graphs = transactions
       .getTransactions()
       .map(new ToTFSMGraph())
       .returns(TypeExtractor.getForClass(TFSMGraph.class));
 
     GradoopFlinkConfig gradoopConfig = transactions.getConfig();
 
-    DataSet<GraphTransaction> dataSet = execute(fsmGraphs, gradoopConfig);
+    DataSet<GraphTransaction> dataSet = execute(graphs, gradoopConfig);
 
     return new GraphTransactions(dataSet, gradoopConfig);
   }
@@ -113,29 +113,29 @@ public class TransactionalFSM extends TransactionalFSMBase {
   /**
    * Core mining method.
    *
-   * @param fsmGraphs search space
+   * @param graphs search space
    * @param gradoopConfig Gradoop Flink configuration
    *
    * @return frequent subgraphs
    */
   public DataSet<GraphTransaction> execute(
-    DataSet<TFSMGraph> fsmGraphs, GradoopFlinkConfig gradoopConfig) {
+    DataSet<TFSMGraph> graphs, GradoopFlinkConfig gradoopConfig) {
 
-    setMinFrequency(fsmGraphs);
+    setMinFrequency(graphs);
 
     if (fsmConfig.usePreprocessing()) {
-      fsmGraphs = preProcess(fsmGraphs);
+      graphs = preProcess(graphs);
     }
 
     DataSet<TFSMSubgraph> allFrequentSubgraphs;
 
-    DataSet<TFSMSubgraphEmbeddings> embeddings = fsmGraphs
+    DataSet<TFSMSubgraphEmbeddings> embeddings = graphs
       .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));
 
-    if (fsmConfig.getImplementation() == TFSMImplementation.BULK_ITERATION) {
-      allFrequentSubgraphs = executeBulkIteration(fsmGraphs, embeddings);
+    if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
+      allFrequentSubgraphs = mineWithLoopUnrolling(graphs, embeddings);
     } else  {
-      allFrequentSubgraphs = executeLoopUnrolling(fsmGraphs, embeddings);
+      allFrequentSubgraphs = mineWithBulkIteration(graphs, embeddings);
     }
 
     if (fsmConfig.getMinEdgeCount() > 1) {
@@ -147,48 +147,60 @@ public class TransactionalFSM extends TransactionalFSMBase {
       .map(new TFSMSubgraphDecoder(gradoopConfig));
   }
 
-  private DataSet<TFSMSubgraph> executeBulkIteration(
-    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
-
-    // ITERATION HEAD
-    IterativeDataSet<TFSMSubgraphEmbeddings> iterative = embeddings
-      .iterate(fsmConfig.getMaxEdgeCount());
-
-    // ITERATION BODY
-
-    // get frequent subgraphs
-    DataSet<TFSMSubgraphEmbeddings> parentEmbeddings = iterative
-      .filter(new IsResult(false));
-
-    DataSet<TFSMSubgraph> frequentSubgraphs =
-      getFrequentSubgraphs(parentEmbeddings);
-
-    parentEmbeddings =
-      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
-
-    DataSet<TFSMSubgraphEmbeddings> childEmbeddings =
-      growEmbeddingsOfFrequentSubgraphs(
-        fsmGraphs, parentEmbeddings, frequentSubgraphs
-    );
-
-    DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
-      .map(new TFSMWrapInSubgraphEmbeddings());
-
-    DataSet<TFSMSubgraphEmbeddings> resultAndEmbeddings = iterative
-      .filter(new IsResult(true))
-      .union(resultIncrement)
-      .union(childEmbeddings);
-
-    // ITERATION FOOTER
-
-    return iterative
-      .closeWith(resultAndEmbeddings, childEmbeddings)
-      .filter(new IsResult(true))
-      .map(new TFSMSubgraphOnly());
+  /**
+   * Determines the min frequency based on graph count and support threshold.
+   *
+   * @param graphs search space
+   */
+  private void setMinFrequency(DataSet<TFSMGraph> graphs) {
+    minFrequency = Count
+      .count(graphs)
+      .map(new MinFrequency(fsmConfig));
   }
 
-  private DataSet<TFSMSubgraph> executeLoopUnrolling(
-    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
+  /**
+   * Removes vertices and edges showing infrequent labels.
+   *
+   * @param graphs search space
+   * @return processed search space
+   */
+  private DataSet<TFSMGraph> preProcess(DataSet<TFSMGraph> graphs) {
+    DataSet<String> frequentVertexLabels = graphs
+      .flatMap(new VertexLabels<TFSMGraph>())
+      .groupBy(0)
+      .sum(1)
+      .filter(new Frequent<WithCount<String>>())
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .map(new ValueOfWithCount<String>());
+
+    graphs = graphs
+      .map(new WithoutInfrequentVertexLabels<TFSMGraph>())
+      .withBroadcastSet(
+        frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+
+    DataSet<String> frequentEdgeLabels = graphs
+      .flatMap(new EdgeLabels<TFSMGraph>())
+      .groupBy(0)
+      .sum(1)
+      .filter(new Frequent<WithCount<String>>())
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .map(new ValueOfWithCount<String>());
+
+    graphs = graphs
+      .map(new WithoutInfrequentEdgeLabels<TFSMGraph>())
+      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+    return graphs;
+  }
+
+  /**
+   * Mining core based on loop unrolling.
+   *
+   * @param graphs search space
+   * @param embeddings 1-edge embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet<TFSMSubgraph> mineWithLoopUnrolling(
+    DataSet<TFSMGraph> graphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
 
     DataSet<TFSMSubgraph> frequentSubgraphs = getFrequentSubgraphs(embeddings);
     DataSet<TFSMSubgraph> allFrequentSubgraphs = frequentSubgraphs;
@@ -197,7 +209,7 @@ public class TransactionalFSM extends TransactionalFSMBase {
       for (int k=fsmConfig.getMinEdgeCount();
            k<fsmConfig.getMaxEdgeCount(); k++) {
 
-        embeddings = growEmbeddingsOfFrequentSubgraphs(fsmGraphs, embeddings,
+        embeddings = growEmbeddingsOfFrequentSubgraphs(graphs, embeddings,
           frequentSubgraphs);
 
         frequentSubgraphs = getFrequentSubgraphs(embeddings);
@@ -208,8 +220,55 @@ public class TransactionalFSM extends TransactionalFSMBase {
     return allFrequentSubgraphs;
   }
 
+  /**
+   * Mining core based on bulk iteration.
+   *
+   * @param graphs search space
+   * @param embeddings 1-edge embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet<TFSMSubgraph> mineWithBulkIteration(
+    DataSet<TFSMGraph> graphs, DataSet<TFSMSubgraphEmbeddings> embeddings) {
+
+    // ITERATION HEAD
+    IterativeDataSet<TFSMSubgraphEmbeddings> iterative = embeddings
+      .iterate(fsmConfig.getMaxEdgeCount());
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+    DataSet<TFSMSubgraphEmbeddings> parentEmbeddings = iterative
+      .filter(new IsResult<TFSMSubgraphEmbeddings>(false));
+
+    DataSet<TFSMSubgraph> frequentSubgraphs =
+      getFrequentSubgraphs(parentEmbeddings);
+
+    parentEmbeddings =
+      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
+
+    DataSet<TFSMSubgraphEmbeddings> childEmbeddings =
+      growEmbeddingsOfFrequentSubgraphs(
+        graphs, parentEmbeddings, frequentSubgraphs
+    );
+
+    DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
+      .map(new TFSMWrapInSubgraphEmbeddings());
+
+    DataSet<TFSMSubgraphEmbeddings> resultAndEmbeddings = iterative
+      .filter(new IsResult<TFSMSubgraphEmbeddings>(true))
+      .union(resultIncrement)
+      .union(childEmbeddings);
+
+    // ITERATION FOOTER
+
+    return iterative
+      .closeWith(resultAndEmbeddings, childEmbeddings)
+      .filter(new IsResult<TFSMSubgraphEmbeddings>(true))
+      .map(new TFSMSubgraphOnly());
+  }
+
   private DataSet<TFSMSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<TFSMGraph> fsmGraphs, DataSet<TFSMSubgraphEmbeddings> embeddings,
+    DataSet<TFSMGraph> graphs, DataSet<TFSMSubgraphEmbeddings> embeddings,
     DataSet<TFSMSubgraph> frequentSubgraphs) {
     embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
 
@@ -218,44 +277,10 @@ public class TransactionalFSM extends TransactionalFSMBase {
       .reduceGroup(new MergeEmbeddings<TFSMSubgraphEmbeddings>());
 
     embeddings = embeddings
-      .join(fsmGraphs)
+      .join(graphs)
       .where(0).equalTo(new GraphId<TFSMGraph>())
       .with(new PatternGrowth<TFSMGraph, TFSMSubgraphEmbeddings>(fsmConfig));
     return embeddings;
-  }
-
-  private void setMinFrequency(DataSet<TFSMGraph> fsmGraphs) {
-    minFrequency = Count
-      .count(fsmGraphs)
-      .map(new MinFrequency(fsmConfig));
-  }
-
-  private DataSet<TFSMGraph> preProcess(DataSet<TFSMGraph> fsmGraphs) {
-    DataSet<String> frequentVertexLabels = fsmGraphs
-      .flatMap(new VertexLabels<TFSMGraph>())
-      .groupBy(0)
-      .sum(1)
-      .filter(new Frequent<WithCount<String>>())
-      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-      .map(new ValueOfWithCount<String>());
-
-    fsmGraphs = fsmGraphs
-      .map(new WithoutInfrequentVertexLabels<TFSMGraph>())
-      .withBroadcastSet(
-        frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
-
-    DataSet<String> frequentEdgeLabels = fsmGraphs
-      .flatMap(new EdgeLabels<TFSMGraph>())
-      .groupBy(0)
-      .sum(1)
-      .filter(new Frequent<WithCount<String>>())
-      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-      .map(new ValueOfWithCount<String>());
-
-    fsmGraphs = fsmGraphs
-      .map(new WithoutInfrequentEdgeLabels<TFSMGraph>())
-      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
-    return fsmGraphs;
   }
 
   /**

@@ -24,8 +24,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSSubgraphOnly;
-import org.gradoop.flink.algorithms.fsm.ccs.functions
-  .CCSWrapInSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.ccs.functions.CCSWrapInSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryFrequent;
 import org.gradoop.flink.algorithms.fsm.ccs.functions.CategoryFrequentAndInteresting;
@@ -53,7 +52,6 @@ import org.gradoop.flink.algorithms.fsm.tfsm.functions.GraphId;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.IsResult;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.MergeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.tfsm.functions.PatternGrowth;
-import org.gradoop.flink.algorithms.fsm.tfsm.functions.TFSMWrapInSubgraphEmbeddings;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.First;
@@ -124,14 +122,14 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
    * @return frequent subgraphs as Gradoop graph transactions
    */
   public GraphTransactions execute(GraphTransactions transactions) {
-    DataSet<CCSGraph> fsmGraphs = transactions
+    DataSet<CCSGraph> graphs = transactions
       .getTransactions()
       .map(new ToCCSGraph())
       .returns(TypeExtractor.getForClass(CCSGraph.class));
 
     GradoopFlinkConfig gradoopConfig = transactions.getConfig();
 
-    DataSet<GraphTransaction> dataSet = execute(fsmGraphs, gradoopConfig);
+    DataSet<GraphTransaction> dataSet = execute(graphs, gradoopConfig);
 
     return new GraphTransactions(dataSet, gradoopConfig);
   }
@@ -139,32 +137,32 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
   /**
    * Core mining method.
    *
-   * @param fsmGraphs search space
+   * @param graphs search space
    * @param gradoopConfig Gradoop Flink configuration
    *
    * @return frequent subgraphs
    */
   public DataSet<GraphTransaction> execute(
-    DataSet<CCSGraph> fsmGraphs, GradoopFlinkConfig gradoopConfig) {
+    DataSet<CCSGraph> graphs, GradoopFlinkConfig gradoopConfig) {
 
-    setCategoryCounts(fsmGraphs);
+    setCategoryCounts(graphs);
 
     setMinFrequencies();
 
     if (fsmConfig.usePreprocessing()) {
-      fsmGraphs = preprocess(fsmGraphs);
+      graphs = preProcess(graphs);
     }
 
     DataSet<CCSSubgraphEmbeddings>
-      embeddings = fsmGraphs
+      embeddings = graphs
       .flatMap(new CCSSingleEdgeEmbeddings(fsmConfig));
 
     DataSet<CCSSubgraph> characteristicSubgraphs;
 
     if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
-      characteristicSubgraphs = executeLoopUnrolling(embeddings, fsmGraphs);
+      characteristicSubgraphs = mineWithLoopUnrolling(graphs, embeddings);
     } else {
-      characteristicSubgraphs = executeBulkIteration(fsmGraphs, embeddings);
+      characteristicSubgraphs = mineWithBulkIteration(graphs, embeddings);
     }
 
     if (fsmConfig.getMinEdgeCount() > 1) {
@@ -176,94 +174,11 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
       .map(new CCSSubgraphDecoder(gradoopConfig));
   }
 
-  private DataSet<CCSSubgraph> executeBulkIteration(
-    DataSet<CCSGraph> fsmGraphs, DataSet<CCSSubgraphEmbeddings> embeddings) {
-
-    // ITERATION HEAD
-    IterativeDataSet<CCSSubgraphEmbeddings> iterative = embeddings
-      .iterate(fsmConfig.getMaxEdgeCount());
-
-    // ITERATION BODY
-
-    // get frequent subgraphs
-    DataSet<CCSSubgraphEmbeddings> parentEmbeddings = iterative
-      .filter(new IsResult<CCSSubgraphEmbeddings>(false));
-
-    DataSet<CCSSubgraph> frequentSubgraphs =
-      getCategoryFrequentSubgraphs(parentEmbeddings);
-
-    parentEmbeddings =
-      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
-
-    DataSet<CCSSubgraphEmbeddings> childEmbeddings =
-      growEmbeddingsOfFrequentSubgraphs(
-        fsmGraphs, parentEmbeddings, frequentSubgraphs
-      );
-
-    DataSet<CCSSubgraphEmbeddings> resultIncrement =
-      getCharacteristicSubgraphs(frequentSubgraphs)
-      .map(new CCSWrapInSubgraphEmbeddings());
-
-    DataSet<CCSSubgraphEmbeddings> resultAndEmbeddings = iterative
-      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
-      .union(resultIncrement)
-      .union(childEmbeddings);
-
-    // ITERATION FOOTER
-
-    return iterative
-      .closeWith(resultAndEmbeddings, childEmbeddings)
-      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
-      .map(new CCSSubgraphOnly());
-  }
-
-  private DataSet<CCSSubgraph> executeLoopUnrolling(
-    DataSet<CCSSubgraphEmbeddings> embeddings, DataSet<CCSGraph> fsmGraphs) {
-    
-    DataSet<CCSSubgraph> frequentSubgraphs =
-      getCategoryFrequentSubgraphs(embeddings);
-
-    DataSet<CCSSubgraph> characteristicSubgraphs =
-      getCharacteristicSubgraphs(frequentSubgraphs);
-
-    if (fsmConfig.getMaxEdgeCount() > 1) {
-      for (int k=fsmConfig.getMinEdgeCount(); 
-           k<fsmConfig.getMaxEdgeCount(); k++) {
-          
-        embeddings = growEmbeddingsOfFrequentSubgraphs(
-          fsmGraphs, embeddings, frequentSubgraphs);
-        
-        frequentSubgraphs = getCategoryFrequentSubgraphs(embeddings);
-        characteristicSubgraphs = characteristicSubgraphs
-          .union(getCharacteristicSubgraphs(frequentSubgraphs));
-      }
-      
-    }
-    return characteristicSubgraphs;
-  }
-
-  private DataSet<CCSSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<CCSGraph> fsmGraphs, DataSet<CCSSubgraphEmbeddings> embeddings,
-    DataSet<CCSSubgraph> frequentSubgraphs) {
-    
-    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
-
-    embeddings = embeddings
-      .groupBy(0)
-      .reduceGroup(new MergeEmbeddings<CCSSubgraphEmbeddings>());
-
-    embeddings = embeddings
-      .join(fsmGraphs)
-      .where(0).equalTo(new GraphId<CCSGraph>())
-      .with(new PatternGrowth<CCSGraph, CCSSubgraphEmbeddings>(fsmConfig));
-    return embeddings;
-  }
-  
-  private void setMinFrequencies() {
-    categoryMinFrequencies = categoryCounts
-      .map(new CategoryMinFrequencies(fsmConfig));
-  }
-
+  /**
+   * Determines the graph count for each category.
+   *
+   * @param graphs search space
+   */
   private void setCategoryCounts(DataSet<CCSGraph> graphs) {
     categoryCounts = graphs
       .map(new CategoryWithCount())
@@ -272,7 +187,23 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
       .reduceGroup(new CategoryGraphCounts());
   }
 
-  private DataSet<CCSGraph> preprocess(DataSet<CCSGraph> graphs) {
+  /**
+   * Determines the min frequency per category based on category graph count
+   * and support threshold.
+   **/
+  private void setMinFrequencies() {
+    categoryMinFrequencies = categoryCounts
+      .map(new CategoryMinFrequencies(fsmConfig));
+  }
+
+  /**
+   * Removes vertices and edges showing labels that are infrequent in all
+   * categories.
+   *
+   * @param graphs graph collection
+   * @return processed graph collection
+   */
+  private DataSet<CCSGraph> preProcess(DataSet<CCSGraph> graphs) {
     DataSet<String> frequentVertexLabels = graphs
       .flatMap(new CategoryVertexLabels())
       .groupBy(0, 1)
@@ -300,6 +231,104 @@ public class CategoryCharacteristicSubgraphs extends TransactionalFSMBase {
       .map(new WithoutInfrequentEdgeLabels<CCSGraph>())
       .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
     return graphs;
+  }
+
+  /**
+   * Mining core based on loop unrolling.
+   *
+   * @param graphs search space
+   * @param embeddings 1-edge embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet<CCSSubgraph> mineWithLoopUnrolling(DataSet<CCSGraph> graphs,
+    DataSet<CCSSubgraphEmbeddings> embeddings) {
+
+    DataSet<CCSSubgraph> frequentSubgraphs =
+      getCategoryFrequentSubgraphs(embeddings);
+
+    DataSet<CCSSubgraph> characteristicSubgraphs =
+      getCharacteristicSubgraphs(frequentSubgraphs);
+
+    if (fsmConfig.getMaxEdgeCount() > 1) {
+      for (int k=fsmConfig.getMinEdgeCount();
+           k<fsmConfig.getMaxEdgeCount(); k++) {
+
+        embeddings = growEmbeddingsOfFrequentSubgraphs(
+          graphs, embeddings, frequentSubgraphs);
+
+        frequentSubgraphs = getCategoryFrequentSubgraphs(embeddings);
+        characteristicSubgraphs = characteristicSubgraphs
+          .union(getCharacteristicSubgraphs(frequentSubgraphs));
+      }
+
+    }
+    return characteristicSubgraphs;
+  }
+
+  /**
+   * Mining core based on bulk iteration.
+   *
+   * @param graphs search space
+   * @param embeddings 1-edge embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet<CCSSubgraph> mineWithBulkIteration(
+    DataSet<CCSGraph> graphs, DataSet<CCSSubgraphEmbeddings> embeddings) {
+
+    // ITERATION HEAD
+    IterativeDataSet<CCSSubgraphEmbeddings> iterative = embeddings
+      .iterate(fsmConfig.getMaxEdgeCount());
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+    DataSet<CCSSubgraphEmbeddings> parentEmbeddings = iterative
+      .filter(new IsResult<CCSSubgraphEmbeddings>(false));
+
+    DataSet<CCSSubgraph> frequentSubgraphs =
+      getCategoryFrequentSubgraphs(parentEmbeddings);
+
+    parentEmbeddings =
+      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
+
+    DataSet<CCSSubgraphEmbeddings> childEmbeddings =
+      growEmbeddingsOfFrequentSubgraphs(
+        graphs, parentEmbeddings, frequentSubgraphs
+      );
+
+    DataSet<CCSSubgraphEmbeddings> resultIncrement =
+      getCharacteristicSubgraphs(frequentSubgraphs)
+      .map(new CCSWrapInSubgraphEmbeddings());
+
+    DataSet<CCSSubgraphEmbeddings> resultAndEmbeddings = iterative
+      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
+      .union(resultIncrement)
+      .union(childEmbeddings);
+
+    // ITERATION FOOTER
+
+    return iterative
+      .closeWith(resultAndEmbeddings, childEmbeddings)
+      .filter(new IsResult<CCSSubgraphEmbeddings>(true))
+      .map(new CCSSubgraphOnly());
+  }
+
+
+  private DataSet<CCSSubgraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
+    DataSet<CCSGraph> graphs, DataSet<CCSSubgraphEmbeddings> embeddings,
+    DataSet<CCSSubgraph> frequentSubgraphs) {
+    
+    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+
+    embeddings = embeddings
+      .groupBy(0)
+      .reduceGroup(new MergeEmbeddings<CCSSubgraphEmbeddings>());
+
+    embeddings = embeddings
+      .join(graphs)
+      .where(0).equalTo(new GraphId<CCSGraph>())
+      .with(new PatternGrowth<CCSGraph, CCSSubgraphEmbeddings>(fsmConfig));
+    return embeddings;
   }
 
   /**
