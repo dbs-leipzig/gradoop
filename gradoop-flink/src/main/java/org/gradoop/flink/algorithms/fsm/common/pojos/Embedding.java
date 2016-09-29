@@ -52,19 +52,6 @@ public class Embedding {
   }
 
   /**
-   * Checks, if this embedding has common vertices with another embedding.
-   *
-   * @param that other embedding
-   *
-   * @return true, in the case of common vertices
-   */
-  public boolean sharesVerticesWith(Embedding that) {
-    return
-      ! intersection(this.vertices.keySet(),
-        that.getVertices().keySet()).isEmpty();
-  }
-
-  /**
    * Combines this embedding with another one.
    *
    * @param that other embedding

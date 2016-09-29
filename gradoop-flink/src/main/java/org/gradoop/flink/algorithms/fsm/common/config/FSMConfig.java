@@ -19,8 +19,9 @@ package org.gradoop.flink.algorithms.fsm.common.config;
 
 import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan
-  .MinDFSLabeler;
+
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.cam.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan.MinDFSLabeler;
 
 import java.io.Serializable;
 
@@ -40,14 +41,14 @@ public class FSMConfig implements Serializable {
   private final boolean directed;
 
   /**
-   * Maximum subgraph size by edge count.
-   */
-  private int maxEdgeCount;
-
-  /**
    * Minimum subgraph size by edge count.
    */
-  private int minEdgeCount;
+  private final int minEdgeCount;
+
+  /**
+   * Maximum subgraph size by edge count.
+   */
+  private final int maxEdgeCount;
 
   /**
    * flag to enable preprocessing (true=enabled)
@@ -57,18 +58,44 @@ public class FSMConfig implements Serializable {
   /**
    * labeler used to generate canonical labels
    */
-  private final CanonicalLabeler canonicalLabeler;
+  private final CanonicalLabel canonicalLabel;
 
   /**
    * Strategy used to filter embeddings by frequent subgraphs
    */
   private final FilterStrategy filterStrategy;
 
-  public void setImplementation(TFSMImplementation implementation) {
-    this.implementation = implementation;
-  }
+  /**
+   * Strategy used to grow children of frequent subgraphs
+   */
+  private final GrowthStrategy growthStrategy;
 
-  private TFSMImplementation implementation;
+  /**
+   * Strategy for distributed iteration
+   */
+  private final IterationStrategy iterationStrategy;
+
+  public FSMConfig(
+    float minSupport,
+    boolean directed,
+    int minEdgeCount,
+    int maxEdgeCount,
+    boolean preprocessing,
+    CanonicalLabel canonicalLabel,
+    FilterStrategy filterStrategy,
+    GrowthStrategy growthStrategy,
+    IterationStrategy iterationStrategy
+  ) {
+    this.minSupport = minSupport;
+    this.directed = directed;
+    this.minEdgeCount = minEdgeCount;
+    this.maxEdgeCount = maxEdgeCount;
+    this.preprocessing = preprocessing;
+    this.canonicalLabel = canonicalLabel;
+    this.filterStrategy = filterStrategy;
+    this.growthStrategy = growthStrategy;
+    this.iterationStrategy = iterationStrategy;
+  }
 
   /**
    * valued constructor
@@ -78,12 +105,13 @@ public class FSMConfig implements Serializable {
   public FSMConfig(float minSupport, boolean directed) {
     this.minSupport = minSupport;
     this.directed = directed;
-    this.maxEdgeCount = 16;
     this.minEdgeCount = 1;
-    this.canonicalLabeler =  new MinDFSLabeler(directed);
+    this.maxEdgeCount = 16;
     this.preprocessing = true;
+    this.canonicalLabel = CanonicalLabel.MIN_DFS;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
-    this.implementation = TFSMImplementation.BULK_ITERATION;
+    this.growthStrategy = GrowthStrategy.FUSION;
+    this.iterationStrategy = IterationStrategy.BULK_ITERATION;
   }
 
   public float getMinSupport() {
@@ -94,20 +122,12 @@ public class FSMConfig implements Serializable {
     return directed;
   }
 
-  public int getMaxEdgeCount() {
-    return maxEdgeCount;
-  }
-
-  public void setMaxEdgeCount(int maxEdgeCount) {
-    this.maxEdgeCount = maxEdgeCount;
-  }
-
   public int getMinEdgeCount() {
     return minEdgeCount;
   }
 
-  public void setMinEdgeCount(int minEdgeCount) {
-    this.minEdgeCount = minEdgeCount;
+  public int getMaxEdgeCount() {
+    return maxEdgeCount;
   }
 
   /**
@@ -120,14 +140,20 @@ public class FSMConfig implements Serializable {
   }
 
   public CanonicalLabeler getCanonicalLabeler() {
-    return canonicalLabeler;
+    return canonicalLabel == CanonicalLabel.ADJACENCY_MATRIX ?
+      new CAMLabeler(directed) : new MinDFSLabeler(directed);
   }
 
   public FilterStrategy getFilterStrategy() {
     return filterStrategy;
   }
 
-  public TFSMImplementation getImplementation() {
-    return implementation;
+  public GrowthStrategy getGrowthStrategy() {
+    return growthStrategy;
   }
+
+  public IterationStrategy getIterationStrategy() {
+    return iterationStrategy;
+  }
+
 }

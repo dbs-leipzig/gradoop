@@ -13,7 +13,7 @@ Gradoop can be easily integrated in a workflow which already uses Flink&trade; o
 and Flink&trade; libraries (i.e. Gelly, ML and Table).
 
 Gradoop is **work in progress** which means APIs may change. It is currently used
-as a proof of concept implementation and far from production ready.
+as a proof of concept iterationStrategy and far from production ready.
 
 ##### Further Information
 
@@ -131,7 +131,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 ### gradoop-common
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
-implementation which is used in Flink&trade;. The persistent representation of the EPGM
+iterationStrategy which is used in Flink&trade;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
 ### gradoop-flink
@@ -160,7 +160,7 @@ Used to maintain the code style for the whole project.
 * 0.0.1 first prototype using Hadoop MapReduce and Apache Giraph for operator
  processing
 * 0.0.2 support for HBase as distributed graph storage
-* 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
+* 0.0.3 Apache Flink replaces MapReduce and Giraph as operator iterationStrategy
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
 

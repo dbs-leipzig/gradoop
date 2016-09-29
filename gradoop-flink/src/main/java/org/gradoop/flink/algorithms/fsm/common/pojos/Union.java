@@ -32,22 +32,10 @@ public class Union {
    */
   private final TreeSet<Integer> ids;
 
-  /**
-   * Constructor.
-   *
-   * @param first first integer set
-   * @param second first integer set
-   */
-  public Union(Set<Integer> first, Set<Integer> second) {
-    this.ids = Sets.newTreeSet(first);
-    this.ids.addAll(second);
-  }
-
   public Union(Set<Integer> ids, int id) {
     this.ids = Sets.newTreeSet(ids);
     this.ids.add(id);
   }
-
 
   /**
    * Returns the number of intersecting numbers.

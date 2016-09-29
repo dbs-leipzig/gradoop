@@ -21,6 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.common.config.GrowthStrategy;
 import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
 import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMGraph;
@@ -63,10 +64,16 @@ public abstract class TransactionalFSMBase
       .groupBy(0)
       .reduceGroup(new MergeEmbeddings<SE>());
 
-    embeddings = embeddings
-      .join(graphs)
-      .where(0).equalTo(new GraphId<G>())
-      .with(new PatternGrowth<G, SE>(fsmConfig));
+    if (fsmConfig.getGrowthStrategy() == GrowthStrategy.JOIN) {
+      embeddings = embeddings
+        .join(graphs)
+        .where(0).equalTo(new GraphId<G>())
+        .with(new PatternGrowth<G, SE>(fsmConfig));
+    } else {
+      embeddings = embeddings
+        .flatMap(new PatternGrowth<G, SE>(fsmConfig));
+    }
+
     return embeddings;
   }
 

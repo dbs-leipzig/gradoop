@@ -23,7 +23,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.common.config.TFSMImplementation;
+import org.gradoop.flink.algorithms.fsm.common.config.IterationStrategy;
 import org.gradoop.flink.algorithms.fsm.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinEdgeCount;
@@ -127,7 +127,7 @@ public class TransactionalFSM
     DataSet<TFSMSubgraphEmbeddings> embeddings = graphs
       .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));
 
-    if (fsmConfig.getImplementation() == TFSMImplementation.LOOP_UNROLLING) {
+    if (fsmConfig.getIterationStrategy() == IterationStrategy.LOOP_UNROLLING) {
       allFrequentSubgraphs = mineWithLoopUnrolling(graphs, embeddings);
     } else  {
       allFrequentSubgraphs = mineWithBulkIteration(graphs, embeddings);

@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Representation of a subgraph supported by a graph and all its local
@@ -31,7 +31,7 @@ import java.util.Collection;
  * (category, graphId, size, canonicalLabel, embeddings)
  */
 public class CCSSubgraphEmbeddings
-  extends Tuple5<GradoopId, Integer, String, Collection<Embedding>, String>
+  extends Tuple5<GradoopId, Integer, String, List<Embedding>, String>
   implements SubgraphEmbeddings {
 
   /**
@@ -74,11 +74,11 @@ public class CCSSubgraphEmbeddings
     f2 = label;
   }
 
-  public Collection<Embedding> getEmbeddings() {
+  public List<Embedding> getEmbeddings() {
     return f3;
   }
 
-  public void setEmbeddings(Collection<Embedding> embeddings) {
+  public void setEmbeddings(List<Embedding> embeddings) {
     f3 = embeddings;
   }
 }

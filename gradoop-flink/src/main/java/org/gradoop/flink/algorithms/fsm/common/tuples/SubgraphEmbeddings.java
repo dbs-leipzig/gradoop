@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Describes a subgraph and its embeddings in a certain graph.
@@ -74,12 +75,12 @@ public interface SubgraphEmbeddings {
    *
    * @return embeddings
    */
-  Collection<Embedding> getEmbeddings();
+  List<Embedding> getEmbeddings();
 
   /**
    * Setter.
    *
    * @param embeddings embeddings
    */
-  void setEmbeddings(Collection<Embedding> embeddings);
+  void setEmbeddings(List<Embedding> embeddings);
 }

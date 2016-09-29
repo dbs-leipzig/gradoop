@@ -14,7 +14,6 @@ public class CCSWrapInSubgraphEmbeddings implements
   public CCSWrapInSubgraphEmbeddings() {
     this.reuseTuple = new CCSSubgraphEmbeddings();
     this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);
-    this.reuseTuple.setSize(0);
   }
 
   @Override
@@ -23,6 +22,7 @@ public class CCSWrapInSubgraphEmbeddings implements
 
     reuseTuple.setCanonicalLabel(subgraph.getCanonicalLabel());
     reuseTuple.setCategory(subgraph.getCategory());
+    reuseTuple.setSize(subgraph.getEmbedding().getEdges().size());
     reuseTuple.setEmbeddings(Lists.newArrayList(subgraph.getEmbedding()));
 
     return reuseTuple;

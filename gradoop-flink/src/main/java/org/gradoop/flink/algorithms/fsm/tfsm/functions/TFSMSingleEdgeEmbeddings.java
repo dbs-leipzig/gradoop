@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.tfsm.pojos.TFSMGraph;
 import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraphEmbeddings;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,13 +53,13 @@ public class TFSMSingleEdgeEmbeddings extends SingleEdgeEmbeddings
   public void flatMap(
     TFSMGraph graph, Collector<TFSMSubgraphEmbeddings> out) throws Exception {
 
-    Map<String, Collection<Embedding>> subgraphEmbeddings =
+    Map<String, List<Embedding>> subgraphEmbeddings =
       createEmbeddings(graph);
 
     reuseTuple.setGraphId(graph.getId());
     reuseTuple.setSize(1);
 
-    for (Map.Entry<String, Collection<Embedding>> entry :
+    for (Map.Entry<String, List<Embedding>> entry :
       subgraphEmbeddings.entrySet()) {
 
       reuseTuple.setCanonicalLabel(entry.getKey());
