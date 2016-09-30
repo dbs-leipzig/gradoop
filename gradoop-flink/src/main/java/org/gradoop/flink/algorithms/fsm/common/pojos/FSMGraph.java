@@ -40,5 +40,10 @@ public interface FSMGraph {
    */
   Map<Integer, FSMEdge> getEdges();
 
+  /**
+   * Getter.
+   *
+   * @return graph id
+   */
   GradoopId getId();
 }

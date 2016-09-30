@@ -15,7 +15,7 @@ HDFS=$4
 #Parallelism
 PARA=$5
 #Used generator running class
-CLASS="org.gradoop.benchmark.fsm.TLFDataDuplicator"
+CLASS="org.gradoop.benchmark.fsm.TFSMDataDuplicator"
 
 
 #Running commands

@@ -118,7 +118,7 @@ public class TransactionalFSM
 
     setMinFrequency(graphs);
 
-    if (fsmConfig.usePreprocessing()) {
+    if (fsmConfig.isPreprocessingEnabled()) {
       graphs = preProcess(graphs);
     }
 
@@ -201,11 +201,11 @@ public class TransactionalFSM
     DataSet<TFSMSubgraph> allFrequentSubgraphs = frequentSubgraphs;
 
     if (fsmConfig.getMaxEdgeCount() > 1) {
-      for (int k=fsmConfig.getMinEdgeCount();
-           k<fsmConfig.getMaxEdgeCount(); k++) {
+      for (int k = fsmConfig.getMinEdgeCount();
+           k < fsmConfig.getMaxEdgeCount(); k++) {
 
-        embeddings = growEmbeddingsOfFrequentSubgraphs(graphs, embeddings,
-          frequentSubgraphs);
+        embeddings = growEmbeddingsOfFrequentSubgraphs(
+          graphs, embeddings, frequentSubgraphs);
 
         frequentSubgraphs = getFrequentSubgraphs(embeddings);
         allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
@@ -243,8 +243,7 @@ public class TransactionalFSM
 
     DataSet<TFSMSubgraphEmbeddings> childEmbeddings =
       growEmbeddingsOfFrequentSubgraphs(
-        graphs, parentEmbeddings, frequentSubgraphs
-    );
+        graphs, parentEmbeddings, frequentSubgraphs);
 
     DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
       .map(new TFSMWrapInSubgraphEmbeddings());

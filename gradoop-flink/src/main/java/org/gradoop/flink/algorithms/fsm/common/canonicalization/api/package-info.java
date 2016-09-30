@@ -15,18 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.config;
-
 /**
- * FSM canonical labels.
+ * interfaces related to canonical labels of graphs
  */
-public enum CanonicalLabel {
-  /**
-   * gSpan minimum DFS code
-   */
-  MIN_DFS,
-  /**
-   * canonical adjacency matrix
-   */
-  ADJACENCY_MATRIX
-}
+
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.api;

@@ -47,6 +47,12 @@ import java.util.concurrent.TimeUnit;
 public class TFSMBenchmark
   extends AbstractRunner implements ProgramDescription {
 
+  static {
+    for (TFSMParam param : TFSMParam.values()) {
+      OPTIONS.addOption(param.toString(), param.toString());
+    }
+  }
+
   /**
    * Main program to run the benchmark. Arguments are the available options.
    *
@@ -61,32 +67,29 @@ public class TFSMBenchmark
       return;
     }
 
-    // read cmd arguments
-    String inputPath = cmd.getOptionValue(TFSMParam.input.toString());
-    String logPath = cmd.getOptionValue(TFSMParam.log.toString());
-
-    // set config
-    FSMConfig fsmConfig = new FSMConfig(
-      Float.parseFloat(cmd.getOptionValue(TFSMParam.minSup.toString())),
-      Boolean.parseBoolean(cmd.getOptionValue(TFSMParam.directed.toString())),
-      1,
-      14,
-      Boolean.parseBoolean(cmd.getOptionValue(TFSMParam.pre.toString())),
-      CanonicalLabel.valueOf(cmd.getOptionValue(TFSMParam.canlab.toString())),
-      FilterStrategy.valueOf(cmd.getOptionValue(TFSMParam.f.toString())),
-      GrowthStrategy.valueOf(cmd.getOptionValue(TFSMParam.g.toString())),
-      IterationStrategy.valueOf(cmd.getOptionValue(TFSMParam.i.toString()))
-    );
-
-    // create gradoop conf
+    // read from source
     GradoopFlinkConfig gradoopConfig = GradoopFlinkConfig
       .createConfig(getExecutionEnvironment());
 
-    // read tlf graph
-    TLFDataSource tlfSource = new TLFDataSource(inputPath, gradoopConfig);
+    String inputPath = cmd.getOptionValue(TFSMParam.i.toString());
 
-    // create input dataset
+    System.out.println(inputPath);
+
+    TLFDataSource tlfSource = new TLFDataSource(inputPath, gradoopConfig);
     GraphTransactions graphs = tlfSource.getGraphTransactions();
+
+    // set config
+    FSMConfig fsmConfig = new FSMConfig(
+      Float.parseFloat(cmd.getOptionValue(TFSMParam.m.toString())),
+      Boolean.parseBoolean(cmd.getOptionValue(TFSMParam.d.toString())),
+      1,
+      14,
+      Boolean.parseBoolean(cmd.getOptionValue(TFSMParam.r.toString())),
+      CanonicalLabel.valueOf(cmd.getOptionValue(TFSMParam.n.toString())),
+      FilterStrategy.valueOf(cmd.getOptionValue(TFSMParam.f.toString())),
+      GrowthStrategy.valueOf(cmd.getOptionValue(TFSMParam.g.toString())),
+      IterationStrategy.valueOf(cmd.getOptionValue(TFSMParam.t.toString()))
+    );
 
     // mine
     GraphTransactions frequentSubgraphs =
@@ -112,7 +115,7 @@ public class TFSMBenchmark
     while (iterator.hasNext()) {
       Option op = iterator.next();
 
-      if (op.getArgName().equals(TFSMParam.log.toString())) {
+      if (op.getArgName().equals(TFSMParam.l.toString())) {
         logPath = op.getValue();
       } else {
         columns.add(op.getValue());
@@ -132,7 +135,6 @@ public class TFSMBenchmark
       FileUtils.writeStringToFile(f, row, true);
     } else {
       PrintWriter writer = new PrintWriter(logPath, "UTF-8");
-//      writer.print(head);
       writer.print(row);
       writer.close();
     }

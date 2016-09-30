@@ -47,14 +47,14 @@ public class SNABenchmark1 extends AbstractRunner implements
   /**
    * Runs the example program.
    *
-   * Need a (possibly HDFS) input directory that contains
+   * Need a (possibly HDFS) i directory that contains
    *  - nodes.json
    *  - edges.json
    *  - graphs.json
    *
    * Needs a (possibly HDFS) output directory to write the resulting graph to.
    *
-   * @param args args[0] = input directed, args[1] output directed
+   * @param args args[0] = i d, args[1] output d
    * @throws Exception
    */
   @SuppressWarnings({
@@ -63,7 +63,7 @@ public class SNABenchmark1 extends AbstractRunner implements
   })
   public static void main(String[] args) throws Exception {
     Preconditions.checkArgument(
-      args.length == 2, "input directed and output directed required");
+      args.length == 2, "i d and output d required");
     String inputDir  = args[0];
     String outputDir = args[1];
 

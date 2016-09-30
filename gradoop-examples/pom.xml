@@ -54,6 +54,7 @@
                                     <include>org.codehaus.jettison:jettison</include>
                                     <include>com.google.guava:guava</include>
                                     <include>org.antlr:antlr4-runtime</include>
+                                    <include>commons-cli:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

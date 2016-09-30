@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
 /**
- * Performs graph pattern matching on an arbitrary input graph.
+ * Performs graph pattern matching on an arbitrary i graph.
  */
 public class PatternMatchingRunner extends AbstractRunner implements
   ProgramDescription {
@@ -65,9 +65,9 @@ public class PatternMatchingRunner extends AbstractRunner implements
       ALGO_ISO_EXP_BC_HASH_FIRST
   };
   /**
-   * Option to declare path to input graph
+   * Option to declare path to i graph
    */
-  private static final String OPTION_INPUT_PATH  = "i";
+  private static final String OPTION_INPUT_PATH  = "t";
   /**
    *Option to declare path to output graph
     */
@@ -86,7 +86,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
   private static final String OPTION_ATTACH_DATA = "dir";
 
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
+    OPTIONS.addOption(OPTION_INPUT_PATH, "i-path", true,
       "Input graph directory (EPGM json format)");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Output graph directory");
@@ -102,7 +102,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
   /**
    * Runs the simulation.
    *
-   * @param args args[0]: input directed, args[1]: output directed
+   * @param args args[0]: i d, args[1]: output d
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -126,7 +126,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
 
     writeGraphCollection(result, outputDir);
 
-    System.out.println(String.format("Net runtime [s]: %directed",
+    System.out.println(String.format("Net runtime [s]: %d",
       getExecutionEnvironment()
         .getLastJobExecutionResult()
         .getNetRuntime(TimeUnit.SECONDS)));
@@ -139,7 +139,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
    */
   private static void performSanityCheck(final CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph input directory.");
+      throw new IllegalArgumentException("Define a graph i directory.");
     }
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define an graph output directory.");

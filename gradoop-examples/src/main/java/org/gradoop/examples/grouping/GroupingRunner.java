@@ -32,9 +32,9 @@ public class GroupingRunner extends AbstractRunner implements
   ProgramDescription {
 
   /**
-   * Option to declare path to input graph
+   * Option to declare path to i graph
    */
-  public static final String OPTION_INPUT_PATH = "i";
+  public static final String OPTION_INPUT_PATH = "t";
   /**
    * Option to declare path to output graph
    */
@@ -57,7 +57,7 @@ public class GroupingRunner extends AbstractRunner implements
   public static final String OPTION_USE_EDGE_LABELS = "uel";
 
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
+    OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-i-path", true,
       "Path to vertex file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
@@ -143,7 +143,7 @@ public class GroupingRunner extends AbstractRunner implements
    */
   private static void performSanityCheck(final CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph input directory.");
+      throw new IllegalArgumentException("Define a graph i directory.");
     }
     if (!cmd.hasOption(OPTION_VERTEX_GROUPING_KEY) &&
       !cmd.hasOption(OPTION_USE_VERTEX_LABELS)) {

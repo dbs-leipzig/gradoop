@@ -22,8 +22,6 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Sets.intersection;
-
 /**
  * Represent a subgraph embedding.
  */
@@ -90,6 +88,11 @@ public class Embedding {
     return edges.keySet();
   }
 
+  /**
+   * Deep copy method.
+   *
+   * @return deep copy
+   */
   public Embedding deepCopy() {
     return new Embedding(Maps.newHashMap(vertices), Maps.newHashMap(edges));
   }

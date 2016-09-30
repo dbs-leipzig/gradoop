@@ -15,7 +15,6 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.gradoop.flink.algorithms.fsm.common.canonicalization.cam;
 
 import com.google.common.collect.Lists;

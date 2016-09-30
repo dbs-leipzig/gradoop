@@ -14,7 +14,7 @@ HADOOP=$3
 HDFS=$4
 #Parallelism
 PARA=$5
-CLASS="org.gradoop.examples.datagen.PredictableTransactionsGeneratorRunner"
+CLASS="org.gradoop.benchmark.fsm.TFSMDataGeneration"
 
 # create graph count data sets
 for SIZE in 1000 3000 10000

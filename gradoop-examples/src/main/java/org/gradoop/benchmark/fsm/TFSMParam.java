@@ -1,8 +1,51 @@
 package org.gradoop.benchmark.fsm;
 
 /**
- * Created by peet on 29.09.16.
+ * Transactional FSM benchmark parameters.
  */
 public enum TFSMParam {
-  p, c, input, log, minSup, directed, pre, canlab, f, g, i;
+  /**
+   * Flink parallelism
+   */
+  p,
+  /**
+   * Flink program class
+   */
+  c,
+  /**
+   * input file path
+   */
+  i,
+  /**
+   * log file pth
+   */
+  l,
+  /**
+   * minimum support
+   */
+  m,
+  /**
+   * directed mode (true/false)
+   */
+  d,
+  /**
+   * enable preprocessing (true/false)
+   */
+  r,
+  /**
+   * canonical label
+   */
+  n,
+  /**
+   * filter strategy
+   */
+  f,
+  /**
+   * growth strategy
+   */
+  g,
+  /**
+   * iteration strategy
+   */
+  t
 }

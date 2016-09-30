@@ -20,7 +20,6 @@ package org.gradoop.flink.algorithms.fsm.common.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
@@ -40,6 +39,7 @@ import java.util.TreeSet;
 /**
  * Superclass of classes joining subgraph embeddings.
  *
+ * @param <G> graph type
  * @param <SE> subgraph type
  */
 public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
@@ -135,6 +135,12 @@ public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
     collect(embeddings, collector, subgraphEmbeddings);
   }
 
+  /**
+   * Cross-joins k-edge (k>1) embeddings on k-1-edge overlap.
+   *
+   * @param embeddings k-edge embeddings
+   * @return Map of k+1-edge subgraphs and embeddings
+   */
   private Map<String, List<Embedding>> joinOnEdgeOverlap(SE embeddings) {
     Map<String, List<Embedding>> subgraphEmbeddings;
     subgraphEmbeddings = Maps.newHashMap();
@@ -207,6 +213,12 @@ public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
     return subgraphEmbeddings;
   }
 
+  /**
+   * Cross-joins 1-edge embeddings on source and target vertices.
+   *
+   * @param embeddings 1-edge embeddings
+   * @return Map of 2-edge subgraphs and embeddings
+   */
   private Map<String, List<Embedding>> joinOnVertex(SE embeddings) {
     Map<String, List<Embedding>> subgraphEmbeddings;
     subgraphEmbeddings = Maps.newHashMap();

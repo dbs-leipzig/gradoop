@@ -143,7 +143,7 @@ public class CategoryCharacteristicSubgraphs
 
     setMinFrequencies();
 
-    if (fsmConfig.usePreprocessing()) {
+    if (fsmConfig.isPreprocessingEnabled()) {
       graphs = preProcess(graphs);
     }
 
@@ -245,8 +245,8 @@ public class CategoryCharacteristicSubgraphs
       getCharacteristicSubgraphs(categoryFrequentSubgraphs);
 
     if (fsmConfig.getMaxEdgeCount() > 1) {
-      for (int k=fsmConfig.getMinEdgeCount();
-           k<fsmConfig.getMaxEdgeCount(); k++) {
+      for (int k = fsmConfig.getMinEdgeCount();
+           k < fsmConfig.getMaxEdgeCount(); k++) {
 
         DataSet<CCSSubgraph> frequentSubgraphs = categoryFrequentSubgraphs
           .groupBy(0)
@@ -302,7 +302,7 @@ public class CategoryCharacteristicSubgraphs
 
     DataSet<CCSSubgraphEmbeddings> resultIncrement =
       getCharacteristicSubgraphs(categoryFrequentSubgraphs)
-      .map(new CCSWrapInSubgraphEmbeddings());
+        .map(new CCSWrapInSubgraphEmbeddings());
 
     DataSet<CCSSubgraphEmbeddings> resultAndEmbeddings = iterative
       .filter(new IsResult<CCSSubgraphEmbeddings>(true))

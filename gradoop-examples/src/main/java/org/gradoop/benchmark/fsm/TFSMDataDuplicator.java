@@ -36,18 +36,18 @@ public class TFSMDataDuplicator extends AbstractRunner implements
   ProgramDescription {
 
   /**
-   * Option to declare path to input graph
+   * Option to declare path to i graph
    */
-  private static final String OPTION_INPUT_PATH = "i";
+  private static final String OPTION_INPUT_PATH = "t";
 
   /**
-   * Option to declare path to input graph
+   * Option to declare path to i graph
    */
   private static final String OPTION_MULTIPLICAND = "m";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH,
-      "input-path", true, "path of graph files (hdfs)");
+      "i-path", true, "path of graph files (hdfs)");
     OPTIONS.addOption(OPTION_MULTIPLICAND,
       "multiplicand", true, "number of duplicates per graph");
   }

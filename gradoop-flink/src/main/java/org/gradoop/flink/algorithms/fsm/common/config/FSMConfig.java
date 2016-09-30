@@ -51,9 +51,9 @@ public class FSMConfig implements Serializable {
   private final int maxEdgeCount;
 
   /**
-   * flag to enable preprocessing (true=enabled)
+   * flag to enable preprocessingEnbabled (true=enabled)
    */
-  private final boolean preprocessing;
+  private final boolean preprocessingEnbabled;
 
   /**
    * labeler used to generate canonical labels
@@ -75,12 +75,25 @@ public class FSMConfig implements Serializable {
    */
   private final IterationStrategy iterationStrategy;
 
+  /**
+   * Constructor.
+   *
+   * @param minSupport min support
+   * @param directed true, for directed mode
+   * @param minEdgeCount min number of edges
+   * @param maxEdgeCount max number of edges
+   * @param preprocessingEnbabled true, to enable preprocessingEnbabled
+   * @param canonicalLabel canonical label
+   * @param filterStrategy frequent subgraph filter strategy
+   * @param growthStrategy children growth strategy
+   * @param iterationStrategy iteration strategy
+   */
   public FSMConfig(
     float minSupport,
     boolean directed,
     int minEdgeCount,
     int maxEdgeCount,
-    boolean preprocessing,
+    boolean preprocessingEnbabled,
     CanonicalLabel canonicalLabel,
     FilterStrategy filterStrategy,
     GrowthStrategy growthStrategy,
@@ -90,7 +103,7 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
-    this.preprocessing = preprocessing;
+    this.preprocessingEnbabled = preprocessingEnbabled;
     this.canonicalLabel = canonicalLabel;
     this.filterStrategy = filterStrategy;
     this.growthStrategy = growthStrategy;
@@ -98,9 +111,12 @@ public class FSMConfig implements Serializable {
   }
 
   /**
-   * valued constructor
-   * @param minSupport minimum relative support of a subgraph
-   * @param directed direction mode
+   * Constructor.
+   *
+   * @param minSupport min support
+   * @param directed true, for directed mode
+   * @param minEdgeCount min number of edges
+   * @param maxEdgeCount max number of edges
    */
   public FSMConfig(
     float minSupport,
@@ -112,7 +128,7 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
-    this.preprocessing = true;
+    this.preprocessingEnbabled = true;
     this.canonicalLabel = CanonicalLabel.MIN_DFS;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
     this.growthStrategy = GrowthStrategy.FUSION;
@@ -129,13 +145,12 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.minEdgeCount = 1;
     this.maxEdgeCount = 16;
-    this.preprocessing = true;
+    this.preprocessingEnbabled = true;
     this.canonicalLabel = CanonicalLabel.MIN_DFS;
     this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
     this.growthStrategy = GrowthStrategy.FUSION;
     this.iterationStrategy = IterationStrategy.BULK_ITERATION;
   }
-
 
   public float getMinSupport() {
     return minSupport;
@@ -154,12 +169,12 @@ public class FSMConfig implements Serializable {
   }
 
   /**
-   * Getter for preprocessing flag.
+   * Getter for preprocessingEnbabled flag.
    *
-   * @return true, if preprocessing is enabled
+   * @return true, if preprocessingEnbabled is enabled
    */
-  public boolean usePreprocessing() {
-    return preprocessing;
+  public boolean isPreprocessingEnabled() {
+    return preprocessingEnbabled;
   }
 
   public CanonicalLabeler getCanonicalLabeler() {

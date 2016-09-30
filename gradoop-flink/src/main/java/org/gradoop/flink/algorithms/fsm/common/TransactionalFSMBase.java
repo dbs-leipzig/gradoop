@@ -36,6 +36,10 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Superclass of transactional FSM and derivatives.
+ *
+ * @param <G> graph type
+ * @param <S> subgraph type
+ * @param <SE> subgraph embeddings type
  */
 public abstract class TransactionalFSMBase
   <G extends FSMGraph, S extends Subgraph, SE extends SubgraphEmbeddings>
@@ -55,26 +59,34 @@ public abstract class TransactionalFSMBase
     this.fsmConfig = fsmConfig;
   }
 
+  /**
+   * Grows children of embeddings of frequent subgraphs.
+   *
+   * @param graphs search space
+   * @param parents parent embeddings
+   * @param frequentSubgraphs frequent subgraphs
+   * @return child embeddings
+   */
   protected DataSet<SE> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<G> graphs, DataSet<SE> embeddings,
+    DataSet<G> graphs, DataSet<SE> parents,
     DataSet<S> frequentSubgraphs) {
-    embeddings = filterByFrequentSubgraphs(embeddings, frequentSubgraphs);
+    parents = filterByFrequentSubgraphs(parents, frequentSubgraphs);
 
-    embeddings = embeddings
+    parents = parents
       .groupBy(0)
       .reduceGroup(new MergeEmbeddings<SE>());
 
     if (fsmConfig.getGrowthStrategy() == GrowthStrategy.JOIN) {
-      embeddings = embeddings
+      parents = parents
         .join(graphs)
         .where(0).equalTo(new GraphId<G>())
         .with(new PatternGrowth<G, SE>(fsmConfig));
     } else {
-      embeddings = embeddings
+      parents = parents
         .flatMap(new PatternGrowth<G, SE>(fsmConfig));
     }
 
-    return embeddings;
+    return parents;
   }
 
   /**
