@@ -35,8 +35,6 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
   @Test
   public void execute() throws Exception {
 
-    getExecutionEnvironment().setParallelism(1);
-
     GraphTransactions transactions = new PredictableTransactionsGenerator(
       100, 1, true, getConfig()).execute();
 

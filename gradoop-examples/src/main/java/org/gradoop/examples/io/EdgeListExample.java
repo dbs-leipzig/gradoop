@@ -65,7 +65,7 @@ public class EdgeListExample implements ProgramDescription {
   public static void main(String[] args) throws Exception {
     if (args.length == 0) {
       throw new IllegalArgumentException(
-        "missing arguments, define at least an i edge list");
+        "missing arguments, define at least an input edge list");
     }
     String edgeListPath = args[0];
     String tokenSeparator = args.length > 1 ? args[1] : TOKEN_SEPARATOR;

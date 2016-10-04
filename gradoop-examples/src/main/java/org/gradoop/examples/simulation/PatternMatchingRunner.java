@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
 /**
- * Performs graph pattern matching on an arbitrary i graph.
+ * Performs graph pattern matching on an arbitrary input graph.
  */
 public class PatternMatchingRunner extends AbstractRunner implements
   ProgramDescription {
@@ -65,9 +65,9 @@ public class PatternMatchingRunner extends AbstractRunner implements
       ALGO_ISO_EXP_BC_HASH_FIRST
   };
   /**
-   * Option to declare path to i graph
+   * Option to declare path to input graph
    */
-  private static final String OPTION_INPUT_PATH  = "t";
+  private static final String OPTION_INPUT_PATH  = "i";
   /**
    *Option to declare path to output graph
     */
@@ -83,10 +83,10 @@ public class PatternMatchingRunner extends AbstractRunner implements
   /**
    * Attach original data true/false
    */
-  private static final String OPTION_ATTACH_DATA = "dir";
+  private static final String OPTION_ATTACH_DATA = "d";
 
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "i-path", true,
+    OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
       "Input graph directory (EPGM json format)");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Output graph directory");
@@ -102,7 +102,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
   /**
    * Runs the simulation.
    *
-   * @param args args[0]: i d, args[1]: output d
+   * @param args args[0]: input dir, args[1]: output dir
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -139,7 +139,7 @@ public class PatternMatchingRunner extends AbstractRunner implements
    */
   private static void performSanityCheck(final CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph i directory.");
+      throw new IllegalArgumentException("Define a graph input directory.");
     }
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define an graph output directory.");

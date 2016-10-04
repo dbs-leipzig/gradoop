@@ -98,7 +98,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   }
 
   /**
-   * Returns example integrated instance graph from GDL i.
+   * Returns example integrated instance graph from GDL input.
    * @return integrated instance graph
    * @throws IOException
    */

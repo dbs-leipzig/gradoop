@@ -45,9 +45,9 @@ public class GroupingBenchmark extends AbstractRunner implements
   ProgramDescription {
 
   /**
-   * Option to declare path to i graph
+   * Option to declare path to input graph
    */
-  private static final String OPTION_INPUT_PATH = "t";
+  private static final String OPTION_INPUT_PATH = "i";
   /**
    * Option to declare path to output graph
    */
@@ -73,7 +73,7 @@ public class GroupingBenchmark extends AbstractRunner implements
    */
   private static final String OPTION_USE_EDGE_LABELS = "uel";
   /**
-   * Path to CSV l file
+   * Path to CSV log file
    */
   private static final String OPTION_CSV_PATH = "csv";
   /**
@@ -157,13 +157,13 @@ public class GroupingBenchmark extends AbstractRunner implements
    */
   private static boolean USE_EDGE_LABELS;
   /**
-   * Token separator for i strings
+   * Token separator for input strings
    */
   private static final Pattern TOKEN_SEPARATOR = Pattern.compile(",");
 
 
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-i-path", true,
+    OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
       "Path to vertex file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
@@ -263,7 +263,7 @@ public class GroupingBenchmark extends AbstractRunner implements
    */
   private static void performSanityCheck(final CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph i directory.");
+      throw new IllegalArgumentException("Define a graph input directory.");
     }
     if (!cmd.hasOption(OPTION_CSV_PATH)) {
       throw new IllegalArgumentException("Path to CSV-File need to be set");
@@ -290,7 +290,7 @@ public class GroupingBenchmark extends AbstractRunner implements
    * @param cmd command line
    */
   private static void readCMDArguments(final CommandLine cmd) {
-    // read i output paths
+    // read input output paths
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
