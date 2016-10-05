@@ -18,21 +18,15 @@
 package org.gradoop.flink.algorithms.fsm.common.config;
 
 /**
- * Enum representing different implementations of transactional frequent
- * subgraph mining algorithms.
+ * FSM canonical labels.
  */
-public enum TransactionalFSMAlgorithm {
+public enum CanonicalLabel {
   /**
-   * gSpan algorithm implemented based on Flink bulk iteration
+   * gSpan minimum DFS code
    */
-  GSPAN_BULKITERATION,
+  MIN_DFS,
   /**
-   * gSpan algorithm implemented based on distributed cache
+   * canonical adjacency matrix
    */
-  GSPAN_ITERATIVE,
-  /**
-   * gSpan algorithm
-   * implemented based on the filter-refinement approach (ICDE 2014)
-   */
-  GSPAN_FILTERREFINE
+  ADJACENCY_MATRIX
 }

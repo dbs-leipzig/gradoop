@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
- * Program to run parametrized Grouping on extended property graphs.
+ * classes related canonical adjacency matrix labels
  */
-package org.gradoop.examples.datagen;
+
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.cam;

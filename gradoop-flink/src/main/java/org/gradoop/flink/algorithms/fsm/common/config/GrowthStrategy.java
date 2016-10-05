@@ -15,35 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.pojos;
-
-import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.Map;
+package org.gradoop.flink.algorithms.fsm.common.config;
 
 /**
- * Describe a FSM-fitted graph representation.
+ * FSM pattern growth strategies.
  */
-public interface FSMGraph {
-
+public enum GrowthStrategy {
   /**
-   * Getter.
-   *
-   * @return id-vertex label map
+   * create k+1 edge embeddings by fusion of multiple k edge embeddings
    */
-  Map<Integer, String> getVertices();
-
+  FUSION,
   /**
-   * Setter.
-   *
-   * @return id-edge map
+   * create k+1 edge embeddings by joining k edge ones with the search space
    */
-  Map<Integer, FSMEdge> getEdges();
-
-  /**
-   * Getter.
-   *
-   * @return graph id
-   */
-  GradoopId getId();
+  JOIN
 }

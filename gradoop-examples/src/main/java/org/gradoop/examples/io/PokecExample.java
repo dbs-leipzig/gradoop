@@ -86,7 +86,7 @@ public class PokecExample {
   /**
    * Property key to use for the decade attribute
    */
-  private static final String PROP_KEY_DECADE = "d";
+  private static final String PROP_KEY_DECADE = "dir";
 
   /**
    * Reads the Pokec network from a given directory. The graph can be stored in

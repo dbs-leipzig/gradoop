@@ -55,4 +55,5 @@ public interface Subgraph extends Countable, Serializable {
    * @param embedding sample embedding
    */
   void setEmbedding(Embedding embedding);
+
 }

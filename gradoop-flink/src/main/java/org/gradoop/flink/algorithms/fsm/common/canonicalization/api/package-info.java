@@ -15,23 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
-
-import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
-
-import java.io.Serializable;
-
 /**
- * Represents object that can derive a canonical label from an embedding.
+ * interfaces related to canonical labels of graphs
  */
-public interface CanonicalLabeler extends Serializable {
 
-  /**
-   * Labelling method.
-   *
-   * @param embedding input embedding
-   * @return canonical label
-   */
-  String label(Embedding embedding);
-}
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.api;

@@ -15,35 +15,26 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.pojos;
-
-import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.Map;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;
 
 /**
- * Describe a FSM-fitted graph representation.
+ * Roles of a vertex with regard to an embedding.
  */
-public interface FSMGraph {
-
+public class VertexRole  {
   /**
-   * Getter.
-   *
-   * @return id-vertex label map
+   * not contained
    */
-  Map<Integer, String> getVertices();
-
+  public static final int NOT_CONTAINED = 0;
   /**
-   * Setter.
-   *
-   * @return id-edge map
+   * contained
    */
-  Map<Integer, FSMEdge> getEdges();
-
+  public static final int CONTAINED = 1;
   /**
-   * Getter.
-   *
-   * @return graph id
+   * on rightmost path
    */
-  GradoopId getId();
+  public static final int ON_RIGHTMOST_PATH = 2;
+  /**
+   * is rightmost
+   */
+  public static final int IS_RIGHTMOST = 3;
 }

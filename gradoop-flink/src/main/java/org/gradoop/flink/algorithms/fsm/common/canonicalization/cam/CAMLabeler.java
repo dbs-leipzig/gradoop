@@ -15,13 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-package org.gradoop.flink.algorithms.fsm.common.canonicalization;
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.cam;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 
@@ -47,7 +47,7 @@ public class CAMLabeler implements CanonicalLabeler {
   /**
    * separator among adjacency list entries
    */
-  private static final char NEW_ENTRY = ';';
+  private static final char NEW_ENTRY = ',';
   /**
    * edge separator indicating an outgoing edge
    */

@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.SingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,14 +52,14 @@ public class CCSSingleEdgeEmbeddings extends SingleEdgeEmbeddings
   public void flatMap(CCSGraph graph,
     Collector<CCSSubgraphEmbeddings> out) throws Exception {
 
-    Map<String, Collection<Embedding>> subgraphEmbeddings =
+    Map<String, List<Embedding>> subgraphEmbeddings =
       createEmbeddings(graph);
 
     reuseTuple.setCategory(graph.getCategory());
     reuseTuple.setGraphId(graph.getId());
     reuseTuple.setSize(1);
 
-    for (Map.Entry<String, Collection<Embedding>> entry :
+    for (Map.Entry<String, List<Embedding>> entry :
       subgraphEmbeddings.entrySet()) {
 
       reuseTuple.setCanonicalLabel(entry.getKey());

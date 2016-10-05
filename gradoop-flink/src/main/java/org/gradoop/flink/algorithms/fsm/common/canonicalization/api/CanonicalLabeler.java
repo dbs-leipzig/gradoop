@@ -14,7 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
+
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.api;
+
+import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
+
+import java.io.Serializable;
+
 /**
- * Program to run parametrized Grouping on extended property graphs.
+ * Represents object that can derive a canonical label from an embedding.
  */
-package org.gradoop.benchmark.fsm;
+public interface CanonicalLabeler extends Serializable {
+
+  /**
+   * Labelling method.
+   *
+   * @param embedding input embedding
+   * @return canonical label
+   */
+  String label(Embedding embedding);
+}

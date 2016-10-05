@@ -19,14 +19,14 @@ package org.gradoop.flink.algorithms.fsm.common.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.gradoop.flink.algorithms.fsm.common.canonicalization.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.common.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMGraph;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,11 +55,11 @@ public abstract class SingleEdgeEmbeddings implements Serializable {
    * @param graph graph
    * @return 1-edge embeddings
    */
-  protected Map<String, Collection<Embedding>> createEmbeddings(
+  protected Map<String, List<Embedding>> createEmbeddings(
     FSMGraph graph) {
 
     Map<Integer, String> vertices = graph.getVertices();
-    Map<String, Collection<Embedding>> subgraphEmbeddings = Maps.newHashMap();
+    Map<String, List<Embedding>> subgraphEmbeddings = Maps.newHashMap();
 
     for (Map.Entry<Integer, FSMEdge> entry : graph.getEdges().entrySet()) {
 
@@ -84,7 +84,7 @@ public abstract class SingleEdgeEmbeddings implements Serializable {
 
       String subgraph = canonicalLabeler.label(embedding);
 
-      Collection<Embedding> embeddings = subgraphEmbeddings.get(subgraph);
+      List<Embedding> embeddings = subgraphEmbeddings.get(subgraph);
 
       if (embeddings == null) {
         subgraphEmbeddings.put(subgraph, Lists.newArrayList(embedding));
@@ -92,6 +92,7 @@ public abstract class SingleEdgeEmbeddings implements Serializable {
         embeddings.add(embedding);
       }
     }
+
     return subgraphEmbeddings;
   }
 }

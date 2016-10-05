@@ -17,14 +17,32 @@
 
 package org.gradoop.flink.algorithms.fsm.common;
 
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.common.config.GrowthStrategy;
+import org.gradoop.flink.algorithms.fsm.common.functions.CanonicalLabelOnly;
+import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphIsFrequent;
+import org.gradoop.flink.algorithms.fsm.common.pojos.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.common.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.common.tuples.SubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.common.functions.GraphId;
+import org.gradoop.flink.algorithms.fsm.common.functions.MergeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.common.functions.PatternGrowth;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 
 /**
  * Superclass of transactional FSM and derivatives.
+ *
+ * @param <G> graph type
+ * @param <S> subgraph type
+ * @param <SE> subgraph embeddings type
  */
 public abstract class TransactionalFSMBase
+  <G extends FSMGraph, S extends Subgraph, SE extends SubgraphEmbeddings>
   implements UnaryCollectionToCollectionOperator {
 
   /**
@@ -42,12 +60,65 @@ public abstract class TransactionalFSMBase
   }
 
   /**
-   * Calculates the number of iterations necessary to fine all frequent
-   * subgraphs according to a specified maximum edge count.
+   * Grows children of embeddings of frequent subgraphs.
    *
-   * @return number of iterations
+   * @param graphs search space
+   * @param parents parent embeddings
+   * @param frequentSubgraphs frequent subgraphs
+   * @return child embeddings
    */
-  protected int getMaxIterations() {
-    return (int) (Math.log(fsmConfig.getMaxEdgeCount() - 1) / Math.log(2));
+  protected DataSet<SE> growEmbeddingsOfFrequentSubgraphs(
+    DataSet<G> graphs, DataSet<SE> parents,
+    DataSet<S> frequentSubgraphs) {
+    parents = filterByFrequentSubgraphs(parents, frequentSubgraphs);
+
+    parents = parents
+      .groupBy(0)
+      .reduceGroup(new MergeEmbeddings<SE>());
+
+    if (fsmConfig.getGrowthStrategy() == GrowthStrategy.JOIN) {
+      parents = parents
+        .join(graphs)
+        .where(0).equalTo(new GraphId<G>())
+        .with(new PatternGrowth<G, SE>(fsmConfig));
+    } else {
+      parents = parents
+        .flatMap(new PatternGrowth<G, SE>(fsmConfig));
+    }
+
+    return parents;
+  }
+
+  /**
+   * Filter a set of embeddings to such representing a frequent subgraph.
+   *
+   * @param embeddings set of embeddings
+   * @param frequentSubgraphs frequent subgraphs
+   *
+   * @return embeddings representing frequent subgraphs
+   */
+  protected DataSet<SE> filterByFrequentSubgraphs(
+    DataSet<SE> embeddings,
+    DataSet<S> frequentSubgraphs) {
+
+    if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_FILTER) {
+      return embeddings
+        .filter(new SubgraphIsFrequent<SE>())
+        .withBroadcastSet(
+          frequentSubgraphs
+            .map(new CanonicalLabelOnly<S>()),
+          Constants.FREQUENT_SUBGRAPHS
+        );
+    } else if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_JOIN) {
+      return embeddings
+        .joinWithTiny(frequentSubgraphs)
+        .where(2).equalTo(0) // on canonical label
+        .with(new LeftSide<SE, S>());
+    } else {
+      return embeddings
+        .join(frequentSubgraphs)
+        .where(2).equalTo(0) // on canonical label
+        .with(new LeftSide<SE, S>());
+    }
   }
 }

@@ -15,35 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.pojos;
-
-import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.Map;
-
 /**
- * Describe a FSM-fitted graph representation.
+ * classes related to min DFS canonical labels
  */
-public interface FSMGraph {
 
-  /**
-   * Getter.
-   *
-   * @return id-vertex label map
-   */
-  Map<Integer, String> getVertices();
-
-  /**
-   * Setter.
-   *
-   * @return id-edge map
-   */
-  Map<Integer, FSMEdge> getEdges();
-
-  /**
-   * Getter.
-   *
-   * @return graph id
-   */
-  GradoopId getId();
-}
+package org.gradoop.flink.algorithms.fsm.common.canonicalization.gspan;

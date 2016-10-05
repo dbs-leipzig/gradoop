@@ -22,8 +22,6 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Sets.intersection;
-
 /**
  * Represent a subgraph embedding.
  */
@@ -49,19 +47,6 @@ public class Embedding {
 
     this.vertices = vertices;
     this.edges = edges;
-  }
-
-  /**
-   * Checks, if this embedding has common vertices with another embedding.
-   *
-   * @param that other embedding
-   *
-   * @return true, in the case of common vertices
-   */
-  public boolean sharesVerticesWith(Embedding that) {
-    return
-      ! intersection(this.vertices.keySet(),
-        that.getVertices().keySet()).isEmpty();
   }
 
   /**
@@ -101,5 +86,14 @@ public class Embedding {
 
   public Set<Integer> getEdgeIds() {
     return edges.keySet();
+  }
+
+  /**
+   * Deep copy method.
+   *
+   * @return deep copy
+   */
+  public Embedding deepCopy() {
+    return new Embedding(Maps.newHashMap(vertices), Maps.newHashMap(edges));
   }
 }

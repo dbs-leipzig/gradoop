@@ -15,35 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.pojos;
+package org.gradoop.flink.algorithms.fsm.common.functions;
 
+import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.Map;
+import org.gradoop.flink.algorithms.fsm.common.pojos.FSMGraph;
 
 /**
- * Describe a FSM-fitted graph representation.
+ * graph => id
+ *
+ * @param <G> graph type
  */
-public interface FSMGraph {
+public class GraphId<G extends FSMGraph> implements KeySelector<G, GradoopId> {
 
-  /**
-   * Getter.
-   *
-   * @return id-vertex label map
-   */
-  Map<Integer, String> getVertices();
-
-  /**
-   * Setter.
-   *
-   * @return id-edge map
-   */
-  Map<Integer, FSMEdge> getEdges();
-
-  /**
-   * Getter.
-   *
-   * @return graph id
-   */
-  GradoopId getId();
+  @Override
+  public GradoopId getKey(G graph) throws Exception {
+    return graph.getId();
+  }
 }
