@@ -32,10 +32,12 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.E
  * Read fields:
  *
  * f3: edge candidates
+ *
+ * @param <K> key type
  */
 @FunctionAnnotation.ReadFields("f3")
-public class EdgeHasCandidate
-  extends RichFilterFunction<TripleWithCandidates> {
+public class EdgeHasCandidate<K>
+  extends RichFilterFunction<TripleWithCandidates<K>> {
 
   /**
    * Traversal code
@@ -65,7 +67,7 @@ public class EdgeHasCandidate
   }
 
   @Override
-  public boolean filter(TripleWithCandidates t) throws Exception {
+  public boolean filter(TripleWithCandidates<K> t) throws Exception {
     return t.getCandidates()[candidate];
   }
 }

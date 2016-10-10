@@ -21,7 +21,6 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
@@ -32,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.t
  *
  * Read fields first:
  *
- * f0.f0: vertex mappings
+ * f1.f0: vertex mappings
  *
  * Read fields second:
  *
@@ -42,11 +41,13 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.t
  *
  * f0.f1: edge mappings
  *
+ * @param <K> key type
  */
-@FunctionAnnotation.ReadFieldsFirst("f0.f0")
+@FunctionAnnotation.ReadFieldsFirst("f1.f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")
-public class UpdateVertexMappings extends RichFlatJoinFunction
-  <EmbeddingWithTiePoint, VertexStep, EmbeddingWithTiePoint> {
+public class UpdateVertexMappings<K>
+  extends RichFlatJoinFunction
+    <EmbeddingWithTiePoint<K>, VertexStep<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Traversal code
    */
@@ -100,12 +101,12 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
   }
 
   @Override
-  public void join(EmbeddingWithTiePoint embedding, VertexStep vertexStep,
-    Collector<EmbeddingWithTiePoint> collector) throws Exception {
+  public void join(EmbeddingWithTiePoint<K> embedding, VertexStep<K> vertexStep,
+    Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    GradoopId[] vertexMappings = embedding.getEmbedding().getVertexMappings();
+    K[] vertexMappings = embedding.getEmbedding().getVertexMappings();
 
-    GradoopId vertexId = vertexStep.getVertexId();
+    K vertexId = vertexStep.getVertexId();
     boolean isMapped = vertexMappings[candidate] != null;
 
     // not seen before or same as seen before (ensure bijection)
@@ -139,7 +140,7 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
    * @param id              current vertex id
    * @return true, if visited before
    */
-  private boolean seenBefore(GradoopId[] vertexMappings, GradoopId id) {
+  private boolean seenBefore(K[] vertexMappings, K id) {
     boolean result = false;
     for (int i = 0; i <= currentStep; i++) {
       if (vertexMappings[previousFroms[i]].equals(id)) {

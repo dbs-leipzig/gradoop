@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -40,7 +41,7 @@ import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 public class BuildIdWithCandidates<V extends Vertex>
-  extends AbstractBuilder<V, IdWithCandidates> {
+  extends AbstractBuilder<V, IdWithCandidates<GradoopId>> {
   /**
    * serial version uid
    */
@@ -56,7 +57,7 @@ public class BuildIdWithCandidates<V extends Vertex>
   /**
    * Reduce instantiations
    */
-  private final IdWithCandidates reuseTuple;
+  private final IdWithCandidates<GradoopId> reuseTuple;
 
   /**
    * Constructor
@@ -65,7 +66,7 @@ public class BuildIdWithCandidates<V extends Vertex>
    */
   public BuildIdWithCandidates(String query) {
     super(query);
-    reuseTuple = new IdWithCandidates();
+    reuseTuple = new IdWithCandidates<>();
   }
 
   @Override
@@ -76,7 +77,7 @@ public class BuildIdWithCandidates<V extends Vertex>
   }
 
   @Override
-  public IdWithCandidates map(V v) throws Exception {
+  public IdWithCandidates<GradoopId> map(V v) throws Exception {
     reuseTuple.setId(v.getId());
     reuseTuple.setCandidates(getCandidates(vertexCount,
       ElementMatcher.getMatches(v, queryVertices, DEFAULT_VERTEX_LABEL)));

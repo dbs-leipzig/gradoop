@@ -19,10 +19,8 @@ package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.VertexStep;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
 /**
  * (id, [candidates]) -> (id)
@@ -34,24 +32,27 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism
  * Read fields:
  *
  * f0: vertex id
+ *
+ * @param <K> key type
  */
 @FunctionAnnotation.ForwardedFields("f0")
 @FunctionAnnotation.ReadFields("f0")
-public class BuildVertexStep implements MapFunction<IdWithCandidates, VertexStep> {
+public class BuildVertexStep<K>
+  implements MapFunction<IdWithCandidates<K>, VertexStep<K>> {
   /**
    * Reduce instantiations
    */
-  private final VertexStep reuseTuple;
+  private final VertexStep<K> reuseTuple;
 
   /**
    * Constructor
    */
   public BuildVertexStep() {
-    reuseTuple = new VertexStep();
+    reuseTuple = new VertexStep<>();
   }
 
   @Override
-  public VertexStep map(IdWithCandidates v) throws Exception {
+  public VertexStep<K> map(IdWithCandidates<K> v) throws Exception {
     reuseTuple.setVertexId(v.getId());
     return reuseTuple;
   }

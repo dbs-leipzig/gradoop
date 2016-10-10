@@ -36,4 +36,11 @@ public interface Traverser {
    */
   void setQueryHandler(QueryHandler queryHandler);
 
+  /**
+   * Returns the query handler.
+   *
+   * @return query handler
+   */
+  QueryHandler getQueryHandler();
+
 }

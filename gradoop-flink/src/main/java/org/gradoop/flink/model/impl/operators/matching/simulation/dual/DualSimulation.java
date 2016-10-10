@@ -34,7 +34,6 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
-import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.debug.PrintDeletion;
@@ -53,6 +52,7 @@ import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.De
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.Message;
 
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
  * Vertex-centric Dual-Simulation.
@@ -118,7 +118,7 @@ public class DualSimulation extends PatternMatching {
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
 
-    DataSet<TripleWithCandidates> triples = filterTriples(graph);
+    DataSet<TripleWithCandidates<GradoopId>> triples = filterTriples(graph);
     DataSet<FatVertex> fatVertices = buildInitialWorkingSet(triples);
 
     //--------------------------------------------------------------------------
@@ -149,7 +149,8 @@ public class DualSimulation extends PatternMatching {
    * @param g input graph
    * @return triples that have a match in the query graph
    */
-  private DataSet<TripleWithCandidates> filterTriples(LogicalGraph g) {
+  private DataSet<TripleWithCandidates<GradoopId>> filterTriples(
+    LogicalGraph g) {
     // filter vertex-edge-vertex triples by query predicates
     return PreProcessor.filterTriplets(g, getQuery());
   }
@@ -161,7 +162,7 @@ public class DualSimulation extends PatternMatching {
    * @return data set containing fat vertices
    */
   private DataSet<FatVertex> buildInitialWorkingSet(
-    DataSet<TripleWithCandidates> triples) {
+    DataSet<TripleWithCandidates<GradoopId>> triples) {
     return triples.flatMap(new CloneAndReverse())
       .groupBy(1) // sourceId
       .combineGroup(new BuildFatVertex(getQuery()))
@@ -177,12 +178,8 @@ public class DualSimulation extends PatternMatching {
    */
   private DataSet<FatVertex> simulateBulk(DataSet<FatVertex> vertices) {
 
-    if (LOG.isDebugEnabled()) {
-      vertices = vertices
-        .map(new PrintFatVertex(false, "iteration start"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    vertices = log(vertices, new PrintFatVertex(false, "iteration start"),
+      getVertexMapping(), getEdgeMapping());
 
     // ITERATION HEAD
     IterativeDataSet<FatVertex> workSet = vertices.iterate(Integer.MAX_VALUE);
@@ -194,36 +191,24 @@ public class DualSimulation extends PatternMatching {
       .filter(new UpdatedFatVertices())
       .flatMap(new ValidateNeighborhood(getQuery()));
 
-    if (LOG.isDebugEnabled()) {
-      deletions = deletions
-        .map(new PrintDeletion(true, "deletion"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    deletions = log(deletions, new PrintDeletion(true, "deletion"),
+      getVertexMapping(), getEdgeMapping());
 
     // combine deletions to message
     DataSet<Message> combinedMessages = deletions
       .groupBy(0)
       .combineGroup(new CombinedMessages());
 
-    if (LOG.isDebugEnabled()) {
-      combinedMessages = combinedMessages
-        .map(new PrintMessage(true, "combined"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    combinedMessages = log(combinedMessages, new PrintMessage(true, "combined"),
+      getVertexMapping(), getEdgeMapping());
 
     // group messages to final message
     DataSet<Message> messages = combinedMessages
       .groupBy(0)
       .reduceGroup(new GroupedMessages());
 
-    if (LOG.isDebugEnabled()) {
-      messages = messages
-        .map(new PrintMessage(true, "grouped"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    messages = log(messages, new PrintMessage(true, "grouped"),
+      getVertexMapping(), getEdgeMapping());
 
     // update candidates and build next working set
     DataSet<FatVertex> nextWorkingSet = workSet
@@ -232,12 +217,9 @@ public class DualSimulation extends PatternMatching {
       .with(new UpdateVertexState(getQuery()))
       .filter(new ValidFatVertices());
 
-    if (LOG.isDebugEnabled()) {
-      nextWorkingSet = nextWorkingSet
-        .map(new PrintFatVertex(true, "next workset"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    nextWorkingSet = log(nextWorkingSet,
+      new PrintFatVertex(true, "next workset"),
+      getVertexMapping(), getEdgeMapping());
 
     // ITERATION FOOTER
     return workSet.closeWith(nextWorkingSet, deletions);
@@ -258,17 +240,12 @@ public class DualSimulation extends PatternMatching {
       .groupBy(0)
       .reduceGroup(new GroupedMessages());
 
-    if (LOG.isDebugEnabled()) {
-      vertices = vertices
-        .map(new PrintFatVertex(false, "initial solution set"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
+    vertices = log(vertices, new PrintFatVertex(false, "initial solution set"),
+      getVertexMapping(), getEdgeMapping());
 
-      initialWorkingSet = initialWorkingSet
-        .map(new PrintMessage(false, "initial working set"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    initialWorkingSet = log(initialWorkingSet,
+      new PrintMessage(false, "initial working set"),
+      getVertexMapping(), getEdgeMapping());
 
     // ITERATION HEAD
     DeltaIteration<FatVertex, Message> iteration = vertices
@@ -282,12 +259,8 @@ public class DualSimulation extends PatternMatching {
       .where(0).equalTo(0)
       .with(new UpdateVertexState(getQuery()));
 
-    if (LOG.isDebugEnabled()) {
-      deltas = deltas
-        .map(new PrintFatVertex(true, "solution set delta"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    deltas = log(deltas, new PrintFatVertex(true, "solution set delta"),
+      getVertexMapping(), getEdgeMapping());
 
     // prepare new messages for the next round from updates
     DataSet<Message> updates = deltas
@@ -298,12 +271,8 @@ public class DualSimulation extends PatternMatching {
       .groupBy(0)
       .reduceGroup(new GroupedMessages());
 
-    if (LOG.isDebugEnabled()) {
-      updates = updates
-        .map(new PrintMessage(true, "next working set"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
+    updates = log(updates, new PrintMessage(true, "next working set"),
+      getVertexMapping(), getEdgeMapping());
 
     // ITERATION FOOTER
     // filter vertices with no candidates after iteration

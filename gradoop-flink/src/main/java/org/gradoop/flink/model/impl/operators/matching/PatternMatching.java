@@ -22,23 +22,21 @@ import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.debug
-  .PrintIdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.common.debug
-  .PrintTripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithPropertyValue;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintIdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples
+  .TripleWithCandidates;
 
 /**
  * Base class for pattern matching implementations.
@@ -170,10 +168,10 @@ public abstract class PatternMatching implements
    * @param edges edge triples with candidates
    * @return edges
    */
-  protected DataSet<TripleWithCandidates> printTriplesWithCandidates(
-    DataSet<TripleWithCandidates> edges) {
+  protected DataSet<TripleWithCandidates<GradoopId>> printTriplesWithCandidates(
+    DataSet<TripleWithCandidates<GradoopId>> edges) {
     return edges
-      .map(new PrintTripleWithCandidates())
+      .map(new PrintTripleWithCandidates<GradoopId>())
       .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
   }
@@ -184,10 +182,10 @@ public abstract class PatternMatching implements
    * @param vertices vertex ids with candidates
    * @return vertices
    */
-  protected DataSet<IdWithCandidates> printIdWithCandidates(
-    DataSet<IdWithCandidates> vertices) {
+  protected DataSet<IdWithCandidates<GradoopId>> printIdWithCandidates(
+    DataSet<IdWithCandidates<GradoopId>> vertices) {
     return vertices
-      .map(new PrintIdWithCandidates())
+      .map(new PrintIdWithCandidates<GradoopId>())
       .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)
       .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);
   }

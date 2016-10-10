@@ -20,10 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.model.impl.operators.matching.common.query
-  .TraversalCode;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.EdgeStep;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
 
@@ -34,15 +32,17 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.E
  * Forwarded fields:
  *
  * f0: edge id
+ *
+ * @param <K> key type
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class BuildEdgeStep
-  extends RichMapFunction<TripleWithCandidates, EdgeStep> {
+public class BuildEdgeStep<K>
+  extends RichMapFunction<TripleWithCandidates<K>, EdgeStep<K>> {
 
   /**
    * Reduce instantiations
    */
-  private final EdgeStep reuseTuple;
+  private final EdgeStep<K> reuseTuple;
 
   /**
    * Traversal code to determine correct step.
@@ -61,7 +61,7 @@ public class BuildEdgeStep
    */
   public BuildEdgeStep(TraversalCode traversalCode) {
     this.traversalCode = traversalCode;
-    reuseTuple = new EdgeStep();
+    reuseTuple = new EdgeStep<>();
   }
 
   @Override
@@ -73,7 +73,7 @@ public class BuildEdgeStep
   }
 
   @Override
-  public EdgeStep map(TripleWithCandidates t) throws Exception {
+  public EdgeStep<K> map(TripleWithCandidates<K> t) throws Exception {
     reuseTuple.setEdgeId(t.getEdgeId());
     reuseTuple.setTiePointId(isOutgoing ? t.getSourceId() : t.getTargetId());
     reuseTuple.setNextId(isOutgoing ? t.getTargetId() : t.getSourceId());

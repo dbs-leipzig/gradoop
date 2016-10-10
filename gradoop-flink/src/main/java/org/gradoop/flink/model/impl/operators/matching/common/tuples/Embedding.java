@@ -18,29 +18,32 @@
 package org.gradoop.flink.model.impl.operators.matching.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Represents an embedding of a query pattern in the search graph.
+ * Represents an embedding of a query pattern in the search graph. Vertex and
+ * edge embeddings are represented by two arrays where the index in the array
+ * refers to the index of the query vertex/edge.
  *
  * f0: vertex mappings
  * f1: edge mappings
+ *
+ * @param <K> key type
  */
-public class Embedding extends Tuple2<GradoopId[], GradoopId[]> {
+public class Embedding<K> extends Tuple2<K[], K[]> {
 
-  public GradoopId[] getVertexMappings() {
+  public K[] getVertexMappings() {
     return f0;
   }
 
-  public void setVertexMappings(GradoopId[] vertexMappings) {
+  public void setVertexMappings(K[] vertexMappings) {
     f0 = vertexMappings;
   }
 
-  public GradoopId[] getEdgeMappings() {
+  public K[] getEdgeMappings() {
     return f1;
   }
 
-  public void setEdgeMappings(GradoopId[] edgeMappings) {
+  public void setEdgeMappings(K[] edgeMappings) {
     f1 = edgeMappings;
   }
 }

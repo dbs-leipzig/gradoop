@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.matching.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Represents an edge, source and target vertex triple that matches at least one
@@ -29,31 +28,32 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * f1: source vertex id
  * f2: target vertex id
  * f3: edge query candidates
+ *
+ * @param <K> key type
  */
-public class TripleWithCandidates
-  extends Tuple4<GradoopId, GradoopId, GradoopId, boolean[]> {
+public class TripleWithCandidates<K> extends Tuple4<K, K, K, boolean[]> {
 
-  public GradoopId getEdgeId() {
+  public K getEdgeId() {
     return f0;
   }
 
-  public void setEdgeId(GradoopId id) {
+  public void setEdgeId(K id) {
     f0 = id;
   }
 
-  public GradoopId getSourceId() {
+  public K getSourceId() {
     return f1;
   }
 
-  public void setSourceId(GradoopId id) {
+  public void setSourceId(K id) {
     f1 = id;
   }
 
-  public GradoopId getTargetId() {
+  public K getTargetId() {
     return f2;
   }
 
-  public void setTargetId(GradoopId id) {
+  public void setTargetId(K id) {
     f2 = id;
   }
 

@@ -34,9 +34,12 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.E
  * Read fields:
  *
  * f1: vertex candidates
+ *
+ * @param <K> key type
  */
 @FunctionAnnotation.ReadFields("f1")
-public class VertexHasCandidate extends RichFilterFunction<IdWithCandidates> {
+public class VertexHasCandidate<K>
+  extends RichFilterFunction<IdWithCandidates<K>> {
 
   /**
    * Traversal code
@@ -66,7 +69,7 @@ public class VertexHasCandidate extends RichFilterFunction<IdWithCandidates> {
   }
 
   @Override
-  public boolean filter(IdWithCandidates t) throws Exception {
+  public boolean filter(IdWithCandidates<K> t) throws Exception {
     return t.getCandidates()[candidate];
   }
 }

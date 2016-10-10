@@ -26,19 +26,21 @@ import java.util.Arrays;
 
 /**
  * Debug output for {@link EmbeddingWithTiePoint}.
+ *
+ * @param <K> key type
  */
-public class PrintEmbeddingWithWeldPoint
-  extends Printer<EmbeddingWithTiePoint> {
+public class PrintEmbeddingWithTiePoint<K>
+  extends Printer<EmbeddingWithTiePoint<K>, K> {
   /**
    * Logger
    */
   private static final Logger LOG = Logger.getLogger(
-    PrintEmbeddingWithWeldPoint.class);
+    PrintEmbeddingWithTiePoint.class);
 
   /**
    * Constructor
    */
-  public PrintEmbeddingWithWeldPoint() {
+  public PrintEmbeddingWithTiePoint() {
     this(false, "");
   }
 
@@ -48,12 +50,12 @@ public class PrintEmbeddingWithWeldPoint
    * @param isIterative true, if used in iterative context
    * @param prefix      prefix for debug string
    */
-  public PrintEmbeddingWithWeldPoint(boolean isIterative, String prefix) {
+  public PrintEmbeddingWithTiePoint(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }
 
   @Override
-  protected String getDebugString(EmbeddingWithTiePoint embedding) {
+  protected String getDebugString(EmbeddingWithTiePoint<K> embedding) {
     return String.format("(([%s],[%s]),%s)",
       StringUtils.join(convertList(Arrays.asList(
         embedding.getEmbedding().getVertexMappings()), true), ','),
