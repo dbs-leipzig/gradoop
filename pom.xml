@@ -61,6 +61,14 @@
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
+        <developer>
+            <id>skemper</id>
+            <name>Stephan Kemper</name>
+            <email>mai12byw@studserv.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
