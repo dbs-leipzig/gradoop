@@ -19,7 +19,6 @@ package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
@@ -39,13 +38,10 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.functions.utils.Superstep;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
-import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
@@ -55,19 +51,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintEmbeddingWithWeldPoint;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug.PrintVertexStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildEmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.BuildVertexStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.EdgeHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.UpdateEdgeMappings;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.UpdateVertexMappings;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions.VertexHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
@@ -76,8 +59,8 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
-  UnaryGraphToCollectionOperator {
+public class ExplorativeSubgraphIsomorphism extends PatternMatching
+  implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
    */
@@ -88,9 +71,9 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   private static final Logger LOG = Logger.getLogger(
     ExplorativeSubgraphIsomorphism.class);
   /**
-   * Traversal code to process the graph.
+   * Holds information on how to traverse the graph.
    */
-  private final TraversalCode traversalCode;
+  private final Traverser traverser;
   /**
    * Join strategy used for the join between embeddings and edges
    */
@@ -101,7 +84,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   private final JoinOperatorBase.JoinHint vertexStepJoinStrategy;
 
   /**
-   * Constructor
+   * Create new operator instance
    *
    * @param query      GDL query graph
    * @param attachData true, if original data shall be attached to the result
@@ -111,7 +94,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   }
 
   /**
-   * Constructor
+   * Create new operator instance
    *
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
@@ -124,7 +107,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   }
 
   /**
-   * Constructor
+   * Create new operator instance
    *
    * @param query                   GDL query graph
    * @param attachData              true, if original data shall be attached
@@ -138,15 +121,14 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
-    traverser.setQueryHandler(getQueryHandler());
-    this.traversalCode          = traverser.traverse();
+    this.traverser = traverser;
+    this.traverser.setQueryHandler(getQueryHandler());
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
     this.vertexStepJoinStrategy = vertexStepJoinStrategy;
   }
 
   @Override
-  protected GraphCollection executeForVertex(
-    LogicalGraph graph) {
+  protected GraphCollection executeForVertex(LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
     GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
     VertexFactory vertexFactory = config.getVertexFactory();
@@ -174,45 +156,39 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   }
 
   @Override
-  protected GraphCollection executeForPattern(
-    LogicalGraph graph) {
+  protected GraphCollection executeForPattern(LogicalGraph graph) {
 
     //--------------------------------------------------------------------------
-    // Pre-processing (filter candidates + build initial embeddings)
+    // Pre-processing (filter candidates)
     //--------------------------------------------------------------------------
 
-    DataSet<IdWithCandidates> vertices = PreProcessor.filterVertices(
+    DataSet<IdWithCandidates<GradoopId>> vertices = PreProcessor.filterVertices(
       graph, getQuery());
 
-    DataSet<TripleWithCandidates> edges = PreProcessor.filterEdges(
+    DataSet<TripleWithCandidates<GradoopId>> edges = PreProcessor.filterEdges(
       graph, getQuery());
-
-    DataSet<EmbeddingWithTiePoint> initialEmbeddings = vertices
-      .filter(new ElementHasCandidate(traversalCode.getStep(0).getFrom()))
-      .map(new BuildEmbeddingWithTiePoint(traversalCode,
-        getQueryHandler().getVertexCount(), getQueryHandler().getEdgeCount()));
-
-    if (LOG.isDebugEnabled()) {
-      initialEmbeddings = initialEmbeddings
-        .map(new PrintEmbeddingWithWeldPoint())
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
 
     //--------------------------------------------------------------------------
     // Exploration via Traversal
     //--------------------------------------------------------------------------
 
-    DataSet<EmbeddingWithTiePoint> result = explore(
-      vertices, edges, initialEmbeddings);
+    TraversalCode traversalCode = traverser.traverse();
 
+    DistributedTraverser<GradoopId> explorer = new DistributedTraverser<>(
+      traversalCode,
+      traverser.getQueryHandler().getVertexCount(),
+      traverser.getQueryHandler().getEdgeCount(),
+      getVertexMapping(), getEdgeMapping(),
+      edgeStepJoinStrategy, vertexStepJoinStrategy);
+
+    DataSet<Tuple1<Embedding<GradoopId>>> embeddings = explorer
+      .traverse(GradoopId.class, vertices, edges);
 
     //--------------------------------------------------------------------------
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<Element> elements = result
-      .<Tuple1<Embedding>>project(0)
+    DataSet<Element> elements = embeddings
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
@@ -221,84 +197,6 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
       PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
-  }
-
-  /**
-   * Explores the data graph according to the traversal code of this operator.
-   *
-   * @param vertices          vertex candidates
-   * @param edges             edge candidates
-   * @param initialEmbeddings initial embeddings which are extended
-   * @return final embeddings
-   */
-  private DataSet<EmbeddingWithTiePoint> explore(
-    DataSet<IdWithCandidates> vertices, DataSet<TripleWithCandidates> edges,
-    DataSet<EmbeddingWithTiePoint> initialEmbeddings) {
-    // ITERATION HEAD
-    IterativeDataSet<EmbeddingWithTiePoint> embeddings = initialEmbeddings
-      .iterate(traversalCode.getSteps().size());
-
-    // ITERATION BODY
-
-    // get current superstep
-    DataSet<Integer> superstep = embeddings
-      .first(1)
-      .map(new Superstep<EmbeddingWithTiePoint>());
-
-    // traverse to outgoing/incoming edges
-    DataSet<EdgeStep> edgeSteps = edges
-      .filter(new EdgeHasCandidate(traversalCode))
-      .withBroadcastSet(superstep, BC_SUPERSTEP)
-      .map(new BuildEdgeStep(traversalCode))
-      .withBroadcastSet(superstep, BC_SUPERSTEP);
-
-    if (LOG.isDebugEnabled()) {
-      edgeSteps = edgeSteps
-        .map(new PrintEdgeStep(true, "post-filter-map-edge"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
-
-    DataSet<EmbeddingWithTiePoint> nextWorkSet = embeddings
-      .join(edgeSteps, edgeStepJoinStrategy)
-      .where(1).equalTo(1) // tiePointId == tiePointId
-      .with(new UpdateEdgeMappings(traversalCode));
-
-    if (LOG.isDebugEnabled()) {
-      nextWorkSet = nextWorkSet
-        .map(new PrintEmbeddingWithWeldPoint(true, "post-edge-update"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
-
-    // traverse to vertices
-    DataSet<VertexStep> vertexSteps = vertices
-      .filter(new VertexHasCandidate(traversalCode))
-      .withBroadcastSet(superstep, BC_SUPERSTEP)
-      .map(new BuildVertexStep());
-
-    if (LOG.isDebugEnabled()) {
-      vertexSteps = vertexSteps
-        .map(new PrintVertexStep(true, "post-filter-project-vertex"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
-
-    nextWorkSet = nextWorkSet
-      .join(vertexSteps, vertexStepJoinStrategy)
-      .where(1).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings(traversalCode));
-
-    if (LOG.isDebugEnabled()) {
-      nextWorkSet = nextWorkSet
-        .map(new PrintEmbeddingWithWeldPoint(true, "post-vertex-update"))
-        .withBroadcastSet(getVertexMapping(), Printer.VERTEX_MAPPING)
-        .withBroadcastSet(getEdgeMapping(), Printer.EDGE_MAPPING);
-    }
-
-    // ITERATION FOOTER
-    return embeddings
-      .closeWith(nextWorkSet, nextWorkSet);
   }
 
   @Override

@@ -41,7 +41,7 @@ import java.util.Map;
  * Extracts {@link Element} instances from an {@link Embedding}.
  */
 public class ElementsFromEmbedding implements
-  FlatMapFunction<Tuple1<Embedding>, Element> {
+  FlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -84,8 +84,8 @@ public class ElementsFromEmbedding implements
   }
 
   @Override
-  public void flatMap(Tuple1<Embedding> embedding, Collector<Element> out)
-      throws Exception {
+  public void flatMap(Tuple1<Embedding<GradoopId>> embedding,
+    Collector<Element> out) throws Exception {
     GradoopId[] vertexEmbeddings  = embedding.f0.getVertexMappings();
     GradoopId[] edgeEmbeddings    = embedding.f0.getEdgeMappings();
 

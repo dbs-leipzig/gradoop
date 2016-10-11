@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.matching.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Represents a triple with source and edge candidates.
@@ -28,23 +27,25 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * f2: source vertex candidates
  * f3: target vertex id
  * f4: edge candidates
+ *
+ * @param <K> key type
  */
-public class TripleWithSourceEdgeCandidates
-  extends Tuple5<GradoopId, GradoopId, boolean[], GradoopId, boolean[]> {
+public class TripleWithSourceEdgeCandidates<K>
+  extends Tuple5<K, K, boolean[], K, boolean[]> {
 
-  public GradoopId getEdgeId() {
+  public K getEdgeId() {
     return f0;
   }
 
-  public void setEdgeId(GradoopId edgeId) {
+  public void setEdgeId(K edgeId) {
     f0 = edgeId;
   }
 
-  public GradoopId getSourceId() {
+  public K getSourceId() {
     return f1;
   }
 
-  public void setSourceId(GradoopId sourceId) {
+  public void setSourceId(K sourceId) {
     f1 = sourceId;
   }
 
@@ -56,11 +57,11 @@ public class TripleWithSourceEdgeCandidates
     f2 = sourceCandidates;
   }
 
-  public GradoopId getTargetId() {
+  public K getTargetId() {
     return f3;
   }
 
-  public void setTargetId(GradoopId targetId) {
+  public void setTargetId(K targetId) {
     f3 = targetId;
   }
 

@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples
   .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -39,7 +40,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithS
  */
 @FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2->f3")
 public class MatchingPairs extends RichFlatJoinFunction
-  <IdWithCandidates, TripleWithCandidates, TripleWithSourceEdgeCandidates> {
+  <IdWithCandidates<GradoopId>, TripleWithCandidates<GradoopId>,
+    TripleWithSourceEdgeCandidates<GradoopId>> {
 
   /**
    * serial version uid
@@ -59,7 +61,7 @@ public class MatchingPairs extends RichFlatJoinFunction
   /**
    * Reduce instantiations
    */
-  private final TripleWithSourceEdgeCandidates reuseTuple;
+  private final TripleWithSourceEdgeCandidates<GradoopId> reuseTuple;
 
   /**
    * Constructor
@@ -68,7 +70,7 @@ public class MatchingPairs extends RichFlatJoinFunction
    */
   public MatchingPairs(final String query) {
     this.query = query;
-    this.reuseTuple = new TripleWithSourceEdgeCandidates();
+    this.reuseTuple = new TripleWithSourceEdgeCandidates<>();
   }
 
   @Override
@@ -78,8 +80,10 @@ public class MatchingPairs extends RichFlatJoinFunction
   }
 
   @Override
-  public void join(IdWithCandidates sourceVertex, TripleWithCandidates edge,
-    Collector<TripleWithSourceEdgeCandidates> collector) throws Exception {
+  public void join(IdWithCandidates<GradoopId> sourceVertex,
+    TripleWithCandidates<GradoopId> edge,
+    Collector<TripleWithSourceEdgeCandidates<GradoopId>> collector)
+      throws Exception {
 
     boolean[] sourceCandidates  = sourceVertex.getCandidates();
     boolean[] edgeCandidates    = edge.getCandidates();

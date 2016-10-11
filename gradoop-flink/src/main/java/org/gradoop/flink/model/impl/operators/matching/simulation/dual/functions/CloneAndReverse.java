@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.simulation.dual.function
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.TripleWithDirection;
 
@@ -35,7 +36,7 @@ import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.Tr
  */
 @FunctionAnnotation.ForwardedFields("f0;f3->f4")
 public class CloneAndReverse implements
-  FlatMapFunction<TripleWithCandidates, TripleWithDirection> {
+  FlatMapFunction<TripleWithCandidates<GradoopId>, TripleWithDirection> {
 
   /**
    * Reduce instantiations
@@ -50,7 +51,7 @@ public class CloneAndReverse implements
   }
 
   @Override
-  public void flatMap(TripleWithCandidates tripleWithCandidates,
+  public void flatMap(TripleWithCandidates<GradoopId> tripleWithCandidates,
     Collector<TripleWithDirection> collector) throws Exception {
     reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());
     reuseTuple.setCandidates(tripleWithCandidates.getCandidates());

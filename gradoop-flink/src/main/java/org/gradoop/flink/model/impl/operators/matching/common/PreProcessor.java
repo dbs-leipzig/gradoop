@@ -18,18 +18,17 @@
 package org.gradoop.flink.model.impl.operators.matching.common;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingPairs;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingTriples;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
-
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
 /**
  * Provides methods for filtering vertices, edges, pairs (vertex + edge) and
@@ -46,8 +45,8 @@ public class PreProcessor {
    * @param query query graph
    * @return dataset with matching vertex ids and their candidates
    */
-  public static DataSet<IdWithCandidates> filterVertices(LogicalGraph graph,
-    final String query) {
+  public static DataSet<IdWithCandidates<GradoopId>> filterVertices(
+    LogicalGraph graph, final String query) {
     return graph.getVertices()
       .filter(new MatchingVertices<>(query))
       .map(new BuildIdWithCandidates<>(query));
@@ -61,8 +60,8 @@ public class PreProcessor {
    * @param query query graph
    * @return dataset with matching edge triples and their candidates
    */
-  public static DataSet<TripleWithCandidates> filterEdges(LogicalGraph graph,
-    final String query) {
+  public static DataSet<TripleWithCandidates<GradoopId>> filterEdges(
+    LogicalGraph graph, final String query) {
     return graph.getEdges()
       .filter(new MatchingEdges<>(query))
       .map(new BuildTripleWithCandidates<>(query));
@@ -77,9 +76,8 @@ public class PreProcessor {
    * @param query query graph
    * @return dataset with matching vertex-edge pairs
    */
-  public static
-  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph g,
-    final String query) {
+  public static DataSet<TripleWithSourceEdgeCandidates<GradoopId>> filterPairs(
+    LogicalGraph g, final String query) {
     return filterPairs(g, query, filterVertices(g, query));
   }
 
@@ -94,9 +92,9 @@ public class PreProcessor {
 
    * @return dataset with matching vertex-edge pairs and their candidates
    */
-  public static
-  DataSet<TripleWithSourceEdgeCandidates> filterPairs(LogicalGraph graph,
-    final String query, DataSet<IdWithCandidates> filteredVertices) {
+  public static DataSet<TripleWithSourceEdgeCandidates<GradoopId>> filterPairs(
+    LogicalGraph graph, final String query,
+    DataSet<IdWithCandidates<GradoopId>> filteredVertices) {
     return filteredVertices
       .join(filterEdges(graph, query))
       .where(0).equalTo(1)
@@ -112,9 +110,8 @@ public class PreProcessor {
    * @param query query graph
    * @return dataset with matching triples
    */
-  public static
-  DataSet<TripleWithCandidates> filterTriplets(LogicalGraph graph,
-    final String query) {
+  public static DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
+    LogicalGraph graph, final String query) {
     return filterTriplets(graph, query, filterVertices(graph, query));
   }
 
@@ -128,8 +125,9 @@ public class PreProcessor {
    * @param filteredVertices  used for the edge join
    * @return dataset with matching triples and their candidates
    */
-  public static DataSet<TripleWithCandidates> filterTriplets(LogicalGraph graph,
-    final String query, DataSet<IdWithCandidates> filteredVertices) {
+  public static DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
+    LogicalGraph graph, final String query,
+    DataSet<IdWithCandidates<GradoopId>> filteredVertices) {
     return filterPairs(graph, query, filteredVertices)
       .join(filteredVertices)
       .where(3).equalTo(0)

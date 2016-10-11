@@ -19,37 +19,34 @@ package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.flink.model.impl.operators.matching.common.query
-  .TraversalCode;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
+
+import java.lang.reflect.Array;
 
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.
  *
  * Forwarded fields:
  *
- * f0->f2: vertex id -> weld point
+ * f0: vertex id -> tie point
  *
+ * @param <K> key type
  */
-@FunctionAnnotation.ForwardedFields("f0->f1")
-public class BuildEmbeddingWithTiePoint
-  implements MapFunction<IdWithCandidates, EmbeddingWithTiePoint> {
+@FunctionAnnotation.ForwardedFields("f0")
+public class BuildEmbeddingWithTiePoint<K>
+  implements MapFunction<IdWithCandidates<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Reduce instantiations
    */
-  private final Embedding reuseEmbedding;
+  private final Embedding<K> reuseEmbedding;
   /**
    * Reduce instantiations
    */
-  private final EmbeddingWithTiePoint reuseEmbeddingWithTiePoint;
-  /**
-   * Number of vertices in the query graph
-   */
-  private final int vertexCount;
+  private final EmbeddingWithTiePoint<K> reuseEmbeddingWithTiePoint;
+
   /**
    * Vertex candidate to start with
    */
@@ -58,26 +55,31 @@ public class BuildEmbeddingWithTiePoint
   /**
    * Constructor
    *
+   * @param keyClazz      key type is needed for array initialization
    * @param traversalCode traversal code for the current exploration
    * @param vertexCount   number of vertices in the query graph
    * @param edgeCount     number of edges in the query graph
    */
-  public BuildEmbeddingWithTiePoint(TraversalCode traversalCode,
-    long vertexCount, long edgeCount) {
-    this.vertexCount            = (int) vertexCount;
+  public BuildEmbeddingWithTiePoint(Class<K> keyClazz,
+    TraversalCode traversalCode, long vertexCount, long edgeCount) {
     this.candidate              = (int) traversalCode.getStep(0).getFrom();
-    reuseEmbedding              = new Embedding();
-    reuseEmbeddingWithTiePoint  = new EmbeddingWithTiePoint();
-    reuseEmbedding.setEdgeMappings(new GradoopId[(int) edgeCount]);
+    reuseEmbedding              = new Embedding<>();
+    reuseEmbeddingWithTiePoint  = new EmbeddingWithTiePoint<>();
+    //noinspection unchecked
+    reuseEmbedding.setVertexMappings(
+      (K[]) Array.newInstance(keyClazz, (int) vertexCount));
+    //noinspection unchecked
+    reuseEmbedding.setEdgeMappings(
+      (K[]) Array.newInstance(keyClazz, (int) edgeCount));
     reuseEmbeddingWithTiePoint.setEmbedding(reuseEmbedding);
   }
 
   @Override
-  public EmbeddingWithTiePoint map(IdWithCandidates v) throws Exception {
+  public EmbeddingWithTiePoint<K> map(IdWithCandidates<K> v)
+      throws Exception {
     reuseEmbeddingWithTiePoint.setTiePointId(v.getId());
-    GradoopId[] vertexEmbeddings = new GradoopId[vertexCount];
-    vertexEmbeddings[candidate] = v.getId();
-    reuseEmbedding.setVertexMappings(vertexEmbeddings);
+    // candidate is same for all vertices
+    reuseEmbedding.getVertexMappings()[candidate] = v.getId();
     return reuseEmbeddingWithTiePoint;
   }
 }

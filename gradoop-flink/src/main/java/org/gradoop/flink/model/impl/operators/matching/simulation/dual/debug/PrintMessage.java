@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.simulation.dual.debug;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples
   .Message;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
@@ -26,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 /**
  * Debug output for {@link Message}.
  */
-public class PrintMessage extends Printer<Message> {
+public class PrintMessage extends Printer<Message, GradoopId> {
 
   /**
    * Logger

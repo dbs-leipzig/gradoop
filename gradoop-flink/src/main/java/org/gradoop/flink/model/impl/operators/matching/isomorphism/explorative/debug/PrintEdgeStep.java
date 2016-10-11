@@ -24,8 +24,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 
 /**
  * Debug output for {@link EdgeStep}.
+ *
+ * @param <K> key type
  */
-public class PrintEdgeStep extends Printer<EdgeStep> {
+public class PrintEdgeStep<K>
+  extends Printer<EdgeStep<K>, K> {
   /**
    * Logger
    */
@@ -42,7 +45,7 @@ public class PrintEdgeStep extends Printer<EdgeStep> {
   }
 
   @Override
-  protected String getDebugString(EdgeStep edgeStep) {
+  protected String getDebugString(EdgeStep<K> edgeStep) {
     return String.format("(%s,%s,%s)",
       edgeMap.get(edgeStep.getEdgeId()),
       vertexMap.get(edgeStep.getTiePoint()),

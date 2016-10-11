@@ -45,6 +45,11 @@ public class DFSTraverser implements RootedTraverser {
   }
 
   @Override
+  public QueryHandler getQueryHandler() {
+    return queryHandler;
+  }
+
+  @Override
   public TraversalCode traverse(long rootVertex) {
     Set<Long> vertexVisited = Sets.newHashSetWithExpectedSize(
       queryHandler.getVertexCount());

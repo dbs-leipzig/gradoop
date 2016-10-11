@@ -24,8 +24,11 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism
 
 /**
  * Debug output for {@link VertexStep}.
+ *
+ * @param <K> key type
  */
-public class PrintVertexStep extends Printer<VertexStep> {
+public class PrintVertexStep<K>
+  extends Printer<VertexStep<K>, K> {
   /**
    * Logger
    */
@@ -42,7 +45,7 @@ public class PrintVertexStep extends Printer<VertexStep> {
   }
 
   @Override
-  protected String getDebugString(VertexStep vertexStep) {
+  protected String getDebugString(VertexStep<K> vertexStep) {
     return String.format("(%s)", vertexMap.get(vertexStep.getVertexId()));
   }
 

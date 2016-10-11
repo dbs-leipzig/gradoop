@@ -21,11 +21,8 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.EdgeStep;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
-
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
 
 /**
@@ -33,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.t
  *
  * Read fields first:
  *
- * f0.f1: edge mappings
+ * f1.f1: edge mappings
  *
  * Read fields second:
  *
@@ -42,19 +39,20 @@ import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.t
  *
  * Forwarded fields first:
  *
- * f0.f0: vertex mappings
+ * f1.f0: vertex mappings
  *
  * Forwarded fields second:
  *
  * f2->f1: next id -> tie point id
  *
+ * @param <K> key type
  */
-@FunctionAnnotation.ReadFieldsFirst("f0.f1")
+@FunctionAnnotation.ReadFieldsFirst("f1.f1")
 @FunctionAnnotation.ReadFieldsSecond("f0;f2")
-@FunctionAnnotation.ForwardedFieldsFirst("f0.f0")
-@FunctionAnnotation.ForwardedFieldsSecond("f2->f1")
-public class UpdateEdgeMappings extends
-  RichFlatJoinFunction<EmbeddingWithTiePoint, EdgeStep, EmbeddingWithTiePoint> {
+@FunctionAnnotation.ForwardedFieldsFirst("f1.f0")
+@FunctionAnnotation.ForwardedFieldsSecond("f2->f0")
+public class UpdateEdgeMappings<K> extends RichFlatJoinFunction
+    <EmbeddingWithTiePoint<K>, EdgeStep<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Traversal code for the current exploration
    */
@@ -81,10 +79,10 @@ public class UpdateEdgeMappings extends
   }
 
   @Override
-  public void join(EmbeddingWithTiePoint embedding, EdgeStep edgeStep,
-    Collector<EmbeddingWithTiePoint> collector) throws Exception {
+  public void join(EmbeddingWithTiePoint<K> embedding, EdgeStep<K> edgeStep,
+    Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    GradoopId[] edgeEmbeddings = embedding.getEmbedding().getEdgeMappings();
+    K[] edgeEmbeddings = embedding.getEmbedding().getEdgeMappings();
 
     // traverse if no edge set for that step
     if (edgeEmbeddings[candidate] == null) {
