@@ -12,29 +12,29 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class DOTIOTest extends GradoopFlinkTestBase {
+public class DOTDataSinkTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Test
-  public void testLogicalGraphAsDot() throws Exception {
+  public void testWrite() throws Exception {
 
-    String gdlFile =
-      DOTIOTest.class.getResource("/data/dot/input.gdl").getFile();
+    String gdlFile = DOTDataSinkTest.class
+      .getResource("/data/dot/input.gdl").getFile();
 
     // load from gdl
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
 
     // load input graph
-    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("singleGraph");
+    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("input");
 
     // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
 
     final String dotFile = tmpDir + "/test.dot";
 
-    // create datasink
+    // create data sink
     DataSink dataSink = new DOTDataSink(dotFile, false);
 
     // write graph

@@ -21,10 +21,8 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
-import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,108 +32,7 @@ import java.util.Comparator;
 import static org.junit.Assert.assertEquals;
 
 
-public class TLFIOTest extends GradoopFlinkTestBase {
-
-  @Test
-  public void testReadWrite() throws Exception {
-
-    String asciiGraphs = "" +
-      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
-      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
-
-    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
-
-    GraphCollection originalCollection = loader
-      .getGraphCollectionByVariables("g1", "g2");
-
-    String filePath =
-      TLFIOTest.class.getResource("/data/tlf").getFile() + "/io_test_rw.tlf";
-
-    new File(filePath).createNewFile();
-
-    // create data sink
-    DataSink dataSink = new TLFDataSink(filePath, config);
-
-    dataSink.write(originalCollection);
-
-    getExecutionEnvironment().execute();
-
-    // create data source
-    TLFDataSource dataSource = new TLFDataSource(filePath, config);
-
-    //get transactions
-    GraphTransactions transactions = dataSource.getGraphTransactions();
-
-    collectAndAssertTrue(
-      originalCollection.equalsByGraphData(
-        GraphCollection.fromTransactions(transactions)
-      )
-    );
-  }
-
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
-  @Test
-  public void testRead() throws Exception {
-    String tlfFile = TLFIOTest.class
-      .getResource("/data/tlf/io_test_string.tlf").getFile();
-
-    // create datasource
-    DataSource dataSource = new TLFDataSource(tlfFile, config);
-    //get transactions
-    GraphTransactions transactions = dataSource.getGraphTransactions();
-
-    String asciiGraphs = "" +
-      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
-      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
-
-    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
-
-    collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
-        GraphCollection.fromTransactions(transactions)
-      )
-    );
-  }
-
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
-  @Test
-  public void testReadWithDictionary() throws Exception {
-    String tlfFile = TLFIOTest.class
-      .getResource("/data/tlf/io_test.tlf").getFile();
-    String tlfVertexDictionaryFile = TLFIOTest.class
-      .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
-    String tlfEdgeDictionaryFile = TLFIOTest.class
-      .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
-
-    // create datasource
-    DataSource dataSource = new TLFDataSource(tlfFile, tlfVertexDictionaryFile,
-        tlfEdgeDictionaryFile, config);
-    //get transactions
-    GraphTransactions transactions = dataSource.getGraphTransactions();
-
-    String asciiGraphs = "" +
-      "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
-      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
-
-    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
-
-    collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
-        GraphCollection.fromTransactions(transactions)
-      )
-    );
-  }
-
+public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
   /**
    * Test method for
@@ -143,11 +40,11 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * {@link TLFDataSink#write(GraphTransactions)}
    */
   @Test
-  public void testWriteAsTLF() throws Exception {
-    String tlfFileImport = TLFIOTest.class
+  public void testWrite() throws Exception {
+    String tlfFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test.tlf").getFile();
 
-    String tlfFileExport = TLFIOTest.class
+    String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
@@ -157,16 +54,16 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, config);
     // write to ouput path
-    DataSink dataSink = new TLFDataSink(tlfFileExport,getConfig());
+    DataSink dataSink = new TLFDataSink(tlfFileExport, getConfig());
     dataSink.write(dataSource.getGraphTransactions());
     // read from output path
-    dataSource = new TLFDataSource(tlfFileExport, config);
-    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
+    DataSource dataSource2 = new TLFDataSource(tlfFileExport, config);
 
     getExecutionEnvironment().execute();
 
-    assertEquals("Wrong graph count", 2, 
-      graphTransactions.getTransactions().count());
+    // compare original graph and written one
+    collectAndAssertTrue(dataSource.getGraphCollection()
+      .equalsByGraphElementData(dataSource2.getGraphCollection()));
   }
 
   /**
@@ -175,19 +72,19 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * {@link TLFDataSink#write(GraphTransactions)}
    */
   @Test
-  public void testWriteAsTLFWithVertexDictionary() throws Exception {
-    String tlfFileImport = TLFIOTest.class
+  public void testWriteWithVertexDictionary() throws Exception {
+    String tlfFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test.tlf").getFile();
-    String tlfVertexDictionaryFileImport = TLFIOTest.class
+    String tlfVertexDictionaryFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
 
-    String tlfFileExport = TLFIOTest.class
+    String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfVertexDictionaryFileExport = TLFIOTest.class
+    String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_vertex_dictionary");
     file = new File(tlfFileExport);
@@ -198,7 +95,7 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, 
       tlfVertexDictionaryFileImport, "", config);
-    // write to ouput path
+    // write to output path
     DataSink dataSink = new TLFDataSink(tlfFileExport, 
       tlfVertexDictionaryFileExport, "", getConfig());
     dataSink.write(dataSource.getGraphTransactions());
@@ -206,14 +103,14 @@ public class TLFIOTest extends GradoopFlinkTestBase {
     dataSource = new TLFDataSource(tlfFileExport, config);
     GraphTransactions graphTransactions = dataSource.getGraphTransactions();
 
-    //get first transaction which contains one complete graph
+    // get first transaction which contains one complete graph
     GraphTransaction graphTransaction = graphTransactions
       .getTransactions()
       .collect().get(0);
-    //get vertices of the first transaction/graph
+    // get vertices of the first transaction/graph
     EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
       new EPGMVertex[graphTransaction.getVertices().size()]);
-    //sort vertices by label(alphabetically)
+    // sort vertices by label(alphabetically)
     Arrays.sort(vertexArray, new Comparator<EPGMVertex>() {
       @Override
       public int compare(EPGMVertex vertex1, EPGMVertex vertex2) {
@@ -233,28 +130,28 @@ public class TLFIOTest extends GradoopFlinkTestBase {
    * {@link TLFDataSink#write(GraphTransactions)}
    */
   @Test
-  public void testWriteAsTLFWithDictionaries() throws Exception {
-    String tlfFileImport = TLFIOTest.class
+  public void testWriteWithDictionaries() throws Exception {
+    String tlfFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test.tlf").getFile();
-    String tlfVertexDictionaryFileImport = TLFIOTest.class
+    String tlfVertexDictionaryFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
-    String tlfEdgeDictionaryFileImport = TLFIOTest.class
+    String tlfEdgeDictionaryFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
 
-    String tlfFileExport = TLFIOTest.class
+    String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
     File file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfVertexDictionaryFileExport = TLFIOTest.class
+    String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_vertex_dictionary");
     file = new File(tlfFileExport);
     if (!file.exists()) {
       file.createNewFile();
     }
-    String tlfEdgeDictionaryFileExport = TLFIOTest.class
+    String tlfEdgeDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_edge_dictionary");
     file = new File(tlfFileExport);

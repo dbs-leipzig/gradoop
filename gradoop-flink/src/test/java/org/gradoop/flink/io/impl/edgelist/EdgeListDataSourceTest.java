@@ -23,14 +23,14 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class EdgeListIOTest extends GradoopFlinkTestBase {
+public class EdgeListDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testEdgeListData() throws Exception {
-    String edgeListFile = EdgeListIOTest.class
+  public void testRead() throws Exception {
+    String edgeListFile = EdgeListDataSourceTest.class
       .getResource("/data/edgelist/input").getFile();
 
-    String gdlFile = EdgeListIOTest.class
+    String gdlFile = EdgeListDataSourceTest.class
       .getResource("/data/edgelist/expected.gdl").getFile();
 
     // load from tsv file

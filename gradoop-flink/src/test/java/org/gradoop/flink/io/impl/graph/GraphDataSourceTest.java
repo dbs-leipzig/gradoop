@@ -12,10 +12,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class GraphIOTest extends GradoopFlinkTestBase {
+public class GraphDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testStructureOnly() throws Exception {
+  public void testReadStructureOnly() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     DataSet<ImportVertex<Long>> importVertices = env.fromElements(
@@ -37,7 +37,7 @@ public class GraphIOTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testWithLabel() throws Exception {
+  public void testReadWithLabel() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     DataSet<ImportVertex<Long>> importVertices = env.fromElements(
@@ -59,7 +59,7 @@ public class GraphIOTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testWithLabelAndProperties() throws Exception {
+  public void testReadWithLabelAndProperties() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     Map<String, Object> properties = Maps.newHashMap();
@@ -89,7 +89,7 @@ public class GraphIOTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testWithLineage() throws Exception {
+  public void testReadWithLineage() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     Map<String, Object> properties = Maps.newHashMap();
