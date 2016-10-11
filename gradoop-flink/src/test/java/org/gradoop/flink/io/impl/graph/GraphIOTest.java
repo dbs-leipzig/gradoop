@@ -15,28 +15,21 @@ import java.util.Map;
 public class GraphIOTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testWithLineage() throws Exception {
+  public void testStructureOnly() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
-    Map<String, Object> properties = Maps.newHashMap();
-    properties.put("foo", 42);
-
     DataSet<ImportVertex<Long>> importVertices = env.fromElements(
-      new ImportVertex<>(0L, "A", PropertyList.createFromMap(properties)),
-      new ImportVertex<>(1L, "B", PropertyList.createFromMap(properties)));
+      new ImportVertex<>(0L),
+      new ImportVertex<>(1L));
 
     DataSet<ImportEdge<Long>> importEdges = env.fromElements(
-      new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
-      new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
+      new ImportEdge<>(0L, 0L, 1L));
 
-    LogicalGraph expected = getLoaderFromString("expected[" +
-        "(a:A {foo = 42, __L = 0L});" +
-        "(b:B {foo = 42, __L = 1L});" +
-        "(a)-[:a {foo=42, __L = 0L}]->(b)-[:b {foo=42, __L = 1L}]->(a);" +
-        "]").getLogicalGraphByVariable("expected");
+    LogicalGraph expected = getLoaderFromString("expected[()-->()]")
+      .getLogicalGraphByVariable("expected");
 
     GraphDataSource<Long> dataSource = new GraphDataSource<>(
-      importVertices, importEdges, "__L", getConfig());
+      importVertices, importEdges, getConfig());
 
     LogicalGraph output = dataSource.getLogicalGraph();
 
@@ -44,7 +37,29 @@ public class GraphIOTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testWithoutLineage() throws Exception {
+  public void testWithLabel() throws Exception {
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    DataSet<ImportVertex<Long>> importVertices = env.fromElements(
+      new ImportVertex<>(0L, "A"),
+      new ImportVertex<>(1L, "B"));
+
+    DataSet<ImportEdge<Long>> importEdges = env.fromElements(
+      new ImportEdge<>(0L, 0L, 1L, "a"));
+
+    LogicalGraph expected = getLoaderFromString("expected[(:A)-[:a]->(:B)]")
+      .getLogicalGraphByVariable("expected");
+
+    GraphDataSource<Long> dataSource = new GraphDataSource<>(
+      importVertices, importEdges, getConfig());
+
+    LogicalGraph output = dataSource.getLogicalGraph();
+
+    collectAndAssertTrue(output.equalsByElementData(expected));
+  }
+
+  @Test
+  public void testWithLabelAndProperties() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     Map<String, Object> properties = Maps.newHashMap();
@@ -67,6 +82,35 @@ public class GraphIOTest extends GradoopFlinkTestBase {
 
     GraphDataSource<Long> dataSource = new GraphDataSource<>(
       importVertices, importEdges, getConfig());
+
+    LogicalGraph output = dataSource.getLogicalGraph();
+
+    collectAndAssertTrue(output.equalsByElementData(expected));
+  }
+
+  @Test
+  public void testWithLineage() throws Exception {
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    Map<String, Object> properties = Maps.newHashMap();
+    properties.put("foo", 42);
+
+    DataSet<ImportVertex<Long>> importVertices = env.fromElements(
+      new ImportVertex<>(0L, "A", PropertyList.createFromMap(properties)),
+      new ImportVertex<>(1L, "B", PropertyList.createFromMap(properties)));
+
+    DataSet<ImportEdge<Long>> importEdges = env.fromElements(
+      new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
+      new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
+
+    LogicalGraph expected = getLoaderFromString("expected[" +
+        "(a:A {foo = 42, __L = 0L});" +
+        "(b:B {foo = 42, __L = 1L});" +
+        "(a)-[:a {foo=42, __L = 0L}]->(b)-[:b {foo=42, __L = 1L}]->(a);" +
+        "]").getLogicalGraphByVariable("expected");
+
+    GraphDataSource<Long> dataSource = new GraphDataSource<>(
+      importVertices, importEdges, "__L", getConfig());
 
     LogicalGraph output = dataSource.getLogicalGraph();
 
