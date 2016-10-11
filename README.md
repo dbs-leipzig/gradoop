@@ -119,6 +119,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 ### Build gradoop from source
 
+* Gradoop requires Java 8
 * Clone Gradoop into your local file system
 
     > git clone https://github.com/dbs-leipzig/gradoop.git

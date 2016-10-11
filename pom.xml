@@ -89,7 +89,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.maven.version>3.0.0</project.maven.version>
-        <project.build.targetJdk>1.7</project.build.targetJdk>
+        <project.build.targetJdk>1.8</project.build.targetJdk>
 
         <dep.flink.version>1.1.2</dep.flink.version>
         <dep.gdl.version>0.2-SNAPSHOT</dep.gdl.version>
@@ -101,12 +101,12 @@
 
         <log4j.properties>log4j-test.properties</log4j.properties>
 
-        <plugin.maven-compiler.version>3.0</plugin.maven-compiler.version>
+        <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.14</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
-        <plugin.maven-surefire.version>2.19</plugin.maven-surefire.version>
-        <plugin.maven-shade.version>2.4.2</plugin.maven-shade.version>
+        <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
+        <plugin.maven-shade.version>2.4.3</plugin.maven-shade.version>
     </properties>
 
     <repositories>
