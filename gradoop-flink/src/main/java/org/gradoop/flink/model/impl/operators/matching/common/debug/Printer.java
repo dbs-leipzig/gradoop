@@ -72,7 +72,6 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    */
   protected final boolean isIterative;
 
-
   /**
    * Constructor
    */

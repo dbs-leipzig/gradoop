@@ -24,8 +24,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
 
-
-
 import java.lang.reflect.Array;
 
 /**
@@ -38,8 +36,8 @@ import java.lang.reflect.Array;
  * @param <K> key type
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class BuildEmbeddingWithTiePoint<K> implements
-  MapFunction<IdWithCandidates<K>, EmbeddingWithTiePoint<K>> {
+public class BuildEmbeddingWithTiePoint<K>
+  implements MapFunction<IdWithCandidates<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Reduce instantiations
    */

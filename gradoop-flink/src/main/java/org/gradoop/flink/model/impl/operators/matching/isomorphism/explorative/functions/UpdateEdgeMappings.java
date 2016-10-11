@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions;
 
-
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;

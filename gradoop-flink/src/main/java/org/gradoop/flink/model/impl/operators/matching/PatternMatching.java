@@ -35,8 +35,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintTripleW
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 /**
  * Base class for pattern matching implementations.
