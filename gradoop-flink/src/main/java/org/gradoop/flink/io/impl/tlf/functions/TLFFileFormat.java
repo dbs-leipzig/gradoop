@@ -17,9 +17,7 @@
 
 package org.gradoop.flink.io.impl.tlf.functions;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
@@ -29,7 +27,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -45,14 +42,13 @@ public class TLFFileFormat implements
   TextOutputFormat.TextFormatter<GraphTransaction> {
 
   /**
-   * Global counter for the graph id used for each single graph transaction.
-   */
-  private int graphId = 0;
-
-  /**
    * TLF graph number indicator
    */
   private static final String NEW_GRAPH_TAG = "#";
+  /**
+   * Global counter for the graph id used for each single graph transaction.
+   */
+  private int graphId = 0;
 
   /**
    * Creates a TLF string representation of a given graph transaction.
