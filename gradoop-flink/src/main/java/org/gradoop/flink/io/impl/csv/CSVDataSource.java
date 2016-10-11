@@ -14,101 +14,96 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.flink.io.impl.csv;
 
-
-
-import org.apache.hadoop.io.Text;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.functions.CSVToEdge;
+import org.gradoop.flink.io.impl.csv.functions.CreateTuple;
 import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
-import org.gradoop.flink.io.impl.csv.functions.CsvTypeFilter;
-import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
-import org.gradoop.flink.io.impl.csv.functions.XmlToGraphhead;
-import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
-import org.gradoop.flink.io.impl.csv.pojos.Graphhead;
+import org.gradoop.flink.io.impl.csv.pojos.Domain;
+import org.gradoop.flink.io.impl.graph.GraphDataSource;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class CSVDataSource extends CSVBase implements DataSource {
-
-  public static final String CACHED_FILE = "cachedfile";
-
+  public final String CSV_VERTEX = "vertex";
+  public final String CSV_EDGE = "edge";
+  public final String CSV_GRAPH = "graph";
   private ExecutionEnvironment env;
+  private String path;
+  private final Datasource source;
 
-  private String hdfsPrefix;
-
-
-  public CSVDataSource(GradoopFlinkConfig config, String metaXmlPath,
-    String hdfsPrefix) {
-    super(config, metaXmlPath);
-    this.hdfsPrefix = hdfsPrefix;
-
-    env = getConfig().getExecutionEnvironment();
-    env.registerCachedFile(getMetaXmlPath(), CACHED_FILE);
+  public CSVDataSource(GradoopFlinkConfig config, Datasource source,
+    String path) {
+    super(config, path);
+    this.path = path;
+    this.source = source;
+    this.env = config.getExecutionEnvironment();
   }
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-
-    Datasource source = null;
-
-    SchemaFactory schemaFactory =
-      SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-    Schema schema = null;
-    try {
-      schema = schemaFactory.newSchema(new File(getXsdPath()));
-      JAXBContext jaxbContext =
-        JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      unmarshaller.setSchema( schema );
-      source = (Datasource) unmarshaller
-        .unmarshal(new FileInputStream(getMetaXmlPath()));
-
-    } catch (SAXException|JAXBException e) {
-      e.printStackTrace();
-    }
-
-    DataSet<Datasource> datasource = env.fromElements(source);
-
-
-    DataSet<Csv> csvGraphHead = datasource
-      .flatMap(new DatasourceToCsv()) //csv graphheads etc
-      .filter(new CsvTypeFilter(Graphhead.class));
-
-    DataSet<GraphHead> graphHead = csvGraphHead
-      .map(new XmlToGraphhead(env)); //import graphheads
-
-
-
-
-
     return null;
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
+    String datasourceName = source.getName();
+    List<Domain> domains = source.getDomain();
+
+    for (Domain domain : domains) {
+      String domainName = domain.getName();
+      for (Csv csv : domain.getCsv()) {
+        if (csv.getType().equals(CSV_VERTEX)) {
+
+          DataSet<String> vertexFile = env.readTextFile(path + csv.getName());
+          DataSet<Csv> csvDataSet = env.fromElements(csv);
+
+          DataSet<Tuple3<Csv, String, String>> vertexList = csvDataSet
+            .cross(vertexFile)
+            .with(new CreateTuple(domainName));
+
+          DataSet<ImportVertex<String>> importVertices = vertexList
+            .map(new CSVToVertex(datasourceName));
+
+          try {
+            importVertices.print();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        } else if (csv.getType().equals(CSV_EDGE)){
+
+          DataSet<String> vertexFile = env.readTextFile(path + csv.getName());
+          DataSet<Csv> csvDataSet = env.fromElements(csv);
+
+          DataSet<Tuple2<Csv, String>> tupleList = csvDataSet
+            .cross(vertexFile)
+            .with(new CreateTuple());
+
+          DataSet<ImportEdge<String>> importEdges = tupleList
+            .map(new CSVToEdge(datasourceName, domainName));
+
+        }
+      }
+    }
+
+//    GraphDataSource<String> graphDataSource = new GraphDataSource<String>
+//      (importVertices, null, null);
+
     return null;
   }
 

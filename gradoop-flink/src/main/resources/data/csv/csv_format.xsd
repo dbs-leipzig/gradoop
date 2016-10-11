@@ -16,6 +16,7 @@
     <!-- csv attributes -->
     <xsd:attributeGroup name="csvattributes">
         <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="type" type="xsd:string"/>
         <xsd:attribute name="charset" type="xsd:string"/>
         <xsd:attribute name="separator" type="xsd:string"/>
     </xsd:attributeGroup>
@@ -27,7 +28,7 @@
     </xsd:attributeGroup>
     <!-- property attributes -->
     <xsd:attributeGroup name="propertyattributes">
-        <xsd:attribute name="column_id" type="xsd:long"/>
+        <xsd:attribute name="column_id" type="xsd:int"/>
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:attributeGroup>
     <!-- label attributes -->
@@ -134,7 +135,7 @@
     <xsd:complexType name="element">
         <xsd:sequence>
             <xsd:element ref="key"/>
-            <xsd:element ref="label" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="label" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="properties" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>

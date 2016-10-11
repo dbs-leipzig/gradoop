@@ -2,52 +2,50 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Key;
 import org.gradoop.flink.io.impl.csv.pojos.Label;
-import org.gradoop.flink.io.impl.csv.pojos.Properties;
 import org.gradoop.flink.io.impl.csv.pojos.Property;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * Created by galpha on 9/28/16.
  */
-public class CSVToVertex implements
-  MapFunction<Tuple3<Csv, String, String>, ImportVertex<String>> {
+public class CSVToEdge
+  implements MapFunction<Tuple2<Csv, String>, ImportEdge<String>> {
 
   private final String datasourceName;
 
+  private final String domainName;
 
-  private ImportVertex<String> reuse;
+  private ImportEdge<String> reuse;
 
 
-  public CSVToVertex(String datasourceName){
+  public CSVToEdge(String datasourceName, String domainName){
     this.datasourceName = datasourceName;
-    this.reuse = new ImportVertex<>();
+    this.domainName = domainName;
+    this.reuse = new ImportEdge<>();
   }
 
 
 
-
   @Override
-  public ImportVertex<String> map(Tuple3<Csv, String, String> tuple) throws
-    Exception {
+  public ImportEdge<String> map(Tuple2<Csv, String> tuple) throws Exception {
+
 
     Csv csv = tuple.f0;
-    String domainName = tuple.f1;
-    String line = tuple.f2;
+    String line = tuple.f1;
 
     String[] fields = line.split(Pattern.quote(csv.getSeparator()));
 
 
-    String key = createKey(csv.getVertex().getKey(), domainName, fields);
-    String label = createLabel(csv.getVertex().getLabel(), fields);
+
+    String key = createKey(csv.getEdge().getKey(), fields);
+    String label = createLabel(csv.getEdge().getLabel(), fields);
     PropertyList properties = createProperties(csv, fields);
 
 
@@ -58,6 +56,7 @@ public class CSVToVertex implements
 
 
     return reuse;
+
   }
 
   private String createLabel(Label label, String[] fields) {
@@ -84,7 +83,7 @@ public class CSVToVertex implements
     return labelString;
   }
 
-  private String createKey (Key key, String domainName,  String[] fields){
+  private String createKey (Key key, String[] fields){
 
     String id = datasourceName + "_" + domainName + "_" + key.getClazz() + "_"
       + fields[0];
@@ -97,7 +96,7 @@ public class CSVToVertex implements
 
 
 
-    for (Property p: csv.getVertex().getProperties().get(0).getProperty()) {
+    for (Property p: csv.getEdge().getProperties().get(0).getProperty()) {
       org.gradoop.common.model.impl.properties.Property prop =
         new org.gradoop.common.model.impl.properties.Property();
 
@@ -121,5 +120,4 @@ public class CSVToVertex implements
 
     return list;
   }
-
 }

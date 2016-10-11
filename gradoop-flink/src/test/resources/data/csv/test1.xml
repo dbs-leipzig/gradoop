@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<datasource xmlns="http://www.gradoop.org/flink/io/impl/csv/pojo"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.gradoop.org/flink/io/impl/csv/pojo
+            http://www.gradoop.org/flink/io/impl/csv/pojo"
+            name="MySQL">
+
+    <domain name="ComputerScience">
+
+        <csv name="personVertex.csv" type="vertex" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+                <column id="2" pos="2" type="Integer"/>
+                <column id="3" pos="3" type="String"/>
+            </columns>
+            <vertex>
+                <key class="Person">
+                    <ref column_id="0"/>
+                </key>
+                <label>
+                    <static name="Person"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="name"/>
+                    <property column_id="2" name="age"/>
+                    <property column_id="3" name="gender"/>
+                </properties>
+                <graphs>
+                    <static name="1"/>
+                </graphs>
+            </vertex>
+        </csv>
+        <csv name="isMemberEdge.csv" type="edge" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Integer"/>
+            </columns>
+            <edge>
+                <key class="isMember">
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
+                </key>
+                <label>
+                    <static name="isMember"/>
+                </label>
+                <properties>
+                    <property column_id="3" name="since"/>
+                </properties>
+                <graphs>
+                    <static name="1"/>
+                </graphs>
+                <source>
+                    <ref column_id="1"/>
+                </source>
+                <target>
+                    <ref column_id="2"/>
+                </target>
+            </edge>
+        </csv>
+    </domain>
+</datasource>
