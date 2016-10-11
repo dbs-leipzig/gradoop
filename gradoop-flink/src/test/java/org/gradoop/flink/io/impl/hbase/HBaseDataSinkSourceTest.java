@@ -2,19 +2,16 @@ package org.gradoop.flink.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.EPGMDatabase;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.GradoopHBaseTestBase;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.flink.model.impl.EPGMDatabase;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -27,10 +24,14 @@ import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSoc
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
 
-public class HBaseIOTest extends FlinkHBaseTestBase {
+/**
+ * Test class contains read and write tests to start/shutdown an HBase mini
+ * cluster only once.
+ */
+public class HBaseDataSinkSourceTest extends FlinkHBaseTestBase {
 
   @Test
-  public void readFromHBaseTest() throws Exception {
+  public void testRead() throws Exception {
     HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore =
       GradoopHBaseTestBase.createEmptyEPGMStore();
 
@@ -81,7 +82,7 @@ public class HBaseIOTest extends FlinkHBaseTestBase {
   }
 
   @Test
-  public void writeToHBaseTest() throws Exception {
+  public void testWrite() throws Exception {
     // create empty EPGM store
     HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore =
       GradoopHBaseTestBase.createEmptyEPGMStore();
