@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains a naive traversal implementation for subgraph isomorphism.
+ * Contains debug related classed (e.g., printers for tuples)
  */
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.debug;

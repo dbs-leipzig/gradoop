@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains isomorphism based pattern matching algorithms.
+ * Contains Flink functions that are used by {@link org.gradoop.flink.model.impl.operators.matching.preserving.explorative.ExplorativePatternMatching}.
  */
-package org.gradoop.flink.model.impl.operators.matching.isomorphism;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.functions;

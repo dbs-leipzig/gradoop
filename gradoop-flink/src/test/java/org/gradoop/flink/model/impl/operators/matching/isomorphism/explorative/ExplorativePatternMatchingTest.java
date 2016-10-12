@@ -3,10 +3,14 @@ package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.SubgraphIsomorphismTest;
 
-public class ExplorativeSubgraphIsomorphismTest extends
+
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative
+  .ExplorativePatternMatching;
+
+public class ExplorativePatternMatchingTest extends
   SubgraphIsomorphismTest {
 
-  public ExplorativeSubgraphIsomorphismTest(String testName, String dataGraph,
+  public ExplorativePatternMatchingTest(String testName, String dataGraph,
     String queryGraph, String[] expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -16,6 +20,6 @@ public class ExplorativeSubgraphIsomorphismTest extends
   @Override
   public PatternMatching getImplementation(String queryGraph,
     boolean attachData) {
-    return new ExplorativeSubgraphIsomorphism(queryGraph, attachData);
+    return new ExplorativePatternMatching(queryGraph, attachData);
   }
 }

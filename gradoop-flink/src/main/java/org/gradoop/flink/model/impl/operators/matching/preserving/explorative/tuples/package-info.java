@@ -18,4 +18,4 @@
 /**
  * Contains tuples that are used exclusively by that implementation.
  */
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples;

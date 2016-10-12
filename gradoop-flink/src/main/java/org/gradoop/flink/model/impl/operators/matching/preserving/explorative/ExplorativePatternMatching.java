@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
@@ -59,7 +59,7 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativeSubgraphIsomorphism extends PatternMatching
+public class ExplorativePatternMatching extends PatternMatching
   implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
@@ -69,7 +69,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
    * Logger
    */
   private static final Logger LOG = Logger.getLogger(
-    ExplorativeSubgraphIsomorphism.class);
+    ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
@@ -89,7 +89,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
    * @param query      GDL query graph
    * @param attachData true, if original data shall be attached to the result
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData) {
+  public ExplorativePatternMatching(String query, boolean attachData) {
     this(query, attachData, new DFSTraverser());
   }
 
@@ -100,7 +100,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
    * @param attachData  true, if original data shall be attached to the result
    * @param traverser   Traverser used for the query graph
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
+  public ExplorativePatternMatching(String query, boolean attachData,
     Traverser traverser) {
     this(query, attachData, traverser,
       OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
@@ -116,7 +116,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
+  public ExplorativePatternMatching(String query, boolean attachData,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
@@ -138,20 +138,20 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
 
     if (!doAttachData()) {
       matchingVertices = matchingVertices
-        .map(new Id<Vertex>())
-        .map(new ObjectTo1<GradoopId>())
+        .map(new Id<>())
+        .map(new ObjectTo1<>())
         .map(new VertexFromId(vertexFactory));
     }
 
     DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<Vertex>(graphHeadFactory))
-      .returns(new TupleTypeInfo<Tuple2<Vertex, GraphHead>>(
+      .map(new AddGraphElementToNewGraph<>(graphHeadFactory))
+      .returns(new TupleTypeInfo<>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
 
     return GraphCollection.fromDataSets(
-      pairs.map(new Value1Of2<Vertex, GraphHead>()),
-      pairs.map(new Value0Of2<Vertex, GraphHead>()),
+      pairs.map(new Value1Of2<>()),
+      pairs.map(new Value0Of2<>()),
       config);
   }
 
@@ -206,6 +206,6 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching
 
   @Override
   public String getName() {
-    return ExplorativeSubgraphIsomorphism.class.getName();
+    return ExplorativePatternMatching.class.getName();
   }
 }
