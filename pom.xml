@@ -250,12 +250,6 @@
 
             <dependency>
                 <groupId>org.gradoop</groupId>
-                <artifactId>gradoop-algorithms</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-datagen</artifactId>
                 <version>${project.version}</version>
             </dependency>
