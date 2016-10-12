@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -64,8 +65,9 @@ public class Csv {
     @XmlAttribute(name = "separator")
     protected String separator;
 
+    @XmlTransient
     private String datasourceName;
-
+    @XmlTransient
     private String domainName;
     /**
      * Gets the value of the columns property.
