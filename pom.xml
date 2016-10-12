@@ -73,7 +73,7 @@
 
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
-        <connection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</connection>
+        <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
         <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
     </scm>
 
