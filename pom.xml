@@ -5,7 +5,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -73,7 +73,7 @@
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
         <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
-      <tag>release/0.2.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
