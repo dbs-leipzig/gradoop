@@ -47,7 +47,7 @@
                     <static name="isMember"/>
                 </label>
                 <properties>
-                    <property column_id="3" name="since"/>
+                    <property column_id="2" name="since"/>
                 </properties>
                 <graphs>
                     <static name="1"/>
