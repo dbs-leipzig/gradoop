@@ -113,7 +113,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -167,6 +167,7 @@ Used to maintain the code style for the whole project.
 * 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
+* 0.2.0 Pattern Matching and Frequent Subgraph Mining algorithms
 
 ### Disclaimer
 
