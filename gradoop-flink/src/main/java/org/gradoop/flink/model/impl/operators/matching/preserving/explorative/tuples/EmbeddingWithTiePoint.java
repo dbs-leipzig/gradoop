@@ -15,43 +15,35 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 
 /**
- * Represents an edge that is joined with an {@link EmbeddingWithTiePoint} to
- * extend it at the tie point.
+ * Represents an embedding and a weld point to grow the embedding.
  *
- * f0: edge id
- * f1: tie point (sourceId/targetId)
- * f2: next id (sourceId/targetId)
+ * f0: tie point
+ * f1: embedding
  *
  * @param <K> key type
  */
-public class EdgeStep<K> extends Tuple3<K, K, K> {
+public class EmbeddingWithTiePoint<K>
+  extends Tuple2<K, Embedding<K>> {
 
-  public K getEdgeId() {
+  public K getTiePointId() {
     return f0;
   }
 
-  public void setEdgeId(K edgeId) {
-    f0 = edgeId;
+  public void setTiePointId(K tiePointId) {
+    f0 = tiePointId;
   }
 
-  public K getTiePoint() {
+  public Embedding<K> getEmbedding() {
     return f1;
   }
 
-  public void setTiePointId(K tiePoint) {
-    f1 = tiePoint;
-  }
-
-  public K getNextId() {
-    return f2;
-  }
-
-  public void setNextId(K nextId) {
-    f2 = nextId;
+  public void setEmbedding(Embedding<K> embedding) {
+    f1 = embedding;
   }
 }

@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -23,8 +23,9 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples.EmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples.VertexStep;
+
 
 /**
  * Extends an embedding with a vertex if possible.

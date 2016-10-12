@@ -15,12 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.functions;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples.VertexStep;
 
 /**
  * (id, [candidates]) -> (id)

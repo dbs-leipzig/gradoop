@@ -15,24 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.debug;
+package org.gradoop.flink.model.impl.operators.matching.preserving.explorative.debug;
 
 import org.apache.log4j.Logger;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism
-  .explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples.VertexStep;
 
 /**
- * Debug output for {@link EdgeStep}.
+ * Debug output for {@link VertexStep}.
  *
  * @param <K> key type
  */
-public class PrintEdgeStep<K>
-  extends Printer<EdgeStep<K>, K> {
+public class PrintVertexStep<K>
+  extends Printer<VertexStep<K>, K> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintEdgeStep.class);
+  private static Logger LOG = Logger.getLogger(PrintVertexStep.class);
 
   /**
    * Constructor
@@ -40,16 +39,13 @@ public class PrintEdgeStep<K>
    * @param isIterative true, if used in iterative context
    * @param prefix      prefix for debug string
    */
-  public PrintEdgeStep(boolean isIterative, String prefix) {
+  public PrintVertexStep(boolean isIterative, String prefix) {
     super(isIterative, prefix);
   }
 
   @Override
-  protected String getDebugString(EdgeStep<K> edgeStep) {
-    return String.format("(%s,%s,%s)",
-      edgeMap.get(edgeStep.getEdgeId()),
-      vertexMap.get(edgeStep.getTiePoint()),
-      vertexMap.get(edgeStep.getNextId()));
+  protected String getDebugString(VertexStep<K> vertexStep) {
+    return String.format("(%s)", vertexMap.get(vertexStep.getVertexId()));
   }
 
   @Override

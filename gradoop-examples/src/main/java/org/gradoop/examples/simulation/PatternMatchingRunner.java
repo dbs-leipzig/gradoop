@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
+import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.DualSimulation;
 
 import java.util.concurrent.TimeUnit;
@@ -47,11 +47,11 @@ public class PatternMatchingRunner extends AbstractRunner implements
    */
   private static final String ALGO_DUAL_DELTA = "dual-delta";
   /**
-   * Refers to {@link ExplorativeSubgraphIsomorphism}
+   * Refers to {@link ExplorativePatternMatching}
    */
   private static final String ALGO_ISO_EXP = "iso-exp";
   /**
-   * Refers to {@link ExplorativeSubgraphIsomorphism} using
+   * Refers to {@link ExplorativePatternMatching} using
    * BROADCAST_HASH_FIRST as {@link JoinHint} for extending embeddings.
    */
   private static final String ALGO_ISO_EXP_BC_HASH_FIRST = "iso-exp-bc-hf";
@@ -175,10 +175,10 @@ public class PatternMatchingRunner extends AbstractRunner implements
       op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativeSubgraphIsomorphism(query, attachData);
+      op = new ExplorativePatternMatching(query, attachData);
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
-      op = new ExplorativeSubgraphIsomorphism(query, attachData,
+      op = new ExplorativePatternMatching(query, attachData,
         new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :
