@@ -25,15 +25,18 @@ import java.util.Arrays;
 
 /**
  * Debug output for {@link Embedding}.
+ *
+ * @param <K> key type
  */
-public class PrintEmbedding extends Printer<Embedding> {
+public class PrintEmbedding<K extends Comparable<K>>
+  extends Printer<Embedding<K>, K> {
   /**
    * Logger
    */
   private static final Logger LOG = Logger.getLogger(PrintEmbedding.class);
 
   @Override
-  protected String getDebugString(Embedding embedding) {
+  protected String getDebugString(Embedding<K> embedding) {
     return String.format("([%s],[%s])",
       StringUtils.join(convertList(Arrays.asList(
         embedding.getVertexMappings()), true), ' '),

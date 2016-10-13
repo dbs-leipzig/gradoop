@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.simulation.dual.debug;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples
   .IdPair;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * Debug output for {@link FatVertex}.
  */
-public class PrintFatVertex extends Printer<FatVertex> {
+public class PrintFatVertex extends Printer<FatVertex, GradoopId> {
 
   /**
    * Logger

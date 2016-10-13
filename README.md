@@ -15,8 +15,11 @@ and Flink&trade; libraries (i.e. Gelly, ML and Table).
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
 
-##### Further Information
+##### Further Information (articles and talks)
 
+* [Graph Mining for Complex Data Analytics, ICDM Demo, December 2016](http://dbs.uni-leipzig.de/file/Graph_Mining_for_Complex_Data_Analytics.pdf)
+* [[german] Graph Mining für Business Intelligence, data2day, October 2016](http://www.slideshare.net/s1ck/gut-vernetzt-skalierbares-graph-mining-fr-business-intelligence)
+* [[german] Verteilte Graphanalyse mit Gradoop, JavaSPEKTRUM, October 2016](http://www.sigs-datacom.de/uploads/tx_dmjournals/junghans_petermann_JS_05_16_eeNZ.pdf)
 * [Extended Property Graphs with Apache Flink, SIGMOD NDA Workshop, June 2016](http://dbs.uni-leipzig.de/file/EPGM.pdf)
 * [Gradoop @Flink/Neo4j Meetup Berlin, March 2016](http://www.slideshare.net/s1ck/gradoop-scalable-graph-analytics-with-apache-flink-flink-neo4j-meetup-berlin)
 * [Gradoop @FOSDEM GraphDevroom, January 2016](https://fosdem.org/2016/schedule/event/graph_processing_gradoop_flink_analytics)
@@ -110,12 +113,13 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
 </dependency>
 ```
 
 ### Build gradoop from source
 
+* Gradoop requires Java 8
 * Clone Gradoop into your local file system
 
     > git clone https://github.com/dbs-leipzig/gradoop.git
@@ -163,6 +167,7 @@ Used to maintain the code style for the whole project.
 * 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
+* 0.2.0 Pattern Matching and Frequent Subgraph Mining algorithms
 
 ### Disclaimer
 

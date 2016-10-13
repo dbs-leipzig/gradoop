@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
@@ -40,7 +41,7 @@ import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
  */
 @FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
 public class BuildTripleWithCandidates<E extends Edge>
-  extends AbstractBuilder<E, TripleWithCandidates> {
+  extends AbstractBuilder<E, TripleWithCandidates<GradoopId>> {
   /**
    * serial version uid
    */
@@ -56,7 +57,7 @@ public class BuildTripleWithCandidates<E extends Edge>
   /**
    * Reduce instantiations
    */
-  private final TripleWithCandidates reuseTuple;
+  private final TripleWithCandidates<GradoopId> reuseTuple;
   /**
    * Constructor
    *
@@ -64,7 +65,7 @@ public class BuildTripleWithCandidates<E extends Edge>
    */
   public BuildTripleWithCandidates(String query) {
     super(query);
-    reuseTuple = new TripleWithCandidates();
+    reuseTuple = new TripleWithCandidates<>();
   }
 
   @Override
@@ -75,7 +76,7 @@ public class BuildTripleWithCandidates<E extends Edge>
   }
 
   @Override
-  public TripleWithCandidates map(E e) throws Exception {
+  public TripleWithCandidates<GradoopId> map(E e) throws Exception {
     reuseTuple.setEdgeId(e.getId());
     reuseTuple.setSourceId(e.getSourceId());
     reuseTuple.setTargetId(e.getTargetId());

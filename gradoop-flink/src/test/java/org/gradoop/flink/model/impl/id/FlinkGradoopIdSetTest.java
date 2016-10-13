@@ -68,7 +68,7 @@ public class FlinkGradoopIdSetTest extends GradoopFlinkTestBase {
     .collect();
 
     Long joinCount = joinCountTupleList.isEmpty() ?
-      0 :
+      0L :
       joinCountTupleList.get(0);
 
     assertEquals(message, joinCount, expectedCount);

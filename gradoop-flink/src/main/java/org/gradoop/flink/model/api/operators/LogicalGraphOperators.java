@@ -27,11 +27,9 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 
 import java.util.List;
-
-import static org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism.*;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the

@@ -23,8 +23,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 
 /**
  * Debug output for {@link TripleWithCandidates}.
+ *
+ * @param <K> key type
  */
-public class PrintTripleWithCandidates extends Printer<TripleWithCandidates> {
+public class PrintTripleWithCandidates<K extends Comparable<K>>
+  extends Printer<TripleWithCandidates<K>, K> {
   /**
    * Logger
    */
@@ -32,7 +35,7 @@ public class PrintTripleWithCandidates extends Printer<TripleWithCandidates> {
     PrintTripleWithCandidates.class);
 
   @Override
-  protected String getDebugString(TripleWithCandidates t) {
+  protected String getDebugString(TripleWithCandidates<K> t) {
     return String.format("(%s,%s,%s,[%s])",
       edgeMap.get(t.getEdgeId()),
       vertexMap.get(t.getSourceId()),

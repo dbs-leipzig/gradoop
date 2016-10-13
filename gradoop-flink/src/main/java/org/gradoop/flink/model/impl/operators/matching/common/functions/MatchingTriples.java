@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples
   .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -44,7 +45,8 @@ import org.s1ck.gdl.model.Edge;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3->f2")
 public class MatchingTriples extends RichFlatJoinFunction
-  <TripleWithSourceEdgeCandidates, IdWithCandidates, TripleWithCandidates> {
+  <TripleWithSourceEdgeCandidates<GradoopId>, IdWithCandidates<GradoopId>,
+    TripleWithCandidates<GradoopId>> {
 
   /**
    * serial version uid
@@ -64,7 +66,7 @@ public class MatchingTriples extends RichFlatJoinFunction
   /**
    * Reduce instantiations
    */
-  private final TripleWithCandidates reuseTriple;
+  private final TripleWithCandidates<GradoopId> reuseTriple;
 
   /**
    * Constructor
@@ -73,7 +75,7 @@ public class MatchingTriples extends RichFlatJoinFunction
    */
   public MatchingTriples(final String query) {
     this.query = query;
-    this.reuseTriple = new TripleWithCandidates();
+    this.reuseTriple = new TripleWithCandidates<>();
   }
 
   @Override
@@ -83,9 +85,9 @@ public class MatchingTriples extends RichFlatJoinFunction
   }
 
   @Override
-  public void join(TripleWithSourceEdgeCandidates pair,
-    IdWithCandidates target,
-    Collector<TripleWithCandidates> collector) throws Exception {
+  public void join(TripleWithSourceEdgeCandidates<GradoopId> pair,
+    IdWithCandidates<GradoopId> target,
+    Collector<TripleWithCandidates<GradoopId>> collector) throws Exception {
 
     boolean[] edgeCandidates = pair.getEdgeCandidates();
     boolean[] newEdgeCandidates = new boolean[edgeCandidates.length];

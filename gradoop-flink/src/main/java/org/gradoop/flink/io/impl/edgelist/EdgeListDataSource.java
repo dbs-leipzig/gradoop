@@ -109,10 +109,10 @@ public class EdgeListDataSource implements DataSource {
     // generate tuple that contains all information
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple4<Long, String, Long, String>> lineTuples =
-            env.readCsvFile(edgeListPath)
-                    .fieldDelimiter(tokenSeparator)
-                    .types(Long.class, String.class, Long.class, String.class);
+    DataSet<Tuple4<Long, String, Long, String>> lineTuples = env
+      .readCsvFile(edgeListPath)
+      .fieldDelimiter(tokenSeparator)
+      .types(Long.class, String.class, Long.class, String.class);
 
     //--------------------------------------------------------------------------
     // generate vertices
