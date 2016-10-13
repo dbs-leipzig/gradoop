@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.isomorphism;
+package org.gradoop.flink.model.impl.operators.matching.preserving;
 
 import org.gradoop.flink.model.impl.operators.matching.PatternMatchingTest;
 import org.junit.runners.Parameterized;
@@ -11,11 +11,11 @@ import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
  * Test data for pattern matching tests. The graphs are visualized in
  * dev-support/pattern_matching_testcases.pdf
  */
-public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
+public abstract class SubgraphHomomorphismTest extends PatternMatchingTest {
 
-  public SubgraphIsomorphismTest(String testName, String dataGraph,
-    String queryGraph, String[] expectedGraphVariables,
-    String expectedCollection) {
+  public SubgraphHomomorphismTest(String testName, String dataGraph,
+                                  String queryGraph, String[] expectedGraphVariables,
+                                  String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
   }
@@ -46,7 +46,7 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         GRAPH_2,
         PATH_PATTERN_3,
         new String[] {"expected1"},
-        "expected1[ ]"
+        "expected1[(v9)-[e15]->(v9)]"
       },
       {
         "Graph2_Loop0",
@@ -70,9 +70,10 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingTest {
         "Graph1_Cycle4",
         GRAPH_1,
         CYCLE_PATTERN_4,
-        new String[] {"expected1", "expected2"},
+        new String[] {"expected1", "expected2","expected3"},
         "expected1[(v1)-[e2]->(v6)-[e8]->(v5)-[e6]->(v4)-[e4]->(v1)]" +
-        "expected2[(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)]"
+        "expected2[(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)]" +
+        "expected3[(v2)-[e3]->(v6)-[e7]->(v2)-[e3]->(v6)-[e7]->(v2)]"
       },
       {
         "Graph2_Cycle5",

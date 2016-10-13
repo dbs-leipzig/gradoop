@@ -25,6 +25,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.simulation.dual.DualSimulation;
@@ -175,10 +176,12 @@ public class PatternMatchingRunner extends AbstractRunner implements
       op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativePatternMatching(query, attachData);
+      op = new ExplorativePatternMatching(query, attachData,
+              MatchStrategy.ISOMORPHISM);
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
       op = new ExplorativePatternMatching(query, attachData,
+              MatchStrategy.ISOMORPHISM,
         new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :

@@ -24,6 +24,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.functions.utils.Superstep;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
@@ -82,6 +83,10 @@ public class DistributedTraverser<K> {
    * Edge mapping used for debug
    */
   private final DataSet<Tuple2<K, PropertyValue>> edgeMapping;
+  /**
+   *
+   */
+  private final MatchStrategy matchStrategy;
 
   /**
    * Creates a new distributed traverser.
@@ -96,7 +101,8 @@ public class DistributedTraverser<K> {
       vertexCount, edgeCount,
       null, null, // debug mappings
       JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES,
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES,
+      MatchStrategy.ISOMORPHISM);
   }
 
   /**
@@ -109,13 +115,15 @@ public class DistributedTraverser<K> {
    * @param edgeMapping             used for debug
    * @param edgeStepJoinStrategy    {@link JoinOperatorBase.JoinHint} edges
    * @param vertexStepJoinStrategy  {@link JoinOperatorBase.JoinHint} vertices
+   * @param matchStrategy  {@link MatchStrategy} used for pattern matching
    */
   public DistributedTraverser(TraversalCode traversalCode,
     int vertexCount, int edgeCount,
     DataSet<Tuple2<K, PropertyValue>> vertexMapping,
     DataSet<Tuple2<K, PropertyValue>> edgeMapping,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
-    JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
+    JoinOperatorBase.JoinHint vertexStepJoinStrategy,
+    MatchStrategy matchStrategy) {
     Objects.requireNonNull(traversalCode);
     Objects.requireNonNull(edgeStepJoinStrategy);
     Objects.requireNonNull(vertexStepJoinStrategy);
@@ -126,6 +134,7 @@ public class DistributedTraverser<K> {
     this.edgeMapping            = edgeMapping;
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
     this.vertexStepJoinStrategy = vertexStepJoinStrategy;
+    this.matchStrategy = matchStrategy;
   }
 
   /**
@@ -222,7 +231,7 @@ public class DistributedTraverser<K> {
     nextWorkSet = nextWorkSet
       .join(vertexSteps, vertexStepJoinStrategy)
       .where(0).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings<>(traversalCode));
+      .with(new UpdateVertexMappings<>(traversalCode, matchStrategy));
 
     nextWorkSet = log(nextWorkSet,
       new PrintEmbeddingWithTiePoint<>(true, "post-vertex-update"),

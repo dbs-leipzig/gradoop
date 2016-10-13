@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.preserving.explorative.tuples.EmbeddingWithTiePoint;
@@ -54,6 +55,10 @@ public class UpdateVertexMappings<K>
    */
   private final TraversalCode traversalCode;
   /**
+   * Match strategy
+   */
+  private final MatchStrategy matchStrategy;
+  /**
    * Current step in the traversal
    */
   private int currentStep;
@@ -78,10 +83,13 @@ public class UpdateVertexMappings<K>
    * Constructor
    *
    * @param tc traversal code for the current exploration
+   * @param matchStrategy select if subgraph isomorphism or homomorphism is used
    */
-  public UpdateVertexMappings(TraversalCode tc) {
+  public UpdateVertexMappings(TraversalCode tc, MatchStrategy matchStrategy) {
     this.traversalCode  = tc;
     this.stepCount      = tc.getSteps().size();
+    this.matchStrategy  = matchStrategy;
+
   }
 
   @Override
@@ -110,7 +118,7 @@ public class UpdateVertexMappings<K>
     K vertexId = vertexStep.getVertexId();
     boolean isMapped = vertexMappings[candidate] != null;
 
-    // not seen before or same as seen before (ensure bijection)
+    // not seen before or same as seen before (ensure bijection for Isomorphism)
     if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
       (isMapped && vertexMappings[candidate].equals(vertexId))) {
 
@@ -142,6 +150,10 @@ public class UpdateVertexMappings<K>
    * @return true, if visited before
    */
   private boolean seenBefore(K[] vertexMappings, K id) {
+    if (matchStrategy == MatchStrategy.HOMOMORPHISM) {
+      return false;
+    }
+
     boolean result = false;
     for (int i = 0; i <= currentStep; i++) {
       if (vertexMappings[previousFroms[i]].equals(id)) {

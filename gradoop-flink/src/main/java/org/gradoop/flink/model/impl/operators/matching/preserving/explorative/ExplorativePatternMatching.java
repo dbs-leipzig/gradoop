@@ -39,6 +39,7 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.matching.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph;
@@ -84,13 +85,22 @@ public class ExplorativePatternMatching extends PatternMatching
   private final JoinOperatorBase.JoinHint vertexStepJoinStrategy;
 
   /**
+   * Match strategy used for pattern matching
+   */
+  private final MatchStrategy matchStrategy;
+
+
+
+  /**
    * Create new operator instance
    *
-   * @param query      GDL query graph
-   * @param attachData true, if original data shall be attached to the result
+   * @param query         GDL query graph
+   * @param attachData    true, if original data shall be attached to the result
+   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    */
-  public ExplorativePatternMatching(String query, boolean attachData) {
-    this(query, attachData, new DFSTraverser());
+  public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy) {
+    this(query, attachData, matchStrategy, new DFSTraverser());
   }
 
   /**
@@ -98,11 +108,13 @@ public class ExplorativePatternMatching extends PatternMatching
    *
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
+   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    * @param traverser   Traverser used for the query graph
    */
   public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy,
     Traverser traverser) {
-    this(query, attachData, traverser,
+    this(query, attachData, matchStrategy, traverser,
       OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
   }
 
@@ -112,15 +124,18 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param query                   GDL query graph
    * @param attachData              true, if original data shall be attached
    *                                to the result
+   * @param matchStrategy           select Subgraph Isomorphism or Homomorphism
    * @param traverser               Traverser used for the query graph
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
   public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
+    this.matchStrategy = matchStrategy;
     this.traverser = traverser;
     this.traverser.setQueryHandler(getQueryHandler());
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
@@ -179,7 +194,8 @@ public class ExplorativePatternMatching extends PatternMatching
       traverser.getQueryHandler().getVertexCount(),
       traverser.getQueryHandler().getEdgeCount(),
       getVertexMapping(), getEdgeMapping(),
-      edgeStepJoinStrategy, vertexStepJoinStrategy);
+      edgeStepJoinStrategy, vertexStepJoinStrategy,
+      matchStrategy);
 
     DataSet<Tuple1<Embedding<GradoopId>>> embeddings = explorer
       .traverse(GradoopId.class, vertices, edges);
