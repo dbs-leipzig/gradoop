@@ -20,13 +20,10 @@ package org.gradoop.examples.sna;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * The benchmark program executes the following workflow:
@@ -84,18 +81,8 @@ public class SNABenchmark1 extends AbstractRunner implements
   execute(LogicalGraph socialNetwork) {
     return socialNetwork
       .subgraph(
-        new FilterFunction<Vertex>() {
-          @Override
-          public boolean filter(Vertex vertex) throws Exception {
-            return vertex.getLabel().equals("person");
-          }
-        },
-        new FilterFunction<Edge>() {
-          @Override
-          public boolean filter(Edge edge) throws Exception {
-            return edge.getLabel().equals("knows");
-          }
-        })
+        vertex -> vertex.getLabel().equals("person"),
+        edge -> edge.getLabel().equals("knows"))
       .groupBy(Lists.newArrayList("gender", "city"))
       .aggregate(new VertexCount())
       .aggregate(new EdgeCount());

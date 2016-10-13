@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.api.functions.UnaryFunction;
+import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <EL> EPGM element
  */
 public class PropertyGetter<EL extends Element>
-  implements UnaryFunction<EL, List<PropertyValue>> {
+  implements Function<EL, List<PropertyValue>> {
 
   /**
    * Property keys to retrieve property values
@@ -52,7 +52,7 @@ public class PropertyGetter<EL extends Element>
   }
 
   @Override
-  public List<PropertyValue> execute(EL entity) throws Exception {
+  public List<PropertyValue> apply(EL entity) {
     List<PropertyValue> propertyValueList =
       Lists.newArrayListWithCapacity(propertyKeys.size());
 

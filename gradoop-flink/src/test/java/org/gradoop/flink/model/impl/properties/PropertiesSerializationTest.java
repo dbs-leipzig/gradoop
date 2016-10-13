@@ -8,7 +8,6 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Test;
 
-import static org.gradoop.flink.model.impl.GradoopFlinkTestUtils.writeAndRead;
 import static org.junit.Assert.assertEquals;
 
 public class PropertiesSerializationTest extends GradoopFlinkTestBase {

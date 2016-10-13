@@ -4,9 +4,6 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -32,28 +29,28 @@ public class ApplyTransformationTest extends TransformationTest {
     List<GradoopId> expectedVertexIds     = Lists.newArrayList();
     List<GradoopId> expectedEdgeIds       = Lists.newArrayList();
 
-    inputCollection.getGraphHeads().map(new Id<GraphHead>()).output(
+    inputCollection.getGraphHeads().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    inputCollection.getVertices().map(new Id<Vertex>()).output(
+    inputCollection.getVertices().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    inputCollection.getEdges().map(new Id<Edge>()).output(
+    inputCollection.getEdges().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     GraphCollection outputCollection = inputCollection
       .apply(new ApplyTransformation(
-        new GraphHeadModifier(),
-        new VertexModifier(),
-        new EdgeModifier()));
+        TransformationTest::transformGraphHead,
+        TransformationTest::transformVertex,
+        TransformationTest::transformEdge));
 
     List<GradoopId> resultGraphHeadIds = Lists.newArrayList();
     List<GradoopId> resultVertexIds    = Lists.newArrayList();
     List<GradoopId> resultEdgeIds      = Lists.newArrayList();
 
-    outputCollection.getGraphHeads().map(new Id<GraphHead>()).output(
+    outputCollection.getGraphHeads().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(resultGraphHeadIds));
-    outputCollection.getVertices().map(new Id<Vertex>()).output(
+    outputCollection.getVertices().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(resultVertexIds));
-    outputCollection.getEdges().map(new Id<Edge>()).output(
+    outputCollection.getEdges().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(resultEdgeIds));
 
     getExecutionEnvironment().execute();
@@ -81,9 +78,9 @@ public class ApplyTransformationTest extends TransformationTest {
 
     GraphCollection outputCollection = inputCollection
       .apply(new ApplyTransformation(
-        new GraphHeadModifier(),
-        new VertexModifier(),
-        new EdgeModifier()));
+        TransformationTest::transformGraphHead,
+        TransformationTest::transformVertex,
+        TransformationTest::transformEdge));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
@@ -100,7 +97,7 @@ public class ApplyTransformationTest extends TransformationTest {
       loader.getGraphCollectionByVariables("g02", "g12");
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(new GraphHeadModifier(), null, null));
+      .apply(new ApplyTransformation(TransformationTest::transformGraphHead, null, null));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
@@ -117,7 +114,7 @@ public class ApplyTransformationTest extends TransformationTest {
       .getGraphCollectionByVariables("g03", "g13");
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(null, new VertexModifier(), null));
+      .apply(new ApplyTransformation(null, TransformationTest::transformVertex, null));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
@@ -134,7 +131,7 @@ public class ApplyTransformationTest extends TransformationTest {
       .getGraphCollectionByVariables("g04", "g14");
 
     GraphCollection outputCollection = inputCollection.apply(
-        new ApplyTransformation(null, null, new EdgeModifier()));
+        new ApplyTransformation(null, null, TransformationTest::transformEdge));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));

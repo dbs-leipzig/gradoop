@@ -20,14 +20,16 @@ package org.gradoop.flink.model.api.functions;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 
+import java.io.Serializable;
+
 /**
- * A transformation function is applied on an EPGM element (i.e. graph head,
+ * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to transform its data, but not its identity.
  *
  * @param <EL> EPGM attributed / labeled element
  */
 public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
-  extends BinaryFunction<EL, EL, EL> {
+  extends Serializable {
 
   /**
    * The method takes the current version of the element and a copy of that
@@ -41,6 +43,16 @@ public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
    * @param transformed   structural identical, but plain element
    * @return transformed element
    */
-  @Override
-  EL execute(EL current, EL transformed);
+  EL apply(EL current, EL transformed);
+
+  /**
+   * Returns the unmodified element.
+   *
+   * @param <EL> EPGM attributed / labeled element
+   * @return a function that always returns the current element
+   */
+  static <EL extends EPGMAttributed & EPGMLabeled> TransformationFunction<EL>
+  keep() {
+    return (c, t) -> c;
+  }
 }

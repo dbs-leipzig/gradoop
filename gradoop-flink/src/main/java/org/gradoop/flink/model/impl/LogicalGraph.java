@@ -98,7 +98,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   public static LogicalGraph fromDataSets(DataSet<Vertex> vertices,
     GradoopFlinkConfig config) {
     return fromDataSets(vertices,
-      createEdgeDataSet(Lists.<Edge>newArrayListWithCapacity(0), config),
+      createEdgeDataSet(Lists.newArrayListWithCapacity(0), config),
       config);
   }
 
@@ -144,8 +144,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new AddToGraph<Vertex>(graphHead));
-    edges = edges.map(new AddToGraph<Edge>(graphHead));
+    vertices = vertices.map(new AddToGraph<>(graphHead));
+    edges = edges.map(new AddToGraph<>(graphHead));
 
     return new LogicalGraph(graphHeadSet, vertices, edges, config);
   }
@@ -205,13 +205,13 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
     DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<Vertex>(graphHead));
+      .map(new AddToGraph<>(graphHead));
 
     DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<Edge>(graphHead));
+      .map(new AddToGraph<>(graphHead));
 
     return fromDataSets(
-      createGraphHeadDataSet(new ArrayList<GraphHead>(0), config),
+      createGraphHeadDataSet(new ArrayList<>(0), config),
       vertexDataSet, edgeDataSet, config
     );
   }
@@ -588,8 +588,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public GraphCollection splitBy(String propertyKey) {
     return callForCollection(
-      new Split(
-        new PropertyGetter<Vertex>(Lists.newArrayList(propertyKey))));
+      new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
   }
 
   //----------------------------------------------------------------------------
@@ -602,7 +601,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public DataSet<Boolean> isEmpty() {
     return getVertices()
-      .map(new True<Vertex>())
+      .map(new True<>())
       .distinct()
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())

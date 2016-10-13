@@ -19,13 +19,10 @@ package org.gradoop.examples.biiig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -34,7 +31,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -69,10 +65,10 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-    btgs = btgs
-      .apply(new ApplyAggregation(new IsClosedAggregateFunction()));
+    btgs = btgs.apply(new ApplyAggregation(new IsClosedAggregateFunction()));
 
-    btgs = btgs.select(new IsClosedPredicateFunction());
+    // Predicate function to filter graphs by "isClosed" == true
+    btgs = btgs.select(g -> g.getPropertyValue("isClosed").getBoolean());
 
     btgs = btgs
       .apply(new ApplyAggregation(new CountSalesOrdersAggregateFunction()));
@@ -80,9 +76,34 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     out.add("Business Transaction Graphs with Measures", btgs);
 
     btgs = btgs.apply(new ApplyTransformation(
-      new CategorizeGraphsTransformationFunction(),
-      new RelabelVerticesTransformationFunction(),
-      new EdgeLabelOnlyTransformationFunction())
+      // Transformation function to categorize graphs
+      (current, transformed) -> {
+        String category =
+          current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
+        transformed.setProperty(
+          CategoryCharacteristicSubgraphs.CATEGORY_KEY,
+          PropertyValue.create(category)
+        );
+
+        return transformed;
+      },
+      // Transformation function to relabel vertices and to drop properties
+      (current, transformed) -> {
+        transformed.setLabel(current.getPropertyValue(
+          BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
+          .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
+          current.getLabel() :
+          current
+            .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
+        );
+
+        return transformed;
+      },
+      // Transformation function to drop properties of edges
+      (current, transformed) -> {
+        transformed.setLabel(current.getLabel());
+        return transformed;
+      })
     );
 
     out.add("Business Transaction Graphs after Transformation", btgs);
@@ -141,24 +162,11 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     @Override
     public PropertyValue getVertexIncrement(Vertex vertex) {
-
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
 
       return PropertyValue.create(isClosedQuotation);
-    }
-  }
-
-  /**
-   * Predicate function to filter graphs by "isClosed" == true
-   */
-  private static class IsClosedPredicateFunction
-    implements FilterFunction<GraphHead> {
-
-    @Override
-    public boolean filter(GraphHead graphHead) throws Exception {
-      return graphHead.getPropertyValue("isClosed").getBoolean();
     }
   }
 
@@ -177,61 +185,6 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     @Override
     public String getAggregatePropertyKey() {
       return "soCount";
-    }
-  }
-
-  /**
-   * Transformation function to categorize graphs.
-   */
-  private static class CategorizeGraphsTransformationFunction implements
-    TransformationFunction<GraphHead> {
-    @Override
-    public GraphHead execute(GraphHead current,
-      GraphHead transformed) {
-
-      String category =
-        current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
-
-      transformed.setProperty(
-        CategoryCharacteristicSubgraphs.CATEGORY_KEY,
-        PropertyValue.create(category)
-      );
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Transformation function to relabel vertices and to drop properties.
-   */
-  private static class RelabelVerticesTransformationFunction implements
-    TransformationFunction<Vertex> {
-    @Override
-    public Vertex execute(Vertex current, Vertex transformed) {
-
-      transformed.setLabel(current.getPropertyValue(
-        BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
-        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
-        current.getLabel() :
-        current
-          .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
-      );
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Transformation function to drop properties of edges.
-   */
-  private static class EdgeLabelOnlyTransformationFunction implements
-    TransformationFunction<Edge> {
-    @Override
-    public Edge execute(Edge current, Edge transformed) {
-
-      transformed.setLabel(current.getLabel());
-
-      return transformed;
     }
   }
 

@@ -54,7 +54,7 @@ public abstract class TransformBase<EL extends Element>
    */
   @Override
   public EL map(EL element) throws Exception {
-    return transformationFunction.execute(element, initFrom(element));
+    return transformationFunction.apply(element, initFrom(element));
   }
 
   /**

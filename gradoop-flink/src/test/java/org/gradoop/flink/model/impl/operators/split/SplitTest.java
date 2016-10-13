@@ -3,7 +3,6 @@ package org.gradoop.flink.model.impl.operators.split;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.functions.UnaryFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -13,6 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SplitTest extends GradoopFlinkTestBase {
+
+  private static List<PropertyValue> getSplitValues(Vertex v) {
+    String key1 = "key1";
+    String key2 = "key2";
+    List<PropertyValue> valueList = new ArrayList<>();
+    if (v.hasProperty(key1)) {
+      valueList.add(v.getPropertyValue(key1));
+    }
+    if (v.hasProperty(key2)) {
+      valueList.add(v.getProperties().get(key2));
+    }
+    return valueList;
+  }
 
   @Test
   public void testSplit() throws Exception {
@@ -38,7 +50,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result =
-      input.callForCollection(new Split(new SelectKeyValues()));
+      input.callForCollection(new Split(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -75,7 +87,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(new SelectKeyValues()));
+      .callForCollection(new Split(SplitTest::getSplitValues));
 
     GraphCollection expectation = loader.getGraphCollectionByVariables(
       "graph1", "graph2", "graph3");
@@ -110,7 +122,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(new SelectKeyValues()));
+      .callForCollection(new Split(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -148,22 +160,6 @@ public class SplitTest extends GradoopFlinkTestBase {
       loader.getGraphCollectionByVariables("g2")));
   }
 
-  public static class SelectKeyValues
-    implements UnaryFunction<Vertex, List<PropertyValue>>{
-    @Override
-    public List<PropertyValue> execute(Vertex entity) throws Exception {
-      String key1 = "key1";
-      String key2 = "key2";
-      List<PropertyValue> valueList = new ArrayList<>();
-      if (entity.hasProperty(key1)) {
-        valueList.add(entity.getPropertyValue(key1));
-      }
-      if (entity.hasProperty(key2)) {
-        valueList.add(entity.getProperties().get(key2));
-      }
 
-      return valueList;
-    }
-  }
 }
 
