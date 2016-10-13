@@ -24,6 +24,8 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism;
+import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.ExplorativeSubgraphIsomorphism.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.isomorphism.explorative.tuples.VertexStep;
 
@@ -52,6 +54,10 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
    */
   private final TraversalCode traversalCode;
   /**
+   * Match strategy
+   */
+  private final MatchStrategy matchStrategy;
+  /**
    * Current step in the traversal
    */
   private int currentStep;
@@ -76,10 +82,13 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
    * Constructor
    *
    * @param tc traversal code for the current exploration
+   * @param matchStrategy select if subgraph isomorphism or homomorphism is used
    */
-  public UpdateVertexMappings(TraversalCode tc) {
+  public UpdateVertexMappings(TraversalCode tc, MatchStrategy matchStrategy) {
     this.traversalCode  = tc;
     this.stepCount      = tc.getSteps().size();
+    this.matchStrategy  = matchStrategy;
+
   }
 
   @Override
@@ -109,8 +118,10 @@ public class UpdateVertexMappings extends RichFlatJoinFunction
     boolean isMapped = vertexMappings[candidate] != null;
 
     // not seen before or same as seen before (ensure bijection)
-    if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
-      (isMapped && vertexMappings[candidate].equals(vertexId))) {
+    if (
+         (!isMapped && (!seenBefore(vertexMappings, vertexId) || matchStrategy.equals(MatchStrategy.HOMOMORPHISM))) ||
+         (isMapped && vertexMappings[candidate].equals(vertexId))
+       )  {
 
       vertexMappings[candidate] = vertexId;
       embedding.getEmbedding().setVertexMappings(vertexMappings);

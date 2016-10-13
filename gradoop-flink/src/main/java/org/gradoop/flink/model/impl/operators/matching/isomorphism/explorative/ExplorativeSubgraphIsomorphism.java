@@ -101,13 +101,28 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
   private final JoinOperatorBase.JoinHint vertexStepJoinStrategy;
 
   /**
+   * Match strategy used for pattern matching
+   */
+  private final MatchStrategy matchStrategy;
+
+
+  public enum MatchStrategy {
+    ISOMORPHISM,
+    HOMOMORPHISM;
+
+    private MatchStrategy() {
+    }
+  }
+
+  /**
    * Constructor
    *
    * @param query      GDL query graph
    * @param attachData true, if original data shall be attached to the result
+   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData) {
-    this(query, attachData, new DFSTraverser());
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData, MatchStrategy matchStrategy) {
+    this(query, attachData, matchStrategy, new DFSTraverser());
   }
 
   /**
@@ -115,11 +130,12 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
    *
    * @param query       GDL query graph
    * @param attachData  true, if original data shall be attached to the result
+   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    * @param traverser   Traverser used for the query graph
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData, MatchStrategy matchStrategy,
     Traverser traverser) {
-    this(query, attachData, traverser,
+    this(query, attachData, matchStrategy, traverser,
       OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
   }
 
@@ -129,16 +145,18 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
    * @param query                   GDL query graph
    * @param attachData              true, if original data shall be attached
    *                                to the result
+   * @param matchStrategy           select Subgraph Isomorphism or Homomorphism
    * @param traverser               Traverser used for the query graph
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
-  public ExplorativeSubgraphIsomorphism(String query, boolean attachData,
+  public ExplorativeSubgraphIsomorphism(String query, boolean attachData, MatchStrategy matchStrategy,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
     traverser.setQueryHandler(getQueryHandler());
+    this.matchStrategy = matchStrategy;
     this.traversalCode          = traverser.traverse();
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
     this.vertexStepJoinStrategy = vertexStepJoinStrategy;
@@ -287,7 +305,7 @@ public class ExplorativeSubgraphIsomorphism extends PatternMatching implements
     nextWorkSet = nextWorkSet
       .join(vertexSteps, vertexStepJoinStrategy)
       .where(1).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings(traversalCode));
+      .with(new UpdateVertexMappings(traversalCode, matchStrategy));
 
     if (LOG.isDebugEnabled()) {
       nextWorkSet = nextWorkSet

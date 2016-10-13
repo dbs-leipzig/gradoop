@@ -14,8 +14,7 @@ public class ExplorativeSubgraphIsomorphismTest extends
   }
 
   @Override
-  public PatternMatching getImplementation(String queryGraph,
-    boolean attachData) {
-    return new ExplorativeSubgraphIsomorphism(queryGraph, attachData);
+  public PatternMatching getImplementation(String queryGraph, boolean attachData) {
+    return new ExplorativeSubgraphIsomorphism(queryGraph, attachData, ExplorativeSubgraphIsomorphism.MatchStrategy.ISOMORPHISM );
   }
 }
