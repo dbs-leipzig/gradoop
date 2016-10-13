@@ -70,9 +70,10 @@ public abstract class SubgraphHomomorphismTest extends PatternMatchingTest {
         "Graph1_Cycle4",
         GRAPH_1,
         CYCLE_PATTERN_4,
-        new String[] {"expected1", "expected2"},
+        new String[] {"expected1", "expected2","expected3"},
         "expected1[(v1)-[e2]->(v6)-[e8]->(v5)-[e6]->(v4)-[e4]->(v1)]" +
-        "expected2[(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)]"
+        "expected2[(v5)-[e6]->(v4)-[e4]->(v1)-[e2]->(v6)-[e8]->(v5)]" +
+        "expected3[(v2)-[e3]->(v6)-[e7]->(v2)-[e3]->(v6)-[e7]->(v2)]"
       },
       {
         "Graph2_Cycle5",
