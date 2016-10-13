@@ -23,6 +23,7 @@
     <!-- Checks for the correct license header in *.java files -->
     <module name="Header">
         <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="fileExtensions" value="java"/>
     </module>
 
     <!-- Checks for Javadoc comments (checker).           -->
@@ -145,6 +146,7 @@
             <property name="caseIndent" value="0"/>
             <property name="basicOffset" value="2"/>
             <property name="braceAdjustment" value="0"/>
+            <property name="lineWrappingIndentation" value="0"/>
         </module>
         <module name="UpperEll"/>
 
