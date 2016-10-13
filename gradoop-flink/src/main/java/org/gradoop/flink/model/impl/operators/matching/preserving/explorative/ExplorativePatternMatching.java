@@ -94,8 +94,8 @@ public class ExplorativePatternMatching extends PatternMatching
   /**
    * Create new operator instance
    *
-   * @param query      GDL query graph
-   * @param attachData true, if original data shall be attached to the result
+   * @param query         GDL query graph
+   * @param attachData    true, if original data shall be attached to the result
    * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    */
   public ExplorativePatternMatching(String query, boolean attachData,

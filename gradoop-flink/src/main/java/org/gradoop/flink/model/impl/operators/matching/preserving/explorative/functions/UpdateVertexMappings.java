@@ -150,7 +150,7 @@ public class UpdateVertexMappings<K>
    * @return true, if visited before
    */
   private boolean seenBefore(K[] vertexMappings, K id) {
-    if (matchStrategy.equals(MatchStrategy.HOMOMORPHISM)) {
+    if (matchStrategy == MatchStrategy.HOMOMORPHISM) {
       return false;
     }
 

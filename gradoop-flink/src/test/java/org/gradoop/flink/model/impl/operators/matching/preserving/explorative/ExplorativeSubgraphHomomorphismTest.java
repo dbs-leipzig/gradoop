@@ -7,9 +7,9 @@ import org.gradoop.flink.model.impl.operators.matching.preserving.SubgraphHomomo
 public class ExplorativeSubgraphHomomorphismTest extends
         SubgraphHomomorphismTest {
 
-  public ExplorativeSubgraphHomomorphismTest(String testName, String dataGraph,
-                                             String queryGraph, String[] expectedGraphVariables,
-                                             String expectedCollection) {
+  public ExplorativeSubgraphHomomorphismTest(String testName,
+    String dataGraph, String queryGraph, String[] expectedGraphVariables,
+    String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
   }
