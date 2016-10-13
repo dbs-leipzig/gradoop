@@ -101,7 +101,7 @@
         <log4j.properties>log4j-test.properties</log4j.properties>
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
-        <plugin.maven-checkstyle.version>2.14</plugin.maven-checkstyle.version>
+        <plugin.maven-checkstyle.version>2.16</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
@@ -161,6 +161,7 @@
                         <configLocation>gradoop/checkstyle.xml</configLocation>
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
+                        <includeTestResources>false</includeTestResources>
                     </configuration>
                     <executions>
                         <execution>
