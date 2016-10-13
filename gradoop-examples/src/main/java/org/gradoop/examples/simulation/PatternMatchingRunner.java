@@ -176,10 +176,12 @@ public class PatternMatchingRunner extends AbstractRunner implements
       op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativePatternMatching(query, attachData, MatchStrategy.ISOMORPHISM);
+      op = new ExplorativePatternMatching(query, attachData,
+              MatchStrategy.ISOMORPHISM);
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
-      op = new ExplorativePatternMatching(query, attachData, MatchStrategy.ISOMORPHISM,
+      op = new ExplorativePatternMatching(query, attachData,
+              MatchStrategy.ISOMORPHISM,
         new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
       break;
     default :

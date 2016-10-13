@@ -265,7 +265,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection match(String pattern, boolean attachData, MatchStrategy matchStrategy) {
+  public GraphCollection match(String pattern, boolean attachData,
+                               MatchStrategy matchStrategy) {
     return callForCollection(new ExplorativePatternMatching(
       pattern, attachData,
       matchStrategy, new DFSTraverser()));

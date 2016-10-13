@@ -98,7 +98,8 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param attachData true, if original data shall be attached to the result
    * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    */
-  public ExplorativePatternMatching(String query, boolean attachData, MatchStrategy matchStrategy) {
+  public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy) {
     this(query, attachData, matchStrategy, new DFSTraverser());
   }
 
@@ -110,7 +111,8 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param matchStrategy select Subgraph Isomorphism or Homomorphism
    * @param traverser   Traverser used for the query graph
    */
-  public ExplorativePatternMatching(String query, boolean attachData, MatchStrategy matchStrategy,
+  public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy,
     Traverser traverser) {
     this(query, attachData, matchStrategy, traverser,
       OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
@@ -127,7 +129,8 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
-  public ExplorativePatternMatching(String query, boolean attachData, MatchStrategy matchStrategy,
+  public ExplorativePatternMatching(String query, boolean attachData,
+    MatchStrategy matchStrategy,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {

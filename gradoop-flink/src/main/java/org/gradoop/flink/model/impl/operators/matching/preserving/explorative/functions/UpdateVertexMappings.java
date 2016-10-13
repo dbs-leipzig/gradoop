@@ -118,11 +118,9 @@ public class UpdateVertexMappings<K>
     K vertexId = vertexStep.getVertexId();
     boolean isMapped = vertexMappings[candidate] != null;
 
-    // not seen before or same as seen before (ensure bijection)
-    if (
-         (!isMapped && (!seenBefore(vertexMappings, vertexId) || matchStrategy.equals(MatchStrategy.HOMOMORPHISM))) ||
-         (isMapped && vertexMappings[candidate].equals(vertexId))
-       )  {
+    // not seen before or same as seen before (ensure bijection for Isomorphism)
+    if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
+      (isMapped && vertexMappings[candidate].equals(vertexId))) {
 
       vertexMappings[candidate] = vertexId;
       embedding.getEmbedding().setVertexMappings(vertexMappings);
@@ -152,6 +150,10 @@ public class UpdateVertexMappings<K>
    * @return true, if visited before
    */
   private boolean seenBefore(K[] vertexMappings, K id) {
+    if (matchStrategy.equals(MatchStrategy.HOMOMORPHISM)) {
+      return false;
+    }
+
     boolean result = false;
     for (int i = 0; i <= currentStep; i++) {
       if (vertexMappings[previousFroms[i]].equals(id)) {
