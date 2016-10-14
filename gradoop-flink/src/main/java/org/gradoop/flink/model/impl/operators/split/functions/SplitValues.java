@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.functions.UnaryFunction;
+import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -43,14 +43,14 @@ public class SplitValues<V extends Vertex>
   /**
    * Self defined Function
    */
-  private UnaryFunction<V, List<PropertyValue>> function;
+  private Function<V, List<PropertyValue>> function;
 
   /**
    * Constructor
    *
    * @param function user-defined function to determine split values
    */
-  public SplitValues(UnaryFunction<V, List<PropertyValue>> function) {
+  public SplitValues(Function<V, List<PropertyValue>> function) {
     this.function = checkNotNull(function);
   }
 
@@ -60,7 +60,7 @@ public class SplitValues<V extends Vertex>
   @Override
   public void flatMap(V vertex,
     Collector<Tuple2<GradoopId, PropertyValue>> collector) throws Exception {
-    List<PropertyValue> splitValues = function.execute(vertex);
+    List<PropertyValue> splitValues = function.apply(vertex);
     for (PropertyValue value : splitValues) {
       collector.collect(new Tuple2<>(vertex.getId(), value));
     }

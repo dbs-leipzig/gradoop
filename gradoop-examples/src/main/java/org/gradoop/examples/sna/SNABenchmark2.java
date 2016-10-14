@@ -21,9 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -33,8 +31,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -179,40 +175,26 @@ public class SNABenchmark2 extends AbstractRunner implements
 
     return socialNetwork
       // 1) extract subgraph
-      .subgraph(new FilterFunction<Vertex>() {
-        @Override
-        public boolean filter(Vertex vertex) throws Exception {
-          return vertex.getLabel().toLowerCase().equals(person);
-        }
-      }, new FilterFunction<Edge>() {
-        @Override
-        public boolean filter(Edge edge) throws Exception {
-          return edge.getLabel().toLowerCase().equals(knows);
-        }
-      })
+      .subgraph(
+        vertex -> vertex.getLabel().toLowerCase().equals(person),
+        edge -> edge.getLabel().toLowerCase().equals(knows))
       // project to necessary information
-      .transform(new TransformationFunction<GraphHead>() {
-        @Override
-        public GraphHead execute(GraphHead current,
-          GraphHead transformed) {
-          return current;
-        }
-      }, new TransformationFunction<Vertex>() {
-        @Override
-        public Vertex execute(Vertex current, Vertex transformed) {
+      .transform(
+        // keep graph heads
+        TransformationFunction.keep(),
+        // keep necessary vertex properties
+        (current, transformed) -> {
           transformed.setLabel(current.getLabel());
           transformed.setProperty(city, current.getPropertyValue(city));
           transformed.setProperty(gender, current.getPropertyValue(gender));
           transformed.setProperty(label, current.getPropertyValue(birthday));
           return transformed;
-        }
-      }, new TransformationFunction<Edge>() {
-        @Override
-        public Edge execute(Edge current, Edge transformed) {
+        },
+        // keep only edge label
+        (current, transformed) -> {
           transformed.setLabel(current.getLabel());
           return transformed;
-        }
-      })
+        })
       // 3a) compute communities
       .callForGraph(new GellyLabelPropagation(maxIterations, label))
       // 3b) separate communities
@@ -220,12 +202,7 @@ public class SNABenchmark2 extends AbstractRunner implements
       // 4) compute vertex count per community
       .apply(new ApplyAggregation(new VertexCount()))
       // 5) select graphs with more than minClusterSize vertices
-      .select(new FilterFunction<GraphHead>() {
-        @Override
-        public boolean filter(GraphHead g) throws Exception {
-          return g.getPropertyValue(vertexCount).getLong() > threshold;
-        }
-      })
+      .select(g -> g.getPropertyValue(vertexCount).getLong() > threshold)
       // 6) reduce filtered graphs to a single graph using combination
       .reduce(new ReduceCombination())
       // 7) group that graph by vertex properties

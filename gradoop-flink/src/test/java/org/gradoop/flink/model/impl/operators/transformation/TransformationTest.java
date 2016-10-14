@@ -7,7 +7,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -35,6 +34,27 @@ public class TransformationTest extends GradoopFlinkTestBase {
     "g04:A { a = 1 } [(:A { a = 1, b = 2 })-->(:B { c = 2 })]" +
     "g14:B { a = 2 } [(:A { a = 2, b = 2 })-->(:B { c = 3 })]";
 
+  static GraphHead transformGraphHead(GraphHead current, GraphHead transformed) {
+    transformed.setLabel(current.getLabel());
+    transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
+    return transformed;
+  }
+
+  static Vertex transformVertex(Vertex current, Vertex transformed) {
+    transformed.setLabel(current.getLabel());
+    if (current.getLabel().equals("A")) {
+      transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
+      transformed.setProperty("b", current.getPropertyValue("b").getInt() - 1);
+    } else if (current.getLabel().equals("B")) {
+      transformed.setProperty("d", current.getPropertyValue("c"));
+    }
+    return transformed;
+  }
+
+  static Edge transformEdge(Edge current, Edge transformed) {
+    return transformed;
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
     new Transformation(null, null, null);
@@ -56,18 +76,18 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph inputGraph = loader.getLogicalGraphByVariable("g0");
 
-    inputGraph.getGraphHead().map(new Id<GraphHead>()).output(
+    inputGraph.getGraphHead().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    inputGraph.getVertices().map(new Id<Vertex>()).output(
+    inputGraph.getVertices().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    inputGraph.getEdges().map(new Id<Edge>()).output(
+    inputGraph.getEdges().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     LogicalGraph result = inputGraph
       .transform(
-        new GraphHeadModifier(),
-        new VertexModifier(),
-        new EdgeModifier()
+        TransformationTest::transformGraphHead,
+        TransformationTest::transformVertex,
+        TransformationTest::transformEdge
       );
 
     List<GradoopId> resultGraphHeadIds = Lists.newArrayList();
@@ -75,13 +95,13 @@ public class TransformationTest extends GradoopFlinkTestBase {
     List<GradoopId> resultEdgeIds = Lists.newArrayList();
 
     result.getGraphHead()
-      .map(new Id<GraphHead>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultGraphHeadIds));
     result.getVertices()
-      .map(new Id<Vertex>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultVertexIds));
     result.getEdges()
-      .map(new Id<Edge>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
     getExecutionEnvironment().execute();
@@ -105,12 +125,12 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
 
-    LogicalGraph
-      result = original.transform(
-      new GraphHeadModifier(),
-      new VertexModifier(),
-      new EdgeModifier()
-    );
+    LogicalGraph result = original
+      .transform(
+        TransformationTest::transformGraphHead,
+        TransformationTest::transformVertex,
+        TransformationTest::transformEdge
+      );
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -123,7 +143,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
 
-    LogicalGraph result = original.transformGraphHead(new GraphHeadModifier());
+    LogicalGraph result = original.transformGraphHead(TransformationTest::transformGraphHead);
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -136,7 +156,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
 
-    LogicalGraph result = original.transformVertices(new VertexModifier());
+    LogicalGraph result = original.transformVertices(TransformationTest::transformVertex);
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -149,41 +169,10 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
 
-    LogicalGraph result = original.transformEdges(new EdgeModifier());
+    LogicalGraph result = original.transformEdges(TransformationTest::transformEdge);
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
-  public static class GraphHeadModifier implements TransformationFunction<GraphHead> {
 
-    @Override
-    public GraphHead execute(GraphHead current, GraphHead transformed) {
-      transformed.setLabel(current.getLabel());
-      transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
-      return transformed;
-    }
-  }
-
-  public static class VertexModifier implements TransformationFunction<Vertex> {
-
-    @Override
-    public Vertex execute(Vertex current, Vertex transformed) {
-      transformed.setLabel(current.getLabel());
-      if (current.getLabel().equals("A")) {
-        transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
-        transformed.setProperty("b", current.getPropertyValue("b").getInt() - 1);
-      } else if (current.getLabel().equals("B")) {
-        transformed.setProperty("d", current.getPropertyValue("c"));
-      }
-      return transformed;
-    }
-  }
-
-  public static class EdgeModifier implements TransformationFunction<Edge> {
-
-    @Override
-    public Edge execute(Edge current, Edge transformed) {
-      return transformed;
-    }
-  }
 }

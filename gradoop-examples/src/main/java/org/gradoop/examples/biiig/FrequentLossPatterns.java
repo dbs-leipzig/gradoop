@@ -18,7 +18,6 @@
 package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.hadoop.util.Time;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -38,12 +37,13 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
-import org.gradoop.flink.model.impl.operators.transformation
-  .ApplyTransformation;
-import org.gradoop.flink.model.impl.operators.transformation.functions.Keep;
+import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
+
+import static java.math.BigDecimal.ROUND_HALF_UP;
+import static java.math.BigDecimal.ZERO;
 
 /**
  * Example workflow of paper "Scalable Business Intelligence with Graph
@@ -77,6 +77,68 @@ public class FrequentLossPatterns
    * Label prefix of transactional data.
    */
   private static final String TRANSACTIONAL_PREFIX = "T#";
+
+  // TRANSFORMATION FUNCTIONS
+
+  /**
+   * Relabel vertices and to drop properties.
+   *
+   * @param current current vertex
+   * @param transformed copy of current except label and properties
+   * @return current vertex with a new label depending on its type
+   */
+  private static Vertex relabelVerticesAndRemoveProperties(Vertex current,
+    Vertex transformed) {
+
+    String label;
+
+    if (current
+      .getPropertyValue(BusinessTransactionGraphs.SUPERTYPE_KEY).getString()
+      .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL)) {
+
+      label = TRANSACTIONAL_PREFIX + current.getLabel();
+    } else {
+      label = MASTER_PREFIX + current.getPropertyValue(SOURCEID_KEY).toString();
+    }
+
+    transformed.setLabel(label);
+
+    return transformed;
+  }
+
+  /**
+   * Drop edge properties.
+   *
+   * @param current current edge
+   * @param transformed copy of current except label and properties
+   * @return current edge without properties
+   */
+  private static Edge dropEdgeProperties(Edge current, Edge transformed) {
+    transformed.setLabel(current.getLabel());
+    return transformed;
+  }
+
+  /**
+   * Append graph label by FSM support.
+   *
+   * @param current current graph head
+   * @param transformed copy of current except label and properties
+   * @return graph head with additional support property
+   */
+  private static GraphHead addSupportToGraphHead(GraphHead current,
+    GraphHead transformed) {
+
+    BigDecimal support = current
+      .getPropertyValue(SubgraphDecoder.FREQUENCY_KEY)
+      .getBigDecimal().setScale(2, ROUND_HALF_UP);
+
+    String newLabel = current.getLabel() + " (" + support + ")";
+
+    transformed.setLabel(newLabel);
+    transformed.setProperties(null);
+
+    return transformed;
+  }
 
   /**
    * main method
@@ -118,24 +180,23 @@ public class FrequentLossPatterns
     btgs = btgs.apply(new ApplyAggregation(new Result()));
 
     // (4) select by loss (negative financialResult)
-    btgs = btgs.select(new Loss());
+    btgs = btgs.select(
+      g -> g.getPropertyValue(RESULT_KEY).getBigDecimal().compareTo(ZERO) < 0);
 
     // (5) relabel vertices and remove vertex and edge properties
 
     btgs = btgs.apply(new ApplyTransformation(
-      new Keep<GraphHead>(),
-      new RelabelVerticesAndRemoveProperties(),
-      new DropEdgeProperties()
+      TransformationFunction.keep(),
+      FrequentLossPatterns::relabelVerticesAndRemoveProperties,
+      FrequentLossPatterns::dropEdgeProperties
     ));
 
     // (6) mine frequent subgraphs
 
-    FSMConfig fsmConfig = new FSMConfig(
-      0.6f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
-    GraphCollection frequentSubgraphs = btgs.callForCollection(
-      new TransactionalFSM(fsmConfig)
-    );
+    GraphCollection frequentSubgraphs = btgs
+      .callForCollection(new TransactionalFSM(fsmConfig));
 
     // (7) Check, if frequent subgraph contains master data
 
@@ -144,15 +205,15 @@ public class FrequentLossPatterns
 
     // (8) Select graphs containing master data
 
-    frequentSubgraphs = frequentSubgraphs.select(new ContainsMasterData());
-
+    frequentSubgraphs = frequentSubgraphs.select(
+      g -> g.getPropertyValue(MASTERDATA_KEY).getInt() >= 0);
 
     // (9) relabel graph heads of frequent subgraphs
 
     frequentSubgraphs = frequentSubgraphs.apply(new ApplyTransformation(
-      new AddSupportToGraphHead(),
-      new Keep<Vertex>(),
-      new Keep<Edge>()
+      FrequentLossPatterns::addSupportToGraphHead,
+      TransformationFunction.keep(),
+      TransformationFunction.keep()
     ));
 
     // (10) write data sink
@@ -229,97 +290,6 @@ public class FrequentLossPatterns
     }
   }
 
-  // SELECTION PREDICATES
-
-  /**
-   * Select business transaction graphs with negative financial result
-   * */
-  private static class Loss implements FilterFunction<GraphHead> {
-
-    @Override
-    public boolean filter(GraphHead graph) throws Exception {
-      return graph.getPropertyValue(RESULT_KEY)
-        .getBigDecimal().compareTo(BigDecimal.ZERO) < 0;
-    }
-  }
-
-  /**
-   * Select frequent subgraphs that contain master data.
-   */
-  private static class ContainsMasterData implements FilterFunction<GraphHead> {
-
-    @Override
-    public boolean filter(GraphHead value) throws Exception {
-      return value.getPropertyValue(MASTERDATA_KEY).getInt() >= 0;
-    }
-  }
-
-  // TRANSFORMATION FUNCTIONS
-
-  /**
-   * Relabel vertices and to drop properties.
-   */
-  private static class RelabelVerticesAndRemoveProperties
-    implements TransformationFunction<Vertex> {
-
-    @Override
-    public Vertex execute(Vertex current, Vertex transformed) {
-
-      String label;
-
-      if (current
-        .getPropertyValue(BusinessTransactionGraphs.SUPERTYPE_KEY).getString()
-        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL)) {
-
-        label = TRANSACTIONAL_PREFIX +
-          current.getLabel();
-
-      } else {
-        label = MASTER_PREFIX +
-          current.getPropertyValue(SOURCEID_KEY).toString();
-      }
-
-      transformed.setLabel(label);
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Drop edge properties.
-   */
-  private static class DropEdgeProperties implements
-    TransformationFunction<Edge> {
-    @Override
-    public Edge execute(Edge current, Edge transformed) {
-
-      transformed.setLabel(current.getLabel());
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Append graph label by FSM support.
-   */
-  private static class AddSupportToGraphHead implements
-    TransformationFunction<GraphHead> {
-
-    @Override
-    public GraphHead execute(GraphHead current, GraphHead transformed) {
-
-      BigDecimal support = current
-        .getPropertyValue(SubgraphDecoder.FREQUENCY_KEY)
-        .getBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP);
-
-      String newLabel = current.getLabel() + " (" + support + ")";
-
-      transformed.setLabel(newLabel);
-      transformed.setProperties(null);
-
-      return transformed;
-    }
-  }
 
   @Override
   public String getDescription() {

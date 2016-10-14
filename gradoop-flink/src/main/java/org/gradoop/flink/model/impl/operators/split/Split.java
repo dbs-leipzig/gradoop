@@ -32,7 +32,7 @@ import org.gradoop.flink.model.impl.operators.split.functions
 import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.functions.UnaryFunction;
+import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
@@ -60,14 +60,14 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
   /**
    * User-defined function for value extraction
    */
-  private final UnaryFunction<Vertex, List<PropertyValue>> function;
+  private final Function<Vertex, List<PropertyValue>> function;
 
   /**
    * Constructor
    *
    * @param function user-defined function
    */
-  public Split(UnaryFunction<Vertex, List<PropertyValue>> function) {
+  public Split(Function<Vertex, List<PropertyValue>> function) {
     this.function = function;
   }
 
@@ -89,13 +89,13 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     // extract the split properties into a dataset
     DataSet<Tuple1<PropertyValue>> distinctSplitValues = vertexIdWithSplitValues
-      .map(new Project2To1<GradoopId, PropertyValue>())
+      .map(new Project2To1<>())
       .distinct();
 
     // generate one new unique GraphId per distinct split property
     DataSet<Tuple2<PropertyValue, GradoopId>> splitValuesWithGraphIds =
       distinctSplitValues
-        .map(new PairTupleWithNewId<PropertyValue>());
+        .map(new PairTupleWithNewId<>());
 
     // build a dataset of the vertex ids and the new associated graph ids
     DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdWithGraphIds =
@@ -109,7 +109,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     // add new graph ids to the initial vertex set
     DataSet<Vertex> vertices = graph.getVertices()
       .join(vertexIdWithGraphIds)
-      .where(new Id<Vertex>()).equalTo(0)
+      .where(new Id<>()).equalTo(0)
       .with(new AddNewGraphsToVertex<>());
 
     //--------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     // extract graph ids into a dataset
     DataSet<Tuple1<GradoopId>> newGraphIds = splitValuesWithGraphIds
-      .map(new Project2To1<PropertyValue, GradoopId>());
+      .map(new Project2To1<>());
 
     // add new graph id's to the initial graph set
     DataSet<GraphHead> newGraphs = newGraphIds

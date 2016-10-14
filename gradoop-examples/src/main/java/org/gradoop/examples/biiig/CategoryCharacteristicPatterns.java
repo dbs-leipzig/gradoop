@@ -19,13 +19,10 @@ package org.gradoop.examples.biiig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -34,13 +31,18 @@ import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SOURCEID_KEY;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERTYPE_KEY;
+import static org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 
 /**
  * Example workflow of paper "Scalable Business Intelligence with Graph
@@ -66,23 +68,45 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     out.add("Integrated Instance Graph", iig);
 
+    // extract business transaction graphs (BTGs)
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
     btgs = btgs
-      .apply(new ApplyAggregation(new IsClosedAggregateFunction()));
-
-    btgs = btgs.select(new IsClosedPredicateFunction());
-
-    btgs = btgs
+      // determine closed/open BTGs
+      .apply(new ApplyAggregation(new IsClosedAggregateFunction()))
+      // select closed BTGs
+      .select(g -> g.getPropertyValue("isClosed").getBoolean())
+      // count number of sales orders per BTG
       .apply(new ApplyAggregation(new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
     btgs = btgs.apply(new ApplyTransformation(
-      new CategorizeGraphsTransformationFunction(),
-      new RelabelVerticesTransformationFunction(),
-      new EdgeLabelOnlyTransformationFunction())
+      // Transformation function to categorize graphs
+      (graph, copy) -> {
+        String category = graph.getPropertyValue("soCount").getInt() > 0 ?
+          "won" : "lost";
+        copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
+        return copy;
+      },
+      // Transformation function to relabel vertices and to drop properties
+      (vertex, copy) -> {
+        String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
+
+        if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
+          copy.setLabel(vertex.getLabel());
+        } else { // master data
+          copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
+        }
+        return copy;
+      },
+      // Transformation function to drop properties of edges
+      (edge, copy) -> {
+        copy.setLabel(edge.getLabel());
+
+        return copy;
+      })
     );
 
     out.add("Business Transaction Graphs after Transformation", btgs);
@@ -115,13 +139,13 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     gdl = gdl
       .replaceAll("SOURCEID_KEY",
-        BusinessTransactionGraphs.SOURCEID_KEY)
+        SOURCEID_KEY)
       .replaceAll("SUPERTYPE_KEY",
-        BusinessTransactionGraphs.SUPERTYPE_KEY)
+        SUPERTYPE_KEY)
       .replaceAll("SUPERCLASS_VALUE_MASTER",
-        BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER)
+        SUPERCLASS_VALUE_MASTER)
       .replaceAll("SUPERCLASS_VALUE_TRANSACTIONAL",
-        BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL);
+        SUPERCLASS_VALUE_TRANSACTIONAL);
 
     loader.initDatabaseFromString(gdl);
 
@@ -141,24 +165,11 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     @Override
     public PropertyValue getVertexIncrement(Vertex vertex) {
-
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
 
       return PropertyValue.create(isClosedQuotation);
-    }
-  }
-
-  /**
-   * Predicate function to filter graphs by "isClosed" == true
-   */
-  private static class IsClosedPredicateFunction
-    implements FilterFunction<GraphHead> {
-
-    @Override
-    public boolean filter(GraphHead graphHead) throws Exception {
-      return graphHead.getPropertyValue("isClosed").getBoolean();
     }
   }
 
@@ -177,61 +188,6 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     @Override
     public String getAggregatePropertyKey() {
       return "soCount";
-    }
-  }
-
-  /**
-   * Transformation function to categorize graphs.
-   */
-  private static class CategorizeGraphsTransformationFunction implements
-    TransformationFunction<GraphHead> {
-    @Override
-    public GraphHead execute(GraphHead current,
-      GraphHead transformed) {
-
-      String category =
-        current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
-
-      transformed.setProperty(
-        CategoryCharacteristicSubgraphs.CATEGORY_KEY,
-        PropertyValue.create(category)
-      );
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Transformation function to relabel vertices and to drop properties.
-   */
-  private static class RelabelVerticesTransformationFunction implements
-    TransformationFunction<Vertex> {
-    @Override
-    public Vertex execute(Vertex current, Vertex transformed) {
-
-      transformed.setLabel(current.getPropertyValue(
-        BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
-        .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
-        current.getLabel() :
-        current
-          .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
-      );
-
-      return transformed;
-    }
-  }
-
-  /**
-   * Transformation function to drop properties of edges.
-   */
-  private static class EdgeLabelOnlyTransformationFunction implements
-    TransformationFunction<Edge> {
-    @Override
-    public Edge execute(Edge current, Edge transformed) {
-
-      transformed.setLabel(current.getLabel());
-
-      return transformed;
     }
   }
 
