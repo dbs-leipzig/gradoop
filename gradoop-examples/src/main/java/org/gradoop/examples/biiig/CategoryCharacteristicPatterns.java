@@ -38,6 +38,12 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SOURCEID_KEY;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERTYPE_KEY;
+import static org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
+
 /**
  * Example workflow of paper "Scalable Business Intelligence with Graph
  * Collections" submitted to IT special issue on Big Data Analytics
@@ -62,47 +68,44 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     out.add("Integrated Instance Graph", iig);
 
+    // extract business transaction graphs (BTGs)
     GraphCollection btgs = iig
       .callForCollection(new BusinessTransactionGraphs());
 
-    btgs = btgs.apply(new ApplyAggregation(new IsClosedAggregateFunction()));
-
-    // Predicate function to filter graphs by "isClosed" == true
-    btgs = btgs.select(g -> g.getPropertyValue("isClosed").getBoolean());
-
     btgs = btgs
+      // determine closed/open BTGs
+      .apply(new ApplyAggregation(new IsClosedAggregateFunction()))
+      // select closed BTGs
+      .select(g -> g.getPropertyValue("isClosed").getBoolean())
+      // count number of sales orders per BTG
       .apply(new ApplyAggregation(new CountSalesOrdersAggregateFunction()));
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
     btgs = btgs.apply(new ApplyTransformation(
       // Transformation function to categorize graphs
-      (current, transformed) -> {
-        String category =
-          current.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
-        transformed.setProperty(
-          CategoryCharacteristicSubgraphs.CATEGORY_KEY,
-          PropertyValue.create(category)
-        );
-
-        return transformed;
+      (graph, copy) -> {
+        String category = graph.getPropertyValue("soCount").getInt() > 0 ?
+          "won" : "lost";
+        copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
+        return copy;
       },
       // Transformation function to relabel vertices and to drop properties
-      (current, transformed) -> {
-        transformed.setLabel(current.getPropertyValue(
-          BusinessTransactionGraphs.SUPERTYPE_KEY).toString()
-          .equals(BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL) ?
-          current.getLabel() :
-          current
-            .getPropertyValue(BusinessTransactionGraphs.SOURCEID_KEY).toString()
-        );
+      (vertex, copy) -> {
+        String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
 
-        return transformed;
+        if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
+          copy.setLabel(vertex.getLabel());
+        } else { // master data
+          copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
+        }
+        return copy;
       },
       // Transformation function to drop properties of edges
-      (current, transformed) -> {
-        transformed.setLabel(current.getLabel());
-        return transformed;
+      (edge, copy) -> {
+        copy.setLabel(edge.getLabel());
+
+        return copy;
       })
     );
 
@@ -136,13 +139,13 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     gdl = gdl
       .replaceAll("SOURCEID_KEY",
-        BusinessTransactionGraphs.SOURCEID_KEY)
+        SOURCEID_KEY)
       .replaceAll("SUPERTYPE_KEY",
-        BusinessTransactionGraphs.SUPERTYPE_KEY)
+        SUPERTYPE_KEY)
       .replaceAll("SUPERCLASS_VALUE_MASTER",
-        BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER)
+        SUPERCLASS_VALUE_MASTER)
       .replaceAll("SUPERCLASS_VALUE_TRANSACTIONAL",
-        BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL);
+        SUPERCLASS_VALUE_TRANSACTIONAL);
 
     loader.initDatabaseFromString(gdl);
 

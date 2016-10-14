@@ -18,14 +18,11 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.
 import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-
-
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 import static org.junit.Assert.assertEquals;
@@ -120,7 +117,7 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
 
       transaction.getVertices().stream()
         .map(Element::getLabel)
-        .collect(Collectors.toSet())
+        .distinct()
         .forEach(e -> out.collect(new Tuple2<>(category, e)));
     }
   }

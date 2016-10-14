@@ -159,7 +159,5 @@ public class SplitTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(result.equalsByGraphElementData(
       loader.getGraphCollectionByVariables("g2")));
   }
-
-
 }
 
