@@ -81,7 +81,6 @@ public class CSVIOTest extends GradoopFlinkTestBase {
     GraphCollection graph = dataSource.getGraphCollection();
 
     GradoopFlinkTestUtils.printGraphCollection(graph);
-
   }
 
 }

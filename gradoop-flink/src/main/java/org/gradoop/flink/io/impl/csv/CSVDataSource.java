@@ -16,43 +16,66 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.CSVToEdge;
-import org.gradoop.flink.io.impl.csv.functions.CreateTuple;
-import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
+import org.gradoop.flink.io.impl.csv.functions.CSVToElement;
+import org.gradoop.flink.io.impl.csv.functions.CSVTypeFilter;
+import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
+import org.gradoop.flink.io.impl.csv.functions.EPGMElementToPojo;
+import org.gradoop.flink.io.impl.csv.functions.GradoopEdgeIds;
+import org.gradoop.flink.io.impl.csv.functions.VertexIdsToMap;
+import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
-import org.gradoop.flink.io.impl.csv.pojos.Domain;
-import org.gradoop.flink.io.impl.graph.GraphDataSource;
-import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.io.impl.csv.pojos.Edge;
+import org.gradoop.flink.io.impl.csv.pojos.Graphhead;
+import org.gradoop.flink.io.impl.csv.pojos.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class CSVDataSource extends CSVBase implements DataSource {
-  public final String CSV_VERTEX = "vertex";
-  public final String CSV_EDGE = "edge";
-  public final String CSV_GRAPH = "graph";
+  public static final String CSV_VERTEX = "vertex";
+  public static final String CSV_EDGE = "edge";
+  public static final String CSV_GRAPH = "graph";
   private ExecutionEnvironment env;
   private String path;
-  private final Datasource source;
+  private final DataSet<Datasource> datasource;
+
+  private GraphHeadFactory graphHeadFactory;
+  private VertexFactory vertexFactory;
+  private EdgeFactory edgeFactory;
+
 
   public CSVDataSource(GradoopFlinkConfig config, Datasource source,
     String path) {
     super(config, path);
     this.path = path;
-    this.source = source;
     this.env = config.getExecutionEnvironment();
+    datasource = env.fromElements(source);
+
+    graphHeadFactory = config.getGraphHeadFactory();
+    vertexFactory = config.getVertexFactory();
+    edgeFactory = config.getEdgeFactory();
   }
 
   @Override
@@ -62,49 +85,62 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    String datasourceName = source.getName();
-    List<Domain> domains = source.getDomain();
+    DataSet<Csv> csv = datasource.flatMap(new DatasourceToCsv());
 
-    for (Domain domain : domains) {
-      String domainName = domain.getName();
-      for (Csv csv : domain.getCsv()) {
-        if (csv.getType().equals(CSV_VERTEX)) {
+    DataSet<org.gradoop.common.model.impl.pojo.GraphHead> graphHeads;
+    DataSet<org.gradoop.common.model.impl.pojo.Vertex> vertices;
+    DataSet<org.gradoop.common.model.impl.pojo.Edge> edges;
 
-          DataSet<String> vertexFile = env.readTextFile(path + csv.getName());
-          DataSet<Csv> csvDataSet = env.fromElements(csv);
-
-          DataSet<Tuple3<Csv, String, String>> vertexList = csvDataSet
-            .cross(vertexFile)
-            .with(new CreateTuple(domainName));
-
-          DataSet<ImportVertex<String>> importVertices = vertexList
-            .map(new CSVToVertex(datasourceName));
-
-          try {
-            importVertices.print();
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        } else if (csv.getType().equals(CSV_EDGE)){
-
-          DataSet<String> vertexFile = env.readTextFile(path + csv.getName());
-          DataSet<Csv> csvDataSet = env.fromElements(csv);
-
-          DataSet<Tuple2<Csv, String>> tupleList = csvDataSet
-            .cross(vertexFile)
-            .with(new CreateTuple());
-
-          DataSet<ImportEdge<String>> importEdges = tupleList
-            .map(new CSVToEdge(datasourceName, domainName));
-
-        }
+    Collection<Tuple2<Csv, List<String>>> content = new HashSet<>();
+    try {
+      for (Csv csvFile : csv.collect()) {
+        List<String> lines = env.readTextFile(path + csvFile.getName())
+          .collect();
+        content.add(new Tuple2<Csv, List<String>>(csvFile, lines));
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
-//    GraphDataSource<String> graphDataSource = new GraphDataSource<String>
-//      (importVertices, null, null);
+    DataSet<Tuple2<Csv, List<String>>> csvContent = env
+      .fromCollection(content);
 
-    return null;
+    graphHeads = csvContent
+      .filter(
+        new CSVTypeFilter(Graphhead.class))
+      .flatMap(new CSVToElement(Graphhead.class, graphHeadFactory, vertexFactory,
+        edgeFactory))
+      .map(new EPGMElementToPojo<GraphHead>())
+      .returns(graphHeadFactory.getType());
+
+    vertices = csvContent
+      .filter(
+        new CSVTypeFilter(Vertex.class))
+      .flatMap(new CSVToElement(Vertex.class, graphHeadFactory, vertexFactory,
+        edgeFactory))
+      .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Vertex>())
+      .returns(vertexFactory.getType());
+
+    DataSet<Map<String, GradoopId>> vertexIds = vertices
+      .map(new VertexToVertexIds())
+      .reduceGroup(new VertexIdsToMap());
+
+    try {
+      vertexIds.print();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    edges = csvContent
+      .filter(
+        new CSVTypeFilter(Edge.class))
+      .flatMap(new CSVToElement(Edge.class, graphHeadFactory, vertexFactory, edgeFactory))
+      .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Edge>())
+      .returns(edgeFactory.getType())
+      .map(new GradoopEdgeIds())
+      .withBroadcastSet(vertexIds, GradoopEdgeIds.ID_MAP);
+
+    return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
   }
 
   @Override
