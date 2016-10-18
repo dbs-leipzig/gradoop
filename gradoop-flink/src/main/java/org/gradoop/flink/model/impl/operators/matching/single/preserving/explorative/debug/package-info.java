@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains implementations of graph pattern matching algorithms.
+ * Contains debug related classed (e.g., printers for tuples)
  */
-package org.gradoop.flink.model.impl.operators.matching;
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
