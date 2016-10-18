@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains implementations of graph pattern matching algorithms.
+ * Utility classes for dual graph simulation.
  */
-package org.gradoop.flink.model.impl.operators.matching;
+package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util;

@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.MergedGraphIds;
 import org.gradoop.flink.model.impl.functions.utils.IsInstance;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.matching.simulation.dual.functions.EdgeTriple;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
@@ -39,7 +39,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.functions.utils.Cast;
-import org.gradoop.flink.model.impl.operators.matching.simulation.dual.tuples.FatVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 
 /**
  * Provides methods for post-processing query results.
@@ -102,14 +102,14 @@ public class PostProcessor {
     // attach data by joining first and merging the graph head ids
     DataSet<Vertex> newVertices = inputGraph.getVertices()
       .join(collection.getVertices())
-      .where(new Id<Vertex>()).equalTo(new Id<Vertex>())
-      .with(new MergedGraphIds<Vertex>())
+      .where(new Id<>()).equalTo(new Id<>())
+      .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties;");
 
     DataSet<Edge> newEdges = inputGraph.getEdges()
       .join(collection.getEdges())
-      .where(new Id<Edge>()).equalTo(new Id<Edge>())
-      .with(new MergedGraphIds<Edge>())
+      .where(new Id<>()).equalTo(new Id<>())
+      .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties");
 
     return GraphCollection.fromDataSets(
@@ -148,8 +148,8 @@ public class PostProcessor {
   public static DataSet<GraphHead> extractGraphHeads(DataSet<Element> elements,
     Class<GraphHead> graphHeadType) {
     return elements
-      .filter(new IsInstance<Element, GraphHead>(graphHeadType))
-      .map(new Cast<Element, GraphHead>(graphHeadType))
+      .filter(new IsInstance<>(graphHeadType))
+      .map(new Cast<>(graphHeadType))
       .returns(TypeExtractor.createTypeInfo(graphHeadType));
   }
 
@@ -176,14 +176,14 @@ public class PostProcessor {
   public static DataSet<Vertex> extractVertices(DataSet<Element> elements,
     Class<Vertex> vertexType, boolean mayOverlap) {
     DataSet<Vertex> result = elements
-      .filter(new IsInstance<Element, Vertex>(vertexType))
-      .map(new Cast<Element, Vertex>(vertexType))
+      .filter(new IsInstance<>(vertexType))
+      .map(new Cast<>(vertexType))
       .returns(TypeExtractor.createTypeInfo(vertexType));
     return mayOverlap ? result
-      .groupBy(new Id<Vertex>())
-      .combineGroup(new MergedGraphIds<Vertex>())
-      .groupBy(new Id<Vertex>())
-      .reduceGroup(new MergedGraphIds<Vertex>()) : result;
+      .groupBy(new Id<>())
+      .combineGroup(new MergedGraphIds<>())
+      .groupBy(new Id<>())
+      .reduceGroup(new MergedGraphIds<>()) : result;
   }
 
   /**
@@ -209,14 +209,14 @@ public class PostProcessor {
   public static DataSet<Edge> extractEdges(DataSet<Element> elements,
     Class<Edge> edgeType, boolean mayOverlap) {
     DataSet<Edge> result = elements
-      .filter(new IsInstance<Element, Edge>(edgeType))
-      .map(new Cast<Element, Edge>(edgeType))
+      .filter(new IsInstance<>(edgeType))
+      .map(new Cast<>(edgeType))
       .returns(TypeExtractor.createTypeInfo(edgeType));
 
     return mayOverlap ? result
-      .groupBy(new Id<Edge>())
-      .combineGroup(new MergedGraphIds<Edge>()).groupBy(new Id<Edge>())
-      .reduceGroup(new MergedGraphIds<Edge>()) : result;
+      .groupBy(new Id<>())
+      .combineGroup(new MergedGraphIds<>()).groupBy(new Id<>())
+      .reduceGroup(new MergedGraphIds<>()) : result;
   }
 
   /**
@@ -231,8 +231,8 @@ public class PostProcessor {
     DataSet<FatVertex> result, DataSet<Vertex> inputVertices) {
     return extractVertexIds(result)
       .join(inputVertices)
-      .where(0).equalTo(new Id<Vertex>())
-      .with(new RightSide<Tuple1<GradoopId>, Vertex>());
+      .where(0).equalTo(new Id<>())
+      .with(new RightSide<>());
   }
 
   /**
@@ -247,7 +247,7 @@ public class PostProcessor {
     DataSet<Edge> inputEdges) {
     return extractEdgeIds(result)
       .join(inputEdges)
-      .where(0).equalTo(new Id<Edge>())
-      .with(new RightSide<Tuple3<GradoopId, GradoopId, GradoopId>, Edge>());
+      .where(0).equalTo(new Id<>())
+      .with(new RightSide<>());
   }
 }

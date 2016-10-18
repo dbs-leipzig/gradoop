@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains implementations of graph pattern matching algorithms.
+ * Contains Flink functions that are used by
+ * {@link org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching}.
  */
-package org.gradoop.flink.model.impl.operators.matching;
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;

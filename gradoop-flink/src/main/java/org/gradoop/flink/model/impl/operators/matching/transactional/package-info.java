@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains implementations of graph pattern matching algorithms.
+ * Contains implementations graph pattern matching on a single input graph.
  */
-package org.gradoop.flink.model.impl.operators.matching;
+package org.gradoop.flink.model.impl.operators.matching.transactional;
