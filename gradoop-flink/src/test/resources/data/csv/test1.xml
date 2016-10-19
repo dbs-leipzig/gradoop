@@ -8,7 +8,7 @@
 
     <domain name="ComputerScience">
 
-        <csv name="personVertex.csv" type="vertex" charset="utf8" separator="|">
+        <csv name="personVertex.csv" charset="utf8" separator="|">
             <columns>
                 <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="String"/>
@@ -32,7 +32,7 @@
                 </graphs>
             </vertex>
         </csv>
-        <csv name="isMemberEdge.csv" type="edge" charset="utf8" separator="|">
+        <csv name="isMemberEdge.csv" charset="utf8" separator="|">
             <columns>
                 <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="Long"/>

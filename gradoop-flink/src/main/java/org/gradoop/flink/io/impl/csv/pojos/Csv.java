@@ -58,8 +58,6 @@ public class Csv {
     protected Edge edge;
     @XmlAttribute(name = "name")
     protected String name;
-    @XmlAttribute(name = "type")
-    protected String type;
     @XmlAttribute(name = "charset")
     protected String charset;
     @XmlAttribute(name = "separator")
@@ -187,30 +185,6 @@ public class Csv {
      */
     public void setName(String value) {
         this.name = value;
-    }
-
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
     }
 
     /**

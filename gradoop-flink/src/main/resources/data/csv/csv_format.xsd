@@ -16,7 +16,6 @@
     <!-- csv attributes -->
     <xsd:attributeGroup name="csvattributes">
         <xsd:attribute name="name" type="xsd:string"/>
-        <xsd:attribute name="type" type="xsd:string"/>
         <xsd:attribute name="charset" type="xsd:string"/>
         <xsd:attribute name="separator" type="xsd:string"/>
     </xsd:attributeGroup>
