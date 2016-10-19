@@ -14,9 +14,13 @@ public class ExplorativeIsomorphismBulkTest extends SubgraphIsomorphismTest {
   }
 
   @Override
-  public PatternMatching getImplementation(String queryGraph,
-    boolean attachData) {
-    return new ExplorativePatternMatching(queryGraph, attachData,
-      MatchStrategy.ISOMORPHISM, IterationStrategy.BULK_ITERATION);
+  public PatternMatching getImplementation(String queryGraph, boolean attachData) {
+
+    return new ExplorativePatternMatching.Builder()
+      .setQuery(queryGraph)
+      .setAttachData(attachData)
+      .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+      .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+      .build();
   }
 }

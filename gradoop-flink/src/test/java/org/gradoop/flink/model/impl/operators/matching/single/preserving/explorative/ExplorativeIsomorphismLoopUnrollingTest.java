@@ -15,9 +15,12 @@ public class ExplorativeIsomorphismLoopUnrollingTest extends SubgraphIsomorphism
   }
 
   @Override
-  public PatternMatching getImplementation(String queryGraph,
-    boolean attachData) {
-    return new ExplorativePatternMatching(queryGraph, attachData,
-      MatchStrategy.ISOMORPHISM, IterationStrategy.LOOP_UNROLLING);
+  public PatternMatching getImplementation(String queryGraph, boolean attachData) {
+    return new ExplorativePatternMatching.Builder()
+      .setQuery(queryGraph)
+      .setAttachData(attachData)
+      .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+      .setIterationStrategy(IterationStrategy.LOOP_UNROLLING)
+      .build();
   }
 }

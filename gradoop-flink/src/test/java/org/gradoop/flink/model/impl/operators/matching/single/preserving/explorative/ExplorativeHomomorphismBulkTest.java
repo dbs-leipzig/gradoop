@@ -15,7 +15,11 @@ public class ExplorativeHomomorphismBulkTest extends SubgraphHomomorphismTest {
 
   @Override
   public PatternMatching getImplementation(String queryGraph, boolean attachData) {
-    return new ExplorativePatternMatching(queryGraph, attachData,
-      MatchStrategy.HOMOMORPHISM, IterationStrategy.BULK_ITERATION);
+    return new ExplorativePatternMatching.Builder()
+      .setQuery(queryGraph)
+      .setAttachData(attachData)
+      .setMatchStrategy(MatchStrategy.HOMOMORPHISM)
+      .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+      .build();
   }
 }

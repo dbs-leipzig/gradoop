@@ -46,9 +46,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Cou
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.flink.model.impl.operators.split.Split;
@@ -271,8 +269,15 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public GraphCollection match(String pattern, boolean attachData,
     MatchStrategy matchStrategy, IterationStrategy iterationStrategy) {
-    return callForCollection(new ExplorativePatternMatching(pattern, attachData,
-      matchStrategy, iterationStrategy, new DFSTraverser()));
+
+    ExplorativePatternMatching op = new ExplorativePatternMatching.Builder()
+      .setQuery(pattern)
+      .setAttachData(attachData)
+      .setMatchStrategy(matchStrategy)
+      .setIterationStrategy(iterationStrategy)
+      .setTraverser(new DFSTraverser()).build();
+
+    return callForCollection(op);
   }
 
   /**
