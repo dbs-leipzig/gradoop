@@ -24,6 +24,9 @@ import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
@@ -95,7 +98,9 @@ public class UpdateVertexMappings<K>
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
+//    currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
+    currentStep = (int) getRuntimeContext()
+      .getBroadcastVariable(ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
     candidate = (int) traversalCode.getStep(currentStep).getTo();
 
     if (hasMoreSteps()) {

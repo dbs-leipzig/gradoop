@@ -22,6 +22,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
@@ -74,8 +77,9 @@ public class UpdateEdgeMappings<K> extends RichFlatJoinFunction
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    candidate = (int) traversalCode.getStep(
-      getIterationRuntimeContext().getSuperstepNumber() - 1).getVia();
+    int currentStep = (int) getRuntimeContext()
+      .getBroadcastVariable(ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
+    candidate = (int) traversalCode.getStep(currentStep).getVia();
   }
 
   @Override

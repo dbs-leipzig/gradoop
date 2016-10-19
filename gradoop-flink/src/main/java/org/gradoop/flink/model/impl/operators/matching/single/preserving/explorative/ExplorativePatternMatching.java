@@ -52,6 +52,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.BulkTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.ForLoopTraverser;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
@@ -83,38 +86,44 @@ public class ExplorativePatternMatching extends PatternMatching
    * Join strategy used for the join between embeddings and vertices
    */
   private final JoinOperatorBase.JoinHint vertexStepJoinStrategy;
-
   /**
-   * Match strategy used for pattern matching
+   * Strategy for vertex and edge mappings
    */
   private final MatchStrategy matchStrategy;
-
-
+  /**
+   * Strategy iterating the graph
+   */
+  private final IterationStrategy iterationStrategy;
 
   /**
    * Create new operator instance
    *
-   * @param query         GDL query graph
-   * @param attachData    true, if original data shall be attached to the result
-   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
+   * @param query             GDL query graph
+   * @param attachData        true, if original data shall be attached
+   *                          to the result
+   * @param matchStrategy     match strategy for vertex and edge mappings
+   * @param iterationStrategy iteration strategy for distributed traversal
    */
   public ExplorativePatternMatching(String query, boolean attachData,
-    MatchStrategy matchStrategy) {
-    this(query, attachData, matchStrategy, new DFSTraverser());
+    MatchStrategy matchStrategy, IterationStrategy iterationStrategy) {
+    this(query, attachData, matchStrategy, iterationStrategy,
+      new DFSTraverser());
   }
 
   /**
    * Create new operator instance
    *
-   * @param query       GDL query graph
-   * @param attachData  true, if original data shall be attached to the result
-   * @param matchStrategy select Subgraph Isomorphism or Homomorphism
-   * @param traverser   Traverser used for the query graph
+   * @param query             GDL query graph
+   * @param attachData        true, if original data shall be attached
+   *                          to the result
+   * @param matchStrategy     match strategy for vertex and edge mappings
+   * @param iterationStrategy iteration strategy for distributed traversal
+   * @param traverser         Traverser used for the query graph
    */
   public ExplorativePatternMatching(String query, boolean attachData,
-    MatchStrategy matchStrategy,
+    MatchStrategy matchStrategy, IterationStrategy iterationStrategy,
     Traverser traverser) {
-    this(query, attachData, matchStrategy, traverser,
+    this(query, attachData, matchStrategy, iterationStrategy, traverser,
       OPTIMIZER_CHOOSES, OPTIMIZER_CHOOSES);
   }
 
@@ -124,18 +133,21 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param query                   GDL query graph
    * @param attachData              true, if original data shall be attached
    *                                to the result
-   * @param matchStrategy           select Subgraph Isomorphism or Homomorphism
+   * @param matchStrategy           match strategy for vertex and edge mappings
+   * @param iterationStrategy       iteration strategy for distributed traversal
    * @param traverser               Traverser used for the query graph
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
   public ExplorativePatternMatching(String query, boolean attachData,
     MatchStrategy matchStrategy,
+    IterationStrategy iterationStrategy,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
     this.matchStrategy = matchStrategy;
+    this.iterationStrategy = iterationStrategy;
     this.traverser = traverser;
     this.traverser.setQueryHandler(getQueryHandler());
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
@@ -189,16 +201,31 @@ public class ExplorativePatternMatching extends PatternMatching
 
     TraversalCode traversalCode = traverser.traverse();
 
-    DistributedTraverser<GradoopId> explorer = new DistributedTraverser<>(
-      traversalCode,
-      traverser.getQueryHandler().getVertexCount(),
-      traverser.getQueryHandler().getEdgeCount(),
-      getVertexMapping(), getEdgeMapping(),
-      edgeStepJoinStrategy, vertexStepJoinStrategy,
-      matchStrategy);
+    DistributedTraverser<GradoopId> distributedTraverser;
 
-    DataSet<Tuple1<Embedding<GradoopId>>> embeddings = explorer
-      .traverse(GradoopId.class, vertices, edges);
+    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
+      distributedTraverser = new BulkTraverser<>(
+        traversalCode, matchStrategy,
+        traverser.getQueryHandler().getVertexCount(),
+        traverser.getQueryHandler().getEdgeCount(),
+        GradoopId.class,
+        edgeStepJoinStrategy, vertexStepJoinStrategy,
+        getVertexMapping(), getEdgeMapping());
+    } else if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
+      distributedTraverser = new ForLoopTraverser<>(
+        traversalCode, matchStrategy,
+        traverser.getQueryHandler().getVertexCount(),
+        traverser.getQueryHandler().getEdgeCount(),
+        GradoopId.class,
+        edgeStepJoinStrategy, vertexStepJoinStrategy,
+        getVertexMapping(), getEdgeMapping());
+    } else {
+      throw new UnsupportedOperationException(
+        "Unsupported iteration strategy: " + iterationStrategy);
+    }
+
+    DataSet<Tuple1<Embedding<GradoopId>>> embeddings = distributedTraverser
+      .traverse(vertices, edges);
 
     //--------------------------------------------------------------------------
     // Post-Processing (build Graph Collection from embeddings)

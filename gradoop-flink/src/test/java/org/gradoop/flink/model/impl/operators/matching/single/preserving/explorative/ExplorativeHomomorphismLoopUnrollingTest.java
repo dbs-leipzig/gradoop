@@ -1,13 +1,15 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative;
 
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphHomomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .SubgraphHomomorphismTest;
 
 
-public class ExplorativeSubgraphHomomorphismTest extends SubgraphHomomorphismTest {
+public class ExplorativeHomomorphismLoopUnrollingTest extends SubgraphHomomorphismTest {
 
-  public ExplorativeSubgraphHomomorphismTest(String testName,
+  public ExplorativeHomomorphismLoopUnrollingTest(String testName,
     String dataGraph, String queryGraph, String[] expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -16,6 +18,7 @@ public class ExplorativeSubgraphHomomorphismTest extends SubgraphHomomorphismTes
 
   @Override
   public PatternMatching getImplementation(String queryGraph, boolean attachData) {
-    return new ExplorativePatternMatching(queryGraph, attachData, MatchStrategy.HOMOMORPHISM );
+    return new ExplorativePatternMatching(queryGraph, attachData,
+      MatchStrategy.HOMOMORPHISM, IterationStrategy.LOOP_UNROLLING);
   }
 }
