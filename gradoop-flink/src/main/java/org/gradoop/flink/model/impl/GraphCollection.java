@@ -62,6 +62,8 @@ import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraph
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
@@ -303,6 +305,20 @@ public class GraphCollection extends GraphBase implements
   @Override
   public GraphCollection limit(int n) {
     return callForCollection(new Limit(n));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection match(
+    String pattern,
+    PatternMatchingAlgorithm algorithm,
+    boolean returnEmbeddings) {
+    return new TransactionalPatternMatching(
+      pattern,
+      algorithm,
+      returnEmbeddings).execute(this);
   }
 
   //----------------------------------------------------------------------------

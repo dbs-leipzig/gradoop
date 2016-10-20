@@ -23,16 +23,13 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators
-  .ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
-import org.gradoop.flink.model.impl.operators.split.functions.InitGraphHead;
-import org.gradoop.flink.model.impl.operators.subgraph.functions
-  .AddGraphsToElementsCoGroup;
+import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
-
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -41,7 +38,6 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
-
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
