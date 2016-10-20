@@ -24,14 +24,10 @@ import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
-
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
-
 
 /**
  * Extends an embedding with a vertex if possible.
@@ -167,15 +163,13 @@ public class UpdateVertexMappings<K>
    * @return true, if visited before
    */
   private boolean seenBefore(K[] vertexMappings, K id) {
-    if (matchStrategy == MatchStrategy.HOMOMORPHISM) {
-      return false;
-    }
-
     boolean result = false;
-    for (int i = 0; i <= currentStep; i++) {
-      if (vertexMappings[previousFroms[i]].equals(id)) {
-        result = true;
-        break;
+    if (matchStrategy == MatchStrategy.ISOMORPHISM) {
+      for (int i = 0; i <= currentStep; i++) {
+        if (vertexMappings[previousFroms[i]].equals(id)) {
+          result = true;
+          break;
+        }
       }
     }
     return result;
