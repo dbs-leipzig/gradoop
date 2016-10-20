@@ -27,6 +27,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 
 import org.gradoop.flink.model.impl.operators.matching.single.preserving
   .explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
@@ -62,6 +64,10 @@ public class UpdateVertexMappings<K>
    */
   private final MatchStrategy matchStrategy;
   /**
+   * Iteration strategy
+   */
+  private final IterationStrategy iterationStrategy;
+  /**
    * Current step in the traversal
    */
   private int currentStep;
@@ -87,20 +93,26 @@ public class UpdateVertexMappings<K>
    *
    * @param tc traversal code for the current exploration
    * @param matchStrategy select if subgraph isomorphism or homomorphism is used
+   * @param iterationStrategy iteration strategy
    */
-  public UpdateVertexMappings(TraversalCode tc, MatchStrategy matchStrategy) {
-    this.traversalCode  = tc;
-    this.stepCount      = tc.getSteps().size();
-    this.matchStrategy  = matchStrategy;
-
+  public UpdateVertexMappings(TraversalCode tc, MatchStrategy matchStrategy,
+    IterationStrategy iterationStrategy) {
+    this.traversalCode     = tc;
+    this.stepCount         = tc.getSteps().size();
+    this.matchStrategy     = matchStrategy;
+    this.iterationStrategy = iterationStrategy;
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-//    currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
-    currentStep = (int) getRuntimeContext()
-      .getBroadcastVariable(ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
+    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
+      currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
+    } else if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
+      currentStep = (int) getRuntimeContext().getBroadcastVariable(
+        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
+    }
+
     candidate = (int) traversalCode.getStep(currentStep).getTo();
 
     if (hasMoreSteps()) {

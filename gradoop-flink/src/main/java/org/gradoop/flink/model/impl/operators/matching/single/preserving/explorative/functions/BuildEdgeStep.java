@@ -18,25 +18,20 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 
-
-
 /**
  * Converts an edge into a step edge according to the traversal.
  *
- * Forwarded fields:
- *
- * f0: edge id
+ * Note that forwarded fields annotations need to be declared at the calling
+ * site for this function.
  *
  * @param <K> key type
  */
-@FunctionAnnotation.ForwardedFields("f0")
 public class BuildEdgeStep<K>
   extends RichMapFunction<TripleWithCandidates<K>, EdgeStep<K>> {
 

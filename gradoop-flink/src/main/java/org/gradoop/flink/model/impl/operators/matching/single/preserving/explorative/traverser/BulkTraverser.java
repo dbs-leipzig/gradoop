@@ -29,21 +29,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintVertexStep;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildVertexStep;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.EdgeHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateEdgeMappings;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexMappings;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.VertexHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
-
-import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
  * Extracts {@link Embedding}s iteratively from a given graph by traversing the
@@ -139,49 +126,18 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
       .map(new Superstep<>());
 
     // traverse to outgoing/incoming edges
-    DataSet<EdgeStep<K>> edgeSteps = edges
-      .filter(new EdgeHasCandidate<>(getTraversalCode()))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
-      .map(new BuildEdgeStep<>(getTraversalCode()))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
-
-    edgeSteps = log(edgeSteps,
-      new PrintEdgeStep<>(true, "post-filter-map-edge"),
-      getVertexMapping(), getEdgeMapping());
-
-    DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = embeddings
-      .join(edgeSteps, getEdgeStepJoinStrategy())
-      .where(0).equalTo(1) // tiePointId == sourceId/targetId tie point
-      .with(new UpdateEdgeMappings<>(getTraversalCode()))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
-
-    nextWorkSet = log(nextWorkSet,
-      new PrintEmbeddingWithTiePoint<>(true, "post-edge-update"),
-      getVertexMapping(), getEdgeMapping());
+    String[] forwardedFieldsEdgeSteps = new String[] {
+        "f0" // forward edge id
+    };
+    DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = traverseEdges(edges,
+      embeddings, superstep, IterationStrategy.BULK_ITERATION,
+      forwardedFieldsEdgeSteps);
 
     // traverse to vertices
-    DataSet<VertexStep<K>> vertexSteps = vertices
-      .filter(new VertexHasCandidate<>(getTraversalCode()))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
-      .map(new BuildVertexStep<>());
-
-    vertexSteps = log(vertexSteps,
-      new PrintVertexStep<>(true, "post-filter-project-vertex"),
-      getVertexMapping(), getEdgeMapping());
-
-    nextWorkSet = nextWorkSet
-      .join(vertexSteps, getVertexStepJoinStrategy())
-      .where(0).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings<>(getTraversalCode(), getMatchStrategy()))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
-
-    nextWorkSet = log(nextWorkSet,
-      new PrintEmbeddingWithTiePoint<>(true, "post-vertex-update"),
-      getVertexMapping(), getEdgeMapping());
+    nextWorkSet = traverseVertices(vertices, nextWorkSet, superstep,
+      IterationStrategy.BULK_ITERATION);
 
     // ITERATION FOOTER
     return embeddings.closeWith(nextWorkSet, nextWorkSet);
   }
-
-
 }

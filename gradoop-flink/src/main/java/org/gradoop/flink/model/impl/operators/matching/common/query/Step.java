@@ -58,7 +58,7 @@ public class Step implements Serializable {
    * @param to target vertex id
    * @param isOutgoing if traversed edge was outgoing from starting vertex
    */
-  Step(long from, long via, long to, boolean isOutgoing) {
+  public Step(long from, long via, long to, boolean isOutgoing) {
     this.from = from;
     this.via = via;
     this.to = to;

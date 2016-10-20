@@ -25,6 +25,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 
 import org.gradoop.flink.model.impl.operators.matching.single.preserving
   .explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
@@ -61,6 +63,10 @@ public class UpdateEdgeMappings<K> extends RichFlatJoinFunction
    */
   private final TraversalCode traversalCode;
   /**
+   * Iteration strategy
+   */
+  private final IterationStrategy iterationStrategy;
+  /**
    * Index to check in the edge mapping
    */
   private int candidate;
@@ -68,18 +74,26 @@ public class UpdateEdgeMappings<K> extends RichFlatJoinFunction
   /**
    * Constructor
    *
-   * @param traversalCode traversal code for the current exploration
+   * @param traversalCode     traversal code for the current exploration
+   * @param iterationStrategy iteration strategy
    */
-  public UpdateEdgeMappings(TraversalCode traversalCode) {
-    this.traversalCode = traversalCode;
+  public UpdateEdgeMappings(TraversalCode traversalCode,
+    IterationStrategy iterationStrategy) {
+    this.traversalCode      = traversalCode;
+    this.iterationStrategy  = iterationStrategy;
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    int currentStep = (int) getRuntimeContext()
-      .getBroadcastVariable(ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
-    candidate = (int) traversalCode.getStep(currentStep).getVia();
+    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
+      candidate = (int) traversalCode.getStep(
+        getIterationRuntimeContext().getSuperstepNumber() - 1).getVia();
+    } else if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
+      int currentStep = (int) getRuntimeContext().getBroadcastVariable(
+        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
+      candidate = (int) traversalCode.getStep(currentStep).getVia();
+    }
   }
 
   @Override
