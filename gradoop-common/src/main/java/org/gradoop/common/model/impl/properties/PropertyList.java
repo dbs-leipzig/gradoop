@@ -202,6 +202,38 @@ public class PropertyList implements Iterable<Property>, Writable {
   }
 
   /**
+   * Removes the property of the given key from the list.
+   *
+   * @param key property key
+   * @return true if the list contained a property with the given key
+   */
+  public boolean remove(String key) {
+    for (Property property : properties) {
+      if (property.getKey().equals(key)) {
+        return properties.remove(property);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Removes the given property from the list.
+   *
+   * @param property property
+   * @return true if the list contained the given property
+   * *
+   *
+   */
+  public boolean remove(Property property) {
+    for (Property epgmProperty : properties) {
+      if (epgmProperty.getKey().equals(property.getKey())) {
+        return properties.remove(property);
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns the number of properties.
    *
    * @return number of properties
