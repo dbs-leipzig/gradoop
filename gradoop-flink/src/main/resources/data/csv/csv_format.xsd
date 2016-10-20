@@ -166,11 +166,19 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="graphs">
+    <xsd:element name="graph">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="objectreferences"/>
             </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="graphs">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="graph" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
 
@@ -211,7 +219,7 @@
     <xsd:element name="label">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="staticorreference">
+                <xsd:extension base="staticorref">
                     <xsd:attributeGroup ref="labelattributes"/>
                 </xsd:extension>
             </xsd:complexContent>

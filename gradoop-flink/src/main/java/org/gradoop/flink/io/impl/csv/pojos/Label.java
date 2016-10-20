@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
- *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojo}staticorreference"&gt;
+ *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojo}staticorref"&gt;
  *       &lt;attGroup ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}labelattributes"/&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "")
 @XmlRootElement(name = "label")
 public class Label
-    extends Staticorreference
+    extends Staticorref
 {
 
     @XmlAttribute(name = "separator")

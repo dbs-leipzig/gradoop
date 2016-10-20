@@ -28,7 +28,17 @@
                     <property column_id="3" name="gender"/>
                 </properties>
                 <graphs>
-                    <static name="1"/>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
+                    <graph>
+                        <reference domain_name="GraphDomain">
+                            <key class="GraphHead">
+                                <static name="2"/>
+                            </key>
+                        </reference>
+                    </graph>
+
                 </graphs>
             </vertex>
         </csv>
@@ -40,8 +50,8 @@
             </columns>
             <edge>
                 <key class="isMember">
+                    <ref column_id="0"/>
                     <ref column_id="1"/>
-                    <ref column_id="2"/>
                 </key>
                 <label>
                     <static name="isMember"/>
@@ -50,13 +60,23 @@
                     <property column_id="2" name="since"/>
                 </properties>
                 <graphs>
-                    <static name="1"/>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
                 </graphs>
                 <source>
-                    <ref column_id="1"/>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="0"/>
+                        </key>
+                    </reference>
                 </source>
                 <target>
-                    <ref column_id="2"/>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="1"/>
+                        </key>
+                    </reference>
                 </target>
             </edge>
         </csv>

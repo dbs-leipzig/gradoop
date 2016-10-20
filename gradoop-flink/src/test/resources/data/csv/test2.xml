@@ -46,7 +46,9 @@
                     <property column_id="3" name="gender"/>
                 </properties>
                 <graphs>
-                    <static name="1"/>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
                 </graphs>
             </vertex>
         </csv>
@@ -68,7 +70,9 @@
                     <property column_id="3" name="since"/>
                 </properties>
                 <graphs>
-                    <static name="1"/>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
                 </graphs>
                 <source>
                     <ref column_id="1"/>
@@ -82,120 +86,128 @@
 
     <domain name="secondDomain">
 
-    <csv name="secondGraph.csv" charset="utf8" separator="(">
-    <columns>
-    <column id="0" pos="0" type="Long"/>
-    <column id="1" pos="1" type="Long"/>
-    <column id="2" pos="2" type="Long"/>
-    </columns>
-    <graphhead>
-    <key class="secondGraph">
-    <ref column_id="0"/>
-    </key>
-    <label separator=":">
-    <static name="graph"/>
-    <ref column_id="0"/>
-    </label>
-    <properties>
-    <property column_id="1" name="attribute1"/>
-    <property column_id="2" name="attribute2"/>
-    </properties>
-    </graphhead>
-    </csv>
-    <csv name="second_vertex.csv" charset="utf8" separator="*">
-    <columns>
-    <column id="0" pos="0" type="Long"/>
-    </columns>
-    <vertex>
-    <key class="secondVertex">
-    <ref column_id="0"/>
-    </key>
-    <graphs>
-    <static name="2"/>
-    </graphs>
+        <csv name="secondGraph.csv" charset="utf8" separator="(">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Long"/>
+            </columns>
+            <graphhead>
+                <key class="secondGraph">
+                    <ref column_id="0"/>
+                </key>
+                <label separator=":">
+                    <static name="graph"/>
+                    <ref column_id="0"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="attribute1"/>
+                    <property column_id="2" name="attribute2"/>
+                </properties>
+            </graphhead>
+        </csv>
+        <csv name="second_vertex.csv" charset="utf8" separator="*">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+            </columns>
+            <vertex>
+                <key class="secondVertex">
+                    <ref column_id="0"/>
+                </key>
+                <graphs>
+                    <graph>
+                        <static name="2"/>
+                    </graph>
+                </graphs>
 
-    </vertex>
-    </csv>
-    <csv name="third_vertex.csv" charset="utf8" separator="*">
-    <columns>
-    <column id="0" pos="0" type="Long"/>
-    <column id="1" pos="1" type="String"/>
-    <column id="2" pos="2" type="Long"/>
-    </columns>
-    <vertex>
-    <key class="thirdVertex">
-    <ref column_id="0"/>
-    </key>
-    <label>
-    <ref column_id="1"/>
-    </label>
-    <graphs>
-    <reference domain_name="testDomain">
-    <key class="">
-    <ref column_id="2"/>
-    </key>
-    </reference>
-    </graphs>
-    <edges>
-    <vertexedge>
-    <key class="thirdVertexEdge">
-    <ref column_id="0"/>
-    <ref column_id="2"/>
-    </key>
-    <label>
-    <static name="FKedge"/>
-    </label>
-    <graphs>
-    <reference domain_name="testDomain">
-    <key class="testGraph">
-    <static name="1"/>
-    </key>
-    </reference>
-    </graphs>
-    <target>
-    <reference domain_name="testDomain">
-    <key class="testVertex">
-    <ref column_id="2"/>
-    </key>
-    </reference>
-    </target>
-    </vertexedge>
-    </edges>
-    </vertex>
-    </csv>
-    <csv name="second_edge.csv" charset="utf8" separator="|">
-    <columns>
-    <column id="0" pos="0" type="String"/>
-    <column id="1" pos="1" type="Long"/>
-    <column id="2" pos="2" type="Long"/>
-    <column id="3" pos="1" type="Long"/>
-    </columns>
-    <edge>
-    <key class="secondEdge">
-    <ref column_id="1"/>
-    <ref column_id="2"/>
-    </key>
-    <label>
-    <ref column_id="0"/>
-    </label>
-    <properties>
-    <property column_id="1" name="originialSourceID"/>
-    <property column_id="2" name="originialTargetID"/>
-    </properties>
-    <graphs>
-    <reference datasource_name="Another Datasource">
-    <key class="AnotherSource">
-    <ref column_id="3"/>
-    </key>
-    </reference>
-    </graphs>
-    <source>
-    <ref column_id="1"/>
-    </source>
-    <target>
-    <ref column_id="2"/>
-    </target>
-    </edge>
-    </csv>
+            </vertex>
+        </csv>
+        <csv name="third_vertex.csv" charset="utf8" separator="*">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+                <column id="2" pos="2" type="Long"/>
+            </columns>
+            <vertex>
+                <key class="thirdVertex">
+                    <ref column_id="0"/>
+                </key>
+                <label>
+                    <ref column_id="1"/>
+                </label>
+                <graphs>
+                    <graph>
+                        <reference domain_name="testDomain">
+                            <key class="">
+                                <ref column_id="2"/>
+                            </key>
+                        </reference>
+                    </graph>
+                </graphs>
+                <edges>
+                    <vertexedge>
+                        <key class="thirdVertexEdge">
+                            <ref column_id="0"/>
+                            <ref column_id="2"/>
+                        </key>
+                        <label>
+                            <static name="FKedge"/>
+                        </label>
+                        <graphs>
+                            <graph>
+                                <reference domain_name="testDomain">
+                                    <key class="testGraph">
+                                        <static name="1"/>
+                                    </key>
+                                </reference>
+                            </graph>
+                        </graphs>
+                        <target>
+                            <reference domain_name="testDomain">
+                                <key class="testVertex">
+                                    <ref column_id="2"/>
+                                </key>
+                            </reference>
+                        </target>
+                    </vertexedge>
+                </edges>
+            </vertex>
+        </csv>
+        <csv name="second_edge.csv" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="String"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Long"/>
+                <column id="3" pos="1" type="Long"/>
+            </columns>
+            <edge>
+                <key class="secondEdge">
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
+                </key>
+                <label>
+                    <ref column_id="0"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="originialSourceID"/>
+                    <property column_id="2" name="originialTargetID"/>
+                </properties>
+                <graphs>
+                    <graph>
+                        <reference datasource_name="Another Datasource">
+                            <key class="AnotherSource">
+                                <ref column_id="3"/>
+                            </key>
+                        </reference>
+                    </graph>
+                </graphs>
+                <source>
+                    <ref column_id="1"/>
+                </source>
+                <target>
+                    <ref column_id="2"/>
+                </target>
+            </edge>
+        </csv>
     </domain>
 </datasource>
