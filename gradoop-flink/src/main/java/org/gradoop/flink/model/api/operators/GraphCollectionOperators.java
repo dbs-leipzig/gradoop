@@ -22,6 +22,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -109,6 +110,24 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return subset of the graph collection
    */
   GraphCollection limit(int n);
+
+  /**
+   * Matches a given pattern on a graph collection.
+   * The boolean flag specifies, if the return shall be the input graphs with
+   * a new property ("contains pattern"), or a new collection consisting of the
+   * constructed embeddings
+   *
+   * @param algorithm         custom pattern matching algorithm
+   * @param pattern           query pattern
+   * @param returnEmbeddings  true -> return embeddings as new collection,
+   *                          false -> return collection with new property
+   * @return  a graph collection containing either the embeddings or the input
+   * graphs with a new property ("contains pattern")
+   */
+  GraphCollection match(
+    String pattern,
+    PatternMatchingAlgorithm algorithm,
+    boolean returnEmbeddings);
 
   //----------------------------------------------------------------------------
   // Binary operators

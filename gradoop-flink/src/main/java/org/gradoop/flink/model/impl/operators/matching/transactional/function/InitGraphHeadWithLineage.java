@@ -15,22 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.split.functions;
+package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
- * Initializes a new graph head from a given GradoopId.
+ * Initializes a new graph head from a given GradoopId and its lineage information, e.g. the
+ * source graph this one was created from.
  */
-public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
-  ResultTypeQueryable<GraphHead> {
+public class InitGraphHeadWithLineage
+  implements MapFunction<Tuple2<GradoopId, GradoopId>, GraphHead>, ResultTypeQueryable<GraphHead> {
   /**
    * GraphHeadFactory
    */
@@ -41,7 +44,7 @@ public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
    *
    * @param graphHeadFactory graph head factory
    */
-  public InitGraphHead(GraphHeadFactory graphHeadFactory) {
+  public InitGraphHeadWithLineage(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -49,8 +52,13 @@ public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
    * {@inheritDoc}
    */
   @Override
-  public GraphHead map(Tuple1<GradoopId> idTuple) {
-    return graphHeadFactory.initGraphHead(idTuple.f0);
+  public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
+    GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
+    Property property = Property.create("lineage", idTuple.f1.toString());
+    PropertyList properties = new PropertyList();
+    properties.set(property);
+    head.setProperties(properties);
+    return head;
   }
 
   /**

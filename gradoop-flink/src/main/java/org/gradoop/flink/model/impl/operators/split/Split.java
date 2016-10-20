@@ -26,9 +26,8 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
 import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToVertex;
-import org.gradoop.flink.model.impl.operators.split.functions.InitGraphHead;
-import org.gradoop.flink.model.impl.operators.split.functions
-  .JoinVertexIdWithGraphIds;
+import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
+import org.gradoop.flink.model.impl.operators.split.functions.JoinVertexIdWithGraphIds;
 import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -41,7 +40,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
-
 import org.gradoop.flink.model.impl.operators.split.functions.MultipleGraphIdsGroupReducer;
 import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;

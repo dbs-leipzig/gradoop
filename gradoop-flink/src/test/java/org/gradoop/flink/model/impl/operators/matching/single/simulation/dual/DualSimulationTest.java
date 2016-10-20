@@ -5,7 +5,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-import static org.gradoop.flink.model.impl.operators.matching.single.TestData.*;
+import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
 
 public abstract class DualSimulationTest extends PatternMatchingTest {
 

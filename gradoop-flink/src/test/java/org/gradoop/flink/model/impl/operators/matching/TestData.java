@@ -1,8 +1,8 @@
-package org.gradoop.flink.model.impl.operators.matching.single;
+package org.gradoop.flink.model.impl.operators.matching;
 
 public class TestData {
 
-  static final String DATA_GRAPH_VARIABLE = "db";
+  public static final String DATA_GRAPH_VARIABLE = "db";
 
   public static final String CHAIN_PATTERN_0 =
     "(:A)-[:a]->(:B)";
