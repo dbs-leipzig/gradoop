@@ -93,6 +93,26 @@ public class PropertyListTest {
   }
 
   @Test
+  public void testRemove() throws Exception {
+    PropertyList properties = PropertyList.create();
+
+    properties.set(KEY_1, BOOL_VAL_1);
+    properties.remove(KEY_1);
+
+    assertEquals(0, properties.size());
+  }
+
+  @Test
+  public void testRemove2() throws Exception {
+    PropertyList properties = PropertyList.create();
+
+    properties.set(KEY_1, BOOL_VAL_1);
+    properties.remove(Property.create(KEY_1, BOOL_VAL_1));
+
+    assertEquals(0, properties.size());
+  }
+
+  @Test
   public void testSize() throws Exception {
     PropertyList properties = PropertyList.create();
     assertEquals("wrong size", 0, properties.size());
