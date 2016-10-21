@@ -45,8 +45,8 @@ public class ElementHasCandidate<K>
    *
    * @param candidate candidate to test on
    */
-  public ElementHasCandidate(long candidate) {
-    this.candidate = (int) candidate;
+  public ElementHasCandidate(int candidate) {
+    this.candidate = candidate;
   }
 
   @Override

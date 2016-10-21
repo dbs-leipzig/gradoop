@@ -175,10 +175,11 @@ public abstract class DistributedTraverser<K> {
   DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
     DataSet<IdWithCandidates<K>> vertices) {
 
+    int initialCandidate = (int) getTraversalCode().getStep(0).getFrom();
+
     DataSet<EmbeddingWithTiePoint<K>> initialEmbeddings = vertices
-      .filter(new ElementHasCandidate<>(
-        getTraversalCode().getStep(0).getFrom()))
-      .map(new BuildEmbeddingWithTiePoint<>(keyClazz, getTraversalCode(),
+      .filter(new ElementHasCandidate<>(initialCandidate))
+      .map(new BuildEmbeddingWithTiePoint<>(keyClazz, initialCandidate,
         vertexCount, edgeCount));
 
     return log(initialEmbeddings, new PrintEmbeddingWithTiePoint<>(),
@@ -217,8 +218,7 @@ public abstract class DistributedTraverser<K> {
     JoinOperator<EmbeddingWithTiePoint<K>, EdgeStep<K>,
       EmbeddingWithTiePoint<K>> join = embeddings
       .join(edgeSteps, getEdgeStepJoinStrategy())
-      .where(0)
-      .equalTo(1) // tiePointId == sourceId/targetId tie point
+      .where(0).equalTo(1) // tiePointId == sourceId/targetId tie point
       .with(new UpdateEdgeMappings<>(getTraversalCode(), iterationStrategy));
 
     if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
@@ -228,11 +228,9 @@ public abstract class DistributedTraverser<K> {
       embeddings = join;
     }
 
-    embeddings = log(embeddings,
+    return log(embeddings,
       new PrintEmbeddingWithTiePoint<>(true, "post-edge-update"),
       getVertexMapping(), getEdgeMapping());
-
-    return embeddings;
   }
 
   /**
@@ -263,8 +261,7 @@ public abstract class DistributedTraverser<K> {
     JoinOperator<EmbeddingWithTiePoint<K>, VertexStep<K>,
       EmbeddingWithTiePoint<K>> join = embeddings
       .join(vertexSteps, getVertexStepJoinStrategy())
-      .where(0)
-      .equalTo(0) // tiePointId == vertexId
+      .where(0).equalTo(0) // tiePointId == vertexId
       .with(new UpdateVertexMappings<>(getTraversalCode(), getMatchStrategy(),
         iterationStrategy));
 
