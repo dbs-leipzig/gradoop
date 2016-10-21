@@ -221,8 +221,6 @@ public class PropertyList implements Iterable<Property>, Writable {
    *
    * @param property property
    * @return true if the list contained the given property
-   * *
-   *
    */
   public boolean remove(Property property) {
     for (Property epgmProperty : properties) {
