@@ -15,21 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative;
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.operators.JoinOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.functions.utils.Superstep;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintVertexStep;
@@ -49,14 +50,17 @@ import java.util.Objects;
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
- * Extracts {@link Embedding}s iteratively from a given graph by traversing the
- * graph according to a given {@link TraversalCode}.
+ * A distributed traverser extracts embeddings from a given graph.
  *
  * @param <K> key type
  */
-public class DistributedTraverser<K> {
+public abstract class DistributedTraverser<K> {
   /**
-   * Defines the traversal order
+   * Strategy for vertex and edge mappings
+   */
+  private final MatchStrategy matchStrategy;
+  /**
+   * Controls the graph traversal
    */
   private final TraversalCode traversalCode;
   /**
@@ -67,6 +71,10 @@ public class DistributedTraverser<K> {
    * Number of edges in the query graph.
    */
   private final int edgeCount;
+  /**
+   * Needed to build initial embeddings
+   */
+  private final Class<K> keyClazz;
   /**
    * Join strategy used for the join between embeddings and edges
    */
@@ -83,163 +91,190 @@ public class DistributedTraverser<K> {
    * Edge mapping used for debug
    */
   private final DataSet<Tuple2<K, PropertyValue>> edgeMapping;
-  /**
-   *
-   */
-  private final MatchStrategy matchStrategy;
 
   /**
    * Creates a new distributed traverser.
    *
-   * @param traversalCode describes the traversal through the graph\
-   * @param vertexCount number of query vertices
-   * @param edgeCount number of query edges
+   * @param traversalCode          describes the graph traversal
+   * @param matchStrategy          matching strategy for vertices and edges
+   * @param vertexCount            number of query vertices
+   * @param edgeCount              number of query edges
+   * @param keyClazz               key type for embedding initialization
+   * @param edgeStepJoinStrategy   Join strategy for edge extension
+   * @param vertexStepJoinStrategy Join strategy for vertex extension
+   * @param vertexMapping          used for debug
+   * @param edgeMapping            used for debug
    */
-  public DistributedTraverser(TraversalCode traversalCode,
-    int vertexCount, int edgeCount) {
-    this(traversalCode,
-      vertexCount, edgeCount,
-      null, null, // debug mappings
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES,
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES,
-      MatchStrategy.ISOMORPHISM);
-  }
-
-  /**
-   * Creates a new distributed traverser.
-   *
-   * @param traversalCode           describes the traversal through the graph
-   * @param vertexCount             number of query vertices
-   * @param edgeCount               number of query edges
-   * @param vertexMapping           used for debug
-   * @param edgeMapping             used for debug
-   * @param edgeStepJoinStrategy    {@link JoinOperatorBase.JoinHint} edges
-   * @param vertexStepJoinStrategy  {@link JoinOperatorBase.JoinHint} vertices
-   * @param matchStrategy  {@link MatchStrategy} used for pattern matching
-   */
-  public DistributedTraverser(TraversalCode traversalCode,
+  DistributedTraverser(TraversalCode traversalCode,
+    MatchStrategy matchStrategy,
     int vertexCount, int edgeCount,
-    DataSet<Tuple2<K, PropertyValue>> vertexMapping,
-    DataSet<Tuple2<K, PropertyValue>> edgeMapping,
+    Class<K> keyClazz,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy,
-    MatchStrategy matchStrategy) {
+    DataSet<Tuple2<K, PropertyValue>> vertexMapping,
+    DataSet<Tuple2<K, PropertyValue>> edgeMapping) {
+
     Objects.requireNonNull(traversalCode);
+    Objects.requireNonNull(matchStrategy);
+    Objects.requireNonNull(keyClazz);
     Objects.requireNonNull(edgeStepJoinStrategy);
     Objects.requireNonNull(vertexStepJoinStrategy);
+
     this.traversalCode          = traversalCode;
+    this.matchStrategy          = matchStrategy;
     this.vertexCount            = vertexCount;
     this.edgeCount              = edgeCount;
-    this.vertexMapping          = vertexMapping;
-    this.edgeMapping            = edgeMapping;
+    this.keyClazz               = keyClazz;
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
     this.vertexStepJoinStrategy = vertexStepJoinStrategy;
-    this.matchStrategy = matchStrategy;
+    this.vertexMapping          = vertexMapping;
+    this.edgeMapping            = edgeMapping;
   }
 
   /**
-   * Traverses the graph according to the provided traversal code.
+   * Traverses the graph, thereby extracting embeddings of a given pattern.
    *
-   * @param keyClazz needed for embedding initialization
-   * @param vertices vertices including their query candidates
-   * @param edges    edges including their query candidates
-   * @return found embeddings
+   * @param vertices  vertices including their query candidates
+   * @param edges     edges including their query candidates
+   * @return embeddings contained in the graph
    */
-  public DataSet<Tuple1<Embedding<K>>> traverse(
-    Class<K> keyClazz,
+  public abstract DataSet<Tuple1<Embedding<K>>> traverse(
     DataSet<IdWithCandidates<K>> vertices,
-    DataSet<TripleWithCandidates<K>> edges) {
+    DataSet<TripleWithCandidates<K>> edges);
 
-    return iterate(vertices, edges, buildInitialEmbeddings(keyClazz, vertices))
-      .project(1);
+  TraversalCode getTraversalCode() {
+    return traversalCode;
+  }
+
+  private MatchStrategy getMatchStrategy() {
+    return matchStrategy;
+  }
+
+  private JoinOperatorBase.JoinHint getEdgeStepJoinStrategy() {
+    return edgeStepJoinStrategy;
+  }
+
+  private JoinOperatorBase.JoinHint getVertexStepJoinStrategy() {
+    return vertexStepJoinStrategy;
+  }
+
+  private DataSet<Tuple2<K, PropertyValue>> getVertexMapping() {
+    return vertexMapping;
+  }
+
+  private DataSet<Tuple2<K, PropertyValue>> getEdgeMapping() {
+    return edgeMapping;
   }
 
   /**
    * Builds the initial embeddings from the given vertices.
    *
-   * @param keyClass used for embedding array initialization
    * @param vertices vertices and their query candidates
    * @return initial embeddings
    */
-  private DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
-    Class<K> keyClass,
+  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
     DataSet<IdWithCandidates<K>> vertices) {
 
+    int initialCandidate = (int) getTraversalCode().getStep(0).getFrom();
+
     DataSet<EmbeddingWithTiePoint<K>> initialEmbeddings = vertices
-      .filter(new ElementHasCandidate<>(traversalCode.getStep(0).getFrom()))
-      .map(new BuildEmbeddingWithTiePoint<>(keyClass, traversalCode,
+      .filter(new ElementHasCandidate<>(initialCandidate))
+      .map(new BuildEmbeddingWithTiePoint<>(keyClazz, initialCandidate,
         vertexCount, edgeCount));
 
     return log(initialEmbeddings, new PrintEmbeddingWithTiePoint<>(),
-      vertexMapping, edgeMapping);
+      getVertexMapping(), getEdgeMapping());
   }
 
   /**
-   * Explores the data graph according to the traversal code of this operator.
+   * Extends the given embeddings with valid edges and returns the updated
+   * embeddings.
    *
-   * @param vertices          vertex candidates
-   * @param edges             edge candidates
-   * @param initialEmbeddings initial embeddings which are extended
-   * @return final embeddings
+   * @param edges             edges including their candidates
+   * @param embeddings        embeddings
+   * @param superstep         current iteration
+   * @param iterationStrategy iteration strategy
+   * @param forwardedFields   forwarded fields for edge step creation
+   * @return updated embeddings
    */
-  private DataSet<EmbeddingWithTiePoint<K>> iterate(
-    DataSet<IdWithCandidates<K>> vertices,
+  DataSet<EmbeddingWithTiePoint<K>> traverseEdges(
     DataSet<TripleWithCandidates<K>> edges,
-    DataSet<EmbeddingWithTiePoint<K>> initialEmbeddings) {
+    DataSet<EmbeddingWithTiePoint<K>> embeddings,
+    DataSet<Integer> superstep,
+    IterationStrategy iterationStrategy,
+    String[] forwardedFields) {
 
-    // ITERATION HEAD
-    IterativeDataSet<EmbeddingWithTiePoint<K>> embeddings = initialEmbeddings
-      .iterate(traversalCode.getSteps().size());
-
-    // ITERATION BODY
-
-    // get current superstep
-    DataSet<Integer> superstep = embeddings
-      .first(1)
-      .map(new Superstep<>());
-
-    // traverse to outgoing/incoming edges
     DataSet<EdgeStep<K>> edgeSteps = edges
-      .filter(new EdgeHasCandidate<>(traversalCode))
+      .filter(new EdgeHasCandidate<>(getTraversalCode()))
       .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
-      .map(new BuildEdgeStep<>(traversalCode))
-      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
+      .map(new BuildEdgeStep<>(getTraversalCode()))
+      .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
+      .withForwardedFields(forwardedFields);
 
     edgeSteps = log(edgeSteps,
       new PrintEdgeStep<>(true, "post-filter-map-edge"),
-      vertexMapping, edgeMapping);
+      getVertexMapping(), getEdgeMapping());
 
-    DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = embeddings
-      .join(edgeSteps, edgeStepJoinStrategy)
+    JoinOperator<EmbeddingWithTiePoint<K>, EdgeStep<K>,
+      EmbeddingWithTiePoint<K>> join = embeddings
+      .join(edgeSteps, getEdgeStepJoinStrategy())
       .where(0).equalTo(1) // tiePointId == sourceId/targetId tie point
-      .with(new UpdateEdgeMappings<>(traversalCode));
+      .with(new UpdateEdgeMappings<>(getTraversalCode(), iterationStrategy));
 
-    nextWorkSet = log(nextWorkSet,
+    if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
+      embeddings = join
+        .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
+    } else {
+      embeddings = join;
+    }
+
+    return log(embeddings,
       new PrintEmbeddingWithTiePoint<>(true, "post-edge-update"),
-      vertexMapping, edgeMapping);
+      getVertexMapping(), getEdgeMapping());
+  }
 
-    // traverse to vertices
+  /**
+   * Extends the given embeddings with valid vertices and returns the updated
+   * embeddings.
+   *
+   * @param vertices          vertices including their candidates
+   * @param embeddings        embeddings
+   * @param superstep         current super step
+   * @param iterationStrategy iteration strategy
+   * @return updated embeddings
+   */
+  DataSet<EmbeddingWithTiePoint<K>> traverseVertices(
+    DataSet<IdWithCandidates<K>> vertices,
+    DataSet<EmbeddingWithTiePoint<K>> embeddings,
+    DataSet<Integer> superstep,
+    IterationStrategy iterationStrategy) {
+
     DataSet<VertexStep<K>> vertexSteps = vertices
-      .filter(new VertexHasCandidate<>(traversalCode))
+      .filter(new VertexHasCandidate<>(getTraversalCode()))
       .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
       .map(new BuildVertexStep<>());
 
     vertexSteps = log(vertexSteps,
       new PrintVertexStep<>(true, "post-filter-project-vertex"),
-      vertexMapping, edgeMapping);
+      getVertexMapping(), getEdgeMapping());
 
-    nextWorkSet = nextWorkSet
-      .join(vertexSteps, vertexStepJoinStrategy)
+    JoinOperator<EmbeddingWithTiePoint<K>, VertexStep<K>,
+      EmbeddingWithTiePoint<K>> join = embeddings
+      .join(vertexSteps, getVertexStepJoinStrategy())
       .where(0).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings<>(traversalCode, matchStrategy));
+      .with(new UpdateVertexMappings<>(getTraversalCode(), getMatchStrategy(),
+        iterationStrategy));
 
-    nextWorkSet = log(nextWorkSet,
+    if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
+      embeddings = join
+        .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
+    } else {
+      embeddings = join;
+    }
+
+    embeddings = log(embeddings,
       new PrintEmbeddingWithTiePoint<>(true, "post-vertex-update"),
-      vertexMapping, edgeMapping);
-
-    // ITERATION FOOTER
-    return embeddings.closeWith(nextWorkSet, nextWorkSet);
+      getVertexMapping(), getEdgeMapping());
+    return embeddings;
   }
-
-
 }

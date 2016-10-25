@@ -40,7 +40,7 @@ public class TraversalCode implements Serializable {
   /**
    * Initialize a new traversal code
    */
-  TraversalCode() {
+  public TraversalCode() {
     this.steps = Lists.newArrayList();
   }
 
@@ -49,7 +49,7 @@ public class TraversalCode implements Serializable {
    *
    * @param step new step
    */
-  void add(Step step) {
+  public void add(Step step) {
     steps.add(step);
   }
 
@@ -70,5 +70,13 @@ public class TraversalCode implements Serializable {
    */
   public Step getStep(int i) {
     return steps.get(i);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("TraversalCode{");
+    sb.append("steps=").append(steps);
+    sb.append('}');
+    return sb.toString();
   }
 }

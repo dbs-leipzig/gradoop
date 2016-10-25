@@ -28,6 +28,8 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving
+  .explorative.IterationStrategy;
 
 import java.util.List;
 
@@ -81,13 +83,14 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * if vertices and edges can be matched to multiple vertices/edges in the
    * query.
    *
-   * @param pattern     GDL graph pattern
-   * @param attachData  attach original vertex and edge data to the result
-   * @param matchStrategy choose wich strategy is used for the matching
+   * @param pattern           GDL graph pattern
+   * @param attachData        attach original vertex and edge data to the result
+   * @param matchStrategy     strategy for vertex and edge mappings
+   * @param iterationStrategy strategy for internal iteration
    * @return subgraphs of the input graph that match the given graph pattern
    */
   GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy);
+    MatchStrategy matchStrategy, IterationStrategy iterationStrategy);
 
   /**
    * Creates a copy of the logical graph.

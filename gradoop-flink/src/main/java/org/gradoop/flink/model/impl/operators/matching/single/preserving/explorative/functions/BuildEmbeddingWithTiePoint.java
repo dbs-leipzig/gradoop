@@ -19,12 +19,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
-
-
 
 import java.lang.reflect.Array;
 
@@ -58,13 +55,13 @@ public class BuildEmbeddingWithTiePoint<K>
    * Constructor
    *
    * @param keyClazz      key type is needed for array initialization
-   * @param traversalCode traversal code for the current exploration
+   * @param candidate     initial query candidate each vertex is mapped to
    * @param vertexCount   number of vertices in the query graph
    * @param edgeCount     number of edges in the query graph
    */
-  public BuildEmbeddingWithTiePoint(Class<K> keyClazz,
-    TraversalCode traversalCode, long vertexCount, long edgeCount) {
-    this.candidate              = (int) traversalCode.getStep(0).getFrom();
+  public BuildEmbeddingWithTiePoint(Class<K> keyClazz, int candidate,
+    long vertexCount, long edgeCount) {
+    this.candidate              = candidate;
     reuseEmbedding              = new Embedding<>();
     reuseEmbeddingWithTiePoint  = new EmbeddingWithTiePoint<>();
     //noinspection unchecked

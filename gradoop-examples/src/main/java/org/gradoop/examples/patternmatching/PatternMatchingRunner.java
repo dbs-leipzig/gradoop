@@ -26,8 +26,8 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulation;
 
 import java.util.concurrent.TimeUnit;
@@ -182,13 +182,21 @@ public class PatternMatchingRunner extends AbstractRunner
       op = new DualSimulation(query, attachData, false);
       break;
     case ALGO_ISO_EXP:
-      op = new ExplorativePatternMatching(query, attachData,
-              MatchStrategy.ISOMORPHISM);
+      op = new ExplorativePatternMatching.Builder()
+        .setQuery(query)
+        .setAttachData(attachData)
+        .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+        .build();
       break;
     case ALGO_ISO_EXP_BC_HASH_FIRST:
-      op = new ExplorativePatternMatching(query, attachData,
-              MatchStrategy.ISOMORPHISM,
-        new DFSTraverser(), BROADCAST_HASH_FIRST, BROADCAST_HASH_FIRST);
+      op = new ExplorativePatternMatching.Builder()
+        .setQuery(query)
+        .setAttachData(attachData)
+        .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+        .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+        .setEdgeStepJoinStrategy(BROADCAST_HASH_FIRST)
+        .setVertexStepJoinStrategy(BROADCAST_HASH_FIRST)
+        .build();
       break;
     default :
       throw new IllegalArgumentException(algorithm + " not supported");
