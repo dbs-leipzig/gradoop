@@ -17,8 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
 
-
-
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;

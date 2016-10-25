@@ -44,6 +44,9 @@ public class TraverserBenchmark implements ProgramDescription {
    * args[0] - Path to edge list
    * args[1] - Query (q1, q2, ..., q7)
    * args[2] - Iteration strategy (bulk/loop)
+   *
+   * e.g. ... patternmatching.TraverserBenchmark web-Google.txt q2 bulk
+   *
    * @param args program arguments
    */
   public static void main(String[] args) throws Exception {
@@ -84,7 +87,6 @@ public class TraverserBenchmark implements ProgramDescription {
     DataSet<TripleWithCandidates<Long>> edges = DataSetUtils
       .zipWithUniqueId(edgeList)
       .map(new GetTriplesWithCandidates(edgeCount));
-    // read edge list graph
 
     // create distributed traverser
     DistributedTraverser<Long> distributedTraverser;
