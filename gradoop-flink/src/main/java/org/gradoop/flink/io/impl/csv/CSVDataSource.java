@@ -16,27 +16,16 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
-import com.google.common.collect.Maps;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.CSVToElement;
-import org.gradoop.flink.io.impl.csv.functions.CSVTypeFilter;
-import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
-import org.gradoop.flink.io.impl.csv.functions.EPGMElementToPojo;
-import org.gradoop.flink.io.impl.csv.functions.GradoopEdgeIds;
-import org.gradoop.flink.io.impl.csv.functions.VertexIdsToMap;
-import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
+import org.gradoop.flink.io.impl.csv.functions.*;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.io.impl.csv.pojos.Edge;
@@ -125,12 +114,6 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .map(new VertexToVertexIds())
       .reduceGroup(new VertexIdsToMap());
 
-    try {
-      vertexIds.print();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     edges = csvContent
       .filter(
         new CSVTypeFilter(Edge.class))
@@ -139,6 +122,35 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .returns(edgeFactory.getType())
       .map(new GradoopEdgeIds())
       .withBroadcastSet(vertexIds, GradoopEdgeIds.ID_MAP);
+
+    DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Vertex, String>> vertexGraphKeys = vertices
+      .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl.pojo.Vertex>());
+
+    DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Edge, String>>
+      edgeGraphKeys = edges
+      .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl
+        .pojo.Edge>());
+
+    graphHeads = graphHeads
+      .union(vertexGraphKeys
+        .groupBy(1)
+        .reduceGroup(new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Vertex>(graphHeadFactory)))
+      .union(edgeGraphKeys
+        .groupBy(1)
+        .reduceGroup(new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Edge>(graphHeadFactory)));
+
+
+    vertices = vertexGraphKeys
+      .groupBy("f0.id")
+      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Vertex>())
+      .withBroadcastSet(graphHeads, SetElementGraphIds.BROADCAST_GRAPHHEADS);
+
+    edges = edgeGraphKeys
+      .groupBy("f0.id")
+      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Edge>())
+      .withBroadcastSet(graphHeads, SetElementGraphIds.BROADCAST_GRAPHHEADS);
+
+
 
     return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
   }

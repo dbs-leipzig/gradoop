@@ -26,8 +26,11 @@ public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
   @Override
   public Edge map(Edge edge) throws Exception {
     PropertyList properties = edge.getProperties();
-    edge.setSourceId(map.get(properties.get("source").getString()));
-    edge.setTargetId(map.get(properties.get("target").getString()));
+    //TODO remove properties when it is supportet
+    edge.setSourceId(
+      map.get(properties.get(CSVToElement.PROPERTY_KEY_SOURCE).getString()));
+    edge.setTargetId(
+      map.get(properties.get(CSVToElement.PROPERTY_KEY_TARGET).getString()));
     return edge;
   }
 }
