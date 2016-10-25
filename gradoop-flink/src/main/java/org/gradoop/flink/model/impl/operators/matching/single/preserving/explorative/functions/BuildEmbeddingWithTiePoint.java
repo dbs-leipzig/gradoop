@@ -19,12 +19,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
-
-
 
 import java.lang.reflect.Array;
 

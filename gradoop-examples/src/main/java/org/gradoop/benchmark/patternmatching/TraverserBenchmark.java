@@ -57,10 +57,18 @@ public class TraverserBenchmark implements ProgramDescription {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     // parse query
+    // Q?
     Queries.Query query = getQuery(queryString);
-    int vertexCount  = query.getVertexCount();
-    int edgeCount    = query.getEdgeCount();
-    TraversalCode tc = query.getTraversalCode();
+    int vertexCount     = query.getVertexCount();
+    int edgeCount       = query.getEdgeCount();
+    TraversalCode tc    = query.getTraversalCode();
+    // GDL
+//    QueryHandler query  = new QueryHandler(queryString);
+//    int vertexCount     = query.getVertexCount();
+//    int edgeCount       = query.getEdgeCount();
+//    Traverser traverser = new DFSTraverser();
+//    traverser.setQueryHandler(query);
+//    TraversalCode tc    = traverser.traverse();
 
     // read edge list graph
     DataSet<Tuple2<Long, Long>> edgeList = env.readCsvFile(inputPath)
@@ -76,6 +84,7 @@ public class TraverserBenchmark implements ProgramDescription {
     DataSet<TripleWithCandidates<Long>> edges = DataSetUtils
       .zipWithUniqueId(edgeList)
       .map(new GetTriplesWithCandidates(edgeCount));
+    // read edge list graph
 
     // create distributed traverser
     DistributedTraverser<Long> distributedTraverser;

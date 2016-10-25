@@ -87,6 +87,15 @@ public class Queries {
    *
    * (0)<-0-(1)-1->(2)
    *
+   * static:
+   * TraversalCode{steps=[(1,0,0,true), (1,1,2,true)]}
+   * embeddingCount = 67.833.471
+   *
+   * GDL:
+   * TraversalCode{steps=[(0,0,1,false), (1,1,2,true)]}
+   * embeddingCount = 62.728.432
+   *
+   *
    * @return query q2
    */
   public static Query q2() {
