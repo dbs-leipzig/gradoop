@@ -86,7 +86,7 @@
 
     <domain name="secondDomain">
 
-        <csv name="secondGraph.csv" charset="utf8" separator="(">
+        <csv name="second_graph.csv" charset="utf8" separator="(">
             <columns>
                 <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="Long"/>
@@ -127,6 +127,7 @@
                 <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="String"/>
                 <column id="2" pos="2" type="Long"/>
+                <column id="3" pos="3" type="Long"/>
             </columns>
             <vertex>
                 <key class="thirdVertex">
@@ -138,7 +139,7 @@
                 <graphs>
                     <graph>
                         <reference domain_name="testDomain">
-                            <key class="">
+                            <key class="Person">
                                 <ref column_id="2"/>
                             </key>
                         </reference>
@@ -148,7 +149,7 @@
                     <vertexedge>
                         <key class="thirdVertexEdge">
                             <ref column_id="0"/>
-                            <ref column_id="2"/>
+                            <ref column_id="3"/>
                         </key>
                         <label>
                             <static name="FKedge"/>
@@ -164,8 +165,8 @@
                         </graphs>
                         <target>
                             <reference domain_name="testDomain">
-                                <key class="testVertex">
-                                    <ref column_id="2"/>
+                                <key class="Person">
+                                    <ref column_id="3"/>
                                 </key>
                             </reference>
                         </target>
@@ -178,7 +179,7 @@
                 <column id="0" pos="0" type="String"/>
                 <column id="1" pos="1" type="Long"/>
                 <column id="2" pos="2" type="Long"/>
-                <column id="3" pos="1" type="Long"/>
+                <column id="3" pos="3" type="Long"/>
             </columns>
             <edge>
                 <key class="secondEdge">
