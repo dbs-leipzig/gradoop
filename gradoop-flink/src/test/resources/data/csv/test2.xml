@@ -67,7 +67,7 @@
                     <static name="isMember"/>
                 </label>
                 <properties>
-                    <property column_id="3" name="since"/>
+                    <property column_id="2" name="since"/>
                 </properties>
                 <graphs>
                     <graph>
@@ -75,10 +75,10 @@
                     </graph>
                 </graphs>
                 <source>
-                    <ref column_id="1"/>
+                    <ref column_id="0"/>
                 </source>
                 <target>
-                    <ref column_id="2"/>
+                    <ref column_id="1"/>
                 </target>
             </edge>
         </csv>

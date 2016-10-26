@@ -1,7 +1,6 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
@@ -15,10 +14,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.pojos.*;
 import org.gradoop.flink.io.impl.csv.tuples.ReferenceTuple;
 
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -92,14 +88,18 @@ public class CSVToElement implements
 
       if (csv.getGraphhead() != null && type.isInstance(csv.getGraphhead())) {
         reuse = graphHeadFactory.createGraphHead();
-        label = createLabel(csv.getGraphhead().getLabel(), fields);
+        if (csv.getGraphhead().getLabel() != null) {
+          label = createLabel(csv.getGraphhead().getLabel(), fields);
+        }
         key = csv.getGraphhead().getKey();
         propertiesCsv = csv.getGraphhead().getProperties();
         className = csv.getGraphhead().getKey().getClazz();
 
       } else if (csv.getVertex() != null && type.isInstance(csv.getVertex())) {
         reuse = vertexFactory.createVertex();
-        label = createLabel(csv.getVertex().getLabel(), fields);
+        if (csv.getVertex().getLabel() != null) {
+          label = createLabel(csv.getVertex().getLabel(), fields);
+        }
         key = csv.getVertex().getKey();
         propertiesCsv = csv.getVertex().getProperties();
         className = csv.getVertex().getKey().getClazz();
@@ -111,7 +111,9 @@ public class CSVToElement implements
       } else if (csv.getEdge() != null && type.isInstance(csv.getEdge())) {
         reuse = edgeFactory.createEdge(GradoopId.get(), GradoopId.get());
         isEdge = true;
-        label = createLabel(csv.getEdge().getLabel(), fields);
+        if (csv.getEdge().getLabel() != null) {
+          label = createLabel(csv.getEdge().getLabel(), fields);
+        }
         key = csv.getEdge().getKey();
         propertiesCsv = csv.getEdge().getProperties();
         className = csv.getEdge().getKey().getClazz();
@@ -119,7 +121,6 @@ public class CSVToElement implements
 
 
       } else {
-        System.out.println("reuse = " + csv);
         reuse = null;
       }
 
@@ -172,7 +173,9 @@ public class CSVToElement implements
         for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge())
           {
           className = vertexEdge.getKey().getClazz();
-          label = createLabel(vertexEdge.getLabel(), fields);
+          if (vertexEdge.getLabel() != null) {
+            label = createLabel(vertexEdge.getLabel(), fields);
+          }
           key = vertexEdge.getKey();
           propertiesCsv = vertexEdge.getProperties();
           graphs = vertexEdge.getGraphs().getGraph();
@@ -345,29 +348,45 @@ public class CSVToElement implements
 
     list.set(PROPERTY_KEY_KEY, value);
 
+    if (properties != null && !properties.isEmpty()) {
+      for (Property p : properties.get(0).getProperty()) {
+        org.gradoop.common.model.impl.properties.Property prop = new org.gradoop.common.model.impl.properties.Property();
 
-    for (Property p : properties.get(0).getProperty()) {
-      org.gradoop.common.model.impl.properties.Property prop =
-        new org.gradoop.common.model.impl.properties.Property();
+        prop.setKey(p.getName());
 
-      prop.setKey(p.getName());
+        value = new PropertyValue();
 
-      value = new PropertyValue();
+        String type =
+          csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
 
-      String type =
-        csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
+        switch (type) {
+          case "String":
+            value.setString(fields[p.getColumnId()]);
+            break;
+          case "Integer":
+            value.setInt(Integer.parseInt(fields[p.getColumnId()]));
+            break;
+          case "Long":
+            value.setLong(Long.parseLong(fields[p.getColumnId()]));
+            break;
+          case "Float":
+            value.setFloat(Float.parseFloat(fields[p.getColumnId()]));
+            break;
+          case "Double":
+            value.setDouble(Double.parseDouble(fields[p.getColumnId()]));
+            break;
+          case "Boolean":
+            value.setBoolean(Boolean.parseBoolean(fields[p.getColumnId()]));
+            break;
+          default:
+            value.setString(fields[p.getColumnId()]);
+            break;
+        }
 
-      if (type.equals("String")) {
-        value.setString(fields[p.getColumnId()]);
-      } else if (type.equals("Integer")) {
-        value.setInt(Integer.parseInt(fields[p.getColumnId()]));
+        prop.setValue(value);
+        list.set(prop);
       }
-
-
-      prop.setValue(value);
-      list.set(prop);
     }
-
     return list;
   }
 }
