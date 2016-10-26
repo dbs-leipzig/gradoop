@@ -51,7 +51,7 @@ public class CSVIOTest extends GradoopFlinkTestBase {
     String csvFiles = CSVIOTest.class.getResource("/data/csv/").getPath();
 
     String xmlFile =
-      CSVIOTest.class.getResource("/data/csv/test2.xml").getFile();
+      CSVIOTest.class.getResource("/data/csv/test1.xml").getFile();
 
     String metaFile =
       CSVDataSource.class.getResource("/data/csv/csv_format.xsd").getFile();

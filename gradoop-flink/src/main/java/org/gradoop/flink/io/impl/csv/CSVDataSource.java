@@ -19,6 +19,7 @@ package org.gradoop.flink.io.impl.csv;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -93,6 +94,10 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     DataSet<Tuple2<Csv, List<String>>> csvContent = env
       .fromCollection(content);
+
+    DataSet<EPGMElement> elements =csvContent
+      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory,
+        edgeFactory));
 
     graphHeads = csvContent
       .filter(
