@@ -19,20 +19,20 @@ import static org.gradoop.common.GradoopTestUtils.validateIdEquality;
 public class TransformationTest extends GradoopFlinkTestBase {
 
   protected static final String TEST_GRAPH = "" +
-    "g0:A  { a = 1 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
-    "g1:B  { a = 2 } [(:A { a = 2, b = 2 })-[:a { a = 2, b = 2 }]->(:B { c = 3 })]" +
+    "g0:A  { a : 1 } [(:A { a : 1, b : 2 })-[:a { a : 1, b : 2 }]->(:B { c : 2 })]" +
+    "g1:B  { a : 2 } [(:A { a : 2, b : 2 })-[:a { a : 2, b : 2 }]->(:B { c : 3 })]" +
     // full graph transformation
-    "g01:A { a = 2 } [(:A { a = 2, b = 1 })-->(:B { d = 2 })]" +
-    "g11:B { a = 3 } [(:A { a = 3, b = 1 })-->(:B { d = 3 })]" +
+    "g01:A { a : 2 } [(:A { a : 2, b : 1 })-->(:B { d : 2 })]" +
+    "g11:B { a : 3 } [(:A { a : 3, b : 1 })-->(:B { d : 3 })]" +
     // graph head only transformation
-    "g02:A { a = 2 } [(:A { a = 1, b = 2 })-[:a { a = 1, b = 2 }]->(:B { c = 2 })]" +
-    "g12:B { a = 3 } [(:A { a = 2, b = 2 })-[:a { a = 2, b = 2 }]->(:B { c = 3 })]" +
+    "g02:A { a : 2 } [(:A { a : 1, b : 2 })-[:a { a : 1, b : 2 }]->(:B { c : 2 })]" +
+    "g12:B { a : 3 } [(:A { a : 2, b : 2 })-[:a { a : 2, b : 2 }]->(:B { c : 3 })]" +
     // vertex only transformation
-    "g03:A { a = 1 } [(:A { a = 2, b = 1 })-[:a { a = 1, b = 2 }]->(:B { d = 2 })]" +
-    "g13:B { a = 2 } [(:A { a = 3, b = 1 })-[:a { a = 2, b = 2 }]->(:B { d = 3 })]" +
+    "g03:A { a : 1 } [(:A { a : 2, b : 1 })-[:a { a : 1, b : 2 }]->(:B { d : 2 })]" +
+    "g13:B { a : 2 } [(:A { a : 3, b : 1 })-[:a { a : 2, b : 2 }]->(:B { d : 3 })]" +
     // edge only transformation
-    "g04:A { a = 1 } [(:A { a = 1, b = 2 })-->(:B { c = 2 })]" +
-    "g14:B { a = 2 } [(:A { a = 2, b = 2 })-->(:B { c = 3 })]";
+    "g04:A { a : 1 } [(:A { a : 1, b : 2 })-->(:B { c : 2 })]" +
+    "g14:B { a : 2 } [(:A { a : 2, b : 2 })-->(:B { c : 3 })]";
 
   static GraphHead transformGraphHead(GraphHead current, GraphHead transformed) {
     transformed.setLabel(current.getLabel());

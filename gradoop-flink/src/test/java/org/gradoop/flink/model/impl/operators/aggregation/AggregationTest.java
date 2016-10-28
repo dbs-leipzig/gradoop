@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.aggregation;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.runtime.client.JobExecutionException;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -38,7 +37,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVerte
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -57,27 +55,27 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testSingleGraphVertexAndEdgeMin() throws Exception {
     LogicalGraph graph = getLoaderFromString(
           "org:Ga[" +
-          "(:Va{vp=0.5f})-[:ea{ep=2}]->(:Vb{vp=3.1f});" +
-          "(:Vc{vp=0.33f})-[:eb]->(:Vd{vp=0.0f})" +
+          "(:Va{vp : 0.5f})-[:ea{ep : 2}]->(:Vb{vp : 3.1f})" +
+          "(:Vc{vp : 0.33f})-[:eb]->(:Vd{vp : 0.0f})" +
           "]"
       )
       .getLogicalGraphByVariable("org");
 
-    MinVertexProperty minVertexProperty = 
+    MinVertexProperty minVertexProperty =
       new MinVertexProperty(VERTEX_PROPERTY);
-    
-    MinEdgeProperty minEdgeProperty = 
+
+    MinEdgeProperty minEdgeProperty =
       new MinEdgeProperty(EDGE_PROPERTY);
-    
+
     graph = graph
       .aggregate(minVertexProperty)
       .aggregate(minEdgeProperty);
 
     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
 
-    assertTrue("edge minimum not set", 
+    assertTrue("edge minimum not set",
       graphHead.hasProperty(minEdgeProperty.getAggregatePropertyKey()));
-    assertTrue("vertex minimum not set", 
+    assertTrue("vertex minimum not set",
       graphHead.hasProperty(minVertexProperty.getAggregatePropertyKey()));
     assertEquals(
       2,
@@ -93,14 +91,14 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testCollectionVertexAndEdgeMin() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
         "g0[" +
-        "(va {vp=0.5});" +
-        "(vb {vp=0.3});" +
-        "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2L}]->(vb);" +
+        "(va {vp : 0.5})" +
+        "(vb {vp : 0.3})" +
+        "(vc {vp : 0.1})" +
+        "(va)-[ea {ep : 2L}]->(vb)" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
-        "(va)-[ea]->(vb);" +
+        "(va)-[ea]->(vb)" +
         "]" +
         "g2[]");
 
@@ -110,9 +108,9 @@ public class AggregationTest extends GradoopFlinkTestBase {
     MinVertexProperty minVertexProperty =
       new MinVertexProperty(VERTEX_PROPERTY);
 
-    MinEdgeProperty minEdgeProperty = 
+    MinEdgeProperty minEdgeProperty =
       new MinEdgeProperty(EDGE_PROPERTY);
-    
+
     GraphCollection outputCollection = inputCollection
       .apply(new ApplyAggregation(minVertexProperty))
       .apply(new ApplyAggregation(minEdgeProperty));
@@ -152,8 +150,8 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testSingleGraphVertexAndEdgeMax() throws Exception {
     LogicalGraph graph = getLoaderFromString(
           "org:Ga[" +
-          "(:Va{vp=0.5f})-[:ea{ep=2}]->(:Vb{vp=3.1f});" +
-          "(:Vc{vp=0.33f})-[:eb]->(:Vd{vp=0.0f})" +
+          "(:Va{vp : 0.5f})-[:ea{ep : 2}]->(:Vb{vp : 3.1f})" +
+          "(:Vc{vp : 0.33f})-[:eb]->(:Vd{vp : 0.0f})" +
           "]"
       )
       .getLogicalGraphByVariable("org");
@@ -191,14 +189,14 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testCollectionVertexAndEdgeMax() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
         "g0[" +
-        "(va {vp=0.5f});" +
-        "(vb {vp=0.3f});" +
-        "(vc {vp=0.1f});" +
-        "(va)-[ea {ep=2L}]->(vb);" +
+        "(va {vp : 0.5f})" +
+        "(vb {vp : 0.3f})" +
+        "(vc {vp : 0.1f})" +
+        "(va)-[ea {ep : 2L}]->(vb)" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
-        "(va)-[ea]->(vb);" +
+        "(va)-[ea]->(vb)" +
         "]" +
         "g2[]");
 
@@ -208,9 +206,9 @@ public class AggregationTest extends GradoopFlinkTestBase {
     MaxVertexProperty maxVertexProperty =
       new MaxVertexProperty(VERTEX_PROPERTY);
 
-    MaxEdgeProperty maxEdgeProperty = 
+    MaxEdgeProperty maxEdgeProperty =
       new MaxEdgeProperty(EDGE_PROPERTY);
-    
+
     GraphCollection outputCollection = inputCollection
       .apply(new ApplyAggregation(maxVertexProperty))
       .apply(new ApplyAggregation(maxEdgeProperty));
@@ -220,9 +218,9 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
     for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
-      assertTrue("edge maximum not set", 
+      assertTrue("edge maximum not set",
         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
-      assertTrue("vertex maximum not set", 
+      assertTrue("vertex maximum not set",
         graphHead.hasProperty(maxVertexProperty.getAggregatePropertyKey()));
 
 
@@ -252,18 +250,18 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testSingleGraphVertexAndEdgeSum() throws Exception {
     LogicalGraph graph = getLoaderFromString(
           "org:Ga[" +
-          "(:Va{vp=0.5f})-[:ea{ep=2}]->(:Vb{vp=3.1f});" +
-          "(:Vc{vp=0.33f})-[:eb]->(:Vd{vp=0.0f})" +
+          "(:Va{vp : 0.5f})-[:ea{ep : 2}]->(:Vb{vp : 3.1f})" +
+          "(:Vc{vp : 0.33f})-[:eb]->(:Vd{vp : 0.0f})" +
           "]"
       ).getLogicalGraphByVariable("org");
 
 
-    SumVertexProperty sumVertexProperty = 
+    SumVertexProperty sumVertexProperty =
       new SumVertexProperty(VERTEX_PROPERTY);
 
-    SumEdgeProperty sumEdgeProperty = 
+    SumEdgeProperty sumEdgeProperty =
       new SumEdgeProperty(EDGE_PROPERTY);
-    
+
     graph = graph
       .aggregate(sumVertexProperty)
       .aggregate(sumEdgeProperty);
@@ -288,14 +286,14 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testCollectionVertexAndEdgeSum() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
         "g0[" +
-        "(va {vp=0.5});" +
-        "(vb {vp=0.3});" +
-        "(vc {vp=0.1});" +
-        "(va)-[ea {ep=2L}]->(vb);" +
+        "(va {vp : 0.5})" +
+        "(vb {vp : 0.3})" +
+        "(vc {vp : 0.1})" +
+        "(va)-[ea {ep : 2L}]->(vb)" +
         "(vb)-[eb]->(vc)" +
         "]" +
         "g1[" +
-        "(va)-[ea]->(vb);" +
+        "(va)-[ea]->(vb)" +
         "]" +
         "g2[]");
 
@@ -346,13 +344,13 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testWithMixedTypePropertyValues() throws Exception{
     FlinkAsciiGraphLoader loader = getLoaderFromString(
         "g0[" +
-        "(va {vp=0.5});" +
-        "(vc {vp=1});" +
-        "(va)-[ea {ep=2L}]->(vb);" +
-        "(vb)-[eb {ep=2.0F}]->(vc)" +
+        "(va {vp : 0.5})" +
+        "(vc {vp : 1})" +
+        "(va)-[ea {ep : 2L}]->(vb)" +
+        "(vb)-[eb {ep : 2.0F}]->(vc)" +
         "]" +
         "g1[" +
-        "(va)-[ea]->(vb);" +
+        "(va)-[ea]->(vb)" +
         "]" +
         "g2[]");
 
@@ -406,7 +404,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
   @Test
   public void testGraphUnsupportedPropertyValueType() throws Exception{
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "g[({a=0})-[{b=0.0}]->({a=true})-[{b=\"\"}]->({})]");
+      "g[({a : 0})-[{b : 0.0}]->({a : true})-[{b : \"\"}]->({})]");
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("g");
 
@@ -425,7 +423,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
   @Test
   public void testCollectionUnsupportedPropertyValueType() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "g[({a=0})-[{b=0.0}]->({a=true})-[{b=\"\"}]->({})]");
+      "g[({a : 0})-[{b : 0.0}]->({a : true})-[{b : \"\"}]->({})]");
 
     GraphCollection collection = loader.getGraphCollectionByVariables("g");
 

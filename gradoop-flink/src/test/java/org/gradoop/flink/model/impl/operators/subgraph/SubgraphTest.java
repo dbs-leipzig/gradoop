@@ -24,12 +24,12 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave);" +
-      "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave);" +
-      "(eve)-[eka]->(alice);" +
-      "(eve)-[ekb]->(bob);" +
-      "(frank)-[fkc]->(carol);" +
-      "(frank)-[fkd]->(dave);" +
+      "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
+      "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
+      "(eve)-[eka]->(alice)" +
+      "(eve)-[ekb]->(bob)" +
+      "(frank)-[fkc]->(carol)" +
+      "(frank)-[fkd]->(dave)" +
       "]");
 
     LogicalGraph input = loader.getDatabase().getDatabaseGraph();
@@ -53,7 +53,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(alice);(bob);(carol);(dave);(eve);(frank);" +
+      "(alice),(bob),(carol),(dave),(eve),(frank)" +
       "]");
 
     LogicalGraph input = loader.getDatabase().getDatabaseGraph();
@@ -95,7 +95,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs);" +
+      "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop);" +
       "]");
 
@@ -114,8 +114,8 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs);" +
-      "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop);" +
+      "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
+      "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
       "]");
 
     LogicalGraph input = loader.getDatabase().getDatabaseGraph();
@@ -134,16 +134,16 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "(jay:Person {" +
-        "name = \"Jay\", age=45, gender = \"f\", city = \"Leipzig\"})" +
+        "name : \"Jay\", age : 45, gender : \"f\", city : \"Leipzig\"})" +
       "g4:Community[" +
-        "(jay)-[jkb:knows {since = 2016}]->(bob);" +
-        "(bob)-[blj:likes]->(jay);" +
+        "(jay)-[jkb:knows {since : 2016}]->(bob)" +
+        "(bob)-[blj:likes]->(jay)" +
         "]");
 
     loader.appendToDatabaseFromString(
       "expected0[" +
-        "(alice);" +
-        "(bob);" +
+        "(alice)" +
+        "(bob)" +
         "]"
     );
 
@@ -153,7 +153,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "expected4[" +
-        "(jay)-[jkb]->(bob);" +
+        "(jay)-[jkb]->(bob)" +
         "]"
     );
 
@@ -190,15 +190,15 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "(jay:Person {" +
-        "name = \"Jay\", age=45, gender = \"f\", city = \"Leipzig\"})" +
-        "g4:Community[" +
-        "(jay)-[jkb:knows]->(bob);" +
-        "(bob)-[blj:likes]->(jay);" +
+        "name : \"Jay\", age : 45, gender : \"f\", city : \"Leipzig\"})" +
+      "g4:Community[" +
+        "(jay)-[jkb:knows]->(bob)" +
+        "(bob)-[blj:likes]->(jay)" +
         "]");
 
     loader.appendToDatabaseFromString(
       "expected0[" +
-        "(alice)-[akb]->(bob)-[bka]->(alice);" +
+        "(alice)-[akb]->(bob)-[bka]->(alice)" +
         "]"
     );
 
@@ -208,7 +208,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "expected4[" +
-        "(jay)-[jkb]->(bob)-[blj]->(jay);" +
+        "(jay)-[jkb]->(bob)-[blj]->(jay)" +
         "]"
     );
 
@@ -236,14 +236,14 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "expected0[" +
-        "(eve)-[ekb]->(bob);" +
+        "(eve)-[ekb]->(bob)" +
         "]"
     );
 
     loader.appendToDatabaseFromString(
       "expected1[" +
-        "(frank)-[fkc]->(carol);" +
-        "(frank)-[fkd]->(dave);" +
+        "(frank)-[fkc]->(carol)" +
+        "(frank)-[fkd]->(dave)" +
         "]"
     );
 

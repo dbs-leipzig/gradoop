@@ -31,10 +31,10 @@ public class SplitTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
           "input[" +
-            "(v0 {key1 = 0})" +
-            "(v1 {key1 = 1})" +
-            "(v2 {key1 = 1})" +
-            "(v3 {key1 = 0})" +
+            "(v0 {key1 : 0})" +
+            "(v1 {key1 : 1})" +
+            "(v2 {key1 : 1})" +
+            "(v3 {key1 : 0})" +
             "(v1)-[e1]->(v2)" +
             "(v3)-[e2]->(v0)" +
             "(v2)-[e3]->(v0)" +
@@ -62,12 +62,12 @@ public class SplitTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("" +
         "input[" +
-        "(v0 {key1 = 0})" +
-        "(v1 {key1 = 1})" +
-        "(v2 {key1 = 1})" +
-        "(v3 {key1 = 0})" +
-        "(v4 {key1 = 2})" +
-        "(v5 {key1 = 2})" +
+        "(v0 {key1 : 0})" +
+        "(v1 {key1 : 1})" +
+        "(v2 {key1 : 1})" +
+        "(v3 {key1 : 0})" +
+        "(v4 {key1 : 2})" +
+        "(v5 {key1 : 2})" +
         "(v1)-[e1]->(v2)" +
         "(v3)-[e2]->(v0)" +
         "(v2)-[e3]->(v0)" +
@@ -102,10 +102,10 @@ public class SplitTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("" +
         "input[" +
-        "(v0 {key1 = 0})" +
-        "(v1 {key1 = 1})" +
-        "(v2 {key1 = 1, key2 = 0})" +
-        "(v3 {key1 = 0})" +
+        "(v0 {key1 : 0})" +
+        "(v1 {key1 : 1})" +
+        "(v2 {key1 : 1, key2 : 0})" +
+        "(v3 {key1 : 0})" +
         "(v1)-[e1]->(v2)" +
         "(v3)-[e2]->(v0)" +
         "(v2)-[e3]->(v0)" +
@@ -133,20 +133,20 @@ public class SplitTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("" +
           "g1:Persons [" +
-          "(v0:Person {id = 0, author = \"value0\"})" +
-          "(v1:Person {id = 0, author = \"value1\"})" +
-          "(v2:Person {id = 0, author = \"value2\"})" +
-          "(v3:Person {id = 0, author = \"value3\"})" +
-          "(v0)-[e0:sameAs {id = 0, sim=\"0.91\"}]->(v1)" +
-          "(v0)-[e1:sameAs {id = 1, sim=\"0.3\"}]->(v2)" +
-          "(v2)-[e2:sameAs {id = 2, sim=\"0.1\"}]->(v1)" +
-          "(v2)-[e3:sameAs {id = 3, sim=\"0.99\"}]->(v3)" +
+          "(v0:Person {id : 0, author : \"value0\"})" +
+          "(v1:Person {id : 0, author : \"value1\"})" +
+          "(v2:Person {id : 0, author : \"value2\"})" +
+          "(v3:Person {id : 0, author : \"value3\"})" +
+          "(v0)-[e0:sameAs {id : 0, sim : \"0.91\"}]->(v1)" +
+          "(v0)-[e1:sameAs {id : 1, sim : \"0.3\"}]->(v2)" +
+          "(v2)-[e2:sameAs {id : 2, sim : \"0.1\"}]->(v1)" +
+          "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
           "]" +
           "g2 [" +
-          "(v0)-[e0:sameAs {id = 0, sim=\"0.91\"}]->(v1)" +
-          "(v0)-[e1:sameAs {id = 1, sim=\"0.3\"}]->(v2)" +
-          "(v2)-[e2:sameAs {id = 2, sim=\"0.1\"}]->(v1)" +
-          "(v2)-[e3:sameAs {id = 3, sim=\"0.99\"}]->(v3)" +
+          "(v0)-[e0:sameAs {id : 0, sim : \"0.91\"}]->(v1)" +
+          "(v0)-[e1:sameAs {id : 1, sim : \"0.3\"}]->(v2)" +
+          "(v2)-[e2:sameAs {id : 2, sim : \"0.1\"}]->(v1)" +
+          "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
           "]"
       );
 

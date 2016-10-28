@@ -1,9 +1,9 @@
-:Network{social=true}[
-(a:User{name="Alice"})-[:knows{since=2013}]->(b:User{name="Bob"})
-(a)-[:knows{since=2014}]->(b)
-(b)-[k:knows{since=2015}]->(c:User{name="Carol"})
+:Network{social:true}[
+(a:User{name:"Alice"})-[:knows{since:2013}]->(b:User{name:"Bob"})
+(a)-[:knows{since:2014}]->(b)
+(b)-[k:knows{since:2015}]->(c:User{name:"Carol"})
 ]
-:Network{social=false}[
+:Network{social:false}[
 (a)-[:hates]->(b)
 (b)-[k]->(c)
 (a)-[:hates]->(c)

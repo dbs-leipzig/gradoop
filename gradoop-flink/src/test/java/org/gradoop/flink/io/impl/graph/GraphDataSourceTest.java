@@ -75,9 +75,9 @@ public class GraphDataSourceTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected =
       getLoaderFromString("expected[" +
-        "(a:A {foo = 42});" +
-        "(b:B {foo = 42});" +
-        "(a)-[:a {foo=42}]->(b)-[:b {foo=42}]->(a);" +
+        "(a:A {foo : 42})" +
+        "(b:B {foo : 42})" +
+        "(a)-[:a {foo : 42}]->(b)-[:b {foo : 42}]->(a)" +
         "]").getLogicalGraphByVariable("expected");
 
     GraphDataSource<Long> dataSource = new GraphDataSource<>(
@@ -104,9 +104,9 @@ public class GraphDataSourceTest extends GradoopFlinkTestBase {
       new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
 
     LogicalGraph expected = getLoaderFromString("expected[" +
-        "(a:A {foo = 42, __L = 0L});" +
-        "(b:B {foo = 42, __L = 1L});" +
-        "(a)-[:a {foo=42, __L = 0L}]->(b)-[:b {foo=42, __L = 1L}]->(a);" +
+        "(a:A {foo : 42, __L : 0L})" +
+        "(b:B {foo : 42, __L : 1L})" +
+        "(a)-[:a {foo : 42, __L : 0L}]->(b)-[:b {foo : 42, __L : 1L}]->(a)" +
         "]").getLogicalGraphByVariable("expected");
 
     GraphDataSource<Long> dataSource = new GraphDataSource<>(

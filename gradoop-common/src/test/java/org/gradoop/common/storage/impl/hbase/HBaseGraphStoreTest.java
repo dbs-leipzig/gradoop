@@ -270,7 +270,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
   private AsciiGraphLoader<GraphHead, Vertex, Edge>
   getMinimalFullFeaturedGraphLoader() {
-    String asciiGraph = ":G{k=\"v\"}[(v:V{k=\"v\"});(v)-[:e{k=\"v\"}]->(v)]";
+    String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
 
     return AsciiGraphLoader.fromString(
       asciiGraph, GradoopConfig.getDefaultConfig());

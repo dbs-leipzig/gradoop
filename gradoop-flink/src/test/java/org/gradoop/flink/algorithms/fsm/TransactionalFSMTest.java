@@ -15,10 +15,10 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
-      "g1[(v1:A)-[e1:a]->(v2:A)];" +
-      "g2[(v1)-[e1]->(v2)];" +
-      "g3[(:A)-[:a]->(:A);(:B)-[:b]->(:B);(:B)-[:b]->(:B)]" +
-      "g4[(:A)-[:b]->(:A);(:A)-[:b]->(:A);(:A)-[:b]->(:A)];" +
+      "g1[(v1:A)-[e1:a]->(v2:A)]" +
+      "g2[(v1)-[e1]->(v2)]" +
+      "g3[(:A)-[:a]->(:A),(:B)-[:b]->(:B),(:B)-[:b]->(:B)]" +
+      "g4[(:A)-[:b]->(:A),(:A)-[:b]->(:A),(:A)-[:b]->(:A)]" +
       "s1[(:A)-[:a]->(:A)]";
 
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
@@ -36,14 +36,14 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
-      "g1[(:A)-[:a]->(v1:B)-[:b]->(:C);(v1)-[:c]->(:D)]" +
-      "g2[(:A)-[:a]->(v2:B)-[:b]->(:C);(v2)-[:c]->(:E)]" +
-      "g3[(:A)-[:a]->(v3:B)-[:d]->(:C);(v3)-[:c]->(:E)]" +
+      "g1[(:A)-[:a]->(v1:B)-[:b]->(:C),(v1)-[:c]->(:D)]" +
+      "g2[(:A)-[:a]->(v2:B)-[:b]->(:C),(v2)-[:c]->(:E)]" +
+      "g3[(:A)-[:a]->(v3:B)-[:d]->(:C),(v3)-[:c]->(:E)]" +
       "s1[(:A)-[:a]->(:B)]" +
       "s2[(:B)-[:b]->(:C)]" +
       "s3[(:B)-[:c]->(:E)]" +
       "s4[(:A)-[:a]->(:B)-[:b]->(:C)]" +
-      "s5[(:A)-[:a]->(:B)-[:c]->(:E)]" ;
+      "s5[(:A)-[:a]->(:B)-[:c]->(:E)]";
 
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2", "s3", "s4", "s5"};
@@ -103,17 +103,17 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(0.7f, true);
 
     String asciiGraphs = "" +
-      "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
-      "g2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
-      "g3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+      "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+      "g2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+      "g3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
 
-      "s1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+      "s1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
 
-      "s2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);(v1:A)-[:a]->(v3:A)             ]" +
-      "s3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A);             (v3:A)-[:a]->(v4:A)]" +
+      "s2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)             ]" +
+      "s3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),             (v3:A)-[:a]->(v4:A)]" +
       "s4[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A)                                 ]" +
-      "s5[(v1:A)-[:a]->(v2:A)             ;(v1:A)-[:a]->(v3:A)             ]" +
-      "s6[             (v2:A)-[:a]->(v4:A);             (v3:A)-[:a]->(v4:A)]" +
+      "s5[(v1:A)-[:a]->(v2:A)             ,(v1:A)-[:a]->(v3:A)             ]" +
+      "s6[             (v2:A)-[:a]->(v4:A),             (v3:A)-[:a]->(v4:A)]" +
       "s7[(v1:A)-[:a]->(v2:A)                                              ]";
 
     String[] searchSpaceVariables = {"g1", "g2", "g3"};

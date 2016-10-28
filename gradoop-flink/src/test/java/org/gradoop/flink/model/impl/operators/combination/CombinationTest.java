@@ -50,13 +50,13 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(alice)-[akb]->(bob);" +
-      "(bob)-[bka]->(alice);" +
-      "(bob)-[bkc]->(carol);" +
-      "(carol)-[ckb]->(bob);" +
-      "(carol)-[ckd]->(dave);" +
+      "(alice)-[akb]->(bob)" +
+      "(bob)-[bka]->(alice)" +
+      "(bob)-[bkc]->(carol)" +
+      "(carol)-[ckb]->(bob)" +
+      "(carol)-[ckd]->(dave)" +
       "(dave)-[dkc]->(carol)" +
-      "(eve)-[eka]->(alice);" +
+      "(eve)-[eka]->(alice)" +
       "(eve)-[ekb]->(bob)]"
     );
 
@@ -75,13 +75,13 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(alice)-[akb]->(bob);" +
-      "(bob)-[bka]->(alice);" +
-      "(eve)-[eka]->(alice);" +
-      "(eve)-[ekb]->(bob);" +
-      "(carol)-[ckd]->(dave);" +
-      "(dave)-[dkc]->(carol);" +
-      "(frank)-[fkc]->(carol);" +
+      "(alice)-[akb]->(bob)" +
+      "(bob)-[bka]->(alice)" +
+      "(eve)-[eka]->(alice)" +
+      "(eve)-[ekb]->(bob)" +
+      "(carol)-[ckd]->(dave)" +
+      "(dave)-[dkc]->(carol)" +
+      "(frank)-[fkc]->(carol)" +
       "(frank)-[fkd]->(dave)]"
     );
 
@@ -143,10 +143,10 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("" +
-        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
-        "exp12[(a)-[e1]->(b)-[e2]->(c)];" +
-        "exp13[(a)-[e1]->(b);(c)-[e3]->(d)];" +
+        "g1[(a)-[e1]->(b)],g2[(b)-[e2]->(c)]" +
+        "g3[(c)-[e3]->(d)],g4[(a)-[e1]->(b)]" +
+        "exp12[(a)-[e1]->(b)-[e2]->(c)]" +
+        "exp13[(a)-[e1]->(b),(c)-[e3]->(d)]" +
         "exp14[(a)-[e1]->(b)]"
       );
 

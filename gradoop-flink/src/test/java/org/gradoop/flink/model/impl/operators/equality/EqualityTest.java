@@ -295,40 +295,40 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   private FlinkAsciiGraphLoader
   getTestGraphLoader() {
-    String asciiGraphs = "gEmpty[];" +
+    String asciiGraphs = "gEmpty[]" +
 
-      "gRef:G{dataDiff=false}[" +
+      "gRef:G{dataDiff : false}[" +
       // loop around a1 and edge from a1 to a2
-      "(a1:A{x=1})-[loop:a{x=1}]->(a1)-[aa:a{x=1}]->(a2:A{x=2});" +
+      "(a1:A{x : 1})-[loop:a{x : 1}]->(a1)-[aa:a{x : 1}]->(a2:A{x : 2})" +
       // parallel edge from a1 to b1
-      "(a1)-[par1:p]->(b1:B);(a1)-[par2:p]->(b1:B);" +
+      "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1:B)" +
       // cycle of bs
-      "(b1)-[cyc1:c]->(b2:B)-[cyc2:c]->(b3:B)-[cyc3:c]->(b1)];" +
+      "(b1)-[cyc1:c]->(b2:B)-[cyc2:c]->(b3:B)-[cyc3:c]->(b1)]" +
 
       // element id copy of gRef
-      "gClone:G{dataDiff=true}[" +
-      "(a1)-[loop]->(a1)-[aa]->(a2);" +
-      "(a1)-[par1]->(b1);(a1)-[par2]->(b1);" +
-      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)];" +
+      "gClone:G{dataDiff : true}[" +
+      "(a1)-[loop]->(a1)-[aa]->(a2)" +
+      "(a1)-[par1]->(b1),(a1)-[par2]->(b1)" +
+      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]" +
 
       // element id copy of gRef with one different edge id
-      "gDiffId:G{dataDiff=false}[" +
-      "(a1)-[loop]->(a1)-[aa]->(a2);" +
-      "(a1)-[par1]->(b1);(a1)-[par2]->(b1);" +
-      "(b1)-[cyc1]->(b2)-[:c]->(b3)-[cyc3]->(b1)];" +
+      "gDiffId:G{dataDiff : false}[" +
+      "(a1)-[loop]->(a1)-[aa]->(a2)" +
+      "(a1)-[par1]->(b1),(a1)-[par2]->(b1)" +
+      "(b1)-[cyc1]->(b2)-[:c]->(b3)-[cyc3]->(b1)]" +
 
       // element id copy of gRef
       // with each one different vertex and edge attribute
       "gDiffData:G[" +
-      "(a1)-[loop]->(a1)-[:a{y=1}]->(:A{x=\"diff\"});" +
-      "(a1)-[par1]->(b1);(a1)-[par2]->(b1);" +
-      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)];" +
+      "(a1)-[loop]->(a1)-[:a{y : 1}]->(:A{x : \"diff\"})" +
+      "(a1)-[par1]->(b1),(a1)-[par2]->(b1)" +
+      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]" +
 
       // copy of gRef with partially reverse edges
-      "gRev:G{dataDiff=false}[" +
-      "(a1)-[loop]->(a1)<-[:a{x=1}]-(a2);" +
-      "(a1)<-[:p]-(b1);(a1)-[:p]->(b1);" +
-      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)];";
+      "gRev:G{dataDiff : false}[" +
+      "(a1)-[loop]->(a1)<-[:a{x : 1}]-(a2)" +
+      "(a1)<-[:p]-(b1),(a1)-[:p]->(b1)" +
+      "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]";
 
     return getLoaderFromString(asciiGraphs);
   }
