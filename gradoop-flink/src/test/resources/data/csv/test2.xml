@@ -74,12 +74,12 @@
                         <static name="1"/>
                     </graph>
                 </graphs>
-                <source>
-                    <ref column_id="0"/>
-                </source>
                 <target>
                     <ref column_id="1"/>
                 </target>
+                <source>
+                    <ref column_id="0"/>
+                </source>
             </edge>
         </csv>
     </domain>
@@ -202,12 +202,12 @@
                         </reference>
                     </graph>
                 </graphs>
-                <source>
-                    <ref column_id="1"/>
-                </source>
                 <target>
                     <ref column_id="2"/>
                 </target>
+                <source>
+                    <ref column_id="1"/>
+                </source>
             </edge>
         </csv>
     </domain>

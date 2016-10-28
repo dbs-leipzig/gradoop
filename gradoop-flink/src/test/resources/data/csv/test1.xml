@@ -64,13 +64,6 @@
                         <static name="1"/>
                     </graph>
                 </graphs>
-                <source>
-                    <reference>
-                        <key class="Person">
-                            <ref column_id="0"/>
-                        </key>
-                    </reference>
-                </source>
                 <target>
                     <reference>
                         <key class="Person">
@@ -78,6 +71,13 @@
                         </key>
                     </reference>
                 </target>
+                <source>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="0"/>
+                        </key>
+                    </reference>
+                </source>
             </edge>
         </csv>
     </domain>

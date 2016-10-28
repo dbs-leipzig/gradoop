@@ -39,7 +39,6 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlSeeAlso({
     Vertex.class,
-    Edge.class,
     Vertexedge.class
 })
 public class Graphelement

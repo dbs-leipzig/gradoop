@@ -151,52 +151,52 @@ public class CSVToElement implements
           reuse.getProperties().set(PROPERTY_KEY_TARGET, targetKey);
 
         }
-        if (isVertexEdge) {
-          org.gradoop.common.model.impl.pojo.Edge edge =
-            edgeFactory.createEdge(GradoopId.get(), GradoopId.get());
-          for (Vertexedge vertexEdge : csv.getVertex().getEdges()
-            .getVertexedge()) {
-            className = vertexEdge.getKey().getClazz();
-            if (vertexEdge.getLabel() != null) {
-              label = createLabel(vertexEdge.getLabel(), fields);
-            }
-            key = vertexEdge.getKey();
-            propertiesCsv = vertexEdge.getProperties();
-            graphs = vertexEdge.getGraphs().getGraph();
-
-            notFirst = false;
-            for (Graph graph : graphs) {
-              if (!notFirst) {
-                notFirst = true;
-              } else {
-                sb.append(SEPARATOR_GRAPHS);
-              }
-              sb.append(createKey(this
-                .setNamesAndIds(graph, fields, datasourceName, domainName,
-                  className))
-                .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
-            }
-
-            properties = createProperties(csv, propertiesCsv, key, fields);
-
-            edge.setId(GradoopId.get());
-            edge.setLabel(label);
-            edge.setProperties(properties);
-            edge.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
-
-
-            referenceTuple = this
-              .setNamesAndIds(vertexEdge.getTarget(), fields, datasourceName,
-                domainName, className);
-
-            targetKey = createKey(referenceTuple);
-
-            reuse.getProperties().set(PROPERTY_KEY_SOURCE, reuse.getPropertyValue(PROPERTY_KEY_KEY));
-            reuse.getProperties().set(PROPERTY_KEY_TARGET, targetKey);
-
-            collector.collect(edge);
-          }
-        }
+//        if (isVertexEdge) {
+//          org.gradoop.common.model.impl.pojo.Edge edge =
+//            edgeFactory.createEdge(GradoopId.get(), GradoopId.get());
+//          for (Vertexedge vertexEdge : csv.getVertex().getEdges()
+//            .getVertexedge()) {
+//            className = vertexEdge.getKey().getClazz();
+//            if (vertexEdge.getLabel() != null) {
+//              label = createLabel(vertexEdge.getLabel(), fields);
+//            }
+//            key = vertexEdge.getKey();
+//            propertiesCsv = vertexEdge.getProperties();
+//            graphs = vertexEdge.getGraphs().getGraph();
+//
+//            notFirst = false;
+//            for (Graph graph : graphs) {
+//              if (!notFirst) {
+//                notFirst = true;
+//              } else {
+//                sb.append(SEPARATOR_GRAPHS);
+//              }
+//              sb.append(createKey(this
+//                .setNamesAndIds(graph, fields, datasourceName, domainName,
+//                  className))
+//                .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
+//            }
+//
+//            properties = createProperties(csv, propertiesCsv, key, fields);
+//
+//            edge.setId(GradoopId.get());
+//            edge.setLabel(label);
+//            edge.setProperties(properties);
+//            edge.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
+//
+//
+//            referenceTuple = this
+//              .setNamesAndIds(vertexEdge.getTarget(), fields, datasourceName,
+//                domainName, className);
+//
+//            targetKey = createKey(referenceTuple);
+//
+//            reuse.getProperties().set(PROPERTY_KEY_SOURCE, reuse.getPropertyValue(PROPERTY_KEY_KEY));
+//            reuse.getProperties().set(PROPERTY_KEY_TARGET, targetKey);
+//
+//            collector.collect(edge);
+//          }
+//        }
 
       } else if (csv.getEdge() != null) {
 //        reuse = edgeFactory.createEdge(GradoopId.get(), GradoopId.get());
@@ -237,92 +237,88 @@ public class CSVToElement implements
 
 
 
-  private void createVertex(Csv csv, String[] fields) {
-    String label = "";
-    boolean isVertexEdge = false;
-    reuse = vertexFactory.createVertex();
-    if (csv.getVertex().getLabel() != null) {
-      label = createLabel(csv.getVertex().getLabel(), fields);
-    }
-    Key key = csv.getVertex().getKey();
-    List<Properties> propertiesCsv = csv.getVertex().getProperties();
-    String className = csv.getVertex().getKey().getClazz();
-    List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
-    if (csv.getVertex().getEdges() != null) {
-      isVertexEdge = true;
-    }
-
-    StringBuilder sb = new StringBuilder();
-    boolean notFirst = false;
-    for (Graph graph : graphs) {
-      if (!notFirst) {
-        notFirst = true;
-      } else {
-        sb.append(SEPARATOR_GRAPHS);
-      }
-      sb.append(createKey(this.setNamesAndIds(
-        graph, fields, csv.getDatasourceName(), csv.getDomainName(), className))
-        .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
-    }
-
-    PropertyList properties =
-      createProperties(csv, propertiesCsv, key, fields);
-
-
-
-    reuse.setId(GradoopId.get());
-    reuse.setLabel(label);
-    reuse.setProperties(properties);
-    reuse.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
-
-
-
-
-    if (isVertexEdge) {
-      org.gradoop.common.model.impl.pojo.Edge edge = edgeFactory.createEdge(
-        GradoopId.get(), GradoopId.get());
-      for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
-        className = vertexEdge.getKey().getClazz();
-        if (vertexEdge.getLabel() != null) {
-          label = createLabel(vertexEdge.getLabel(), fields);
-        }
-        key = vertexEdge.getKey();
-        propertiesCsv = vertexEdge.getProperties();
-        graphs = vertexEdge.getGraphs().getGraph();
-
-        notFirst = false;
-        for (Graph graph : graphs) {
-          if (!notFirst) {
-            notFirst = true;
-          } else {
-            sb.append(SEPARATOR_GRAPHS);
-          }
-          sb.append(createKey(this
-            .setNamesAndIds(graph, fields, datasourceName, domainName, className))
-            .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
-        }
-
-        properties = createProperties(csv, propertiesCsv, key, fields);
-
-        edge.setId(GradoopId.get());
-        edge.setLabel(label);
-        edge.setProperties(properties);
-        edge.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
-
-
-        referenceTuple = this
-          .setNamesAndIds(vertexEdge.getTarget(), fields, datasourceName,
-            domainName, className);
-
-        targetKey = createKey(referenceTuple);
-
-        reuse.getProperties().set(PROPERTY_KEY_SOURCE, reuse.getPropertyValue(PROPERTY_KEY_KEY));
-        reuse.getProperties().set(PROPERTY_KEY_TARGET, targetKey);
-
-        collector.collect(edge);
-      }
-    }
-  }
+//  private void createVertex(Csv csv, String[] fields) {
+//    String label = "";
+//    reuse = vertexFactory.createVertex();
+//    if (csv.getVertex().getLabel() != null) {
+//      label = createLabel(csv.getVertex().getLabel(), fields);
+//    }
+//    Key key = csv.getVertex().getKey();
+//    List<Properties> propertiesCsv = csv.getVertex().getProperties();
+//    String className = csv.getVertex().getKey().getClazz();
+//    List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
+//
+//    StringBuilder sb = new StringBuilder();
+//    boolean notFirst = false;
+//    for (Graph graph : graphs) {
+//      if (!notFirst) {
+//        notFirst = true;
+//      } else {
+//        sb.append(SEPARATOR_GRAPHS);
+//      }
+//      sb.append(createKey(this.setNamesAndIds(
+//        graph, fields, csv.getDatasourceName(), csv.getDomainName(), className))
+//        .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
+//    }
+//
+//    PropertyList properties =
+//      createProperties(csv, propertiesCsv, key, fields);
+//
+//
+//
+//    reuse.setId(GradoopId.get());
+//    reuse.setLabel(label);
+//    reuse.setProperties(properties);
+//    reuse.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
+//
+//
+//
+//
+//    if (csv.getVertex().getEdges() != null) {
+//      org.gradoop.common.model.impl.pojo.Edge edge = edgeFactory.createEdge(
+//        GradoopId.get(), GradoopId.get());
+//      for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
+//        className = vertexEdge.getKey().getClazz();
+//        if (vertexEdge.getLabel() != null) {
+//          label = createLabel(vertexEdge.getLabel(), fields);
+//        }
+//        key = vertexEdge.getKey();
+//        propertiesCsv = vertexEdge.getProperties();
+//        graphs = vertexEdge.getGraphs().getGraph();
+//
+//        notFirst = false;
+//        for (Graph graph : graphs) {
+//          if (!notFirst) {
+//            notFirst = true;
+//          } else {
+//            sb.append(SEPARATOR_GRAPHS);
+//          }
+//          sb.append(createKey(this
+//            .setNamesAndIds(graph, fields, datasourceName, domainName, className))
+//            .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
+//        }
+//
+//        properties = createProperties(csv, propertiesCsv, key, fields);
+//
+//        edge.setId(GradoopId.get());
+//        edge.setLabel(label);
+//        edge.setProperties(properties);
+//        edge.getProperties().set(PROPERTY_KEY_GRAPHS, sb.toString());
+//
+//
+//        referenceTuple = this
+//          .setNamesAndIds(vertexEdge.getTarget(), fields, datasourceName,
+//            domainName, className);
+//
+//        targetKey = createKey(referenceTuple);
+//
+//        reuse.getProperties().set(PROPERTY_KEY_SOURCE, reuse.getPropertyValue(PROPERTY_KEY_KEY));
+//        reuse.getProperties().set(PROPERTY_KEY_TARGET, targetKey);
+//
+//        collector.collect(edge);
+//      }
+//    }
+//  }
 
   private org.gradoop.common.model.impl.pojo.Edge createEdge(Csv csv,
     String[] fields) {
@@ -330,21 +326,22 @@ public class CSVToElement implements
   }
 
   private org.gradoop.common.model.impl.pojo.Edge createEdge(Csv csv,
-    String datasourceName, String domainName, String[] fields, String sourceKey) {
+    String[] fields, String sourceKey) {
     String label = "";
 
-    Edge edge;
+    Vertexedge edge;
 
-    edge = sourceKey.equals("") ? csv.getEdge() : csv.getVertex().getEdges()
+    edge = sourceKey.equals("") ? csv.getEdge() : csv.getVertex()
+      .getEdges()
       .getVertexedge().get(0);
 
-    if (csv.getEdge().getLabel() != null) {
-      label = createLabel(csv.getEdge().getLabel(), fields);
+    if (edge.getLabel() != null) {
+      label = createLabel(edge.getLabel(), fields);
     }
-    Key key = csv.getEdge().getKey();
-    List<Properties> propertiesCsv = csv.getEdge().getProperties();
-    String className = csv.getEdge().getKey().getClazz();
-    List<Graph> graphs = csv.getEdge().getGraphs().getGraph();
+    Key key = edge.getKey();
+    List<Properties> propertiesCsv = edge.getProperties();
+    String className = edge.getKey().getClazz();
+    List<Graph> graphs = edge.getGraphs().getGraph();
 
 
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv
@@ -357,14 +354,15 @@ public class CSVToElement implements
 
     ReferenceTuple referenceTuple;
 
-    if (!sourceKey.equals("")) {
+    if (sourceKey.equals("")) {
       referenceTuple = this.setNamesAndIds(csv.getEdge().getSource(), fields,
         csv.getDatasourceName(), csv.getDomainName(), className);
+      System.out.println("referenceTuple = " + referenceTuple);
       sourceKey = createKey(referenceTuple);
     }
 
     referenceTuple = this.setNamesAndIds(
-      csv.getEdge().getTarget(), fields, csv.getDatasourceName(),
+      edge.getTarget(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
 
     String targetKey = createKey(referenceTuple);

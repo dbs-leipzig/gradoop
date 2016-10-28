@@ -115,7 +115,6 @@
                 <xsd:element ref="key"/>
                 <xsd:element ref="properties" minOccurs="0" maxOccurs="1"/>
             </xsd:sequence>
-            <!--<xsd:attributeGroup ref="referenceattributes"/>-->
             <xsd:attribute name="domain_name"/>
             <xsd:attribute name="datasource_name"/>
         </xsd:complexType>
@@ -143,29 +142,16 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="edgetype">
+    <xsd:complexType name="vertexedge">
         <xsd:complexContent>
             <xsd:extension base="graphelement">
                 <xsd:sequence>
-                    <xsd:element ref="source"/>
                     <xsd:element ref="target"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="vertexedgetype">
-        <xsd:complexContent>
-            <xsd:restriction base="edgetype">
-                <xsd:sequence>
-                    <xsd:group ref="elementgroup"/>
-                    <xsd:group ref="graphelementgroup"/>
-                    <xsd:element ref="source" minOccurs="0" maxOccurs="0"/>
-                    <xsd:element ref="target"/>
-                </xsd:sequence>
-            </xsd:restriction>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!-- groups -->
 
@@ -234,7 +220,8 @@
     <xsd:element name="edges">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="vertexedge" minOccurs="1" maxOccurs="unbounded"/>
+                <xsd:element name="vertexedge" type="vertexedge" minOccurs="1"
+                             maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
@@ -259,24 +246,14 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="edge" type="edgetype"/>
-
-    <xsd:element name="vertexedge"> <!-- type="vertexedgetype"> -->
+    <xsd:element name="edge">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:restriction base="edgetype">
+                <xsd:extension base="vertexedge">
                     <xsd:sequence>
-                        <!-- <xsd:group ref="elementgroup"/>
-                        <xsd:group ref="graphelementgroup"/> -->
-                        <xsd:element ref="key"/>
-                        <xsd:element ref="label" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element ref="properties" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element ref="graphs"/>
-
-                        <xsd:element ref="source" minOccurs="0" maxOccurs="0"/>
-                        <xsd:element ref="target"/>
+                        <xsd:element ref="source"/>
                     </xsd:sequence>
-                </xsd:restriction>
+                </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
