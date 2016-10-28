@@ -130,10 +130,10 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
   @Test
   public void testReduceCollection() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("" +
-        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)];" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)];" +
-        "exp12[(b)];" +
-        "exp13[];" +
+        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)]" +
+        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)]" +
+        "exp12[(b)]" +
+        "exp13[]" +
         "exp14[(a)-[e1]->(b)]"
       );
 

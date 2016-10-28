@@ -19,13 +19,7 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.IdAsIdSet;
@@ -47,7 +41,7 @@ public class CloningTest extends GradoopFlinkTestBase {
   public void testCloning() throws Exception {
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-        "org:Ga{k=0}[(:Va{k=0, l=0})-[:ea{l=1}]->(:Va{l=1, m=2})]"
+        "org:Ga{k : 0}[(:Va{k : 0, l : 0})-[:ea{l : 1}]->(:Va{l : 1, m : 2})]"
       );
 
     List<GradoopId> expectedGraphHeadIds = Lists.newArrayList();
@@ -57,11 +51,11 @@ public class CloningTest extends GradoopFlinkTestBase {
 
     LogicalGraph original = loader.getLogicalGraphByVariable("org");
 
-    original.getGraphHead().map(new Id<GraphHead>()).output(
+    original.getGraphHead().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedGraphHeadIds));
-    original.getVertices().map(new Id<Vertex>()).output(
+    original.getVertices().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedVertexIds));
-    original.getEdges().map(new Id<Edge>()).output(
+    original.getEdges().map(new Id<>()).output(
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
 
@@ -74,24 +68,24 @@ public class CloningTest extends GradoopFlinkTestBase {
     List<GradoopId> resultEdgeIds = Lists.newArrayList();
 
     result.getGraphHead()
-      .map(new Id<GraphHead>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultGraphHeadIds));
     result.getVertices()
-      .map(new Id<Vertex>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultVertexIds));
     result.getEdges()
-      .map(new Id<Edge>())
+      .map(new Id<>())
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
 
     List<GradoopIdSet> resultGraphIds = Lists.newArrayList();
 
     result.getVertices()
-      .map(new ExpandGraphsToIdSet<Vertex>())
+      .map(new ExpandGraphsToIdSet<>())
       .union(result.getEdges()
-        .map(new ExpandGraphsToIdSet<Edge>()))
+        .map(new ExpandGraphsToIdSet<>()))
       .union(result.getGraphHead()
-        .map(new IdAsIdSet<GraphHead>()))
+        .map(new IdAsIdSet<>()))
       .reduce(new IdSetCombiner())
       .output(new LocalCollectionOutputFormat<>(resultGraphIds));
 

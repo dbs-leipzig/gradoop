@@ -36,7 +36,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
         PATH_PATTERN_2,
         new String[] {"expected"},
         "expected[" +
-          "(v1);(v2);(v5)" +
+          "(v1),(v2),(v5)" +
         "]"
       },
       {

@@ -21,9 +21,9 @@ public class QueryHandlerTest {
   static final String ECC_PROPERTY_KEY = "ecc";
 
   static final String TEST_QUERY = "" +
-    "(v1:A {ecc=2})" +
-    "(v2:B {ecc=1})" +
-    "(v3:B {ecc=2})" +
+    "(v1:A {ecc : 2})" +
+    "(v2:B {ecc : 1})" +
+    "(v3:B {ecc : 2})" +
     "(v1)-[e1:a]->(v2)" +
     "(v2)-[e2:b]->(v3)" +
     "(v2)-[e3:a]->(v1)" +
@@ -188,8 +188,8 @@ public class QueryHandlerTest {
     boolean equal = list.size() == expected.size();
 
     if (equal) {
-      Collections.sort(list, new ElementComparator<EL>());
-      Collections.sort(expected, new ElementComparator<EL>());
+      Collections.sort(list, new ElementComparator<>());
+      Collections.sort(expected, new ElementComparator<>());
       for (int i = 0; i < list.size(); i++) {
         if (!list.get(i).equals(expected.get(i))) {
           equal = false;
