@@ -24,11 +24,11 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
   private final String expectedCollection;
 
   public PatternMatchingTest(String testName, String dataGraph, String queryGraph,
-    String[] expectedGraphVariables, String expectedCollection) {
+    String expectedGraphVariables, String expectedCollection) {
     this.testName = testName;
     this.dataGraph = dataGraph;
     this.queryGraph = queryGraph;
-    this.expectedGraphVariables = expectedGraphVariables;
+    this.expectedGraphVariables = expectedGraphVariables.split(",");
     this.expectedCollection = expectedCollection;
   }
 

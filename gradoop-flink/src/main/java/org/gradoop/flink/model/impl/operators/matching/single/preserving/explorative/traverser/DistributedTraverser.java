@@ -38,8 +38,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildVertexStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.EdgeHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateEdgeMappings;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexMappings;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateEdgeMapping;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexMapping;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.VertexHasCandidate;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
@@ -190,7 +190,7 @@ public abstract class DistributedTraverser<K> {
         vertexCount, edgeCount));
 
     return log(initialEmbeddings,
-      new PrintEmbeddingWithTiePoint<>(isIterative()),
+      new PrintEmbeddingWithTiePoint<>(),
       getVertexMapping(), getEdgeMapping());
   }
 
@@ -227,7 +227,8 @@ public abstract class DistributedTraverser<K> {
       EmbeddingWithTiePoint<K>> join = embeddings
       .join(edgeSteps, getEdgeStepJoinStrategy())
       .where(0).equalTo(1) // tiePointId == sourceId/targetId tie point
-      .with(new UpdateEdgeMappings<>(getTraversalCode(), iterationStrategy));
+      .with(new UpdateEdgeMapping<>(getTraversalCode(), getMatchStrategy(),
+        iterationStrategy));
 
     if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
       embeddings = join
@@ -270,7 +271,7 @@ public abstract class DistributedTraverser<K> {
       EmbeddingWithTiePoint<K>> join = embeddings
       .join(vertexSteps, getVertexStepJoinStrategy())
       .where(0).equalTo(0) // tiePointId == vertexId
-      .with(new UpdateVertexMappings<>(getTraversalCode(), getMatchStrategy(),
+      .with(new UpdateVertexMapping<>(getTraversalCode(), getMatchStrategy(),
         iterationStrategy));
 
     if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {

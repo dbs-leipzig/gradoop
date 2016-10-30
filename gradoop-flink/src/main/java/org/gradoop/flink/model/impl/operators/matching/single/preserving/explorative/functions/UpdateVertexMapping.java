@@ -52,9 +52,10 @@ import java.util.Set;
  */
 @FunctionAnnotation.ReadFieldsFirst("f1.f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")
-public class UpdateVertexMappings<K>
+public class UpdateVertexMapping<K>
   extends RichFlatJoinFunction
-    <EmbeddingWithTiePoint<K>, VertexStep<K>, EmbeddingWithTiePoint<K>> {
+    <EmbeddingWithTiePoint<K>, VertexStep<K>, EmbeddingWithTiePoint<K>>
+  implements UpdateMapping<K> {
   /**
    * Traversal code
    */
@@ -85,8 +86,9 @@ public class UpdateVertexMappings<K>
   private int candidate;
   /**
    * Stores the vertex mapping positions that have been set in previous steps.
+   * Needed for isomorphism checks.
    */
-  private Set<Integer> previousPositions;
+  private Set<Integer> previousCandidates;
   /**
    * Constructor
    *
@@ -94,7 +96,7 @@ public class UpdateVertexMappings<K>
    * @param matchStrategy select if subgraph isomorphism or homomorphism is used
    * @param iterationStrategy iteration strategy
    */
-  public UpdateVertexMappings(TraversalCode tc, MatchStrategy matchStrategy,
+  public UpdateVertexMapping(TraversalCode tc, MatchStrategy matchStrategy,
     IterationStrategy iterationStrategy) {
     this.traversalCode     = tc;
     this.stepCount         = tc.getSteps().size();
@@ -121,36 +123,39 @@ public class UpdateVertexMappings<K>
         .getFrom();
     }
 
-    // find previous positions (limited by two times the number steps (edges))
-    previousPositions = new HashSet<>(traversalCode.getSteps().size() * 2);
-    for (int i = 0; i < this.currentStepId; i++) {
-      Step s = traversalCode.getStep(i);
-      previousPositions.add((int) s.getFrom());
-      previousPositions.add((int) s.getTo());
+    if (matchStrategy == MatchStrategy.ISOMORPHISM) {
+      // find previous positions (limited by two times the number steps (edges))
+      previousCandidates = new HashSet<>(traversalCode.getSteps().size() * 2);
+      for (int i = 0; i < this.currentStepId; i++) {
+        Step s = traversalCode.getStep(i);
+        previousCandidates.add((int) s.getFrom());
+        previousCandidates.add((int) s.getTo());
+      }
+      // add from field of current step
+      previousCandidates.add((int) currentStep.getFrom());
     }
-    // add from field of current step
-    previousPositions.add((int) currentStep.getFrom());
   }
 
   @Override
   public void join(EmbeddingWithTiePoint<K> embedding, VertexStep<K> vertexStep,
     Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    K[] vertexMappings = embedding.getEmbedding().getVertexMappings();
+    K[] mapping = embedding.getEmbedding().getVertexMappings();
+    K id = vertexStep.getVertexId();
 
-    K vertexId = vertexStep.getVertexId();
-    boolean isMapped = vertexMappings[candidate] != null;
+    boolean isMapped = mapping[candidate] != null;
+    boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &&
+      seenBefore(mapping, id, previousCandidates);
 
-    // not seen before or same as seen before (ensure bijection for Isomorphism)
-    if ((!isMapped && !seenBefore(vertexMappings, vertexId)) ||
-      (isMapped && vertexMappings[candidate].equals(vertexId))) {
+    // not seen before or same as seen before
+    if ((!isMapped && !seen) || (isMapped && mapping[candidate].equals(id))) {
 
-      vertexMappings[candidate] = vertexId;
-      embedding.getEmbedding().setVertexMappings(vertexMappings);
+      mapping[candidate] = id;
+      embedding.getEmbedding().setVertexMappings(mapping);
 
       // set next tie point if there are more steps in the traversal
       if (hasMoreSteps()) {
-        embedding.setTiePointId(vertexMappings[nextFrom]);
+        embedding.setTiePointId(mapping[nextFrom]);
       }
       collector.collect(embedding);
     }
@@ -163,25 +168,5 @@ public class UpdateVertexMappings<K>
    */
   private boolean hasMoreSteps() {
     return currentStepId < stepCount - 1;
-  }
-
-  /**
-   * Check if the given id has been visited before.
-   *
-   * @param vertexMappings  current vertex mappings
-   * @param id              current vertex id
-   * @return true, if visited before
-   */
-  private boolean seenBefore(K[] vertexMappings, K id) {
-    boolean result = false;
-    if (matchStrategy == MatchStrategy.ISOMORPHISM) {
-      for (Integer previousPosition : previousPositions) {
-        if (vertexMappings[previousPosition].equals(id)) {
-          result = true;
-          break;
-        }
-      }
-    }
-    return result;
   }
 }
