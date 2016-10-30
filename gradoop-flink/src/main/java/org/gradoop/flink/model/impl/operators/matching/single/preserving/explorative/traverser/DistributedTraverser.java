@@ -167,6 +167,13 @@ public abstract class DistributedTraverser<K> {
   }
 
   /**
+   * True, if the traverser runs in an bulk or delta iteration.
+   *
+   * @return true, if bulk or delta iteration based
+   */
+  abstract boolean isIterative();
+
+  /**
    * Builds the initial embeddings from the given vertices.
    *
    * @param vertices vertices and their query candidates
@@ -182,7 +189,8 @@ public abstract class DistributedTraverser<K> {
       .map(new BuildEmbeddingWithTiePoint<>(keyClazz, initialCandidate,
         vertexCount, edgeCount));
 
-    return log(initialEmbeddings, new PrintEmbeddingWithTiePoint<>(),
+    return log(initialEmbeddings,
+      new PrintEmbeddingWithTiePoint<>(isIterative()),
       getVertexMapping(), getEdgeMapping());
   }
 
@@ -212,7 +220,7 @@ public abstract class DistributedTraverser<K> {
       .withForwardedFields(forwardedFields);
 
     edgeSteps = log(edgeSteps,
-      new PrintEdgeStep<>(true, "post-filter-map-edge"),
+      new PrintEdgeStep<>(isIterative(), "post-filter-map-edge"),
       getVertexMapping(), getEdgeMapping());
 
     JoinOperator<EmbeddingWithTiePoint<K>, EdgeStep<K>,
@@ -229,7 +237,7 @@ public abstract class DistributedTraverser<K> {
     }
 
     return log(embeddings,
-      new PrintEmbeddingWithTiePoint<>(true, "post-edge-update"),
+      new PrintEmbeddingWithTiePoint<>(isIterative(), "post-edge-update"),
       getVertexMapping(), getEdgeMapping());
   }
 
@@ -255,7 +263,7 @@ public abstract class DistributedTraverser<K> {
       .map(new BuildVertexStep<>());
 
     vertexSteps = log(vertexSteps,
-      new PrintVertexStep<>(true, "post-filter-project-vertex"),
+      new PrintVertexStep<>(isIterative(), "post-filter-project-vertex"),
       getVertexMapping(), getEdgeMapping());
 
     JoinOperator<EmbeddingWithTiePoint<K>, VertexStep<K>,
@@ -273,7 +281,7 @@ public abstract class DistributedTraverser<K> {
     }
 
     embeddings = log(embeddings,
-      new PrintEmbeddingWithTiePoint<>(true, "post-vertex-update"),
+      new PrintEmbeddingWithTiePoint<>(isIterative(), "post-vertex-update"),
       getVertexMapping(), getEdgeMapping());
     return embeddings;
   }

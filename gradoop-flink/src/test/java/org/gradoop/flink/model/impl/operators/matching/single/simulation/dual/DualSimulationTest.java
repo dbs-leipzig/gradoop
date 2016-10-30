@@ -21,8 +21,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
     return Arrays.asList(new Object[][] {
       {
         "Graph1_Path0",
-        GRAPH_1,
-        PATH_PATTERN_0,
+        GRAPH_1, CHAIN_PATTERN_0,
         new String[] {"expected"},
         "expected[" +
           "(v1)-[e2]->(v6)" +
@@ -32,8 +31,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
       },
       {
         "Graph1_Path2",
-        GRAPH_1,
-        PATH_PATTERN_2,
+        GRAPH_1, CHAIN_PATTERN_2,
         new String[] {"expected"},
         "expected[" +
           "(v1),(v2),(v5)" +
@@ -41,8 +39,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
       },
       {
         "Graph2_Path3",
-        GRAPH_2,
-        PATH_PATTERN_3,
+        GRAPH_2, CHAIN_PATTERN_3,
         new String[] {"expected"},
         "expected[" +
           "(v9)-[e15]->(v9)" +
@@ -135,8 +132,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
       },
       {
         "Graph3_Path1",
-        GRAPH_3,
-        PATH_PATTERN_1,
+        GRAPH_3, CHAIN_PATTERN_1,
         new String[] {"expected"},
         "expected[" +
           "(v0)-[e0]->(v1)" +
@@ -146,8 +142,7 @@ public abstract class DualSimulationTest extends PatternMatchingTest {
       },
       {
         "Graph1_Tree0",
-        GRAPH_1,
-        TREE_PATTERN_0,
+        GRAPH_1, CHAIN_PATTERN_5,
         new String[] {"expected"},
         "expected[]"
       }

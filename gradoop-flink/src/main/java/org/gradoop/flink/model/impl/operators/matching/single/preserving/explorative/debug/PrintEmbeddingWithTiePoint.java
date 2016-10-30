@@ -22,8 +22,6 @@ import org.apache.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-
-
 import java.util.Arrays;
 
 /**
@@ -44,6 +42,15 @@ public class PrintEmbeddingWithTiePoint<K>
    */
   public PrintEmbeddingWithTiePoint() {
     this(false, "");
+  }
+
+  /**
+   * Constructor
+   *
+   * @param isIterative true, if used in iterative context
+   */
+  public PrintEmbeddingWithTiePoint(boolean isIterative) {
+    this(isIterative, "");
   }
 
   /**
