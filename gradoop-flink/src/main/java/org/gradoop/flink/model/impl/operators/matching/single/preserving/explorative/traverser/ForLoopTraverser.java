@@ -92,6 +92,11 @@ public class ForLoopTraverser<K> extends DistributedTraverser<K> {
       .project(1);
   }
 
+  @Override
+  boolean isIterative() {
+    return false;
+  }
+
   /**
    * Explores the data graph iteratively using the provided traversal code.
    *

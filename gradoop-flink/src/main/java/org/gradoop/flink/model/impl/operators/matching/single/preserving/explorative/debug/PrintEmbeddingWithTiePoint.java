@@ -49,6 +49,15 @@ public class PrintEmbeddingWithTiePoint<K>
   /**
    * Constructor
    *
+   * @param isIterative, true if used in iterative context
+   */
+  public PrintEmbeddingWithTiePoint(boolean isIterative) {
+    this(isIterative, "");
+  }
+
+  /**
+   * Constructor
+   *
    * @param isIterative true, if used in iterative context
    * @param prefix      prefix for debug string
    */

@@ -4,20 +4,29 @@ public class TestData {
 
   public static final String DATA_GRAPH_VARIABLE = "db";
 
-  public static final String PATH_PATTERN_0 =
+  public static final String CHAIN_PATTERN_0 =
     "(:A)-[:a]->(:B)";
 
-  public static final String PATH_PATTERN_1 =
+  public static final String CHAIN_PATTERN_1 =
     "(:A)-[:a]->(:A)";
 
-  public static final String PATH_PATTERN_2 =
+  public static final String CHAIN_PATTERN_2 =
     "(:A)";
 
-  public static final String PATH_PATTERN_3 =
+  public static final String CHAIN_PATTERN_3 =
     "(:B)-[:d]->(:B)";
 
-  public static final String PATH_PATTERN_4 =
+  public static final String CHAIN_PATTERN_4 =
     "(:A)-[:a]->(:A)-[:a]->(:A)";
+
+  public static final String CHAIN_PATTERN_5 =
+    "(:B)-[:b]->(:C)<-[:a]-(:A)";
+
+  public static final String CHAIN_PATTERN_6 =
+    "(c)<--(a)-->(b)";
+
+  public static final String CHAIN_PATTERN_7 =
+    "(a)-->(b),(a)-->(c)";
 
   public static final String LOOP_PATTERN_0 =
     "(b:B)-[:d]->(b)";
@@ -39,9 +48,6 @@ public class TestData {
 
   public static final String CYCLE_PATTERN_5 =
     "(v0:B)-[:a]->(v1:C)<-[:b]-(v0)";
-
-  public static final String TREE_PATTERN_0 =
-    "(:B)-[:b]->(:C)<-[:a]-(:A)";
 
   public static final String UNLABELED_PATTERN_0 =
     "()";
@@ -132,4 +138,7 @@ public class TestData {
     "(v1)-[e1:a {id : 1}]->(v2:A {id : 2})-[e3:a {id : 3}]->(v3:A {id : 3})" +
     "(v1)-[e2:a {id : 2}]->(v2)" +
     "]";
+
+  public static final String GRAPH_5 = DATA_GRAPH_VARIABLE +
+    "[(v0 {id : 0})-[e0 {id:0}]->(v1 {id : 1})]";
 }

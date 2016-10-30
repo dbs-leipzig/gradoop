@@ -29,6 +29,10 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
+
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Extends an embedding with a vertex if possible.
  *
@@ -66,7 +70,7 @@ public class UpdateVertexMappings<K>
   /**
    * Current step in the traversal
    */
-  private int currentStep;
+  private int currentStepId;
   /**
    * From field of the next step in the traversal (if not last)
    */
@@ -80,10 +84,9 @@ public class UpdateVertexMappings<K>
    */
   private int candidate;
   /**
-   * From fields of the previous steps (used for faster checking)
+   * Stores the vertex mapping positions that have been set in previous steps.
    */
-  private int[] previousFroms;
-
+  private Set<Integer> previousPositions;
   /**
    * Constructor
    *
@@ -103,23 +106,30 @@ public class UpdateVertexMappings<K>
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
-      currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
+      currentStepId = getIterationRuntimeContext().getSuperstepNumber() - 1;
     } else if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
-      currentStep = (int) getRuntimeContext().getBroadcastVariable(
+      currentStepId = (int) getRuntimeContext().getBroadcastVariable(
         ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
     }
 
-    candidate = (int) traversalCode.getStep(currentStep).getTo();
+    Step currentStep = traversalCode.getStep(this.currentStepId);
+    candidate = (int) currentStep.getTo();
 
     if (hasMoreSteps()) {
-      this.nextFrom = (int) traversalCode.getStep(currentStep + 1).getFrom();
+      this.nextFrom = (int) traversalCode
+        .getStep(this.currentStepId + 1)
+        .getFrom();
     }
 
-    previousFroms = new int[currentStep + 1];
-    for (int i = 0; i <= currentStep; i++) {
+    // find previous positions (limited by two times the number steps (edges))
+    previousPositions = new HashSet<>(traversalCode.getSteps().size() * 2);
+    for (int i = 0; i < this.currentStepId; i++) {
       Step s = traversalCode.getStep(i);
-      previousFroms[i] = (int) s.getFrom();
+      previousPositions.add((int) s.getFrom());
+      previousPositions.add((int) s.getTo());
     }
+    // add from field of current step
+    previousPositions.add((int) currentStep.getFrom());
   }
 
   @Override
@@ -152,7 +162,7 @@ public class UpdateVertexMappings<K>
    * @return true, if there are more steps
    */
   private boolean hasMoreSteps() {
-    return currentStep < stepCount - 1;
+    return currentStepId < stepCount - 1;
   }
 
   /**
@@ -165,8 +175,8 @@ public class UpdateVertexMappings<K>
   private boolean seenBefore(K[] vertexMappings, K id) {
     boolean result = false;
     if (matchStrategy == MatchStrategy.ISOMORPHISM) {
-      for (int i = 0; i <= currentStep; i++) {
-        if (vertexMappings[previousFroms[i]].equals(id)) {
+      for (Integer previousPosition : previousPositions) {
+        if (vertexMappings[previousPosition].equals(id)) {
           result = true;
           break;
         }

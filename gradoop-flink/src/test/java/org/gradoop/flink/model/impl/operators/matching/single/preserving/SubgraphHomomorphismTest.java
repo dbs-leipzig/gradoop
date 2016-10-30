@@ -14,8 +14,8 @@ import static org.gradoop.flink.model.impl.operators.matching.single.TestData.*;
 public abstract class SubgraphHomomorphismTest extends PatternMatchingTest {
 
   public SubgraphHomomorphismTest(String testName, String dataGraph,
-                                  String queryGraph, String[] expectedGraphVariables,
-                                  String expectedCollection) {
+    String queryGraph, String[] expectedGraphVariables,
+    String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
   }
@@ -24,27 +24,24 @@ public abstract class SubgraphHomomorphismTest extends PatternMatchingTest {
   public static Iterable data() {
     return Arrays.asList(new Object[][]{
       {
-        "Graph1_Path0",
-        GRAPH_1,
-        PATH_PATTERN_0,
+        "Graph1_Chain0",
+        GRAPH_1, CHAIN_PATTERN_0,
         new String[] {"expected1", "expected2", "expected3"},
         "expected1[(v1)-[e2]->(v6)]" +
         "expected2[(v2)-[e3]->(v6)]" +
         "expected3[(v5)-[e6]->(v4)]"
       },
       {
-        "Graph1_Path2",
-        GRAPH_1,
-        PATH_PATTERN_2,
+        "Graph1_Chain2",
+        GRAPH_1, CHAIN_PATTERN_2,
         new String[] {"expected1", "expected2", "expected3"},
         "expected1[(v1)]" +
         "expected2[(v2)]" +
         "expected3[(v5)]"
       },
       {
-        "Graph2_Path3",
-        GRAPH_2,
-        PATH_PATTERN_3,
+        "Graph2_Chain3",
+        GRAPH_2, CHAIN_PATTERN_3,
         new String[] {"expected1"},
         "expected1[(v9)-[e15]->(v9)]"
       },
@@ -84,14 +81,27 @@ public abstract class SubgraphHomomorphismTest extends PatternMatchingTest {
         "expected2[(v5)-[e9]->(v4)<-[e10]-(v5)]"
       },
       {
-        "Graph4_Path4",
-        GRAPH_4,
-        PATH_PATTERN_4,
+        "Graph4_Chain4",
+        GRAPH_4, CHAIN_PATTERN_4,
         new String[] {"expected1", "expected2", "expected3", "expected4"},
         "expected1[(v0)-[e0]->(v1)-[e1]->(v2)]" +
         "expected2[(v0)-[e0]->(v1)-[e2]->(v2)]" +
         "expected3[(v1)-[e1]->(v2)-[e3]->(v3)]" +
         "expected4[(v1)-[e2]->(v2)-[e3]->(v3)]"
+      },
+      {
+        "Graph5_Chain6",
+        GRAPH_5,
+        CHAIN_PATTERN_6,
+        new String[] {"expected1"},
+        "expected1[(v0)-[e0]->(v1)]"
+      },
+      {
+        "Graph5_Chain7",
+        GRAPH_5,
+        CHAIN_PATTERN_7,
+        new String[] {"expected1"},
+        "expected1[(v0)-[e0]->(v1)]"
       },
       {
         "Graph3_Unlabeled0",
