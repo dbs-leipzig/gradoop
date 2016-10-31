@@ -15,17 +15,28 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.io.impl.csv.functions;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMElement;
+package org.gradoop.flink.io.impl.csv;
 
 
-public class EPGMElementToPojo<T extends EPGMElement>
-  implements MapFunction<EPGMElement, T> {
+public class CSVConstants {
 
-  @Override
-  public T map(EPGMElement element) throws Exception {
-    return (T) element;
-  }
+  public static final String SEPARATOR_KEY = "_";
+
+  public static final String ESCAPE_REPLACEMENT_KEY = "&lowbar;";
+
+  public static final String SEPARATOR_GRAPHS = "%";
+
+  public static final String ESCAPE_REPLACEMENT_GRAPHS = "&percnt;";
+
+  public static final String SEPARATOR_LABEL = ";";
+
+  public static final String ESCAPE_REPLACEMENT_LABEL = "&semi;";
+
+  public static final String PROPERTY_KEY_SOURCE = "source";
+
+  public static final String PROPERTY_KEY_TARGET = "target";
+
+  public static final String PROPERTY_KEY_GRAPHS = "graphs";
+
+  public static final String PROPERTY_KEY_KEY = "key";
 }

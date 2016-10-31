@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
@@ -27,41 +28,53 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.*;
+import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
-import org.gradoop.flink.io.impl.csv.pojos.Datasource;
-import org.gradoop.flink.io.impl.csv.pojos.Edge;
-import org.gradoop.flink.io.impl.csv.pojos.Graphhead;
-import org.gradoop.flink.io.impl.csv.pojos.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXBException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Creates an EPGM instance from CSV files. Their format has to be defined
+ * with a xml file. The schema for the xml is located at
+ * 'resources/dara/csv/csv_format.xsd'.
+ */
 public class CSVDataSource extends CSVBase implements DataSource {
-  public static final String CSV_VERTEX = "vertex";
-  public static final String CSV_EDGE = "edge";
-  public static final String CSV_GRAPH = "graph";
-  private ExecutionEnvironment env;
-  private String path;
-  private final DataSet<Datasource> datasource;
-
+  /**
+   * EPGM graph head factory
+   */
   private GraphHeadFactory graphHeadFactory;
+  /**
+   * EPGM vertex factory
+   */
   private VertexFactory vertexFactory;
+  /**
+   * EPGM edge factory
+   */
   private EdgeFactory edgeFactory;
 
-
-  public CSVDataSource(GradoopFlinkConfig config, Datasource source,
-    String path) {
-    super(config, path);
-    this.path = path;
-    this.env = config.getExecutionEnvironment();
-    datasource = env.fromElements(source);
+  /**
+   * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param metaXmlPath xml file
+   * @param csvDir csv directory
+   * @param config Gradoop Flink configuration
+   */
+  public CSVDataSource(String metaXmlPath, String csvDir,
+    GradoopFlinkConfig config) {
+    super(metaXmlPath, csvDir, config);
 
     graphHeadFactory = config.getGraphHeadFactory();
     vertexFactory = config.getVertexFactory();
@@ -70,21 +83,31 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    return null;
+    return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    DataSet<Csv> csv = datasource.flatMap(new DatasourceToCsv());
-
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
     DataSet<org.gradoop.common.model.impl.pojo.GraphHead> graphHeads;
     DataSet<org.gradoop.common.model.impl.pojo.Vertex> vertices;
     DataSet<org.gradoop.common.model.impl.pojo.Edge> edges;
 
+    // parse the xml file to a datasource and select each csv object
+    DataSet<Csv> csv = null;
+    try {
+      csv = env
+        .fromElements(XmlMetaParser.parse(getXsdPath(), getMetaXmlPath()))
+        .flatMap(new DatasourceToCsv());
+    } catch (SAXException | JAXBException e) {
+      e.printStackTrace();
+    }
+
+    // load the content for each csv file described in the xml file
     Collection<Tuple2<Csv, List<String>>> content = new HashSet<>();
     try {
       for (Csv csvFile : csv.collect()) {
-        List<String> lines = env.readTextFile(path + csvFile.getName())
+        List<String> lines = env.readTextFile(getCsvDir() + csvFile.getName())
           .collect();
         content.add(new Tuple2<Csv, List<String>>(csvFile, lines));
       }
@@ -95,24 +118,28 @@ public class CSVDataSource extends CSVBase implements DataSource {
     DataSet<Tuple2<Csv, List<String>>> csvContent = env
       .fromCollection(content);
 
-    DataSet<EPGMElement> elements =csvContent
-      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory,
-        edgeFactory));
+    //map each content line to an epgm element
+    DataSet<EPGMElement> elements = csvContent
+      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory, edgeFactory));
 
+    //get all the graph heads
     graphHeads = elements
       .filter(new CSVTypeFilter(GraphHead.class))
       .map(new EPGMElementToPojo<GraphHead>())
       .returns(graphHeadFactory.getType());
 
+    //get all vertices
     vertices = elements
       .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Vertex.class))
       .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Vertex>())
       .returns(vertexFactory.getType());
 
+    //create map from class key to gradoop id
     DataSet<Map<String, GradoopId>> vertexIds = vertices
       .map(new VertexToVertexIds())
       .reduceGroup(new VertexIdsToMap());
 
+    //get all edges and adjust the vertex keys to their corresponding gradoop id
     edges = elements
       .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Edge.class))
       .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Edge>())
@@ -120,14 +147,17 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .map(new GradoopEdgeIds())
       .withBroadcastSet(vertexIds, GradoopEdgeIds.ID_MAP);
 
+    //get all graph keys from vertex properties
     DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Vertex, String>> vertexGraphKeys = vertices
       .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl.pojo.Vertex>());
 
+    //get all graph keys from edge properties
     DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Edge, String>>
       edgeGraphKeys = edges
       .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl
         .pojo.Edge>());
 
+    //create graph heads for vertices without any
     graphHeads = graphHeads
       .union(vertexGraphKeys
         .groupBy(1)
@@ -136,24 +166,23 @@ public class CSVDataSource extends CSVBase implements DataSource {
         .groupBy(1)
         .reduceGroup(new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Edge>(graphHeadFactory)));
 
-
+    //set all graph heads
     vertices = vertexGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Vertex>())
       .withBroadcastSet(graphHeads, SetElementGraphIds.BROADCAST_GRAPHHEADS);
 
+    //set all graph heads
     edges = edgeGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Edge>())
       .withBroadcastSet(graphHeads, SetElementGraphIds.BROADCAST_GRAPHHEADS);
-
-
 
     return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
   }
 
   @Override
   public GraphTransactions getGraphTransactions() throws IOException {
-    return null;
+    return getGraphCollection().toTransactions();
   }
 }

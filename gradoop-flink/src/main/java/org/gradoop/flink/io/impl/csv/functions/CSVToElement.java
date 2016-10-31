@@ -1,6 +1,22 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.io.impl.csv.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
@@ -11,6 +27,7 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.pojos.*;
 import org.gradoop.flink.io.impl.csv.tuples.ReferenceTuple;
 
@@ -18,28 +35,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
+
 public class CSVToElement implements
   FlatMapFunction<Tuple2<Csv, List<String>>, EPGMElement> {
-
-  public static final String SEPARATOR_KEY = "_";
-
-  public static final String ESCAPE_REPLACEMENT_KEY = "&lowbar;";
-
-  public static final String SEPARATOR_GRAPHS = "%";
-
-  public static final String ESCAPE_REPLACEMENT_GRAPHS = "&percnt;";
-
-  public static final String SEPARATOR_LABEL = ";";
-
-  public static final String ESCAPE_REPLACEMENT_LABEL = "&semi;";
-
-  public static final String PROPERTY_KEY_SOURCE = "source";
-
-  public static final String PROPERTY_KEY_TARGET = "target";
-
-  public static final String PROPERTY_KEY_GRAPHS = "graphs";
-
-  public static final String PROPERTY_KEY_KEY = "key";
 
   private EPGMElement reuse;
 
@@ -71,7 +69,8 @@ public class CSVToElement implements
         if (csv.getVertex().getEdges() != null) {
           for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
             collector.collect(createEdge(csv, fields, vertexEdge,
-              reuse.getPropertyValue(PROPERTY_KEY_KEY).getString()));
+              reuse.getPropertyValue(CSVConstants.PROPERTY_KEY_KEY).getString
+                ()));
           }
         }
       } else if (csv.getEdge() != null) {
@@ -119,7 +118,7 @@ public class CSVToElement implements
     PropertyList properties =
       createProperties(csv, propertiesCsv, key, fields);
 
-    properties.set(PROPERTY_KEY_GRAPHS, graphList);
+    properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
     return vertexFactory.createVertex(label, properties);
   }
@@ -150,7 +149,7 @@ public class CSVToElement implements
 
     PropertyList properties =
       createProperties(csv, propertiesCsv, key, fields);
-    properties.set(PROPERTY_KEY_GRAPHS, graphList);
+    properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
 
     ReferenceTuple referenceTuple;
@@ -167,8 +166,8 @@ public class CSVToElement implements
 
     String targetKey = createKey(referenceTuple);
 
-    properties.set(PROPERTY_KEY_SOURCE, sourceKey);
-    properties.set(PROPERTY_KEY_TARGET, targetKey);
+    properties.set(CSVConstants.PROPERTY_KEY_SOURCE, sourceKey);
+    properties.set(CSVConstants.PROPERTY_KEY_TARGET, targetKey);
 
     return edgeFactory.createEdge(label, GradoopId.get(), GradoopId.get(), properties);
   }
@@ -181,11 +180,11 @@ public class CSVToElement implements
       if (!notFirst) {
         notFirst = true;
       } else {
-        sb.append(SEPARATOR_GRAPHS);
+        sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
       sb.append(createKey(this.setNamesAndIds(
         graph, fields, datasourceName, domainName, className))
-        .replaceAll(SEPARATOR_GRAPHS, ESCAPE_REPLACEMENT_GRAPHS));
+        .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
     }
     return sb.toString();
   }
@@ -276,9 +275,9 @@ public class CSVToElement implements
         if (!contentString.equals("") && !separator.equals("")) {
           contentString += separator;
         }
-        if (separator.equals(SEPARATOR_LABEL)) {
+        if (separator.equals(CSVConstants.SEPARATOR_LABEL)) {
           contentString += fields[((Ref) object).getColumnId().intValue()]
-            .replaceAll(SEPARATOR_LABEL, ESCAPE_REPLACEMENT_LABEL);
+            .replaceAll(CSVConstants.SEPARATOR_LABEL, CSVConstants.ESCAPE_REPLACEMENT_LABEL);
         } else {
           contentString += fields[((Ref) object).getColumnId().intValue()];
         }
@@ -290,20 +289,20 @@ public class CSVToElement implements
 
   private String createLabel(Label label, String[] fields) {
     String labelSeparator = (label.getSeparator() == null) ?
-      SEPARATOR_LABEL : label.getSeparator();
+      CSVConstants.SEPARATOR_LABEL : label.getSeparator();
     return getEntriesFromStaticOrRef(label.getContent(),
       fields, labelSeparator);
   }
 
   private String createKey(ReferenceTuple tuple) {
 
-    String newId = tuple.getDatasourceName().replaceAll(SEPARATOR_KEY,
-      ESCAPE_REPLACEMENT_KEY) + "_" +
-      tuple.getDomainName().replaceAll(SEPARATOR_KEY, ESCAPE_REPLACEMENT_KEY)
+    String newId = tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
+      CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+      tuple.getDomainName().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY)
       + "_" +
-      tuple.getClassName().replaceAll(SEPARATOR_KEY, ESCAPE_REPLACEMENT_KEY)
+      tuple.getClassName().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY)
       + "_" +
-      tuple.getId().replaceAll(SEPARATOR_KEY, ESCAPE_REPLACEMENT_KEY);
+      tuple.getId().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY);
 
     return newId;
   }
@@ -319,7 +318,7 @@ public class CSVToElement implements
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
 
-    list.set(PROPERTY_KEY_KEY, value);
+    list.set(CSVConstants.PROPERTY_KEY_KEY, value);
 
     if (properties != null && !properties.isEmpty()) {
       for (Property p : properties.get(0).getProperty()) {

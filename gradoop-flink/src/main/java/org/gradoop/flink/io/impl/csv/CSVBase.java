@@ -17,12 +17,10 @@
 
 package org.gradoop.flink.io.impl.csv;
 
-
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Base class for TLF data source and sink.
- *
+ * Base class for CSV data source and sink.
  */
 abstract class CSVBase {
   /**
@@ -30,23 +28,41 @@ abstract class CSVBase {
    */
   private final GradoopFlinkConfig config;
   /**
-   * File to read/write TLF content to
+   * Complete path to the xsd file.
    */
-  private final String metaXmlPath;
-
   private final String xsdPath =
     CSVBase.class.getResource("/data/csv/csv_format.xsd").getFile();
+  /**
+   * Complete path to the xml file.
+   */
+  private final String metaXmlPath;
+  /**
+   * Path to the directory containing the csv files.
+   */
+  private String csvDir;
 
-  CSVBase(GradoopFlinkConfig config, String metaXmlPath) {
+  /**
+   * Creates a new data source/sink. Paths can be local (file://) or HDFS
+   * (hdfs://).
+   *
+   * @param metaXmlPath xml file
+   * @param csvDir csv directory
+   * @param config Gradoop Flink configuration
+   */
+  CSVBase(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
     if (config == null) {
       throw new IllegalArgumentException("config must not be null");
     }
     if (metaXmlPath == null) {
-      throw new IllegalArgumentException("csv file must not be null");
+      throw new IllegalArgumentException("path to xml must not be null");
+    }
+    if (csvDir== null) {
+      throw new IllegalArgumentException("csv directory must not be null");
     }
 
     this.config = config;
     this.metaXmlPath = metaXmlPath;
+    this.csvDir = csvDir;
   }
 
   public GradoopFlinkConfig getConfig() {
@@ -59,5 +75,9 @@ abstract class CSVBase {
 
   public String getXsdPath() {
     return xsdPath;
+  }
+
+  public String getCsvDir() {
+    return csvDir;
   }
 }

@@ -27,8 +27,9 @@ import java.io.IOException;
 
 public class CSVDataSink extends CSVBase implements DataSink {
 
-  public CSVDataSink(GradoopFlinkConfig config, String metaXmlPath) {
-    super(config, metaXmlPath);
+  public CSVDataSink(String metaXmlPath, String csvDir,
+    GradoopFlinkConfig config) {
+    super(metaXmlPath, csvDir, config);
   }
 
   @Override

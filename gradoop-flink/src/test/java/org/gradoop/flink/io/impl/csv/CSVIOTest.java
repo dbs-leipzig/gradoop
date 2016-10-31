@@ -19,6 +19,7 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
+import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
@@ -50,34 +51,13 @@ public class CSVIOTest extends GradoopFlinkTestBase {
     // paths to input files
     String csvFiles = CSVIOTest.class.getResource("/data/csv/").getPath();
 
-    String xmlFile =
+    String metaXmlFile =
       CSVIOTest.class.getResource("/data/csv/test2.xml").getFile();
 
-    String metaFile =
-      CSVDataSource.class.getResource("/data/csv/csv_format.xsd").getFile();
-
-
-    // jaxb parser
-    SchemaFactory schemaFactory =
-      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-    Schema schema = schemaFactory.newSchema(new File(metaFile));
-
-    JAXBContext jaxbContext = JAXBContext
-      .newInstance(ObjectFactory.class.getPackage().getName());
-
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-    unmarshaller.setSchema( schema );
-
-    Datasource source = (Datasource) unmarshaller
-      .unmarshal(new FileInputStream(xmlFile));
-
-
     // create datasource
-    DataSource dataSource = new CSVDataSource(config, source, csvFiles);
+    DataSource dataSource = new CSVDataSource(config, metaXmlFile, csvFiles);
 
-    // get transactions
+    // get collection
     GraphCollection graph = dataSource.getGraphCollection();
 
     GradoopFlinkTestUtils.printGraphCollection(graph);
