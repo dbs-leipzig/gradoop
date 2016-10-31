@@ -99,19 +99,13 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .flatMap(new CSVToElement(graphHeadFactory, vertexFactory,
         edgeFactory));
 
-    graphHeads = csvContent
-      .filter(
-        new CSVTypeFilter(Graphhead.class))
-      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory,
-        edgeFactory))
+    graphHeads = elements
+      .filter(new CSVTypeFilter(GraphHead.class))
       .map(new EPGMElementToPojo<GraphHead>())
       .returns(graphHeadFactory.getType());
 
-    vertices = csvContent
-      .filter(
-        new CSVTypeFilter(Vertex.class))
-      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory,
-        edgeFactory))
+    vertices = elements
+      .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Vertex.class))
       .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Vertex>())
       .returns(vertexFactory.getType());
 
@@ -119,10 +113,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .map(new VertexToVertexIds())
       .reduceGroup(new VertexIdsToMap());
 
-    edges = csvContent
-      .filter(
-        new CSVTypeFilter(Edge.class))
-      .flatMap(new CSVToElement(graphHeadFactory, vertexFactory, edgeFactory))
+    edges = elements
+      .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Edge.class))
       .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Edge>())
       .returns(edgeFactory.getType())
       .map(new GradoopEdgeIds())

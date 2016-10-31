@@ -75,10 +75,18 @@
                     </graph>
                 </graphs>
                 <target>
-                    <ref column_id="1"/>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="1"/>
+                        </key>
+                    </reference>
                 </target>
                 <source>
-                    <ref column_id="0"/>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="0"/>
+                        </key>
+                    </reference>
                 </source>
             </edge>
         </csv>
