@@ -23,7 +23,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 
-
+/**
+ * Creates a tuple containing the string representation of a vertex' key and
+ * its id.
+ */
 public class VertexToVertexIds implements
   MapFunction<Vertex, Tuple2<String, GradoopId>> {
 

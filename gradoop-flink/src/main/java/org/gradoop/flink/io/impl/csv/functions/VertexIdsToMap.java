@@ -25,7 +25,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Map;
 
-
+/**
+ * Creates a map from the string representation of a vertex' key to its id.
+ */
 public class VertexIdsToMap implements GroupReduceFunction<Tuple2<String,
   GradoopId>, Map<String, GradoopId>> {
 

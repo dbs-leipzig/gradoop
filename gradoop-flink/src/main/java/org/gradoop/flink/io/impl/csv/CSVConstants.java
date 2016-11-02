@@ -63,4 +63,12 @@ public class CSVConstants {
    * concatenated primary key).
    */
   public static final String PROPERTY_KEY_KEY = "key";
+  /**
+   * Broadcast variable to spread the ids graph keys with their ids.
+   */
+  public static final String BROADCAST_ID_MAP = "idMap";
+  /**
+   * Broadcast variable to spread the graph heads.
+   */
+  public static final String BROADCAST_GRAPHHEADS = "graphHeads";
 }

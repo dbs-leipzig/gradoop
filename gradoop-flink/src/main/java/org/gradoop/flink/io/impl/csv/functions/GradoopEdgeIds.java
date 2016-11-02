@@ -27,24 +27,28 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Sets the source and target id for each edge depending on the keys saved as
+ * properties.
+ */
 public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
-
-  public static final String ID_MAP = "idMap";
-
+  /**
+   * Map which stores the gradoop id for each string representation of the
+   * edge's source and target key.
+   */
   private Map<String, GradoopId> map;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     map = getRuntimeContext()
-      .<HashMap<String, GradoopId>>getBroadcastVariable(ID_MAP).get(0);
+      .<HashMap<String, GradoopId>>getBroadcastVariable(CSVConstants.BROADCAST_ID_MAP)
+        .get(0);
   }
 
   @Override
   public Edge map(Edge edge) throws Exception {
     PropertyList properties = edge.getProperties();
-    //TODO remove properties when it is supportet
     edge.setSourceId(
       map.get(properties.get(CSVConstants.PROPERTY_KEY_SOURCE).getString()));
     edge.setTargetId(

@@ -31,20 +31,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Sets the graph ids for each element depending on the graph keys.
+ *
+ * @param <T> an epgm graph element: vertex or edge
+ */
 public class SetElementGraphIds<T extends EPGMGraphElement>
   extends RichGroupReduceFunction<Tuple2<T, String>, T> {
-
-  public static final String BROADCAST_GRAPHHEADS = "graphHeads";
-
+  /**
+   * List of graph heads.
+   */
   private List<GraphHead> graphHeads;
-
+  /**
+   * Map from string representation of the graph key to its id.
+   */
   private Map<String, GradoopId> keyIdMap;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    graphHeads = getRuntimeContext().getBroadcastVariable(BROADCAST_GRAPHHEADS);
+    graphHeads = getRuntimeContext().getBroadcastVariable(
+      CSVConstants.BROADCAST_GRAPHHEADS);
     keyIdMap = Maps.newHashMapWithExpectedSize(graphHeads.size());
     for (GraphHead graph : graphHeads) {
       keyIdMap.put(

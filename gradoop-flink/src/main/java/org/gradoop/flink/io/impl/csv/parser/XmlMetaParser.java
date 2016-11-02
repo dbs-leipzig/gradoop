@@ -29,7 +29,6 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 
 /**
  * Parser for XML meta information.
