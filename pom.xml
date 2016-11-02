@@ -163,6 +163,7 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
+                        <excludes>org/gradoop/flink/io/impl/csv/pojos/*</excludes>
                     </configuration>
                     <executions>
                         <execution>
