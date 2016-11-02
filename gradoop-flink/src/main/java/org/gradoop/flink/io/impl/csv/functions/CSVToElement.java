@@ -28,7 +28,18 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.pojos.*;
+import org.gradoop.flink.io.impl.csv.pojos.Csv;
+import org.gradoop.flink.io.impl.csv.pojos.Graph;
+import org.gradoop.flink.io.impl.csv.pojos.Key;
+import org.gradoop.flink.io.impl.csv.pojos.Properties;
+import org.gradoop.flink.io.impl.csv.pojos.Ref;
+import org.gradoop.flink.io.impl.csv.pojos.Reference;
+import org.gradoop.flink.io.impl.csv.pojos.Static;
+import org.gradoop.flink.io.impl.csv.pojos.Staticorreference;
+import org.gradoop.flink.io.impl.csv.pojos.Vertexedge;
+import org.gradoop.flink.io.impl.csv.pojos.Label;
+import org.gradoop.flink.io.impl.csv.pojos.Objectreferences;
+import org.gradoop.flink.io.impl.csv.pojos.Property;
 import org.gradoop.flink.io.impl.csv.tuples.ReferenceTuple;
 
 import java.util.List;
@@ -89,7 +100,8 @@ public class CSVToElement implements
         reuse = createVertex(csv, fields);
         //if the vertex also defines an outgoing edge is is also collected
         if (csv.getVertex().getEdges() != null) {
-          for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
+          for (Vertexedge vertexEdge : csv.getVertex().getEdges()
+            .getVertexedge()) {
             collector.collect(
               createEdge(csv, fields, vertexEdge, reuse.getPropertyValue(
                 CSVConstants.PROPERTY_KEY_KEY).getString()));
@@ -133,8 +145,8 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return Vertex
    */
-  private org.gradoop.common.model.impl.pojo.Vertex createVertex(Csv csv, String[]
-    fields) {
+  private org.gradoop.common.model.impl.pojo.Vertex createVertex(Csv csv,
+    String[] fields) {
     String label = "";
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
@@ -217,7 +229,8 @@ public class CSVToElement implements
     properties.set(CSVConstants.PROPERTY_KEY_SOURCE, sourceKey);
     properties.set(CSVConstants.PROPERTY_KEY_TARGET, targetKey);
 
-    return edgeFactory.createEdge(label, GradoopId.get(), GradoopId.get(), properties);
+    return edgeFactory.createEdge(
+      label, GradoopId.get(), GradoopId.get(), properties);
   }
 
   /**
@@ -242,7 +255,8 @@ public class CSVToElement implements
       }
       sb.append(createKey(this.setNamesAndIds(
         graph, fields, datasourceName, domainName, className))
-        .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
+        .replaceAll(CSVConstants.SEPARATOR_GRAPHS,
+          CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
     }
     return sb.toString();
   }
@@ -318,10 +332,10 @@ public class CSVToElement implements
     boolean refSet = false;
     for (Object object : objectReferences.getStaticOrRefOrReference()) {
       if (Static.class.isInstance(object)) {
-        tuple.setId(((Static)object).getName());
+        tuple.setId(((Static) object).getName());
       } else  if (Ref.class.isInstance(object)) {
         tuple.setId(
-          tuple.getId() + fields[((Ref)object).getColumnId().intValue()]);
+          tuple.getId() + fields[((Ref) object).getColumnId().intValue()]);
         refSet = true;
       } else if (Reference.class.isInstance(object)) {
         Reference reference = (Reference) object;
@@ -366,7 +380,8 @@ public class CSVToElement implements
         }
         if (separator.equals(CSVConstants.SEPARATOR_LABEL)) {
           contentString += fields[((Ref) object).getColumnId().intValue()]
-            .replaceAll(CSVConstants.SEPARATOR_LABEL, CSVConstants.ESCAPE_REPLACEMENT_LABEL);
+            .replaceAll(CSVConstants.SEPARATOR_LABEL,
+              CSVConstants.ESCAPE_REPLACEMENT_LABEL);
         } else {
           contentString += fields[((Ref) object).getColumnId().intValue()];
         }
@@ -399,11 +414,12 @@ public class CSVToElement implements
   private String createKey(ReferenceTuple tuple) {
     return tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
       CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
-      tuple.getDomainName().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY)
-      + "_" +
-      tuple.getClassName().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY)
-      + "_" +
-      tuple.getId().replaceAll(CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY);
+      tuple.getDomainName().replaceAll(
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+      tuple.getClassName().replaceAll(
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+      tuple.getId().replaceAll(
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY);
   }
 
   /**
@@ -421,7 +437,7 @@ public class CSVToElement implements
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(),
         key.getClazz(), getEntriesFromStaticOrRef(key.getContent(),
-        fields, "")));
+          fields, "")));
 
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
@@ -432,7 +448,8 @@ public class CSVToElement implements
     //in the meta information
     if (properties != null && !properties.isEmpty()) {
       for (Property p : properties.get(0).getProperty()) {
-        org.gradoop.common.model.impl.properties.Property prop = new org.gradoop.common.model.impl.properties.Property();
+        org.gradoop.common.model.impl.properties.Property prop
+          = new org.gradoop.common.model.impl.properties.Property();
 
         prop.setKey(p.getName());
         value = new PropertyValue();
@@ -440,27 +457,27 @@ public class CSVToElement implements
           csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
 
         switch (type) {
-          case "String":
-            value.setString(fields[p.getColumnId()]);
-            break;
-          case "Integer":
-            value.setInt(Integer.parseInt(fields[p.getColumnId()]));
-            break;
-          case "Long":
-            value.setLong(Long.parseLong(fields[p.getColumnId()]));
-            break;
-          case "Float":
-            value.setFloat(Float.parseFloat(fields[p.getColumnId()]));
-            break;
-          case "Double":
-            value.setDouble(Double.parseDouble(fields[p.getColumnId()]));
-            break;
-          case "Boolean":
-            value.setBoolean(Boolean.parseBoolean(fields[p.getColumnId()]));
-            break;
-          default:
-            value.setString(fields[p.getColumnId()]);
-            break;
+        case "String":
+          value.setString(fields[p.getColumnId()]);
+          break;
+        case "Integer":
+          value.setInt(Integer.parseInt(fields[p.getColumnId()]));
+          break;
+        case "Long":
+          value.setLong(Long.parseLong(fields[p.getColumnId()]));
+          break;
+        case "Float":
+          value.setFloat(Float.parseFloat(fields[p.getColumnId()]));
+          break;
+        case "Double":
+          value.setDouble(Double.parseDouble(fields[p.getColumnId()]));
+          break;
+        case "Boolean":
+          value.setBoolean(Boolean.parseBoolean(fields[p.getColumnId()]));
+          break;
+        default:
+          value.setString(fields[p.getColumnId()]);
+          break;
         }
         prop.setValue(value);
         list.set(prop);

@@ -27,7 +27,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.*;
 import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
 import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -36,6 +35,16 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.xml.sax.SAXException;
+import org.gradoop.flink.io.impl.csv.functions.CSVToElement;
+import org.gradoop.flink.io.impl.csv.functions.CSVTypeFilter;
+import org.gradoop.flink.io.impl.csv.functions.ElementToElementGraphKey;
+import org.gradoop.flink.io.impl.csv.functions.GradoopEdgeIds;
+import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
+import org.gradoop.flink.io.impl.csv.functions.ElementGraphKeyToGraphHead;
+import org.gradoop.flink.io.impl.csv.functions.EPGMElementToPojo;
+import org.gradoop.flink.io.impl.csv.functions.SetElementGraphIds;
+import org.gradoop.flink.io.impl.csv.functions.VertexIdsToMap;
+import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -128,7 +137,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     //get all vertices
     vertices = elements
-      .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Vertex.class))
+      .filter(
+        new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Vertex.class))
       .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Vertex>())
       .returns(vertexFactory.getType());
 
@@ -146,8 +156,12 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .withBroadcastSet(vertexIds, CSVConstants.BROADCAST_ID_MAP);
 
     //get all graph keys from vertex properties
-    DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Vertex, String>> vertexGraphKeys = vertices
-      .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl.pojo.Vertex>());
+    DataSet<
+      Tuple2<org.gradoop.common.model.impl.pojo.Vertex, String>> vertexGraphKeys
+      = vertices
+        .flatMap(
+          new ElementToElementGraphKey<
+            org.gradoop.common.model.impl.pojo.Vertex>());
 
     //get all graph keys from edge properties
     DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Edge, String>>
@@ -159,24 +173,31 @@ public class CSVDataSource extends CSVBase implements DataSource {
     graphHeads = graphHeads
       .union(vertexGraphKeys
         .groupBy(1)
-        .reduceGroup(new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Vertex>(graphHeadFactory)))
+        .reduceGroup(
+          new ElementGraphKeyToGraphHead<
+            org.gradoop.common.model.impl.pojo.Vertex>(graphHeadFactory)))
       .union(edgeGraphKeys
-        .groupBy(1)
-        .reduceGroup(new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Edge>(graphHeadFactory)));
+          .groupBy(1)
+          .reduceGroup(
+            new ElementGraphKeyToGraphHead<
+            org.gradoop.common.model.impl.pojo.Edge>(graphHeadFactory)));
 
     //set all graph heads
     vertices = vertexGraphKeys
       .groupBy("f0.id")
-      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Vertex>())
+      .reduceGroup(
+        new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Vertex>())
       .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
 
     //set all graph heads
     edges = edgeGraphKeys
       .groupBy("f0.id")
-      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Edge>())
+      .reduceGroup(
+        new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Edge>())
       .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
 
-    return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
+    return GraphCollection.fromDataSets(
+      graphHeads, vertices, edges, getConfig());
   }
 
   @Override

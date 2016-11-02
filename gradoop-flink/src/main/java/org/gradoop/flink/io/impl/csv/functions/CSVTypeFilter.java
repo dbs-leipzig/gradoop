@@ -24,6 +24,9 @@ import org.gradoop.common.model.api.entities.EPGMElement;
  * Filters all elements of the given type.
  */
 public class CSVTypeFilter implements FilterFunction<EPGMElement> {
+  /**
+   * Class containing the type to filter.
+   */
   private Class type;
 
   /**

@@ -42,8 +42,8 @@ public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     map = getRuntimeContext()
-      .<HashMap<String, GradoopId>>getBroadcastVariable(CSVConstants.BROADCAST_ID_MAP)
-        .get(0);
+      .<HashMap<String, GradoopId>>getBroadcastVariable(
+        CSVConstants.BROADCAST_ID_MAP).get(0);
   }
 
   @Override

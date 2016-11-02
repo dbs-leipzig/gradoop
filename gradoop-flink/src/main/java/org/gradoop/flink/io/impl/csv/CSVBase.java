@@ -56,7 +56,7 @@ abstract class CSVBase {
     if (metaXmlPath == null) {
       throw new IllegalArgumentException("path to xml must not be null");
     }
-    if (csvDir== null) {
+    if (csvDir == null) {
       throw new IllegalArgumentException("csv directory must not be null");
     }
 

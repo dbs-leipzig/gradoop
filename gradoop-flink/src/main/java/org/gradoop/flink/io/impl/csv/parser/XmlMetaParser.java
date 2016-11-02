@@ -18,6 +18,7 @@
 package org.gradoop.flink.io.impl.csv.parser;
 
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
+import org.gradoop.flink.io.impl.csv.pojos.ObjectFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -53,8 +54,8 @@ public class XmlMetaParser {
     SchemaFactory schemaFactory =
       SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema
-      = (xsdSchema == null || xsdSchema.trim().length() == 0)
-      ? null : schemaFactory.newSchema( new File( xsdSchema ) );
+      = (xsdSchema == null || xsdSchema.trim().length() == 0) ?
+      null : schemaFactory.newSchema(new File(xsdSchema));
     JAXBContext jaxbContext =
       JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
 

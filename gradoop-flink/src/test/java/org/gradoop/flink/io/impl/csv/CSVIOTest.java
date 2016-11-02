@@ -18,24 +18,10 @@
 package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.parser.ObjectFactory;
-import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
-import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.junit.Test;
-import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.File;
-import java.io.FileInputStream;
 
 public class CSVIOTest extends GradoopFlinkTestBase {
 
