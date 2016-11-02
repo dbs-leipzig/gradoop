@@ -17,26 +17,50 @@
 
 package org.gradoop.flink.io.impl.csv;
 
-
+/**
+ * Constants needed for the CSV IO classes.
+ */
 public class CSVConstants {
 
+  /**
+   * Separator for 'key' property concatenation.
+   */
   public static final String SEPARATOR_KEY = "_";
-
+  /**
+   * Replacement string for 'key' property.
+   */
   public static final String ESCAPE_REPLACEMENT_KEY = "&lowbar;";
-
+  /**
+   * Separator for 'graphs' property concatenation.
+   */
   public static final String SEPARATOR_GRAPHS = "%";
-
+  /**
+   * Replacement string for 'graphs' property.
+   */
   public static final String ESCAPE_REPLACEMENT_GRAPHS = "&percnt;";
-
+  /**
+   * Separator for the label concatenation.
+   */
   public static final String SEPARATOR_LABEL = ";";
-
+  /**
+   * Replacement string for the label.
+   */
   public static final String ESCAPE_REPLACEMENT_LABEL = "&semi;";
-
+  /**
+   * Property key for the value containing an edge's source.
+   */
   public static final String PROPERTY_KEY_SOURCE = "source";
-
+  /**
+   * Property key for the value containing an edge's target.
+   */
   public static final String PROPERTY_KEY_TARGET = "target";
-
+  /**
+   * Property key for the value containing an element's graph ids.
+   */
   public static final String PROPERTY_KEY_GRAPHS = "graphs";
-
+  /**
+   * Property key for the value containing an elements's key (i.e.
+   * concatenated primary key).
+   */
   public static final String PROPERTY_KEY_KEY = "key";
 }

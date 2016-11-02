@@ -23,7 +23,9 @@ import org.gradoop.flink.io.impl.csv.pojos.Csv;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.io.impl.csv.pojos.Domain;
 
-
+/**
+ * Collects all csv objects from a datasource.
+ */
 public class DatasourceToCsv implements FlatMapFunction<Datasource, Csv> {
 
   @Override

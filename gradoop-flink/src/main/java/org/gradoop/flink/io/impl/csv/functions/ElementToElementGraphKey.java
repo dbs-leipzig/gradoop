@@ -23,7 +23,11 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 
-
+/**
+ * Extracts all graph keys from an epgm graph element.
+ *
+ * @param <T> an epgm graph element: vertex or edge
+ */
 public class ElementToElementGraphKey<T extends EPGMGraphElement> implements
   FlatMapFunction<T, Tuple2<T, String>> {
 

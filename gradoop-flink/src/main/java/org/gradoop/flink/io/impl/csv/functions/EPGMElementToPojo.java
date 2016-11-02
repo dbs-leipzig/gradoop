@@ -20,7 +20,11 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
 
-
+/**
+ * Returns the correct type of an unspecific epgm element.
+ *
+ * @param <T> an epgm element: graph head, vertex or edge
+ */
 public class EPGMElementToPojo<T extends EPGMElement>
   implements MapFunction<EPGMElement, T> {
 

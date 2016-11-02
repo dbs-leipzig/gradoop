@@ -55,7 +55,7 @@ public class CSVIOTest extends GradoopFlinkTestBase {
       CSVIOTest.class.getResource("/data/csv/test2.xml").getFile();
 
     // create datasource
-    DataSource dataSource = new CSVDataSource(config, metaXmlFile, csvFiles);
+    DataSource dataSource = new CSVDataSource(metaXmlFile, csvFiles,config);
 
     // get collection
     GraphCollection graph = dataSource.getGraphCollection();

@@ -25,12 +25,23 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 
-
+/**
+ * Creates a graph head for each graph key of an epgm graph element.
+ *
+ * @param <T> an epgm graph element: vertex or edge
+ */
 public class ElementGraphKeyToGraphHead<T extends EPGMGraphElement> implements
   GroupReduceFunction<Tuple2<T, String>, GraphHead> {
-
+  /**
+   * EPGM graph head factory
+   */
   private GraphHeadFactory graphHeadFactory;
 
+  /**
+   * Creates a group reduce function.
+   *
+   * @param graphHeadFactory epgm graph head factory
+   */
   public ElementGraphKeyToGraphHead(GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }

@@ -20,10 +20,17 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
 
-
+/**
+ * Filters all elements of the given type.
+ */
 public class CSVTypeFilter implements FilterFunction<EPGMElement> {
   private Class type;
 
+  /**
+   * Creates a filter function.
+   *
+   * @param type type to be filtered
+   */
   public CSVTypeFilter(Class type) {
     this.type = type;
   }

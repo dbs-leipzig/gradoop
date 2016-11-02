@@ -38,9 +38,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;

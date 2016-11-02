@@ -25,8 +25,20 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
+/**
+ * Writes an EPGM instance into CSV files. Their format has to be defined
+ * with a xml file. The schema for the xml is located at
+ * 'resources/dara/csv/csv_format.xsd'.
+ */
 public class CSVDataSink extends CSVBase implements DataSink {
 
+  /**
+   *  Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param metaXmlPath xml file
+   * @param csvDir csv directory
+   * @param config Gradoop Flink configuration
+   */
   public CSVDataSink(String metaXmlPath, String csvDir,
     GradoopFlinkConfig config) {
     super(metaXmlPath, csvDir, config);
