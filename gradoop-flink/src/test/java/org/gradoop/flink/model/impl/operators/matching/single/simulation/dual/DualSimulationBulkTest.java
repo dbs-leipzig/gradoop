@@ -9,7 +9,7 @@ public class DualSimulationBulkTest extends DualSimulationTest {
 
 
   public DualSimulationBulkTest(String testName, String dataGraph,
-    String queryGraph, String[] expectedGraphVariables,
+    String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);

@@ -2,7 +2,7 @@ package org.gradoop.flink.model.impl.operators.matching.single;
 
 public class TestData {
 
-  public static final String DATA_GRAPH_VARIABLE = "db";
+  static final String DATA_GRAPH_VARIABLE = "db";
 
   public static final String CHAIN_PATTERN_0 =
     "(:A)-[:a]->(:B)";
@@ -48,6 +48,9 @@ public class TestData {
 
   public static final String CYCLE_PATTERN_5 =
     "(v0:B)-[:a]->(v1:C)<-[:b]-(v0)";
+
+  public static final String CYCLE_PATTERN_6 =
+    "(v0:A)-[:a]->(v1:A)<-[:a]-(v0)";
 
   public static final String UNLABELED_PATTERN_0 =
     "()";

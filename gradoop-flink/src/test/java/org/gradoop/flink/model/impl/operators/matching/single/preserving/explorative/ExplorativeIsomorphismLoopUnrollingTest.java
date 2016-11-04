@@ -8,7 +8,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving
 public class ExplorativeIsomorphismLoopUnrollingTest extends SubgraphIsomorphismTest {
 
   public ExplorativeIsomorphismLoopUnrollingTest(String testName, String dataGraph,
-    String queryGraph, String[] expectedGraphVariables,
+    String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);

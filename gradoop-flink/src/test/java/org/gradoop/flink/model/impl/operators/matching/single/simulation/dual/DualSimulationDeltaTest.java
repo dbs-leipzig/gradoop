@@ -8,7 +8,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 public class DualSimulationDeltaTest extends DualSimulationTest {
 
   public DualSimulationDeltaTest(String testName, String dataGraph,
-    String queryGraph, String[] expectedGraphVariables,
+    String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
