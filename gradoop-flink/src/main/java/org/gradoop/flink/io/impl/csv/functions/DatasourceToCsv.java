@@ -19,20 +19,20 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.io.impl.csv.pojos.Csv;
+import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
 import org.gradoop.flink.io.impl.csv.pojos.Domain;
 
 /**
  * Collects all csv objects from a datasource.
  */
-public class DatasourceToCsv implements FlatMapFunction<Datasource, Csv> {
+public class DatasourceToCsv implements FlatMapFunction<Datasource, CsvExtension> {
 
   @Override
-  public void flatMap(Datasource datasource, Collector<Csv> collector) throws
+  public void flatMap(Datasource datasource, Collector<CsvExtension> collector) throws
     Exception {
     for (Domain domain : datasource.getDomain()) {
-      for (Csv csv : domain.getCsv()) {
+      for (CsvExtension csv : domain.getCsv()) {
         csv.setDatasourceName(datasource.getName());
         csv.setDomainName(domain.getName());
         collector.collect(csv);

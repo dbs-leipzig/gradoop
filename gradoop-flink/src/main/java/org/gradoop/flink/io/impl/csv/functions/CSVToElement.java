@@ -28,10 +28,9 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.pojos.Csv;
+import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
 import org.gradoop.flink.io.impl.csv.pojos.Graph;
 import org.gradoop.flink.io.impl.csv.pojos.Key;
-import org.gradoop.flink.io.impl.csv.pojos.Properties;
 import org.gradoop.flink.io.impl.csv.pojos.Ref;
 import org.gradoop.flink.io.impl.csv.pojos.Reference;
 import org.gradoop.flink.io.impl.csv.pojos.Static;
@@ -42,6 +41,7 @@ import org.gradoop.flink.io.impl.csv.pojos.Objectreferences;
 import org.gradoop.flink.io.impl.csv.pojos.Property;
 import org.gradoop.flink.io.impl.csv.tuples.ReferenceTuple;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  * to the corresponding content.
  */
 public class CSVToElement implements
-  FlatMapFunction<Tuple2<Csv, List<String>>, EPGMElement> {
+  FlatMapFunction<Tuple2<CsvExtension, List<String>>, EPGMElement> {
   /**
    * EPGMElement which will be initialized as the specific element defined in
    * the csv object.
@@ -85,10 +85,10 @@ public class CSVToElement implements
   }
 
   @Override
-  public void flatMap(Tuple2<Csv, List<String>> tuple,
+  public void flatMap(Tuple2<CsvExtension, List<String>> tuple,
     Collector<EPGMElement> collector) throws Exception {
 
-    Csv csv = tuple.f0;
+    CsvExtension csv = tuple.f0;
     List<String> content = tuple.f1;
     //one EPGMElement for each line
     for (String line : content) {
@@ -124,14 +124,15 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return GraphHead
    */
-  private org.gradoop.common.model.impl.pojo.GraphHead createGraphHead(Csv csv,
+  private org.gradoop.common.model.impl.pojo.GraphHead createGraphHead(CsvExtension csv,
   String[] fields) {
     String label = "";
     if (csv.getGraphhead().getLabel() != null) {
       label = createLabel(csv.getGraphhead().getLabel(), fields);
     }
     Key key = csv.getGraphhead().getKey();
-    List<Properties> propertiesCsv = csv.getGraphhead().getProperties();
+    List<Property> propertiesCsv = csv.getGraphhead().getProperties()
+      .getProperty();
     PropertyList properties =
       createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
@@ -145,14 +146,15 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return Vertex
    */
-  private org.gradoop.common.model.impl.pojo.Vertex createVertex(Csv csv,
+  private org.gradoop.common.model.impl.pojo.Vertex createVertex(CsvExtension csv,
     String[] fields) {
     String label = "";
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
     Key key = csv.getVertex().getKey();
-    List<Properties> propertiesCsv = csv.getVertex().getProperties();
+    List<Property> propertiesCsv = csv.getVertex().getProperties()
+      .getProperty();
     String className = csv.getVertex().getKey().getClazz();
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
 
@@ -174,7 +176,7 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return Edge
    */
-  private org.gradoop.common.model.impl.pojo.Edge createEdge(Csv csv,
+  private org.gradoop.common.model.impl.pojo.Edge createEdge(CsvExtension csv,
     String[] fields) {
     //'null' and "" to create a normal edge and not one initialized by a vertex
     return createEdge(csv, fields, null, "");
@@ -190,7 +192,7 @@ public class CSVToElement implements
    * @param sourceKey the concatenated key of the source vertex
    * @return Edge
    */
-  private org.gradoop.common.model.impl.pojo.Edge createEdge(Csv csv,
+  private org.gradoop.common.model.impl.pojo.Edge createEdge(CsvExtension csv,
     String[] fields, Vertexedge edge, String sourceKey) {
     String label = "";
 
@@ -201,7 +203,7 @@ public class CSVToElement implements
       label = createLabel(edge.getLabel(), fields);
     }
     Key key = edge.getKey();
-    List<Properties> propertiesCsv = edge.getProperties();
+    List<Property> propertiesCsv = edge.getProperties().getProperty();
     String className = edge.getKey().getClazz();
     List<Graph> graphs = edge.getGraphs().getGraph();
 
@@ -368,7 +370,7 @@ public class CSVToElement implements
    * @param separator separates each entry for the string
    * @return String of all separated entries
    */
-  private String getEntriesFromStaticOrRef(List<Object> objects, String[]
+  private String getEntriesFromStaticOrRef(List<Serializable> objects, String[]
     fields, String separator) {
     String contentString = "";
     for (Object object : objects) {
@@ -431,7 +433,7 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return epgm property list
    */
-  private PropertyList createProperties(Csv csv, List<Properties> properties,
+  private PropertyList createProperties(CsvExtension csv, List<Property> properties,
     Key key, String[] fields) {
     PropertyList list = PropertyList.create();
     String resultKey = createKey(
@@ -447,7 +449,7 @@ public class CSVToElement implements
     //load all properties and set their type according to the type specified
     //in the meta information
     if (properties != null && !properties.isEmpty()) {
-      for (Property p : properties.get(0).getProperty()) {
+      for (Property p : properties) {
         org.gradoop.common.model.impl.properties.Property prop
           = new org.gradoop.common.model.impl.properties.Property();
 

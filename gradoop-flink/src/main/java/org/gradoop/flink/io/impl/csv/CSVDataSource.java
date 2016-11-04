@@ -20,6 +20,7 @@ package org.gradoop.flink.io.impl.csv;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
@@ -27,29 +28,20 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.functions.*;
 import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
-import org.gradoop.flink.io.impl.csv.pojos.Csv;
+import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
+import org.gradoop.flink.io.impl.csv.pojos.Datasource;
+import org.gradoop.flink.io.impl.csv.pojos.Domain;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.xml.sax.SAXException;
-import org.gradoop.flink.io.impl.csv.functions.CSVToElement;
-import org.gradoop.flink.io.impl.csv.functions.CSVTypeFilter;
-import org.gradoop.flink.io.impl.csv.functions.ElementToElementGraphKey;
-import org.gradoop.flink.io.impl.csv.functions.GradoopEdgeIds;
-import org.gradoop.flink.io.impl.csv.functions.DatasourceToCsv;
-import org.gradoop.flink.io.impl.csv.functions.ElementGraphKeyToGraphHead;
-import org.gradoop.flink.io.impl.csv.functions.EPGMElementToPojo;
-import org.gradoop.flink.io.impl.csv.functions.SetElementGraphIds;
-import org.gradoop.flink.io.impl.csv.functions.VertexIdsToMap;
-import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -101,29 +93,32 @@ public class CSVDataSource extends CSVBase implements DataSource {
     DataSet<org.gradoop.common.model.impl.pojo.Edge> edges;
 
     // parse the xml file to a datasource and select each csv object
-    DataSet<Csv> csv = null;
+    Datasource datasource = null;
     try {
-      csv = env
-        .fromElements(XmlMetaParser.parse(getXsdPath(), getMetaXmlPath()))
-        .flatMap(new DatasourceToCsv());
+      datasource = XmlMetaParser.parse(getXsdPath(), getMetaXmlPath());
     } catch (SAXException | JAXBException e) {
       e.printStackTrace();
     }
-
-    // load the content for each csv file described in the xml file
-    Collection<Tuple2<Csv, List<String>>> content = new HashSet<>();
-    try {
-      for (Csv csvFile : csv.collect()) {
-        List<String> lines = env.readTextFile(getCsvDir() + csvFile.getName())
-          .collect();
-        content.add(new Tuple2<Csv, List<String>>(csvFile, lines));
+    List<CsvExtension> csvList = Lists.newArrayList();
+    for (Domain domain : datasource.getDomain()) {
+      for (CsvExtension csv : domain.getCsv()) {
+        csv.setDatasourceName(datasource.getName());
+        csv.setDomainName(domain.getName());
+        csvList.add(csv);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
     }
 
-    DataSet<Tuple2<Csv, List<String>>> csvContent = env
-      .fromCollection(content);
+    // load the content for each csv file described in the xml file
+    CsvExtension first = csvList.remove(0);
+    DataSet<Tuple2<CsvExtension, List<String>>> csvContent = env
+      .readTextFile(getCsvDir() + first.getName())
+      .reduceGroup(new CSVToContent(first));
+    for (CsvExtension csvFile : csvList) {
+      csvContent
+        .union(env
+          .readTextFile(getCsvDir() + csvFile.getName())
+          .reduceGroup(new CSVToContent(first)));
+    }
 
     //map each content line to an epgm element
     DataSet<EPGMElement> elements = csvContent
@@ -146,6 +141,18 @@ public class CSVDataSource extends CSVBase implements DataSource {
     DataSet<Map<String, GradoopId>> vertexIds = vertices
       .map(new VertexToVertexIds())
       .reduceGroup(new VertexIdsToMap());
+
+    try {
+      vertexIds.print();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    try {
+      System.out.println("vertexIds.count() = " + vertexIds.count());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     //get all edges and adjust the vertex keys to their corresponding gradoop id
     edges = elements
