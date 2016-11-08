@@ -459,7 +459,7 @@ public class GraphCollection extends GraphBase implements
 
   /**
    * Creates a graph collection from a graph transaction dataset.
-   * Overlapping vertices and edge are merged by Id comparison only.
+   * Overlapping vertices and edge are merged by IdEntry comparison only.
    *
    * @param transactions  transaction dataset
    * @return graph collection
