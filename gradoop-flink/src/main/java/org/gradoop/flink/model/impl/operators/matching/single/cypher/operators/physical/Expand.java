@@ -23,9 +23,11 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
 /**
- * Expands an Edge along the edges. The number of hops can be specified via upper and lower bound
+ * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
  * The input embedding is appended by 2 Entries, the first one represents the path, the second one the
  * end vertex
+ *
+ * Embedding ->
  */
 public class Expand implements PhysicalOperator {
 

@@ -47,6 +47,14 @@ public class Embedding {
   }
 
   /**
+   * Returns a list of all entries
+   * @return entry list
+   */
+  public List<EmbeddingEntry> getEntries() {
+    return entries;
+  }
+
+  /**
    * Adds an entry at the end of the list.
    * @param entry entry that will be appended
    */
@@ -55,13 +63,43 @@ public class Embedding {
   }
 
   /**
+   * Adds a list of entries
+   * @param other entry list
+   */
+  public void addEntries(List<EmbeddingEntry> other) { entries.addAll(other); }
+
+  /**
    * Add an entry to the list at a specified index, replace what was there before
    * @param index the index where the entry will be inserted
    * @param entry the entry
    */
-  public void setEntry(Integer index, EmbeddingEntry entry) { entries.set(index,entry); }
+  public void setEntry(Integer index, EmbeddingEntry entry) { entries.set(index, entry); }
 
+  /**
+   * Returns number of entries in the embedding
+   * @return embedding size
+   */
   public int size() {
     return entries.size();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Embedding embedding = (Embedding) o;
+
+    return entries != null ? entries.equals(embedding.entries) : embedding.entries == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    return entries != null ? entries.hashCode() : 0;
   }
 }

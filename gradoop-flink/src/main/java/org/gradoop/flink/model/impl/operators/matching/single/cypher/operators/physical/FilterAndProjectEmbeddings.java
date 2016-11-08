@@ -28,11 +28,11 @@ import java.util.List;
  * Filters a List of Embeddings by predicates and projects the remaining to the specified properties
  * The resulting embeddings have the same schema as the input embeddings
  */
-public class FilterAndProjectEmbeddings implements PhysicalOperator{
+public class FilterAndProjectEmbeddings implements PhysicalOperator {
 
   private final DataSet<Embedding> input;
   private final CNF predicates;
-  private final HashMap<Integer,List<String>> propertyKeys;
+  private final HashMap<Integer, List<String>> propertyKeys;
 
   /**
    * New Operator
@@ -42,7 +42,7 @@ public class FilterAndProjectEmbeddings implements PhysicalOperator{
    * @param propertyKeys HashMap of property labels, keys are the columns of the entry, values are property keys
    */
   public FilterAndProjectEmbeddings(DataSet<Embedding> input, CNF predicates,
-    HashMap<Integer,List<String>> propertyKeys) {
+    HashMap<Integer, List<String>> propertyKeys) {
     this.input = input;
     this.predicates = predicates;
     this.propertyKeys = propertyKeys;

@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
 /**
- * Expands an Edge along the edges by one hop in the given direction
+ * Expands a vertex along the edges by one hop in the given direction
  * The input embedding is appended by 2 entries
  */
 public class ExpandOne implements PhysicalOperator {

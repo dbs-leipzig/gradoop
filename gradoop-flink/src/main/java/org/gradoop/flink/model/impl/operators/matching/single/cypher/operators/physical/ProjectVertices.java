@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Projects a set of vertices
- * The returned embedding consists of one entry Projection(vertex)
+ * The returned embedding consists of one entry ProjectionEntry(vertex)
  */
 public class ProjectVertices implements PhysicalOperator {
 

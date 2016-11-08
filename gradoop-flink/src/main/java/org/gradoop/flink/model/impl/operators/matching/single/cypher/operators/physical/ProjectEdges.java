@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Projects a set of edges
- * The returned embedding consists of 3 entries Id(sourceID), Projection(edge), Id(targetId)
+ * The returned embedding consists of 3 entries IdEntry(sourceID), ProjectionEntry(edge), IdEntry(targetId)
  */
 public class ProjectEdges implements PhysicalOperator {
 

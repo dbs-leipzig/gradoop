@@ -24,7 +24,7 @@ import org.s1ck.gdl.model.cnf.CNF;
 
 /**
  * Filters a List of Edges by predicates and projects the remaining edges to the specified properties
- * Returns Embedding with three columns Id(sourceID), Id(Edge), Id(targetId)
+ * Returns Embedding with three columns IdEntry(sourceID), IdEntry(Edge), IdEntry(targetId)
  */
 public class FilterEdges implements PhysicalOperator {
   /**

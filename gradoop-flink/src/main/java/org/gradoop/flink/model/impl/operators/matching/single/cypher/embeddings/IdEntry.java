@@ -20,11 +20,13 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
+import java.util.Optional;
+
 /**
  * This is the simplest form an embedding entry.
  * It consists only of the element id.
  */
-public class Id implements EmbeddingEntry {
+public class IdEntry implements EmbeddingEntry {
   /**
    * The elements identifier
    */
@@ -34,7 +36,7 @@ public class Id implements EmbeddingEntry {
    * Create a new id entry
    * @param id the elements id
    */
-  public Id(GradoopId id) {
+  public IdEntry(GradoopId id) {
     this.id = id;
   }
 
@@ -47,7 +49,27 @@ public class Id implements EmbeddingEntry {
    * Since we don't store any properties return an empty list
    * @return empty propertyList
    */
-  public PropertyList getProperties() {
-    return new PropertyList();
+  public Optional<PropertyList> getProperties() {
+    return Optional.empty();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    IdEntry idEntry1 = (IdEntry) o;
+
+    return id != null ? id.equals(idEntry1.id) : idEntry1.id == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    return id != null ? id.hashCode() : 0;
   }
 }

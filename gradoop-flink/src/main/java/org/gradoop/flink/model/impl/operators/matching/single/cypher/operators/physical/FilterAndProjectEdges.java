@@ -26,9 +26,9 @@ import java.util.List;
 
 /**
  * Filters a List of Edges by predicates and projects the remaining edges to the specified properties
- * Returns Embedding with three columns Id(sourceID), Projection(Edge), Id(targetId)
+ * Returns Embedding with three columns IdEntry(sourceID), ProjectionEntry(Edge), IdEntry(targetId)
  */
-public class FilterAndProjectEdges implements PhysicalOperator{
+public class FilterAndProjectEdges implements PhysicalOperator {
 
   private final DataSet<Edge> input;
   private final CNF predicates;

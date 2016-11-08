@@ -20,13 +20,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
 import org.s1ck.gdl.model.cnf.CNF;
 
 import java.util.List;
 
 /**
  * Filters a List of Vertices by predicates and projects the remaining vertices to the specified properties
- * Returns one {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Projection} entry
+ * Returns one {@link ProjectionEntry} entry
  */
 public class FilterAndProjectVertices implements PhysicalOperator{
 

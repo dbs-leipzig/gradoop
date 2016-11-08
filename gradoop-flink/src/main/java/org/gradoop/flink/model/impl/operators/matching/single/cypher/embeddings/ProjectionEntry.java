@@ -21,10 +21,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
+import java.util.Optional;
+
 /**
  * Represents an element with attached properties
  */
-public class Projection implements EmbeddingEntry {
+public class ProjectionEntry implements EmbeddingEntry {
   /**
    * the elements identifier
    */
@@ -38,7 +40,7 @@ public class Projection implements EmbeddingEntry {
    * Create a new projection entry with empty property list
    * @param id element id
    */
-  public Projection(GradoopId id) {
+  public ProjectionEntry(GradoopId id) {
     this(id, new PropertyList());
   }
 
@@ -47,7 +49,7 @@ public class Projection implements EmbeddingEntry {
    * @param id element id
    * @param properties property list
    */
-  public Projection(GradoopId id, PropertyList properties) {
+  public ProjectionEntry(GradoopId id, PropertyList properties) {
     this.id = id;
     this.properties = properties;
   }
@@ -62,7 +64,7 @@ public class Projection implements EmbeddingEntry {
   /**
    * {@inheritDoc}
    */
-  public PropertyList getProperties() { return properties; }
+  public Optional<PropertyList> getProperties() { return Optional.of(properties); }
 
   /**
    * Adds a property to the list
@@ -76,7 +78,32 @@ public class Projection implements EmbeddingEntry {
    * Replaces the property list with a new one
    * @param properties new properties
    */
-  public void setProperties (PropertyList properties) {
+  public void setProperties(PropertyList properties) {
     this.properties = properties;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ProjectionEntry that = (ProjectionEntry) o;
+
+    if (id != null ? !id.equals(that.id) : that.id != null) {
+      return false;
+    }
+    return properties != null ? properties.equals(that.properties) : that.properties == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (properties != null ? properties.hashCode() : 0);
+    return result;
   }
 }
