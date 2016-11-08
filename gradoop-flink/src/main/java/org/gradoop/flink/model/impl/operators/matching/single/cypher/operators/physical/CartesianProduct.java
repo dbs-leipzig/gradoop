@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
+import org.apache.flink.api.common.operators.base.CrossOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 
@@ -27,6 +28,7 @@ public class CartesianProduct implements PhysicalOperator{
 
   private final DataSet<Embedding> lhs;
   private final DataSet<Embedding> rhs;
+  private final CrossOperatorBase.CrossHint crossHint;
 
   /**
    * New Cartesian Product Operator
@@ -34,9 +36,19 @@ public class CartesianProduct implements PhysicalOperator{
    * @param lhs the left hand side embedding
    * @param rhs the right hand side embedding
    */
-  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs) {
+  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs, CrossOperatorBase.CrossHint crossHint) {
     this.lhs = lhs;
     this.rhs = rhs;
+    this.crossHint = crossHint;
+  }
+
+  /**
+   * New Cartesian Product Operator with default cross hint
+   * @param lhs left hand side embedding
+   * @param rhs right hand side embedding
+   */
+  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs) {
+    this(lhs,rhs, CrossOperatorBase.CrossHint.OPTIMIZER_CHOOSES);
   }
 
   @Override
