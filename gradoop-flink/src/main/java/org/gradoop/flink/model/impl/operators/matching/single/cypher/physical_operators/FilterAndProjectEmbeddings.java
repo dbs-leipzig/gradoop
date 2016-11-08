@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 public class FilterAndProjectEmbeddings implements PhysicalOperator{
 
-  private DataSet<Embedding> input;
+  private final DataSet<Embedding> input;
   private final CNF predicates;
   private final HashMap<Integer,List<String>> propertyKeys;
 

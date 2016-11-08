@@ -18,28 +18,33 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-
-import java.util.List;
+import org.s1ck.gdl.model.cnf.CNF;
 
 /**
- * Projects a set of edges
- * The returned embedding consists of 3 entries Id(sourceID), Projection(edge), Id(targetId)
+ * This operator joins two possibly disjunct data sets by predicates only concerning properties
+ * e.g.
+ * <pre>
+ *   MATCH (a:Department), (b)-[:X]->(c:Person {name: "Max") WHERE a.prop = b.prop
+ * </pre>
  */
-public class ProjectEdges implements PhysicalOperator {
+public class ValueJoin implements PhysicalOperator {
 
-  private final DataSet<Edge> input;
-  private final List<String> propertyKeys;
+  private final DataSet<Embedding> lhs;
+  private final DataSet<Embedding> rhs;
+  private final CNF joinCriteria;
 
   /**
-   * New edge projection operator
-   * @param input Candidate edges
-   * @param propertyKeys List of property keys that will be included in the projection
+   * New value join operator
+   *
+   * @param lhs left hand side data set
+   * @param rhs right hand side data set
+   * @param joinCriteria join criteria
    */
-  public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
-    this.input = input;
-    this.propertyKeys = propertyKeys;
+  public ValueJoin(DataSet<Embedding> lhs, DataSet<Embedding> rhs, CNF joinCriteria) {
+    this.lhs = lhs;
+    this.rhs = rhs;
+    this.joinCriteria = joinCriteria;
   }
 
   @Override

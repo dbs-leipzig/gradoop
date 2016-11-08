@@ -20,22 +20,46 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a (partial) embedding of a query.
+ * An Embedding consists of a list of {@link EmbeddingEntry} which represent the vertices and edges
+ */
 public class Embedding {
+  /**
+   * List of entries in this embedding
+   */
   private List<EmbeddingEntry> entries;
 
+  /**
+   * Creates a new empty Embedding
+   */
   public Embedding() {
     entries = new ArrayList<>();
   }
 
+  /**
+   * Returns an entry specified by the index in the list
+   * @param index the entries index in the list
+   * @return the entry
+   */
   public EmbeddingEntry getEntry(int index) {
     return entries.get(index);
   }
 
+  /**
+   * Adds an entry at the end of the list.
+   * @param entry entry that will be appended
+   */
   public void addEntry(EmbeddingEntry entry) {
     entries.add(entry);
   }
 
-  public void setEntry(Integer column, EmbeddingEntry entry) { entries.set(column,entry); }
+  /**
+   * Add an entry to the list at a specified index, replace what was there before
+   * @param index the index where the entry will be inserted
+   * @param entry the entry
+   */
+  public void setEntry(Integer index, EmbeddingEntry entry) { entries.set(index,entry); }
 
   public int size() {
     return entries.size();

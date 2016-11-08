@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -29,11 +30,11 @@ public class FilterEdges implements PhysicalOperator {
   /**
    * Input Edges
    */
-  private DataSet<Edge> input;
+  private final DataSet<Edge> input;
   /**
    * Predicates in conjunctive normal form
    */
-  private CNF predicates;
+  private final CNF predicates;
 
 
   /**

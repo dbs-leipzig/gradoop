@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -28,8 +29,8 @@ import java.util.List;
  */
 public class ProjectVertices implements PhysicalOperator {
 
-  private DataSet<Vertex> input;
-  private List<String> propertyKeys;
+  private final DataSet<Vertex> input;
+  private final List<String> propertyKeys;
 
   /**
    * New vertex projection operator

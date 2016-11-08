@@ -14,20 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
+/**
+ * This is the simplest form an embedding entry.
+ * It consists only of the element id.
+ */
 public class Id implements EmbeddingEntry {
+  /**
+   * The elements identifier
+   */
   private GradoopId id;
 
+  /**
+   * Create a new id entry
+   * @param id the elements id
+   */
   public Id(GradoopId id) {
     this.id = id;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public GradoopId getId() { return id; }
 
+  /**
+   * Since we don't store any properties return an empty list
+   * @return empty propertyList
+   */
   public PropertyList getProperties() {
     return new PropertyList();
   }

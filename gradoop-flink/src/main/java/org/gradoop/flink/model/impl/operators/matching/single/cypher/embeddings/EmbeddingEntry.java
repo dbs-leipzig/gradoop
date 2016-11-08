@@ -19,8 +19,19 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
 
+/**
+ * Represents an entry in an embedding
+ */
 public interface EmbeddingEntry {
+  /**
+   * Returns the identifier of the element
+   * @return id
+   */
   GradoopId getId();
 
+  /**
+   * Returns the list of properties of this element
+   * @return properties
+   */
   PropertyList getProperties();
 }
