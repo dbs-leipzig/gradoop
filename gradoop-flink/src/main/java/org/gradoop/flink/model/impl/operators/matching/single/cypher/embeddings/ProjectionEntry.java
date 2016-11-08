@@ -64,7 +64,9 @@ public class ProjectionEntry implements EmbeddingEntry {
   /**
    * {@inheritDoc}
    */
-  public Optional<PropertyList> getProperties() { return Optional.of(properties); }
+  public Optional<PropertyList> getProperties() {
+    return Optional.of(properties);
+  }
 
   /**
    * Adds a property to the list

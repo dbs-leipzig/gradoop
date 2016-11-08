@@ -29,7 +29,11 @@ import java.util.Optional;
  * This is used e.g. for paths with variable path length where the access specific
  * elements is not necessary.
  */
-public class ListEntry implements EmbeddingEntry{
+public class ListEntry implements EmbeddingEntry {
+
+  /**
+   * Contains the path represented by element ids
+   */
   private List<GradoopId> path;
 
   /**

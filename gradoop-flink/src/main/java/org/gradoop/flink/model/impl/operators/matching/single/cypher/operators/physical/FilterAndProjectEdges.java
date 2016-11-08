@@ -25,13 +25,23 @@ import org.s1ck.gdl.model.cnf.CNF;
 import java.util.List;
 
 /**
- * Filters a List of Edges by predicates and projects the remaining edges to the specified properties
+ * Filters a List of Edges by predicates and projects the remaining edges to the s
+ * pecified properties
  * Returns Embedding with three columns IdEntry(sourceID), ProjectionEntry(Edge), IdEntry(targetId)
  */
 public class FilterAndProjectEdges implements PhysicalOperator {
 
+  /**
+   * Candidate Edges
+   */
   private final DataSet<Edge> input;
+  /**
+   * Predicates used for filtering in Conjunctive Normal Form
+   */
   private final CNF predicates;
+  /**
+   * List of property names that will be keept in the projection
+   */
   private final List<String> propertyKeys;
 
   /**

@@ -29,19 +29,27 @@ import java.util.List;
  */
 public class ProjectEmbeddings implements PhysicalOperator {
 
+  /**
+   * Input Embeddings
+   */
   private final DataSet<Embedding> input;
-  private final HashMap<Integer,List<String>> propertyKeys;
+  /**
+   * Names of the properties that will be kept in the projection
+   */
+  private final HashMap<Integer, List<String>> propertyKeys;
 
   /**
    * Creates a new embedding projection operator
    * @param input Embeddings that should be projected
-   * @param propertyKeys HashMap of property labels, keys are the columns of the entry, values are property keys
+   * @param propertyKeys HashMap of property labels, keys are the columns of the entry,
+   *                     values are property keys
    */
-  public ProjectEmbeddings(DataSet<Embedding> input, HashMap<Integer,List<String>> propertyKeys) {
+  public ProjectEmbeddings(DataSet<Embedding> input, HashMap<Integer, List<String>> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
   }
 
+  @Override
   public DataSet<Embedding> evaluate() {
     return null;
   }

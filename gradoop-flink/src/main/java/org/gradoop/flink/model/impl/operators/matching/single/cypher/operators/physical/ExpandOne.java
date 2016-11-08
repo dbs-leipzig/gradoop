@@ -28,14 +28,29 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Expan
  */
 public class ExpandOne implements PhysicalOperator {
 
+  /**
+   * Input embeddings
+   */
   private final DataSet<Embedding> input;
+  /**
+   * Edge candidates along which we expand
+   */
   private final DataSet<Embedding> candidateEdges;
+  /**
+   * Column of the input embedding which we will expand
+   */
   private final int expandColumn;
+  /**
+   * Expand direction
+   */
   private final ExpandDirection direction;
+  /**
+   * Join Hint
+   */
   private final JoinOperatorBase.JoinHint joinHint;
 
   /**
-   * New Expand One Operator
+   * New ExpandOne operator
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
@@ -52,9 +67,19 @@ public class ExpandOne implements PhysicalOperator {
     this.joinHint = joinHint;
   }
 
+  /**
+   * New ExpandOne operator with default join hint
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   */
   public ExpandOne(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     ExpandDirection direction) {
-    this(input, candidateEdges, expandColumn, direction, JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST);
+
+    this(input, candidateEdges, expandColumn, direction,
+      JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST);
   }
 
   @Override

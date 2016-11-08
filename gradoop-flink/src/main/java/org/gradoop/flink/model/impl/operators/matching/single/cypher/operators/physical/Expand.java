@@ -24,19 +24,38 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Expan
 
 /**
  * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
- * The input embedding is appended by 2 Entries, the first one represents the path, the second one the
- * end vertex
- *
- * Embedding ->
+ * The input embedding is appended by 2 Entries, the first one represents the path,
+ * the second one the end vertex
  */
 public class Expand implements PhysicalOperator {
 
+  /**
+   * Input Embeddings
+   */
   private final DataSet<Embedding> input;
+  /**
+   * Candidate edges
+   */
   private final DataSet<Embedding> candidateEdges;
+  /**
+   * specifies the input column that will be expanded
+   */
   private final int expandColumn;
+  /**
+   * minimum hops
+   */
   private final int lowerBound;
+  /**
+   * maximum hops
+   */
   private final int upperBound;
+  /**
+   * expand direction
+   */
   private final ExpandDirection direction;
+  /**
+   * join hint
+   */
   private final JoinOperatorBase.JoinHint joinHint;
 
   /**
@@ -61,6 +80,16 @@ public class Expand implements PhysicalOperator {
     this.joinHint = joinHint;
   }
 
+  /**
+   * New Expand One Operator with default join hint
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param lowerBound specifies the minimum hops we want to expand
+   * @param upperBound specifies the maximum hops we want to expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction) {
 

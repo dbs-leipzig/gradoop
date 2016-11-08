@@ -23,7 +23,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 import org.s1ck.gdl.model.cnf.CNF;
 
 /**
- * Filters a List of Edges by predicates and projects the remaining edges to the specified properties
+ * Filters a List of Edges by predicates and projects the remaining edges to the specified
+ * properties
  * Returns Embedding with three columns IdEntry(sourceID), IdEntry(Edge), IdEntry(targetId)
  */
 public class FilterEdges implements PhysicalOperator {
@@ -47,6 +48,7 @@ public class FilterEdges implements PhysicalOperator {
     this.predicates = predicates;
   }
 
+  @Override
   public DataSet<Embedding> evaluate() {
 
     return null;

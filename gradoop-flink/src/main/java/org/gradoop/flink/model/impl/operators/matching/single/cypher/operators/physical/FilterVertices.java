@@ -38,12 +38,18 @@ public class FilterVertices implements PhysicalOperator {
    */
   private final CNF predicates;
 
-
+  /**
+   * New vertex filter operator
+   *
+   * @param input candidate vertices
+   * @param predicates predicates used for filtering
+   */
   public FilterVertices(DataSet<Vertex> input, CNF predicates) {
     this.input = input;
     this.predicates = predicates;
   }
 
+  @Override
   public DataSet<Embedding> evaluate() {
 
     return null;

@@ -66,14 +66,18 @@ public class Embedding {
    * Adds a list of entries
    * @param other entry list
    */
-  public void addEntries(List<EmbeddingEntry> other) { entries.addAll(other); }
+  public void addEntries(List<EmbeddingEntry> other) {
+    entries.addAll(other);
+  }
 
   /**
    * Add an entry to the list at a specified index, replace what was there before
    * @param index the index where the entry will be inserted
    * @param entry the entry
    */
-  public void setEntry(Integer index, EmbeddingEntry entry) { entries.set(index, entry); }
+  public void setEntry(Integer index, EmbeddingEntry entry) {
+    entries.set(index, entry);
+  }
 
   /**
    * Returns number of entries in the embedding

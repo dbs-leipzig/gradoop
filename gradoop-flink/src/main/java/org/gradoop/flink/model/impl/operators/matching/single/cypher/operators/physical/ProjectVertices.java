@@ -29,7 +29,13 @@ import java.util.List;
  */
 public class ProjectVertices implements PhysicalOperator {
 
+  /**
+   * Candidate vertices
+   */
   private final DataSet<Vertex> input;
+  /**
+   * Names of the properties that will be kept in the projection
+   */
   private final List<String> propertyKeys;
 
   /**
@@ -43,6 +49,7 @@ public class ProjectVertices implements PhysicalOperator {
     this.propertyKeys = propertyKeys;
   }
 
+  @Override
   public DataSet<Embedding> evaluate() {
     return null;
   }

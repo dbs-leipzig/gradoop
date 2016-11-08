@@ -30,8 +30,17 @@ import org.s1ck.gdl.model.cnf.CNF;
  */
 public class ValueJoin implements PhysicalOperator {
 
+  /**
+   * Embeddings of the left side
+   */
   private final DataSet<Embedding> lhs;
+  /**
+   * Embeddings of the right side
+   */
   private final DataSet<Embedding> rhs;
+  /**
+   * predicates used for the join
+   */
   private final CNF joinCriteria;
 
   /**

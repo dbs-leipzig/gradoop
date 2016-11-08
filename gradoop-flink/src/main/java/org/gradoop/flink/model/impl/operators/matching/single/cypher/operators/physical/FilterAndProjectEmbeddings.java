@@ -30,8 +30,17 @@ import java.util.List;
  */
 public class FilterAndProjectEmbeddings implements PhysicalOperator {
 
+  /**
+   * CandidateEmbeddings
+   */
   private final DataSet<Embedding> input;
+  /**
+   * Predicates used for filtering in Conjunctive Normal Form
+   */
   private final CNF predicates;
+  /**
+   * Property names that will be kept in projection. Hash keys defines column index
+   */
   private final HashMap<Integer, List<String>> propertyKeys;
 
   /**
@@ -39,7 +48,8 @@ public class FilterAndProjectEmbeddings implements PhysicalOperator {
    *
    * @param input Candidate Embeddings
    * @param predicates Predicates that will be used to filter candidates
-   * @param propertyKeys HashMap of property labels, keys are the columns of the entry, values are property keys
+   * @param propertyKeys HashMap of property labels, keys are the columns of the entry,
+   *                     values are property keys
    */
   public FilterAndProjectEmbeddings(DataSet<Embedding> input, CNF predicates,
     HashMap<Integer, List<String>> propertyKeys) {

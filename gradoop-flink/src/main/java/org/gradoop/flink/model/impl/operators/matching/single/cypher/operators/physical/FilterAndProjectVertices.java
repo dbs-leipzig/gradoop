@@ -26,13 +26,23 @@ import org.s1ck.gdl.model.cnf.CNF;
 import java.util.List;
 
 /**
- * Filters a List of Vertices by predicates and projects the remaining vertices to the specified properties
+ * Filters a List of Vertices by predicates and projects the remaining vertices to the
+ * specified properties
  * Returns one {@link ProjectionEntry} entry
  */
-public class FilterAndProjectVertices implements PhysicalOperator{
+public class FilterAndProjectVertices implements PhysicalOperator {
 
+  /**
+   * Candidate vertices
+   */
   private final DataSet<Vertex> input;
+  /**
+   * Predicates used for filtering in Conjunctive Normal Form
+   */
   private final CNF predicates;
+  /**
+   * Property names that will be kept in projection
+   */
   private final List<String> propertyKeys;
 
   /**
@@ -42,7 +52,8 @@ public class FilterAndProjectVertices implements PhysicalOperator{
    * @param predicates Predicates that will be used to filter candidate vertices
    * @param propertyKeys List of property keys that will be used for projection
    */
-  public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates, List<String> propertyKeys) {
+  public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates,
+    List<String> propertyKeys) {
     this.input = input;
     this.predicates = predicates;
     this.propertyKeys = propertyKeys;

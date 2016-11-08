@@ -25,10 +25,25 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
  */
 public class JoinEmbeddings implements PhysicalOperator {
 
+  /**
+   * Left hand side embeddings
+   */
   private final DataSet<Embedding> lhs;
+  /**
+   * Right hand side embeddings
+   */
   private final DataSet<Embedding> rhs;
+  /**
+   * left side join column
+   */
   private final int lhsColumn;
+  /**
+   * right side join column
+   */
   private final int rhsColumn;
+  /**
+   * Join Hint
+   */
   private final JoinOperatorBase.JoinHint joinHint;
 
   /**
@@ -49,8 +64,17 @@ public class JoinEmbeddings implements PhysicalOperator {
     this.joinHint = joinHint;
   }
 
-  public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn, int rhsColumn) {
-    this(lhs, rhs, lhsColumn, rhsColumn, JoinOperatorBase.JoinHint .BROADCAST_HASH_FIRST);
+  /**
+   * New Join operator with default join hint
+   *
+   * @param lhs embeddings of the left side of the join
+   * @param rhs embeddings of the right side of the join
+   * @param lhsColumn specifies the join column of the left hand side
+   * @param rhsColumn specifies the join column of the left hand side
+   */
+  public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,
+    int rhsColumn) {
+    this(lhs, rhs, lhsColumn, rhsColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   @Override

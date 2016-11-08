@@ -43,7 +43,9 @@ public class IdEntry implements EmbeddingEntry {
   /**
    * {@inheritDoc}
    */
-  public GradoopId getId() { return id; }
+  public GradoopId getId() {
+    return id;
+  }
 
   /**
    * Since we don't store any properties return an empty list
