@@ -14,33 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 
 /**
- * Creates the Cartesian Product of two embeddings.
+ * Physical Operators are used to transform input data into Embeddings
+ * Chaining physical operators will execute a query
  */
-public class CartesianProduct implements PhysicalOperator{
-
-  private final DataSet<Embedding> lhs;
-  private final DataSet<Embedding> rhs;
+public interface PhysicalOperator {
 
   /**
-   * New Cartesian Product Operator
-   *
-   * @param lhs the left hand side embedding
-   * @param rhs the right hand side embedding
+   * Runs the operator on the input data
+   * @return The resulting embedding
    */
-  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs) {
-    this.lhs = lhs;
-    this.rhs = rhs;
-  }
+  DataSet<Embedding> evaluate();
 
-  @Override
-  public DataSet<Embedding> evaluate() {
-    return null;
-  }
 }

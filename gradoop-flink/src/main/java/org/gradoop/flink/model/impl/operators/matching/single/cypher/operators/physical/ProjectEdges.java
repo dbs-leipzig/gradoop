@@ -15,35 +15,30 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.s1ck.gdl.model.cnf.CNF;
 
 import java.util.List;
 
 /**
- * Filters a List of Vertices by predicates and projects the remaining vertices to the specified properties
- * Returns one {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Projection} entry
+ * Projects a set of edges
+ * The returned embedding consists of 3 entries Id(sourceID), Projection(edge), Id(targetId)
  */
-public class FilterAndProjectVertices implements PhysicalOperator{
+public class ProjectEdges implements PhysicalOperator {
 
-  private final DataSet<Vertex> input;
-  private final CNF predicates;
+  private final DataSet<Edge> input;
   private final List<String> propertyKeys;
 
   /**
-   * New Operator
-   *
-   * @param input Candidate vertices
-   * @param predicates Predicates that will be used to filter candidate vertices
-   * @param propertyKeys List of property keys that will be used for projection
+   * New edge projection operator
+   * @param input Candidate edges
+   * @param propertyKeys List of property keys that will be included in the projection
    */
-  public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates, List<String> propertyKeys) {
+  public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
     this.input = input;
-    this.predicates = predicates;
     this.propertyKeys = propertyKeys;
   }
 

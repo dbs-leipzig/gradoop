@@ -15,41 +15,36 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.s1ck.gdl.model.cnf.CNF;
 
-import java.util.HashMap;
-import java.util.List;
-
 /**
- * Filters a List of Embeddings by predicates and projects the remaining to the specified properties
- * The resulting embeddings have the same schema as the input embeddings
+ * Filters a set of Vertices by the given predicates
+ * Returns an Embedding with one
+ * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Id} entry
  */
-public class FilterAndProjectEmbeddings implements PhysicalOperator{
-
-  private final DataSet<Embedding> input;
-  private final CNF predicates;
-  private final HashMap<Integer,List<String>> propertyKeys;
-
+public class FilterVertices implements PhysicalOperator {
   /**
-   * New Operator
-   *
-   * @param input Candidate Embeddings
-   * @param predicates Predicates that will be used to filter candidates
-   * @param propertyKeys HashMap of property labels, keys are the columns of the entry, values are property keys
+   * Input vertices
    */
-  public FilterAndProjectEmbeddings(DataSet<Embedding> input, CNF predicates,
-    HashMap<Integer,List<String>> propertyKeys) {
+  private final DataSet<Vertex> input;
+  /**
+   * Predicates in conjunctive normal form
+   */
+  private final CNF predicates;
+
+
+  public FilterVertices(DataSet<Vertex> input, CNF predicates) {
     this.input = input;
     this.predicates = predicates;
-    this.propertyKeys = propertyKeys;
   }
 
-  @Override
   public DataSet<Embedding> evaluate() {
+
     return null;
   }
 }

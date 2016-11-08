@@ -15,39 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.physical_operators;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.s1ck.gdl.model.cnf.CNF;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
- * Filters a set of Embeddings by the given predicates
- * The resulting embeddings have the same schema as the input embeddings
+ * Projects an Embedding by a set of properties.
+ * For each entry in the embedding a different property set can be specified
  */
-public class FilterEmbeddings implements PhysicalOperator {
-  /**
-   * Candidate Embeddings
-   */
+public class ProjectEmbeddings implements PhysicalOperator {
+
   private final DataSet<Embedding> input;
-  /**
-   * Predicates in conjunctive normal form
-   */
-  private CNF predicates;
-
+  private final HashMap<Integer,List<String>> propertyKeys;
 
   /**
-   * New embedding filter operator
-   * @param input Candidate embeddings
-   * @param predicates Predicates to used for filtering
+   * Creates a new embedding projection operator
+   * @param input Embeddings that should be projected
+   * @param propertyKeys HashMap of property labels, keys are the columns of the entry, values are property keys
    */
-  public FilterEmbeddings(DataSet<Embedding> input, CNF predicates) {
+  public ProjectEmbeddings(DataSet<Embedding> input, HashMap<Integer,List<String>> propertyKeys) {
     this.input = input;
-    this.predicates = predicates;
+    this.propertyKeys = propertyKeys;
   }
 
   public DataSet<Embedding> evaluate() {
-
     return null;
   }
 }
