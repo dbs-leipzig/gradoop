@@ -17,8 +17,8 @@
 
 package org.gradoop.examples;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -69,7 +69,7 @@ public abstract class AbstractRunner {
       formatter.printHelp(className, OPTIONS, true);
       return null;
     }
-    return new BasicParser().parse(OPTIONS, args);
+    return new DefaultParser().parse(OPTIONS, args);
   }
 
   /**
