@@ -17,17 +17,20 @@
 
 package org.gradoop.benchmark.patternmatching;
 
-import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.DataSetUtils;
-import org.apache.flink.util.Collector;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.BulkTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
@@ -37,55 +40,93 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Used to benchmark different {@link DistributedTraverser} implementations.
+ *
+ * The benchmarks expects the graph to be stored in two different directories:
+ *
+ * [inputDir]/vertices -> [unique vertex-id]
+ * [inputDir]/edges    -> [unique edge-id,source-vertex-id,target-vertex-id]
+ *
+ * All identifiers must be of type {@link Long}.
  */
-public class TraverserBenchmark implements ProgramDescription {
+public class TraverserBenchmark extends AbstractRunner {
+  /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_QUERY = "q";
+  /**
+   * Option to set the traverser
+   */
+  private static final String OPTION_TRAVERSER = "t";
+
+  static {
+    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
+    OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
+    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true, "[loop|bulk]");
+  }
 
   /**
-   * args[0] - Path to edge list
-   * args[1] - Query (q1, q2, ..., q7)
-   * args[2] - Iteration strategy (bulk/loop)
+   * Given a query pattern, the benchmark computes the number of matching
+   * subgraphs in the given data graph.
    *
-   * e.g. ... patternmatching.TraverserBenchmark web-Google.txt q2 bulk
+   * This benchmark currently supports structure only pattern. For semantic
+   * patterns use {@link PatternMatching}.
+   *
+   * usage: org.gradoop.benchmark.patternmatching.TraverserBenchmark
+   * [-i <arg>] [-q <arg>] [-t <arg>]
+   * -i,--input <arg>       Graph directory
+   * -q,--query <arg>       Pattern or fixed query (e.g. q2 or "(a)-->(b)")
+   * -t,--traverser <arg>   [loop|bulk]
    *
    * @param args program arguments
    */
   public static void main(String[] args) throws Exception {
-    String inputPath   = args[0];
-    String queryString = args[1];
-    String itStrategy  = args[2];
+    CommandLine cmd = parseArguments(args, TraverserBenchmark.class.getName());
+    if (cmd == null) {
+      System.exit(1);
+    }
+    String inputPath   = cmd.getOptionValue(OPTION_INPUT_PATH);
+    String queryString = cmd.getOptionValue(OPTION_QUERY);
+    String itStrategy  = cmd.getOptionValue(OPTION_TRAVERSER);
 
     IterationStrategy iterationStrategy = (itStrategy.equals("bulk")) ?
       IterationStrategy.BULK_ITERATION : IterationStrategy.LOOP_UNROLLING;
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    // parse query
-    // Q?
-    Queries.Query query = getQuery(queryString);
-    int vertexCount     = query.getVertexCount();
-    int edgeCount       = query.getEdgeCount();
-    TraversalCode tc    = query.getTraversalCode();
-    // GDL
-//    QueryHandler query  = new QueryHandler(queryString);
-//    int vertexCount     = query.getVertexCount();
-//    int edgeCount       = query.getEdgeCount();
-//    Traverser traverser = new DFSTraverser();
-//    traverser.setQueryHandler(query);
-//    TraversalCode tc    = traverser.traverse();
+    int vertexCount;
+    int edgeCount;
+    TraversalCode tc;
 
-    // read edge list graph
-    DataSet<Tuple2<Long, Long>> edgeList = env.readCsvFile(inputPath)
-      .fieldDelimiter("\t")
-      .ignoreComments("#")
-      .types(Long.class, Long.class);
+    if (queryString.toLowerCase().startsWith("q")) {
+      // fixed query
+      Queries.Query query = getQuery(queryString.toLowerCase());
+      vertexCount = query.getVertexCount();
+      edgeCount = query.getEdgeCount();
+      tc = query.getTraversalCode();
+    } else {
+      // GDL query pattern
+      QueryHandler queryHandler = new QueryHandler(queryString);
+      vertexCount = queryHandler.getVertexCount();
+      edgeCount = queryHandler.getEdgeCount();
+      Traverser traverser = new DFSTraverser();
+      traverser.setQueryHandler(queryHandler);
+      tc = traverser.traverse();
+    }
 
-    DataSet<IdWithCandidates<Long>> vertices = edgeList
-      .flatMap(new GetVertexIds())
-      .distinct()
+    // read graph
+    DataSet<IdWithCandidates<Long>> vertices = env
+      .readCsvFile(inputPath + "vertices/")
+      .types(Long.class)
       .map(new GetIdWithCandidates(vertexCount));
 
-    DataSet<TripleWithCandidates<Long>> edges = DataSetUtils
-      .zipWithUniqueId(edgeList)
+    DataSet<TripleWithCandidates<Long>> edges = env
+      .readCsvFile(inputPath + "edges/")
+      .fieldDelimiter(",")
+      .types(Long.class, Long.class, Long.class)
       .map(new GetTriplesWithCandidates(edgeCount));
 
     // create distributed traverser
@@ -101,10 +142,12 @@ public class TraverserBenchmark implements ProgramDescription {
     // print embedding count
     long embeddingCount = distributedTraverser
       .traverse(vertices, edges).count();
+
     System.out.println("embeddingCount = " + embeddingCount);
 
     long duration = env.getLastJobExecutionResult()
       .getNetRuntime(TimeUnit.SECONDS);
+
     System.out.println("duration = " + duration);
   }
 
@@ -145,24 +188,10 @@ public class TraverserBenchmark implements ProgramDescription {
   }
 
   /**
-   * Returns the vertex identifiers from an edge tuple
-   */
-  public static class GetVertexIds
-    implements FlatMapFunction<Tuple2<Long, Long>, Long> {
-
-    @Override
-    public void flatMap(Tuple2<Long, Long> value, Collector<Long> out)
-      throws Exception {
-      out.collect(value.f0);
-      out.collect(value.f1);
-    }
-  }
-
-  /**
    * Initializes {@link IdWithCandidates}
    */
   public static class GetIdWithCandidates
-    implements MapFunction<Long, IdWithCandidates<Long>> {
+    implements MapFunction<Tuple1<Long>, IdWithCandidates<Long>> {
     /**
      * Reduce object instantiations
      */
@@ -183,8 +212,8 @@ public class TraverserBenchmark implements ProgramDescription {
     }
 
     @Override
-    public IdWithCandidates<Long> map(Long value) throws Exception {
-      reuseTuple.setId(value);
+    public IdWithCandidates<Long> map(Tuple1<Long> value) throws Exception {
+      reuseTuple.setId(value.f0);
       return reuseTuple;
     }
   }
@@ -192,8 +221,8 @@ public class TraverserBenchmark implements ProgramDescription {
   /**
    * Initializes {@link IdWithCandidates}
    */
-  public static class GetTriplesWithCandidates implements MapFunction<
-      Tuple2<Long, Tuple2<Long, Long>>, TripleWithCandidates<Long>> {
+  public static class GetTriplesWithCandidates implements
+    MapFunction<Tuple3<Long, Long, Long>, TripleWithCandidates<Long>> {
     /**
      * Reduce object instantiations
      */
@@ -215,16 +244,11 @@ public class TraverserBenchmark implements ProgramDescription {
 
     @Override
     public TripleWithCandidates<Long> map(
-      Tuple2<Long, Tuple2<Long, Long>> value) throws Exception {
+      Tuple3<Long, Long, Long> value) throws Exception {
       reuseTuple.setEdgeId(value.f0);
-      reuseTuple.setSourceId(value.f1.f0);
-      reuseTuple.setTargetId(value.f1.f1);
+      reuseTuple.setSourceId(value.f1);
+      reuseTuple.setTargetId(value.f2);
       return reuseTuple;
     }
-  }
-
-  @Override
-  public String getDescription() {
-    return TraverserBenchmark.class.getName();
   }
 }
