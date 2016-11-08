@@ -198,7 +198,7 @@
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <!-- Lines cannot exceed 80 chars -->
         <module name="LineLength">
-            <property name="max" value="80"/>
+            <property name="max" value="100"/>
             <property name="ignorePattern" value="^[import|package]|@see|@link"/>
         </module>
         <!-- Over time, we will revised this down -->
