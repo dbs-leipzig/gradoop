@@ -69,6 +69,19 @@ public class Queries {
   }
 
   /**
+   * (a)-->(b)
+   *
+   * (0)-0->(1)
+   *
+   * @return query q0
+   */
+  public static Query q0() {
+    TraversalCode tc = new TraversalCode();
+    tc.add(new Step(0L, 0L, 1L, true)); // (a)-->(b)
+    return new Query(tc, 2, 1);
+  }
+
+  /**
    * (a)-->(b)-->(a)
    *
    * (0)-0->(1)-1->(0)
