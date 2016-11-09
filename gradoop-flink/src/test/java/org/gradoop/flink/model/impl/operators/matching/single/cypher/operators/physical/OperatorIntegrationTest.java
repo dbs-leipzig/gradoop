@@ -36,12 +36,11 @@ import static org.gradoop.flink.model.impl.operators.matching.single.cypher.util
 
 public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
-
   /**
    * MATCH (p1:Person {name: "Alice"})-[r1:worked_at]->(o)
    * WHERE r1.active=1
    * RETURN *
-   */
+   *//*
   @Test
   public void simplePredicateQueryTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
@@ -80,12 +79,12 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
     System.out.println("res.collect() = " + res.collect());
   }
-​
-​  /**
+
+  *//**
    * MATCH (a:Person)-[]->(b:Person)
    * WHERE a.age > b.age OR a.name=b.name
    * RETURN *
-   */
+   *//*
   @Test
   public void CrossPredicateTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
@@ -133,12 +132,11 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     System.out.println("res.collect() = " + res.collect());
   }
 
-​
-  /**
+  *//**
    * MATCH (n)-[]->(m)-[]->(o)
    * RETURN *
-   */
-​  @Test
+   *//*
+  @Test
   public void homomorphismTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
 
@@ -154,11 +152,11 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     System.out.println("res.collect() = " + res.collect());
   }
 
-  /**
+  *//**
    * MATCH (n)-[]->(m)-[]->(o)
    * RETURN *
-   */
-​  @Test
+   *//*
+  @Test
   public void isomorphismTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
 
@@ -204,10 +202,10 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     System.out.println("res.collect() = " + res.collect());
   }
 
-  /**
+  *//**
    * MATCH (n)-[*2..3]->(m)
    * RETURN *
-   */
+   *//*
   @Test
   public void variableLengthPathQueryTest() throws Exception{
     LogicalGraph graph = loadGraph("","g");
@@ -221,12 +219,11 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
     System.out.println("res.collect() = " + res.collect());
   }
-​
 
-  /**
+  *//**
    * MATCH (a:Department), (b:City)
    * RETURN *
-   */
+   *//*
   @Test
   public void cartesianProductTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
@@ -254,11 +251,11 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     System.out.println("res.collect() = " + res.collect());
   }
 
-  /**
+  *//**
    * ⁠MATCH (a:Department), (b)-[]->(c:Person {name: "Alice")
    * WHERE a.prop = b.prop
    * RETURN *
-   */
+   *//*
   @Test
   public void valueJoinTest() throws Exception {
     LogicalGraph graph = loadGraph("","g");
@@ -318,5 +315,5 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
   private LogicalGraph loadGraph(String dataGraph, String variable) {
     FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
     return loader.getLogicalGraphByVariable(variable);
-  }
+  }*/
 }

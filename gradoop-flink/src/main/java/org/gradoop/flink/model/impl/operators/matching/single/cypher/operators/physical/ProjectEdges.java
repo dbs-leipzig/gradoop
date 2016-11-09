@@ -20,6 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.EdgeIdProjector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.EdgeProjector;
 
 import java.util.List;
 
@@ -51,6 +53,10 @@ public class ProjectEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    if(propertyKeys.isEmpty()) {
+      return input.map(new EdgeIdProjector());
+    } else {
+      return input.map(new EdgeProjector(propertyKeys));
+    }
   }
 }
