@@ -21,6 +21,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.s1ck.gdl.model.cnf.CNF;
 
+import java.util.HashMap;
+
 /**
  * Filters a set of Embeddings by the given predicates
  * The resulting embeddings have the same schema as the input embeddings
@@ -34,16 +36,23 @@ public class FilterEmbeddings implements PhysicalOperator {
    * Predicates in conjunctive normal form
    */
   private CNF predicates;
+  /**
+   * Maps variable names to embedding entries;
+   */
+  private final HashMap<String,Integer> variableMapping;
 
 
   /**
    * New embedding filter operator
    * @param input Candidate embeddings
    * @param predicates Predicates to used for filtering
+   * @param variableMapping Maps variable names to embedding entries
    */
-  public FilterEmbeddings(DataSet<Embedding> input, CNF predicates) {
+  public FilterEmbeddings(DataSet<Embedding> input, CNF predicates,
+    HashMap<String, Integer> variableMapping) {
     this.input = input;
     this.predicates = predicates;
+    this.variableMapping = variableMapping;
   }
 
   /**

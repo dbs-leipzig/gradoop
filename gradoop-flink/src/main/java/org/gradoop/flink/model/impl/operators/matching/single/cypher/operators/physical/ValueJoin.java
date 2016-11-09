@@ -21,6 +21,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.s1ck.gdl.model.cnf.CNF;
 
+import java.util.HashMap;
+
 /**
  * This operator joins two possibly disjunct data sets by predicates only concerning properties
  * e.g.
@@ -42,6 +44,10 @@ public class ValueJoin implements PhysicalOperator {
    * predicates used for the join
    */
   private final CNF joinCriteria;
+  /**
+   * Maps variable names to embedding entries;
+   */
+  private final HashMap<String,Integer> variableMapping;
 
   /**
    * New value join operator
@@ -49,11 +55,14 @@ public class ValueJoin implements PhysicalOperator {
    * @param lhs left hand side data set
    * @param rhs right hand side data set
    * @param joinCriteria join criteria
+   * @param variableMapping Maps variable names to embedding entries
    */
-  public ValueJoin(DataSet<Embedding> lhs, DataSet<Embedding> rhs, CNF joinCriteria) {
+  public ValueJoin(DataSet<Embedding> lhs, DataSet<Embedding> rhs, CNF joinCriteria,
+    HashMap<String, Integer> variableMapping) {
     this.lhs = lhs;
     this.rhs = rhs;
     this.joinCriteria = joinCriteria;
+    this.variableMapping = variableMapping;
   }
 
   @Override
