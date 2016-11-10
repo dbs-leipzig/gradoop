@@ -208,7 +208,7 @@ public class Queries {
     tc.add(new Step(1L, 1L, 2L, true));  // (b)-->(c)
     tc.add(new Step(2L, 2L, 3L, true));  // (c)-->(d)
 
-    return new Query(tc, 3, 3);
+    return new Query(tc, 4, 3);
   }
 
   /**
@@ -225,6 +225,6 @@ public class Queries {
     tc.add(new Step(2L, 2L, 0L, true));  // (c)-->(a)
     tc.add(new Step(0L, 3L, 3L, false));  // (a)<--(d)
 
-    return new Query(tc, 3, 3);
+    return new Query(tc, 4, 4);
   }
 }
