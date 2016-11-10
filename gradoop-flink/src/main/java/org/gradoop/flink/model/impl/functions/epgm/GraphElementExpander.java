@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
@@ -29,8 +30,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * element => (graphId, element)
  * @param <EL> graph element type
  */
-public class GraphElementExpander<EL extends GraphElement> implements
-  FlatMapFunction<EL, Tuple2<GradoopId, EL>> {
+@FunctionAnnotation.ForwardedFields("*->f1")
+public class GraphElementExpander<EL extends GraphElement>
+  implements FlatMapFunction<EL, Tuple2<GradoopId, EL>> {
 
   /**
    * reuse tuple
@@ -45,11 +47,10 @@ public class GraphElementExpander<EL extends GraphElement> implements
   }
 
   @Override
-  public void flatMap(EL el, Collector
-    <Tuple2<GradoopId, EL>> collector) throws Exception {
-    for (GradoopId graphId : el.getGraphIds()) {
+  public void flatMap(EL element, Collector<Tuple2<GradoopId, EL>> collector) throws Exception {
+    reuse.f1 = element;
+    for (GradoopId graphId : element.getGraphIds()) {
       reuse.f0 = graphId;
-      reuse.f1 = el;
       collector.collect(reuse);
     }
   }

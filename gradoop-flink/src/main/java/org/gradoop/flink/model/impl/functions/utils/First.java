@@ -27,8 +27,7 @@ import org.apache.flink.util.Collector;
 public class First<T> implements GroupReduceFunction<T, T> {
 
   @Override
-  public void reduce(Iterable<T> iterable, Collector<T> collector) throws
-    Exception {
+  public void reduce(Iterable<T> iterable, Collector<T> collector) throws Exception {
     collector.collect(iterable.iterator().next());
   }
 }

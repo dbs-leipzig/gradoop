@@ -17,23 +17,17 @@
 
 package org.gradoop.flink.model.impl.tuples;
 
-import com.google.common.collect.Sets;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Set;
 
 /**
  * An encapsulated representation of a logical graph with duplicated elements.
  */
-public class GraphTransaction extends
-  Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
+public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
 
   /**
    * default constructor
@@ -47,8 +41,7 @@ public class GraphTransaction extends
    * @param vertices set of vertices
    * @param edges set of edges
    */
-  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices,
-    Set<Edge> edges) {
+  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices, Set<Edge> edges) {
     setGraphHead(graphHead);
     setVertices(vertices);
     setEdges(edges);
@@ -76,26 +69,5 @@ public class GraphTransaction extends
 
   public void  setEdges(Set<Edge> edges) {
     this.f2 = edges;
-  }
-
-  /**
-   * Returns the Flink type information of a graph transaction.
-   *
-   * @param config Gradoop configuration
-   * @return type information
-   */
-  public static TypeInformation<GraphTransaction> getTypeInformation(
-    GradoopFlinkConfig config) {
-
-    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(1);
-    vertices.add(config.getVertexFactory().createVertex());
-
-    Set<Edge> edges = Sets.newHashSetWithExpectedSize(1);
-    edges.add(config.getEdgeFactory()
-      .createEdge(GradoopId.get(), GradoopId.get()));
-
-    return TypeExtractor.getForObject(
-      new GraphTransaction(config.getGraphHeadFactory().createGraphHead(),
-        vertices, edges));
   }
 }

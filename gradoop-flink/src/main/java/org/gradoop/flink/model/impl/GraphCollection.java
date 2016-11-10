@@ -23,6 +23,8 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -41,7 +43,6 @@ import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
-import org.gradoop.flink.model.impl.functions.epgm.GraphElementSet;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -51,6 +52,7 @@ import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -76,8 +78,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import static org.apache.flink.shaded.com.google.common.base.Preconditions
-  .checkNotNull;
+import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
@@ -134,7 +135,7 @@ public class GraphCollection extends GraphBase implements
     return fromDataSets(
       graphHeads,
       vertices,
-      createEdgeDataSet(new ArrayList<Edge>(0), config),
+      createEdgeDataSet(new ArrayList<>(0), config),
       config
     );
   }
@@ -218,12 +219,12 @@ public class GraphCollection extends GraphBase implements
   public LogicalGraph getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
     DataSet<GraphHead> graphHead = getGraphHeads()
-      .filter(new BySameId<GraphHead>(graphID));
+      .filter(new BySameId<>(graphID));
 
     DataSet<Vertex> vertices = getVertices()
-      .filter(new InGraph<Vertex>(graphID));
+      .filter(new InGraph<>(graphID));
     DataSet<Edge> edges = getEdges()
-      .filter(new InGraph<Edge>(graphID));
+      .filter(new InGraph<>(graphID));
 
     return LogicalGraph.fromDataSets(graphHead, vertices, edges, getConfig());
   }
@@ -259,11 +260,11 @@ public class GraphCollection extends GraphBase implements
 
     // build new vertex set
     DataSet<Vertex> vertices = getVertices()
-      .filter(new InAnyGraph<Vertex>(identifiers));
+      .filter(new InAnyGraph<>(identifiers));
 
     // build new edge set
     DataSet<Edge> edges = getEdges()
-      .filter(new InAnyGraph<Edge>(identifiers));
+      .filter(new InAnyGraph<>(identifiers));
 
     return new GraphCollection(newGraphHeads, vertices, edges, getConfig());
   }
@@ -450,7 +451,7 @@ public class GraphCollection extends GraphBase implements
   @Override
   public DataSet<Boolean> isEmpty() {
     return getGraphHeads()
-      .map(new True<GraphHead>())
+      .map(new True<>())
       .distinct()
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
@@ -464,8 +465,7 @@ public class GraphCollection extends GraphBase implements
    * @param transactions  transaction dataset
    * @return graph collection
    */
-  public static GraphCollection fromTransactions(
-    GraphTransactions transactions) {
+  public static GraphCollection fromTransactions(GraphTransactions transactions) {
 
     GroupReduceFunction<Vertex, Vertex> vertexReducer = new First<>();
     GroupReduceFunction<Edge, Edge> edgeReducer = new First<>();
@@ -497,14 +497,12 @@ public class GraphCollection extends GraphBase implements
 
     DataSet<Vertex> vertices = triples
       .flatMap(new TransactionVertices())
-//      .returns(config.getVertexFactory().getType())
-      .groupBy(new Id<Vertex>())
+      .groupBy(new Id<>())
       .reduceGroup(vertexMergeReducer);
 
     DataSet<Edge> edges = triples
       .flatMap(new TransactionEdges())
-//      .returns(config.getEdgeFactory().getType())
-      .groupBy(new Id<Edge>())
+      .groupBy(new Id<>())
       .reduceGroup(edgeMergeReducer);
 
     return fromDataSets(graphHeads, vertices, edges, config);
@@ -515,29 +513,29 @@ public class GraphCollection extends GraphBase implements
    */
   @Override
   public GraphTransactions toTransactions() {
-    DataSet<Tuple2<GradoopId, Set<Vertex>>> graphVertices = getVertices()
-      .flatMap(new GraphElementExpander<Vertex>())
+    DataSet<Tuple2<GradoopId, GraphElement>> vertices = getVertices()
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
+      .flatMap(new GraphElementExpander<>());
+
+    DataSet<Tuple2<GradoopId, GraphElement>> edges = getEdges()
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
+      .flatMap(new GraphElementExpander<>());
+
+    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
+      .union(edges)
       .groupBy(0)
-      .reduceGroup(new GraphElementSet<Vertex>());
-
-    DataSet<Tuple2<GradoopId, Set<Edge>>> graphEdges = getEdges()
-      .flatMap(new GraphElementExpander<Edge>())
+      .combineGroup(new GraphVerticesEdges())
       .groupBy(0)
-      .reduceGroup(new GraphElementSet<Edge>());
+      .reduceGroup(new GraphVerticesEdges());
 
-
-    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> verticesAndEdges =
-      graphVertices
-        .fullOuterJoin(graphEdges)
-        .where(0).equalTo(0)
-        .with(new GraphVerticesEdges());
-
-    DataSet<GraphTransaction> transactions = getGraphHeads()
-      .leftOuterJoin(verticesAndEdges)
-      .where(new Id<GraphHead>()).equalTo(0)
+    DataSet<GraphTransaction> graphTransactions = getGraphHeads()
+      .leftOuterJoin(transactions)
+      .where(new Id<>()).equalTo(0)
       .with(new TransactionFromSets());
 
-    return new GraphTransactions(transactions, getConfig());
+    return new GraphTransactions(graphTransactions, getConfig());
   }
 
   /**

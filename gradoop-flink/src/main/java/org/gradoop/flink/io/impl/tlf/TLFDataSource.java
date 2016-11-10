@@ -112,8 +112,7 @@ public class TLFDataSource extends TLFBase implements DataSource {
       .map(new GraphTransactionFromTLFGraph(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
-        getConfig().getEdgeFactory()))
-        .returns(GraphTransaction.getTypeInformation(getConfig()));
+        getConfig().getEdgeFactory()));
 
     // map the integer valued labels to strings from dictionary
     if (hasVertexDictionary()) {
