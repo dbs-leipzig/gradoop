@@ -194,4 +194,37 @@ public class Queries {
     tc.add(new Step(0L, 3L, 3L, false)); // (c)<--(b)
     return new Query(tc, 4, 4);
   }
+
+  /**
+   * (a)<--(b)-->(c)-->(d)
+   *
+   * (0)<-0-(1)-1->(2)-2->(3)
+   *
+   * @return query q8
+   */
+  public static Query q8() {
+    TraversalCode tc = new TraversalCode();
+    tc.add(new Step(0L, 0L, 1L, false)); // (a)<--(b)
+    tc.add(new Step(1L, 1L, 2L, true));  // (b)-->(c)
+    tc.add(new Step(2L, 2L, 3L, true));  // (c)-->(d)
+
+    return new Query(tc, 4, 3);
+  }
+
+  /**
+   * (a)<--(b)-->(c)-->(a)<--(d)
+   *
+   * (0)<-0-(1)-1->(2)-2->(0)<-3-(3)
+   *
+   * @return query q9
+   */
+  public static Query q9() {
+    TraversalCode tc = new TraversalCode();
+    tc.add(new Step(0L, 0L, 1L, false)); // (a)<--(b)
+    tc.add(new Step(1L, 1L, 2L, true));  // (b)-->(c)
+    tc.add(new Step(2L, 2L, 0L, true));  // (c)-->(a)
+    tc.add(new Step(0L, 3L, 3L, false));  // (a)<--(d)
+
+    return new Query(tc, 4, 4);
+  }
 }

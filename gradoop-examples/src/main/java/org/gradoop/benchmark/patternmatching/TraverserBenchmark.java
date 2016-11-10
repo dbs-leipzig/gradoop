@@ -160,6 +160,9 @@ public class TraverserBenchmark extends AbstractRunner {
   private static Queries.Query getQuery(String queryString) {
     Queries.Query query;
     switch (queryString) {
+    case "q0":
+      query = Queries.q0();
+      break;
     case "q1":
       query = Queries.q1();
       break;
@@ -180,6 +183,12 @@ public class TraverserBenchmark extends AbstractRunner {
       break;
     case "q7":
       query = Queries.q7();
+      break;
+    case "q8":
+      query = Queries.q8();
+      break;
+    case "q9":
+      query = Queries.q9();
       break;
     default:
       throw new IllegalArgumentException("unsupported query: " + queryString);
