@@ -25,6 +25,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Creates a new {@link GradoopId} for the input element and returns both.
  *
+ * t -> (t, id)
+ *
  * @param <T>
  */
 @FunctionAnnotation.ForwardedFields("*->f0")

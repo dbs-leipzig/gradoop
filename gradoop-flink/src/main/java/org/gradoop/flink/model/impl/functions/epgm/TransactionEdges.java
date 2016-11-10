@@ -36,8 +36,6 @@ public class TransactionEdges implements
   public void flatMap(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> graphTriple,
     Collector<Edge> collector) throws Exception {
 
-    for (Edge edge : graphTriple.f2) {
-      collector.collect(edge);
-    }
+    graphTriple.f2.forEach(collector::collect);
   }
 }

@@ -1,7 +1,5 @@
 package org.gradoop.flink.model.impl;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -43,7 +41,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
+      .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));
@@ -76,7 +74,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = originalCollection.toTransactions();
 
     GraphCollection restoredCollection = GraphCollection
-      .fromTransactions(transactions, new First<Vertex>(), new First<Edge>());
+      .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
       originalCollection.equalsByGraphIds(restoredCollection));

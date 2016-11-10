@@ -17,36 +17,41 @@
 
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Set;
 
 /**
  * graphTransaction <=> (graphHead, {vertex,..}, {edge, ..})
+ *
+ * Forwarded fields:
+ *
+ * f0: transaction graph head
+ * f1: transaction vertices
+ * f2: transaction edges
  */
-public class GraphTransactionTriple implements
-  MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>>,
-  JoinFunction
-    <Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphHead, GraphTransaction> {
+@FunctionAnnotation.ForwardedFields("f0;f1;f2")
+public class GraphTransactionTriple
+  implements MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> {
+  /**
+   * Reduce object instantiations
+   */
+  private final Tuple3<GraphHead, Set<Vertex>, Set<Edge>> reuseTuple = new Tuple3<>();
 
   @Override
-  public Tuple3<GraphHead, Set<Vertex>, Set<Edge>> map(
-    GraphTransaction transaction) throws Exception {
+  public Tuple3<GraphHead, Set<Vertex>, Set<Edge>> map(GraphTransaction transaction)
+    throws Exception {
 
-    return new Tuple3<>(transaction.f0, transaction.f1, transaction.f2);
-  }
+    reuseTuple.f0 = transaction.getGraphHead();
+    reuseTuple.f1 = transaction.getVertices();
+    reuseTuple.f2 = transaction.getEdges();
 
-  @Override
-  public GraphTransaction join(Tuple3<GradoopId, Set<Vertex>, Set<Edge>> triple,
-    GraphHead graphHead) throws Exception {
-
-    return new GraphTransaction(graphHead, triple.f1, triple.f2);
+    return reuseTuple;
   }
 }

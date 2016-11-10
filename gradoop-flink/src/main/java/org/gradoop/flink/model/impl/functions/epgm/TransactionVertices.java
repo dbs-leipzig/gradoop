@@ -36,9 +36,6 @@ public class TransactionVertices implements
   public void flatMap(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> graphTriple,
     Collector<Vertex> collector) throws Exception {
 
-    for (Vertex vertex : graphTriple.f1) {
-      collector.collect(vertex);
-    }
+    graphTriple.f1.forEach(collector::collect);
   }
-
 }

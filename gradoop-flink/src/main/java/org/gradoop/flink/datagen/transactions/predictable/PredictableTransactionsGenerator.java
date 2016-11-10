@@ -73,8 +73,7 @@ public class PredictableTransactionsGenerator implements
       .generateSequence(1, graphCount);
 
     DataSet<GraphTransaction> transactions = graphNumbers
-      .map(new PredictableTransaction(graphSize, multigraph, config))
-      .returns(GraphTransaction.getTypeInformation(config));
+      .map(new PredictableTransaction(graphSize, multigraph, config));
 
     return new GraphTransactions(transactions, config);
   }
