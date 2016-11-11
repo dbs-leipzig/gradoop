@@ -73,6 +73,7 @@ public class GradoopTestUtils {
   public static final double      DOUBLE_VAL_5      = 2.3;
   public static final String      STRING_VAL_6      = "23";
   public static final BigDecimal  BIG_DECIMAL_VAL_7 = new BigDecimal(23);
+  public static final GradoopId   GRADOOP_ID_VAL_8  = GradoopId.get();
 
   static {
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
