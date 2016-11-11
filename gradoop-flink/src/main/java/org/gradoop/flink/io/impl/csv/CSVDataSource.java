@@ -114,10 +114,10 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .readTextFile(getCsvDir() + first.getName())
       .reduceGroup(new CSVToContent(first));
     for (CsvExtension csvFile : csvList) {
-      csvContent
+      csvContent = csvContent
         .union(env
           .readTextFile(getCsvDir() + csvFile.getName())
-          .reduceGroup(new CSVToContent(first)));
+          .reduceGroup(new CSVToContent(csvFile)));
     }
 
     //map each content line to an epgm element
