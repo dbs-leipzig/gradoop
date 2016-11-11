@@ -21,6 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
+  .PredicateWrapper;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.GraphElement;
@@ -106,6 +109,15 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdges() {
     return gdlHandler.getEdges();
+  }
+
+  /**
+   * Returns all predicates in Conjunctive Normal Form
+   *
+   * @return predicates
+   */
+  public CNF getPredicates() {
+    return PredicateWrapper.wrap(gdlHandler.getPredicates()).asCNF();
   }
 
   /**

@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.s1ck.gdl.model.cnf.CNF;
 
 import java.util.HashMap;
 import java.util.List;

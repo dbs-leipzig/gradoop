@@ -23,8 +23,6 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
-import org.s1ck.gdl.model.cnf.CNF;
-import org.s1ck.gdl.model.cnf.CNFElement;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 import org.s1ck.gdl.model.predicates.booleans.Not;

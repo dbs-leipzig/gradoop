@@ -19,9 +19,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
-import org.s1ck.gdl.model.cnf.CNF;
 
 import java.util.List;
 
