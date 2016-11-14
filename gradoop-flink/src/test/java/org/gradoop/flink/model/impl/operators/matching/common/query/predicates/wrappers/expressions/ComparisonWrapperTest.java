@@ -122,7 +122,6 @@ public class ComparisonWrapperTest {
     Literal lhs;
     Literal rhs;
 
-    GradoopId id = GradoopId.get();
     lhs = new Literal(42);
     rhs = new Literal("42");
     assertTrue(compare(lhs, rhs, Comparator.NEQ));

@@ -17,37 +17,56 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans.*;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans
+  .AndWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans
+  .NotWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans
+  .OrWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans
+  .XorWrapper;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
   .expressions.ComparisonWrapper;
 import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.*;
+import org.s1ck.gdl.model.predicates.booleans.And;
+import org.s1ck.gdl.model.predicates.booleans.Or;
+import org.s1ck.gdl.model.predicates.booleans.Not;
+import org.s1ck.gdl.model.predicates.booleans.Xor;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 
+/**
+ * Wrapps a Predicate
+ */
 public abstract class PredicateWrapper {
 
+  /**
+   * Generic wrapper function to wrap a given predicate
+   * @param predicate the predicate to be warpped
+   * @return the wrapped predicate
+   */
   public static PredicateWrapper wrap(Predicate predicate) {
-    if(predicate.getClass() == And.class) {
+    if (predicate.getClass() == And.class) {
       return new AndWrapper((And) predicate);
-    }
 
-    else if(predicate.getClass() == Or.class) {
+    } else if (predicate.getClass() == Or.class) {
       return new OrWrapper((Or) predicate);
-    }
 
-    else if(predicate.getClass() == Xor.class) {
+    } else if (predicate.getClass() == Xor.class) {
       return new XorWrapper((Xor) predicate);
-    }
 
-    else if(predicate.getClass() == Not.class) {
+    } else if (predicate.getClass() == Not.class) {
       return new NotWrapper((Not) predicate);
-    }
 
-    else if(predicate.getClass() == Comparison.class) {
+    } else if (predicate.getClass() == Comparison.class) {
       return new ComparisonWrapper((Comparison) predicate);
     }
+
     return null;
   }
 
+  /**
+   * Converts the predicate into Conjunctive Normal Form
+   * @return the predicate in CNF
+   */
   public abstract CNF asCNF();
 }

@@ -20,21 +20,43 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
+/**
+ * Wraps an {@link Or} predicate
+ */
 public class OrWrapper extends PredicateWrapper {
+  /**
+   * Holds the wrapped or predicate
+   */
   private final Or or;
 
+  /**
+   * Creates a new or wrapper
+   * @param or the wrapped or predicate
+   */
   public OrWrapper(Or or) {
     this.or = or;
   }
 
+  /**
+   * Converts the predicate into conjunctive normal form
+   * @return predicate in cnf
+   */
   public CNF asCNF() {
     return getLhs().asCNF().or(getRhs().asCNF());
   }
 
+  /**
+   * Returns the left hand side predicate
+   * @return the left hand side predicate
+   */
   public PredicateWrapper getLhs() {
     return PredicateWrapper.wrap(or.getArguments()[0]);
   }
 
+  /**
+   * Returns the right hand side predicate
+   * @return the right hand side predicate
+   */
   public PredicateWrapper getRhs() {
     return PredicateWrapper.wrap(or.getArguments()[1]);
   }
@@ -50,11 +72,8 @@ public class OrWrapper extends PredicateWrapper {
 
     OrWrapper orWrapper = (OrWrapper) o;
 
-    if (or != null ? !or.equals(orWrapper.or) : orWrapper.or != null) {
-      return false;
-    }
+    return or != null ? or.equals(orWrapper.or) : orWrapper.or == null;
 
-    return true;
   }
 
   @Override

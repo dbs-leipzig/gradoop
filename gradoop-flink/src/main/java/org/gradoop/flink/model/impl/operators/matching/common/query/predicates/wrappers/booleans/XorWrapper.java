@@ -52,7 +52,7 @@ public class XorWrapper extends PredicateWrapper {
     Predicate rhs = xor.getArguments()[1];
 
     PredicateWrapper wrapper = PredicateWrapper.wrap(
-      new Or(new And(lhs,new Not(rhs)),new And(new Not(lhs),rhs))
+      new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs))
     );
 
     return wrapper.asCNF();

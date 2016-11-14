@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -34,7 +35,7 @@ import org.s1ck.gdl.utils.Comparator;
 /**
  * Wraps a {@link Not} predicate
  */
-public class NotWrapper extends PredicateWrapper{
+public class NotWrapper extends PredicateWrapper {
 
   /**
    * Holds the wrapped not predicate
@@ -57,29 +58,26 @@ public class NotWrapper extends PredicateWrapper{
   public CNF asCNF() {
     Predicate expression = not.getArguments()[0];
 
-    if(expression.getClass() == Comparison.class) {
-      CNF CNF = new CNF();
-      CNFElement CNFElement = new CNFElement();
+    if (expression.getClass() == Comparison.class) {
+      CNF cnf = new CNF();
+      CNFElement cNFElement = new CNFElement();
 
-      CNFElement.addPredicate(new ComparisonWrapper(invertComparison((Comparison) expression)));
-      CNF.addPredicate(CNFElement);
-      return CNF;
-    }
+      cNFElement.addPredicate(new ComparisonWrapper(invertComparison((Comparison) expression)));
+      cnf.addPredicate(cNFElement);
+      return cnf;
 
-    else if (expression.getClass() == Not.class) {
+    } else if (expression.getClass() == Not.class) {
       return PredicateWrapper.wrap(expression.getArguments()[0]).asCNF();
-    }
 
-    else if (expression.getClass() == And.class) {
+    } else if (expression.getClass() == And.class) {
       Predicate[] otherArguments = expression.getArguments();
       Or or = new Or(
         new Not(otherArguments[0]),
         new Not(otherArguments[0])
       );
       return PredicateWrapper.wrap(or).asCNF();
-    }
 
-    else if (expression.getClass() == Or.class) {
+    } else if (expression.getClass() == Or.class) {
       Predicate[] otherArguments = expression.getArguments();
       And and = new And(
         new Not(otherArguments[0]),
@@ -87,9 +85,8 @@ public class NotWrapper extends PredicateWrapper{
       );
 
       return PredicateWrapper.wrap(and).asCNF();
-    }
 
-    else {
+    } else {
       Predicate[] otherArguments = expression.getArguments();
       Or or = new Or(
         new And(

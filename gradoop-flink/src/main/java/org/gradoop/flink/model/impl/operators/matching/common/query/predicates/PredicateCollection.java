@@ -1,24 +1,23 @@
 /*
- * This file is part of GDL.
+ * This file is part of Gradoop.
  *
- * GDL is free software: you can redistribute it and/or modify
+ * Gradoop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * GDL is distributed in the hope that it will be useful,
+ * Gradoop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GDL.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,9 @@ public abstract class PredicateCollection<P> {
    *
    * @return predicates
    */
-  public List<P> getPredicates() { return this.predicates; }
+  public List<P> getPredicates() {
+    return this.predicates;
+  }
 
   /**
    * Add a single predicate to the collection
@@ -63,7 +64,6 @@ public abstract class PredicateCollection<P> {
   }
 
   /**
-   * Evaluates the Predicates against a set of graph elements
    *
    * @param values Mapping of embedding entries to variables
    * @return evaluation result
@@ -87,13 +87,17 @@ public abstract class PredicateCollection<P> {
   public String toString() {
     return "(" + predicates.stream()
             .map(P::toString)
-            .collect(joining(" "+ operatorName() +" ")) + ")";
+            .collect(joining(" " + operatorName() + " ")) + ")";
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     PredicateCollection predicateCollection = (PredicateCollection) o;
 

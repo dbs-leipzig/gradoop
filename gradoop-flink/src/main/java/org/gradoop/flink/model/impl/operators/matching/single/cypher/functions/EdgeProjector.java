@@ -45,7 +45,7 @@ public class EdgeProjector extends RichMapFunction<Edge, Embedding> {
    * @param keys properties that will be included in the projection
    */
   public EdgeProjector(List<String> keys) {
-    this.keys=keys;
+    this.keys = keys;
   }
 
   @Override

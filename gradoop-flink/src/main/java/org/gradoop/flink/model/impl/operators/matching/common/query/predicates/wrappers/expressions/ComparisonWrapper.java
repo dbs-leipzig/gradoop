@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * Wraps a {@link Comparison}
  */
-public class ComparisonWrapper extends PredicateWrapper{
+public class ComparisonWrapper extends PredicateWrapper {
   /**
    * Holds the wrapped comparison
    */
@@ -84,8 +84,8 @@ public class ComparisonWrapper extends PredicateWrapper{
         comparison.getComparator() == Comparator.LTE && result <=  0 ||
         comparison.getComparator() == Comparator.GTE && result >=  0;
 
-    } catch(IllegalArgumentException e) {
-      return comparison.getComparator() == Comparator.NEQ ;
+    } catch (IllegalArgumentException e) {
+      return comparison.getComparator() == Comparator.NEQ;
     }
   }
 

@@ -23,100 +23,52 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class CNFTest {
-  @Test
-  public void andConjunctionTest() {
-    CNFElement or1 = new CNFElement();
-    CNFElement or2 = new CNFElement();
-
-    CNF and1 = new CNF();
-    and1.addPredicate(or1);
-
-    CNF and2 = new CNF();
-    and2.addPredicate(or2);
-
-    ArrayList<CNFElement> reference = new ArrayList<>();
-    reference.add(or1);
-    reference.add(or2);
-
-    assertEquals(reference, and1.and(and2).getPredicates());
-  }
-
-  @Test
-  public void orConjunctionTest() {
-    QueryHandler query = new QueryHandler("MATCH (a),(b),(c) WHERE a=b AND b=c");
-    CNF cnf1 = query.getPredicates();
-
-    query = new QueryHandler("MATCH (n),(m),(o) WHERE n=m AND m=o");
-    CNF cnf2 = query.getPredicates();
-
-    assertEquals(
-      "((a = b OR n = m) AND (a = b OR m = o) AND (b = c OR n = m) AND (b = c OR m = o))",
-      cnf1.or(cnf2).toString()
-    );
-  }
-
+public class CNFElementTest {
   @Test
   public void extractVariablesTest() {
     QueryHandler query = new QueryHandler("MATCH (a), (b) WHERE a=b OR a.name = \"Alice\"");
-    CNF cnf = query.getPredicates();
+    CNFElement cnfElement = query.getPredicates().getPredicates().get(0);
 
     Set<String> reference = new HashSet<>();
     reference.add("a");
     reference.add("b");
 
-    assertEquals(reference,cnf.getVariables());
-  }
-
-  @Test
-  public void createExistingSubCnfTest() {
-    String queryString = "MATCH (a), (b), (c)" +
-      "WHERE a=b AND a.name = \"Alice\" AND c.name = \"Chris\"";
-    QueryHandler query = new QueryHandler(queryString);
-    CNF cnf = query.getPredicates();
-
-    Set<String> variables = new HashSet<>();
-    variables.add("a");
-    variables.add("b");
-
-    assertEquals("((a = b))",cnf.getSubCNF(variables).toString());
-
-    variables.add("c");
-    assertTrue(cnf.getSubCNF(variables).getPredicates().isEmpty());
+    assertEquals(reference,cnfElement.getVariables());
   }
 
   @Test
   public void testEvaluation() {
     String queryString = "MATCH (a), (b), (c)" +
-      "WHERE a=b AND a.name = \"Alice\" AND a.age > c.age";
+      "WHERE a=b OR a.name = \"Alice\" OR a.age > c.age";
     QueryHandler query = new QueryHandler(queryString);
-    CNF cnf = query.getPredicates();
+    CNFElement cnfElement = query.getPredicates().getPredicates().get(0);
 
     ProjectionEntry a = new ProjectionEntry(GradoopId.get());
-    a.addProperty(Property.create("name","Alice"));
+    a.addProperty(Property.create("name","Alfred"));
     a.addProperty(Property.create("age",42));
-
     ProjectionEntry c = new ProjectionEntry(GradoopId.get());
-    c.addProperty(Property.create("age",23));
-
+    c.addProperty(Property.create("age",42));
     HashMap<String, EmbeddingEntry> mapping = new HashMap<>();
     mapping.put("a",a);
     mapping.put("b",a);
     mapping.put("c",c);
+    assertTrue(cnfElement.evaluate(mapping));
 
-    assertTrue(cnf.evaluate(mapping));
+    a.addProperty(Property.create("name","Alice"));
+    mapping.put("b",c);
+    assertTrue(cnfElement.evaluate(mapping));
+
+    a.addProperty(Property.create("name","Alfred"));
+    c.addProperty(Property.create("age",23));
+    assertTrue(cnfElement.evaluate(mapping));
 
     c.addProperty(Property.create("age",101));
-
-    assertFalse(cnf.evaluate(mapping));
+    assertFalse(cnfElement.evaluate(mapping));
   }
 }

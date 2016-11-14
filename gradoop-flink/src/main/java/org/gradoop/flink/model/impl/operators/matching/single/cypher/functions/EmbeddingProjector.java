@@ -32,19 +32,19 @@ public class EmbeddingProjector extends RichMapFunction<Embedding, Embedding> {
   /**
    * Holds a list of property keys for every entry in th embedding
    */
-  private HashMap<Integer,List<String>> propertyKeys;
+  private HashMap<Integer, List<String>> propertyKeys;
 
   /**
    * Crete new embedding projector
    * @param propertyKeys property which will be kept in projection
    */
-  public EmbeddingProjector(HashMap<Integer,List<String>> propertyKeys) {
+  public EmbeddingProjector(HashMap<Integer, List<String>> propertyKeys) {
     this.propertyKeys = propertyKeys;
   }
 
   @Override
   public Embedding map(Embedding embedding) {
-    for(Integer column : propertyKeys.keySet()) {
+    for (Integer column : propertyKeys.keySet()) {
       PropertyProjector projector = new PropertyProjector(propertyKeys.get(column));
       embedding.setEntry(column, projector.project(embedding.getEntry(column)));
     }

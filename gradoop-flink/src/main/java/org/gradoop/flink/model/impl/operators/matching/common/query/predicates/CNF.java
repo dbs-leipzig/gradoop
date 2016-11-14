@@ -1,18 +1,18 @@
 /*
- * This file is part of GDL.
+ * This file is part of Gradoop.
  *
- * GDL is free software: you can redistribute it and/or modify
+ * Gradoop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * GDL is distributed in the hope that it will be useful,
+ * Gradoop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GDL.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
@@ -81,8 +81,8 @@ public class CNF extends PredicateCollection<CNFElement> {
 
   @Override
   public boolean evaluate(Map<String, EmbeddingEntry> values) {
-    for(CNFElement element : predicates) {
-      if(!element.evaluate(values)) {
+    for (CNFElement element : predicates) {
+      if (!element.evaluate(values)) {
         return false;
       }
     }
@@ -91,7 +91,9 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   @Override
-  public String operatorName() { return "AND"; }
+  public String operatorName() {
+    return "AND";
+  }
 
   /**
    * Creates a new CNF containing only predicates concerning the specified variables
@@ -101,9 +103,9 @@ public class CNF extends PredicateCollection<CNFElement> {
   public CNF getSubCNF(Set<String> variables) {
     CNF subCNF = new CNF();
 
-    for(CNFElement cnfElement : predicates) {
+    for (CNFElement cnfElement : predicates) {
       Set<String> elementVariables = cnfElement.getVariables();
-      if(elementVariables.containsAll(variables) && elementVariables.size() == variables.size()) {
+      if (elementVariables.containsAll(variables) && elementVariables.size() == variables.size()) {
         subCNF.addPredicate(cnfElement);
       }
     }
@@ -117,7 +119,7 @@ public class CNF extends PredicateCollection<CNFElement> {
   @Override
   public Set<String> getVariables() {
     Set<String> variables = new HashSet<>();
-    for(CNFElement cnfElement : predicates) {
+    for (CNFElement cnfElement : predicates) {
       variables.addAll(cnfElement.getVariables());
     }
     return variables;

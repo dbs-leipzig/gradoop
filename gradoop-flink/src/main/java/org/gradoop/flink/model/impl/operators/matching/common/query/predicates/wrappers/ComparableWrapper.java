@@ -18,10 +18,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.*;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+  .comparables.ElementSelectorWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
+  .comparables.LiteralWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
+  .comparables.PropertySelectorWrapper;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 import org.s1ck.gdl.model.comparables.Literal;
@@ -29,23 +31,34 @@ import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.util.Map;
 
+/**
+ * Wrapps a {@link ComparableExpression}
+ */
 public abstract class ComparableWrapper {
 
+  /**
+   * Generic method to wrap a comparable expression
+   *
+   * @param expression the expression to be wrapped
+   * @return wrapped expression
+   */
   public static ComparableWrapper wrap(ComparableExpression expression) {
-    if(expression.getClass() == Literal.class) {
+    if (expression.getClass() == Literal.class) {
       return new LiteralWrapper((Literal) expression);
-    }
-
-    else if(expression.getClass() == PropertySelector.class) {
+    } else if (expression.getClass() == PropertySelector.class) {
       return new PropertySelectorWrapper((PropertySelector) expression);
-    }
-
-    else if(expression.getClass() == ElementSelector.class) {
+    } else if (expression.getClass() == ElementSelector.class) {
       return new ElementSelectorWrapper((ElementSelector) expression);
     }
 
     return null;
   }
 
+  /**
+   * Evaluates the expression with respect to the given variable mapping
+   *
+   * @param values mapping of variables to EmbeddingEntries
+   * @return the property value
+   */
   public abstract PropertyValue evaluate(Map<String, EmbeddingEntry> values);
 }

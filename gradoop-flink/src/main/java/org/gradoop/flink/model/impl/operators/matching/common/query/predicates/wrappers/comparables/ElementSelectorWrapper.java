@@ -55,7 +55,9 @@ public class ElementSelectorWrapper extends ComparableWrapper {
   public PropertyValue evaluate(Map<String, EmbeddingEntry> values) {
     EmbeddingEntry entry = values.get(elementSelector.getVariable());
 
-    if(entry == null) throw new MissingElementException(elementSelector.getVariable());
+    if (entry == null) {
+      throw new MissingElementException(elementSelector.getVariable());
+    }
 
     return PropertyValue.create(entry.getId());
   }

@@ -14,4 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * Contains functions concerning query predicates
+ */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
