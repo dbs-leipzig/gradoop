@@ -15,40 +15,40 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEdgeFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Filter;
+
+import java.util.Map;
 
 /**
- * Filters a List of edges by predicates
- * Edge -> Embedding(IdEntry(SrcID), IdEntry(Edge), IdEntry(TargetID))
+ * Filters a set of embedding by given predicates
  */
-public class FilterEdges implements PhysicalOperator {
+public class FilterEmbeddingFunction extends RichFilterFunction<Embedding> {
   /**
-   * Input graph elements
-   */
-  private final DataSet<Edge> input;
-  /**
-   * Predicates in conjunctive normal form
+   * Predicates used for filtering
    */
   private final CNF predicates;
+  /**
+   * Mapping of variables names to embedding column
+   */
+  private final Map<String, Integer> columnMapping;
 
   /**
-   * New edge filter operator
-   * @param input Candidate edges
-   * @param predicates Predicates used to filter edges
+   * New embedding filter function
+   * @param predicates predicates used for filtering
+   * @param columnMapping mapping of variable names to embedding column
    */
-  public FilterEdges(DataSet<Edge> input, CNF predicates) {
-    this.input = input;
+  public FilterEmbeddingFunction(CNF predicates, Map<String, Integer> columnMapping) {
     this.predicates = predicates;
+    this.columnMapping = columnMapping;
   }
 
   @Override
-  public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterEdgeFunction(predicates));
+  public boolean filter(Embedding embedding) {
+    return Filter.filter(predicates, embedding, columnMapping);
   }
 }
