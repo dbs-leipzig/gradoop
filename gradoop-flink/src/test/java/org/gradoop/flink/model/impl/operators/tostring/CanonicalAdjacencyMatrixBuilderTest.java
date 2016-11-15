@@ -10,6 +10,7 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 
 public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
@@ -35,7 +36,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
       FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
         .getResource("/data/expected/cam_test_directed").getFile()));
 
-    assertTrue(expectation.equals(result));
+    assertEquals(expectation, result);
   }
 
   @Test
@@ -59,7 +60,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
       FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
         .getResource("/data/expected/cam_test_undirected").getFile()));
 
-    assertTrue(expectation.equals(result));
+    assertEquals(expectation, result);
   }
 
 }

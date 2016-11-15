@@ -35,7 +35,7 @@ public class VertexTest {
     GradoopId vertexID = GradoopId.get();
     EPGMVertex v = new VertexFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
-    assertThat(v.getPropertyCount(), is(0));
+    assertThat(v.getPropertyCount(), is(1));
     assertThat(v.getGraphCount(), is(0));
   }
 
@@ -59,9 +59,10 @@ public class VertexTest {
 
     assertThat(vertex.getId(), is(vertexID));
     assertEquals(label, vertex.getLabel());
-    assertThat(vertex.getPropertyCount(), is(2));
+    assertThat(vertex.getPropertyCount(), is(3));
     assertThat(vertex.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
     assertThat(vertex.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
+    assertThat(vertex.getPropertyValue("__label__").getString(), Is.<Object>is("A"));
     assertThat(vertex.getGraphCount(), is(2));
     assertTrue(vertex.getGraphIds().contains(graphId1));
     assertTrue(vertex.getGraphIds().contains(graphId2));

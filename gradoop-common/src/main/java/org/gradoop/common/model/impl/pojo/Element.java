@@ -47,6 +47,7 @@ public abstract class Element implements EPGMElement {
    * Default constructor.
    */
   protected Element() {
+    properties = new PropertyList();
   }
 
   /**
@@ -62,6 +63,7 @@ public abstract class Element implements EPGMElement {
     this.id = id;
     this.label = label;
     this.properties = properties;
+    setProperty("__label__", label);
   }
 
   /**
@@ -93,6 +95,7 @@ public abstract class Element implements EPGMElement {
    */
   @Override
   public void setLabel(String label) {
+    setProperty("__label__", label);
     this.label = label;
   }
 
