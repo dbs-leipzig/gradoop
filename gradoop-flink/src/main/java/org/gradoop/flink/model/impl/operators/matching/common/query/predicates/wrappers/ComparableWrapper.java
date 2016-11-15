@@ -29,12 +29,13 @@ import org.s1ck.gdl.model.comparables.ElementSelector;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Wrapps a {@link ComparableExpression}
  */
-public abstract class ComparableWrapper {
+public abstract class ComparableWrapper implements Serializable {
 
   /**
    * Generic method to wrap a comparable expression

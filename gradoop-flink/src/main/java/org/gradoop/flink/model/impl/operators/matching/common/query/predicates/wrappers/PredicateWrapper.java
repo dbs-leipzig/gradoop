@@ -34,10 +34,12 @@ import org.s1ck.gdl.model.predicates.booleans.Not;
 import org.s1ck.gdl.model.predicates.booleans.Xor;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 
+import java.io.Serializable;
+
 /**
  * Wrapps a Predicate
  */
-public abstract class PredicateWrapper {
+public abstract class PredicateWrapper implements Serializable {
 
   /**
    * Generic wrapper function to wrap a given predicate

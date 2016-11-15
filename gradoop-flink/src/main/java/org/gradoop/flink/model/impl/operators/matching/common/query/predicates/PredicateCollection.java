@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +31,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param <P> the stored predicate type
  */
-public abstract class PredicateCollection<P> {
+public abstract class PredicateCollection<P>  implements Serializable {
   /**
    * Holds the predicate collection
    */
@@ -43,6 +44,15 @@ public abstract class PredicateCollection<P> {
    */
   public List<P> getPredicates() {
     return this.predicates;
+  }
+
+  /**
+   * Sets the predicates to the given list
+   *
+   * @param predicates new predicates
+   */
+  public void setPredicates(List<P> predicates) {
+    this.predicates = predicates;
   }
 
   /**
