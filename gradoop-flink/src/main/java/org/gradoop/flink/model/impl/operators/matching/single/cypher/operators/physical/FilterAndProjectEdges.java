@@ -21,35 +21,35 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions
+  .FilterAndProjectEdgeFunction;
 
 import java.util.List;
 
 /**
- * Filters a List of Edges by predicates and projects the remaining edges to the s
- * pecified properties
- * Returns Embedding with three columns IdEntry(sourceID), ProjectionEntry(Edge), IdEntry(targetId)
+ * Filters a List of edges by predicates and projects the remaining elements to the
+ * specified properties
  */
 public class FilterAndProjectEdges implements PhysicalOperator {
-
   /**
-   * Candidate Edges
+   * The input data set
    */
   private final DataSet<Edge> input;
   /**
-   * Predicates used for filtering in Conjunctive Normal Form
+   * Predicate used for filtering in CNF
    */
   private final CNF predicates;
   /**
-   * List of property names that will be keept in the projection
+   * Holds a list of property keys for every embedding entry
+   * The specified properties will be kept in the projection
    */
   private final List<String> propertyKeys;
 
   /**
-   * New Operator
-   *
-   * @param input Candidate edges
-   * @param predicates Predicates that will be used to filter candidate edges
-   * @param propertyKeys List of property keys that will be used for projection
+   * Create a new edge filter and project function
+   * @param input the vertex data set
+   * @param predicates filter predicates
+   * @param propertyKeys projection properties
    */
   public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates, List<String> propertyKeys) {
     this.input = input;
@@ -59,6 +59,8 @@ public class FilterAndProjectEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return input.flatMap(
+      new FilterAndProjectEdgeFunction(predicates, propertyKeys)
+    );
   }
 }
