@@ -19,59 +19,75 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.PropertyProjector;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class ProjectEmbeddingsTest extends GradoopFlinkTestBase {
+public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception{
-    ProjectionEntry entry = new ProjectionEntry(GradoopId.get(),
-      getPropertyList(Lists.newArrayList("foo", "bar", "baz")));
-
-    Embedding embedding = new Embedding();
-    embedding.addEntry(new IdEntry(GradoopId.get()));
-    embedding.addEntry(entry);
-    embedding.addEntry(new IdEntry(GradoopId.get()));
-
-    DataSet<Embedding> embeddingDataSet =
-      getExecutionEnvironment().fromCollection(Lists.newArrayList(embedding));
+    DataSet<Embedding> embeddings = createEmbeddings(
+      Lists.newArrayList(
+        new IdEntry(GradoopId.get()),
+        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o"))),
+        new IdEntry(GradoopId.get())
+      )
+    );
 
     HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();
-    extractedPropertyKeys.put(1, Lists.newArrayList("foo", "bar"));
-    ProjectEmbeddings operator = new ProjectEmbeddings(embeddingDataSet, extractedPropertyKeys);
+    extractedPropertyKeys.put(1, Lists.newArrayList("m", "o"));
+    
+    ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
-    List<Embedding> results = operator.evaluate().collect();
+    DataSet<Embedding> results = operator.evaluate();
 
-    assertEquals(1,results.size());
-    assertEquals(3,results.get(0).size());
-    assertEquals(IdEntry.class, results.get(0).getEntry(0).getClass());
-    assertEquals(ProjectionEntry.class, results.get(0).getEntry(1).getClass());
-    assertEquals(IdEntry.class, results.get(0).getEntry(2).getClass());
-    assertEquals(extractedPropertyKeys.get(1),results.get(0).getEntry(1).getProperties().get().getKeys());
+    assertEquals(2,results.count());
+    
+    assertEveryEmbedding(results, (e) -> {
+      assertEquals(3,                            e.size());
+      assertEquals(IdEntry.class,                e.getEntry(0).getClass());
+      assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
+      assertEquals(IdEntry.class,                e.getEntry(2).getClass());
+      assertEquals(extractedPropertyKeys.get(1), e.getEntry(1).getProperties().get().getKeys());
+    });
   }
 
+  @Test
+  public void testProjectMultipleEntriesAtOnce() throws Exception{
+    DataSet<Embedding> embeddings = createEmbeddings(
+      Lists.newArrayList(
+        new IdEntry(GradoopId.get()),
+        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o"))),
+        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("a", "b", "c")))
+      )
+    );
 
-  private PropertyList getPropertyList(List<String> property_names) {
-    PropertyList properties = new PropertyList();
+    HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();
+    extractedPropertyKeys.put(1, Lists.newArrayList("m", "o"));
+    extractedPropertyKeys.put(2, Lists.newArrayList("a", "d"));
+    
+    ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
-    for(String property_name : property_names) {
-      properties.set(property_name, property_name);
-    }
+    DataSet<Embedding> results = operator.evaluate();
 
-    return properties;
+    assertEquals(2,results.count());
+    
+    assertEveryEmbedding(results, (e) -> {
+      assertEquals(3,                            e.size());
+
+      assertEquals(IdEntry.class,                e.getEntry(0).getClass());
+      assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
+      assertEquals(ProjectionEntry.class,        e.getEntry(2).getClass());
+
+      assertEquals(extractedPropertyKeys.get(1), e.getEntry(1).getProperties().get().getKeys());
+      assertEquals(extractedPropertyKeys.get(2), e.getEntry(2).getProperties().get().getKeys());
+    });
   }
 }

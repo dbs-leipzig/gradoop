@@ -14,40 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.PropertyProjector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Projects an embedding
- * A set of properties can be specified for every entry in the embedding
+ * Projects an Embedding by a set of properties.
+ * For each entry in the embedding a different property set can be specified
  */
-public class EmbeddingProjector extends RichMapFunction<Embedding, Embedding> {
+public class ProjectEmbeddingFunction extends RichMapFunction<Embedding, Embedding> {
   /**
-   * Holds a list of property keys for every entry in th embedding
+   * Names of the properties that will be kept in the projection
    */
-  private HashMap<Integer, List<String>> propertyKeys;
+  private final Map<Integer, List<String>> propertyKeyMapping;
 
   /**
-   * Crete new embedding projector
-   * @param propertyKeys property which will be kept in projection
+   * Creates a new embedding projection operator
+   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
+   *                           values are property keys
    */
-  public EmbeddingProjector(HashMap<Integer, List<String>> propertyKeys) {
-    this.propertyKeys = propertyKeys;
+  public ProjectEmbeddingFunction(Map<Integer, List<String>> propertyKeyMapping) {
+    this.propertyKeyMapping = propertyKeyMapping;
   }
 
   @Override
   public Embedding map(Embedding embedding) {
-    for (Integer column : propertyKeys.keySet()) {
-      PropertyProjector projector = new PropertyProjector(propertyKeys.get(column));
-      embedding.setEntry(column, projector.project(embedding.getEntry(column)));
-    }
-    return embedding;
+    return Projector.project(embedding, propertyKeyMapping);
   }
 }

@@ -20,19 +20,33 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Takes a edge and converts it into an Embedding with three IdEntry
- * Edge -> Embedding[ID(src), ID(edge), ID(target)]
+ * Projects an Edge by a set of properties.
+ * Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
  */
-public class EdgeIdProjector extends RichMapFunction<Edge, Embedding> {
+public class ProjectEdgeFunction extends RichMapFunction<Edge, Embedding> {
+  /**
+   * Names of the properties that will be kept in the projection
+   */
+  private final Map<Integer, List<String>> propertyKeyMapping;
+
+  /**
+   * Creates a new edge projection function
+   * @param propertyKeys List of property names that will be kept in the projection
+   */
+  public ProjectEdgeFunction(List<String> propertyKeys) {
+    this.propertyKeyMapping = new HashMap<>();
+    propertyKeyMapping.put(1, propertyKeys);
+  }
+
   @Override
-  public Embedding map(Edge edge) throws Exception {
-    Embedding embedding = new Embedding();
-    embedding.addEntry(new IdEntry(edge.getSourceId()));
-    embedding.addEntry(new IdEntry(edge.getId()));
-    embedding.addEntry(new IdEntry(edge.getTargetId()));
-    return embedding;
+  public Embedding map(Edge edge) {
+    return Projector.project(Embedding.fromEdge(edge), propertyKeyMapping);
   }
 }

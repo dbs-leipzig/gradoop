@@ -18,4 +18,8 @@
 /**
  * Contains UDFs
  */
+
+/**
+ * Includes RICH functions used for cypher matching
+ */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;

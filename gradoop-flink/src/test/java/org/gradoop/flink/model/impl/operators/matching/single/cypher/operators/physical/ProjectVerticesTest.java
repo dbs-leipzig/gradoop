@@ -31,57 +31,24 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-public class ProjectVerticesTest extends GradoopFlinkTestBase {
+public class ProjectVerticesTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception{
-    DataSet<Vertex> vertexDataSet = verticesForProperties( getPropertyList(Lists.newArrayList("foo", "bar", "baz")));
+    DataSet<Vertex> vertexDataSet =
+      createVerticesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
 
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
     ProjectVertices operator = new ProjectVertices(vertexDataSet, extractedPropertyKeys);
 
-    List<Embedding> results = operator.evaluate().collect();
+    DataSet<Embedding> results = operator.evaluate();
 
-    assertEquals(2,results.size());
-    assertEquals(1,results.get(0).size());
-    assertEquals(ProjectionEntry.class, results.get(0).getEntry(0).getClass());
-    assertEquals(extractedPropertyKeys,results.get(0).getEntry(0).getProperties().get().getKeys());
-  }
+    assertEquals(2, results.count());
 
-  @Test
-  public void returnsIdEntryOnEmtpyPropertyListTets() throws Exception{
-    DataSet<Vertex> vertexDataSet = verticesForProperties( getPropertyList(Lists.newArrayList("foo", "bar", "baz")));
-
-    ArrayList<String> extractedPropertyKeys = Lists.newArrayList();
-    ProjectVertices operator = new ProjectVertices(vertexDataSet, extractedPropertyKeys);
-
-    List<Embedding> results = operator.evaluate().collect();
-
-    assertEquals(2,results.size());
-    assertEquals(1,results.get(0).size());
-    assertEquals(IdEntry.class, results.get(0).getEntry(0).getClass());
-  }
-
-
-
-  private PropertyList getPropertyList(List<String> property_names) {
-    PropertyList properties = new PropertyList();
-
-    for(String property_name : property_names) {
-      properties.set(property_name, property_name);
-    }
-
-    return properties;
-  }
-
-  private DataSet<Vertex> verticesForProperties(PropertyList properties) {
-    VertexFactory vertexFactory = new VertexFactory();
-
-    List<Vertex> vertices = Lists.newArrayList(
-      vertexFactory.createVertex("Label1",properties),
-      vertexFactory.createVertex("Label2",properties)
-    );
-
-    return getExecutionEnvironment().fromCollection(vertices);
+    assertEveryEmbedding(results, (embedding) -> {
+      assertEquals(1, embedding.size());
+      assertEquals(ProjectionEntry.class, embedding.getEntry(0).getClass());
+      assertEquals(extractedPropertyKeys, embedding.getEntry(0).getProperties().get().getKeys());
+    });
   }
 }

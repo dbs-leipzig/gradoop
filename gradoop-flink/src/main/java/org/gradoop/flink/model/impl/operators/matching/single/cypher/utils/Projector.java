@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -27,78 +26,58 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Projects a PropertyList to include only specified properties
+ * Projects an Embedding
  */
-public class PropertyProjector {
-  /**
-   * Which properties to keep in the projection
-   */
-  private List<String> propertyKeys;
+public class Projector {
 
   /**
-   * Create a new projector
-   * @param propertyKeys properties which will be kept
+   * Projects an embedding
+   * @param embedding the embedding to project
+   * @param propertyKeyMap mapping of embedding entries to property keys
+   * @return the projected embedding
    */
-  public PropertyProjector(List<String> propertyKeys) {
-    this.propertyKeys = propertyKeys;
-  }
+  public static Embedding project(Embedding embedding, Map<Integer, List<String>> propertyKeyMap) {
+    for (Map.Entry<Integer, List<String>> pair : propertyKeyMap.entrySet()) {
+      Integer column = pair.getKey();
 
-  /**
-   * projects an embedding entry
-   * @param entry the entry to project
-   * @return the projected entry
-   */
-  public ProjectionEntry project(EmbeddingEntry entry) {
-    ProjectionEntry projectionEntry = new ProjectionEntry(entry.getId());
+      EmbeddingEntry entry = embedding.getEntry(column);
+      PropertyList properties = entry.getProperties().orElse(new PropertyList());
+      List<String> propertyKeys = pair.getValue();
 
-    if(entry.getProperties().isPresent()) {
-      PropertyList properties = projectPropertyList(entry.getProperties().get());
-      projectionEntry.setProperties(properties);
+      ProjectionEntry projectionEntry = new ProjectionEntry(entry.getId());
+      projectionEntry.setProperties(projectPropertyList(properties, propertyKeys));
+
+      embedding.setEntry(column, projectionEntry);
     }
 
-    return projectionEntry;
-  }
-
-  /**
-   * Projects a graph element
-   * @param element the element to project
-   * @return the projected entry
-   */
-  public ProjectionEntry project(GraphElement element) {
-    ProjectionEntry projectionEntry = new ProjectionEntry(element.getId());
-
-    projectionEntry.setProperties(projectPropertyList(element.getProperties()));
-
-    // add label to projectionEntry
-    if(propertyKeys.contains("__label__")) {
-      Property labelProperty = Property.create("__label__", element.getLabel());
-      projectionEntry.addProperty(labelProperty);
-    }
-
-    return projectionEntry;
+    return embedding;
   }
 
   /**
    * projects a PropertyList to include only specified properties
    * @param properties the properties which will be kept
+   * @param propertyKeys List of property names that will be kept in the projection
    * @return the projected property list
    */
-  private PropertyList projectPropertyList(PropertyList properties) {
+  private static PropertyList projectPropertyList(PropertyList properties,
+    List<String> propertyKeys) {
+
     PropertyList projectedList = new PropertyList();
     List<String> remainingKeys = new ArrayList<>(propertyKeys);
 
     // add existing properties to projection
-    for(Property property : properties) {
-      if(remainingKeys.contains(property.getKey())) {
+    for (Property property : properties) {
+      if (remainingKeys.contains(property.getKey())) {
         remainingKeys.remove(property.getKey());
         projectedList.set(property);
       }
     }
 
-    // add missing properties ass null values
-    for(String key : remainingKeys) {
+    // add missing properties as null values
+    for (String key : remainingKeys) {
       projectedList.set(Property.create(key, PropertyValue.NULL_VALUE));
     }
 

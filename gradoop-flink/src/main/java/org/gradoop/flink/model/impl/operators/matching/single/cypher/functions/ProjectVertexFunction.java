@@ -17,44 +17,35 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.PropertyProjector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Converts a vertex into an Embedding containing one ProjectionEntry including all specified
- * properties.
- * vertex -> Embedding(ProjectionEntry)
+ * Projects a Vertex by a set of properties.
+ * Vertex -> Embedding(GraphElementEmbedding(Vertex))
  */
-public class VertexProjector extends RichMapFunction<Vertex, Embedding> {
+public class ProjectVertexFunction extends RichMapFunction<Vertex, Embedding> {
   /**
-   * Specifies properties included in projection
+   * Names of the properties that will be kept in the projection
    */
-  private List<String> keys;
-  /**
-   * Stores a reuse projector
-   */
-  private PropertyProjector projector;
+  private final Map<Integer, List<String>> propertyKeyMapping;
 
   /**
-   * Create a new VertexProjector
-   * @param keys properties included in projection
+   * Creates a new vertex projection function
+   * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
-  public VertexProjector(List<String> keys) {
-    this.keys = keys;
+  public ProjectVertexFunction(List<String> propertyKeys) {
+    this.propertyKeyMapping = new HashMap<>();
+    propertyKeyMapping.put(0, propertyKeys);
   }
 
   @Override
-  public void open(Configuration configuration) {
-    this.projector = new PropertyProjector(keys);
-  }
-
   public Embedding map(Vertex vertex) {
-    Embedding embedding = new Embedding();
-    embedding.addEntry(projector.project(vertex));
-    return embedding;
+    return Projector.project(Embedding.fromVertex(vertex), propertyKeyMapping);
   }
 }
