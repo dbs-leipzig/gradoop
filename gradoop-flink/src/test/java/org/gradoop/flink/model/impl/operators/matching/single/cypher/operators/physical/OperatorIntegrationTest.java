@@ -16,21 +16,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
-import com.google.common.collect.Lists;
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.junit.Test;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-
-import java.util.HashMap;
-
-import static org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection.*;
 
 public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
@@ -72,7 +58,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> p1 =
       new FilterVertices(graph.getVertices(), p1Predicate).evaluate();
     DataSet<Embedding> r1 =
-      new FilterEdges(graph.getEdges(), r1Predicate).evaluate();
+      new FilterVertices(graph.getEdges(), r1Predicate).evaluate();
     DataSet<Embedding> res = new ExpandOne(p1,r1,0,OUT).evaluate();
 
     System.out.println("res.collect() = " + res.collect());
@@ -116,7 +102,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
       new FilterAndProjectVertices(graph.getVertices(), vertexPredicate, Lists.newArrayList("age","name"))
         .evaluate();
 
-    DataSet<Embedding> edges = new ProjectEdges(graph.getEdges(),Lists.newArrayList()).evaluate();
+    DataSet<Embedding> edges = new ProjectGraphElements(graph.getEdges(),Lists.newArrayList()).evaluate();
 
     DataSet<Embedding> aExpanded = new ExpandOne(vertices,edges,0,OUT).evaluate();
 
@@ -141,7 +127,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> vertices =
       new ProjectVertices(graph.getVertices(), Lists.newArrayList()).evaluate();
     DataSet<Embedding> edges =
-      new ProjectEdges(graph.getEdges(), Lists.newArrayList()).evaluate();
+      new ProjectGraphElements(graph.getEdges(), Lists.newArrayList()).evaluate();
 
     DataSet a = new ExpandOne(vertices, edges, 0, OUT).evaluate();
 
@@ -184,7 +170,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> vertices =
       new ProjectVertices(graph.getVertices(),Lists.newArrayList()).evaluate();
     DataSet<Embedding> edges =
-      new ProjectEdges(graph.getEdges(),Lists.newArrayList()).evaluate();
+      new ProjectGraphElements(graph.getEdges(),Lists.newArrayList()).evaluate();
     DataSet<Embedding> a = new ExpandOne(vertices,edges,0,OUT).evaluate();
     DataSet<Embedding> b = new ExpandOne(a,edges,2,OUT).evaluate();
 
@@ -211,7 +197,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> n =
       new ProjectVertices(graph.getVertices(), Lists.newArrayList()).evaluate();
     DataSet<Embedding> edges =
-      new ProjectEdges(graph.getEdges(), Lists.newArrayList()).evaluate();
+      new ProjectGraphElements(graph.getEdges(), Lists.newArrayList()).evaluate();
 
     DataSet<Embedding> res = new Expand(n,edges,0,2,3,OUT).evaluate();
 
@@ -284,7 +270,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
     DataSet<Embedding> c = new FilterVertices(graph.getVertices(),cPredicate).evaluate();
 
-    DataSet<Embedding> edges = new ProjectEdges(graph.getEdges(), Lists.newArrayList()).evaluate();
+    DataSet<Embedding> edges = new ProjectGraphElements(graph.getEdges(), Lists.newArrayList()).evaluate();
 
     DataSet<Embedding> cexpand = new ExpandOne(c,edges,0,IN).evaluate();
 
