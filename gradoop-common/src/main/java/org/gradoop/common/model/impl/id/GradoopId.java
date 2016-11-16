@@ -17,6 +17,7 @@
 
 package org.gradoop.common.model.impl.id;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
@@ -138,8 +139,9 @@ public class GradoopId
    *
    * @return Byte representation
    */
+  @SuppressWarnings({"EI_EXPOSE_REP"})
   public byte[] getRawBytes() {
-    return rawBytes.clone();
+    return rawBytes;
   }
 
   @Override
