@@ -7,7 +7,10 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.nio.ByteBuffer;
+import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
@@ -70,5 +73,31 @@ public class GradoopIdTest {
       "reconstruction from string failed",
       originalId.equals(toFromStringId)
     );
+  }
+  
+  @Test
+  public void testGetRawBytes() {
+    GradoopId originalId = GradoopId.get();
+    assertEquals(16, originalId.getRawBytes().length);
+    assertEquals(
+      "Reconstruction failed",
+      originalId,
+      GradoopId.fromBytes(originalId.getRawBytes())
+    );
+  }
+
+  @Test
+  public void testFromBytes() {
+    UUID uuid = UUID.randomUUID();
+    GradoopId expextedID = new GradoopId(uuid);
+
+    byte[] bytes = new byte[GradoopId.ID_SIZE];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.putLong(uuid.getMostSignificantBits());
+    buffer.putLong(uuid.getLeastSignificantBits());
+
+    GradoopId newId = GradoopId.fromBytes(bytes);
+
+    assertEquals(expextedID, newId);
   }
 }
