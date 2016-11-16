@@ -54,9 +54,8 @@ public class InitGraphHeadWithLineage
   @Override
   public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
     GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
-    Property property = Property.create("lineage", idTuple.f1.toString());
-    Properties properties = new Properties();
-    properties.set(property);
+    Properties properties = Properties.createWithCapacity(1);
+    properties.set("lineage", idTuple.f1);
     head.setProperties(properties);
     return head;
   }
