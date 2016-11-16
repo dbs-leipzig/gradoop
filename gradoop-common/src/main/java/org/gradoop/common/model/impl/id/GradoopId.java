@@ -91,6 +91,11 @@ public class GradoopId
     buffer.putLong(uuid.getLeastSignificantBits());
   }
 
+  /**
+   * Creates a GradoopId from a given byte representation
+   *
+   * @param bytes the GradoopId represented by the byte array
+   */
   private GradoopId(byte[] bytes) {
     this.rawBytes = bytes;
   }
@@ -134,7 +139,7 @@ public class GradoopId
    * @return Byte representation
    */
   public byte[] getRawBytes() {
-    return rawBytes;
+    return rawBytes.clone();
   }
 
   @Override
