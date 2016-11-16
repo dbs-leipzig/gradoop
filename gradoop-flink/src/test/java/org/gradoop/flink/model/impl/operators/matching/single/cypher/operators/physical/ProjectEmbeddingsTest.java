@@ -17,6 +17,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
@@ -36,7 +37,7 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings = createEmbeddings(
       Lists.newArrayList(
         new IdEntry(GradoopId.get()),
-        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o"))),
+        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
         new IdEntry(GradoopId.get())
       )
     );
@@ -55,7 +56,10 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
       assertEquals(IdEntry.class,                e.getEntry(0).getClass());
       assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
       assertEquals(IdEntry.class,                e.getEntry(2).getClass());
-      assertEquals(extractedPropertyKeys.get(1), e.getEntry(1).getProperties().get().getKeys());
+      assertEquals(
+        Sets.newHashSet(extractedPropertyKeys.get(1)),
+        e.getEntry(1).getProperties().get().getKeys()
+      );
     });
   }
 
@@ -64,8 +68,8 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings = createEmbeddings(
       Lists.newArrayList(
         new IdEntry(GradoopId.get()),
-        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o"))),
-        new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("a", "b", "c")))
+        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
+        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("a", "b", "c")))
       )
     );
 
@@ -86,8 +90,15 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
       assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
       assertEquals(ProjectionEntry.class,        e.getEntry(2).getClass());
 
-      assertEquals(extractedPropertyKeys.get(1), e.getEntry(1).getProperties().get().getKeys());
-      assertEquals(extractedPropertyKeys.get(2), e.getEntry(2).getProperties().get().getKeys());
+      assertEquals(
+        Sets.newHashSet(extractedPropertyKeys.get(1))
+        , e.getEntry(1).getProperties().get().getKeys()
+      );
+
+      assertEquals(
+        Sets.newHashSet(extractedPropertyKeys.get(2)),
+        e.getEntry(2).getProperties().get().getKeys()
+      );
     });
   }
 }

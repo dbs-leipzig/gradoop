@@ -17,10 +17,11 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import java.util.ArrayList;
@@ -48,7 +49,9 @@ public class ProjectVerticesTest extends PhysicalOperatorTest {
     assertEveryEmbedding(results, (embedding) -> {
       assertEquals(1, embedding.size());
       assertEquals(ProjectionEntry.class, embedding.getEntry(0).getClass());
-      assertEquals(extractedPropertyKeys, embedding.getEntry(0).getProperties().get().getKeys());
+      assertEquals(Sets.newHashSet(extractedPropertyKeys),
+        embedding.getEntry(0).getProperties().get().getKeys()
+      );
     });
   }
 }

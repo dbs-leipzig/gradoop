@@ -17,7 +17,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.Optional;
 
@@ -35,5 +35,5 @@ public interface EmbeddingEntry {
    * Returns the list of properties of this element
    * @return properties
    */
-  Optional<PropertyList>  getProperties();
+  Optional<Properties>  getProperties();
 }

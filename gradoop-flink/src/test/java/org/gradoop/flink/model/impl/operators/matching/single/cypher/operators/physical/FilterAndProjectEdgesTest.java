@@ -17,11 +17,12 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
@@ -37,7 +38,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Anton");
     DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -55,7 +56,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testKeepEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
     DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -73,13 +74,13 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testProjectRemainingEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList propertiesMatch = PropertyList.create();
+    Properties propertiesMatch = Properties.create();
     propertiesMatch.set("name", "Alice");
     propertiesMatch.set("foo", "bar");
     Edge edgeMatch =
       new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), propertiesMatch);
 
-    PropertyList propertiesMiss = PropertyList.create();
+    Properties propertiesMiss = Properties.create();
     propertiesMiss.set("name", "Anton");
     propertiesMiss.set("foo", "baz");
     Edge edgeMiss =
@@ -105,8 +106,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     assertEquals(edgeMatch.getId(),       result.get(0).getEntry(1).getId());
     assertEquals(edgeMatch.getTargetId(), result.get(0).getEntry(2).getId());
 
-    assertEquals(
-      Lists.newArrayList("foo"),
+    assertEquals(Sets.newHashSet("foo"),
       result.get(0).getEntry(1).getProperties().get().getKeys()
     );
   }

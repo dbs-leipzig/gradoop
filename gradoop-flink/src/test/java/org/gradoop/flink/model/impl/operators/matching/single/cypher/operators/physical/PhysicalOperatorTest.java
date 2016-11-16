@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -51,7 +51,7 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
   }
 
   DataSet<Vertex> createVerticesWithProperties(List<String> property_names) {
-    PropertyList properties = getPropertyList(property_names);
+    Properties properties = getProperties(property_names);
     VertexFactory vertexFactory = new VertexFactory();
 
     List<Vertex> vertices = Lists.newArrayList(
@@ -63,7 +63,7 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
   }
 
   DataSet<Edge> createEdgesWithProperties(List<String> property_names) {
-    PropertyList properties = getPropertyList(property_names);
+    Properties properties = getProperties(property_names);
     EdgeFactory edgeFactory = new EdgeFactory();
 
     List<Edge> edges = Lists.newArrayList(
@@ -74,8 +74,8 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(edges);
   }
 
-  PropertyList getPropertyList(List<String> property_names) {
-    PropertyList properties = new PropertyList();
+  Properties getProperties(List<String> property_names) {
+    Properties properties = new Properties();
 
     for(String property_name : property_names) {
       properties.set(property_name, property_name);

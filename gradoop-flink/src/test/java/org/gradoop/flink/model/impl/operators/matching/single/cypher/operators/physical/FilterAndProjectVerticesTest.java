@@ -17,10 +17,11 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
@@ -35,7 +36,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
   public void testFilterVertices() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Anton");
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -53,7 +54,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
   public void testKeepVertices() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -71,11 +72,11 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
   public void testProjectRemainingVertices() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList propertiesMatch = PropertyList.create();
+    Properties propertiesMatch = Properties.create();
     propertiesMatch.set("name", "Alice");
     propertiesMatch.set("foo", "bar");
 
-    PropertyList propertiesMiss = PropertyList.create();
+    Properties propertiesMiss = Properties.create();
     propertiesMiss.set("name", "Anton");
     propertiesMiss.set("foo", "baz");
 
@@ -94,7 +95,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     assertEquals(ProjectionEntry.class, result.get(0).getEntry(0).getClass());
     assertEquals(vertex.collect().get(0).getId(), result.get(0).getEntry(0).getId());
     assertEquals(
-      Lists.newArrayList("foo"),
+      Sets.newHashSet("foo"),
       result.get(0).getEntry(0).getProperties().get().getKeys()
     );
   }

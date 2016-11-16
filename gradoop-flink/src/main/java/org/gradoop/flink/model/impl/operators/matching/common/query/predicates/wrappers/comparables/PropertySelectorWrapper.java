@@ -16,7 +16,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.comparables;
 
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions
   .MissingElementException;
@@ -60,7 +60,7 @@ public class PropertySelectorWrapper extends ComparableWrapper {
     }
 
     return entry.getProperties().
-      orElse(new PropertyList()).
+      orElse(new Properties()).
       get(propertySelector.getPropertyName());
   }
 

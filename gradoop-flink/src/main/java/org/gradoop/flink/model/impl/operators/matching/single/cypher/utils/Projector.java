@@ -17,8 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
@@ -44,11 +44,11 @@ public class Projector {
       Integer column = pair.getKey();
 
       EmbeddingEntry entry = embedding.getEntry(column);
-      PropertyList properties = entry.getProperties().orElse(new PropertyList());
+      Properties properties = entry.getProperties().orElse(new Properties());
       List<String> propertyKeys = pair.getValue();
 
       ProjectionEntry projectionEntry = new ProjectionEntry(entry.getId());
-      projectionEntry.setProperties(projectPropertyList(properties, propertyKeys));
+      projectionEntry.setProperties(projectProperties(properties, propertyKeys));
 
       embedding.setEntry(column, projectionEntry);
     }
@@ -57,15 +57,15 @@ public class Projector {
   }
 
   /**
-   * projects a PropertyList to include only specified properties
+   * projects Properties to include only specified properties
    * @param properties the properties which will be kept
    * @param propertyKeys List of property names that will be kept in the projection
    * @return the projected property list
    */
-  private static PropertyList projectPropertyList(PropertyList properties,
+  private static Properties projectProperties(Properties properties,
     List<String> propertyKeys) {
 
-    PropertyList projectedList = new PropertyList();
+    Properties projectedList = new Properties();
     List<String> remainingKeys = new ArrayList<>(propertyKeys);
 
     // add existing properties to projection

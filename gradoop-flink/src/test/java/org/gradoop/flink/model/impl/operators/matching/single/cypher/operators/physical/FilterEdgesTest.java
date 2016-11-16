@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
@@ -37,7 +37,7 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Anton");
     DataSet<Edge> edge = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -54,7 +54,7 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
   public void testKeepEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
     DataSet<Edge> edge = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -71,7 +71,7 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
   public void testReturnEmbeddingWithThreeIdEntries() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
 
     Edge edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);

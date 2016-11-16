@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
@@ -39,10 +39,10 @@ public class FilterTest {
     String query = "MATCH (a), (b), (c) WHERE a = b AND ( b.name = \"Bob\" OR b.age < c.age )";
     CNF predicates = new QueryHandler(query).getPredicates();
 
-    PropertyList propertiesA = PropertyList.create();
+    Properties propertiesA = Properties.create();
     propertiesA.set("age", 42);
 
-    PropertyList propertiesB = PropertyList.create();
+    Properties propertiesB = Properties.create();
     propertiesB.set("age", 23);
     propertiesB.set("name", "Bob");
 
@@ -69,10 +69,10 @@ public class FilterTest {
     String query = "MATCH (a), (b), (c) WHERE a = b AND b.name = \"Bob\" OR b.age < c.age";
     CNF predicates = new QueryHandler(query).getPredicates();
 
-    PropertyList propertiesA = PropertyList.create();
+    Properties propertiesA = Properties.create();
     propertiesA.set("age", 42);
 
-    PropertyList propertiesB = PropertyList.create();
+    Properties propertiesB = Properties.create();
     propertiesB.set("age", 66);
     propertiesB.set("name", "Birgit");
 

@@ -47,7 +47,6 @@ public abstract class Element implements EPGMElement {
    * Default constructor.
    */
   protected Element() {
-    properties = new PropertyList();
   }
 
   /**

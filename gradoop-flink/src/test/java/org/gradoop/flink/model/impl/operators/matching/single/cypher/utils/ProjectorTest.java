@@ -17,10 +17,11 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
@@ -40,8 +41,8 @@ public class ProjectorTest {
   @Test
   public void projectWithExistingPropertyKeysTest() throws Exception{
     Embedding embedding = new Embedding(Lists.newArrayList(
-      new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o"))),
-      new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("a", "b", "c")))
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("a", "b", "c")))
     ));
 
     Map<Integer, List<String>> propertyKeyMap = new HashMap<>();
@@ -51,12 +52,12 @@ public class ProjectorTest {
     Embedding result = Projector.project(embedding, propertyKeyMap);
 
     assertEquals(
-      Lists.newArrayList("m", "o"),
+      Sets.newHashSet("m", "o"),
       result.getEntry(0).getProperties().get().getKeys()
     );
 
     assertEquals(
-      Lists.newArrayList("a", "b"),
+      Sets.newHashSet("a", "b"),
       result.getEntry(1).getProperties().get().getKeys()
     );
   }
@@ -64,7 +65,7 @@ public class ProjectorTest {
   @Test
   public void embeddingEntryProjectionHasCorrectId() throws Exception{
     ProjectionEntry projectionEntry =
-      new ProjectionEntry(GradoopId.get(), getPropertyList(Lists.newArrayList("m", "n", "o")));
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o")));
 
     Embedding embedding = new Embedding(Lists.newArrayList(
       projectionEntry
@@ -93,11 +94,14 @@ public class ProjectorTest {
 
     assertEquals(ProjectionEntry.class,        result.getEntry(0).getClass());
     assertEquals(entry.getId(),                result.getEntry(0).getId());
-    assertEquals(Lists.newArrayList("m", "o"), result.getEntry(0).getProperties().get().getKeys());
+    assertEquals(
+      Sets.newHashSet("m", "o"),
+      result.getEntry(0).getProperties().get().getKeys()
+    );
   }
 
-  private PropertyList getPropertyList(List<String> property_names) {
-    PropertyList properties = new PropertyList();
+  private Properties getProperties(List<String> property_names) {
+    Properties properties = new Properties();
 
     for(String property_name : property_names) {
       properties.set(property_name, property_name);

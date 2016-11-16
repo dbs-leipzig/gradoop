@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
@@ -37,7 +37,7 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
   public void testFilterVertices() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Anton");
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -54,7 +54,7 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
   public void testKeepVertices() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
@@ -71,7 +71,7 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
   public void testReturnEmbeddingWithIdEntry() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    PropertyList properties = PropertyList.create();
+    Properties properties = Properties.create();
     properties.set("name", "Alice");
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(

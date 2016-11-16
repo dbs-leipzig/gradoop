@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
@@ -38,10 +38,10 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testFilterEmbeddings() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    PropertyList propertiesA = PropertyList.create();
+    Properties propertiesA = Properties.create();
     propertiesA.set("age", 23);
 
-    PropertyList propertiesB = PropertyList.create();
+    Properties propertiesB = Properties.create();
     propertiesB.set("age", 42);
 
     DataSet<Embedding> embedding = getExecutionEnvironment().fromCollection(
@@ -66,10 +66,10 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testKeepEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    PropertyList propertiesA = PropertyList.create();
+    Properties propertiesA = Properties.create();
     propertiesA.set("age", 42);
 
-    PropertyList propertiesB = PropertyList.create();
+    Properties propertiesB = Properties.create();
     propertiesB.set("age", 23);
 
     DataSet<Embedding> embedding = getExecutionEnvironment().fromCollection(
@@ -94,10 +94,10 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testDontAlterEmbedding() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    PropertyList propertiesA = PropertyList.create();
+    Properties propertiesA = Properties.create();
     propertiesA.set("age", 42);
 
-    PropertyList propertiesB = PropertyList.create();
+    Properties propertiesB = Properties.create();
     propertiesB.set("age", 23);
 
     Embedding embedding = new Embedding(
