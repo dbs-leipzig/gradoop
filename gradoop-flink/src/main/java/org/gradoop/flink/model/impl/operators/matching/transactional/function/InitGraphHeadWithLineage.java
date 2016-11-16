@@ -26,7 +26,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.Property;
 
 /**
  * Initializes a new graph head from a given GradoopId and its lineage information, e.g. the
