@@ -2,6 +2,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -116,10 +117,10 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
       getExecutionEnvironment().execute();
 
-      Map<String, String> lineageIdMap = new HashMap<>();
+      Map<GradoopId, String> lineageIdMap = new HashMap<>();
 
       for(GraphHead original : originalHeads) {
-        lineageIdMap.put(original.getId().toString(), original.getLabel());
+        lineageIdMap.put(original.getId(), original.getLabel());
       }
 
       int aCount = 0;
@@ -128,7 +129,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
       int dCount = 0;
       int eCount = 0;
       for(GraphHead head : resultHeads) {
-        String id = head.getProperties().get("lineage").getString();
+        GradoopId id = head.getProperties().get("lineage").getGradoopId();
         if (lineageIdMap.get(id).equals("A")) {
           aCount++;
         }
