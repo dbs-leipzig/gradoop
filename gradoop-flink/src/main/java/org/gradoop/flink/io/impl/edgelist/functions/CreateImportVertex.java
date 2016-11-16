@@ -20,8 +20,8 @@ package org.gradoop.flink.io.impl.edgelist.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.util.GConstants;
 
 /**
@@ -60,7 +60,7 @@ public class CreateImportVertex
   public ImportVertex<Long> map(Tuple2<Long, String> inputTuple) throws
     Exception {
     reuseVertex.setId(inputTuple.f0);
-    PropertyList properties = PropertyList.createWithCapacity(1);
+    Properties properties = Properties.createWithCapacity(1);
     properties.set(propertyKey, inputTuple.f1);
     reuseVertex.setProperties(properties);
     return reuseVertex;

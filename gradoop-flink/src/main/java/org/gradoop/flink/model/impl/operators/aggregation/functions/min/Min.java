@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
@@ -29,6 +29,6 @@ public abstract class Min implements AggregateFunction {
   @Override
   public PropertyValue aggregate(PropertyValue aggregate,
     PropertyValue increment) {
-    return PropertyValues.Numeric.min(aggregate, increment);
+    return PropertyValueUtils.Numeric.min(aggregate, increment);
   }
 }

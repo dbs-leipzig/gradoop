@@ -3,11 +3,11 @@ package org.gradoop.flink.io.impl.graph;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.junit.Test;
 
 import java.util.Map;
@@ -66,12 +66,12 @@ public class GraphDataSourceTest extends GradoopFlinkTestBase {
     properties.put("foo", 42);
 
     DataSet<ImportVertex<Long>> importVertices = env.fromElements(
-      new ImportVertex<>(0L, "A", PropertyList.createFromMap(properties)),
-      new ImportVertex<>(1L, "B", PropertyList.createFromMap(properties)));
+      new ImportVertex<>(0L, "A", Properties.createFromMap(properties)),
+      new ImportVertex<>(1L, "B", Properties.createFromMap(properties)));
 
     DataSet<ImportEdge<Long>> importEdges = env.fromElements(
-      new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
-      new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
+      new ImportEdge<>(0L, 0L, 1L, "a", Properties.createFromMap(properties)),
+      new ImportEdge<>(1L, 1L, 0L, "b", Properties.createFromMap(properties)));
 
     LogicalGraph expected =
       getLoaderFromString("expected[" +
@@ -96,12 +96,12 @@ public class GraphDataSourceTest extends GradoopFlinkTestBase {
     properties.put("foo", 42);
 
     DataSet<ImportVertex<Long>> importVertices = env.fromElements(
-      new ImportVertex<>(0L, "A", PropertyList.createFromMap(properties)),
-      new ImportVertex<>(1L, "B", PropertyList.createFromMap(properties)));
+      new ImportVertex<>(0L, "A", Properties.createFromMap(properties)),
+      new ImportVertex<>(1L, "B", Properties.createFromMap(properties)));
 
     DataSet<ImportEdge<Long>> importEdges = env.fromElements(
-      new ImportEdge<>(0L, 0L, 1L, "a", PropertyList.createFromMap(properties)),
-      new ImportEdge<>(1L, 1L, 0L, "b", PropertyList.createFromMap(properties)));
+      new ImportEdge<>(0L, 0L, 1L, "a", Properties.createFromMap(properties)),
+      new ImportEdge<>(1L, 1L, 0L, "b", Properties.createFromMap(properties)));
 
     LogicalGraph expected = getLoaderFromString("expected[" +
         "(a:A {foo : 42, __L : 0L})" +

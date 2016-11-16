@@ -20,8 +20,8 @@ package org.gradoop.flink.io.impl.edgelist.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.util.GConstants;
 
 /**
@@ -62,7 +62,7 @@ public class CreateImportEdge
   public ImportEdge<Long> map(Tuple2<Long, Tuple2<Long, Long>> idTuple)
       throws Exception {
     reuseEdge.setId(idTuple.f0);
-    reuseEdge.setProperties(PropertyList.create());
+    reuseEdge.setProperties(Properties.create());
     reuseEdge.setSourceId(idTuple.f1.f0);
     reuseEdge.setTargetId(idTuple.f1.f1);
     return reuseEdge;

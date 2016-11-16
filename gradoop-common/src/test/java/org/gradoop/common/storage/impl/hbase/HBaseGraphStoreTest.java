@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
@@ -185,7 +185,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
-    PropertyList props = PropertyList.create();
+    Properties props = Properties.create();
     props.set("k1", value);
 
     final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
@@ -212,7 +212,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";
 
-    PropertyList properties = PropertyList.createFromMap(SUPPORTED_PROPERTIES);
+    Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
     final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);

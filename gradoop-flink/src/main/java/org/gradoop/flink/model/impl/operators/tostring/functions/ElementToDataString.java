@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.tostring.functions;
 import org.apache.commons.lang3.StringUtils;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public abstract class ElementToDataString<EL extends Element> {
 
     label += "{";
 
-    PropertyList properties = el.getProperties();
+    Properties properties = el.getProperties();
 
     if (properties != null) {
       List<String> propertyLabels = new ArrayList<>();

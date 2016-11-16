@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
@@ -31,7 +31,7 @@ public abstract class Count
   @Override
   public PropertyValue aggregate(
     PropertyValue aggregate, PropertyValue increment) {
-    return PropertyValues.Numeric.add(aggregate, increment);
+    return PropertyValueUtils.Numeric.add(aggregate, increment);
   }
 
   @Override

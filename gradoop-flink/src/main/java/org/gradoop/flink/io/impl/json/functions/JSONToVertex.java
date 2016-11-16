@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Reads vertex data from a json document. The document contains at least
@@ -70,7 +70,7 @@ public class JSONToVertex extends JSONToEntity
     JSONObject jsonVertex = new JSONObject(s);
     GradoopId vertexID = getID(jsonVertex);
     String label = getLabel(jsonVertex);
-    PropertyList properties = PropertyList.createFromMap(
+    Properties properties = Properties.createFromMap(
       getProperties(jsonVertex));
     GradoopIdSet graphs = getGraphs(jsonVertex);
 

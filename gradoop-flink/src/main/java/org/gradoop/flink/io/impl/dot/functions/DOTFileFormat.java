@@ -22,8 +22,8 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
@@ -232,10 +232,10 @@ public class DOTFileFormat
    * Writes all attributes of the epgm element as string
    *
    * @param label         label of the epgm element
-   * @param propertyList  List of properties
+   * @param properties  List of properties
    * @return              properties as string
    */
-  private String writeDOTAttributes(String label, PropertyList propertyList) {
+  private String writeDOTAttributes(String label, Properties properties) {
 
     StringBuilder attributeBuilder = new StringBuilder();
 
@@ -256,8 +256,8 @@ public class DOTFileFormat
 
     // writes for each property:
     // ",propertyKey1=propertyValue1,propertyKey2=propertyValue2,..."
-    if (propertyList != null && propertyList.size() > 0) {
-      for (Property property : propertyList) {
+    if (properties != null && properties.size() > 0) {
+      for (Property property : properties) {
         attributeBuilder.append(String.format("%s%s%s%s%s",
           DOT_ATTRIBUTE_SEPARATOR,
           property.getKey(),

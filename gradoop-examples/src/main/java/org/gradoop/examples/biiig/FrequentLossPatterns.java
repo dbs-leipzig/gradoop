@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValues;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphDecoder;
@@ -256,7 +256,7 @@ public class FrequentLossPatterns
 
       } else if (vertex.hasProperty(EXPENSE_KEY)) {
         PropertyValue expense = vertex.getPropertyValue(EXPENSE_KEY);
-        increment = PropertyValues.Numeric
+        increment = PropertyValueUtils.Numeric
           .multiply(expense, PropertyValue.create(-1));
 
       } else {

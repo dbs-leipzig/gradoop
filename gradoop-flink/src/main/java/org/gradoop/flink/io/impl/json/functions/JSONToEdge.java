@@ -25,7 +25,7 @@ import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Reads edge data from a json document. The document contains at least
@@ -73,7 +73,7 @@ public class JSONToEdge extends JSONToEntity
     String edgeLabel = getLabel(jsonEdge);
     GradoopId sourceID = getSourceId(jsonEdge);
     GradoopId targetID = getTargetId(jsonEdge);
-    PropertyList properties = PropertyList.createFromMap(
+    Properties properties = Properties.createFromMap(
       getProperties(jsonEdge));
     GradoopIdSet graphs = getGraphs(jsonEdge);
 

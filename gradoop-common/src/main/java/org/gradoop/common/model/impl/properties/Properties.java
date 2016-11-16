@@ -17,30 +17,22 @@
 
 package org.gradoop.common.model.impl.properties;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Represents a list of properties.
- *
- * Properties inside property lists are ordered by their insertion order. A
- * property list cannot contain two properties with the same key.
- *
- * Two property lists are considered equal, if they contain the same
- * properties in the same order.
- *
+ * Represents the properties of an {@link org.gradoop.common.model.impl.pojo.Element}.
  */
-public class PropertyList implements Iterable<Property>, Writable, Serializable {
+public class Properties implements Iterable<Property>, Writable, Serializable {
 
   /**
    * Default capacity for new property lists.
@@ -50,13 +42,13 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
   /**
    * Internal representation
    */
-  private List<Property> properties;
+  private Map<String, PropertyValue> properties;
 
   /**
    * Default constructor
    */
-  public PropertyList() {
-    properties = Lists.newArrayListWithCapacity(DEFAULT_CAPACITY);
+  public Properties() {
+    properties = new HashMap<>(DEFAULT_CAPACITY);
   }
 
   /**
@@ -64,8 +56,8 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    *
    * @param capacity initial capacity
    */
-  private PropertyList(int capacity) {
-    properties = Lists.newArrayListWithCapacity(capacity);
+  private Properties(int capacity) {
+    properties = new HashMap<>(capacity);
   }
 
   /**
@@ -73,8 +65,8 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    *
    * @return PropertyList
    */
-  public static PropertyList create() {
-    return new PropertyList();
+  public static Properties create() {
+    return new Properties();
   }
 
   /**
@@ -83,8 +75,8 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * @param capacity initial capacity
    * @return PropertyList
    */
-  public static PropertyList createWithCapacity(int capacity) {
-    return new PropertyList(capacity);
+  public static Properties createWithCapacity(int capacity) {
+    return new Properties(capacity);
   }
 
   /**
@@ -95,13 +87,13 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * @param map key value map
    * @return PropertyList
    */
-  public static PropertyList createFromMap(Map<String, Object> map) {
-    PropertyList properties;
+  public static Properties createFromMap(Map<String, Object> map) {
+    Properties properties;
 
     if (map == null) {
-      properties = PropertyList.createWithCapacity(0);
+      properties = Properties.createWithCapacity(0);
     } else {
-      properties = PropertyList.createWithCapacity(map.size());
+      properties = Properties.createWithCapacity(map.size());
 
       for (Map.Entry<String, Object> entry : map.entrySet()) {
         properties.set(entry.getKey(), PropertyValue.create(entry.getValue()));
@@ -117,7 +109,7 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * @return property keys
    */
   public Iterable<String> getKeys() {
-    return properties.stream().map(Property::getKey).collect(Collectors.toList());
+    return properties.keySet();
   }
 
   /**
@@ -135,17 +127,11 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * exist.
    *
    * @param key property key
-   * @return propert value or {@code null} if key does not exist
+   * @return property value or {@code null} if key does not exist
    */
   public PropertyValue get(String key) {
-    PropertyValue result = null;
-    for (Property property : properties) {
-      if (property.getKey().equals(key)) {
-        result = property.getValue();
-        break;
-      }
-    }
-    return result;
+    Objects.requireNonNull(key);
+    return properties.get(key);
   }
 
   /**
@@ -155,18 +141,7 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * @param property property
    */
   public void set(Property property) {
-    int index = 0;
-    for (Property epgmProperty : properties) {
-      if (epgmProperty.getKey().equals(property.getKey())) {
-        break;
-      }
-      index++;
-    }
-    if (index >= size()) {
-      properties.add(property);
-    } else {
-      properties.set(index, property);
-    }
+    set(property.getKey(), property.getValue());
   }
 
   /**
@@ -177,7 +152,9 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * @param value property value
    */
   public void set(String key, PropertyValue value) {
-    set(Property.create(key, value));
+    Objects.requireNonNull(key);
+    Objects.requireNonNull(value);
+    properties.put(key, value);
   }
 
   /**
@@ -203,30 +180,24 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
    * Removes the property of the given key from the list.
    *
    * @param key property key
-   * @return true if the list contained a property with the given key
+   * @return the previous value associated with <tt>key</tt>, or
+   *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
    */
-  public boolean remove(String key) {
-    for (Property property : properties) {
-      if (property.getKey().equals(key)) {
-        return properties.remove(property);
-      }
-    }
-    return false;
+  public PropertyValue remove(String key) {
+    Objects.requireNonNull(key);
+    return properties.remove(key);
   }
 
   /**
    * Removes the given property from the list.
    *
    * @param property property
-   * @return true if the list contained the given property
+   * @return the previous value associated with <tt>key</tt>, or
+   *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
    */
-  public boolean remove(Property property) {
-    for (Property epgmProperty : properties) {
-      if (epgmProperty.getKey().equals(property.getKey())) {
-        return properties.remove(property);
-      }
-    }
-    return false;
+  public PropertyValue remove(Property property) {
+    Objects.requireNonNull(property);
+    return remove(property.getKey());
   }
 
   /**
@@ -264,7 +235,7 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
       return false;
     }
 
-    PropertyList that = (PropertyList) o;
+    Properties that = (Properties) o;
 
     return !(properties != null ? !properties.equals(that.properties) :
       that.properties != null);
@@ -283,31 +254,41 @@ public class PropertyList implements Iterable<Property>, Writable, Serializable 
 
   @Override
   public Iterator<Property> iterator() {
-    return properties.iterator();
+    return properties.entrySet().stream()
+      .map(e -> Property.create(e.getKey(), e.getValue()))
+      .collect(Collectors.toList()).iterator();
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeInt(properties.size());
-    for (Property property : properties) {
-      property.write(dataOutput);
+
+    for (Map.Entry<String, PropertyValue> entry : properties.entrySet()) {
+      dataOutput.writeUTF(entry.getKey());
+      entry.getValue().write(dataOutput);
     }
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
     int propertyCount = dataInput.readInt();
-    properties = Lists.newArrayListWithCapacity(propertyCount);
+    this.properties = new HashMap<>(propertyCount);
+
+    String key;
+    PropertyValue value;
+
     for (int i = 0; i < propertyCount; i++) {
-      Property p = new Property();
-      p.readFields(dataInput);
-      properties.add(p);
+      key = dataInput.readUTF();
+      value = new PropertyValue();
+      value.readFields(dataInput);
+      properties.put(key, value);
     }
   }
 
   @Override
   public String toString() {
-    return StringUtils.join(properties, ",");
+    return properties.entrySet().stream()
+      .map(e -> Property.create(e.getKey(), e.getValue()).toString())
+      .collect(Collectors.joining(","));
   }
-
 }

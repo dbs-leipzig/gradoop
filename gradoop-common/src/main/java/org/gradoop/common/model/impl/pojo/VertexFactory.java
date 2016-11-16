@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GConstants;
 
 import java.io.Serializable;
@@ -72,7 +72,7 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public Vertex createVertex(String label, PropertyList properties) {
+  public Vertex createVertex(String label, Properties properties) {
     return initVertex(GradoopId.get(), label, properties);
   }
 
@@ -81,7 +81,7 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
    */
   @Override
   public Vertex initVertex(final GradoopId vertexID, final String label,
-    PropertyList properties) {
+    Properties properties) {
     return initVertex(vertexID, label, properties, null);
   }
 
@@ -106,7 +106,7 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public Vertex createVertex(String label, PropertyList properties,
+  public Vertex createVertex(String label, Properties properties,
     GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, properties, graphIds);
   }
@@ -116,7 +116,7 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
    */
   @Override
   public Vertex initVertex(final GradoopId id, final String label,
-    final PropertyList properties, final GradoopIdSet graphs) {
+    final Properties properties, final GradoopIdSet graphs) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
     return new Vertex(id, label, properties, graphs);

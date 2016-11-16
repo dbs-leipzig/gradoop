@@ -166,8 +166,7 @@ public class Property implements WritableComparable<Property>, Serializable {
 
   @Override
   public String toString() {
-    return String
-      .format("%s=%s:%s", key, value, value.getType() != null ?
-        value.getType().getSimpleName() : "null");
+    return String.format("%s=%s:%s", key, value, value.getType() != null ?
+      value.getType().getSimpleName() : "null");
   }
 }

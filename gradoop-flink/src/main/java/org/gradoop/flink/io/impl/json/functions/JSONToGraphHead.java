@@ -22,7 +22,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Reads graph data from a json document. The document contains at least
@@ -68,7 +68,7 @@ public class JSONToGraphHead extends JSONToEntity
     JSONObject jsonGraph = new JSONObject(s);
     GradoopId graphID = getID(jsonGraph);
     String label = getLabel(jsonGraph);
-    PropertyList properties = PropertyList.createFromMap(
+    Properties properties = Properties.createFromMap(
       getProperties(jsonGraph));
 
     return graphHeadFactory.initGraphHead(graphID, label, properties);

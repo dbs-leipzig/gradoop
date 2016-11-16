@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Utilities for operations on multiple property values.
  */
-public class PropertyValues {
+public class PropertyValueUtils {
 
   /**
    * Boolean utilities.
