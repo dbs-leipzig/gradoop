@@ -24,7 +24,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
@@ -131,7 +131,7 @@ public class PokecExample {
           importVertex.setId(Long.parseLong(fields[0])); // user-id
           importVertex.setLabel(VERTEX_LABEL);
 
-          PropertyList properties = PropertyList.create();
+          Properties properties = Properties.create();
 
           // set gender if existing
           String genderString = fields[CSV_IDX_GENDER];
@@ -183,7 +183,7 @@ public class PokecExample {
           importEdge.setSourceId(value.f1.f0);
           importEdge.setTargetId(value.f1.f1);
           importEdge.setLabel(EDGE_LABEL);
-          importEdge.setProperties(PropertyList.create());
+          importEdge.setProperties(Properties.create());
           return importEdge;
         }
       }).withForwardedFields("f0;f1.f0->f1;f1.f1->f2");

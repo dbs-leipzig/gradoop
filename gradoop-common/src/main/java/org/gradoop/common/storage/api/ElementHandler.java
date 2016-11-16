@@ -24,7 +24,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -96,7 +96,7 @@ public interface ElementHandler extends Serializable {
    * @param res row result
    * @return all properties contained in the row
    */
-  PropertyList readProperties(final Result res) throws IOException;
+  Properties readProperties(final Result res) throws IOException;
 
   /**
    * Creates table based on the given table descriptor.

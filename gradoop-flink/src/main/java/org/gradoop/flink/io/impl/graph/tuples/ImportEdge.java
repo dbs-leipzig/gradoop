@@ -18,7 +18,7 @@
 package org.gradoop.flink.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <K> vertex/edge identifier type
  */
 public class ImportEdge<K extends Comparable<K>>
-  extends Tuple5<K, K, K, String, PropertyList> {
+  extends Tuple5<K, K, K, String, Properties> {
 
   /**
    * Default constructor for (de-)serialization.
@@ -63,7 +63,7 @@ public class ImportEdge<K extends Comparable<K>>
    */
   public ImportEdge(K edgeId, K sourceId, K targetId, String label) {
     this(edgeId, sourceId, targetId, label,
-      PropertyList.createWithCapacity(0));
+      Properties.createWithCapacity(0));
   }
 
   /**
@@ -76,7 +76,7 @@ public class ImportEdge<K extends Comparable<K>>
    * @param properties  edge properties
    */
   public ImportEdge(K edgeId, K sourceId, K targetId, String label,
-    PropertyList properties) {
+    Properties properties) {
     setId(edgeId);
     setSourceId(sourceId);
     setTargetId(targetId);
@@ -116,11 +116,11 @@ public class ImportEdge<K extends Comparable<K>>
     f3 = checkNotNull(label, "label was null");
   }
 
-  public PropertyList getProperties() {
+  public Properties getProperties() {
     return f4;
   }
 
-  public void setProperties(PropertyList properties) {
+  public void setProperties(Properties properties) {
     f4 = checkNotNull(properties, "properties were null");
   }
 }

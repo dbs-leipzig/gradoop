@@ -24,11 +24,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.api.ElementHandler;
 import org.gradoop.common.util.GConstants;
-import org.gradoop.common.model.impl.properties.PropertyList;
 
 import java.io.IOException;
 import java.util.Map;
@@ -52,8 +52,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   /**
    * Byte representation of the properties column family.
    */
-  static final byte[] CF_PROPERTIES_BYTES =
-    Bytes.toBytes(GConstants.CF_PROPERTIES);
+  static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(GConstants.CF_PROPERTIES);
 
   /**
    * {@inheritDoc}
@@ -126,8 +125,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public PropertyList readProperties(final Result res) throws IOException {
-    PropertyList properties = PropertyList.create();
+  public Properties readProperties(final Result res) throws IOException {
+    Properties properties = Properties.create();
     Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
     for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
       properties.set(
@@ -147,8 +146,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   protected Set<Long> getColumnKeysFromFamily(final Result res,
     final byte[] columnFamily) {
     Set<Long> keys = Sets.newHashSet();
-    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily)
-      .entrySet()) {
+    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily).entrySet()) {
       keys.add(Bytes.toLong(column.getKey()));
     }
     return keys;

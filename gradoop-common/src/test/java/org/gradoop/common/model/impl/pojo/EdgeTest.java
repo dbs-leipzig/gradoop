@@ -3,7 +3,7 @@ package org.gradoop.common.model.impl.pojo;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class EdgeTest {
       .fromExisting(GradoopId.get(), GradoopId.get());
 
     String label = "A";
-    PropertyList props = PropertyList.create();
+    Properties props = Properties.create();
     props.set("k1", "v1");
     props.set("k2", "v2");
 

@@ -17,9 +17,9 @@
 
 package org.gradoop.common.model.api.entities;
 
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Used to describe entities that can have properties.
@@ -31,7 +31,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  PropertyList getProperties();
+  Properties getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -55,7 +55,7 @@ public interface EPGMAttributed {
    *
    * @param properties new properties
    */
-  void setProperties(PropertyList properties);
+  void setProperties(Properties properties);
 
   /**
    * Adds a given property to that entity. If a property with the same key

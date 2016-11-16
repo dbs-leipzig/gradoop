@@ -20,9 +20,9 @@ package org.gradoop.common.model.impl.pojo;
 import com.google.common.base.Preconditions;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -41,7 +41,7 @@ public abstract class Element implements EPGMElement {
   /**
    * Internal property storage
    */
-  protected PropertyList properties;
+  protected Properties properties;
 
   /**
    * Default constructor.
@@ -58,7 +58,7 @@ public abstract class Element implements EPGMElement {
    * @param properties key-value properties
    */
   protected Element(
-    GradoopId id, String label, PropertyList properties) {
+    GradoopId id, String label, Properties properties) {
     this.id = id;
     this.label = label;
     this.properties = properties;
@@ -100,7 +100,7 @@ public abstract class Element implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public PropertyList getProperties() {
+  public Properties getProperties() {
     return properties;
   }
 
@@ -124,7 +124,7 @@ public abstract class Element implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(PropertyList properties) {
+  public void setProperties(Properties properties) {
     this.properties = properties;
   }
 
@@ -210,7 +210,7 @@ public abstract class Element implements EPGMElement {
    */
   private void initProperties() {
     if (this.properties == null) {
-      this.properties = PropertyList.create();
+      this.properties = Properties.create();
     }
   }
 }

@@ -1,8 +1,8 @@
 package org.gradoop.flink.model.impl.properties;
 
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
@@ -28,7 +28,7 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testPropertyListSerialization() throws Exception {
-    PropertyList pIn = PropertyList.createFromMap(
+    Properties pIn = Properties.createFromMap(
       GradoopTestUtils.SUPPORTED_PROPERTIES);
     assertEquals("Property Lists were not equal", pIn,
       GradoopFlinkTestUtils.writeAndRead(pIn, getExecutionEnvironment()));

@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.common.tuples.Subgraph;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -88,7 +88,7 @@ public abstract class SubgraphDecoder implements Serializable {
 
     // GRAPH HEAD
 
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     properties.set(FREQUENCY_KEY, subgraph.getCount());
     properties.set(CANONICAL_LABEL_KEY, subgraph.getCanonicalLabel());

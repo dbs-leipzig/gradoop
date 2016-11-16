@@ -19,9 +19,9 @@ package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 
 /**
  * Wraps EPGM data entity.
@@ -49,7 +49,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public PropertyList getProperties() {
+  public Properties getProperties() {
     return epgmElement.getProperties();
   }
 
@@ -73,7 +73,7 @@ public abstract class HBaseElement<T extends EPGMElement>
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(PropertyList properties) {
+  public void setProperties(Properties properties) {
     epgmElement.setProperties(properties);
   }
 
