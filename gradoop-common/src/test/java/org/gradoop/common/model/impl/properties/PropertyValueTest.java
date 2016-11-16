@@ -1,5 +1,6 @@
 package org.gradoop.common.model.impl.properties;
 
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,6 +95,10 @@ public class PropertyValueTest {
     p = create(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
+    //GradoopId
+    p = create(GRADOOP_ID_VAL_8);
+    assertTrue(p.isGradoopId());
+    assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
   @Test
@@ -131,6 +136,10 @@ public class PropertyValueTest {
     p.setObject(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
     assertEquals(BIG_DECIMAL_VAL_7, p.getObject());
+    // GradoopId
+    p.setObject(GRADOOP_ID_VAL_8);
+    assertTrue(p.isGradoopId());
+    assertEquals(GRADOOP_ID_VAL_8, p.getObject());
   }
 
   @Test(expected = UnsupportedTypeException.class)
@@ -150,6 +159,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -163,6 +173,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -189,6 +200,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -215,6 +227,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -241,6 +254,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -267,6 +281,7 @@ public class PropertyValueTest {
     assertTrue(p.isDouble());
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -293,6 +308,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertTrue(p.isString());
     assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -319,6 +335,7 @@ public class PropertyValueTest {
     assertFalse(p.isDouble());
     assertFalse(p.isString());
     assertTrue(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
   }
 
   @Test
@@ -332,6 +349,33 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setBigDecimal(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
+  }
+
+  @Test
+  public void testIsGradoopId() throws Exception {
+    PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertTrue(p.isGradoopId());
+  }
+
+  @Test
+  public void testGetGradoopId() throws Exception {
+    PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
+    assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
+  }
+
+  @Test
+  public void testSetGradoopId() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setGradoopId(GRADOOP_ID_VAL_8);
+    assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
   @Test
@@ -353,6 +397,12 @@ public class PropertyValueTest {
     validateEqualsAndHashCode(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
+
+    validateEqualsAndHashCode(
+      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
+      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
+      create(GradoopId.fromString("42424242-4242-4242-4242-424242424242"))
+    );
   }
 
   /**
@@ -395,6 +445,12 @@ public class PropertyValueTest {
     validateCompareTo(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
+
+    validateCompareTo(
+      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
+      create(GradoopId.fromString("9b7a3995-c3bd-4503-9286-fe45955599eb")),
+      create(GradoopId.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
+    );
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -426,6 +482,9 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(BIG_DECIMAL_VAL_7);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(GRADOOP_ID_VAL_8);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
   /**

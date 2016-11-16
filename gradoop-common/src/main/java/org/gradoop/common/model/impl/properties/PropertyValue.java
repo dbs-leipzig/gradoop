@@ -19,6 +19,7 @@ package org.gradoop.common.model.impl.properties;
 
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.common.util.GConstants;
 
@@ -79,6 +80,10 @@ public class PropertyValue
    * {@code <property-type>} for {@link java.lang.String}
    */
   private static final transient byte TYPE_BIG_DECIMAL  = 0x07;
+  /**
+   * {@code <property-type>} for {@link org.gradoop.common.model.impl.id.GradoopId}
+   */
+  private static final transient byte TYPE_GRADOOP_ID   = 0x08;
   /**
    * Value offset in byte
    */
@@ -189,6 +194,14 @@ public class PropertyValue
   public boolean isBigDecimal() {
     return rawBytes[0] == TYPE_BIG_DECIMAL;
   }
+  /**
+   * True, if the wrapped value is of type {@code GradoopId}.
+   *
+   * @return true, if {@code GradoopId} value
+   */
+  public boolean isGradoopId() {
+    return rawBytes[0] == TYPE_GRADOOP_ID;
+  }
 
   //----------------------------------------------------------------------------
   // Getter
@@ -207,7 +220,8 @@ public class PropertyValue
             isDouble() ? getDouble() :
               isString() ? getString() :
                 isBigDecimal() ? getBigDecimal() :
-                  null;
+                  isGradoopId() ? getGradoopId() :
+                    null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -286,6 +300,14 @@ public class PropertyValue
     }
     return decimal;
   }
+  /**
+   * Returns the wrapped value as {@code GradoopId.
+   *
+   * @return {@code GradoopId} value
+   */
+  public GradoopId getGradoopId() {
+    return GradoopId.fromBytes(Arrays.copyOfRange(rawBytes, OFFSET, GradoopId.ID_SIZE + OFFSET));
+  }
 
   //----------------------------------------------------------------------------
   // Setter
@@ -314,6 +336,8 @@ public class PropertyValue
       setString((String) value);
     } else if (value instanceof BigDecimal) {
       setBigDecimal((BigDecimal) value);
+    } else if (value instanceof GradoopId) {
+      setGradoopId((GradoopId) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -390,6 +414,17 @@ public class PropertyValue
     rawBytes[0] = TYPE_BIG_DECIMAL;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
+  /**
+   * Sets the wrapped value as {@code GradoopId} value.
+   *
+   * @param gradoopIdValue value
+   */
+  public void setGradoopId(GradoopId gradoopIdValue) {
+    byte[] valueBytes = gradoopIdValue.getRawBytes();
+    rawBytes = new byte[OFFSET + GradoopId.ID_SIZE];
+    rawBytes[0] = TYPE_GRADOOP_ID;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
 
   //----------------------------------------------------------------------------
   // Util
@@ -403,7 +438,8 @@ public class PropertyValue
       Float.class       : rawBytes[0] == TYPE_DOUBLE      ?
       Double.class      : rawBytes[0] == TYPE_STRING      ?
       String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
-      BigDecimal.class  : null;
+      BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
+      GradoopId.class   : null;
   }
 
   @Override
@@ -443,6 +479,8 @@ public class PropertyValue
       result = this.getString().compareTo(o.getString());
     } else if (this.isBigDecimal() && o.isBigDecimal()) {
       result = this.getBigDecimal().compareTo(o.getBigDecimal());
+    } else if (this.isGradoopId() && o.isGradoopId()) {
+      result = this.getGradoopId().compareTo(o.getGradoopId());
     } else {
       throw new IllegalArgumentException(String.format(
         "Incompatible types: %s, %s", this.getClass(), o.getClass()));
@@ -502,6 +540,8 @@ public class PropertyValue
       length = Bytes.SIZEOF_FLOAT;
     } else if (type == TYPE_DOUBLE) {
       length = Bytes.SIZEOF_DOUBLE;
+    } else if (type == TYPE_GRADOOP_ID) {
+      length = GradoopId.ID_SIZE;
     }
     // init new array
     rawBytes = new byte[OFFSET + length];

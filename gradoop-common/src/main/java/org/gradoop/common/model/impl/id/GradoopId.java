@@ -17,6 +17,7 @@
 
 package org.gradoop.common.model.impl.id;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
@@ -66,7 +67,7 @@ public class GradoopId
   /**
    * Number of bytes to represent an id internally.
    */
-  private static final int ID_SIZE = 16;
+  public static final int ID_SIZE = 16;
 
   /**
    * Internal representation
@@ -92,6 +93,15 @@ public class GradoopId
   }
 
   /**
+   * Creates a GradoopId from a given byte representation
+   *
+   * @param bytes the GradoopId represented by the byte array
+   */
+  private GradoopId(byte[] bytes) {
+    this.rawBytes = bytes;
+  }
+
+  /**
    * Returns a new GradoopId
    *
    * @return new GradoopId
@@ -110,6 +120,28 @@ public class GradoopId
     checkNotNull(string, "ID string was null");
     checkArgument(!string.isEmpty(), "ID string was empty");
     return new GradoopId(UUID.fromString(string));
+  }
+
+  /**
+   * Returns the Gradoop ID represented by a byte array
+   *
+   * @param bytes byte representation
+   * @return Gradoop ID
+   */
+  public static GradoopId fromBytes(byte[] bytes) {
+    checkNotNull(bytes, "Byte array was null");
+    checkArgument(bytes.length == ID_SIZE, "Byte array has wrong size");
+    return new GradoopId(bytes);
+  }
+
+  /**
+   * Returns byte representation of a GradoopId
+   *
+   * @return Byte representation
+   */
+  @SuppressWarnings({"EI_EXPOSE_REP"})
+  public byte[] getRawBytes() {
+    return rawBytes;
   }
 
   @Override
