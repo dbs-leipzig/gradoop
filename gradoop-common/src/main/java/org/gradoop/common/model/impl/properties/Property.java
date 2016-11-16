@@ -22,6 +22,7 @@ import org.apache.hadoop.io.WritableComparable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * and a property value, whereas a given property key does not enforce specific
  * value type.
  */
-public class Property implements WritableComparable<Property> {
+public class Property implements WritableComparable<Property>, Serializable {
 
   /**
    * Property key

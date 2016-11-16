@@ -37,8 +37,7 @@ import java.util.Iterator;
  * Represents a list of property values.
  */
 public class PropertyValueList
-  implements
-  Iterable<PropertyValue>, WritableComparable<PropertyValueList>, Serializable {
+  implements Iterable<PropertyValue>, WritableComparable<PropertyValueList>, Serializable {
 
   /**
    * Class version for serialization.
@@ -161,7 +160,7 @@ public class PropertyValueList
      *
      * @param rawBytes property value list byte representation
      */
-    public PropertyValueListIterator(byte[] rawBytes) {
+    PropertyValueListIterator(byte[] rawBytes) {
       if (rawBytes == null) {
         rawBytes = new byte[0];
       }

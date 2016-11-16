@@ -24,9 +24,11 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents a list of properties.
@@ -38,7 +40,7 @@ import java.util.Map;
  * properties in the same order.
  *
  */
-public class PropertyList implements Iterable<Property>, Writable {
+public class PropertyList implements Iterable<Property>, Writable, Serializable {
 
   /**
    * Default capacity for new property lists.
@@ -115,11 +117,7 @@ public class PropertyList implements Iterable<Property>, Writable {
    * @return property keys
    */
   public Iterable<String> getKeys() {
-    List<String> keys = Lists.newArrayListWithCapacity(size());
-    for (Property property : properties) {
-      keys.add(property.getKey());
-    }
-    return keys;
+    return properties.stream().map(Property::getKey).collect(Collectors.toList());
   }
 
   /**
