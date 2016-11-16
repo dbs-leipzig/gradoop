@@ -67,6 +67,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 | Operator      | Output  | Output description                                                  | Impl |
 |:--------------|:--------|:--------------------------------------------------------------------|:----:|
+| Matching      | GC      | Graphs that match a given graph pattern                             | Yes  |
 | Selection     | GC      | Filter graphs based on their attached data (i.e. label, properties) | Yes  |
 | Distinct      | GC      | Collection with no duplicate graphs                                 | Yes  |
 | SortBy        | GC      | Collection sorted by values of a given property key                 | No   |
