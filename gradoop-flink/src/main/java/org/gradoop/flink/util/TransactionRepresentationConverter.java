@@ -8,7 +8,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
 import org.gradoop.flink.model.impl.pojos.AdjacencyListCell;
 import org.gradoop.flink.model.impl.pojos.AdjacencyListRow;
@@ -30,7 +30,7 @@ public class TransactionRepresentationConverter {
     Map<GradoopId, String> labels =
       Maps.newHashMapWithExpectedSize(1 + vertices.size() + edges.size());
 
-    Map<GradoopId, PropertyList> properties =
+    Map<GradoopId, Properties> properties =
       Maps.newHashMap();
 
     Map<GradoopId, AdjacencyListRow<T>> rows =
@@ -69,10 +69,10 @@ public class TransactionRepresentationConverter {
   }
 
   private void addLabelsAndProperties(EPGMElement graphHead, Map<GradoopId, String> labels,
-    Map<GradoopId, PropertyList> properties) {
+    Map<GradoopId, Properties> properties) {
     labels.put(graphHead.getId(), graphHead.getLabel());
 
-    PropertyList propertyList = graphHead.getProperties();
+    Properties propertyList = graphHead.getProperties();
     if (propertyList != null && !propertyList.isEmpty()) {
       properties.put(graphHead.getId(), propertyList);
     }
@@ -93,7 +93,7 @@ public class TransactionRepresentationConverter {
     // VERTICES
     for (Map.Entry<GradoopId, AdjacencyListRow<T>> entry : adjacencyList.getRows().entrySet()) {
       GradoopId sourceId = entry.getKey();
-      PropertyList properties = adjacencyList.getProperties(sourceId);
+      Properties properties = adjacencyList.getProperties(sourceId);
       String label = adjacencyList.getLabel(sourceId);
       vertices.add(new Vertex(sourceId, label, properties, graphIds));
 
