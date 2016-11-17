@@ -23,8 +23,7 @@ public class EdgeTest {
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceId(), is(sourceId));
     assertThat(e.getTargetId(), is(targetId));
-    assertThat(e.getPropertyCount(), is(1));
-    assertThat(e.getPropertyValue("__label__").getString(), is(e.getLabel()));
+    assertThat(e.getPropertyCount(), is(0));
     assertThat(e.getGraphCount(), is(0));
   }
 
@@ -48,10 +47,9 @@ public class EdgeTest {
     assertEquals(label, edge.getLabel());
     assertThat(edge.getSourceId(), is(sourceId));
     assertThat(edge.getTargetId(), is(targetId));
-    assertThat(edge.getPropertyCount(), is(3));
+    assertThat(edge.getPropertyCount(), is(2));
     assertThat(edge.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
     assertThat(edge.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
-    assertThat(edge.getPropertyValue("__label__").getString(), Is.<Object>is("A"));
     assertThat(edge.getGraphCount(), is(2));
 
     for(GradoopId graphId : graphIds) {

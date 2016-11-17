@@ -33,7 +33,7 @@ public class GraphHeadTest {
     GradoopId graphID = GradoopId.get();
     EPGMGraphHead g = new GraphHeadFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
-    assertThat(g.getPropertyCount(), is(1));
+    assertThat(g.getPropertyCount(), is(0));
   }
 
   @Test
@@ -49,10 +49,9 @@ public class GraphHeadTest {
 
     assertThat(graphHead.getId(), is(graphID));
     assertEquals(label, graphHead.getLabel());
-    assertThat(graphHead.getPropertyCount(), is(3));
+    assertThat(graphHead.getPropertyCount(), is(2));
     assertThat(graphHead.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
     assertThat(graphHead.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
-    assertThat(graphHead.getPropertyValue("__label__").getString(), Is.<Object>is("A"));
   }
 
   @Test
