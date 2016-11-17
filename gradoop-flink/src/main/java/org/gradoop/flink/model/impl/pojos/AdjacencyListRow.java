@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.model.impl.pojos;
 
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -30,6 +32,13 @@ public class AdjacencyListRow<T> implements Serializable {
    * collection of adjacency list cells
    */
   private Collection<AdjacencyListCell<T>> cells;
+
+  /**
+   * Default constructor.
+   */
+  public AdjacencyListRow() {
+    this.cells = Lists.newArrayList();
+  }
 
   /**
    * Constructor.

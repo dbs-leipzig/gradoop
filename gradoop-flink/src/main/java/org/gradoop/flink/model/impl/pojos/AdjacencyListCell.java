@@ -46,15 +46,16 @@ public class AdjacencyListCell<T> implements Serializable {
 
   /**
    * Constructor.
-   *
-   * @param edgeId edge id
+   *  @param edgeId edge id
    * @param outgoing true, if outgoing, false, if incoming
    * @param vertexId target id (outgoing) or source id (incoming)
+   * @param value
    */
-  public AdjacencyListCell(GradoopId edgeId, boolean outgoing, GradoopId vertexId) {
+  public AdjacencyListCell(GradoopId edgeId, boolean outgoing, GradoopId vertexId, T value) {
     this.outgoing = outgoing;
     this.edgeId = edgeId;
     this.vertexId = vertexId;
+    this.value = value;
   }
 
   @Override

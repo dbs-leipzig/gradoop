@@ -31,7 +31,8 @@ public interface AdjacencyListCellValueFactory<T> {
    * @param source source vertex
    * @param edge edge
    * @param target target vertex
-   * @return
+   *
+   * @return cell value
    */
   T createValue(Vertex source, Edge edge, Vertex target);
 }

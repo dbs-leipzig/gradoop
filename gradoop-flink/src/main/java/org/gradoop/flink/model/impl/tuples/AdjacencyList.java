@@ -15,39 +15,52 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.pojos;
+package org.gradoop.flink.model.impl.tuples;
 
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.flink.model.impl.pojos.AdjacencyListRow;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
  * @param <T> type of algorithm specific cell value
  */
-public class AdjacencyList<T> implements Serializable {
+public class AdjacencyList<T> extends Tuple4<
+  GradoopId,
+  Map<GradoopId, String>,
+  Map<GradoopId, PropertyList>,
+  Map<GradoopId, AdjacencyListRow<T>>
+  > {
+
+//  /**
+//   * Graph Id
+//   */
+//  private GradoopId f0;
+//
+//  /**
+//   * graph / vertex / edge id => label
+//   */
+//  private Map<GradoopId, String> f1;
+//
+//  /**
+//   * graph / vertex / edge id => properties
+//   */
+//  private Map<GradoopId, PropertyList> f2;
+//
+//  /**
+//   * vertex id => adjacency list row
+//   */
+//  private Map<GradoopId, AdjacencyListRow<T>> f3;
+
 
   /**
-   * Graph Id
+   * Default constructor.
    */
-  private GradoopId graphId;
-  
-  /**
-   * graph / vertex / edge id => label
-   */
-  private Map<GradoopId, String> labels;
-
-  /**
-   * graph / vertex / edge id => properties
-   */
-  private Map<GradoopId, PropertyList> properties;
-
-  /**
-   * vertex id => adjacency list row
-   */
-  private Map<GradoopId, AdjacencyListRow<T>> rows;
+  public AdjacencyList() {
+  }
 
   /**
    * Constructor.
@@ -59,30 +72,33 @@ public class AdjacencyList<T> implements Serializable {
    */
   public AdjacencyList(GradoopId graphId, Map<GradoopId, String> labels,
     Map<GradoopId, PropertyList> properties, Map<GradoopId, AdjacencyListRow<T>> rows) {
-    this.graphId = graphId;
-    this.labels = labels;
-    this.properties = properties;
-    this.rows = rows;
+    this.f0 = graphId;
+    this.f1 = labels;
+    this.f2 = properties;
+    this.f3 = rows;
   }
 
   /**
    * Label accessor.
    *
    * @param elementId graph / vertex / edge id
+   *
+   * @return label
    */
   public String getLabel(GradoopId elementId) {
-    return labels.get(elementId);
+    return f1.get(elementId);
   }
 
   /**
    * Property accessor.
-   *
    * @param elementId graph / vertex / edge id
+   *
+   * @return property list
    */
   public PropertyList getProperties(GradoopId elementId) {
-    return properties.get(elementId);
+    return f2.get(elementId);
   }
-  
+
   /**
    * Convenience method to get the adjacency list of a vertex.
    *
@@ -90,14 +106,18 @@ public class AdjacencyList<T> implements Serializable {
    * @return adjacency list
    */
   public AdjacencyListRow<T> getRows(GradoopId vertexId) {
-    return rows.get(vertexId);
+    return f3.get(vertexId);
   }
 
   public GradoopId getGraphId() {
-    return graphId;
+    return f0;
   }
 
   public void setGraphId(GradoopId graphId) {
-    this.graphId = graphId;
+    this.f0 = graphId;
+  }
+
+  public Map<GradoopId, AdjacencyListRow<T>> getRows() {
+    return f3;
   }
 }
