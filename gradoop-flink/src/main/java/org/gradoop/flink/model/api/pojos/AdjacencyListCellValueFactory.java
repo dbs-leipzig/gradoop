@@ -15,27 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.flink.model.api.pojos;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Describes all operators that can be applied on a single logical graph in the
- * EPGM.
+ * A factory to create algorithm-specific value of adjacency list cells.
+ * @param <T> algorithm-specific value type
  */
-public interface GraphTransactionsOperators {
-
+public interface AdjacencyListCellValueFactory<T> {
   /**
-   * Getter.
-   * @return data set of graph transactions
+   * Returns algorithm-specific value for an edge triple
+   *
+   * @param source source vertex
+   * @param edge edge
+   * @param target target vertex
+   *
+   * @return cell value
    */
-  DataSet<GraphTransaction> getTransactions();
-
-  /**
-   * Getter.
-   * @return Gradoop Flink Configuration
-   */
-  GradoopFlinkConfig getConfig();
+  T createValue(Vertex source, Edge edge, Vertex target);
 }
