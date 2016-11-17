@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.pojos;
+package org.gradoop.flink.representation.pojos;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -49,7 +49,7 @@ public class AdjacencyListCell<T> implements Serializable {
    *  @param edgeId edge id
    * @param outgoing true, if outgoing, false, if incoming
    * @param vertexId target id (outgoing) or source id (incoming)
-   * @param value
+   * @param value algorithm-specific value
    */
   public AdjacencyListCell(GradoopId edgeId, boolean outgoing, GradoopId vertexId, T value) {
     this.outgoing = outgoing;

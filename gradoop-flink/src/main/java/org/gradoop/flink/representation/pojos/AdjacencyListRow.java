@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.pojos;
+package org.gradoop.flink.representation.pojos;
 
 import com.google.common.collect.Lists;
 

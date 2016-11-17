@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains general pojo classes used by Gradoop operators.
+ * Pojo classes related to graph representations.
  */
-package org.gradoop.flink.model.impl.pojos;
+package org.gradoop.flink.representation;

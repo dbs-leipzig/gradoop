@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
 import java.util.Set;

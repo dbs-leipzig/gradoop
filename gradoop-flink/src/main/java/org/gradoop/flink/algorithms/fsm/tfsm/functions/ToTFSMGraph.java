@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.common.functions.ToFSMGraph;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.tfsm.pojos.TFSMGraph;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 
 import java.util.Map;
 

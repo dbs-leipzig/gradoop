@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 
 import java.util.Map;
 

@@ -1,4 +1,21 @@
-package org.gradoop.flink.util;
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.flink.representation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -10,16 +27,27 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
-import org.gradoop.flink.model.impl.pojos.AdjacencyListCell;
-import org.gradoop.flink.model.impl.pojos.AdjacencyListRow;
-import org.gradoop.flink.model.impl.tuples.AdjacencyList;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.pojos.AdjacencyListCell;
+import org.gradoop.flink.representation.pojos.AdjacencyListRow;
+import org.gradoop.flink.representation.tuples.AdjacencyList;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 
 import java.util.Map;
 import java.util.Set;
 
-public class TransactionRepresentationConverter {
+/**
+ * Util to convert among different graph representations.
+ */
+public class RepresentationConverter {
 
+  /**
+   * transaction => adjacency list
+   *
+   * @param transaction transaction
+   * @param cellValueFactory factory for algorithm-specific cell values
+   * @param <T> cell value type
+   * @return adjacency list
+   */
   public <T> AdjacencyList<T> getAdjacencyList(
     GraphTransaction transaction, AdjacencyListCellValueFactory<T> cellValueFactory) {
 
@@ -68,16 +96,33 @@ public class TransactionRepresentationConverter {
     return new AdjacencyList<>(graphHead.getId(), labels, properties, rows);
   }
 
-  private void addLabelsAndProperties(EPGMElement graphHead, Map<GradoopId, String> labels,
-    Map<GradoopId, Properties> properties) {
-    labels.put(graphHead.getId(), graphHead.getLabel());
+  /**
+   * Adds label and properties of an EPGM element to id-label and id-properties maps.
+   *
+   * @param element EPGM element
+   * @param labels id-label map
+   * @param properties id-properties map
+   */
+  private void addLabelsAndProperties(
+    EPGMElement element,
+    Map<GradoopId, String> labels,
+    Map<GradoopId, Properties> properties
+  ) {
+    labels.put(element.getId(), element.getLabel());
 
-    Properties propertyList = graphHead.getProperties();
+    Properties propertyList = element.getProperties();
     if (propertyList != null && !propertyList.isEmpty()) {
-      properties.put(graphHead.getId(), propertyList);
+      properties.put(element.getId(), propertyList);
     }
   }
 
+  /**
+   * adjacency list => transaction
+   *
+   * @param adjacencyList adjacency list
+   * @param <T> cell value type
+   * @return transaction
+   */
   public <T> GraphTransaction getGraphTransaction(AdjacencyList<T>  adjacencyList) {
 
     // GRAPH HEAD

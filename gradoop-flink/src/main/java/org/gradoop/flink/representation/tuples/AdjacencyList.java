@@ -15,12 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.tuples;
+package org.gradoop.flink.representation.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.model.impl.pojos.AdjacencyListRow;
+import org.gradoop.flink.representation.pojos.AdjacencyListRow;
 
 import java.util.Map;
 
