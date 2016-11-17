@@ -15,14 +15,17 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.dfscode;
 
 import java.io.Serializable;
 
 /**
  * DFSStep of an embedding.
+ *
+ * @param <C> vertex and edge value type
  */
-public class DFSExtension<C extends Comparable<C>> implements Serializable {
+public class DFSExtension<C extends Comparable<C>>
+  implements Serializable, Comparable<DFSExtension<C>> {
 
   /**
    * separator between vertex time and label
@@ -165,7 +168,74 @@ public class DFSExtension<C extends Comparable<C>> implements Serializable {
     return result;
   }
 
+  /**
+   * Comparison according to gSpan lexicographic order.
+   *
+   * @param that other extension
+   * @return comparison result
+   */
+  @Override
   public int compareTo(DFSExtension<C> that) {
-    return 0;
+
+    int comparison;
+
+    // no difference is times
+    if (this.fromTime == that.fromTime && this.toTime == that.toTime) {
+
+      // compare from values
+      comparison = this.fromValue.compareTo(that.fromValue);
+
+      if (comparison == 0) {
+
+        // compare direction
+        boolean thisIsOutgoing = this.isOutgoing();
+        boolean thatIsOutgoing = that.isOutgoing();
+
+        if (thisIsOutgoing && !thatIsOutgoing) {
+          comparison = -1;
+        } else if (thatIsOutgoing && !thisIsOutgoing) {
+          comparison = 1;
+        } else {
+
+          // compare edge values
+          comparison = this.edgeValue.compareTo(that.edgeValue);
+
+          if (comparison == 0) {
+
+            // compare to values
+            comparison = this.toValue.compareTo(that.toValue);
+          }
+        }
+      }
+
+      // time differences
+    } else {
+
+      // compare backtracking
+      boolean thisIsBacktrack = this.isBackTrack();
+      boolean thatIsBacktrack = that.isBackTrack();
+
+      if (thisIsBacktrack && !thatIsBacktrack) {
+        comparison = -1;
+      } else if (thatIsBacktrack && !thisIsBacktrack) {
+        comparison = 1;
+      } else {
+
+        // both forwards
+        if (thatIsBacktrack) {
+
+          // back to earlier vertex is smaller
+          comparison = this.toTime - that.toTime;
+
+          // both backwards
+        } else {
+
+          // forwards from later vertex is smaller
+          comparison = that.fromTime - this.fromTime;
+        }
+      }
+    }
+
+    return comparison;
   }
 }

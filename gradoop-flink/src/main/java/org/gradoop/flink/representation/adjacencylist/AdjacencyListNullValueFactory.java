@@ -15,7 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.representation.adjacencylist;
+
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
+
 /**
- * Classes related to graph representations.
+ * Creates null values for adjacency list cells.
  */
-package org.gradoop.flink.representation.tuples;
+public class AdjacencyListNullValueFactory implements AdjacencyListCellValueFactory<Object> {
+  @Override
+  public Object createValue(Vertex source, Edge edge, Vertex target) {
+    return null;
+  }
+}

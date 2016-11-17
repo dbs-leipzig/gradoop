@@ -18,7 +18,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.
 import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transaction.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Test;
 

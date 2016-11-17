@@ -25,7 +25,7 @@ import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transaction.GraphTransaction;
 
 import java.util.Map;
 import java.util.Set;

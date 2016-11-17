@@ -18,7 +18,7 @@
 package org.gradoop.flink.datagen.transactions.predictable;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transaction.GraphTransaction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

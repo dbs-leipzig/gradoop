@@ -37,7 +37,7 @@ import org.gradoop.flink.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transaction.GraphTransaction;
 
 import java.io.IOException;
 

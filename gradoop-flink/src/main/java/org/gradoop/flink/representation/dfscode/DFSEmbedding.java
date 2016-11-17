@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.dfscode;
 
 import com.google.common.collect.Lists;
 
@@ -36,11 +36,30 @@ public class DFSEmbedding {
    */
   private final List<Integer> edgeIds;
 
+  /**
+   * Constructor.
+   *
+   * @param vertexIds vertex ids
+   * @param edgeIds edge ids
+   */
   public DFSEmbedding(List<Integer> vertexIds, List<Integer> edgeIds) {
     this.vertexIds = vertexIds;
     this.edgeIds = edgeIds;
   }
 
+  /**
+   * Constructor.
+   *
+   * @param parent parent embedding
+   */
+  public DFSEmbedding(DFSEmbedding parent) {
+    this.vertexIds = Lists.newArrayList(parent.getVertexIds());
+    this.edgeIds = Lists.newArrayList(parent.getEdgeIds());
+  }
+
+  public List<Integer> getEdgeIds() {
+    return edgeIds;
+  }
 
   public List<Integer> getVertexIds() {
     return vertexIds;
@@ -49,16 +68,5 @@ public class DFSEmbedding {
   @Override
   public String toString() {
     return vertexIds + ";" + edgeIds;
-  }
-
-  public List<Integer> getEdgeIds() {
-    return edgeIds;
-  }
-
-  public DFSEmbedding deepCopy() {
-    return new DFSEmbedding(
-      Lists.newArrayList(vertexIds),
-      Lists.newArrayList(edgeIds)
-    );
   }
 }
