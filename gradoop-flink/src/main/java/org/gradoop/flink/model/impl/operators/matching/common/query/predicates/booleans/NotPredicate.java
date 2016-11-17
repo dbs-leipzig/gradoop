@@ -15,15 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
-
-
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .expressions.ComparisonWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions
+  .ComparisonExpression;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
@@ -33,9 +31,9 @@ import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 /**
- * Wraps a {@link Not} predicate
+ * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
  */
-public class NotWrapper extends PredicateWrapper {
+public class NotPredicate extends QueryPredicate {
 
   /**
    * Holds the wrapped not predicate
@@ -46,7 +44,7 @@ public class NotWrapper extends PredicateWrapper {
    * Create a new wrapper
    * @param not the wrapped not predicate
    */
-  public NotWrapper(Not not) {
+  public NotPredicate(Not not) {
     this.not = not;
   }
 
@@ -60,14 +58,13 @@ public class NotWrapper extends PredicateWrapper {
 
     if (expression.getClass() == Comparison.class) {
       CNF cnf = new CNF();
-      CNFElement cNFElement = new CNFElement();
-
-      cNFElement.addPredicate(new ComparisonWrapper(invertComparison((Comparison) expression)));
-      cnf.addPredicate(cNFElement);
+      CNFElement cnfElement = new CNFElement();
+      cnfElement.addPredicate(new ComparisonExpression(invertComparison((Comparison) expression)));
+      cnf.addPredicate(cnfElement);
       return cnf;
 
     } else if (expression.getClass() == Not.class) {
-      return PredicateWrapper.wrap(expression.getArguments()[0]).asCNF();
+      return QueryPredicate.createFrom(expression.getArguments()[0]).asCNF();
 
     } else if (expression.getClass() == And.class) {
       Predicate[] otherArguments = expression.getArguments();
@@ -75,7 +72,7 @@ public class NotWrapper extends PredicateWrapper {
         new Not(otherArguments[0]),
         new Not(otherArguments[0])
       );
-      return PredicateWrapper.wrap(or).asCNF();
+      return QueryPredicate.createFrom(or).asCNF();
 
     } else if (expression.getClass() == Or.class) {
       Predicate[] otherArguments = expression.getArguments();
@@ -84,7 +81,7 @@ public class NotWrapper extends PredicateWrapper {
         new Not(otherArguments[0])
       );
 
-      return PredicateWrapper.wrap(and).asCNF();
+      return QueryPredicate.createFrom(and).asCNF();
 
     } else {
       Predicate[] otherArguments = expression.getArguments();
@@ -97,7 +94,7 @@ public class NotWrapper extends PredicateWrapper {
           new Not(otherArguments[0]))
       );
 
-      return PredicateWrapper.wrap(or).asCNF();
+      return QueryPredicate.createFrom(or).asCNF();
     }
   }
 
@@ -107,7 +104,8 @@ public class NotWrapper extends PredicateWrapper {
    * @param comparison the comparison that will be inverted
    * @return inverted comparison
    */
-  private Comparison invertComparison(Comparison comparison) {
+  private Comparison invertComparison(
+    Comparison comparison) {
     ComparableExpression[] arguments = comparison.getComparableExpressions();
     Comparator op = comparison.getComparator();
 
@@ -127,7 +125,7 @@ public class NotWrapper extends PredicateWrapper {
       return false;
     }
 
-    NotWrapper that = (NotWrapper) o;
+    NotPredicate that = (NotPredicate) o;
 
     return not != null ? not.equals(that.not) : that.not == null;
 

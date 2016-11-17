@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.comparables;
-
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .ComparableWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.comparables.Literal;
 
 import java.util.Map;
 
 /**
- * Wraps a {@link Literal}
+ * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
  */
-public class LiteralWrapper extends ComparableWrapper {
+public class LiteralComparable extends QueryComparable {
   /**
    * Holds the wrapped literal
    */
@@ -39,7 +37,7 @@ public class LiteralWrapper extends ComparableWrapper {
    *
    * @param literal the wrapped literal
    */
-  public LiteralWrapper(Literal literal) {
+  public LiteralComparable(Literal literal) {
     this.literal = literal;
   }
 
@@ -63,7 +61,7 @@ public class LiteralWrapper extends ComparableWrapper {
       return false;
     }
 
-    LiteralWrapper that = (LiteralWrapper) o;
+    LiteralComparable that = (LiteralComparable) o;
 
     return literal != null ? literal.equals(that.literal) : that.literal == null;
 

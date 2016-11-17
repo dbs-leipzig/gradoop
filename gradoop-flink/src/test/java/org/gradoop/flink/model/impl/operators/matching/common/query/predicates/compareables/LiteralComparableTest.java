@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .compareables;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.compareables;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.LiteralWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 
@@ -28,11 +26,11 @@ import java.util.HashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class LiteralWrapperTest {
+public class LiteralComparableTest {
   @Test
   public void testEvaluationReturnsPropertyValue() {
     Literal literal = new Literal(42);
-    LiteralWrapper wrapper = new LiteralWrapper(literal);
+    LiteralComparable wrapper = new LiteralComparable(literal);
     PropertyValue reference = PropertyValue.create(42);
 
     assertEquals(reference, wrapper.evaluate(new HashMap<>()));

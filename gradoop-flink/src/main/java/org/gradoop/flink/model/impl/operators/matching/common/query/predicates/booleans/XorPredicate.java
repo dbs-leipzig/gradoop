@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 import org.s1ck.gdl.model.predicates.booleans.Not;
@@ -25,9 +25,9 @@ import org.s1ck.gdl.model.predicates.booleans.Or;
 import org.s1ck.gdl.model.predicates.booleans.Xor;
 
 /**
- * Wraps a {@link Xor} predicate
+ * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
  */
-public class XorWrapper extends PredicateWrapper {
+public class XorPredicate extends QueryPredicate {
   /**
    * Holdes the wrapped predicate
    */
@@ -38,7 +38,7 @@ public class XorWrapper extends PredicateWrapper {
    *
    * @param xor The wrapped xor predicate
    */
-  public XorWrapper(Xor xor) {
+  public XorPredicate(Xor xor) {
     this.xor = xor;
   }
 
@@ -51,7 +51,7 @@ public class XorWrapper extends PredicateWrapper {
     Predicate lhs = xor.getArguments()[0];
     Predicate rhs = xor.getArguments()[1];
 
-    PredicateWrapper wrapper = PredicateWrapper.wrap(
+    QueryPredicate wrapper = QueryPredicate.createFrom(
       new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs))
     );
 
@@ -62,16 +62,16 @@ public class XorWrapper extends PredicateWrapper {
    * Returns the wrapped left hand side predicate
    * @return wrapped left hand side predicate
    */
-  public PredicateWrapper getLhs() {
-    return PredicateWrapper.wrap(xor.getArguments()[0]);
+  public QueryPredicate getLhs() {
+    return QueryPredicate.createFrom(xor.getArguments()[0]);
   }
 
   /**
    * Returns the wrapped right hand side predicate
    * @return wrapped right hand side predicate
    */
-  public PredicateWrapper getRhs() {
-    return PredicateWrapper.wrap(xor.getArguments()[1]);
+  public QueryPredicate getRhs() {
+    return QueryPredicate.createFrom(xor.getArguments()[1]);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class XorWrapper extends PredicateWrapper {
       return false;
     }
 
-    XorWrapper that = (XorWrapper) o;
+    XorPredicate that = (XorPredicate) o;
 
     return xor != null ? xor.equals(that.xor) : that.xor == null;
 

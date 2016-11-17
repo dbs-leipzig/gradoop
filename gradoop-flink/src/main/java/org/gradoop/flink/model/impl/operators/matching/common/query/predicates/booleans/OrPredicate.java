@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
 /**
- * Wraps an {@link Or} predicate
+ * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
  */
-public class OrWrapper extends PredicateWrapper {
+public class OrPredicate extends QueryPredicate {
   /**
    * Holds the wrapped or predicate
    */
@@ -33,7 +33,7 @@ public class OrWrapper extends PredicateWrapper {
    * Creates a new or wrapper
    * @param or the wrapped or predicate
    */
-  public OrWrapper(Or or) {
+  public OrPredicate(Or or) {
     this.or = or;
   }
 
@@ -49,16 +49,16 @@ public class OrWrapper extends PredicateWrapper {
    * Returns the left hand side predicate
    * @return the left hand side predicate
    */
-  public PredicateWrapper getLhs() {
-    return PredicateWrapper.wrap(or.getArguments()[0]);
+  public QueryPredicate getLhs() {
+    return QueryPredicate.createFrom(or.getArguments()[0]);
   }
 
   /**
    * Returns the right hand side predicate
    * @return the right hand side predicate
    */
-  public PredicateWrapper getRhs() {
-    return PredicateWrapper.wrap(or.getArguments()[1]);
+  public QueryPredicate getRhs() {
+    return QueryPredicate.createFrom(or.getArguments()[1]);
   }
 
   @Override
@@ -70,10 +70,9 @@ public class OrWrapper extends PredicateWrapper {
       return false;
     }
 
-    OrWrapper orWrapper = (OrWrapper) o;
+    OrPredicate orPredicateWrapper = (OrPredicate) o;
 
-    return or != null ? or.equals(orWrapper.or) : orWrapper.or == null;
-
+    return or != null ? or.equals(orPredicateWrapper.or) : orPredicateWrapper.or == null;
   }
 
   @Override

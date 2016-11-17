@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.comparables;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions
-  .MissingElementException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .ComparableWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
@@ -30,7 +28,7 @@ import java.util.Map;
 /**
  * Wraps a {@link PropertySelector}
  */
-public class PropertySelectorWrapper extends ComparableWrapper {
+public class PredicateSelectorComparable extends QueryComparable {
   /**
    * Holds the wrapped property selector
    */
@@ -40,7 +38,7 @@ public class PropertySelectorWrapper extends ComparableWrapper {
    * Creates a new wrapper
    * @param propertySelector the wrapped property selector
    */
-  public PropertySelectorWrapper(PropertySelector propertySelector) {
+  public PredicateSelectorComparable(PropertySelector propertySelector) {
     this.propertySelector = propertySelector;
   }
 
@@ -73,7 +71,7 @@ public class PropertySelectorWrapper extends ComparableWrapper {
       return false;
     }
 
-    PropertySelectorWrapper that = (PropertySelectorWrapper) o;
+    PredicateSelectorComparable that = (PredicateSelectorComparable) o;
 
     return propertySelector != null ? propertySelector.equals(that.propertySelector) :
       that.propertySelector == null;

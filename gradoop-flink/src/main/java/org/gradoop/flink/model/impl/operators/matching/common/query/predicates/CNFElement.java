@@ -17,8 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .expressions.ComparisonWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import java.util.Set;
  * Represents a collection disjunct predicates
  * This can be used to represent a CNF
  */
-public class CNFElement extends PredicateCollection<ComparisonWrapper> {
+public class CNFElement extends PredicateCollection<ComparisonExpression> {
 
   /**
    * Creates a new CNFElement with empty predicate list
@@ -45,14 +44,14 @@ public class CNFElement extends PredicateCollection<ComparisonWrapper> {
    *
    * @param predicates predicates
    */
-  public CNFElement(List<ComparisonWrapper> predicates) {
+  public CNFElement(List<ComparisonExpression> predicates) {
     this.predicates = predicates;
   }
 
   @Override
   public boolean evaluate(Map<String, EmbeddingEntry> values) {
-    for (ComparisonWrapper comparisonWrapper : predicates) {
-      if (comparisonWrapper.evaluate(values)) {
+    for (ComparisonExpression comparisonExpressionWrapper : predicates) {
+      if (comparisonExpressionWrapper.evaluate(values)) {
         return true;
       }
     }
@@ -66,8 +65,8 @@ public class CNFElement extends PredicateCollection<ComparisonWrapper> {
   @Override
   public Set<String> getVariables() {
     Set<String> variables = new HashSet<>();
-    for (ComparisonWrapper comparison : predicates) {
-      variables.addAll(comparison.getVariables());
+    for (ComparisonExpression comparisonExpression : predicates) {
+      variables.addAll(comparisonExpression.getVariables());
     }
     return variables;
   }

@@ -64,6 +64,7 @@ public class CNF extends PredicateCollection<CNFElement> {
    */
   public CNF or(CNF other) {
     ArrayList<CNFElement> newPredicates = new ArrayList<>();
+
     for (CNFElement p : predicates) {
       for (CNFElement q : other.getPredicates()) {
         CNFElement newCNFElement = new CNFElement();

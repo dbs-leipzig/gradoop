@@ -43,8 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @see EPGMIdentifiable
  */
-public class GradoopId
-  implements WritableComparable<GradoopId>, NormalizableKey<GradoopId> {
+public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey<GradoopId> {
 
   /**
    * Represents a null id.

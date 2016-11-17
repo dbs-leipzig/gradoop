@@ -15,15 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.expressions;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .ComparableWrapper;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
-
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
@@ -34,7 +32,7 @@ import java.util.Set;
 /**
  * Wraps a {@link Comparison}
  */
-public class ComparisonWrapper extends PredicateWrapper {
+public class ComparisonExpression extends QueryPredicate {
   /**
    * Holds the wrapped comparison
    */
@@ -44,7 +42,7 @@ public class ComparisonWrapper extends PredicateWrapper {
    * Creates a new comparison wrapped
    * @param comparison the wrapped comparison
    */
-  public ComparisonWrapper(Comparison comparison) {
+  public ComparisonExpression(Comparison comparison) {
     this.comparison = comparison;
   }
 
@@ -52,16 +50,16 @@ public class ComparisonWrapper extends PredicateWrapper {
    * Returns the wrapped left hand side of the comparison
    * @return wrapped left hand side
    */
-  public ComparableWrapper getLhs() {
-    return ComparableWrapper.wrap(comparison.getComparableExpressions()[0]);
+  public QueryComparable getLhs() {
+    return QueryComparable.createFrom(comparison.getComparableExpressions()[0]);
   }
 
   /**
    * Returns the wrapped left hand side of the comparison
    * @return wrapped left hand side
    */
-  public ComparableWrapper getRhs() {
-    return ComparableWrapper.wrap(comparison.getComparableExpressions()[1]);
+  public QueryComparable getRhs() {
+    return QueryComparable.createFrom(comparison.getComparableExpressions()[1]);
   }
 
   /**
@@ -121,7 +119,7 @@ public class ComparisonWrapper extends PredicateWrapper {
       return false;
     }
 
-    ComparisonWrapper that = (ComparisonWrapper) o;
+    ComparisonExpression that = (ComparisonExpression) o;
 
     return comparison != null ? comparison.equals(that.comparison) : that.comparison == null;
 

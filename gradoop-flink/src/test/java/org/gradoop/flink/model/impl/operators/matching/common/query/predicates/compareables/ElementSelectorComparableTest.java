@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.compareables;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.compareables;
 
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions
   .MissingElementException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.ElementSelectorWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.junit.Test;
@@ -34,11 +34,11 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class ElementSelectorWrapperTest {
+public class ElementSelectorComparableTest {
   @Test
   public void testEvaluationReturnsPropertyValue() {
     ElementSelector selector = new ElementSelector("a");
-    ElementSelectorWrapper wrapper = new ElementSelectorWrapper(selector);
+    ElementSelectorComparable wrapper = new ElementSelectorComparable(selector);
 
     EmbeddingEntry idEntry = new IdEntry(GradoopId.get());
     PropertyValue reference = PropertyValue.create(idEntry.getId());
@@ -53,7 +53,7 @@ public class ElementSelectorWrapperTest {
   @Test(expected= MissingElementException.class)
   public void testThrowErrorIfElementNotPresent() {
     ElementSelector selector = new ElementSelector("a");
-    ElementSelectorWrapper wrapper = new ElementSelectorWrapper(selector);
+    ElementSelectorComparable wrapper = new ElementSelectorComparable(selector);
 
     EmbeddingEntry idEntry = new IdEntry(GradoopId.get());
     Map<String, EmbeddingEntry> values = new HashMap<>();

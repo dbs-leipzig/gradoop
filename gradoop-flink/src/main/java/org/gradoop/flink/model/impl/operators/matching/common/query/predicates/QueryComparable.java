@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.ElementSelectorWrapper;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.LiteralWrapper;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.PropertySelectorWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .ElementSelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .PredicateSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
@@ -35,24 +35,26 @@ import java.util.Map;
 /**
  * Wrapps a {@link ComparableExpression}
  */
-public abstract class ComparableWrapper implements Serializable {
+public abstract class QueryComparable implements Serializable {
 
   /**
-   * Generic method to wrap a comparable expression
+   * Generic method to createFrom a comparable expression
    *
    * @param expression the expression to be wrapped
    * @return wrapped expression
    */
-  public static ComparableWrapper wrap(ComparableExpression expression) {
+  public static QueryComparable createFrom(ComparableExpression expression) {
     if (expression.getClass() == Literal.class) {
-      return new LiteralWrapper((Literal) expression);
+      return new LiteralComparable((Literal) expression);
     } else if (expression.getClass() == PropertySelector.class) {
-      return new PropertySelectorWrapper((PropertySelector) expression);
+      return new PredicateSelectorComparable((PropertySelector) expression);
     } else if (expression.getClass() == ElementSelector.class) {
-      return new ElementSelectorWrapper((ElementSelector) expression);
+      return new ElementSelectorComparable((ElementSelector) expression);
+    } else {
+      throw new IllegalArgumentException(
+        expression.getClass() + " is not a GDL ComparableExpression"
+      );
     }
-
-    return null;
   }
 
   /**

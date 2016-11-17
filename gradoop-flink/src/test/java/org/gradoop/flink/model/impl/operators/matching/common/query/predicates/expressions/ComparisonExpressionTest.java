@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.expressions;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
 
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .comparables.LiteralWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .LiteralComparable;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
@@ -29,24 +28,24 @@ import org.s1ck.gdl.utils.Comparator;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class ComparisonWrapperTest {
+public class ComparisonExpressionTest {
 
   @Test
   public void testAsCNF() {
     Literal l1 = new Literal(1);
     Literal l2 = new Literal(1);
-    ComparisonWrapper comparison = new ComparisonWrapper(new Comparison(l1, Comparator.EQ, l2));
+    ComparisonExpression comparisonExpression = new ComparisonExpression(
+      new Comparison(l1, Comparator.EQ, l2)
+    );
 
     CNFElement cnfElement = new CNFElement();
-    cnfElement.addPredicate(comparison);
+    cnfElement.addPredicate(comparisonExpression);
     CNF reference = new CNF();
     reference.addPredicate(cnfElement);
 
-    assertEquals(reference, comparison.asCNF());
+    assertEquals(reference, comparisonExpression.asCNF());
   }
 
   @Test
@@ -54,9 +53,11 @@ public class ComparisonWrapperTest {
     Literal l1 = new Literal(1);
     Literal l2 = new Literal(1);
 
-    ComparisonWrapper comparison = new ComparisonWrapper(new Comparison(l1, Comparator.EQ, l2));
+    ComparisonExpression comparisonExpression = new ComparisonExpression(
+      new Comparison(l1, Comparator.EQ, l2)
+    );
 
-    assertEquals(new LiteralWrapper(l1), comparison.getLhs());
+    assertEquals(new LiteralComparable(l1), comparisonExpression.getLhs());
   }
 
   @Test
@@ -64,9 +65,11 @@ public class ComparisonWrapperTest {
     Literal l1 = new Literal(1);
     Literal l2 = new Literal(1);
 
-    ComparisonWrapper comparison = new ComparisonWrapper(new Comparison(l1, Comparator.EQ, l2));
+    ComparisonExpression comparisonExpression = new ComparisonExpression(
+      new Comparison(l1, Comparator.EQ, l2)
+    );
 
-    assertEquals(new LiteralWrapper(l2), comparison.getRhs());
+    assertEquals(new LiteralComparable(l2), comparisonExpression.getRhs());
   }
 
   @Test
@@ -132,8 +135,9 @@ public class ComparisonWrapperTest {
     assertFalse(compare(lhs, rhs, Comparator.LTE));
   }
 
-  private boolean compare(Literal lhs, Literal rhs, Comparator comparator) {
-    return new ComparisonWrapper(
+  private boolean compare(
+    Literal lhs, Literal rhs, Comparator comparator) {
+    return new ComparisonExpression(
       new Comparison(lhs,comparator,rhs)
     ).evaluate(new HashMap<>());
   }

@@ -15,46 +15,47 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .PredicateWrapper;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .expressions.ComparisonWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.*;
+import org.s1ck.gdl.model.predicates.booleans.And;
+import org.s1ck.gdl.model.predicates.booleans.Not;
+import org.s1ck.gdl.model.predicates.booleans.Or;
+import org.s1ck.gdl.model.predicates.booleans.Xor;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 import static org.junit.Assert.assertEquals;
 
-public class NotWrapperTest {
+public class NotPredicateTest {
 
   @Test
   public void convertNestedNotToCnfTest() {
     Predicate a = getComparison();
     Predicate nestedNot = new Not(a);
 
-    NotWrapper not = new NotWrapper(new Not(nestedNot));
+    NotPredicate notPredicate = new NotPredicate(new Not(nestedNot));
 
-    CNF reference = PredicateWrapper.wrap(a).asCNF();
+    CNF reference = QueryPredicate.createFrom(a).asCNF();
 
-    assertEquals(reference,not.asCNF());
+    assertEquals(reference, notPredicate.asCNF());
   }
 
   @Test
   public void convertNestedComparisonToCnfTest() {
     Comparison a = getComparison();
 
-    NotWrapper not = new NotWrapper(new Not(a));
+    NotPredicate notPredicate = new NotPredicate(new Not(a));
 
-    CNF reference = PredicateWrapper.wrap(invert(a)).asCNF();
+    CNF reference = QueryPredicate.createFrom(invert(a)).asCNF();
 
-    assertEquals(reference,not.asCNF());
+    assertEquals(reference, notPredicate.asCNF());
   }
 
   @Test
@@ -62,12 +63,12 @@ public class NotWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
     And and = new And(a,b);
-    NotWrapper not = new NotWrapper(new Not(and));
+    NotPredicate notPredicate = new NotPredicate(new Not(and));
 
     CNF reference =
-      new ComparisonWrapper(invert(a)).asCNF().or(new ComparisonWrapper(invert(b)).asCNF());
+      new ComparisonExpression(invert(a)).asCNF().or(new ComparisonExpression(invert(b)).asCNF());
 
-    assertEquals(reference,not.asCNF());
+    assertEquals(reference, notPredicate.asCNF());
   }
 
   @Test
@@ -75,12 +76,12 @@ public class NotWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
     Or or = new Or(a,b);
-    NotWrapper not = new NotWrapper(new Not(or));
+    NotPredicate notPredicate = new NotPredicate(new Not(or));
 
     CNF reference =
-      new ComparisonWrapper(invert(a)).asCNF().and(new ComparisonWrapper(invert(b)).asCNF());
+      new ComparisonExpression(invert(a)).asCNF().and(new ComparisonExpression(invert(b)).asCNF());
 
-    assertEquals(reference,not.asCNF());
+    assertEquals(reference, notPredicate.asCNF());
   }
 
   @Test
@@ -88,12 +89,20 @@ public class NotWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
     Xor xor = new Xor(a,b);
-    NotWrapper not = new NotWrapper(new Not(xor));
+    NotPredicate notPredicate = new NotPredicate(new Not(xor));
 
     CNF reference =
-      PredicateWrapper.wrap(new Or(new And(a,b),new And(new Not(a),new Not(b)))).asCNF();
+      QueryPredicate.createFrom(
+        new Or(
+          new And(a,b),
+          new And(
+            new Not(a),
+            new Not(b)
+          )
+        )
+      ).asCNF();
 
-    assertEquals(reference,not.asCNF());
+    assertEquals(reference, notPredicate.asCNF());
   }
 
   protected Comparison getComparison() {
@@ -104,7 +113,8 @@ public class NotWrapperTest {
     );
   }
 
-  private Comparison invert(Comparison comparison) {
+  private Comparison invert(
+    Comparison comparison) {
     ComparableExpression[] arguments = comparison.getComparableExpressions();
     return new Comparison(
       arguments[0],

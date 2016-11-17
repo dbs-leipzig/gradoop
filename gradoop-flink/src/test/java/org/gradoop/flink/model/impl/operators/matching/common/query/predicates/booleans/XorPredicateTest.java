@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .expressions.ComparisonWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.booleans.And;
@@ -30,18 +29,29 @@ import org.s1ck.gdl.utils.Comparator;
 
 import static org.junit.Assert.assertEquals;
 
-public class XorWrapperTest {
+public class XorPredicateTest {
 
   @Test
   public void convertToCnfTest() {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    XorWrapper xor = new XorWrapper(new Xor(a,b));
+    XorPredicate xorPredicate = new XorPredicate(new Xor(a,b));
 
-    CNF reference = new OrWrapper(new Or(new And(a,new Not(b)),new And(new Not(a),b))).asCNF();
+    CNF reference = new OrPredicate(
+      new Or(
+        new And(
+          a,
+          new Not(b)
+        ),
+        new And(
+          new Not(a),
+          b
+        )
+      )
+    ).asCNF();
 
-    assertEquals(reference,xor.asCNF());
+    assertEquals(reference, xorPredicate.asCNF());
   }
 
   @Test
@@ -49,9 +59,9 @@ public class XorWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrWrapper or = new OrWrapper(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
 
-    assertEquals(new ComparisonWrapper(a), or.getLhs());
+    assertEquals(new ComparisonExpression(a), orPredicate.getLhs());
   }
 
   @Test
@@ -59,9 +69,9 @@ public class XorWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrWrapper or = new OrWrapper(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
 
-    assertEquals(new ComparisonWrapper(b), or.getRhs());
+    assertEquals(new ComparisonExpression(b), orPredicate.getRhs());
   }
 
   protected Comparison getComparison() {

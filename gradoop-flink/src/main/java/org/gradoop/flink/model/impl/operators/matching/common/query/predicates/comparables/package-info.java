@@ -16,6 +16,7 @@
  */
 
 /**
- * Includes wrappers of all boolean predicates
+ * Includes wrappers of all comparable expressions
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;

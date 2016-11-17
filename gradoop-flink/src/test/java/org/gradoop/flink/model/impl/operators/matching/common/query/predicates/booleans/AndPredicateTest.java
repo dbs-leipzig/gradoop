@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .expressions.ComparisonWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.booleans.And;
@@ -27,18 +26,18 @@ import org.s1ck.gdl.utils.Comparator;
 
 import static org.junit.Assert.assertEquals;
 
-public class AndWrapperTest {
+public class AndPredicateTest {
 
   @Test
   public void convertToCnfTest() {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndWrapper and = new AndWrapper(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a,b));
 
-    CNF reference = and.getLhs().asCNF().and(and.getRhs().asCNF());
+    CNF reference = andPredicate.getLhs().asCNF().and(andPredicate.getRhs().asCNF());
 
-    assertEquals(reference,and.asCNF());
+    assertEquals(reference, andPredicate.asCNF());
   }
 
   @Test
@@ -46,9 +45,9 @@ public class AndWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndWrapper and = new AndWrapper(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a,b));
 
-    assertEquals(new ComparisonWrapper(a), and.getLhs());
+    assertEquals(new ComparisonExpression(a), andPredicate.getLhs());
   }
 
   @Test
@@ -56,9 +55,9 @@ public class AndWrapperTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndWrapper and = new AndWrapper(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a,b));
 
-    assertEquals(new ComparisonWrapper(b), and.getRhs());
+    assertEquals(new ComparisonExpression(b), andPredicate.getRhs());
   }
 
   protected Comparison getComparison() {

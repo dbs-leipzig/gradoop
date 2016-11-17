@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.booleans;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.PredicateWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 
 /**
- * Wraps an {@link And} predicate
+ * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.And} predicate
  */
-public class AndWrapper extends PredicateWrapper {
+public class AndPredicate extends QueryPredicate {
   /**
    * Holds the wrapped predicate
    */
   private final And and;
 
   /**
-   * Returns a new AndWrapper
+   * Returns a new AndPredicate
    * @param and the predicate
    */
-  public AndWrapper(And and) {
+  public AndPredicate(And and) {
     this.and = and;
   }
 
@@ -50,16 +50,16 @@ public class AndWrapper extends PredicateWrapper {
    * Retruns the wrapped left hand side predicate
    * @return the left hand side
    */
-  public PredicateWrapper getLhs() {
-    return PredicateWrapper.wrap(and.getArguments()[0]);
+  public QueryPredicate getLhs() {
+    return QueryPredicate.createFrom(and.getArguments()[0]);
   }
 
   /**
    * Retruns the wrapped right hand side predicate
    * @return the right hand side
    */
-  public PredicateWrapper getRhs() {
-    return PredicateWrapper.wrap(and.getArguments()[1]);
+  public QueryPredicate getRhs() {
+    return QueryPredicate.createFrom(and.getArguments()[1]);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class AndWrapper extends PredicateWrapper {
       return false;
     }
 
-    AndWrapper that = (AndWrapper) o;
+    AndPredicate that = (AndPredicate) o;
 
     return and != null ? and.equals(that.and) : that.and == null;
   }

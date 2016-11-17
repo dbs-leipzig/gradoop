@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers.comparables;
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions
-  .MissingElementException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.wrappers
-  .ComparableWrapper;
+import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
 import java.util.Map;
 
 /**
- * Wraps an {@link ElementSelector}
+ * Wraps an {@link org.s1ck.gdl.model.comparables.ElementSelector}
  */
-public class ElementSelectorWrapper extends ComparableWrapper {
+public class ElementSelectorComparable extends QueryComparable {
   /**
    * Holds the wrapped ElementSelector
    */
@@ -38,9 +36,9 @@ public class ElementSelectorWrapper extends ComparableWrapper {
   /**
    * Creates a new Wrapper
    *
-   * @param elementSelector the wrapped ElementSelector
+   * @param elementSelector the wrapped ElementSelectorComparable
    */
-  public ElementSelectorWrapper(ElementSelector elementSelector) {
+  public ElementSelectorComparable(ElementSelector elementSelector) {
     this.elementSelector = elementSelector;
   }
 
@@ -71,7 +69,7 @@ public class ElementSelectorWrapper extends ComparableWrapper {
       return false;
     }
 
-    ElementSelectorWrapper that = (ElementSelectorWrapper) o;
+    ElementSelectorComparable that = (ElementSelectorComparable) o;
 
     return elementSelector != null ? elementSelector.equals(that.elementSelector) :
       that.elementSelector == null;
