@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 
 /**
@@ -42,6 +43,10 @@ public class JoinEmbeddings implements PhysicalOperator {
    */
   private final int rhsColumn;
   /**
+   * The strategy used for the matching
+   */
+  private final MatchStrategy matchStrategy;
+  /**
    * Join Hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
@@ -56,11 +61,12 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param joinHint join strategy
    */
   public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,
-    int rhsColumn, JoinOperatorBase.JoinHint joinHint) {
+    int rhsColumn, MatchStrategy matchStrategy, JoinOperatorBase.JoinHint joinHint) {
     this.lhs = lhs;
     this.rhs = rhs;
     this.lhsColumn = lhsColumn;
     this.rhsColumn = rhsColumn;
+    this.matchStrategy = matchStrategy;
     this.joinHint = joinHint;
   }
 
@@ -74,7 +80,8 @@ public class JoinEmbeddings implements PhysicalOperator {
    */
   public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,
     int rhsColumn) {
-    this(lhs, rhs, lhsColumn, rhsColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+    this(lhs, rhs, lhsColumn, rhsColumn, MatchStrategy.ISOMORPHISM,
+    JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   @Override

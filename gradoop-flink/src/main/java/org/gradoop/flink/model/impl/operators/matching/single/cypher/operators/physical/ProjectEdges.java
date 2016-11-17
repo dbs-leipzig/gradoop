@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectEdgeFunction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,6 +48,17 @@ public class ProjectEdges implements PhysicalOperator {
   public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
+  }
+
+  /**
+   * Creates a new edge projection operator wih empty property list
+   * Evaluate will return Embedding(IDEntry)
+   *
+   * @param input vertices that will be projected
+   */
+  public ProjectEdges(DataSet<Edge> input) {
+    this.input = input;
+    this.propertyKeys = new ArrayList<>();
   }
 
   @Override

@@ -22,11 +22,13 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectVertexFunction;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Projects a Vertex by a set of properties.
- * Vertex -> Embedding(GraphElementEmbedding(Vertex))
+ * Vertex -> Embedding(ProjectionEmbedding(Vertex))
  */
 public class ProjectVertices implements PhysicalOperator {
 
@@ -41,12 +43,24 @@ public class ProjectVertices implements PhysicalOperator {
 
   /**
    * Creates a new vertex projection operator
+   *
    * @param input vertices that should be projected
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
   public ProjectVertices(DataSet<Vertex> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
+  }
+
+  /**
+   * Creates a new vertex projection operator wih empty property list
+   * Evaluate will return Embedding(IDEntry)
+   *
+   * @param input vertices that will be projected
+   */
+  public ProjectVertices(DataSet<Vertex> input) {
+    this.input = input;
+    this.propertyKeys = new ArrayList<>();
   }
 
   @Override

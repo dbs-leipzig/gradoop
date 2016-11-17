@@ -17,9 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
 import java.util.HashMap;
@@ -47,6 +49,10 @@ public class ProjectEdgeFunction extends RichMapFunction<Edge, Embedding> {
 
   @Override
   public Embedding map(Edge edge) {
-    return Projector.project(Embedding.fromEdge(edge), propertyKeyMapping);
+    if (propertyKeyMapping.get(0).isEmpty()) {
+      return new Embedding(Lists.newArrayList(new IdEntry(edge.getId())));
+    } else {
+      return Projector.project(Embedding.fromEdge(edge), propertyKeyMapping);
+    }
   }
 }

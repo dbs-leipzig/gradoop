@@ -19,23 +19,16 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 import org.junit.Test;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProjectorTest {
   @Test

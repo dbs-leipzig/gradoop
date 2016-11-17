@@ -16,9 +16,11 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
 import java.util.HashMap;
@@ -46,6 +48,10 @@ public class ProjectVertexFunction extends RichMapFunction<Vertex, Embedding> {
 
   @Override
   public Embedding map(Vertex vertex) {
-    return Projector.project(Embedding.fromVertex(vertex), propertyKeyMapping);
+    if (propertyKeyMapping.get(0).isEmpty()) {
+      return new Embedding(Lists.newArrayList(new IdEntry(vertex.getId())));
+    } else {
+      return Projector.project(Embedding.fromVertex(vertex), propertyKeyMapping);
+    }
   }
 }

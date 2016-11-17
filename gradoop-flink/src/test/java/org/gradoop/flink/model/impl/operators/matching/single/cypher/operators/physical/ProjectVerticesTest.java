@@ -20,14 +20,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
