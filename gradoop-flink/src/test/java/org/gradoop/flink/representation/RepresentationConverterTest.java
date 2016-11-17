@@ -23,16 +23,15 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
   @Test
   public void testGraphTransactionAdjacencyList() throws Exception {
 
-    RepresentationConverter converter = new RepresentationConverter();
-
     GraphTransaction transaction = getGraphTransaction();
 
-    AdjacencyList<Object> adjacencyList = converter
+    AdjacencyList<Object> adjacencyList = RepresentationConverters
       .getAdjacencyList(transaction, new AdjacencyListNullValueFactory());
 
-    GraphTransaction convertedTransaction = converter.getGraphTransaction(adjacencyList);
+    GraphTransaction convertedTransaction = RepresentationConverters
+      .getGraphTransaction(adjacencyList);
 
-    AdjacencyList<Object> convertedAdjacencyList = converter
+    AdjacencyList<Object> convertedAdjacencyList = RepresentationConverters
       .getAdjacencyList(convertedTransaction, new AdjacencyListNullValueFactory());
 
     assertTrue(transaction.equals(convertedTransaction));

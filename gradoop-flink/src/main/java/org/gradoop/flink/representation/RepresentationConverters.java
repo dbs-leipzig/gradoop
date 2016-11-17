@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Util to convert among different graph representations.
  */
-public class RepresentationConverter {
+public class RepresentationConverters {
 
   /**
    * transaction => adjacency list
@@ -48,7 +48,7 @@ public class RepresentationConverter {
    * @param <T> cell value type
    * @return adjacency list
    */
-  public <T> AdjacencyList<T> getAdjacencyList(
+  public static <T> AdjacencyList<T> getAdjacencyList(
     GraphTransaction transaction, AdjacencyListCellValueFactory<T> cellValueFactory) {
 
     GraphHead graphHead = transaction.getGraphHead();
@@ -64,7 +64,8 @@ public class RepresentationConverter {
     Map<GradoopId, AdjacencyListRow<T>> rows =
       Maps.newHashMapWithExpectedSize(vertices.size());
 
-    Map<GradoopId, Vertex> vertexIndex = Maps.newHashMapWithExpectedSize(vertices.size());
+    Map<GradoopId, Vertex> vertexIndex =
+      Maps.newHashMapWithExpectedSize(vertices.size());
 
     // GRAPH HEAD
     addLabelsAndProperties(graphHead, labels, properties);
@@ -103,7 +104,7 @@ public class RepresentationConverter {
    * @param labels id-label map
    * @param properties id-properties map
    */
-  private void addLabelsAndProperties(
+  private static void addLabelsAndProperties(
     EPGMElement element,
     Map<GradoopId, String> labels,
     Map<GradoopId, Properties> properties
@@ -123,7 +124,7 @@ public class RepresentationConverter {
    * @param <T> cell value type
    * @return transaction
    */
-  public <T> GraphTransaction getGraphTransaction(AdjacencyList<T>  adjacencyList) {
+  public static <T> GraphTransaction getGraphTransaction(AdjacencyList<T>  adjacencyList) {
 
     // GRAPH HEAD
     GradoopId graphId = adjacencyList.getGraphId();
