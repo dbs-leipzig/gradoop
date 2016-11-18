@@ -28,9 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CNFTest {
   @Test
@@ -95,7 +93,7 @@ public class CNFTest {
   }
 
   @Test
-  public void testEvaluation() {
+  public void testEvaluationForProperties() {
     String queryString = "MATCH (a), (b), (c)" +
       "WHERE a=b AND a.name = \"Alice\" AND a.age > c.age";
     QueryHandler query = new QueryHandler(queryString);
@@ -118,5 +116,19 @@ public class CNFTest {
     c.addProperty(Property.create("age",101));
 
     assertFalse(cnf.evaluate(mapping));
+  }
+
+  @Test public void testEvaluationWithMissingProperty() {
+    String queryString = "MATCH (a) WHERE a.age > 20";
+    QueryHandler query = new QueryHandler(queryString);
+    CNF predicates = query.getPredicates();
+
+    ProjectionEntry a = new ProjectionEntry(GradoopId.get());
+    a.addProperty(Property.create("name", "Alice"));
+
+    HashMap<String, EmbeddingEntry> mapping = new HashMap<>();
+    mapping.put("a",a);
+
+    assertFalse(predicates.evaluate(mapping));
   }
 }

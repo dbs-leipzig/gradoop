@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.c
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
   .LiteralComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
-  .PredicateSelectorComparable;
+  .PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
@@ -47,7 +47,7 @@ public abstract class QueryComparable implements Serializable {
     if (expression.getClass() == Literal.class) {
       return new LiteralComparable((Literal) expression);
     } else if (expression.getClass() == PropertySelector.class) {
-      return new PredicateSelectorComparable((PropertySelector) expression);
+      return new PropertySelectorComparable((PropertySelector) expression);
     } else if (expression.getClass() == ElementSelector.class) {
       return new ElementSelectorComparable((ElementSelector) expression);
     } else {

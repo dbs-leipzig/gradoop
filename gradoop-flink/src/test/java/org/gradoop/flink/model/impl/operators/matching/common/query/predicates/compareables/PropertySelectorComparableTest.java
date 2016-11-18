@@ -18,10 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions
-  .MissingElementException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
-  .PredicateSelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
@@ -33,12 +31,12 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class PredicateSelectorComparableTest {
+public class PropertySelectorComparableTest {
   @Test
   public void testEvaluationReturnsPropertyValue() {
     PropertySelector
       selector = new PropertySelector("a","age");
-    PredicateSelectorComparable wrapper = new PredicateSelectorComparable(selector);
+    PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
     entry.getProperties().get().set("age", PropertyValue.create(42));
@@ -53,27 +51,27 @@ public class PredicateSelectorComparableTest {
   }
 
   @Test
-  public void testReturnNullIfPropertyIsMissing() {
+  public void testReturnNullPropertyValueIfPropertyIsMissing() {
     PropertySelector selector = new PropertySelector("a","age");
-    PredicateSelectorComparable wrapper = new PredicateSelectorComparable(selector);
+    PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
 
     // property is missing
     Map<String, EmbeddingEntry> values = new HashMap<>();
     values.put("a", entry);
-    assertNull(wrapper.evaluate(values));
+    assertTrue(wrapper.evaluate(values).isNull());
 
     // entry is not a PropertyEntry
     entry = new IdEntry(GradoopId.get());
     values.put("a", entry);
-    assertNull(wrapper.evaluate(values));
+    assertTrue(wrapper.evaluate(values).isNull());
   }
 
   @Test(expected= MissingElementException.class)
   public void testThrowErrorIfElementNotPresent() {
     PropertySelector selector = new PropertySelector("a","age");
-    PredicateSelectorComparable wrapper = new PredicateSelectorComparable(selector);
+    PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
 

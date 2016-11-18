@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Wraps a {@link PropertySelector}
  */
-public class PredicateSelectorComparable extends QueryComparable {
+public class PropertySelectorComparable extends QueryComparable {
   /**
    * Holds the wrapped property selector
    */
@@ -38,7 +38,7 @@ public class PredicateSelectorComparable extends QueryComparable {
    * Creates a new wrapper
    * @param propertySelector the wrapped property selector
    */
-  public PredicateSelectorComparable(PropertySelector propertySelector) {
+  public PropertySelectorComparable(PropertySelector propertySelector) {
     this.propertySelector = propertySelector;
   }
 
@@ -57,9 +57,10 @@ public class PredicateSelectorComparable extends QueryComparable {
       throw new MissingElementException(propertySelector.getVariable());
     }
 
-    return entry.getProperties().
-      orElse(new Properties()).
-      get(propertySelector.getPropertyName());
+    PropertyValue value =  entry.getProperties().orElse(new Properties())
+      .get(propertySelector.getPropertyName());
+
+    return value == null ? PropertyValue.NULL_VALUE : value;
   }
 
   @Override
@@ -71,7 +72,7 @@ public class PredicateSelectorComparable extends QueryComparable {
       return false;
     }
 
-    PredicateSelectorComparable that = (PredicateSelectorComparable) o;
+    PropertySelectorComparable that = (PropertySelectorComparable) o;
 
     return propertySelector != null ? propertySelector.equals(that.propertySelector) :
       that.propertySelector == null;
