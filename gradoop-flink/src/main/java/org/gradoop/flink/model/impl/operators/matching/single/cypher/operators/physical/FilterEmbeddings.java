@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEmbeddingFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEmbedding;
 
 import java.util.Map;
 
@@ -60,6 +60,6 @@ public class FilterEmbeddings implements PhysicalOperator {
    * {@inheritDoc}
    */
   public DataSet<Embedding> evaluate() {
-    return input.filter(new FilterEmbeddingFunction(predicates, columnMapping));
+    return input.filter(new FilterEmbedding(predicates, columnMapping));
   }
 }

@@ -17,54 +17,38 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import com.google.common.collect.Lists;
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Filter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Filters a set of edges by given predicates
+ * Filters a set of embedding by given predicates
  */
-public class FilterEdgeFunction extends RichFlatMapFunction<Edge, Embedding> {
+public class FilterEmbedding extends RichFilterFunction<Embedding> {
   /**
    * Predicates used for filtering
    */
   private final CNF predicates;
   /**
    * Mapping of variables names to embedding column
-   * The predicate should only hold one variables which we map to column 1
    */
-  private final Map<String, Integer> columnMapping = new HashMap<>();
+  private final Map<String, Integer> columnMapping;
 
   /**
-   * New edge filter function
+   * New embedding filter function
    * @param predicates predicates used for filtering
+   * @param columnMapping mapping of variable names to embedding column
    */
-  public FilterEdgeFunction(CNF predicates) {
+  public FilterEmbedding(CNF predicates, Map<String, Integer> columnMapping) {
     this.predicates = predicates;
-
-    String variable = Lists.newArrayList(predicates.getVariables()).get(0);
-    columnMapping.put(variable, 1);
+    this.columnMapping = columnMapping;
   }
 
   @Override
-  public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    if (Filter.filter(predicates, Embedding.fromEdge(edge), columnMapping)) {
-
-      Embedding embedding = new Embedding();
-      embedding.addEntry(new IdEntry(edge.getSourceId()));
-      embedding.addEntry(new IdEntry(edge.getId()));
-      embedding.addEntry(new IdEntry(edge.getTargetId()));
-
-      out.collect(embedding);
-
-    }
+  public boolean filter(Embedding embedding) {
+    return Filter.filter(predicates, embedding, columnMapping);
   }
 }
