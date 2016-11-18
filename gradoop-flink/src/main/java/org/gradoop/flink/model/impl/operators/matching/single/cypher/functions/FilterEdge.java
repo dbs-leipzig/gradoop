@@ -17,52 +17,54 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Filter;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Filters a set of embeddings and projects the remaining elements.
+ * Filters a set of edges by given predicates
  */
-public class FilterAndProjectEmbeddingFunction extends RichFlatMapFunction<Embedding, Embedding> {
+public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
   /**
-   * Predicate used for filtering in CNF
+   * Predicates used for filtering
    */
   private final CNF predicates;
   /**
-   * Holds a list of property keys for every embedding entry
-   * The specified properties will be kept in the projection
+   * Mapping of variables names to embedding column
+   * The predicate should only hold one variables which we map to column 1
    */
-  private final Map<Integer, List<String>> propertyKeyMapping;
-  /**
-   * Maps the predicates variables to embedding entries
-   */
-  private final Map<String, Integer> columnMapping;
+  private final Map<String, Integer> columnMapping = new HashMap<>();
 
   /**
-   * Create a new embedding filter and project function
-   * @param predicates filter predicates
-   * @param propertyKeyMapping maps embedding entries to property keys
-   * @param columnMapping maps predicate variables to embedding entries
+   * New edge filter function
+   * @param predicates predicates used for filtering
    */
-  public FilterAndProjectEmbeddingFunction(CNF predicates,
-    Map<Integer, List<String>> propertyKeyMapping, Map<String, Integer> columnMapping) {
+  public FilterEdge(CNF predicates) {
     this.predicates = predicates;
-    this.propertyKeyMapping = propertyKeyMapping;
-    this.columnMapping = columnMapping;
+
+    String variable = Lists.newArrayList(predicates.getVariables()).get(0);
+    columnMapping.put(variable, 1);
   }
 
   @Override
-  public void flatMap(Embedding embedding, Collector<Embedding> out) throws Exception {
-    if (Filter.filter(predicates, embedding, columnMapping)) {
-      Projector.project(embedding, propertyKeyMapping);
+  public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
+    if (Filter.filter(predicates, Embedding.fromEdge(edge), columnMapping)) {
+
+      Embedding embedding = new Embedding();
+      embedding.addEntry(new IdEntry(edge.getSourceId()));
+      embedding.addEntry(new IdEntry(edge.getId()));
+      embedding.addEntry(new IdEntry(edge.getTargetId()));
+
       out.collect(embedding);
+
     }
   }
 }

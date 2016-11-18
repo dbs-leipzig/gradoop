@@ -17,42 +17,34 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Projects an Edge by a set of properties.
- * Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
+ * Projects an Embedding by a set of properties.
+ * For each entry in the embedding a different property set can be specified
  */
-public class ProjectEdgeFunction extends RichMapFunction<Edge, Embedding> {
+public class ProjectEmbedding extends RichMapFunction<Embedding, Embedding> {
   /**
    * Names of the properties that will be kept in the projection
    */
   private final Map<Integer, List<String>> propertyKeyMapping;
 
   /**
-   * Creates a new edge projection function
-   * @param propertyKeys List of property names that will be kept in the projection
+   * Creates a new embedding projection operator
+   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
+   *                           values are property keys
    */
-  public ProjectEdgeFunction(List<String> propertyKeys) {
-    this.propertyKeyMapping = new HashMap<>();
-    propertyKeyMapping.put(1, propertyKeys);
+  public ProjectEmbedding(Map<Integer, List<String>> propertyKeyMapping) {
+    this.propertyKeyMapping = propertyKeyMapping;
   }
 
   @Override
-  public Embedding map(Edge edge) {
-    if (propertyKeyMapping.get(1).isEmpty()) {
-      return new Embedding(Lists.newArrayList(new IdEntry(edge.getId())));
-    } else {
-      return Projector.project(Embedding.fromEdge(edge), propertyKeyMapping);
-    }
+  public Embedding map(Embedding embedding) {
+    return Projector.project(embedding, propertyKeyMapping);
   }
 }

@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectVertexFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectVertex;
 
 
 import java.util.ArrayList;
@@ -65,6 +65,6 @@ public class ProjectVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectVertexFunction(propertyKeys));
+    return input.map(new ProjectVertex(propertyKeys));
   }
 }
