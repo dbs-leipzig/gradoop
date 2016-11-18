@@ -29,6 +29,11 @@ import java.util.Optional;
  */
 public class GraphElementEntry implements EmbeddingEntry {
   /**
+   * Holds the property key for the label property
+   */
+  public static final String LABEL_PROPERTY_KEY = "__label__";
+
+  /**
    * Holds the wrapped graph element
    */
   private final GraphElement graphElement;
@@ -57,7 +62,7 @@ public class GraphElementEntry implements EmbeddingEntry {
     Properties propertiesWithLabel =
       graphElement.getPropertyCount() > 0 ? graphElement.getProperties() : new Properties();
 
-    propertiesWithLabel.set("__label__", PropertyValue.create(graphElement.getLabel()));
+    propertiesWithLabel.set(LABEL_PROPERTY_KEY, PropertyValue.create(graphElement.getLabel()));
 
     return Optional.of(propertiesWithLabel);
   }
