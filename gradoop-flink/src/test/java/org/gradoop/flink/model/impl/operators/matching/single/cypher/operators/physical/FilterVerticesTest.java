@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 public class FilterVerticesTest extends PhysicalOperatorTest {
 
   @Test
-  public void testFilterVertices() throws Exception{
+  public void testFilterVerticesByProperty() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
@@ -42,6 +42,21 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
         new VertexFactory().createVertex("Person", properties)
+      )
+    );
+
+    FilterVertices filter = new FilterVertices(vertex, predicates);
+
+    assertEquals(0, filter.evaluate().count());
+  }
+
+  @Test
+  public void testFilterVerticesByLabel() throws Exception{
+    CNF predicates = predicateFromQuery("MATCH (a:Person)");
+
+    DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
+      Lists.newArrayList(
+        new VertexFactory().createVertex("Robot", new Properties())
       )
     );
 
@@ -59,6 +74,21 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
         new VertexFactory().createVertex("Person", properties)
+      )
+    );
+
+    FilterVertices filter = new FilterVertices(vertex, predicates);
+
+    assertEquals(1, filter.evaluate().count());
+  }
+
+  @Test
+  public void testKeepVerticesByLabel() throws Exception{
+    CNF predicates = predicateFromQuery("MATCH (a:Person)");
+
+    DataSet<Vertex> vertex = getExecutionEnvironment().fromCollection(
+      Lists.newArrayList(
+        new VertexFactory().createVertex("Person", new Properties())
       )
     );
 

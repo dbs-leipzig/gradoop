@@ -51,6 +51,21 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
   }
 
   @Test
+  public void testFilterEdgesByLabel() throws Exception{
+    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
+
+    DataSet<Edge> edge = getExecutionEnvironment().fromCollection(
+      Lists.newArrayList(
+        new EdgeFactory().createEdge("hates", GradoopId.get(), GradoopId.get(), Properties.create())
+      )
+    );
+
+    FilterEdges filter = new FilterEdges(edge, predicates);
+
+    assertEquals(0, filter.evaluate().count());
+  }
+
+  @Test
   public void testKeepEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
@@ -59,6 +74,21 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edge = getExecutionEnvironment().fromCollection(
       Lists.newArrayList(
         new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties)
+      )
+    );
+
+    FilterEdges filter = new FilterEdges(edge, predicates);
+
+    assertEquals(1, filter.evaluate().count());
+  }
+
+  @Test
+  public void testKeepEdgesByLabel() throws Exception{
+    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
+
+    DataSet<Edge> edge = getExecutionEnvironment().fromCollection(
+      Lists.newArrayList(
+        new EdgeFactory().createEdge("likes", GradoopId.get(), GradoopId.get(), Properties.create())
       )
     );
 

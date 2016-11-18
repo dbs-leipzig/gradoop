@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Optional;
 
@@ -49,10 +50,13 @@ public class GraphElementEntry implements EmbeddingEntry {
 
   /**
    * Return the GraphElements property list
+   * This list also includes the label
    * @return property list
    */
   public Optional<Properties> getProperties() {
-    return Optional.of(graphElement.getProperties());
+    Properties propertiesWithLabel = graphElement.getProperties();
+    propertiesWithLabel.set("__label__", PropertyValue.create(graphElement.getLabel()));
+    return Optional.of(propertiesWithLabel);
   }
 
   @Override
