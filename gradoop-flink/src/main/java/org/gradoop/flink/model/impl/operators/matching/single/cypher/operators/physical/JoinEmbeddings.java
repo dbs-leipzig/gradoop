@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
@@ -58,6 +59,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param rhs embeddings of the right side of the join
    * @param lhsColumn specifies the join column of the left hand side
    * @param rhsColumn specifies the join column of the left hand side
+   * @param matchStrategy match strategy
    * @param joinHint join strategy
    */
   public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,

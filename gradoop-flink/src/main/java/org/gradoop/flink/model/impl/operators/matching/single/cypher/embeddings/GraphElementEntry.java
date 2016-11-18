@@ -54,8 +54,11 @@ public class GraphElementEntry implements EmbeddingEntry {
    * @return property list
    */
   public Optional<Properties> getProperties() {
-    Properties propertiesWithLabel = graphElement.getProperties();
+    Properties propertiesWithLabel =
+      graphElement.getPropertyCount() > 0 ? graphElement.getProperties() : new Properties();
+
     propertiesWithLabel.set("__label__", PropertyValue.create(graphElement.getLabel()));
+
     return Optional.of(propertiesWithLabel);
   }
 

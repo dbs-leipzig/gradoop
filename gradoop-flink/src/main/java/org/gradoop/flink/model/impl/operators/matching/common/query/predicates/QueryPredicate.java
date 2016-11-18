@@ -17,15 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans
-  .AndPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans
-  .NotPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.AndPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.NotPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans
-  .XorPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions
-  .ComparisonExpression;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.XorPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 import org.s1ck.gdl.model.predicates.booleans.Not;

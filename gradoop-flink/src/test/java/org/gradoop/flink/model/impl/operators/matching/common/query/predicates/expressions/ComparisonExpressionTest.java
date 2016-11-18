@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
-  .LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
