@@ -96,7 +96,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString("expected[" +
       "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
-      "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
+      "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop);" +
       "]");
 
     LogicalGraph input = loader.getDatabase().getDatabaseGraph();
