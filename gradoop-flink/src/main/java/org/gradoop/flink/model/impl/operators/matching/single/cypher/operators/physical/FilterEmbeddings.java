@@ -18,10 +18,11 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.s1ck.gdl.model.cnf.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEmbeddingFunction;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Filters a set of Embeddings by the given predicates
@@ -39,27 +40,26 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * Maps variable names to embedding entries;
    */
-  private final HashMap<String,Integer> variableMapping;
+  private final Map<String, Integer> columnMapping;
 
 
   /**
    * New embedding filter operator
    * @param input Candidate embeddings
    * @param predicates Predicates to used for filtering
-   * @param variableMapping Maps variable names to embedding entries
+   * @param columnMapping Maps variable names to embedding entries
    */
   public FilterEmbeddings(DataSet<Embedding> input, CNF predicates,
-    HashMap<String, Integer> variableMapping) {
+    Map<String, Integer> columnMapping) {
     this.input = input;
     this.predicates = predicates;
-    this.variableMapping = variableMapping;
+    this.columnMapping = columnMapping;
   }
 
   /**
    * {@inheritDoc}
    */
   public DataSet<Embedding> evaluate() {
-
-    return null;
+    return input.filter(new FilterEmbeddingFunction(predicates, columnMapping));
   }
 }

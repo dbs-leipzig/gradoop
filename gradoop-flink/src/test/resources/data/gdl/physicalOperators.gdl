@@ -1,0 +1,15 @@
+(alice:Person {name:"Alice"})
+(bob:Person {name:"Bob"})
+(robot:Robot {name:"Alice"})
+(neo4j:Company {name:"Neo4J"})
+(oracle:Company {name:"Oracle"})
+(malmo:City {name:"Malmö"})
+
+
+g[
+    (alice)-[:worked_at {active:1}]->(neo4j),
+    (alice)-[:worked_at {active:0}]->(oracle),
+    (bob)-[:worked_at {active:1}]->(neo4j),
+    (robot)-[:worked_at {active:1}]->(neo4j),
+]
+
