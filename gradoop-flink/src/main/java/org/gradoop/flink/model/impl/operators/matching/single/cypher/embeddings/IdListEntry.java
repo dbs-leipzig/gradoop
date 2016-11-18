@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +29,7 @@ import java.util.Optional;
  * This is used e.g. for paths with variable path length where the access specific
  * elements is not necessary.
  */
-public class ListEntry implements EmbeddingEntry {
+public class IdListEntry implements EmbeddingEntry {
 
   /**
    * Contains the path represented by element ids
@@ -37,17 +37,17 @@ public class ListEntry implements EmbeddingEntry {
   private List<GradoopId> path;
 
   /**
-   * Creates a new ListEntry from a given path
+   * Creates a new IdListEntry from a given path
    * @param path path representet bei element ids
    */
-  public ListEntry(List<GradoopId> path) {
+  public IdListEntry(List<GradoopId> path) {
     this.path = path;
   }
 
   /**
-   * Creates a new ListEntry with empty path
+   * Creates a new IdListEntry with empty path
    */
-  public ListEntry() {
+  public IdListEntry() {
     this(Lists.newArrayList());
   }
 
@@ -61,7 +61,7 @@ public class ListEntry implements EmbeddingEntry {
    * @return empty optional
    */
   @Override
-  public Optional<PropertyList> getProperties() {
+  public Optional<Properties> getProperties() {
     return Optional.empty();
   }
 }

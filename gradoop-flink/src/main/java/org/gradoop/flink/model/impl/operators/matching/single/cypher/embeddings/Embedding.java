@@ -17,6 +17,10 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings;
 
+import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +38,15 @@ public class Embedding {
    * Creates a new empty Embedding
    */
   public Embedding() {
-    entries = new ArrayList<>();
+    this(new ArrayList<>());
+  }
+
+  /**
+   * Creates am embedding with the given entries
+   * @param entries initial embedding entries
+   */
+  public Embedding(List<EmbeddingEntry> entries) {
+    this.entries = entries;
   }
 
   /**
@@ -85,6 +97,29 @@ public class Embedding {
    */
   public int size() {
     return entries.size();
+  }
+
+  /**
+   * Create an embedding from an Edge
+   * @param edge the embedding
+   * @return the embedding created from the edge
+   */
+  public static Embedding fromEdge(Edge edge) {
+    return new Embedding(Lists.newArrayList(
+      new IdEntry(edge.getSourceId()),
+      new GraphElementEntry(edge),
+      new IdEntry(edge.getTargetId())));
+  }
+
+  /**
+   * Create an embedding from a vertex
+   * @param vertex the vertex
+   * @return the embedding created from the vertex
+   */
+  public static Embedding fromVertex(Vertex vertex) {
+    return new Embedding(Lists.newArrayList(
+      new GraphElementEntry(vertex)
+    ));
   }
 
   @Override
