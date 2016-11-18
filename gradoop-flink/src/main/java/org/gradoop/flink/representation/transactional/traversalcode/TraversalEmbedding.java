@@ -48,6 +48,14 @@ public class TraversalEmbedding {
   }
 
   /**
+   * Default constructor.
+   */
+  public TraversalEmbedding() {
+    this.vertexIds = Lists.newArrayList();
+    this.edgeIds = Lists.newArrayList();
+  }
+
+  /**
    * Constructor.
    *
    * @param parent parent embedding

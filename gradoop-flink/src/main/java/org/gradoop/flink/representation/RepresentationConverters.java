@@ -159,5 +159,4 @@ public class RepresentationConverters {
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
-
 }
