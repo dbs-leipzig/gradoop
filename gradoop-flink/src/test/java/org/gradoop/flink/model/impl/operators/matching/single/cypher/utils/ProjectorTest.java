@@ -94,10 +94,10 @@ public class ProjectorTest {
     );
   }
 
-  private Properties getProperties(List<String> property_names) {
+  private Properties getProperties(List<String> propertyNames) {
     Properties properties = new Properties();
 
-    for(String property_name : property_names) {
+    for(String property_name : propertyNames) {
       properties.set(property_name, property_name);
     }
 

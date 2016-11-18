@@ -51,8 +51,8 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(embeddings);
   }
 
-  DataSet<Vertex> createVerticesWithProperties(List<String> property_names) {
-    Properties properties = getProperties(property_names);
+  DataSet<Vertex> createVerticesWithProperties(List<String> propertyNames) {
+    Properties properties = getProperties(propertyNames);
     VertexFactory vertexFactory = new VertexFactory();
 
     List<Vertex> vertices = Lists.newArrayList(
@@ -63,8 +63,8 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(vertices);
   }
 
-  DataSet<Edge> createEdgesWithProperties(List<String> property_names) {
-    Properties properties = getProperties(property_names);
+  DataSet<Edge> createEdgesWithProperties(List<String> propertyNames) {
+    Properties properties = getProperties(propertyNames);
     EdgeFactory edgeFactory = new EdgeFactory();
 
     List<Edge> edges = Lists.newArrayList(
@@ -75,10 +75,10 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(edges);
   }
 
-  Properties getProperties(List<String> property_names) {
+  Properties getProperties(List<String> propertyNames) {
     Properties properties = new Properties();
 
-    for(String property_name : property_names) {
+    for(String property_name : propertyNames) {
       properties.set(property_name, property_name);
     }
 
