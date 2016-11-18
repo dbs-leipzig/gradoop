@@ -48,20 +48,17 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   /**
    * Represents a null id.
    */
-  public static final GradoopId NULL_VALUE =
-    new GradoopId(new UUID(0L, 0L));
+  public static final GradoopId NULL_VALUE = new GradoopId(new UUID(0L, 0L));
 
   /**
    * Highest possible Gradoop Id.
    */
-  public static final GradoopId MAX_VALUE =
-    new GradoopId(new UUID(Long.MAX_VALUE, Long.MAX_VALUE));
+  public static final GradoopId MAX_VALUE = new GradoopId(new UUID(Long.MAX_VALUE, Long.MAX_VALUE));
 
   /**
    * Lowest possible Gradoop Id.
    */
-  public static final GradoopId MIN_VALUE =
-    new GradoopId(new UUID(Long.MIN_VALUE, Long.MIN_VALUE));
+  public static final GradoopId MIN_VALUE = new GradoopId(new UUID(Long.MIN_VALUE, Long.MIN_VALUE));
 
   /**
    * Number of bytes to represent an id internally.
