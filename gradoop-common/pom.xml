@@ -18,37 +18,7 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <minimizeJar>true</minimizeJar>
-                            <artifactSet>
-                                <includes>
-                                    <!-- include BSON object ids -->
-                                    <include>org.mongodb:mongo-java-driver</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        org/gradoop/common/model/impl/id/ObjectId.java
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
