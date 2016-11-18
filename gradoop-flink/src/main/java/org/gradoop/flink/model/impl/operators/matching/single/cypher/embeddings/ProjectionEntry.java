@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings;
 
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyList;
 
 import java.util.Optional;
 
@@ -34,14 +34,14 @@ public class ProjectionEntry implements EmbeddingEntry {
   /**
    * the elements properties
    */
-  private PropertyList properties;
+  private Properties properties;
 
   /**
    * Create a new projection entry with empty property list
    * @param id element id
    */
   public ProjectionEntry(GradoopId id) {
-    this(id, new PropertyList());
+    this(id, new Properties());
   }
 
   /**
@@ -49,7 +49,7 @@ public class ProjectionEntry implements EmbeddingEntry {
    * @param id element id
    * @param properties property list
    */
-  public ProjectionEntry(GradoopId id, PropertyList properties) {
+  public ProjectionEntry(GradoopId id, Properties properties) {
     this.id = id;
     this.properties = properties;
   }
@@ -64,7 +64,7 @@ public class ProjectionEntry implements EmbeddingEntry {
   /**
    * {@inheritDoc}
    */
-  public Optional<PropertyList> getProperties() {
+  public Optional<Properties> getProperties() {
     return Optional.of(properties);
   }
 
@@ -80,7 +80,7 @@ public class ProjectionEntry implements EmbeddingEntry {
    * Replaces the property list with a new one
    * @param properties new properties
    */
-  public void setProperties(PropertyList properties) {
+  public void setProperties(Properties properties) {
     this.properties = properties;
   }
 
