@@ -34,7 +34,7 @@ import java.util.Map;
  * Filters a set of vertices and projects the remaining elements.
  * Vertex -> Embedding(ProjectionEntry(Vertex))
  */
-public class FilterAndProjectVertexFunction extends RichFlatMapFunction<Vertex, Embedding> {
+public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embedding> {
   /**
    * Predicate used for filtering in CNF
    */
@@ -54,7 +54,7 @@ public class FilterAndProjectVertexFunction extends RichFlatMapFunction<Vertex, 
    * @param predicates filter predicates
    * @param propertyKeys projection properties
    */
-  public FilterAndProjectVertexFunction(CNF predicates, List<String> propertyKeys) {
+  public FilterAndProjectVertex(CNF predicates, List<String> propertyKeys) {
     this.predicates = predicates;
     propertyKeyMapping.put(0, propertyKeys);
 

@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterVertexFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterVertex;
 
 /**
  * Filters a List of vertices by predicates
@@ -50,6 +50,6 @@ public class FilterVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterVertexFunction(predicates));
+    return input.flatMap(new FilterVertex(predicates));
   }
 }
