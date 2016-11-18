@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Filters a set of vertices by given predicates
  */
-public class FilterVertexFunction extends RichFlatMapFunction<Vertex, Embedding> {
+public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
   /**
    * Predicates used for filtering
    */
@@ -47,7 +47,7 @@ public class FilterVertexFunction extends RichFlatMapFunction<Vertex, Embedding>
    * New vertex filter function
    * @param predicates predicates used for filtering
    */
-  public FilterVertexFunction(CNF predicates) {
+  public FilterVertex(CNF predicates) {
     this.predicates = predicates;
 
     String variable = Lists.newArrayList(predicates.getVariables()).get(0);
