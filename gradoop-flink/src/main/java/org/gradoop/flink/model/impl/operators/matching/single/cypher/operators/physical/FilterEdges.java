@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEdgeFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEdge;
 
 /**
  * Filters a List of edges by predicates
@@ -49,6 +49,6 @@ public class FilterEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterEdgeFunction(predicates));
+    return input.flatMap(new FilterEdge(predicates));
   }
 }
