@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.transactional.dfscode;
+package org.gradoop.flink.representation.transactional.traversalcode;
 
 import java.io.Serializable;
 
@@ -24,8 +24,8 @@ import java.io.Serializable;
  *
  * @param <C> vertex and edge value type
  */
-public class DFSExtension<C extends Comparable<C>>
-  implements Serializable, Comparable<DFSExtension<C>> {
+public class Traversal<C extends Comparable<C>>
+  implements Serializable, Comparable<Traversal<C>> {
 
   /**
    * separator between vertex time and label
@@ -78,7 +78,7 @@ public class DFSExtension<C extends Comparable<C>>
    * @param toTime      traversal end time
    * @param toValue     traversal end label
    */
-  public DFSExtension(
+  public Traversal(
     int fromTime, C fromValue, boolean outgoing, C edgeValue, int toTime,  C toValue) {
     this.fromTime = fromTime;
     this.fromValue = fromValue;
@@ -136,7 +136,7 @@ public class DFSExtension<C extends Comparable<C>>
       return false;
     }
 
-    DFSExtension<?> that = (DFSExtension<?>) o;
+    Traversal<?> that = (Traversal<?>) o;
 
     if (fromTime != that.fromTime) {
       return false;
@@ -175,7 +175,7 @@ public class DFSExtension<C extends Comparable<C>>
    * @return comparison result
    */
   @Override
-  public int compareTo(DFSExtension<C> that) {
+  public int compareTo(Traversal<C> that) {
 
     int comparison;
 

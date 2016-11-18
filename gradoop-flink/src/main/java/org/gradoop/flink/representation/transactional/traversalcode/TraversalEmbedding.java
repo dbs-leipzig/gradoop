@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.transactional.dfscode;
+package org.gradoop.flink.representation.transactional.traversalcode;
 
 import com.google.common.collect.Lists;
 
@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Mapping between an embedding and a DFS code.
  */
-public class DFSEmbedding {
+public class TraversalEmbedding {
 
   /**
    * Initial vertex discovery times.
@@ -42,7 +42,7 @@ public class DFSEmbedding {
    * @param vertexIds vertex ids
    * @param edgeIds edge ids
    */
-  public DFSEmbedding(List<Integer> vertexIds, List<Integer> edgeIds) {
+  public TraversalEmbedding(List<Integer> vertexIds, List<Integer> edgeIds) {
     this.vertexIds = vertexIds;
     this.edgeIds = edgeIds;
   }
@@ -52,7 +52,7 @@ public class DFSEmbedding {
    *
    * @param parent parent embedding
    */
-  public DFSEmbedding(DFSEmbedding parent) {
+  public TraversalEmbedding(TraversalEmbedding parent) {
     this.vertexIds = Lists.newArrayList(parent.getVertexIds());
     this.edgeIds = Lists.newArrayList(parent.getEdgeIds());
   }

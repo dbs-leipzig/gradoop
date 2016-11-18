@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.transactional.dfscode;
+package org.gradoop.flink.representation.transactional.traversalcode;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -29,28 +29,28 @@ import java.util.List;
  *
  * @param <C> vertex and edge value type
  */
-public class DFSCode<C extends Comparable<C>> implements Serializable, Comparable<DFSCode<C>> {
+public class TraversalCode<C extends Comparable<C>> implements Serializable, Comparable<TraversalCode<C>> {
 
   /**
    * Included edges.
    */
-  private final List<DFSExtension<C>> extensions;
+  private final List<Traversal<C>> traversals;
 
   /**
    * Default constructor.
    */
-  public DFSCode() {
-    this.extensions = Lists.newArrayList();
+  public TraversalCode() {
+    this.traversals = Lists.newArrayList();
   }
 
   /**
    * Constructor.
    *
-   * @param extension initial extensions
+   * @param traversal initial traversals
    */
-  public DFSCode(DFSExtension<C> extension) {
-    this.extensions = Lists.newArrayListWithExpectedSize(1);
-    this.extensions.add(extension);
+  public TraversalCode(Traversal<C> traversal) {
+    this.traversals = Lists.newArrayListWithExpectedSize(1);
+    this.traversals.add(traversal);
   }
 
   /**
@@ -58,17 +58,17 @@ public class DFSCode<C extends Comparable<C>> implements Serializable, Comparabl
    *
    * @param parent parent DFS-code
    */
-  public DFSCode(DFSCode<C> parent) {
-    this.extensions = Lists.newArrayList(parent.getExtensions());
+  public TraversalCode(TraversalCode<C> parent) {
+    this.traversals = Lists.newArrayList(parent.getExtensions());
   }
 
-  public List<DFSExtension<C>> getExtensions() {
-    return extensions;
+  public List<Traversal<C>> getExtensions() {
+    return traversals;
   }
 
   @Override
   public String toString() {
-    return StringUtils.join(extensions, ',');
+    return StringUtils.join(traversals, ',');
   }
 
   @Override
@@ -80,18 +80,18 @@ public class DFSCode<C extends Comparable<C>> implements Serializable, Comparabl
       return false;
     }
 
-    DFSCode code = (DFSCode) o;
+    TraversalCode code = (TraversalCode) o;
 
-    return extensions.equals(code.extensions);
+    return traversals.equals(code.traversals);
   }
 
   @Override
   public int hashCode() {
-    return extensions.hashCode();
+    return traversals.hashCode();
   }
 
   @Override
-  public int compareTo(DFSCode<C> that) {
+  public int compareTo(TraversalCode<C> that) {
 
     int comparison;
 
@@ -107,11 +107,11 @@ public class DFSCode<C extends Comparable<C>> implements Serializable, Comparabl
     } else {
       comparison = 0;
 
-      Iterator<DFSExtension<C>> thisIterator = this.getExtensions().iterator();
-      Iterator<DFSExtension<C>> thatIterator = that.getExtensions().iterator();
+      Iterator<Traversal<C>> thisIterator = this.getExtensions().iterator();
+      Iterator<Traversal<C>> thatIterator = that.getExtensions().iterator();
 
-      // if two DFS-Codes share initial extensions,
-      // the first different extension will decide about comparison
+      // if two DFS-Codes share initial traversals,
+      // the first different traversal will decide about comparison
       while (comparison == 0 && thisIterator.hasNext() && thatIterator.hasNext())
       {
         comparison = thisIterator.next().compareTo(thatIterator.next());
@@ -120,11 +120,11 @@ public class DFSCode<C extends Comparable<C>> implements Serializable, Comparabl
       // DFS-Codes are equal or one is parent of other
       if (comparison == 0) {
 
-        // this is child, cause it has further extensions
+        // this is child, cause it has further traversals
         if (thisIterator.hasNext()) {
           comparison = 1;
 
-          // that is child, cause it has further extensions
+          // that is child, cause it has further traversals
         } else if (thatIterator.hasNext()) {
           comparison = -1;
 
