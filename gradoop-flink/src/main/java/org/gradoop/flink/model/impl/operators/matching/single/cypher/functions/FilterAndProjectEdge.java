@@ -34,7 +34,7 @@ import java.util.Map;
  * Filters a set of edges and projects the remaining elements.
  * Edge -> Embedding(IdEntry(SrcId), ProjectionEntry(Edge), IdEntry(TargetId))
  */
-public class FilterAndProjectEdgeFunction extends RichFlatMapFunction<Edge, Embedding> {
+public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
   /**
    * Predicate used for filtering in CNF
    */
@@ -54,7 +54,7 @@ public class FilterAndProjectEdgeFunction extends RichFlatMapFunction<Edge, Embe
    * @param predicates filter predicates
    * @param propertyKeys projection properties
    */
-  public FilterAndProjectEdgeFunction(CNF predicates, List<String> propertyKeys) {
+  public FilterAndProjectEdge(CNF predicates, List<String> propertyKeys) {
     this.predicates = predicates;
     propertyKeyMapping.put(1, propertyKeys);
 
