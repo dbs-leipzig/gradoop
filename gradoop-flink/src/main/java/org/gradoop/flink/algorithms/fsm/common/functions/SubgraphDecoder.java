@@ -30,7 +30,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.common.tuples.Subgraph;
-import org.gradoop.flink.representation.transaction.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.Serializable;

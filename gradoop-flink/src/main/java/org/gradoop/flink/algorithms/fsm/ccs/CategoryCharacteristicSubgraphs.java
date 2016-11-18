@@ -49,7 +49,7 @@ import org.gradoop.flink.algorithms.fsm.common.functions.IsResult;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.First;
-import org.gradoop.flink.representation.transaction.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Map;

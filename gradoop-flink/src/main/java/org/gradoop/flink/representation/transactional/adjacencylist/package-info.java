@@ -16,6 +16,6 @@
  */
 
 /**
- * Classes related to DFS code graph representation.
+ * Classes related to adjacency list representation.
  */
-package org.gradoop.flink.representation.dfscode;
+package org.gradoop.flink.representation.transactional.adjacencylist;

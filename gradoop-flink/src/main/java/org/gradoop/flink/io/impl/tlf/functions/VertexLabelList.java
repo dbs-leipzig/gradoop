@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.representation.transaction.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.List;
 

@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
-import org.gradoop.flink.representation.transaction.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.ArrayList;
 import java.util.List;

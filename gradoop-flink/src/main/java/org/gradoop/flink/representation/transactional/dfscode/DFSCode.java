@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.transactional.dfscode;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +26,8 @@ import java.util.List;
 
 /**
  * Represents a graph by the log of a depth first search.
+ *
+ * @param <C> vertex and edge value type
  */
 public class DFSCode<C extends Comparable<C>> implements Serializable, Comparable<DFSCode<C>> {
 

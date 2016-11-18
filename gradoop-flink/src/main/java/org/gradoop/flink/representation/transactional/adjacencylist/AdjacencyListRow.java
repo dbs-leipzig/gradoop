@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.adjacencylist;
+package org.gradoop.flink.representation.transactional.adjacencylist;
 
 import com.google.common.collect.Lists;
 
