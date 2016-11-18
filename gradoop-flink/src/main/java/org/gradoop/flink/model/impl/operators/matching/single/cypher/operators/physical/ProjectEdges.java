@@ -20,37 +20,49 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectEdgeFunction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Projects a set of edges
- * The returned embedding consists of 3 entries
- * IdEntry(sourceID), ProjectionEntry(edge), IdEntry(targetId)
+ * Projects an Edge by a set of properties.
+ * Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
  */
 public class ProjectEdges implements PhysicalOperator {
 
   /**
-   * Candidate Edges
+   * Input edge
    */
   private final DataSet<Edge> input;
   /**
-   * Names of the property that will be kept in the projection
+   * Names of the properties that will be kept in the projection
    */
   private final List<String> propertyKeys;
 
   /**
-   * New edge projection operator
-   * @param input Candidate edges
-   * @param propertyKeys List of property keys that will be included in the projection
+   * Creates a new edge projection operator
+   * @param input edges that should be projected
+   * @param propertyKeys List of property names that will be kept in the projection
    */
   public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
   }
 
+  /**
+   * Creates a new edge projection operator wih empty property list
+   * Evaluate will return Embedding(IDEntry)
+   *
+   * @param input vertices that will be projected
+   */
+  public ProjectEdges(DataSet<Edge> input) {
+    this.input = input;
+    this.propertyKeys = new ArrayList<>();
+  }
+
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return input.map(new ProjectEdgeFunction(propertyKeys));
   }
 }

@@ -19,9 +19,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectEmbeddingFunction;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Projects an Embedding by a set of properties.
@@ -36,21 +37,23 @@ public class ProjectEmbeddings implements PhysicalOperator {
   /**
    * Names of the properties that will be kept in the projection
    */
-  private final HashMap<Integer, List<String>> propertyKeys;
+  private final Map<Integer, List<String>> propertyKeyMapping;
 
   /**
    * Creates a new embedding projection operator
    * @param input Embeddings that should be projected
-   * @param propertyKeys HashMap of property labels, keys are the columns of the entry,
+   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
    *                     values are property keys
    */
-  public ProjectEmbeddings(DataSet<Embedding> input, HashMap<Integer, List<String>> propertyKeys) {
+  public ProjectEmbeddings(DataSet<Embedding> input,
+    Map<Integer, List<String>> propertyKeyMapping) {
+
     this.input = input;
-    this.propertyKeys = propertyKeys;
+    this.propertyKeyMapping = propertyKeyMapping;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return input.map(new ProjectEmbeddingFunction(propertyKeyMapping));
   }
 }

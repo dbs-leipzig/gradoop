@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
@@ -45,6 +46,10 @@ public class ExpandOne implements PhysicalOperator {
    */
   private final ExpandDirection direction;
   /**
+   * The strategy used for the matching
+   */
+  private final MatchStrategy matchStrategy;
+  /**
    * Join Hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
@@ -56,14 +61,16 @@ public class ExpandOne implements PhysicalOperator {
    * @param candidateEdges candidate edges along which we expand
    * @param expandColumn specifies the colum that represents the vertex from which we expand
    * @param direction direction of the expansion {@see ExpandDirection}
+   * @param matchStrategy match strategy
    * @param joinHint join strategy
    */
   public ExpandOne(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
-    ExpandDirection direction, JoinOperatorBase.JoinHint joinHint) {
+    ExpandDirection direction, MatchStrategy matchStrategy, JoinOperatorBase.JoinHint joinHint) {
     this.input = input;
     this.candidateEdges = candidateEdges;
     this.expandColumn = expandColumn;
     this.direction = direction;
+    this.matchStrategy = matchStrategy;
     this.joinHint = joinHint;
   }
 
@@ -78,7 +85,7 @@ public class ExpandOne implements PhysicalOperator {
   public ExpandOne(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     ExpandDirection direction) {
 
-    this(input, candidateEdges, expandColumn, direction,
+    this(input, candidateEdges, expandColumn, direction, MatchStrategy.ISOMORPHISM,
       JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST);
   }
 
