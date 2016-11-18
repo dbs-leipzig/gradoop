@@ -17,34 +17,42 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Projector;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Projects an Embedding by a set of properties.
- * For each entry in the embedding a different property set can be specified
+ * Projects a Vertex by a set of properties.
+ * Vertex -> Embedding(GraphElementEmbedding(Vertex))
  */
-public class ProjectEmbeddingFunction extends RichMapFunction<Embedding, Embedding> {
+public class ProjectVertex extends RichMapFunction<Vertex, Embedding> {
   /**
    * Names of the properties that will be kept in the projection
    */
   private final Map<Integer, List<String>> propertyKeyMapping;
 
   /**
-   * Creates a new embedding projection operator
-   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
-   *                           values are property keys
+   * Creates a new vertex projection function
+   * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
-  public ProjectEmbeddingFunction(Map<Integer, List<String>> propertyKeyMapping) {
-    this.propertyKeyMapping = propertyKeyMapping;
+  public ProjectVertex(List<String> propertyKeys) {
+    this.propertyKeyMapping = new HashMap<>();
+    propertyKeyMapping.put(0, propertyKeys);
   }
 
   @Override
-  public Embedding map(Embedding embedding) {
-    return Projector.project(embedding, propertyKeyMapping);
+  public Embedding map(Vertex vertex) {
+    if (propertyKeyMapping.get(0).isEmpty()) {
+      return new Embedding(Lists.newArrayList(new IdEntry(vertex.getId())));
+    } else {
+      return Projector.project(Embedding.fromVertex(vertex), propertyKeyMapping);
+    }
   }
 }
