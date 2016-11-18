@@ -22,7 +22,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
   }
 
   @Test
@@ -32,7 +32,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromFile(file, config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
   }
 
   @Test
@@ -41,7 +41,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
-    validateCaches(asciiGraphLoader, 0, 1, 0);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
 
     for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
       assertEquals("Graph has wrong label",
@@ -52,10 +52,10 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadByVariable() throws Exception {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()],h[()]", config);
+      AsciiGraphLoader.fromString("g[()];h[()]", config);
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
-    validateCaches(asciiGraphLoader, 2, 2, 0);
+    validateCaches(asciiGraphLoader, 2, 0, 0);
 
     GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
@@ -81,7 +81,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()]", config);
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
-    validateCaches(asciiGraphLoader, 0, 1, 0);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
 
     for (Vertex vertex : asciiGraphLoader.getVertices()) {
       assertEquals("Vertex has wrong label",
@@ -197,7 +197,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
 
     for (Edge edge : asciiGraphLoader.getEdges()) {
       assertEquals("Edge has wrong label",
@@ -211,7 +211,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", config);
 
     validateCollections(asciiGraphLoader, 1, 3, 2);
-    validateCaches(asciiGraphLoader, 0, 3, 2);
+    validateCaches(asciiGraphLoader, 0, 0, 2);
 
     Collection<Edge> edges = asciiGraphLoader
       .getEdgesByVariables("e", "f");
@@ -231,7 +231,7 @@ public class AsciiGraphLoaderTest {
         config);
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
-    validateCaches(asciiGraphLoader, 2, 6, 4);
+    validateCaches(asciiGraphLoader, 2, 0, 4);
 
     GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
@@ -270,7 +270,7 @@ public class AsciiGraphLoaderTest {
         config);
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
-    validateCaches(asciiGraphLoader, 2, 6, 4);
+    validateCaches(asciiGraphLoader, 2, 0, 4);
 
     Collection<Edge> edgesG = asciiGraphLoader
       .getEdgesByGraphVariables("g");
@@ -306,7 +306,7 @@ public class AsciiGraphLoaderTest {
         config);
 
     validateCollections(asciiGraphLoader, 3, 3, 0);
-    validateCaches(asciiGraphLoader, 2, 3, 0);
+    validateCaches(asciiGraphLoader, 2, 0, 0);
 
     GraphHead g = asciiGraphLoader.getGraphHeadByVariable("g");
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
@@ -324,7 +324,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("(a),(b),()", config);
 
     validateCollections(asciiGraphLoader, 0, 3, 0);
-    validateCaches(asciiGraphLoader, 0, 3, 0);
+    validateCaches(asciiGraphLoader, 0, 2, 0);
 
     Vertex a = asciiGraphLoader.getVertexByVariable("a");
     Vertex b = asciiGraphLoader.getVertexByVariable("b");
@@ -342,7 +342,7 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", config);
 
     validateCollections(asciiGraphLoader, 0, 4, 3);
-    validateCaches(asciiGraphLoader, 0, 4, 3);
+    validateCaches(asciiGraphLoader, 0, 0, 2);
 
     Edge e = asciiGraphLoader.getEdgeByVariable("e");
     Edge f = asciiGraphLoader.getEdgeByVariable("f");
@@ -360,11 +360,11 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
 
     asciiGraphLoader.appendFromString("[()-->()]");
     validateCollections(asciiGraphLoader, 2, 4, 2);
-    validateCaches(asciiGraphLoader, 0, 4, 2);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
   }
 
   @Test
@@ -373,11 +373,11 @@ public class AsciiGraphLoaderTest {
       AsciiGraphLoader.fromString("[()-->()]", config);
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
-    validateCaches(asciiGraphLoader, 0, 2, 1);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
 
     asciiGraphLoader.appendFromString("()-->()");
     validateCollections(asciiGraphLoader, 1, 4, 2);
-    validateCaches(asciiGraphLoader, 0, 4, 2);
+    validateCaches(asciiGraphLoader, 0, 0, 0);
   }
 
   @Test
