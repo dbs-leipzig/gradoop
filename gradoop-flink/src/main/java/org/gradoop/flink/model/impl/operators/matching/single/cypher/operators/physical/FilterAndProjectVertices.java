@@ -19,41 +19,39 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
-import org.s1ck.gdl.model.cnf.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterAndProjectVertexFunction;
 
 import java.util.List;
 
 /**
- * Filters a List of Vertices by predicates and projects the remaining vertices to the
+ * Filters a List of vertices by predicates and projects the remaining elements to the
  * specified properties
- * Returns one {@link ProjectionEntry} entry
  */
 public class FilterAndProjectVertices implements PhysicalOperator {
-
   /**
-   * Candidate vertices
+   * vertex data set
    */
   private final DataSet<Vertex> input;
   /**
-   * Predicates used for filtering in Conjunctive Normal Form
+   * Predicate used for filtering in CNF
    */
   private final CNF predicates;
   /**
-   * Property names that will be kept in projection
+   * Specifies properties that will be kept in the projection
    */
   private final List<String> propertyKeys;
 
   /**
-   * New Operator
-   *
-   * @param input Candidate vertices
-   * @param predicates Predicates that will be used to filter candidate vertices
-   * @param propertyKeys List of property keys that will be used for projection
+   * Create a new vertex filter and project function
+   * @param input input data set
+   * @param predicates filter predicates
+   * @param propertyKeys projection properties
    */
   public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates,
     List<String> propertyKeys) {
+
     this.input = input;
     this.predicates = predicates;
     this.propertyKeys = propertyKeys;
@@ -61,6 +59,8 @@ public class FilterAndProjectVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return input.flatMap(
+      new FilterAndProjectVertexFunction(predicates, propertyKeys)
+    );
   }
 }

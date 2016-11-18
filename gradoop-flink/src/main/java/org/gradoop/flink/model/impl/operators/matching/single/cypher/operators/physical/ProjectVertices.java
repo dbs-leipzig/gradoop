@@ -20,17 +20,20 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProjectVertexFunction;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Projects a set of vertices
- * The returned embedding consists of one entry ProjectionEntry(vertex)
+ * Projects a Vertex by a set of properties.
+ * Vertex -> Embedding(ProjectionEmbedding(Vertex))
  */
 public class ProjectVertices implements PhysicalOperator {
 
   /**
-   * Candidate vertices
+   * Input vertices
    */
   private final DataSet<Vertex> input;
   /**
@@ -39,18 +42,29 @@ public class ProjectVertices implements PhysicalOperator {
   private final List<String> propertyKeys;
 
   /**
-   * New vertex projection operator
+   * Creates a new vertex projection operator
    *
-   * @param input List of Vertices
-   * @param propertyKeys List of property keys that will be included in the projection
+   * @param input vertices that should be projected
+   * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
   public ProjectVertices(DataSet<Vertex> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
   }
 
+  /**
+   * Creates a new vertex projection operator wih empty property list
+   * Evaluate will return Embedding(IDEntry)
+   *
+   * @param input vertices that will be projected
+   */
+  public ProjectVertices(DataSet<Vertex> input) {
+    this.input = input;
+    this.propertyKeys = new ArrayList<>();
+  }
+
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return input.map(new ProjectVertexFunction(propertyKeys));
   }
 }

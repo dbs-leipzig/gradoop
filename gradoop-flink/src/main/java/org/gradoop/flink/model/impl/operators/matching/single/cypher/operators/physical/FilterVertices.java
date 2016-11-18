@@ -19,14 +19,13 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
-import org.s1ck.gdl.model.cnf.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterVertexFunction;
 
 /**
- * Filters a set of Vertices by the given predicates
- * Returns an Embedding with one
- * {@link IdEntry} entry
+ * Filters a List of vertices by predicates
+ * Vertex -> Embedding( IdEntry(Vertex) )
  */
 public class FilterVertices implements PhysicalOperator {
   /**
@@ -38,11 +37,11 @@ public class FilterVertices implements PhysicalOperator {
    */
   private final CNF predicates;
 
+
   /**
    * New vertex filter operator
-   *
-   * @param input candidate vertices
-   * @param predicates predicates used for filtering
+   * @param input Candidate vertices
+   * @param predicates Predicates used to filter vertices
    */
   public FilterVertices(DataSet<Vertex> input, CNF predicates) {
     this.input = input;
@@ -51,7 +50,6 @@ public class FilterVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-
-    return null;
+    return input.flatMap(new FilterVertexFunction(predicates));
   }
 }
