@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
@@ -54,9 +55,14 @@ public class Expand implements PhysicalOperator {
    */
   private final ExpandDirection direction;
   /**
+   * The strategy used for the matching
+   */
+  private final MatchStrategy matchStrategy;
+  /**
    * join hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
+
 
   /**
    * New Expand One Operator
@@ -67,16 +73,19 @@ public class Expand implements PhysicalOperator {
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
+   * @param matchStrategy match via isomorphism or homomorphism
    * @param joinHint join strategy
    */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
-    int lowerBound, int upperBound, ExpandDirection direction, JoinOperatorBase.JoinHint joinHint) {
+    int lowerBound, int upperBound, ExpandDirection direction,
+    MatchStrategy matchStrategy, JoinOperatorBase.JoinHint joinHint) {
     this.input = input;
     this.candidateEdges = candidateEdges;
     this.expandColumn = expandColumn;
     this.lowerBound = lowerBound;
     this.upperBound = upperBound;
     this.direction = direction;
+    this.matchStrategy = matchStrategy;
     this.joinHint = joinHint;
   }
 
@@ -94,7 +103,7 @@ public class Expand implements PhysicalOperator {
     int lowerBound, int upperBound, ExpandDirection direction) {
 
     this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,
-      JoinOperatorBase.JoinHint .BROADCAST_HASH_FIRST);
+      MatchStrategy.ISOMORPHISM, JoinOperatorBase.JoinHint .BROADCAST_HASH_FIRST);
   }
 
   @Override
