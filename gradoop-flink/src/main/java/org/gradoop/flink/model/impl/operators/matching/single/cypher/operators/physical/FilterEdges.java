@@ -19,24 +19,23 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.s1ck.gdl.model.cnf.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterEdgeFunction;
 
 /**
- * Filters a List of Edges by predicates and projects the remaining edges to the specified
- * properties
- * Returns Embedding with three columns IdEntry(sourceID), IdEntry(Edge), IdEntry(targetId)
+ * Filters a List of edges by predicates
+ * Edge -> Embedding(IdEntry(SrcID), IdEntry(Edge), IdEntry(TargetID))
  */
 public class FilterEdges implements PhysicalOperator {
   /**
-   * Input Edges
+   * Input graph elements
    */
   private final DataSet<Edge> input;
   /**
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
-
 
   /**
    * New edge filter operator
@@ -50,7 +49,6 @@ public class FilterEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-
-    return null;
+    return input.flatMap(new FilterEdgeFunction(predicates));
   }
 }
