@@ -1,7 +1,7 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
+import org.gradoop.flink.algorithms.fsm2.TransactionalFSM;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;

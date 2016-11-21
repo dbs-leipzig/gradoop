@@ -17,8 +17,12 @@
 
 package org.gradoop.flink.algorithms.fsm2;
 
+import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 
+import org.apache.flink.api.java.aggregation.SumAggregationFunction;
+import org.apache.flink.api.java.operators.AggregateOperator;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
@@ -26,16 +30,25 @@ import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
 import org.gradoop.flink.algorithms.fsm2.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterEdgesByLabel;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterVerticesByLabel;
+import org.gradoop.flink.algorithms.fsm2.functions.Report;
 import org.gradoop.flink.algorithms.fsm2.functions.ToAdjacencyList;
+import org.gradoop.flink.algorithms.fsm2.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm2.functions.VertexLabels;
-import org.gradoop.flink.algorithms.fsm2.tuples.LabelPair;
+import org.gradoop.flink.algorithms.fsm2.gspan.EmptyGraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm2.gspan.ExpandResult;
+import org.gradoop.flink.algorithms.fsm2.gspan.HasEmbeddings;
+import org.gradoop.flink.algorithms.fsm2.gspan.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm2.gspan.ToGraphTransaction;
+import org.gradoop.flink.algorithms.fsm2.gspan.Validate;
+import org.gradoop.flink.algorithms.fsm2.tuples.GraphEmbeddingPair;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.util.Collect;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -115,69 +128,56 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
       .map(new FilterEdgesByLabel())
       .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
 
-    DataSet<AdjacencyList<LabelPair>> adjacencyLists = transactions
-      .map(new ToAdjacencyList());
+    DataSet<GraphEmbeddingPair> searchSpace = transactions
+      .map(new ToAdjacencyList())
+      .map(new InitSingleEdgeEmbeddings());
 
+    DataSet<GraphEmbeddingPair> collector = input
+      .getConfig()
+      .getExecutionEnvironment()
+      .fromElements(true)
+      .map(new EmptyGraphEmbeddingPair());
 
+    searchSpace = searchSpace.union(collector);
 
+    // ITERATION HEAD
 
-//    DataSet<Map<String, Integer>> edgeDictionary;
-//
-//    DataSet<WithCount<String>> vertexLabelFrequencies = statistics
-//
-//
-//    if (fsmConfig.isPreprocessingEnabled()) {
-//      vertexDictionary = vertexLabelFrequencies
-//
-//
-//      edgeDictionary = statistics
-//        .flatMap(new FilteredEdgeLabels())
-//        .withBroadcastSet(
-//          vertexDictionary, Constants.VERTEX_DICTIONARY)
-//        .groupBy(0)
-//        .sum(1)
-//        .filter(new Frequent<>())
-//        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-//        .reduceGroup(new SortedDictionary());
-//
-//    } else {
-//      vertexDictionary = statistics
-//        .flatMap(new VertexLabels())
-//        .map(new ValueOfWithCount<>())
-//        .distinct()
-//        .reduceGroup(new RandomDictionary());
-//
-//      edgeDictionary = statistics
-//        .flatMap(new EdgeLabels())
-//        .distinct()
-//        .reduceGroup(new RandomDictionary());
-//    }
-//
-//    DataSet<GraphEmbeddings> graphEmbeddings = graphs
-//      .map(new ToGraphEmbeddings(fsmConfig))
-//      .withBroadcastSet(vertexDictionary, Constants.VERTEX_DICTIONARY)
-//      .withBroadcastSet(edgeDictionary, Constants.EDGE_DICTIONARY);
-//
-//    DataSet<WithCount<CompressedDfsCode>> allFrequentSubgraphs;
-//
-//    if (fsmConfig.getIterationStrategy() == IterationStrategy.LOOP_UNROLLING) {
-//      allFrequentSubgraphs = mineWithLoopUnrolling(graphEmbeddings);
-//    } else  {
-//      allFrequentSubgraphs = mineWithBulkIteration(
-//        graphEmbeddings, transactions.getConfig());
-//    }
-//
-//    if (fsmConfig.getMinEdgeCount() > 1) {
-//      allFrequentSubgraphs = allFrequentSubgraphs
-//        .filter(new MinEdgeCount(fsmConfig));
-//    }
-//
-//    return allFrequentSubgraphs
-//      .map(new DFSDecoder(transactions.getConfig()))
-//      .withBroadcastSet(vertexDictionary, Constants.VERTEX_DICTIONARY)
-//      .withBroadcastSet(edgeDictionary, Constants.EDGE_DICTIONARY);
+    IterativeDataSet<GraphEmbeddingPair> iterative = searchSpace
+      .iterate(fsmConfig.getMaxEdgeCount());
 
-    return null;
+    // ITERATION BODY
+
+    DataSet<WithCount<TraversalCode<String>>> frequentPatterns = iterative
+      .flatMap(new Report())
+      .groupBy(0)
+      .combineGroup(sumPartition())
+      .filter(new Validate())
+      .groupBy(0)
+      .sum(1)
+      .filter(new Frequent<>())
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
+
+    DataSet<GraphEmbeddingPair> grownEmbeddings = iterative
+      .map(new PatternGrowth())
+      .filter(new HasEmbeddings())
+      .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS);
+
+    // ITERATION FOOTER
+
+    return iterative
+      .closeWith(grownEmbeddings, frequentPatterns)
+      .flatMap(new ExpandResult())
+      .map(new ToGraphTransaction());
+  }
+
+  private GroupCombineFunction
+    <WithCount<TraversalCode<String>>, WithCount<TraversalCode<String>>> sumPartition() {
+
+    SumAggregationFunction.LongSumAgg[] sum = { new SumAggregationFunction.LongSumAgg() };
+
+    int[] fields = { 1 };
+
+    return new AggregateOperator.AggregatingUdf(sum, fields);
   }
 
   /**
@@ -190,132 +190,6 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
       .count(graphs)
       .map(new MinFrequency(fsmConfig));
   }
-
-//  /**
-//   * Mining core based on loop unrolling.
-//   *
-//   * @param graphEmbeddings
-//   * @return frequent subgraphs
-//   */
-//  private DataSet<WithCount<CompressedDfsCode>> mineWithLoopUnrolling(
-//    DataSet<GraphEmbeddings> graphEmbeddings) {
-//
-//    DataSet<WithCount<CompressedDfsCode>> frequentSubgraphs =
-//      getFrequentSubgraphs(graphEmbeddings);
-//
-//    DataSet<WithCount<CompressedDfsCode>> allFrequentSubgraphs = frequentSubgraphs;
-//
-//    if (fsmConfig.getMaxEdgeCount() > 1) {
-//      for (int k = 1; k < fsmConfig.getMaxEdgeCount(); k++) {
-//
-//        graphEmbeddings =
-//          growEmbeddingsOfFrequentSubgraphs(graphEmbeddings, frequentSubgraphs);
-//
-//        frequentSubgraphs = getFrequentSubgraphs(graphEmbeddings);
-//        allFrequentSubgraphs = allFrequentSubgraphs.union(frequentSubgraphs);
-//      }
-//    }
-//
-//    return allFrequentSubgraphs;
-//  }
-//
-//  /**
-//   * Mining core based on bulk iteration.
-//   *
-//   * @param graphEmbeddings
-//   * @param config
-//   * @return frequent subgraphs
-//   */
-//  private DataSet<WithCount<CompressedDfsCode>> mineWithBulkIteration(
-//    DataSet<GraphEmbeddings> graphEmbeddings, GradoopFlinkConfig config) {
-//
-//    DataSet<GraphEmbeddings> collector = config
-//      .getExecutionEnvironment()
-//      .fromElements(0)
-//      .map(new Collector());
-//
-//    // ITERATION HEAD
-//
-//    IterativeDataSet<GraphEmbeddings> iterative = graphEmbeddings
-//      .union(collector)
-//      .iterate(fsmConfig.getMaxEdgeCount());
-//
-//    // ITERATION BODY
-//
-//    DataSet<WithCount<CompressedDfsCode>> frequentSubgraphs =
-//      getFrequentSubgraphs(iterative);
-//
-//    DataSet<GraphEmbeddings> nextEmbeddings =
-//      growEmbeddingsOfFrequentSubgraphs(iterative, frequentSubgraphs);
-//
-//    // ITERATION FOOTER
-//
-//    return iterative
-//      .closeWith(nextEmbeddings, frequentSubgraphs)
-//      .filter(new IsResult(true))
-//      .flatMap(new ReportResultDFSCodes());
-//  }
-//
-//  /**
-//   * Determines frequent subgraphs in a set of embeddings.
-//   *
-//   * @param embeddings set of embeddings
-//   * @return frequent subgraphs
-//   */
-//  private DataSet<WithCount<CompressedDfsCode>> getFrequentSubgraphs(
-//    DataSet<GraphEmbeddings> embeddings) {
-//
-//    DataSet<WithCount<CompressedDfsCode>> reports =
-//      embeddings.flatMap(new ReportDFSCodes(fsmConfig));
-//
-//    if (fsmConfig.getValidationTime().equals(ValidationTime.GRAPH)) {
-//      reports = reports
-//        .filter(new ValidDFSCode(fsmConfig));
-//
-//    } else if (fsmConfig.getValidationTime().equals(ValidationTime.WORKER)) {
-//      SumAggregationFunction.LongSumAgg[] sum = { new SumAggregationFunction.LongSumAgg() };
-//
-//      int[] fields = { 1 };
-//
-//      AggregateOperator.AggregatingUdf udf =
-//      new AggregateOperator.AggregatingUdf(sum, fields);
-//
-//      reports = reports
-//        .groupBy(0)
-//        .combineGroup(udf)
-//        .filter(new ValidDFSCode(fsmConfig));
-//    }
-//
-//    DataSet<WithCount<CompressedDfsCode>> frequentSubgraphs = reports
-//      .groupBy(0)
-//      .sum(1)
-//      .filter(new Frequent<>())
-//      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
-//
-//    if (fsmConfig.getValidationTime().equals(ValidationTime.GLOBAL)) {
-//      frequentSubgraphs = frequentSubgraphs
-//        .filter(new ValidDFSCode(fsmConfig));
-//    }
-//
-//    return frequentSubgraphs;
-//  }
-//
-//  /**
-//   * Grows children of embeddings of frequent subgraphs.
-//   * @param graphEmbeddings
-//   * @param frequentSubgraphs frequent subgraphs  @return child embeddings
-//   */
-//  private DataSet<GraphEmbeddings> growEmbeddingsOfFrequentSubgraphs(
-//    DataSet<GraphEmbeddings> graphEmbeddings,
-//    DataSet<WithCount<CompressedDfsCode>> frequentSubgraphs) {
-//
-//    return graphEmbeddings
-//      .map(new PatternGrowth(fsmConfig))
-//      .withBroadcastSet(
-//        frequentSubgraphs.map(new ValueOfWithCount<>()),
-//        Constants.FREQUENT_SUBGRAPHS)
-//      .filter(new CouldGrow());
-//  }
 
   @Override
   public String getName() {

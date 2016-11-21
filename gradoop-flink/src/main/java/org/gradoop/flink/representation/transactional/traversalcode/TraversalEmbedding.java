@@ -18,6 +18,7 @@
 package org.gradoop.flink.representation.transactional.traversalcode;
 
 import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.List;
 
@@ -29,12 +30,12 @@ public class TraversalEmbedding {
   /**
    * Initial vertex discovery times.
    */
-  private final List<Integer> vertexIds;
+  private final List<GradoopId> vertexIds;
 
   /**
    * Included edges.
    */
-  private final List<Integer> edgeIds;
+  private final List<GradoopId> edgeIds;
 
   /**
    * Constructor.
@@ -42,7 +43,7 @@ public class TraversalEmbedding {
    * @param vertexIds vertex ids
    * @param edgeIds edge ids
    */
-  public TraversalEmbedding(List<Integer> vertexIds, List<Integer> edgeIds) {
+  public TraversalEmbedding(List<GradoopId> vertexIds, List<GradoopId> edgeIds) {
     this.vertexIds = vertexIds;
     this.edgeIds = edgeIds;
   }
@@ -65,11 +66,11 @@ public class TraversalEmbedding {
     this.edgeIds = Lists.newArrayList(parent.getEdgeIds());
   }
 
-  public List<Integer> getEdgeIds() {
+  public List<GradoopId> getEdgeIds() {
     return edgeIds;
   }
 
-  public List<Integer> getVertexIds() {
+  public List<GradoopId> getVertexIds() {
     return vertexIds;
   }
 

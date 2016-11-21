@@ -31,6 +31,8 @@ import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyLis
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
+import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 import java.util.Map;
 import java.util.Set;
@@ -155,6 +157,45 @@ public class RepresentationConverters {
           edges.add(new Edge(edgeId, label, sourceId, targetId, properties, graphIds));
         }
       }
+    }
+
+    return new GraphTransaction(graphHead, vertices, edges);
+  }
+
+  public static GraphTransaction createGraphTransaction(TraversalCode<String> traversalCode) {
+
+    GraphHead graphHead = new GraphHead(GradoopId.get(), "FSG", null);
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+
+    Map<Integer, GradoopId> vertexIdMap = Maps.newHashMap();
+
+    Set<Vertex> vertices = Sets.newHashSet();
+    Set<Edge> edges = Sets.newHashSet();
+
+    for (Traversal<String> traversal : traversalCode.getTraversals()) {
+      Integer fromTime = traversal.getFromTime();
+      GradoopId fromId = vertexIdMap.get(fromTime);
+
+      if (fromId == null) {
+        Vertex fromVertex = new Vertex(GradoopId.get(), traversal.getFromValue(), null, graphIds);
+        vertexIdMap.put(fromTime, fromVertex.getId());
+        vertices.add(fromVertex);
+      }
+
+      Integer toTime = traversal.getToTime();
+      GradoopId toId = vertexIdMap.get(toTime);
+
+      if (toId == null) {
+        Vertex toVertex = new Vertex(GradoopId.get(), traversal.getToValue(), null, graphIds);
+        vertexIdMap.put(toTime, toVertex.getId());
+        vertices.add(toVertex);
+      }
+
+      GradoopId sourceId = traversal.isOutgoing() ? fromId : toId;
+      GradoopId targetId = traversal.isOutgoing() ? toId : fromId;
+
+      edges.add(
+        new Edge(GradoopId.get(), traversal.getEdgeValue(), sourceId, targetId, null, graphIds));
     }
 
     return new GraphTransaction(graphHead, vertices, edges);

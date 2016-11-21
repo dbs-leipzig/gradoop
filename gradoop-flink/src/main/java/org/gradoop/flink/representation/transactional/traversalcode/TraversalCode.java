@@ -59,10 +59,10 @@ public class TraversalCode<C extends Comparable<C>> implements Serializable, Com
    * @param parent parent DFS-code
    */
   public TraversalCode(TraversalCode<C> parent) {
-    this.traversals = Lists.newArrayList(parent.getExtensions());
+    this.traversals = Lists.newArrayList(parent.getTraversals());
   }
 
-  public List<Traversal<C>> getExtensions() {
+  public List<Traversal<C>> getTraversals() {
     return traversals;
   }
 
@@ -95,8 +95,8 @@ public class TraversalCode<C extends Comparable<C>> implements Serializable, Com
 
     int comparison;
 
-    boolean thisIsRoot = this.getExtensions().isEmpty();
-    boolean thatIsRoot = that.getExtensions().isEmpty();
+    boolean thisIsRoot = this.getTraversals().isEmpty();
+    boolean thatIsRoot = that.getTraversals().isEmpty();
 
     if (thisIsRoot && ! thatIsRoot) {
       comparison = -1;
@@ -107,8 +107,8 @@ public class TraversalCode<C extends Comparable<C>> implements Serializable, Com
     } else {
       comparison = 0;
 
-      Iterator<Traversal<C>> thisIterator = this.getExtensions().iterator();
-      Iterator<Traversal<C>> thatIterator = that.getExtensions().iterator();
+      Iterator<Traversal<C>> thisIterator = this.getTraversals().iterator();
+      Iterator<Traversal<C>> thatIterator = that.getTraversals().iterator();
 
       // if two DFS-Codes share initial traversals,
       // the first different traversal will decide about comparison
