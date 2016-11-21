@@ -18,8 +18,7 @@
 package org.gradoop.flink.algorithms.fsm2;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.aggregation.SumAggregationFunction;
-import org.apache.flink.api.java.operators.AggregateOperator;
+
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
@@ -27,7 +26,6 @@ import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
 import org.gradoop.flink.algorithms.fsm2.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterEdgesByLabel;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterVerticesByLabel;
-import org.gradoop.flink.algorithms.fsm2.functions.SortedDictionary;
 import org.gradoop.flink.algorithms.fsm2.functions.ToAdjacencyList;
 import org.gradoop.flink.algorithms.fsm2.functions.VertexLabels;
 import org.gradoop.flink.algorithms.fsm2.tuples.LabelPair;
@@ -36,14 +34,13 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.flink.representation.tuples.AdjacencyList;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.Collect;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent

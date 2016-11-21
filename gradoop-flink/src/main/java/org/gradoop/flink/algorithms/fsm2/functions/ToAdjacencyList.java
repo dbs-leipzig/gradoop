@@ -5,8 +5,8 @@ import org.gradoop.flink.algorithms.fsm2.factories.LabelPairCellValueFactory;
 import org.gradoop.flink.algorithms.fsm2.tuples.LabelPair;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
 import org.gradoop.flink.representation.RepresentationConverters;
-import org.gradoop.flink.representation.tuples.AdjacencyList;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 
 public class ToAdjacencyList
