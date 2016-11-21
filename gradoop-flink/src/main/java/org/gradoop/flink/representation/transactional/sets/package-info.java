@@ -16,6 +16,6 @@
  */
 
 /**
- * Classes related to graph representations.
+ * Classes related to graph transaction representation.
  */
-package org.gradoop.flink.representation.tuples;
+package org.gradoop.flink.representation.transactional.sets;

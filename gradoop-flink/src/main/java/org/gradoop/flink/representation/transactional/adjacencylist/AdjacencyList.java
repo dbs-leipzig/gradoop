@@ -15,12 +15,11 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.tuples;
+package org.gradoop.flink.representation.transactional.adjacencylist;
 
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.representation.pojos.AdjacencyListRow;
 
 import java.util.Map;
 
@@ -34,27 +33,6 @@ public class AdjacencyList<T> extends Tuple4<
   Map<GradoopId, Properties>,
   Map<GradoopId, AdjacencyListRow<T>>
   > {
-
-//  /**
-//   * Graph Id
-//   */
-//  private GradoopId f0;
-//
-//  /**
-//   * graph / vertex / edge id => label
-//   */
-//  private Map<GradoopId, String> f1;
-//
-//  /**
-//   * graph / vertex / edge id => properties
-//   */
-//  private Map<GradoopId, Properties> f2;
-//
-//  /**
-//   * vertex id => adjacency list row
-//   */
-//  private Map<GradoopId, AdjacencyListRow<T>> f3;
-
 
   /**
    * Default constructor.
@@ -97,16 +75,6 @@ public class AdjacencyList<T> extends Tuple4<
    */
   public Properties getProperties(GradoopId elementId) {
     return f2.get(elementId);
-  }
-
-  /**
-   * Convenience method to get the adjacency list of a vertex.
-   *
-   * @param vertexId vertex id
-   * @return adjacency list
-   */
-  public AdjacencyListRow<T> getRows(GradoopId vertexId) {
-    return f3.get(vertexId);
   }
 
   public GradoopId getGraphId() {

@@ -7,7 +7,7 @@ import org.gradoop.flink.datagen.transactions.predictable
   .PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 

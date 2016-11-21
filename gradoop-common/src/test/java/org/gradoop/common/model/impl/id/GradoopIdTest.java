@@ -1,6 +1,7 @@
 package org.gradoop.common.model.impl.id;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.bson.types.ObjectId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.junit.Test;
 
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -78,7 +80,7 @@ public class GradoopIdTest {
   @Test
   public void testGetRawBytes() {
     GradoopId originalId = GradoopId.get();
-    assertEquals(16, originalId.getRawBytes().length);
+    assertEquals(12, originalId.getRawBytes().length);
     assertEquals(
       "Reconstruction failed",
       originalId,
@@ -88,13 +90,33 @@ public class GradoopIdTest {
 
   @Test
   public void testFromBytes() {
-    UUID uuid = UUID.randomUUID();
-    GradoopId expextedID = new GradoopId(uuid);
+    ObjectId bsonid = ObjectId.get();
+    GradoopId expextedID = new GradoopId(bsonid);
 
     byte[] bytes = new byte[GradoopId.ID_SIZE];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
-    buffer.putLong(uuid.getMostSignificantBits());
-    buffer.putLong(uuid.getLeastSignificantBits());
+
+    buffer.putInt(bsonid.getTimestamp());
+
+    byte b1,b2,b3;
+
+    int machineId = bsonid.getMachineIdentifier();
+    b3 = (byte)(machineId & 0xFF);
+    b2 = (byte)((machineId >> 8) & 0xFF);
+    b1 = (byte)((machineId >> 16) & 0xFF);
+    buffer.put(b1);
+    buffer.put(b2);
+    buffer.put(b3);
+
+    buffer.putShort(bsonid.getProcessIdentifier());
+
+    int counter = bsonid.getCounter();
+    b3 = (byte)(counter & 0xFF);
+    b2 = (byte)((counter >> 8) & 0xFF);
+    b1 = (byte)((counter >> 16) & 0xFF);
+    buffer.put(b1);
+    buffer.put(b2);
+    buffer.put(b3);
 
     GradoopId newId = GradoopId.fromBytes(bytes);
 
