@@ -1,11 +1,11 @@
-{"id":"e67c8f7b-0d87-4941-a068-60662ae8cda0","data":{"gender":"m","city":"Dresden","name":"Dave","age":40},"meta":{"label":"Person","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed","5471debf-2c91-4d0a-9d7b-88efca32edf7","37c98562-34b1-4bc4-992f-caa2afe19c5e","496883af-64c2-41f3-92db-7290bce4bdaf"]}}
-{"id":"1472bed4-04c4-4eb9-b701-82d379f769a7","data":{"name":"Hadoop"},"meta":{"label":"Tag","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"e8f3afbb-f8c4-4fa7-880e-dd8aeb125424","data":{"locIP":"127.0.0.1","gender":"m","city":"Berlin","name":"Frank","age":35},"meta":{"label":"Person","graphs":["496883af-64c2-41f3-92db-7290bce4bdaf","78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"ed8386ee-338a-4177-82c4-6c1080df0411","data":{"name":"Databases"},"meta":{"label":"Tag","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"a3d85dd8-4720-4c73-a1e3-032d13fa1b8d","data":{"gender":"f","city":"Dresden","name":"Carol","age":30},"meta":{"label":"Person","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed","5471debf-2c91-4d0a-9d7b-88efca32edf7","37c98562-34b1-4bc4-992f-caa2afe19c5e","496883af-64c2-41f3-92db-7290bce4bdaf"]}}
-{"id":"14505ae1-5003-4458-b86b-d137daff6525","data":{"title":"Graph Databases"},"meta":{"label":"Forum","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"5ae33d3a-8a58-4b7f-9f85-fe3bae8b6856","data":{"gender":"f","city":"Leipzig","name":"Alice","age":20},"meta":{"label":"Person","graphs":["5471debf-2c91-4d0a-9d7b-88efca32edf7","62ffe9d8-2823-4bd5-9b13-72f44b4e8835","78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"d2b9a539-6e2f-4440-8bf0-5184ff58aede","data":{"gender":"m","city":"Leipzig","name":"Bob","age":30},"meta":{"label":"Person","graphs":["5471debf-2c91-4d0a-9d7b-88efca32edf7","62ffe9d8-2823-4bd5-9b13-72f44b4e8835","78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"97e71723-359c-427f-912b-d99ba32e35f4","data":{"gender":"f","city":"Dresden","speaks":"English","name":"Eve","age":35},"meta":{"label":"Person","graphs":["62ffe9d8-2823-4bd5-9b13-72f44b4e8835","78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"7f2d8ff8-d16e-4b80-977c-98f58ce9c535","data":{"title":"Graph Processing"},"meta":{"label":"Forum","graphs":["37c98562-34b1-4bc4-992f-caa2afe19c5e","78493268-ba7d-4200-8674-e37ec9a003ed"]}}
-{"id":"56cbc00b-fdeb-4345-a92a-603bd4781428","data":{"name":"Graphs"},"meta":{"label":"Tag","graphs":["78493268-ba7d-4200-8674-e37ec9a003ed"]}}
+{"id":"0-0-0-0","data":{"gender":"m","city":"Dresden","name":"Dave","age":40},"meta":{"label":"Person","graphs":["0-0-2-4","0-0-2-0","0-0-2-2","0-0-2-1"]}}
+{"id":"0-0-0-1","data":{"name":"Hadoop"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
+{"id":"0-0-0-2","data":{"locIP":"127.0.0.1","gender":"m","city":"Berlin","name":"Frank","age":35},"meta":{"label":"Person","graphs":["0-0-2-1","0-0-2-4"]}}
+{"id":"0-0-0-3","data":{"name":"Databases"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
+{"id":"0-0-0-4","data":{"gender":"f","city":"Dresden","name":"Carol","age":30},"meta":{"label":"Person","graphs":["0-0-2-4","0-0-2-0","0-0-2-2","0-0-2-1"]}}
+{"id":"0-0-0-5","data":{"title":"Graph Databases"},"meta":{"label":"Forum","graphs":["0-0-2-4"]}}
+{"id":"0-0-0-6","data":{"gender":"f","city":"Leipzig","name":"Alice","age":20},"meta":{"label":"Person","graphs":["0-0-2-0","0-0-2-3","0-0-2-4"]}}
+{"id":"0-0-0-7","data":{"gender":"m","city":"Leipzig","name":"Bob","age":30},"meta":{"label":"Person","graphs":["0-0-2-0","0-0-2-3","0-0-2-4"]}}
+{"id":"0-0-0-8","data":{"gender":"f","city":"Dresden","speaks":"English","name":"Eve","age":35},"meta":{"label":"Person","graphs":["0-0-2-3","0-0-2-4"]}}
+{"id":"0-0-0-9","data":{"title":"Graph Processing"},"meta":{"label":"Forum","graphs":["0-0-2-2","0-0-2-4"]}}
+{"id":"0-0-0-10","data":{"name":"Graphs"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
