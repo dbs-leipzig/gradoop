@@ -33,20 +33,21 @@ public class FilterEdgesByLabel
   }
   
   @Override
-  public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
+  public GraphTransaction map(GraphTransaction transaction) throws Exception {
 
     Set<GradoopId> referenceEdgeIds = Sets.newHashSet();
 
 
     // drop edges with infrequent labels
 
-    Iterator<Edge> edgeIterator = graphTransaction.getEdges().iterator();
+    Iterator<Edge> edgeIterator = transaction.getEdges().iterator();
 
     while (edgeIterator.hasNext()) {
       Edge next = edgeIterator.next();
 
       if (frequentEdgeLabels.contains(next.getLabel())) {
-        referenceEdgeIds.add(next.getId());
+        referenceEdgeIds.add(next.getSourceId());
+        referenceEdgeIds.add(next.getTargetId());
       } else {
         edgeIterator.remove();
       }
@@ -54,7 +55,7 @@ public class FilterEdgesByLabel
 
     // drop vertex without any edges
 
-    Iterator<Vertex> vertexIterator = graphTransaction.getVertices().iterator();
+    Iterator<Vertex> vertexIterator = transaction.getVertices().iterator();
     
     while (vertexIterator.hasNext()) {
       Vertex next = vertexIterator.next();
@@ -64,6 +65,6 @@ public class FilterEdgesByLabel
       }
     }
 
-    return graphTransaction;
+    return transaction;
   }
 }

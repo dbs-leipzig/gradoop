@@ -17,6 +17,9 @@ public class ToAdjacencyList
 
   @Override
   public AdjacencyList<LabelPair> map(GraphTransaction graphTransaction) throws Exception {
-    return RepresentationConverters.getAdjacencyList(graphTransaction, cellValueFactory);
+
+    AdjacencyList<LabelPair> adjacencyList =
+      RepresentationConverters.getAdjacencyList(graphTransaction, cellValueFactory);
+    return adjacencyList;
   }
 }

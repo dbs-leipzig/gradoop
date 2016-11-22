@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.representation.transactional.adjacencylist;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -38,6 +39,7 @@ public class AdjacencyList<T> extends Tuple4<
    * Default constructor.
    */
   public AdjacencyList() {
+    super(GradoopId.get(), Maps.newHashMap(), Maps.newHashMap(), Maps.newHashMap());
   }
 
   /**
@@ -50,10 +52,7 @@ public class AdjacencyList<T> extends Tuple4<
    */
   public AdjacencyList(GradoopId graphId, Map<GradoopId, String> labels,
     Map<GradoopId, Properties> properties, Map<GradoopId, AdjacencyListRow<T>> rows) {
-    this.f0 = graphId;
-    this.f1 = labels;
-    this.f2 = properties;
-    this.f3 = rows;
+    super(graphId, labels, properties, rows);
   }
 
   /**

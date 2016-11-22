@@ -17,7 +17,6 @@ public class Report
 
     if (!graphEmbeddings.getAdjacencyLists().getRows().isEmpty()) {
       for (TraversalCode<String> code : graphEmbeddings.getCodeEmbeddings().keySet()) {
-
         collector.collect(new WithCount<>(code));
       }
     }

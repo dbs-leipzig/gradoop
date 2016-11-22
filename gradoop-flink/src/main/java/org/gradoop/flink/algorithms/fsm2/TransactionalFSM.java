@@ -27,6 +27,7 @@ import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm2.functions.DropPropertiesAndGraphContainment;
 import org.gradoop.flink.algorithms.fsm2.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterEdgesByLabel;
 import org.gradoop.flink.algorithms.fsm2.functions.FilterVerticesByLabel;
@@ -98,31 +99,32 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
    */
   public DataSet<GraphTransaction> execute(GraphTransactions input) {
 
-    DataSet<GraphTransaction> transactions = input.getTransactions();
+    DataSet<GraphTransaction> transactions = input
+      .getTransactions()
+      .map(new DropPropertiesAndGraphContainment());
 
     this.minFrequency = Count.count(transactions);
 
-    DataSet<Collection<String>> frequentVertexLabels = transactions
+    DataSet<String> frequentVertexLabels = transactions
       .flatMap(new VertexLabels())
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
       .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-      .map(new ValueOfWithCount<>())
-      .reduceGroup(new Collect<>());
+      .map(new ValueOfWithCount<>());
+
 
     transactions = transactions
       .map(new FilterVerticesByLabel())
       .withBroadcastSet(frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
 
-    DataSet<Collection<String>> frequentEdgeLabels = transactions
+    DataSet<String> frequentEdgeLabels = transactions
       .flatMap(new EdgeLabels())
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
       .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
-      .map(new ValueOfWithCount<>())
-      .reduceGroup(new Collect<>());
+      .map(new ValueOfWithCount<>());
 
     transactions = transactions
       .map(new FilterEdgesByLabel())

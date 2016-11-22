@@ -29,17 +29,16 @@ public class FilterVerticesByLabel
       .getBroadcastVariable(Constants.FREQUENT_VERTEX_LABELS);
 
     this.frequentVertexLabels = Sets.newHashSet(broadcast);
-
   }
 
   @Override
-  public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
+  public GraphTransaction map(GraphTransaction transaction) throws Exception {
 
     Set<GradoopId> keptVertexIds = Sets.newHashSet();
 
     // drop vertices with infrequent labels
 
-    Iterator<Vertex> vertexIterator = graphTransaction.getVertices().iterator();
+    Iterator<Vertex> vertexIterator = transaction.getVertices().iterator();
 
     while (vertexIterator.hasNext()) {
       Vertex next = vertexIterator.next();
@@ -53,7 +52,7 @@ public class FilterVerticesByLabel
 
     // drop inconsistent edges
 
-    Iterator<Edge> edgeIterator = graphTransaction.getEdges().iterator();
+    Iterator<Edge> edgeIterator = transaction.getEdges().iterator();
 
     while (edgeIterator.hasNext()) {
       Edge next = edgeIterator.next();
@@ -64,6 +63,6 @@ public class FilterVerticesByLabel
       }
     }
 
-    return graphTransaction;
+    return transaction;
   }
 }
