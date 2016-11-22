@@ -149,7 +149,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
 
     // ITERATION BODY
 
-    DataSet<WithCount<TraversalCode<String>>> frequentPatterns = iterative
+    DataSet<TraversalCode<String>> frequentPatterns = iterative
       .flatMap(new Report())
       .groupBy(0)
       .combineGroup(sumPartition())
@@ -157,12 +157,13 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
+      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .map(new ValueOfWithCount<>());
 
     DataSet<GraphEmbeddingPair> grownEmbeddings = iterative
       .map(new PatternGrowth())
-      .filter(new HasEmbeddings())
-      .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS);
+      .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS)
+      .filter(new HasEmbeddings());
 
     // ITERATION FOOTER
 

@@ -178,7 +178,8 @@ public class RepresentationConverters {
 
       if (fromId == null) {
         Vertex fromVertex = new Vertex(GradoopId.get(), traversal.getFromValue(), null, graphIds);
-        vertexIdMap.put(fromTime, fromVertex.getId());
+        fromId = fromVertex.getId();
+        vertexIdMap.put(fromTime, fromId);
         vertices.add(fromVertex);
       }
 
@@ -187,7 +188,8 @@ public class RepresentationConverters {
 
       if (toId == null) {
         Vertex toVertex = new Vertex(GradoopId.get(), traversal.getToValue(), null, graphIds);
-        vertexIdMap.put(toTime, toVertex.getId());
+        toId = toVertex.getId();
+        vertexIdMap.put(toTime, toId);
         vertices.add(toVertex);
       }
 

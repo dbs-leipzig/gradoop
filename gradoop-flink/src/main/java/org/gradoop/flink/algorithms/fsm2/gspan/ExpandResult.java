@@ -13,7 +13,8 @@ public class ExpandResult
     Collector<TraversalCode<String>> collector) throws Exception {
 
     for (TraversalCode<String> code : graphEmbeddingPair.getCodeEmbeddings().keySet()) {
-     collector.collect(code);
+      System.out.println(code);
+      collector.collect(code);
     }
   }
 }
