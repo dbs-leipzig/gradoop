@@ -100,8 +100,6 @@ public class GSpan {
     Collection<TraversalEmbedding> parentEmbeddings
   ) {
 
-    List<Traversal<String>> traversals = parentCode.getTraversals();
-
     Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
       Maps.newHashMap();
 
@@ -109,25 +107,10 @@ public class GSpan {
 
     // DETERMINE RIGHTMOST PATH
 
-    List<Integer> rightmostPathTimes = Lists.newArrayList();
-    int rightmostTime = -1;
+    List<Integer> rightmostPathTimes = getRightmostPathTimes(parentCode);
 
-    for (int edgeTime = traversals.size() - 1; edgeTime >= 0; edgeTime--) {
-      Traversal<String> traversal = traversals.get(edgeTime);
+    int rightmostTime = rightmostPathTimes.get(0);
 
-      if (traversal.isForwards()) {
-        if (rightmostPathTimes.isEmpty()) {
-          rightmostTime = traversal.getToTime();
-          rightmostPathTimes.add(rightmostTime);
-          rightmostPathTimes.add(traversal.getFromTime());
-        } else if (rightmostPathTimes.contains(traversal.getToTime())) {
-          rightmostPathTimes.add(traversal.getFromTime());
-        }
-      } else if (edgeTime == 0 && traversal.isLoop()) {
-        rightmostTime = 0;
-        rightmostPathTimes.add(0);
-      }
-    }
 
     // FOR EACH EMBEDDING
     for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
@@ -204,6 +187,40 @@ public class GSpan {
       }
     }
     return extensionEmbeddings;
+  }
+
+  private static List<Integer> getRightmostPathTimes(TraversalCode<String> traversalCode) {
+
+    List<Integer> rightmostPathTimes;
+
+    List<Traversal<String>> traversals = traversalCode.getTraversals();
+
+    if (traversals.size() == 1) {
+      if (traversals.get(0).isLoop()) {
+        rightmostPathTimes = Lists.newArrayList(0);
+      } else {
+        rightmostPathTimes = Lists.newArrayList(1, 0);
+      }
+    } else {
+      rightmostPathTimes = Lists.newArrayList();
+
+      for (int edgeTime = traversals.size() - 1; edgeTime >= 0; edgeTime--) {
+        Traversal<String> traversal = traversals.get(edgeTime);
+
+        if (traversal.isForwards()) {
+          if (rightmostPathTimes.isEmpty()) {
+            rightmostPathTimes.add(traversal.getToTime());
+            rightmostPathTimes.add(traversal.getFromTime());
+          } else if (rightmostPathTimes.contains(traversal.getToTime())) {
+            rightmostPathTimes.add(traversal.getFromTime());
+          }
+        } else if (rightmostPathTimes.isEmpty() && traversal.isLoop()) {
+          rightmostPathTimes.add(0);
+        }
+      }
+    }
+
+    return rightmostPathTimes;
   }
 
   public static boolean isMinimal(TraversalCode<String> code) {
