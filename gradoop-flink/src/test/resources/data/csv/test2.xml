@@ -126,6 +126,9 @@
                     <graph>
                         <static name="2"/>
                     </graph>
+                    <graph>
+                        <static name="3"/>
+                    </graph>
                 </graphs>
 
             </vertex>
