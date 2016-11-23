@@ -248,7 +248,7 @@ public class CSVToElement
         sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
       sb.append(createKey(createGraphTuple(graph, fields, datasourceName, domainName, className))
-        .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
+        .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_SEPARATOR_GRAPHS));
     }
     return sb.toString();
   }
@@ -365,11 +365,11 @@ public class CSVToElement
         switch (separator) {
         case CSVConstants.SEPARATOR_LABEL:
           fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_LABEL,
-            CSVConstants.ESCAPE_REPLACEMENT_LABEL);
+            CSVConstants.ESCAPE_SEPARATOR_LABEL);
           break;
         case CSVConstants.SEPARATOR_ID:
           fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_ID,
-            CSVConstants.ESCAPE_REPLACEMENT_ID);
+            CSVConstants.ESCAPE_SEPARATOR_ID);
           break;
         default:
           break;
@@ -408,13 +408,13 @@ public class CSVToElement
    */
   private String createKey(ReferenceTuple tuple) {
     return tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
-      CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+      CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
       tuple.getDomainName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
       tuple.getClassName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY) + "_" +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
       tuple.getId().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_REPLACEMENT_KEY);
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY);
   }
 
   /**

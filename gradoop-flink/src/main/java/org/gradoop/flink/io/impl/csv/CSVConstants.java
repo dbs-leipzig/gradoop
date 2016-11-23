@@ -29,7 +29,7 @@ public class CSVConstants {
   /**
    * Replacement string for 'key' property.
    */
-  public static final String ESCAPE_REPLACEMENT_KEY = "&lowbar;";
+  public static final String ESCAPE_SEPARATOR_KEY = "&lowbar;";
   /**
    * Separator for 'graphs' property concatenation.
    */
@@ -37,7 +37,7 @@ public class CSVConstants {
   /**
    * Replacement string for 'graphs' property.
    */
-  public static final String ESCAPE_REPLACEMENT_GRAPHS = "&percnt;";
+  public static final String ESCAPE_SEPARATOR_GRAPHS = "&percnt;";
   /**
    * Separator for the label concatenation.
    */
@@ -45,7 +45,7 @@ public class CSVConstants {
   /**
    * Replacement string for the label.
    */
-  public static final String ESCAPE_REPLACEMENT_LABEL = "&semi;";
+  public static final String ESCAPE_SEPARATOR_LABEL = "&semi;";
   /**
    * Separator for the id part of the label.
    */
@@ -53,7 +53,7 @@ public class CSVConstants {
   /**
    * Replacement string the id part of the label.
    */
-  public static final String ESCAPE_REPLACEMENT_ID = "&commat;";
+  public static final String ESCAPE_SEPARATOR_ID = "&commat;";
   /**
    * Property key for the value containing an edge's source.
    */
