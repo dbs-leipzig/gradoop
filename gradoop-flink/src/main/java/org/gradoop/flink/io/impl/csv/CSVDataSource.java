@@ -110,14 +110,14 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     // load the content for each csv file described in the xml file
     CsvExtension first = csvList.remove(0);
-    DataSet<Tuple2<CsvExtension, List<String>>> csvContent = env
+    DataSet<Tuple2<CsvExtension, String>> csvContent = env
       .readTextFile(getCsvDir() + first.getName())
-      .reduceGroup(new CSVToContent(first));
+      .map(new CSVToContent(first));
     for (CsvExtension csvFile : csvList) {
       csvContent = csvContent
         .union(env
           .readTextFile(getCsvDir() + csvFile.getName())
-          .reduceGroup(new CSVToContent(csvFile)));
+          .map(new CSVToContent(csvFile)));
     }
 
     //map each content line to an epgm element

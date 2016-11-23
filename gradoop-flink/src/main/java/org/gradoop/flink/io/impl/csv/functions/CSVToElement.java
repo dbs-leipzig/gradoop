@@ -50,12 +50,7 @@ import java.util.regex.Pattern;
  * Creates EPGMElements from a csv object which contains the meta information
  * to the corresponding content.
  */
-public class CSVToElement
-  implements FlatMapFunction<Tuple2<CsvExtension, List<String>>, EPGMElement> {
-  /**
-   * EPGMElement which will be initialized as the specific element defined in the csv object.
-   */
-  private EPGMElement reuse;
+public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String>, EPGMElement> {
   /**
    * EPGM graph head factory
    */
@@ -84,32 +79,32 @@ public class CSVToElement
   }
 
   @Override
-  public void flatMap(Tuple2<CsvExtension, List<String>> tuple, Collector<EPGMElement> collector)
+  public void flatMap(Tuple2<CsvExtension, String> tuple, Collector<EPGMElement> collector)
     throws Exception {
 
     CsvExtension csv = tuple.f0;
-    List<String> content = tuple.f1;
-    //one EPGMElement for each line
-    for (String line : content) {
-      String[] fields = line.split(Pattern.quote(csv.getSeparator()));
-      //one csv element contains only one type of element
-      if (csv.getGraphhead() != null) {
-        reuse = createGraphHead(csv, fields);
-      } else if (csv.getVertex() != null) {
-        reuse = createVertex(csv, fields);
-        //if the vertex also defines an outgoing edge is is also collected
-        if (csv.getVertex().getEdges() != null) {
-          for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
-            collector.collect(createEdge(csv, fields, vertexEdge, reuse.getPropertyValue(
-                CSVConstants.PROPERTY_KEY_KEY).getString()));
-          }
+    String content = tuple.f1;
+    //the single values of each line
+    String[] fields = content.split(Pattern.quote(csv.getSeparator()));
+    //create the graphhead
+    if (csv.getGraphhead() != null) {
+      collector.collect(createGraphHead(csv, fields));
+    }
+    //create the vertex
+    if (csv.getVertex() != null) {
+      EPGMElement vertex = createVertex(csv, fields);
+      //if the vertex also defines an outgoing edge is is also collected
+      if (csv.getVertex().getEdges() != null) {
+        for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
+          collector.collect(createEdge(csv, fields, vertexEdge, vertex.getPropertyValue(
+              CSVConstants.PROPERTY_KEY_KEY).getString()));
         }
-      } else if (csv.getEdge() != null) {
-        reuse = createEdge(csv, fields);
-      } else {
-        reuse = null;
       }
-      collector.collect(reuse);
+      collector.collect(vertex);
+    }
+    //create the edge
+    if (csv.getEdge() != null) {
+      collector.collect(createEdge(csv, fields));
     }
   }
 
