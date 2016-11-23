@@ -149,12 +149,14 @@ public class CSVToElement implements
   private org.gradoop.common.model.impl.pojo.Vertex createVertex(CsvExtension csv,
     String[] fields) {
     String label = "";
+    List<Property> propertiesCsv= null;
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
     Key key = csv.getVertex().getKey();
-    List<Property> propertiesCsv = csv.getVertex().getProperties()
-      .getProperty();
+    if (csv.getVertex().getProperties() != null) {
+      propertiesCsv = csv.getVertex().getProperties().getProperty();
+    }
     String className = csv.getVertex().getKey().getClazz();
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
 
@@ -195,7 +197,7 @@ public class CSVToElement implements
   private org.gradoop.common.model.impl.pojo.Edge createEdge(CsvExtension csv,
     String[] fields, Vertexedge edge, String sourceKey) {
     String label = "";
-
+    List<Property> propertiesCsv = null;
     if (edge == null) {
       edge = csv.getEdge();
     }
@@ -203,7 +205,9 @@ public class CSVToElement implements
       label = createLabel(edge.getLabel(), fields);
     }
     Key key = edge.getKey();
-    List<Property> propertiesCsv = edge.getProperties().getProperty();
+    if (edge.getProperties() != null) {
+      propertiesCsv = edge.getProperties().getProperty();
+    }
     String className = edge.getKey().getClazz();
     List<Graph> graphs = edge.getGraphs().getGraph();
 
