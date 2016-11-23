@@ -1,6 +1,5 @@
 package org.gradoop.flink.algorithms.fsm2.gspan;
 
-import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
@@ -27,12 +26,12 @@ public class PatternGrowth
   @Override
   public GraphEmbeddingPair map(GraphEmbeddingPair graphEmbeddingPair) throws Exception {
 
-    if (graphEmbeddingPair.getAdjacencyLists().getRows().isEmpty()) {
+    if (graphEmbeddingPair.getAdjacencyList().getRows().isEmpty()) {
       for (TraversalCode<String> code : frequentSubgraphs) {
         graphEmbeddingPair.getCodeEmbeddings().put(code, null);
       }
     } else {
-      graphEmbeddingPair.setCodeEmbeddings(Maps.newHashMap());
+      GSpan.growChildren(graphEmbeddingPair, frequentSubgraphs);
     }
 
     return graphEmbeddingPair;

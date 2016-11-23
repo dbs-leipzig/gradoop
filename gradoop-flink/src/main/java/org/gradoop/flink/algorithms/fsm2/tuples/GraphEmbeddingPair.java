@@ -22,7 +22,7 @@ public class GraphEmbeddingPair extends
     super(new AdjacencyList<>(), Maps.newHashMap());
   }
 
-  public AdjacencyList<LabelPair> getAdjacencyLists() {
+  public AdjacencyList<LabelPair> getAdjacencyList() {
     return f0;
   }
 

@@ -50,7 +50,6 @@ import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
-import org.gradoop.flink.util.Collect;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -112,7 +111,6 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator
       .filter(new Frequent<>())
       .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
-
 
     transactions = transactions
       .map(new FilterVerticesByLabel())

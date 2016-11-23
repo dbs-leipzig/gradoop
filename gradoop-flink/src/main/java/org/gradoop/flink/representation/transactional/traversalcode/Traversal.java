@@ -88,7 +88,7 @@ public class Traversal<C extends Comparable<C>>
     this.toValue = toValue;
   }
 
-  public boolean isBackTrack() {
+  public boolean isBackwards() {
     return toTime <= fromTime;
   }
 
@@ -212,8 +212,8 @@ public class Traversal<C extends Comparable<C>>
     } else {
 
       // compare backtracking
-      boolean thisIsBacktrack = this.isBackTrack();
-      boolean thatIsBacktrack = that.isBackTrack();
+      boolean thisIsBacktrack = this.isBackwards();
+      boolean thatIsBacktrack = that.isBackwards();
 
       if (thisIsBacktrack && !thatIsBacktrack) {
         comparison = -1;
@@ -237,5 +237,9 @@ public class Traversal<C extends Comparable<C>>
     }
 
     return comparison;
+  }
+
+  public boolean isForwards() {
+    return !isBackwards();
   }
 }
