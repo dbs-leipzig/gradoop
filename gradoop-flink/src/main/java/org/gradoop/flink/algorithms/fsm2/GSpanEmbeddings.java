@@ -24,10 +24,7 @@ import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm2.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm2.functions.Report;
-import org.gradoop.flink.algorithms.fsm2.gspan.EmptyGraphEmbeddingPair;
-import org.gradoop.flink.algorithms.fsm2.gspan.ExpandResult;
-import org.gradoop.flink.algorithms.fsm2.gspan.HasEmbeddings;
-import org.gradoop.flink.algorithms.fsm2.gspan.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm2.gspan.*;
 import org.gradoop.flink.algorithms.fsm2.tuples.GraphEmbeddingPair;
 import org.gradoop.flink.algorithms.fsm2.tuples.LabelPair;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -70,7 +67,6 @@ public class GSpanEmbeddings extends GSpanBase {
 
     // ITERATION BODY
 
-
     FlatMapOperator<GraphEmbeddingPair, WithCount<TraversalCode<String>>> reports = iterative
       .flatMap(new Report());
 
@@ -85,6 +81,7 @@ public class GSpanEmbeddings extends GSpanBase {
 
     return iterative
       .closeWith(grownEmbeddings, frequentPatterns)
+      .filter(new IsCollector())
       .flatMap(new ExpandResult());
   }
 

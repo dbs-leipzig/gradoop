@@ -7,11 +7,8 @@ import org.apache.flink.api.java.operators.AggregateOperator;
 import org.gradoop.flink.algorithms.fsm.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.common.functions.Frequent;
-import org.gradoop.flink.algorithms.fsm2.functions.DropPropertiesAndGraphContainment;
-import org.gradoop.flink.algorithms.fsm2.functions.EdgeLabels;
-import org.gradoop.flink.algorithms.fsm2.functions.FilterEdgesByLabel;
-import org.gradoop.flink.algorithms.fsm2.functions.FilterVerticesByLabel;
-import org.gradoop.flink.algorithms.fsm2.functions.VertexLabels;
+import org.gradoop.flink.algorithms.fsm.common.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm2.functions.*;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -56,7 +53,9 @@ public abstract class TransactionalFSMBase
       .getTransactions()
       .map(new DropPropertiesAndGraphContainment());
 
-    this.minFrequency = Count.count(transactions);
+    this.minFrequency = Count
+      .count(transactions)
+      .map(new MinFrequency(fsmConfig));
 
     DataSet<String> frequentVertexLabels = transactions
       .flatMap(new VertexLabels())
@@ -81,6 +80,10 @@ public abstract class TransactionalFSMBase
     transactions = transactions
       .map(new FilterEdgesByLabel())
       .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+
+    transactions = transactions
+      .filter(new NotEmpty());
+
     return transactions;
   }
 
