@@ -20,11 +20,9 @@ import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
+import org.gradoop.flink.util.Collect;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides static methods for all logic related to the gSpan algorithm.
@@ -72,109 +70,12 @@ public class GSpan {
 
     // FOR EACH FREQUENT SUBGRAPH
     for (TraversalCode<String> parentCode : frequentSubgraphs) {
-      List<Traversal<String>> traversals = parentCode.getTraversals();
 
-      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
-        Maps.newHashMap();
-
-      Traversal<String> singleEdgeParent = parentCode.getTraversals().get(0);
-
-      // DETERMINE RIGHTMOST PATH
-      
-      Set<Integer> rightmostPathTimes = Sets.newHashSet();
-      int rightmostTime = -1;
-      
-      for (int edgeTime = traversals.size() - 1; edgeTime >= 0; edgeTime--) {
-        Traversal<String> traversal = traversals.get(edgeTime);
-        
-        if (traversal.isForwards()) {
-          if (rightmostPathTimes.isEmpty()) {
-            rightmostTime = traversal.getToTime();
-            rightmostPathTimes.add(rightmostTime);
-            rightmostPathTimes.add(traversal.getFromTime());
-          } else if (rightmostPathTimes.contains(traversal.getToTime())) {
-            rightmostPathTimes.add(traversal.getFromTime());
-          }
-        }
-      }
-      
-      // FOR EACH EMBEDDING
       Collection<TraversalEmbedding> parentEmbeddings =
         graphEmbeddingPair.getCodeEmbeddings().get(parentCode);
 
-      for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
-
-        Set<GradoopId> vertexIds = Sets.newHashSet(parentEmbedding.getVertexIds());
-        Set<GradoopId> edgeIds = Sets.newHashSet(parentEmbedding.getEdgeIds());
-
-        int forwardTime = vertexIds.size();
-
-        // FOR EACH VERTEX ON RIGHTMOST PATH
-        for (int fromTime : rightmostPathTimes) {
-          boolean rightmost = fromTime == rightmostTime;
-
-          GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
-          AdjacencyListRow<LabelPair> row = adjacencyList.getRows().get(fromId);
-          String fromLabel = adjacencyList.getLabel(fromId);
-
-          // FOR EACH INCIDENT EDGE
-          for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
-            GradoopId toId = cell.getVertexId();
-
-            boolean loop = fromId.equals(toId);
-
-            // loop is always backwards
-            if (!loop || rightmost) {
-
-            GradoopId edgeId = cell.getEdgeId();
-
-              // edge not already contained
-              if (!edgeIds.contains(edgeId)) {
-
-                boolean backwards = loop || vertexIds.contains(toId);
-
-                // forwards or backwards from rightmost
-                if (!backwards || rightmost) {
-                  String toLabel = cell.getValue().getVertexLabel();
-                  String edgeLabel = cell.getValue().getEdgeLabel();
-
-                  Traversal<String> singleEdgeTraversal = cell.isOutgoing() ?
-                    GSpan.createSingleEdgeTraversal(fromLabel, edgeLabel, toLabel, loop) :
-                    GSpan.createSingleEdgeTraversal(toLabel, edgeLabel, fromLabel, loop);
-
-                  // valid branch by lexicographical order
-                  if (singleEdgeTraversal.compareTo(singleEdgeParent) >= 0) {
-
-                    boolean outgoing = cell.isOutgoing();
-
-                    int toTime = backwards ?
-                      parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
-
-                    Traversal<String> extension = new Traversal<>(
-                      fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
-
-                    TraversalEmbedding childEmbedding = new TraversalEmbedding(parentEmbedding);
-                    childEmbedding.getEdgeIds().add(edgeId);
-
-                    if (!backwards) {
-                      childEmbedding.getVertexIds().add(toId);
-                    }
-
-                    Collection<TraversalEmbedding> embeddings =
-                      extensionEmbeddings.get(extension);
-
-                    if (embeddings == null) {
-                      extensionEmbeddings.put(extension, Lists.newArrayList(childEmbedding));
-                    } else {
-                      embeddings.add(childEmbedding);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
+        getValidExtensions(adjacencyList, parentCode, parentEmbeddings);
 
       for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry :
         extensionEmbeddings.entrySet()) {
@@ -190,11 +91,152 @@ public class GSpan {
     graphEmbeddingPair.setCodeEmbeddings(childEmbeddings);
   }
 
+  private static Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
+    AdjacencyList<LabelPair> adjacencyList,
+    TraversalCode<String> parentCode,
+    Collection<TraversalEmbedding> parentEmbeddings
+  ) {
+
+    List<Traversal<String>> traversals = parentCode.getTraversals();
+
+    Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
+      Maps.newHashMap();
+
+    Traversal<String> singleEdgeParent = parentCode.getTraversals().get(0);
+
+    // DETERMINE RIGHTMOST PATH
+
+    Set<Integer> rightmostPathTimes = Sets.newHashSet();
+    int rightmostTime = -1;
+
+    for (int edgeTime = traversals.size() - 1; edgeTime >= 0; edgeTime--) {
+      Traversal<String> traversal = traversals.get(edgeTime);
+
+      if (traversal.isForwards()) {
+        if (rightmostPathTimes.isEmpty()) {
+          rightmostTime = traversal.getToTime();
+          rightmostPathTimes.add(rightmostTime);
+          rightmostPathTimes.add(traversal.getFromTime());
+        } else if (rightmostPathTimes.contains(traversal.getToTime())) {
+          rightmostPathTimes.add(traversal.getFromTime());
+        }
+      }
+    }
+
+    // FOR EACH EMBEDDING
+    for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
+
+      Set<GradoopId> vertexIds = Sets.newHashSet(parentEmbedding.getVertexIds());
+      Set<GradoopId> edgeIds = Sets.newHashSet(parentEmbedding.getEdgeIds());
+
+      int forwardTime = vertexIds.size();
+
+      // FOR EACH VERTEX ON RIGHTMOST PATH
+      for (int fromTime : rightmostPathTimes) {
+        boolean rightmost = fromTime == rightmostTime;
+
+        GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
+        AdjacencyListRow<LabelPair> row = adjacencyList.getRows().get(fromId);
+        String fromLabel = adjacencyList.getLabel(fromId);
+
+        // FOR EACH INCIDENT EDGE
+        for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
+          GradoopId toId = cell.getVertexId();
+
+          boolean loop = fromId.equals(toId);
+
+          // loop is always backwards
+          if (!loop || rightmost) {
+
+          GradoopId edgeId = cell.getEdgeId();
+
+            // edge not already contained
+            if (!edgeIds.contains(edgeId)) {
+
+              boolean backwards = loop || vertexIds.contains(toId);
+
+              // forwards or backwards from rightmost
+              if (!backwards || rightmost) {
+                String toLabel = cell.getValue().getVertexLabel();
+                String edgeLabel = cell.getValue().getEdgeLabel();
+
+                Traversal<String> singleEdgeTraversal = cell.isOutgoing() ?
+                  GSpan.createSingleEdgeTraversal(fromLabel, edgeLabel, toLabel, loop) :
+                  GSpan.createSingleEdgeTraversal(toLabel, edgeLabel, fromLabel, loop);
+
+                // valid branch by lexicographical order
+                if (singleEdgeTraversal.compareTo(singleEdgeParent) >= 0) {
+
+                  boolean outgoing = cell.isOutgoing();
+
+                  int toTime = backwards ?
+                    parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
+
+                  Traversal<String> extension = new Traversal<>(
+                    fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
+
+                  TraversalEmbedding childEmbedding = new TraversalEmbedding(parentEmbedding);
+                  childEmbedding.getEdgeIds().add(edgeId);
+
+                  if (!backwards) {
+                    childEmbedding.getVertexIds().add(toId);
+                  }
+
+                  Collection<TraversalEmbedding> embeddings =
+                    extensionEmbeddings.get(extension);
+
+                  if (embeddings == null) {
+                    extensionEmbeddings.put(extension, Lists.newArrayList(childEmbedding));
+                  } else {
+                    embeddings.add(childEmbedding);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return extensionEmbeddings;
+  }
+
   public static boolean isMinimal(TraversalCode<String> code) {
 
     AdjacencyList<LabelPair> adjacencyList = getAdjacencyList(code);
 
-    return false;
+    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings =
+      getSingleEdgeTraversalEmbeddings(adjacencyList);
+
+    Iterator<Traversal<String>> iterator = code.getTraversals().iterator();
+
+    Traversal<String> minTraversal = iterator.next();
+    TraversalCode<String> minCode = new TraversalCode<>(minTraversal);
+    Collection<TraversalEmbedding> minEmbeddings = traversalEmbeddings.get(minTraversal);
+
+    boolean minimal = true;
+
+    while (minimal && iterator.hasNext()) {
+      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionOptions =
+        getValidExtensions(adjacencyList, minCode, minEmbeddings);
+
+      Traversal<String> inputExtension = iterator.next();
+
+      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> extensionOption : extensionOptions.entrySet()) {
+        int comparison = inputExtension.compareTo(extensionOption.getKey());
+
+        if (comparison == 0) {
+          minEmbeddings = extensionOption.getValue();
+        } else if (comparison > 0) {
+          minimal = false;
+        }
+      }
+
+      if (minimal) {
+        minCode.getTraversals().add(inputExtension);
+      }
+    }
+
+    return minimal;
   }
 
   /**
@@ -261,6 +303,7 @@ public class GSpan {
         fromId = GradoopId.get();
         timeVertexMap.put(0, fromId);
         labels.put(fromId, traversal.getFromValue());
+        rows.put(fromId, new AdjacencyListRow<>());
         first = false;
       } else {
         fromId = timeVertexMap.get(traversal.getFromTime());
@@ -275,9 +318,12 @@ public class GSpan {
         toId = GradoopId.get();
         timeVertexMap.put(toTime, toId);
         labels.put(toId, traversal.getToValue());
+        rows.put(toId, new AdjacencyListRow<>());
       } else {
         toId = timeVertexMap.get(toTime);
       }
+
+      // EDGE
 
       GradoopId edgeId = GradoopId.get();
       boolean outgoing = traversal.isOutgoing();
@@ -291,4 +337,56 @@ public class GSpan {
     }
 
     return new AdjacencyList<>(GradoopId.get(), labels, null, rows);  }
+
+  public static Map<TraversalCode<String>, Collection<TraversalEmbedding>> getSingleEdgeCodeEmbeddings(
+    AdjacencyList<LabelPair> graph) {
+    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = getSingleEdgeTraversalEmbeddings(graph);
+
+    Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings = Maps
+      .newHashMapWithExpectedSize(traversalEmbeddings.size());
+
+    for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry : traversalEmbeddings.entrySet()) {
+      codeEmbeddings.put(new TraversalCode<>(entry.getKey()), entry.getValue());
+    }
+    return codeEmbeddings;
+  }
+
+  private static Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
+    AdjacencyList<LabelPair> graph) {
+
+    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = Maps.newHashMap();
+
+    for (Map.Entry<GradoopId, AdjacencyListRow<LabelPair>> vertexRow : graph.getRows().entrySet()) {
+
+      GradoopId sourceId = vertexRow.getKey();
+      String sourceLabel = graph.getLabel(sourceId);
+
+      AdjacencyListRow<LabelPair> row = vertexRow.getValue();
+
+      for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
+        if (cell.isOutgoing()) {
+          GradoopId edgeId = cell.getEdgeId();
+          GradoopId targetId = cell.getVertexId();
+
+          boolean loop = sourceId.equals(targetId);
+
+          String edgeLabel = cell.getValue().getEdgeLabel();
+          String targetLabel = cell.getValue().getVertexLabel();
+
+          Traversal<String> traversal = createSingleEdgeTraversal(sourceLabel, edgeLabel, targetLabel, loop);
+
+          TraversalEmbedding singleEdgeEmbedding = createSingleEdgeEmbedding(sourceId, edgeId, targetId, traversal);
+
+          Collection<TraversalEmbedding> embeddings = traversalEmbeddings.get(traversal);
+
+          if (embeddings == null) {
+            traversalEmbeddings.put(traversal, Lists.newArrayList(singleEdgeEmbedding));
+          } else {
+            embeddings.add(singleEdgeEmbedding);
+          }
+        }
+      }
+    }
+    return traversalEmbeddings;
+  }
 }
