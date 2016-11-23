@@ -30,8 +30,8 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
  *
  * @param <T> an epgm graph element: vertex or edge
  */
-public class ElementGraphKeyToGraphHead<T extends EPGMGraphElement> implements
-  GroupReduceFunction<Tuple2<T, String>, GraphHead> {
+public class ElementGraphKeyToGraphHead<T extends EPGMGraphElement>
+  implements GroupReduceFunction<Tuple2<T, String>, GraphHead> {
   /**
    * EPGM graph head factory
    */
@@ -47,11 +47,10 @@ public class ElementGraphKeyToGraphHead<T extends EPGMGraphElement> implements
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<T, String>> iterable,
-    Collector<GraphHead> collector) throws Exception {
+  public void reduce(Iterable<Tuple2<T, String>> iterable, Collector<GraphHead> collector)
+    throws Exception {
     GraphHead graphHead = graphHeadFactory.createGraphHead();
-    graphHead.setProperty(CSVConstants.PROPERTY_KEY_KEY,
-      iterable.iterator().next().f1);
+    graphHead.setProperty(CSVConstants.PROPERTY_KEY_KEY, iterable.iterator().next().f1);
     collector.collect(graphHead);
   }
 }

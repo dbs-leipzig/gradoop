@@ -50,19 +50,17 @@ public class SetElementGraphIds<T extends EPGMGraphElement>
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    graphHeads = getRuntimeContext().getBroadcastVariable(
-      CSVConstants.BROADCAST_GRAPHHEADS);
+    graphHeads = getRuntimeContext().getBroadcastVariable(CSVConstants.BROADCAST_GRAPHHEADS);
     keyIdMap = Maps.newHashMapWithExpectedSize(graphHeads.size());
     for (GraphHead graph : graphHeads) {
-      keyIdMap.put(
-        graph.getPropertyValue(CSVConstants.PROPERTY_KEY_KEY).getString(),
+      keyIdMap.put(graph.getPropertyValue(CSVConstants.PROPERTY_KEY_KEY).getString(),
         graph.getId());
     }
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<T, String>> iterable,
-    Collector<T> collector) throws Exception {
+  public void reduce(Iterable<Tuple2<T, String>> iterable, Collector<T> collector)
+    throws Exception {
     Iterator<Tuple2<T, String>> iterator = iterable.iterator();
     Tuple2<T, String> tuple = iterator.next();
     T element = tuple.f0;

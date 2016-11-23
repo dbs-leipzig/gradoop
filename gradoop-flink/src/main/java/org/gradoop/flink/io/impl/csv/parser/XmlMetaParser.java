@@ -37,8 +37,7 @@ import java.io.FileNotFoundException;
 public class XmlMetaParser {
 
   /**
-   * Parses content from the xml file which satisfies the schema and returns
-   * the datasource object.
+   * Parses content from the xml file which satisfies the schema and returns the datasource object.
    *
    * @param xsdSchema path to the xml schema
    * @param xmlDatei path to the xml file
@@ -48,23 +47,19 @@ public class XmlMetaParser {
    * @throws JAXBException
    * @throws FileNotFoundException
    */
-  public static Datasource parse(String xsdSchema, String xmlDatei) throws
-    SAXException, JAXBException, FileNotFoundException {
+  public static Datasource parse(String xsdSchema, String xmlDatei)
+    throws SAXException, JAXBException, FileNotFoundException {
 
-    SchemaFactory schemaFactory =
-      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    Schema schema
-      = (xsdSchema == null || xsdSchema.trim().length() == 0) ?
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    Schema schema = (xsdSchema == null || xsdSchema.trim().length() == 0) ?
       null : schemaFactory.newSchema(new File(xsdSchema));
-    JAXBContext jaxbContext =
-      JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
 
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     unmarshaller.setSchema(schema);
     unmarshaller.setEventHandler(new XmlValidationEventHandler());
 
-    Datasource source = (Datasource) unmarshaller.unmarshal(new
-      FileInputStream(xmlDatei));
+    Datasource source = (Datasource) unmarshaller.unmarshal(new FileInputStream(xmlDatei));
 
     return source;
   }

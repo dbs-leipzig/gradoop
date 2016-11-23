@@ -28,8 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Sets the source and target id for each edge depending on the keys saved as
- * properties.
+ * Sets the source and target id for each edge depending on the keys saved as properties.
  */
 public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
   /**
@@ -41,18 +40,15 @@ public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    map = getRuntimeContext()
-      .<HashMap<String, GradoopId>>getBroadcastVariable(
+    map = getRuntimeContext().<HashMap<String, GradoopId>>getBroadcastVariable(
         CSVConstants.BROADCAST_ID_MAP).get(0);
   }
 
   @Override
   public Edge map(Edge edge) throws Exception {
     PropertyList properties = edge.getProperties();
-    edge.setSourceId(
-      map.get(properties.get(CSVConstants.PROPERTY_KEY_SOURCE).getString()));
-    edge.setTargetId(
-      map.get(properties.get(CSVConstants.PROPERTY_KEY_TARGET).getString()));
+    edge.setSourceId(map.get(properties.get(CSVConstants.PROPERTY_KEY_SOURCE).getString()));
+    edge.setTargetId(map.get(properties.get(CSVConstants.PROPERTY_KEY_TARGET).getString()));
     return edge;
   }
 }

@@ -21,7 +21,6 @@ public class CSVToContent
   @Override
   public void reduce(Iterable<String> iterable,
     Collector<Tuple2<CsvExtension, List<String>>> collector) throws Exception {
-    collector.collect(
-      new Tuple2<CsvExtension, List<String>>(csv, Lists.newArrayList(iterable)));
+    collector.collect(new Tuple2<CsvExtension, List<String>>(csv, Lists.newArrayList(iterable)));
   }
 }

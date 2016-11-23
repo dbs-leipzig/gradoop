@@ -30,8 +30,7 @@ abstract class CSVBase {
   /**
    * Complete path to the xsd file.
    */
-  private final String xsdPath =
-    CSVBase.class.getResource("/data/csv/csv_format.xsd").getFile();
+  private final String xsdPath = CSVBase.class.getResource("/data/csv/csv_format.xsd").getFile();
   /**
    * Complete path to the xml file.
    */
@@ -42,8 +41,7 @@ abstract class CSVBase {
   private String csvDir;
 
   /**
-   * Creates a new data source/sink. Paths can be local (file://) or HDFS
-   * (hdfs://).
+   * Creates a new data source/sink. Paths can be local (file://) or HDFS (hdfs://).
    *
    * @param metaXmlPath xml file
    * @param csvDir csv directory

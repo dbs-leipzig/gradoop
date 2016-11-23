@@ -39,8 +39,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
    * @param csvDir csv directory
    * @param config Gradoop Flink configuration
    */
-  public CSVDataSink(String metaXmlPath, String csvDir,
-    GradoopFlinkConfig config) {
+  public CSVDataSink(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
     super(metaXmlPath, csvDir, config);
   }
 

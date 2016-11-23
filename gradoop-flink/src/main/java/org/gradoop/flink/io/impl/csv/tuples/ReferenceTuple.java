@@ -20,8 +20,8 @@ package org.gradoop.flink.io.impl.csv.tuples;
 import org.apache.flink.api.java.tuple.Tuple4;
 
 /**
- * Contains all relevant information for a reference: datasource name, domain
- * name, class name and id.
+ * Contains all relevant information for a reference: datasource name, domain name,
+ * class name and id.
  */
 public class ReferenceTuple extends Tuple4<String, String, String, String> {
   /**
@@ -38,8 +38,7 @@ public class ReferenceTuple extends Tuple4<String, String, String, String> {
    * @param className name of the class
    * @param id the id
    */
-  public ReferenceTuple(String datasourceName, String domainName,
-    String className, String id) {
+  public ReferenceTuple(String datasourceName, String domainName, String className, String id) {
     super(datasourceName, domainName, className, id);
   }
 

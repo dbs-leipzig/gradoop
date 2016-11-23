@@ -25,8 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
  *
  * @param <T> an epgm element: graph head, vertex or edge
  */
-public class EPGMElementToPojo<T extends EPGMElement>
-  implements MapFunction<EPGMElement, T> {
+public class EPGMElementToPojo<T extends EPGMElement> implements MapFunction<EPGMElement, T> {
 
   @Override
   public T map(EPGMElement element) throws Exception {

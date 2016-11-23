@@ -28,17 +28,16 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
  *
  * @param <T> an epgm graph element: vertex or edge
  */
-public class ElementToElementGraphKey<T extends EPGMGraphElement> implements
-  FlatMapFunction<T, Tuple2<T, String>> {
+public class ElementToElementGraphKey<T extends EPGMGraphElement>
+  implements FlatMapFunction<T, Tuple2<T, String>> {
 
   @Override
   public void flatMap(T element, Collector<Tuple2<T, String>> collector)
       throws Exception {
-    String graphs = element.getPropertyValue(CSVConstants.PROPERTY_KEY_GRAPHS)
-      .getString();
+    String graphs = element.getPropertyValue(CSVConstants.PROPERTY_KEY_GRAPHS).getString();
     for (String graph : graphs.split(CSVConstants.SEPARATOR_GRAPHS)) {
-      graph.replaceAll(
-        CSVConstants.ESCAPE_REPLACEMENT_GRAPHS, CSVConstants.SEPARATOR_GRAPHS);
+      graph = graph.replaceAll(CSVConstants.ESCAPE_REPLACEMENT_GRAPHS,
+        CSVConstants.SEPARATOR_GRAPHS);
       collector.collect(new Tuple2<>(element, graph));
     }
   }

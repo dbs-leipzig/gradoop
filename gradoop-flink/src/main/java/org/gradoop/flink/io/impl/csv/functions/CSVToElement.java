@@ -50,11 +50,10 @@ import java.util.regex.Pattern;
  * Creates EPGMElements from a csv object which contains the meta information
  * to the corresponding content.
  */
-public class CSVToElement implements
-  FlatMapFunction<Tuple2<CsvExtension, List<String>>, EPGMElement> {
+public class CSVToElement
+  implements FlatMapFunction<Tuple2<CsvExtension, List<String>>, EPGMElement> {
   /**
-   * EPGMElement which will be initialized as the specific element defined in
-   * the csv object.
+   * EPGMElement which will be initialized as the specific element defined in the csv object.
    */
   private EPGMElement reuse;
   /**
@@ -77,16 +76,16 @@ public class CSVToElement implements
    * @param vertexFactory EPGM vertex factory
    * @param edgeFactory EPGM edge factory
    */
-  public CSVToElement(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory) {
+  public CSVToElement(GraphHeadFactory graphHeadFactory, VertexFactory vertexFactory,
+    EdgeFactory edgeFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
   }
 
   @Override
-  public void flatMap(Tuple2<CsvExtension, List<String>> tuple,
-    Collector<EPGMElement> collector) throws Exception {
+  public void flatMap(Tuple2<CsvExtension, List<String>> tuple, Collector<EPGMElement> collector)
+    throws Exception {
 
     CsvExtension csv = tuple.f0;
     List<String> content = tuple.f1;
@@ -100,10 +99,8 @@ public class CSVToElement implements
         reuse = createVertex(csv, fields);
         //if the vertex also defines an outgoing edge is is also collected
         if (csv.getVertex().getEdges() != null) {
-          for (Vertexedge vertexEdge : csv.getVertex().getEdges()
-            .getVertexedge()) {
-            collector.collect(
-              createEdge(csv, fields, vertexEdge, reuse.getPropertyValue(
+          for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
+            collector.collect(createEdge(csv, fields, vertexEdge, reuse.getPropertyValue(
                 CSVConstants.PROPERTY_KEY_KEY).getString()));
           }
         }
@@ -117,8 +114,7 @@ public class CSVToElement implements
   }
 
   /**
-   * Creates a graph head from the given fields by using the csv meta
-   * information.
+   * Creates a graph head from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -131,16 +127,13 @@ public class CSVToElement implements
       label = createLabel(csv.getGraphhead().getLabel(), fields);
     }
     Key key = csv.getGraphhead().getKey();
-    List<Property> propertiesCsv = csv.getGraphhead().getProperties()
-      .getProperty();
-    PropertyList properties =
-      createProperties(csv, propertiesCsv, key, fields);
+    List<Property> propertiesCsv = csv.getGraphhead().getProperties().getProperty();
+    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
   }
 
   /**
-   * Creates a vertex from the given fields by using the csv meta
-   * information.
+   * Creates a vertex from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -160,19 +153,17 @@ public class CSVToElement implements
     String className = csv.getVertex().getKey().getClazz();
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
 
-    String graphList = createGraphList(graphs, csv.getDatasourceName(), csv
-      .getDomainName(), className, fields);
+    String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
+      className, fields);
 
-    PropertyList properties =
-      createProperties(csv, propertiesCsv, key, fields);
+    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
     return vertexFactory.createVertex(label, properties);
   }
 
   /**
-   * Creates an edge from the given fields by using the csv meta
-   * information.
+   * Creates an edge from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -185,8 +176,8 @@ public class CSVToElement implements
   }
 
   /**
-   * Creates an edge from the given fields by using the csv meta
-   * information. May be called to create an edge directly from an vertex.
+   * Creates an edge from the given fields by using the csv meta information.
+   * May be called to create an edge directly from an vertex.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -211,11 +202,10 @@ public class CSVToElement implements
     String className = edge.getKey().getClazz();
     List<Graph> graphs = edge.getGraphs().getGraph();
 
-    String graphList = createGraphList(graphs, csv.getDatasourceName(), csv
-      .getDomainName(), className, fields);
+    String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
+      className, fields);
 
-    PropertyList properties =
-      createProperties(csv, propertiesCsv, key, fields);
+    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
     ReferenceTuple referenceTuple;
@@ -227,16 +217,14 @@ public class CSVToElement implements
       sourceKey = createKey(referenceTuple);
     }
     //relevant key information for the target
-    referenceTuple = this.setNamesAndIds(
-      edge.getTarget(), fields, csv.getDatasourceName(),
+    referenceTuple = this.setNamesAndIds(edge.getTarget(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
     String targetKey = createKey(referenceTuple);
 
     properties.set(CSVConstants.PROPERTY_KEY_SOURCE, sourceKey);
     properties.set(CSVConstants.PROPERTY_KEY_TARGET, targetKey);
 
-    return edgeFactory.createEdge(
-      label, GradoopId.get(), GradoopId.get(), properties);
+    return edgeFactory.createEdge(label, GradoopId.get(), GradoopId.get(), properties);
   }
 
   /**
@@ -249,8 +237,8 @@ public class CSVToElement implements
    * @param fields contains the data
    * @return concatenated string representing the key
    */
-  private String createGraphList(List<Graph> graphs, String datasourceName,
-    String domainName, String className, String[] fields) {
+  private String createGraphList(List<Graph> graphs, String datasourceName, String domainName,
+    String className, String[] fields) {
     StringBuilder sb = new StringBuilder();
     boolean notFirst = false;
     for (Graph graph : graphs) {
@@ -259,17 +247,14 @@ public class CSVToElement implements
       } else {
         sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
-      sb.append(createKey(this.setNamesAndIds(
-        graph, fields, datasourceName, domainName, className))
-        .replaceAll(CSVConstants.SEPARATOR_GRAPHS,
-          CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
+      sb.append(createKey(this.setNamesAndIds(graph, fields, datasourceName, domainName, className))
+        .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
     }
     return sb.toString();
   }
 
   /**
-   * Creates a Tuple which contains the datasource name, the domain name, the
-   * class name and the id.
+   * Creates a Tuple which contains the datasource name, the domain name, the class name and the id.
    *
    * @param staticOrReference contains the id information
    * @param fields contains the data
@@ -278,9 +263,8 @@ public class CSVToElement implements
    * @param className name of the class
    * @return tuple containing all relevant information
    */
-  private ReferenceTuple setNamesAndIds(Staticorreference staticOrReference,
-    String[] fields, String datasourceName, String domainName,
-    String className) {
+  private ReferenceTuple setNamesAndIds(Staticorreference staticOrReference, String[] fields,
+    String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
     tuple.setDatasourceName(datasourceName);
     tuple.setDomainName(domainName);
@@ -303,21 +287,18 @@ public class CSVToElement implements
         tuple.setDomainName(reference.getDomainName());
       }
       if (refSet) {
-        tuple
-          .setClassName(tuple.getClassName() + reference.getKey().getClazz());
+        tuple.setClassName(tuple.getClassName() + reference.getKey().getClazz());
       } else {
         tuple.setClassName(reference.getKey().getClazz());
       }
-      tuple
-        .setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference
-          .getKey().getContent(), fields, ""));
+      tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
+        fields, ""));
     }
     return tuple;
   }
 
   /**
-   * Creates a Tuple which contains the datasource name, the domain name, the
-   * class name and the id.
+   * Creates a Tuple which contains the datasource name, the domain name, the class name and the id.
    *
    * @param objectReferences contains objects with the id information
    * @param fields contains the data
@@ -326,9 +307,8 @@ public class CSVToElement implements
    * @param className name of the class
    * @return tuple containing all relevant information
    */
-  private ReferenceTuple setNamesAndIds(Objectreferences objectReferences,
-    String[] fields, String datasourceName, String domainName,
-    String className) {
+  private ReferenceTuple setNamesAndIds(Objectreferences objectReferences, String[] fields,
+    String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
     tuple.setDatasourceName(datasourceName);
     tuple.setDomainName(domainName);
@@ -340,8 +320,7 @@ public class CSVToElement implements
       if (Static.class.isInstance(object)) {
         tuple.setId(((Static) object).getName());
       } else  if (Ref.class.isInstance(object)) {
-        tuple.setId(
-          tuple.getId() + fields[((Ref) object).getColumnId().intValue()]);
+        tuple.setId(tuple.getId() + fields[((Ref) object).getColumnId().intValue()]);
         refSet = true;
       } else if (Reference.class.isInstance(object)) {
         Reference reference = (Reference) object;
@@ -352,14 +331,12 @@ public class CSVToElement implements
           tuple.setDomainName(reference.getDomainName());
         }
         if (refSet) {
-          tuple
-            .setClassName(tuple.getClassName() + reference.getKey().getClazz());
+          tuple.setClassName(tuple.getClassName() + reference.getKey().getClazz());
         } else {
           tuple.setClassName(reference.getKey().getClazz());
         }
-        tuple
-          .setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference
-            .getKey().getContent(), fields, ""));
+        tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
+            fields, ""));
       }
     }
     return tuple;
@@ -386,8 +363,7 @@ public class CSVToElement implements
         }
         if (separator.equals(CSVConstants.SEPARATOR_LABEL)) {
           contentString += fields[((Ref) object).getColumnId().intValue()]
-            .replaceAll(CSVConstants.SEPARATOR_LABEL,
-              CSVConstants.ESCAPE_REPLACEMENT_LABEL);
+            .replaceAll(CSVConstants.SEPARATOR_LABEL, CSVConstants.ESCAPE_REPLACEMENT_LABEL);
         } else {
           contentString += fields[((Ref) object).getColumnId().intValue()];
         }
@@ -406,8 +382,7 @@ public class CSVToElement implements
   private String createLabel(Label label, String[] fields) {
     String labelSeparator = (label.getSeparator() == null) ?
       CSVConstants.SEPARATOR_LABEL : label.getSeparator();
-    return getEntriesFromStaticOrRef(label.getContent(),
-      fields, labelSeparator);
+    return getEntriesFromStaticOrRef(label.getContent(), fields, labelSeparator);
   }
 
   /**
@@ -441,17 +416,15 @@ public class CSVToElement implements
     Key key, String[] fields) {
     PropertyList list = PropertyList.create();
     String resultKey = createKey(
-      new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(),
-        key.getClazz(), getEntriesFromStaticOrRef(key.getContent(),
-          fields, "")));
+      new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
+        getEntriesFromStaticOrRef(key.getContent(), fields, "")));
 
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
 
     list.set(CSVConstants.PROPERTY_KEY_KEY, value);
 
-    //load all properties and set their type according to the type specified
-    //in the meta information
+    //load all properties and set their type according to the type specified in the meta information
     if (properties != null && !properties.isEmpty()) {
       for (Property p : properties) {
         org.gradoop.common.model.impl.properties.Property prop
@@ -459,8 +432,7 @@ public class CSVToElement implements
 
         prop.setKey(p.getName());
         value = new PropertyValue();
-        String type =
-          csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
+        String type = csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
 
         switch (type) {
         case "String":

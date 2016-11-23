@@ -29,8 +29,7 @@ import org.gradoop.flink.io.impl.csv.pojos.Domain;
 public class DatasourceToCsv implements FlatMapFunction<Datasource, CsvExtension> {
 
   @Override
-  public void flatMap(Datasource datasource, Collector<CsvExtension> collector) throws
-    Exception {
+  public void flatMap(Datasource datasource, Collector<CsvExtension> collector) throws Exception {
     for (Domain domain : datasource.getDomain()) {
       for (CsvExtension csv : domain.getCsv()) {
         csv.setDatasourceName(datasource.getName());
