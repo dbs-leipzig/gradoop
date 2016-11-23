@@ -212,12 +212,12 @@ public class CSVToElement
     // normal edge, so information can be read by the csv-edge meta information
     if (sourceKey.equals("")) {
       //relevant key information for the source
-      referenceTuple = this.setNamesAndIds(csv.getEdge().getSource(), fields,
-        csv.getDatasourceName(), csv.getDomainName(), className);
+      referenceTuple = createKeyTuple(csv.getEdge().getSource(), fields, csv.getDatasourceName(),
+        csv.getDomainName(), className);
       sourceKey = createKey(referenceTuple);
     }
     //relevant key information for the target
-    referenceTuple = this.setNamesAndIds(edge.getTarget(), fields, csv.getDatasourceName(),
+    referenceTuple = createKeyTuple(edge.getTarget(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
     String targetKey = createKey(referenceTuple);
 
@@ -247,7 +247,7 @@ public class CSVToElement
       } else {
         sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
-      sb.append(createKey(this.setNamesAndIds(graph, fields, datasourceName, domainName, className))
+      sb.append(createKey(createGraphTuple(graph, fields, datasourceName, domainName, className))
         .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_REPLACEMENT_GRAPHS));
     }
     return sb.toString();
@@ -263,7 +263,7 @@ public class CSVToElement
    * @param className name of the class
    * @return tuple containing all relevant information
    */
-  private ReferenceTuple setNamesAndIds(Staticorreference staticOrReference, String[] fields,
+  private ReferenceTuple createKeyTuple(Staticorreference staticOrReference, String[] fields,
     String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
     tuple.setDatasourceName(datasourceName);
@@ -292,7 +292,7 @@ public class CSVToElement
         tuple.setClassName(reference.getKey().getClazz());
       }
       tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
-        fields, ""));
+        fields, CSVConstants.SEPARATOR_ID));
     }
     return tuple;
   }
@@ -307,7 +307,7 @@ public class CSVToElement
    * @param className name of the class
    * @return tuple containing all relevant information
    */
-  private ReferenceTuple setNamesAndIds(Objectreferences objectReferences, String[] fields,
+  private ReferenceTuple createGraphTuple(Objectreferences objectReferences, String[] fields,
     String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
     tuple.setDatasourceName(datasourceName);
@@ -336,7 +336,7 @@ public class CSVToElement
           tuple.setClassName(reference.getKey().getClazz());
         }
         tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
-            fields, ""));
+            fields, CSVConstants.SEPARATOR_ID));
       }
     }
     return tuple;
@@ -354,19 +354,33 @@ public class CSVToElement
   private String getEntriesFromStaticOrRef(List<Serializable> objects, String[]
     fields, String separator) {
     String contentString = "";
+    String fieldContent;
+    boolean notFirst = false;
+    boolean hasSeparator = !separator.equals("");
     for (Object object : objects) {
       if (Static.class.isInstance(object)) {
         contentString = ((Static) object).getName();
       } else if (Ref.class.isInstance(object)) {
-        if (!contentString.equals("") && !separator.equals("")) {
+        fieldContent = fields[((Ref) object).getColumnId().intValue()];
+        switch (separator) {
+        case CSVConstants.SEPARATOR_LABEL:
+          fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_LABEL,
+            CSVConstants.ESCAPE_REPLACEMENT_LABEL);
+          break;
+        case CSVConstants.SEPARATOR_ID:
+          fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_ID,
+            CSVConstants.ESCAPE_REPLACEMENT_ID);
+          break;
+        default:
+          break;
+        }
+
+        if (notFirst && hasSeparator) {
           contentString += separator;
-        }
-        if (separator.equals(CSVConstants.SEPARATOR_LABEL)) {
-          contentString += fields[((Ref) object).getColumnId().intValue()]
-            .replaceAll(CSVConstants.SEPARATOR_LABEL, CSVConstants.ESCAPE_REPLACEMENT_LABEL);
         } else {
-          contentString += fields[((Ref) object).getColumnId().intValue()];
+          notFirst = true;
         }
+        contentString += fieldContent;
       }
     }
     return contentString;
@@ -417,7 +431,7 @@ public class CSVToElement
     PropertyList list = PropertyList.create();
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
-        getEntriesFromStaticOrRef(key.getContent(), fields, "")));
+        getEntriesFromStaticOrRef(key.getContent(), fields, CSVConstants.SEPARATOR_ID)));
 
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
