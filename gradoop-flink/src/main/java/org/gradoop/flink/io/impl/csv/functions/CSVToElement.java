@@ -147,7 +147,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     }
     String className = csv.getVertex().getKey().getClazz();
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
-
+    //List containing the keys of graphs the vertex is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
 
@@ -184,6 +184,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields, Vertexedge edge, String sourceKey) {
     String label = "";
     List<Property> propertiesCsv = null;
+    //in this case it is a normal edge and none initialized by a vertex
     if (edge == null) {
       edge = csv.getEdge();
     }
@@ -196,7 +197,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     }
     String className = edge.getKey().getClazz();
     List<Graph> graphs = edge.getGraphs().getGraph();
-
+    //List containing the keys of graphs the edge is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
 
@@ -242,6 +243,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       } else {
         sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
+      //adds a key of a graph to the 'list'
       sb.append(createKey(createGraphTuple(graph, fields, datasourceName, domainName, className))
         .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_SEPARATOR_GRAPHS));
     }
@@ -261,6 +263,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private ReferenceTuple createKeyTuple(Staticorreference staticOrReference, String[] fields,
     String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
+    //hierarchy information
     tuple.setDatasourceName(datasourceName);
     tuple.setDomainName(domainName);
     tuple.setClassName(className);
@@ -305,6 +308,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private ReferenceTuple createGraphTuple(Objectreferences objectReferences, String[] fields,
     String datasourceName, String domainName, String className) {
     ReferenceTuple tuple = new ReferenceTuple();
+    //hierarchy information
     tuple.setDatasourceName(datasourceName);
     tuple.setDomainName(domainName);
     tuple.setClassName(className);
