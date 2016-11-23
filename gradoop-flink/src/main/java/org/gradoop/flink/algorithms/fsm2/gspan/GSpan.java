@@ -74,17 +74,20 @@ public class GSpan {
       Collection<TraversalEmbedding> parentEmbeddings =
         graphEmbeddingPair.getCodeEmbeddings().get(parentCode);
 
-      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
-        getValidExtensions(adjacencyList, parentCode, parentEmbeddings);
+      // IF GRAPH CONTAINS FREQUENT SUBGRAPH
+      if (parentEmbeddings != null) {
+        Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
+          getValidExtensions(adjacencyList, parentCode, parentEmbeddings);
 
-      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry :
-        extensionEmbeddings.entrySet()) {
+        for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry :
+          extensionEmbeddings.entrySet()) {
 
-        TraversalCode<String> childCode = new TraversalCode<>(parentCode);
+          TraversalCode<String> childCode = new TraversalCode<>(parentCode);
 
-        childCode.getTraversals().add(entry.getKey());
+          childCode.getTraversals().add(entry.getKey());
 
-        childEmbeddings.put(childCode, entry.getValue());
+          childEmbeddings.put(childCode, entry.getValue());
+        }
       }
     }
 
