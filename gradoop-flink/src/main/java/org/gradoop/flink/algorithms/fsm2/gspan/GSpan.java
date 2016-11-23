@@ -109,7 +109,7 @@ public class GSpan {
 
     // DETERMINE RIGHTMOST PATH
 
-    Set<Integer> rightmostPathTimes = Sets.newHashSet();
+    List<Integer> rightmostPathTimes = Lists.newArrayList();
     int rightmostTime = -1;
 
     for (int edgeTime = traversals.size() - 1; edgeTime >= 0; edgeTime--) {
@@ -123,6 +123,9 @@ public class GSpan {
         } else if (rightmostPathTimes.contains(traversal.getToTime())) {
           rightmostPathTimes.add(traversal.getFromTime());
         }
+      } else if (edgeTime == 0 && traversal.isLoop()) {
+        rightmostTime = 0;
+        rightmostPathTimes.add(0);
       }
     }
 
