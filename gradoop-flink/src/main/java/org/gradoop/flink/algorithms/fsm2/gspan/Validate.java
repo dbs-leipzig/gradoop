@@ -11,6 +11,6 @@ public class Validate implements FilterFunction<WithCount<TraversalCode<String>>
 
   @Override
   public boolean filter(WithCount<TraversalCode<String>> traversalCodeWithCount) throws Exception {
-    return true;
+    return GSpan.isMinimal(traversalCodeWithCount.getObject());
   }
 }

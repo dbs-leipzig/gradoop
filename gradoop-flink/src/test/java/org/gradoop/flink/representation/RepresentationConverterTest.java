@@ -7,6 +7,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.algorithms.fsm2.gspan.GSpan;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListNullValueFactory;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
@@ -28,7 +29,7 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
     AdjacencyList<Object> adjacencyList = RepresentationConverters
       .getAdjacencyList(transaction, new AdjacencyListNullValueFactory());
 
-    GraphTransaction convertedTransaction = RepresentationConverters
+    GraphTransaction convertedTransaction = GSpan
       .getGraphTransaction(adjacencyList);
 
     AdjacencyList<Object> convertedAdjacencyList = RepresentationConverters

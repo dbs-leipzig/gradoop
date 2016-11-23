@@ -51,8 +51,8 @@ public class GSpanEmbeddings extends GSpanBase {
   }
 
   @Override
-  protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs,
-    GradoopFlinkConfig config) {
+  protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config) {
+
     DataSet<GraphEmbeddingPair> searchSpace = graphs
       .map(new InitSingleEdgeEmbeddings());
 
