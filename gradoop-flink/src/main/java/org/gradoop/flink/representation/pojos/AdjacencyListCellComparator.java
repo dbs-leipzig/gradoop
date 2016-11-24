@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.representation.pojos;
 
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
