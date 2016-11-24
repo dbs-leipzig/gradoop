@@ -1,8 +1,8 @@
-package org.gradoop.flink.algorithms.fsm.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.factories.LabelPairCellValueFactory;
-import org.gradoop.flink.algorithms.fsm.tuples.LabelPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.factories.LabelPairCellValueFactory;
+import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
 import org.gradoop.flink.representation.RepresentationConverters;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;

@@ -1,9 +1,10 @@
-package org.gradoop.flink.algorithms.fsm.gspan;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
-import org.gradoop.flink.algorithms.fsm.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 import java.util.Collection;

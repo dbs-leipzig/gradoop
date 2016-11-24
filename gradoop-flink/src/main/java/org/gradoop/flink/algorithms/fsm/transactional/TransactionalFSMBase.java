@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm;
+package org.gradoop.flink.algorithms.fsm.transactional;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
@@ -8,7 +8,7 @@ import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.MinFrequency;
-import org.gradoop.flink.algorithms.fsm.functions.*;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.*;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;

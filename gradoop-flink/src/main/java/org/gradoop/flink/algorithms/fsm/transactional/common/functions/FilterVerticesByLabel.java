@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;

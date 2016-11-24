@@ -1,8 +1,8 @@
-package org.gradoop.flink.algorithms.fsm.factories;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.factories;
 
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.fsm.tuples.LabelPair;
+import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
 
 import java.io.Serializable;

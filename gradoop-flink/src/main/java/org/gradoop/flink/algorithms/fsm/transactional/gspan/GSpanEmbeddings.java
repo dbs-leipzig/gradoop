@@ -15,18 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.EmptyGraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ExpandResult;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.HasEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.IsCollector;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.PatternGrowth;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.functions.InitSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.functions.Report;
-import org.gradoop.flink.algorithms.fsm.gspan.*;
-import org.gradoop.flink.algorithms.fsm.tuples.GraphEmbeddingPair;
-import org.gradoop.flink.algorithms.fsm.tuples.LabelPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.InitSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Report;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;

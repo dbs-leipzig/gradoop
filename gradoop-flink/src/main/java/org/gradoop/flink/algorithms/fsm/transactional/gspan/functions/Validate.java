@@ -1,6 +1,7 @@
-package org.gradoop.flink.algorithms.fsm.gspan;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 

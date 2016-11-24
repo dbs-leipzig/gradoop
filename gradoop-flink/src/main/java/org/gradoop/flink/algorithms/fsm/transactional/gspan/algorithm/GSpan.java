@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.gspan;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -9,8 +9,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.algorithms.fsm.tuples.GraphEmbeddingPair;
-import org.gradoop.flink.algorithms.fsm.tuples.LabelPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;

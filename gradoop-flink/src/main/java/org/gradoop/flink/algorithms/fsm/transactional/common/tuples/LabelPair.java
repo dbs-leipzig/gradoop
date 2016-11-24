@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.tuples;
+package org.gradoop.flink.algorithms.fsm.transactional.common.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 

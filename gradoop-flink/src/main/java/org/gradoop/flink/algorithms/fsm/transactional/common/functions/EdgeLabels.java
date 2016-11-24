@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;

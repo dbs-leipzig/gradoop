@@ -1,7 +1,8 @@
-package org.gradoop.flink.algorithms.fsm.tuples;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;

@@ -1,7 +1,7 @@
-package org.gradoop.flink.algorithms.fsm.gspan;
+package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
 
 public class IsCollector implements FilterFunction<GraphEmbeddingPair> {
 

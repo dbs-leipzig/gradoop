@@ -7,7 +7,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.algorithms.fsm.gspan.GSpan;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListNullValueFactory;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;

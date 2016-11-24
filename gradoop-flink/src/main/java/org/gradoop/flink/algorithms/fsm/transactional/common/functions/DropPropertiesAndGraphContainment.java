@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
