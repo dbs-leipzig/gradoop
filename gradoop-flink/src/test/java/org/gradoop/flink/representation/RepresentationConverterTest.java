@@ -8,9 +8,10 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListNullValueFactory;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
+import org.gradoop.flink.representation.pojos.AdjacencyListNullValueFactory;
+import org.gradoop.flink.representation.tuples.AdjacencyList;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 import org.junit.Test;
 
 import java.util.Set;
@@ -34,10 +35,8 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
     AdjacencyList<Object> convertedAdjacencyList = RepresentationConverters
       .getAdjacencyList(convertedTransaction, new AdjacencyListNullValueFactory());
 
-    assertTrue(transaction.equals(convertedTransaction));
-    assertTrue(transaction.toString().equals(convertedTransaction.toString()));
-    assertTrue(adjacencyList.equals(convertedAdjacencyList));
-    assertTrue(adjacencyList.toString().equals(convertedAdjacencyList.toString()));
+    GradoopFlinkTestUtils.assertEquals(transaction, convertedTransaction);
+    GradoopFlinkTestUtils.assertEquals(adjacencyList, convertedAdjacencyList);
   }
 
   private GraphTransaction getGraphTransaction() {
