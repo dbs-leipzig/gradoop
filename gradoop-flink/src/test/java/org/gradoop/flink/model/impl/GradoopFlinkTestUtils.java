@@ -1,21 +1,39 @@
 package org.gradoop.flink.model.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.comparators.ElementIdComparator;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.representation.pojos.AdjacencyListCell;
+import org.gradoop.flink.representation.pojos.AdjacencyListCellComparator;
+import org.gradoop.flink.representation.pojos.AdjacencyListRow;
+import org.gradoop.flink.representation.tuples.AdjacencyList;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 public class GradoopFlinkTestUtils {
 
@@ -120,5 +138,98 @@ public class GradoopFlinkTestUtils {
       new GraphHeadToDataString(),
       new VertexToDataString(),
       new EdgeToDataString(), false).execute(collection).print();
+  }
+
+  public static void assertEquals(GraphTransaction a, GraphTransaction b) {
+    assertEqualElements(a.getGraphHead(), b.getGraphHead());
+
+    List<Vertex> aVertices = Lists.newArrayList(a.getVertices());
+    List<Vertex> bVertices = Lists.newArrayList(b.getVertices());
+
+    assertTrue(aVertices.size() == bVertices.size());
+
+    Collections.sort(aVertices, new ElementIdComparator());
+    Collections.sort(bVertices, new ElementIdComparator());
+
+    Iterator<Vertex> aVertexIterator = aVertices.iterator();
+    Iterator<Vertex> bVertexIterator = bVertices.iterator();
+
+    while (aVertexIterator.hasNext()) {
+      assertEqualGraphElements(aVertexIterator.next(), bVertexIterator.next());
+    }
+
+    List<Edge> aEdges = Lists.newArrayList(a.getEdges());
+    List<Edge> bEdges = Lists.newArrayList(a.getEdges());
+
+    assertTrue(aEdges.size() == bEdges.size());
+
+    Collections.sort(aEdges, new ElementIdComparator());
+    Collections.sort(bEdges, new ElementIdComparator());
+
+    Iterator<Edge> aEdgeIterator = aEdges.iterator();
+    Iterator<Edge> bEdgeIterator = bEdges.iterator();
+
+    while (aEdgeIterator.hasNext()) {
+      assertEqualEdges(aEdgeIterator.next(), bEdgeIterator.next());
+    }
+  }
+
+  private static void assertEqualEdges(EPGMEdge a, EPGMEdge b) {
+    assertTrue(a.getSourceId().equals(b.getSourceId()));
+    assertTrue(a.getTargetId().equals(b.getTargetId()));
+    assertEqualGraphElements(a, b);
+  }
+
+  private static void assertEqualGraphElements(EPGMGraphElement a, EPGMGraphElement b) {
+    assertTrue(a.getGraphIds().equals(b.getGraphIds()));
+    assertEqualElements(a, b);
+  }
+
+  private static void assertEqualElements(EPGMElement a, EPGMElement b) {
+    assertTrue(a.getId().equals(b.getId()));
+    assertTrue(a.getLabel().equals(b.getLabel()));
+    assertTrue(a.getProperties() == null && b.getProperties() == null ||
+      a.getProperties().equals(b.getProperties()));
+  }
+
+  public static <T> void assertEquals(AdjacencyList<T> a, AdjacencyList<T> b) {
+
+    assertTrue(a.getGraphId().equals(b.getGraphId()));
+
+    Set<GradoopId> ids = Sets.newHashSet(a.getGraphId());
+
+    Map<GradoopId, AdjacencyListRow<T>> aRows = a.getRows();
+    Map<GradoopId, AdjacencyListRow<T>> bRows = b.getRows();
+
+    assertTrue(aRows.size() == bRows.size());
+
+    for (GradoopId vertexId : aRows.keySet()) {
+      ids.add(vertexId);
+
+      List<AdjacencyListCell<T>> aCells = Lists.newArrayList(aRows.get(vertexId).getCells());
+      List<AdjacencyListCell<T>> bCells = Lists.newArrayList(aRows.get(vertexId).getCells());
+
+      assertTrue(aCells.size() == bCells.size());
+
+      Collections.sort(aCells, new AdjacencyListCellComparator<>());
+      Collections.sort(bCells, new AdjacencyListCellComparator<>());
+
+      assertTrue(aCells.equals(bCells));
+
+      for (AdjacencyListCell<T> cell : aCells) {
+        if (cell.isOutgoing()) {
+          ids.add(cell.getVertexId());
+        }
+      }
+    }
+
+    for (GradoopId id : ids) {
+      assertTrue(a.getLabel(id).equals(b.getLabel(id)));
+      Properties aProperties = a.getProperties(id);
+      Properties bProperties = b.getProperties(id);
+
+      assertTrue(aProperties == null && bProperties == null || aProperties.equals(bProperties));
+
+    }
   }
 }
