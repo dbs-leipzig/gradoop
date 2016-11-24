@@ -3,15 +3,15 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpan;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
@@ -22,11 +22,11 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalCod
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public abstract class GSpanBase extends TransactionalFSMBase {
-  protected final GSpan gSpan;
+  protected final GSpanKernel gSpan;
 
   public GSpanBase(FSMConfig fsmConfig) {
     super(fsmConfig);
-    gSpan = new DirectedGSpan();
+    gSpan = new DirectedGSpanKernel();
   }
 
   /**
@@ -59,7 +59,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
     DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config);
 
   protected DataSet<TraversalCode<String>> getFrequentPatterns(
-    FlatMapOperator<GraphEmbeddingPair, WithCount<TraversalCode<String>>> reports) {
+    FlatMapOperator<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> reports) {
     return reports
         .groupBy(0)
         .combineGroup(sumPartition())

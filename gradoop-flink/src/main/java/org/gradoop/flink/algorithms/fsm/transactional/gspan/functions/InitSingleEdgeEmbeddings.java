@@ -1,8 +1,8 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
@@ -12,21 +12,21 @@ import java.util.Collection;
 import java.util.Map;
 
 public class InitSingleEdgeEmbeddings
-  implements MapFunction<AdjacencyList<LabelPair>, GraphEmbeddingPair> {
+  implements MapFunction<AdjacencyList<LabelPair>, GraphEmbeddingsPair> {
 
-  private final GSpan gSpan;
+  private final GSpanKernel gSpan;
 
-  public InitSingleEdgeEmbeddings(GSpan gSpan) {
+  public InitSingleEdgeEmbeddings(GSpanKernel gSpan) {
     this.gSpan = gSpan;
   }
 
   @Override
-  public GraphEmbeddingPair map(AdjacencyList<LabelPair> graph) throws Exception {
+  public GraphEmbeddingsPair map(AdjacencyList<LabelPair> graph) throws Exception {
 
     Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings =
-      gSpan.getSingleEdgeCodeEmbeddings(graph);
+      gSpan.getSingleEdgePatternEmbeddings(graph);
 
-    return new GraphEmbeddingPair(graph, codeEmbeddings);
+    return new GraphEmbeddingsPair(graph, codeEmbeddings);
   }
 
 }

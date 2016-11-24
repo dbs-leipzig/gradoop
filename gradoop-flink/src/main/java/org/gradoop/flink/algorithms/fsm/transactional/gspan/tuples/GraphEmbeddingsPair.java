@@ -10,16 +10,16 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmb
 import java.util.Collection;
 import java.util.Map;
 
-public class GraphEmbeddingPair extends
+public class GraphEmbeddingsPair extends
   Tuple2<AdjacencyList<LabelPair>, Map<TraversalCode<String>, Collection<TraversalEmbedding>>> {
 
 
-  public GraphEmbeddingPair(AdjacencyList<LabelPair> adjacencyLists,
+  public GraphEmbeddingsPair(AdjacencyList<LabelPair> adjacencyLists,
     Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings) {
     super(adjacencyLists, codeEmbeddings);
   }
 
-  public GraphEmbeddingPair() {
+  public GraphEmbeddingsPair() {
     super(new AdjacencyList<>(), Maps.newHashMap());
   }
 

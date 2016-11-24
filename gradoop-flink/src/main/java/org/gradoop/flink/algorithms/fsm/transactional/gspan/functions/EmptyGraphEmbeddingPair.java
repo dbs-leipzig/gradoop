@@ -1,11 +1,11 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 
-public class EmptyGraphEmbeddingPair implements MapFunction<Boolean, GraphEmbeddingPair> {
+public class EmptyGraphEmbeddingPair implements MapFunction<Boolean, GraphEmbeddingsPair> {
   @Override
-  public GraphEmbeddingPair map(Boolean aBoolean) throws Exception {
-    return new GraphEmbeddingPair();
+  public GraphEmbeddingsPair map(Boolean aBoolean) throws Exception {
+    return new GraphEmbeddingsPair();
   }
 }

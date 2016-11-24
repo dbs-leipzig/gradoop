@@ -1,15 +1,15 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 public class Validate implements FilterFunction<WithCount<TraversalCode<String>>> {
 
-  private final GSpan gSpan;
+  private final GSpanKernel gSpan;
 
-  public Validate(GSpan gSpan) {
+  public Validate(GSpanKernel gSpan) {
     this.gSpan = gSpan;
   }
 

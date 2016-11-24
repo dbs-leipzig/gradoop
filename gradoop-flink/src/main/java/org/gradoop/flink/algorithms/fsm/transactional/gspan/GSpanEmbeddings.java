@@ -29,7 +29,7 @@ import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Report;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
@@ -54,10 +54,10 @@ public class GSpanEmbeddings extends GSpanBase {
   @Override
   protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config) {
 
-    DataSet<GraphEmbeddingPair> searchSpace = graphs
+    DataSet<GraphEmbeddingsPair> searchSpace = graphs
       .map(new InitSingleEdgeEmbeddings(gSpan));
 
-    DataSet<GraphEmbeddingPair> collector = config
+    DataSet<GraphEmbeddingsPair> collector = config
       .getExecutionEnvironment()
       .fromElements(true)
       .map(new EmptyGraphEmbeddingPair());
@@ -66,17 +66,17 @@ public class GSpanEmbeddings extends GSpanBase {
 
     // ITERATION HEAD
 
-    IterativeDataSet<GraphEmbeddingPair> iterative = searchSpace
+    IterativeDataSet<GraphEmbeddingsPair> iterative = searchSpace
       .iterate(fsmConfig.getMaxEdgeCount());
 
     // ITERATION BODY
 
-    FlatMapOperator<GraphEmbeddingPair, WithCount<TraversalCode<String>>> reports = iterative
+    FlatMapOperator<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> reports = iterative
       .flatMap(new Report());
 
     DataSet<TraversalCode<String>> frequentPatterns = getFrequentPatterns(reports);
 
-    DataSet<GraphEmbeddingPair> grownEmbeddings = iterative
+    DataSet<GraphEmbeddingsPair> grownEmbeddings = iterative
       .map(new PatternGrowth(gSpan))
       .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS)
       .filter(new HasEmbeddings());
