@@ -1,6 +1,6 @@
-package org.gradoop.flink.algorithms.fsm_old;
+package org.gradoop.flink.algorithms.fsm;
 
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.GSpanEmbeddings;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;

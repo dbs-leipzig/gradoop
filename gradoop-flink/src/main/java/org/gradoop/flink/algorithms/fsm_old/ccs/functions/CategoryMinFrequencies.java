@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm_old.ccs.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.MinFrequency;
 
 import java.util.Map;

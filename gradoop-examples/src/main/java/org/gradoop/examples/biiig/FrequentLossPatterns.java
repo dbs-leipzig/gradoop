@@ -28,7 +28,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.SubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm_old.tfsm.TransactionalFSM;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.TransformationFunction;

@@ -40,7 +40,7 @@ import org.gradoop.flink.algorithms.fsm_old.ccs.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm_old.ccs.tuples.CCSSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm_old.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.config.IterationStrategy;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.WithoutInfrequentEdgeLabels;

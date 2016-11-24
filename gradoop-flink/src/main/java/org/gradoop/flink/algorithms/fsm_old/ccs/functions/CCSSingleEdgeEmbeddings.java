@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm_old.ccs.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm_old.ccs.tuples.CCSSubgraphEmbeddings;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.SingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm_old.common.pojos.Embedding;
 

@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm_old.common;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.config.FilterStrategy;
 import org.gradoop.flink.algorithms.fsm_old.common.config.GrowthStrategy;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.CanonicalLabelOnly;

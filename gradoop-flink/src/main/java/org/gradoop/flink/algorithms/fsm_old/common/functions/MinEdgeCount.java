@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm_old.common.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.tuples.Subgraph;
 
 /**

@@ -26,7 +26,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.HasEmbeddi
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.IsCollector;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.PatternGrowth;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Report;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingPair;

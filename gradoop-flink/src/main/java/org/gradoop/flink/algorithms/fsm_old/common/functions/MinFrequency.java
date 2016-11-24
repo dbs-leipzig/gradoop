@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm_old.common.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 
 /**
  * Calculates the min frequency based on a configured min support.

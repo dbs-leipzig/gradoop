@@ -22,7 +22,7 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm_old.common.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.config.IterationStrategy;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;

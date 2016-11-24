@@ -22,7 +22,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;

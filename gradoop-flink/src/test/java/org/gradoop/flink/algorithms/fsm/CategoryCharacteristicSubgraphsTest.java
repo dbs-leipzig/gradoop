@@ -1,11 +1,11 @@
-package org.gradoop.flink.algorithms.fsm_old;
+package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;

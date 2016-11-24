@@ -24,7 +24,7 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm_old.common.canonicalization.api.CanonicalLabeler;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm_old.common.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm_old.common.pojos.FSMGraph;

@@ -1,10 +1,9 @@
-package org.gradoop.flink.algorithms.fsm_old;
+package org.gradoop.flink.algorithms.fsm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
-import org.gradoop.flink.algorithms.fsm_old.tfsm.TransactionalFSM;
-import org.gradoop.flink.datagen.transactions.predictable
-  .PredictableTransactionsGenerator;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.GSpanEmbeddings;
+import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
@@ -31,10 +30,8 @@ public class PredictableGeneratorCorrectnessTest extends GradoopFlinkTestBase {
 
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
-    DataSet<GraphTransaction> frequentSubgraphs =
-      new TransactionalFSM(fsmConfig)
-        .execute(transactions)
-        .getTransactions();
+    DataSet<GraphTransaction> frequentSubgraphs = new GSpanEmbeddings(fsmConfig)
+      .execute(transactions);
 
     Assert.assertEquals(
       PredictableTransactionsGenerator
@@ -58,10 +55,8 @@ public class PredictableGeneratorCorrectnessTest extends GradoopFlinkTestBase {
 
     FSMConfig fsmConfig = new FSMConfig(threshold, false);
 
-    DataSet<GraphTransaction> frequentSubgraphs =
-      new TransactionalFSM(fsmConfig)
-        .execute(transactions)
-        .getTransactions();
+    DataSet<GraphTransaction> frequentSubgraphs = new GSpanEmbeddings(fsmConfig)
+      .execute(transactions);
 
     Assert.assertEquals(
       PredictableTransactionsGenerator
