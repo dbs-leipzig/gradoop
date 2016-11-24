@@ -39,52 +39,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return codeEmbeddings;
   }
 
-  /**
-   * Finds all traversal start patterns and their embeddings in a given graph.
-   *
-   * @param graph graph
-   * @return traversal pattern -> embeddings
-   */
-  protected Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
-    AdjacencyList<LabelPair> graph) {
 
-    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = Maps.newHashMap();
-
-    // FOR EACH VERTEX
-    for (Map.Entry<GradoopId, AdjacencyListRow<LabelPair>> vertexRow : graph.getRows().entrySet()) {
-
-      GradoopId sourceId = vertexRow.getKey();
-      String sourceLabel = graph.getLabel(sourceId);
-
-      AdjacencyListRow<LabelPair> row = vertexRow.getValue();
-
-      // FOR EACH EDGE
-      for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
-        if (cell.isOutgoing()) {
-          GradoopId edgeId = cell.getEdgeId();
-          GradoopId targetId = cell.getVertexId();
-
-          boolean loop = sourceId.equals(targetId);
-
-          String edgeLabel = cell.getValue().getEdgeLabel();
-          String targetLabel = cell.getValue().getVertexLabel();
-
-          Traversal<String> traversal = createSingleEdgeTraversal(sourceLabel, edgeLabel, targetLabel, loop);
-
-          TraversalEmbedding singleEdgeEmbedding = createSingleEdgeEmbedding(sourceId, edgeId, targetId, traversal);
-
-          Collection<TraversalEmbedding> embeddings = traversalEmbeddings.get(traversal);
-
-          if (embeddings == null) {
-            traversalEmbeddings.put(traversal, Lists.newArrayList(singleEdgeEmbedding));
-          } else {
-            embeddings.add(singleEdgeEmbedding);
-          }
-        }
-      }
-    }
-    return traversalEmbeddings;
-  }
 
   @Override
   public void growChildren(GraphEmbeddingsPair graphEmbeddingsPair,
@@ -121,11 +76,15 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     graphEmbeddingsPair.setCodeEmbeddings(childEmbeddings);
   }
 
-  protected abstract Traversal<String> createSingleEdgeTraversal(String sourceLabel,
-    String edgeLabel, String targetLabel, boolean loop);
+  /**
+   * Finds all traversal start patterns and their embeddings in a given graph.
+   *
+   * @param graph graph
+   * @return traversal pattern -> embeddings
+   */
+  protected abstract Map<Traversal<String>,Collection<TraversalEmbedding>>
+  getSingleEdgeTraversalEmbeddings(AdjacencyList<LabelPair> graph);
 
-  public abstract TraversalEmbedding createSingleEdgeEmbedding(GradoopId sourceId, GradoopId edgeId,
-    GradoopId targetId, Traversal<String> traversal);
 
   protected abstract Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
     AdjacencyList<LabelPair> adjacencyList, TraversalCode<String> parentCode,
@@ -249,7 +208,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
       // EDGE
 
       GradoopId edgeId = GradoopId.get();
-      boolean outgoing = traversal.isOutgoing();
+      boolean outgoing = getOutgoing(traversal);
       String edgeLabel = traversal.getEdgeValue();
 
       rows.get(fromId).getCells().add(new AdjacencyListCell<>(
@@ -260,4 +219,6 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     }
 
     return new AdjacencyList<>(GradoopId.get(), labels, null, rows);  }
+
+  protected abstract boolean getOutgoing(Traversal<String> traversal);
 }
