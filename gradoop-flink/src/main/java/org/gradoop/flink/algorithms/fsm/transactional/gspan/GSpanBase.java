@@ -3,6 +3,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpan;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpan;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;
@@ -19,12 +21,12 @@ import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-/**
- * Created by peet on 23.11.16.
- */
 public abstract class GSpanBase extends TransactionalFSMBase {
+  protected final GSpan gSpan;
+
   public GSpanBase(FSMConfig fsmConfig) {
     super(fsmConfig);
+    gSpan = new DirectedGSpan();
   }
 
   /**
@@ -61,7 +63,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
     return reports
         .groupBy(0)
         .combineGroup(sumPartition())
-        .filter(new Validate())
+        .filter(new Validate(gSpan))
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<>())

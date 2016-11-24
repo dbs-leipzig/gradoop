@@ -7,10 +7,16 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalCod
 
 public class Validate implements FilterFunction<WithCount<TraversalCode<String>>> {
 
+  private final GSpan gSpan;
+
+  public Validate(GSpan gSpan) {
+    this.gSpan = gSpan;
+  }
+
   @Override
   public boolean filter(WithCount<TraversalCode<String>> traversalCodeWithCount) throws Exception {
     TraversalCode<String> code = traversalCodeWithCount.getObject();
 
-    return code.getTraversals().size() == 1 || GSpan.isMinimal(code);
+    return code.getTraversals().size() == 1 || gSpan.isMinimal(code);
   }
 }

@@ -160,4 +160,46 @@ public class RepresentationConverters {
     return new GraphTransaction(graphHead, vertices, edges);
   }
 
+  /**
+   * adjacency list => transaction
+   *
+   * @param adjacencyList adjacency list
+   * @param <T> cell value type
+   * @return transaction
+   */
+  public static <T> GraphTransaction getGraphTransaction(AdjacencyList<T> adjacencyList) {
+
+    // GRAPH HEAD
+    GradoopId graphId = adjacencyList.getGraphId();
+    GraphHead graphHead =
+      new GraphHead(graphId, adjacencyList.getLabel(graphId), adjacencyList.getProperties(graphId));
+
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphId);
+
+    Set<Vertex> vertices = Sets.newHashSet();
+    Set<Edge> edges = Sets.newHashSet();
+
+    // VERTICES
+    for (Map.Entry<GradoopId, AdjacencyListRow<T>> entry : adjacencyList.getRows().entrySet()) {
+      GradoopId sourceId = entry.getKey();
+      Properties properties = adjacencyList.getProperties(sourceId);
+      String label = adjacencyList.getLabel(sourceId);
+      vertices.add(new Vertex(sourceId, label, properties, graphIds));
+
+      // EDGES
+      for (AdjacencyListCell<T> cell : entry.getValue().getCells()) {
+
+        if (cell.isOutgoing()) {
+          GradoopId edgeId = cell.getEdgeId();
+          label = adjacencyList.getLabel(edgeId);
+          properties = adjacencyList.getProperties(edgeId);
+          GradoopId targetId = cell.getVertexId();
+
+          edges.add(new Edge(edgeId, label, sourceId, targetId, properties, graphIds));
+        }
+      }
+    }
+
+    return new GraphTransaction(graphHead, vertices, edges);
+  }
 }

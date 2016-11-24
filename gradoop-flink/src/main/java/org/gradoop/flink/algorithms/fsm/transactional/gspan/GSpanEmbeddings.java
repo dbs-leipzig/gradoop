@@ -55,7 +55,7 @@ public class GSpanEmbeddings extends GSpanBase {
   protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config) {
 
     DataSet<GraphEmbeddingPair> searchSpace = graphs
-      .map(new InitSingleEdgeEmbeddings());
+      .map(new InitSingleEdgeEmbeddings(gSpan));
 
     DataSet<GraphEmbeddingPair> collector = config
       .getExecutionEnvironment()
@@ -77,7 +77,7 @@ public class GSpanEmbeddings extends GSpanBase {
     DataSet<TraversalCode<String>> frequentPatterns = getFrequentPatterns(reports);
 
     DataSet<GraphEmbeddingPair> grownEmbeddings = iterative
-      .map(new PatternGrowth())
+      .map(new PatternGrowth(gSpan))
       .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS)
       .filter(new HasEmbeddings());
 

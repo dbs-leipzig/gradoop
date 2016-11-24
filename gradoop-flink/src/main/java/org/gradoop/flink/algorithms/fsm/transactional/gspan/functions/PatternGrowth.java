@@ -16,6 +16,11 @@ public class PatternGrowth
   extends RichMapFunction<GraphEmbeddingPair, GraphEmbeddingPair> {
 
   private Collection<TraversalCode<String>> frequentSubgraphs;
+  private final GSpan gSpan;
+
+  public PatternGrowth(GSpan gSpan) {
+    this.gSpan = gSpan;
+  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -32,7 +37,7 @@ public class PatternGrowth
         graphEmbeddingPair.getCodeEmbeddings().put(code, null);
       }
     } else {
-      GSpan.growChildren(graphEmbeddingPair, frequentSubgraphs);
+      gSpan.growChildren(graphEmbeddingPair, frequentSubgraphs);
     }
 
     return graphEmbeddingPair;
