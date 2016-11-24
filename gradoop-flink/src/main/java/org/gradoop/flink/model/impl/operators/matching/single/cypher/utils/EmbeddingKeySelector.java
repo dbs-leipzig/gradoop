@@ -14,34 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings;
-
+import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 
-import java.util.Optional;
+public class EmbeddingKeySelector implements KeySelector<Embedding, GradoopId> {
+  public static final int LAST = -1;
 
-/**
- * Represents an entry in an embedding
- */
-public interface EmbeddingEntry {
-  /**
-   * Returns the identifier of the element
-   * @return id
-   */
-  GradoopId getId();
+  public final int column;
 
-  /**
-   * Returns the list of properties of this element
-   * @return properties
-   */
-  Optional<Properties>  getProperties();
+  public EmbeddingKeySelector(int column) {
+    this.column = column;
+  }
 
-  /**
-   * Checks if the embedding entry contains the specified id
-   * @param id the query id
-   * @return true if the id is contained in the embedding entry
-   */
-  Boolean contains(GradoopId id);
+  @Override
+  public GradoopId getKey(Embedding value) throws Exception {
+    if (column < 0) {
+      return value.getEntry(value.size() + column).getId();
+    } else {
+      return value.getEntry(column).getId();
+    }
+  }
 }

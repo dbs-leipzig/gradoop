@@ -14,24 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-/**
- * Used to select the strategy used by the matching algorithms
- */
-public enum MatchStrategy {
-    /**
-     * If this strategy is used vertices and edges can only be
-     * mapped to one vertice/edge in the query graph
-     */
-    ISOMORPHISM,
-    /**
-     * If this strategy is used vertices and edges can be
-     * mapped to multiple verices/edges in the query graph
-     */
-    HOMOMORPHISM,
-    /**
-     * Match cypher style: Homomorphism for vertices, isomorphism for edges
-     */
-    CYPHER
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
+
+public class ReverseEmbeddings extends RichMapFunction<Embedding, Embedding> {
+
+  @Override
+  public Embedding map(Embedding value) throws Exception {
+    EmbeddingEntry tmp = value.getEntry(0);
+    value.setEntry(0, value.getEntry(2));
+    value.setEntry(2, tmp);
+    return value;
+  }
 }

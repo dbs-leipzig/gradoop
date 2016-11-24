@@ -30,11 +30,22 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static org.junit.Assert.assertTrue;
 
 abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
+
+  void assertEmbeddingExists(DataSet<Embedding> dataSet, Predicate<Embedding> predicate)
+  throws Exception {
+
+    assertTrue(dataSet.collect().stream().anyMatch(predicate::test));
+  }
 
   void assertEveryEmbedding(DataSet<Embedding> dataSet, Consumer<Embedding> consumer)
     throws Exception {
@@ -42,11 +53,22 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     dataSet.collect().forEach(consumer::accept);
   }
 
-  DataSet<Embedding> createEmbeddings(List<EmbeddingEntry> entries) {
-    List<Embedding> embeddings = Lists.newArrayList(
-      new Embedding(entries),
-      new Embedding(entries)
-    );
+  Embedding createEmbedding(GradoopId... ids) {
+    Embedding embedding = new Embedding();
+
+    for (GradoopId id : ids) {
+      embedding.addEntry(new IdEntry(id));
+    }
+
+    return embedding;
+  }
+
+  DataSet<Embedding> createEmbeddings(Integer size, List<EmbeddingEntry> entries) {
+    List<Embedding> embeddings = new ArrayList<>(size);
+
+    for (int i = 0; i < size; i++) {
+      embeddings.add(new Embedding(entries));
+    }
 
     return getExecutionEnvironment().fromCollection(embeddings);
   }
