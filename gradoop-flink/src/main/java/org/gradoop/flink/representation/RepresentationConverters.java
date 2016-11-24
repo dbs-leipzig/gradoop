@@ -19,7 +19,6 @@ package org.gradoop.flink.representation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -27,8 +26,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.algorithms.fsm2.factories.LabelPairCellValueFactory;
-import org.gradoop.flink.algorithms.fsm2.tuples.LabelPair;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;

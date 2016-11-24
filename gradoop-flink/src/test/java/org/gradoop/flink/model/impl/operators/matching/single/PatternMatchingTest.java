@@ -12,7 +12,7 @@ import org.junit.runners.Parameterized;
  * Base class for Pattern Matching Tests.
  */
 @RunWith(Parameterized.class)
-public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
+public abstract class  PatternMatchingTest extends GradoopFlinkTestBase {
 
   private final String testName;
 

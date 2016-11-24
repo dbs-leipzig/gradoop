@@ -21,8 +21,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.utils.ExampleOutput;
-import org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs;
-import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs;
+import org.gradoop.flink.algorithms.fsm_old.common.config.FSMConfig;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -42,7 +42,7 @@ import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SOURCE
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER;
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL;
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERTYPE_KEY;
-import static org.gradoop.flink.algorithms.fsm.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
+import static org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 
 /**
  * Example workflow of paper "Scalable Business Intelligence with Graph
