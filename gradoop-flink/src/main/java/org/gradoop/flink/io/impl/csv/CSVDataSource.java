@@ -23,12 +23,23 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.*;
+import org.gradoop.flink.io.impl.csv.functions.CSVToContent;
+import org.gradoop.flink.io.impl.csv.functions.CSVToElement;
+import org.gradoop.flink.io.impl.csv.functions.CSVTypeFilter;
+import org.gradoop.flink.io.impl.csv.functions.EPGMElementToPojo;
+import org.gradoop.flink.io.impl.csv.functions.ElementGraphKeyToGraphHead;
+import org.gradoop.flink.io.impl.csv.functions.ElementToElementGraphKey;
+import org.gradoop.flink.io.impl.csv.functions.GradoopEdgeIds;
+import org.gradoop.flink.io.impl.csv.functions.SetElementGraphIds;
+import org.gradoop.flink.io.impl.csv.functions.VertexIdsToMap;
+import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
 import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
 import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
@@ -88,9 +99,9 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public GraphCollection getGraphCollection() throws IOException {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    DataSet<org.gradoop.common.model.impl.pojo.GraphHead> graphHeads;
-    DataSet<org.gradoop.common.model.impl.pojo.Vertex> vertices;
-    DataSet<org.gradoop.common.model.impl.pojo.Edge> edges;
+    DataSet<GraphHead> graphHeads;
+    DataSet<Vertex> vertices;
+    DataSet<Edge> edges;
 
     // parse the xml file to a datasource and select each csv object
     Datasource datasource = null;
@@ -132,8 +143,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     //get all vertices
     vertices = elements
-      .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Vertex.class))
-      .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Vertex>())
+      .filter(new CSVTypeFilter(Vertex.class))
+      .map(new EPGMElementToPojo<Vertex>())
       .returns(vertexFactory.getType());
 
     //create map from class key to gradoop id
@@ -143,44 +154,44 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     //get all edges and adjust the vertex keys to their corresponding gradoop id
     edges = elements
-      .filter(new CSVTypeFilter(org.gradoop.common.model.impl.pojo.Edge.class))
-      .map(new EPGMElementToPojo<org.gradoop.common.model.impl.pojo.Edge>())
+      .filter(new CSVTypeFilter(Edge.class))
+      .map(new EPGMElementToPojo<Edge>())
       .returns(edgeFactory.getType())
       .map(new GradoopEdgeIds())
       .withBroadcastSet(vertexIds, CSVConstants.BROADCAST_ID_MAP);
 
     //get all graph keys from vertex properties
-    DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Vertex, String>> vertexGraphKeys = vertices
-        .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl.pojo.Vertex>());
+    DataSet<Tuple2<Vertex, String>> vertexGraphKeys = vertices
+        .flatMap(new ElementToElementGraphKey<Vertex>());
 
     //get all graph keys from edge properties
-    DataSet<Tuple2<org.gradoop.common.model.impl.pojo.Edge, String>>
+    DataSet<Tuple2<Edge, String>>
       edgeGraphKeys = edges
-      .flatMap(new ElementToElementGraphKey<org.gradoop.common.model.impl.pojo.Edge>());
+      .flatMap(new ElementToElementGraphKey<Edge>());
 
     //create graph heads for vertices without any
     graphHeads = graphHeads
       .union(vertexGraphKeys
         .groupBy(1)
         .reduceGroup(
-          new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Vertex>(
+          new ElementGraphKeyToGraphHead<Vertex>(
             graphHeadFactory)))
       .union(edgeGraphKeys
           .groupBy(1)
           .reduceGroup(
-            new ElementGraphKeyToGraphHead<org.gradoop.common.model.impl.pojo.Edge>(
+            new ElementGraphKeyToGraphHead<Edge>(
               graphHeadFactory)));
 
     //set all graph heads
     vertices = vertexGraphKeys
       .groupBy("f0.id")
-      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Vertex>())
+      .reduceGroup(new SetElementGraphIds<Vertex>())
       .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
 
     //set all graph heads
     edges = edgeGraphKeys
       .groupBy("f0.id")
-      .reduceGroup(new SetElementGraphIds<org.gradoop.common.model.impl.pojo.Edge>())
+      .reduceGroup(new SetElementGraphIds<Edge>())
       .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
 
     return GraphCollection.fromDataSets(
