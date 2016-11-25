@@ -17,10 +17,14 @@
 
 package org.gradoop.flink.io.impl.csv;
 
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -163,13 +167,55 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .withBroadcastSet(vertexIds, CSVConstants.BROADCAST_ID_MAP);
 
     //get all graph keys from vertex properties
-    DataSet<Tuple2<Vertex, String>> vertexGraphKeys = vertices
+    DataSet<String> vertexGraphKeys = vertices
         .flatMap(new ElementToElementGraphKey<Vertex>());
 
     //get all graph keys from edge properties
-    DataSet<Tuple2<Edge, String>>
+    DataSet<String>
       edgeGraphKeys = edges
       .flatMap(new ElementToElementGraphKey<Edge>());
+
+
+    DataSet<Tuple2<String, GraphHead>> keyGraphHead = graphHeads
+      .map(new MapFunction<GraphHead, Tuple2<String, GraphHead>>() {
+        @Override
+        public Tuple2<String, GraphHead> map(GraphHead graphHead) throws Exception {
+          return new Tuple2<String, GraphHead>(graphHead.getPropertyValue("key").getString(), graphHead);
+        }
+      });
+
+    keyGraphHead = keyGraphHead
+      .union(vertexGraphKeys
+        .distinct()
+        .map(new MapFunction<String, Tuple2<String, GraphHead>>() {
+          @Override
+          public Tuple2<String, GraphHead> map(String s) throws Exception {
+            return new Tuple2<String, GraphHead>(s, null);
+          }
+        }));
+    //distinct with validation that only existing graphhead is used, if there is one
+    keyGraphHead = keyGraphHead
+      .groupBy(0)
+      .reduceGroup(new GroupReduceFunction<Tuple2<String, GraphHead>, Tuple2<String, GraphHead>>() {
+        @Override
+        public void reduce(Iterable<Tuple2<String, GraphHead>> iterable,
+          Collector<Tuple2<String, GraphHead>> collector) throws Exception {
+          Tuple2<String, GraphHead> result;
+          result = iterable.iterator().next();
+          for (Tuple2<String, GraphHead> tuple : iterable) {
+            if (tuple.f1 != null){
+              result = tuple;
+            }
+          }
+          if (result.f1 == null){
+            GraphHead graphHead = graphHeadFactory.createGraphHead();
+            graphHead.setProperty(CSVConstants.PROPERTY_KEY_KEY, result.f0);
+            result.f1 = graphHead;
+          }
+          collector.collect(result);
+        }
+      });
+
 
     //create graph heads for vertices without any
     graphHeads = graphHeads
