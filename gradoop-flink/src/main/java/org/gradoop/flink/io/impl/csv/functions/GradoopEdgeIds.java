@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class GradoopEdgeIds extends RichMapFunction<Edge, Edge> {
 
   @Override
   public Edge map(Edge edge) throws Exception {
-    PropertyList properties = edge.getProperties();
+    Properties properties = edge.getProperties();
     edge.setSourceId(map.get(properties.get(CSVConstants.PROPERTY_KEY_SOURCE).getString()));
     edge.setTargetId(map.get(properties.get(CSVConstants.PROPERTY_KEY_TARGET).getString()));
     return edge;

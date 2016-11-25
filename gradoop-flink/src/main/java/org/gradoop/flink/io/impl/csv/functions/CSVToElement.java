@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
@@ -123,7 +123,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     }
     Key key = csv.getGraphhead().getKey();
     List<Property> propertiesCsv = csv.getGraphhead().getProperties().getProperty();
-    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
+    Properties properties = createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
   }
 
@@ -151,7 +151,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
 
-    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
+    Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
     return vertexFactory.createVertex(label, properties);
@@ -201,7 +201,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
 
-    PropertyList properties = createProperties(csv, propertiesCsv, key, fields);
+    Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
     ReferenceTuple referenceTuple;
@@ -425,9 +425,9 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param fields contains the data
    * @return epgm property list
    */
-  private PropertyList createProperties(CsvExtension csv, List<Property> properties,
+  private Properties createProperties(CsvExtension csv, List<Property> properties,
     Key key, String[] fields) {
-    PropertyList list = PropertyList.create();
+    Properties list = Properties.create();
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
         getEntriesFromStaticOrRef(key.getContent(), fields, CSVConstants.SEPARATOR_ID)));
