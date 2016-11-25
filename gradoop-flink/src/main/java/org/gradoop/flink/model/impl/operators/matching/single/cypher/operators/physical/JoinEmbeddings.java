@@ -19,34 +19,53 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 
 /**
- * Joins two embeddings at given columns
+ * Joins two embeddings at given columns and checks for vertex/edge isomorphism/homomorphism.
+ *
+ * The result is always a new embedding with the following constraints.
+ * <ul>
+ * <li>{@link EmbeddingEntry} elements of the right embedding are always appended to the left embedding</li>
+ * <li>duplicate fields are removed, i.e., the join columns are stored once in the result</li>
+ * <li>join columns are either adopted from the left or right side</li>
+ * </ul>
  */
 public class JoinEmbeddings implements PhysicalOperator {
 
   /**
    * Left hand side embeddings
    */
-  private final DataSet<Embedding> lhs;
+  private final DataSet<Embedding> left;
   /**
    * Right hand side embeddings
    */
-  private final DataSet<Embedding> rhs;
+  private final DataSet<Embedding> right;
   /**
-   * left side join column
+   * left side join columns
    */
-  private final int lhsColumn;
+  private final int[] leftColumns;
   /**
-   * right side join column
+   * right side join columns
    */
-  private final int rhsColumn;
+  private final int[] rightColumns;
   /**
-   * The strategy used for the matching
+   * left side columns to adopt
    */
-  private final MatchStrategy matchStrategy;
+  private final int[] adoptLeft;
+  /**
+   * right side columns to adopt
+   */
+  private final int[] adoptRight;
+  /**
+   * columns that represent vertices and need to be distinct
+   */
+  private final int[] distinctVertexColumns;
+  /**
+   * columns that represent edges and need to be distinct
+   */
+  private final int[] distinctEdgeColumns;
   /**
    * Join Hint
    */
@@ -55,35 +74,30 @@ public class JoinEmbeddings implements PhysicalOperator {
   /**
    * New Join Operator
    *
-   * @param lhs embeddings of the left side of the join
-   * @param rhs embeddings of the right side of the join
-   * @param lhsColumn specifies the join column of the left hand side
-   * @param rhsColumn specifies the join column of the left hand side
-   * @param matchStrategy match strategy
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param leftColumns specifies the join columns of the left side
+   * @param rightColumns specifies the join columns of the left side
+   * @param adoptLeft columns that are adopted from the left side
+   * @param adoptRight columns that are adopted fom the right side
+   * @param distinctVertexColumns distinct vertex columns
+   * @param distinctEdgeColumns distinct edge columns
    * @param joinHint join strategy
    */
-  public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,
-    int rhsColumn, MatchStrategy matchStrategy, JoinOperatorBase.JoinHint joinHint) {
-    this.lhs = lhs;
-    this.rhs = rhs;
-    this.lhsColumn = lhsColumn;
-    this.rhsColumn = rhsColumn;
-    this.matchStrategy = matchStrategy;
-    this.joinHint = joinHint;
-  }
-
-  /**
-   * New Join operator with default join hint
-   *
-   * @param lhs embeddings of the left side of the join
-   * @param rhs embeddings of the right side of the join
-   * @param lhsColumn specifies the join column of the left hand side
-   * @param rhsColumn specifies the join column of the left hand side
-   */
-  public JoinEmbeddings(DataSet<Embedding> lhs, DataSet<Embedding> rhs, int lhsColumn,
-    int rhsColumn) {
-    this(lhs, rhs, lhsColumn, rhsColumn, MatchStrategy.ISOMORPHISM,
-    JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    int[] leftColumns, int[] rightColumns,
+    int[] adoptLeft, int[] adoptRight,
+    int[] distinctVertexColumns, int[] distinctEdgeColumns,
+    JoinOperatorBase.JoinHint joinHint) {
+    this.left                  = left;
+    this.right                 = right;
+    this.leftColumns           = leftColumns;
+    this.rightColumns          = rightColumns;
+    this.adoptLeft             = adoptLeft;
+    this.adoptRight            = adoptRight;
+    this.distinctVertexColumns = distinctVertexColumns;
+    this.distinctEdgeColumns   = distinctEdgeColumns;
+    this.joinHint              = joinHint;
   }
 
   @Override
