@@ -15,9 +15,9 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.comparators;
+package org.gradoop.common.model.impl.comparators;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -25,10 +25,10 @@ import java.util.Comparator;
 /**
  * Id based EPGM element comparator.
  */
-public class ElementIdComparator implements Comparator<EPGMElement>, Serializable {
+public class EPGMIdentifiableComparator implements Comparator<EPGMIdentifiable>, Serializable {
 
   @Override
-  public int compare(EPGMElement a, EPGMElement b) {
+  public int compare(EPGMIdentifiable a, EPGMIdentifiable b) {
     return a.getId().compareTo(b.getId());
   }
 }

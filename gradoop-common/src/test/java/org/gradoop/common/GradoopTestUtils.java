@@ -24,6 +24,7 @@ import org.apache.hadoop.io.Writable;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.impl.comparators.EPGMIdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -48,8 +49,7 @@ import static org.junit.Assert.*;
 
 public class GradoopTestUtils {
 
-  public static final String SOCIAL_NETWORK_GDL_FILE =
-    "/data/gdl/social_network.gdl";
+  public static final String SOCIAL_NETWORK_GDL_FILE = "/data/gdl/social_network.gdl";
 
   /**
    * Contains values of all supported property types
@@ -75,6 +75,8 @@ public class GradoopTestUtils {
   public static final BigDecimal  BIG_DECIMAL_VAL_7 = new BigDecimal(23);
   public static final GradoopId   GRADOOP_ID_VAL_8  = GradoopId.get();
 
+  private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
+
   static {
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
     SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
@@ -95,13 +97,12 @@ public class GradoopTestUtils {
    *
    * @return graph store containing a simple social network for tests.
    */
-  public static AsciiGraphLoader<GraphHead, Vertex, Edge>
-  getSocialNetworkLoader() throws IOException {
-    GradoopConfig<GraphHead, Vertex, Edge> config =
-      GradoopConfig.getDefaultConfig();
+  public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
+    throws IOException {
 
-    InputStream inputStream = GradoopTestUtils.class
-      .getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
+    GradoopConfig<GraphHead, Vertex, Edge> config = GradoopConfig.getDefaultConfig();
+
+    InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
     return AsciiGraphLoader.fromStream(inputStream, config);
   }
 
@@ -201,9 +202,7 @@ public class GradoopTestUtils {
     Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
 
     while(it1.hasNext()) {
-      validateEPGMGraphElements(
-        it1.next(),
-        it2.next());
+      validateEPGMGraphElements(it1.next(), it2.next());
     }
     assertFalse("too many elements in first collection", it1.hasNext());
     assertFalse("too many elements in second collection", it2.hasNext());
@@ -216,8 +215,7 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateEPGMElements(EPGMElement element1,
-    EPGMElement element2) {
+  public static void validateEPGMElements(EPGMElement element1, EPGMElement element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
 
@@ -269,8 +267,7 @@ public class GradoopTestUtils {
     );
   }
 
-  public static <T extends Writable> T writeAndReadFields(Class<T> clazz, T in)
-    throws IOException {
+  public static <T extends Writable> T writeAndReadFields(Class<T> clazz, T in) throws IOException {
     // write to byte[]
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     DataOutputStream dataOut = new DataOutputStream(outputStream);
@@ -286,27 +283,14 @@ public class GradoopTestUtils {
     }
 
     // read from byte[]
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(
-      outputStream.toByteArray());
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
     DataInputStream dataIn = new DataInputStream(inputStream);
     out.readFields(dataIn);
 
     return out;
   }
 
-  /**
-   * Compares to EPGM elements based on their ID.
-   */
-  private static Comparator<EPGMIdentifiable> ID_COMPARATOR =
-    new Comparator<EPGMIdentifiable>() {
-      @Override
-      public int compare(EPGMIdentifiable o1, EPGMIdentifiable o2) {
-        return o1.getId().compareTo(o2.getId());
-      }
-    };
-
-  public static <T> boolean equalContent(
-    Collection<T> col1, Collection<T> col2) {
+  public static <T> boolean equalContent(Collection<T> col1, Collection<T> col2) {
 
     boolean equal = col1.size() == col2.size();
 
