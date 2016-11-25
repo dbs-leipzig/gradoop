@@ -12,12 +12,15 @@ import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Provides methods for logic related to the gSpan algorithm in directed mode.
+ * Provides methods for logic related to the gSpan algorithm in undirected mode.
  */
-public class DirectedGSpanKernel extends GSpanKernelBase {
+public class UndirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
@@ -28,32 +31,51 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
     // FOR EACH VERTEX
     for (Map.Entry<GradoopId, AdjacencyListRow<LabelPair>> vertexRow : graph.getRows().entrySet()) {
 
-      GradoopId sourceId = vertexRow.getKey();
-      String sourceLabel = graph.getLabel(sourceId);
+      GradoopId fromId = vertexRow.getKey();
+      String fromLabel = graph.getLabel(fromId);
 
       AdjacencyListRow<LabelPair> row = vertexRow.getValue();
 
       // FOR EACH EDGE
       for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
-        if (cell.isOutgoing()) {
-          GradoopId edgeId = cell.getEdgeId();
-          GradoopId targetId = cell.getVertexId();
 
-          boolean loop = sourceId.equals(targetId);
+        GradoopId toId = cell.getVertexId();
+        String toLabel = cell.getValue().getVertexLabel();
 
-          String edgeLabel = cell.getValue().getEdgeLabel();
-          String targetLabel = cell.getValue().getVertexLabel();
+        boolean loop = fromId.equals(toId);
 
-          Traversal<String> traversal = createSingleEdgeTraversal(sourceLabel, edgeLabel, targetLabel, loop);
+        GradoopId edgeId = cell.getEdgeId();
+        String edgeLabel = cell.getValue().getEdgeLabel();
 
-          TraversalEmbedding singleEdgeEmbedding = createSingleEdgeEmbedding(sourceId, edgeId, targetId, traversal);
+        Traversal<String> traversal = null;
+        TraversalEmbedding embedding = null;
 
+        if (loop) {
+          // create only one embedding
+
+          traversal = new Traversal<>(
+            0, fromLabel, true, edgeLabel, 0, toLabel);
+
+          embedding = new TraversalEmbedding(
+            Lists.newArrayList(fromId), Lists.newArrayList(edgeId));
+
+        } else {
+          if (fromLabel.compareTo(toLabel) <= 0) {
+            traversal = new Traversal<>(
+              0, fromLabel, true, edgeLabel, 1, toLabel);
+
+            embedding = new TraversalEmbedding(
+              Lists.newArrayList(fromId, toId), Lists.newArrayList(edgeId));
+          }
+        }
+
+        if (traversal != null) {
           Collection<TraversalEmbedding> embeddings = traversalEmbeddings.get(traversal);
 
           if (embeddings == null) {
-            traversalEmbeddings.put(traversal, Lists.newArrayList(singleEdgeEmbedding));
+            traversalEmbeddings.put(traversal, Lists.newArrayList(embedding));
           } else {
-            embeddings.add(singleEdgeEmbedding);
+            embeddings.add(embedding);
           }
         }
       }
