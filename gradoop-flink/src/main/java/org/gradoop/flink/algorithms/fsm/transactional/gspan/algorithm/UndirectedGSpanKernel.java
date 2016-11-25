@@ -3,6 +3,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
@@ -23,64 +25,41 @@ import java.util.Set;
 public class UndirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
-  protected Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
-    AdjacencyList<LabelPair> graph) {
+  protected Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(GradoopId fromId,
+    String fromLabel, AdjacencyListCell<LabelPair> cell) {
 
-    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = Maps.newHashMap();
 
-    // FOR EACH VERTEX
-    for (Map.Entry<GradoopId, AdjacencyListRow<LabelPair>> vertexRow : graph.getRows().entrySet()) {
+    GradoopId toId = cell.getVertexId();
+    String toLabel = cell.getValue().getVertexLabel();
 
-      GradoopId fromId = vertexRow.getKey();
-      String fromLabel = graph.getLabel(fromId);
+    boolean loop = fromId.equals(toId);
 
-      AdjacencyListRow<LabelPair> row = vertexRow.getValue();
+    GradoopId edgeId = cell.getEdgeId();
+    String edgeLabel = cell.getValue().getEdgeLabel();
 
-      // FOR EACH EDGE
-      for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
+    Pair<Traversal<String>, TraversalEmbedding> traversalEmbedding = null;
+    Traversal<String> traversal;
+    TraversalEmbedding embedding;
 
-        GradoopId toId = cell.getVertexId();
-        String toLabel = cell.getValue().getVertexLabel();
+    if (loop) {
+      traversal = new Traversal<>(
+        0, fromLabel, true, edgeLabel, 0, toLabel);
 
-        boolean loop = fromId.equals(toId);
+      embedding = new TraversalEmbedding(
+        Lists.newArrayList(fromId), Lists.newArrayList(edgeId));
 
-        GradoopId edgeId = cell.getEdgeId();
-        String edgeLabel = cell.getValue().getEdgeLabel();
+      traversalEmbedding = new ImmutablePair<>(traversal, embedding);
+    } else if (fromLabel.compareTo(toLabel) <= 0) {
+      traversal = new Traversal<>(
+        0, fromLabel, true, edgeLabel, 1, toLabel);
 
-        Traversal<String> traversal = null;
-        TraversalEmbedding embedding = null;
+      embedding = new TraversalEmbedding(
+        Lists.newArrayList(fromId, toId), Lists.newArrayList(edgeId));
 
-        if (loop) {
-          // create only one embedding
-
-          traversal = new Traversal<>(
-            0, fromLabel, true, edgeLabel, 0, toLabel);
-
-          embedding = new TraversalEmbedding(
-            Lists.newArrayList(fromId), Lists.newArrayList(edgeId));
-
-        } else {
-          if (fromLabel.compareTo(toLabel) <= 0) {
-            traversal = new Traversal<>(
-              0, fromLabel, true, edgeLabel, 1, toLabel);
-
-            embedding = new TraversalEmbedding(
-              Lists.newArrayList(fromId, toId), Lists.newArrayList(edgeId));
-          }
-        }
-
-        if (traversal != null) {
-          Collection<TraversalEmbedding> embeddings = traversalEmbeddings.get(traversal);
-
-          if (embeddings == null) {
-            traversalEmbeddings.put(traversal, Lists.newArrayList(embedding));
-          } else {
-            embeddings.add(embedding);
-          }
-        }
-      }
+      traversalEmbedding = new ImmutablePair<>(traversal, embedding);
     }
-    return traversalEmbeddings;
+
+    return traversalEmbedding;
   }
 
   /**

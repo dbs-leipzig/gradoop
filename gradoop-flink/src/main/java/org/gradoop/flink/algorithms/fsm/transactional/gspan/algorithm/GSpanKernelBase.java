@@ -2,6 +2,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
@@ -75,14 +76,43 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     graphEmbeddingsPair.setCodeEmbeddings(childEmbeddings);
   }
 
-  /**
-   * Finds all traversal start patterns and their embeddings in a given graph.
-   *
-   * @param graph graph
-   * @return traversal pattern -> embeddings
-   */
-  protected abstract Map<Traversal<String>,Collection<TraversalEmbedding>>
-  getSingleEdgeTraversalEmbeddings(AdjacencyList<LabelPair> graph);
+  protected Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
+    AdjacencyList<LabelPair> graph) {
+
+    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = Maps.newHashMap();
+
+    // FOR EACH VERTEX
+    for (Map.Entry<GradoopId, AdjacencyListRow<LabelPair>> vertexRow : graph.getRows().entrySet()) {
+
+      GradoopId fromId = vertexRow.getKey();
+      String fromLabel = graph.getLabel(fromId);
+
+      AdjacencyListRow<LabelPair> row = vertexRow.getValue();
+
+      // FOR EACH EDGE
+      for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
+
+        Pair<Traversal<String>, TraversalEmbedding> traversalEmbedding =
+          getTraversalEmbedding(fromId, fromLabel, cell);
+
+        if (traversalEmbedding != null) {
+          Collection<TraversalEmbedding> embeddings = traversalEmbeddings
+            .get(traversalEmbedding.getKey());
+
+          if (embeddings == null) {
+            traversalEmbeddings.put(traversalEmbedding.getKey(), Lists.newArrayList
+              (traversalEmbedding.getValue()));
+          } else {
+            embeddings.add(traversalEmbedding.getValue());
+          }
+        }
+      }
+    }
+    return traversalEmbeddings;
+  }
+
+  protected abstract Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(
+    GradoopId fromId, String fromLabel, AdjacencyListCell<LabelPair> cell);
 
   /**
    * Finds all extensions of a given pattern which are valid according to gSpan growth constraints.
