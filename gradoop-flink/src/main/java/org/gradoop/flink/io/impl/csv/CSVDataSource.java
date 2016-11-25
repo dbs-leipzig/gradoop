@@ -111,11 +111,13 @@ public class CSVDataSource extends CSVBase implements DataSource {
       e.printStackTrace();
     }
     List<CsvExtension> csvList = Lists.newArrayList();
-    for (Domain domain : datasource.getDomain()) {
-      for (CsvExtension csv : domain.getCsv()) {
-        csv.setDatasourceName(datasource.getName());
-        csv.setDomainName(domain.getName());
-        csvList.add(csv);
+    if (datasource != null) {
+      for (Domain domain : datasource.getDomain()) {
+        for (CsvExtension csv : domain.getCsv()) {
+          csv.setDatasourceName(datasource.getName());
+          csv.setDomainName(domain.getName());
+          csvList.add(csv);
+        }
       }
     }
 

@@ -29,7 +29,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Parser for XML meta information.
@@ -43,12 +43,12 @@ public class XmlMetaParser {
    * @param xmlDatei path to the xml file
    * @return datasource which has a name and contains csv objects
    *
-   * @throws SAXException
-   * @throws JAXBException
-   * @throws FileNotFoundException
+   * @throws SAXException schema loading failed
+   * @throws JAXBException jaxb context failed
+   * @throws IOException xml loading failed
    */
   public static Datasource parse(String xsdSchema, String xmlDatei)
-    throws SAXException, JAXBException, FileNotFoundException {
+    throws SAXException, JAXBException, IOException {
 
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = (xsdSchema == null || xsdSchema.trim().length() == 0) ?
@@ -59,7 +59,15 @@ public class XmlMetaParser {
     unmarshaller.setSchema(schema);
     unmarshaller.setEventHandler(new XmlValidationEventHandler());
 
-    Datasource source = (Datasource) unmarshaller.unmarshal(new FileInputStream(xmlDatei));
+    FileInputStream fileInputStream = new FileInputStream(xmlDatei);
+    Datasource source;
+    try {
+      source = (Datasource) unmarshaller.unmarshal(fileInputStream);
+
+    } finally {
+      fileInputStream.close();
+
+    }
 
     return source;
   }
