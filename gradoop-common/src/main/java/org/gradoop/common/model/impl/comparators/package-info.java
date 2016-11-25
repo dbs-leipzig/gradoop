@@ -18,4 +18,4 @@
 /**
  * Contains comparators for EPGM elements.
  */
-package org.gradoop.flink.model.impl.comparators;
+package org.gradoop.common.model.impl.comparators;
