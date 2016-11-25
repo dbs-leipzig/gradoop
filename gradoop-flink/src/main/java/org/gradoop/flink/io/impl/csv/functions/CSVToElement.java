@@ -137,7 +137,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private org.gradoop.common.model.impl.pojo.Vertex createVertex(CsvExtension csv,
     String[] fields) {
     String label = "";
-    List<Property> propertiesCsv= null;
+    List<Property> propertiesCsv = null;
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
