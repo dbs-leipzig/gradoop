@@ -5,6 +5,7 @@ import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;
@@ -26,7 +27,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
 
   public GSpanBase(FSMConfig fsmConfig) {
     super(fsmConfig);
-    gSpan = new DirectedGSpanKernel();
+    gSpan = fsmConfig.isDirected() ? new DirectedGSpanKernel() : new UndirectedGSpanKernel();
   }
 
   /**

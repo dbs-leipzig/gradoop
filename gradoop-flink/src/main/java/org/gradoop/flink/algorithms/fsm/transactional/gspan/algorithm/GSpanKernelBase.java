@@ -171,7 +171,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
                 String toLabel = cell.getValue().getVertexLabel();
 
                 // valid branch by lexicographical order
-                if (validBranch(firstTraversal, fromLabel, outgoing, edgeLabel, toLabel)) {
+                if (validBranch(firstTraversal, fromLabel, outgoing, edgeLabel, toLabel, loop)) {
 
                   int toTime = backwards ?
                     parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
@@ -350,7 +350,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   }
 
   protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
-    boolean outgoing, String edgeLabel, String toLabel);
+    boolean outgoing, String edgeLabel, String toLabel, boolean loop);
 
   protected abstract boolean getOutgoing(Traversal<String> traversal);
 }

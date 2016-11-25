@@ -54,7 +54,7 @@ public class UndirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
-    boolean outgoing, String edgeLabel, String toLabel) {
+    boolean outgoing, String edgeLabel, String toLabel, boolean loop) {
 
     String filterFromLabel = firstTraversal.getFromValue();
     String filterEdgeLabel = firstTraversal.getEdgeValue();

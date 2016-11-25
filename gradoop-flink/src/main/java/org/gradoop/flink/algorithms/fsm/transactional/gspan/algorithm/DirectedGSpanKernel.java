@@ -59,17 +59,16 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
-    boolean outgoing, String edgeLabel, String toLabel) {
+    boolean outgoing, String edgeLabel, String toLabel, boolean loop) {
 
     String filterFromLabel = firstTraversal.getFromValue();
-    boolean filterOutgoing = firstTraversal.isOutgoing();
     String filterEdgeLabel = firstTraversal.getEdgeValue();
     String filterToLabel = firstTraversal.getToValue();
 
     int labelComparison = fromLabel.compareTo(toLabel);
-    boolean flipActual = labelComparison > 0 || labelComparison == 0 && !outgoing;
+    boolean flip = labelComparison > 0 || labelComparison == 0 && !outgoing;
 
-    if (flipActual) {
+    if (flip) {
       String oldFromLabel = fromLabel;
       fromLabel = toLabel;
       toLabel = oldFromLabel;
@@ -80,7 +79,7 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
     int fromLabelComparison = filterFromLabel.compareTo(fromLabel);
 
-    if (fromLabelComparison < 0) {
+    if (fromLabelComparison < 0 ) {
       valid = true;
 
     } else if (fromLabelComparison > 0) {
@@ -88,32 +87,43 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
     } else {
 
-      if (filterOutgoing && !outgoing) {
-        valid = true;
+      boolean filterLoop = firstTraversal.isLoop();
+      if (filterLoop == loop) {
 
-      } else if (!filterOutgoing && outgoing) {
-        valid = false;
+        boolean filterOutgoing = firstTraversal.isOutgoing();
+        if (filterOutgoing == outgoing) {
+          int edgeLabelComparison = filterEdgeLabel.compareTo(edgeLabel);
 
-      } else {
-        int edgeLabelComparison = filterEdgeLabel.compareTo(edgeLabel);
-
-        if (edgeLabelComparison < 0) {
-          valid = true;
-
-        } else if (edgeLabelComparison > 0) {
-          valid = false;
-
-        } else {
-
-          int toLabelComparison = filterToLabel.compareTo(toLabel);
-
-          if (toLabelComparison <= 0) {
+          if (edgeLabelComparison < 0) {
             valid = true;
 
-          } else  {
+          } else if (edgeLabelComparison > 0) {
             valid = false;
+
+          } else {
+
+            int toLabelComparison = filterToLabel.compareTo(toLabel);
+
+            if (toLabelComparison <= 0) {
+              valid = true;
+
+            } else {
+              valid = false;
+            }
           }
+        } else if (filterOutgoing) {
+          valid = true;
+
+        } else {
+          valid = false;
+
         }
+      } else if (filterLoop) {
+        valid = true;
+
+      } else {
+        valid = false;
+
       }
     }
 
