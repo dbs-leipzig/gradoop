@@ -1,23 +1,13 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
-import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides methods for logic related to the gSpan algorithm in undirected mode.
@@ -62,156 +52,62 @@ public class UndirectedGSpanKernel extends GSpanKernelBase {
     return traversalEmbedding;
   }
 
-  /**
-   * created a initial traversal of a pattern based on data of an edge an its incident vertices.
-   *
-   * @param sourceLabel source vertex label
-   * @param edgeLabel edge label
-   * @param targetLabel target vertex label
-   * @param loop true, if source and target are equal
-   *
-   * @return traversal, suitable to create an 1-edge minimum DFS code
-   */
-  private Traversal<String> createSingleEdgeTraversal(String sourceLabel, String edgeLabel,
-    String targetLabel, boolean loop) {
+  @Override
+  protected boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
+    boolean outgoing, String edgeLabel, String toLabel) {
 
-    int fromTime = 0;
-    int toTime = loop ? 0 : 1;
+    String filterFromLabel = firstTraversal.getFromValue();
+    String filterEdgeLabel = firstTraversal.getEdgeValue();
+    String filterToLabel = firstTraversal.getToValue();
 
-    boolean outgoing = loop || sourceLabel.compareTo(targetLabel) <= 0;
+    int labelComparison = fromLabel.compareTo(toLabel);
+    boolean flipActual = labelComparison > 0;
 
-    String fromLabel = outgoing ? sourceLabel : targetLabel;
-    String toLabel = outgoing ? targetLabel : sourceLabel;
-
-    return new Traversal<>(fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
-  }
-
-  /**
-   * creates an initial embeddings of a 1-edge pattern
-   * based on data of an edge an its incident vertices.
-   *
-   * @param sourceId source vertex id
-   * @param edgeId edge id
-   * @param targetId target id
-   * @param traversal initial traversal
-   *
-   * @return embedding of a 1-edge pattern based on the given traversal
-   */
-  private TraversalEmbedding createSingleEdgeEmbedding(GradoopId sourceId, GradoopId edgeId,
-    GradoopId targetId, Traversal<String> traversal) {
-
-    List<GradoopId> vertexIds;
-
-    if (traversal.isLoop()) {
-      vertexIds = Lists.newArrayList(sourceId);
-    } else if (traversal.isOutgoing()) {
-      vertexIds = Lists.newArrayList(sourceId, targetId);
-    } else {
-      vertexIds = Lists.newArrayList(targetId, sourceId);
+    if (flipActual) {
+      String oldFromLabel = fromLabel;
+      fromLabel = toLabel;
+      toLabel = oldFromLabel;
     }
 
-    List<GradoopId> edgeIds = Lists.newArrayList(edgeId);
+    boolean valid;
 
-    return new TraversalEmbedding(vertexIds, edgeIds);
-  }
+    int fromLabelComparison = filterFromLabel.compareTo(fromLabel);
 
-  @Override
-  protected Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
-    AdjacencyList<LabelPair> graph, TraversalCode<String> parentPattern,
-    Collection<TraversalEmbedding> parentEmbeddings) {
+    if (fromLabelComparison < 0) {
+      valid = true;
 
-    Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
-      Maps.newHashMap();
+    } else if (fromLabelComparison > 0) {
+      valid = false;
 
-    Traversal<String> singleEdgeParent = parentPattern.getTraversals().get(0);
+    } else {
 
-    // DETERMINE RIGHTMOST PATH
+      int edgeLabelComparison = filterEdgeLabel.compareTo(edgeLabel);
 
-    List<Integer> rightmostPathTimes = getRightmostPathTimes(parentPattern);
+      if (edgeLabelComparison < 0) {
+        valid = true;
 
-    int rightmostTime = rightmostPathTimes.get(0);
+      } else if (edgeLabelComparison > 0) {
+        valid = false;
 
+      } else {
 
-    // FOR EACH EMBEDDING
-    for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
+        int toLabelComparison = filterToLabel.compareTo(toLabel);
 
-      Set<GradoopId> vertexIds = Sets.newHashSet(parentEmbedding.getVertexIds());
-      Set<GradoopId> edgeIds = Sets.newHashSet(parentEmbedding.getEdgeIds());
+        if (toLabelComparison <= 0) {
+          valid = true;
 
-      int forwardTime = vertexIds.size();
-
-      // FOR EACH VERTEX ON RIGHTMOST PATH
-      for (int fromTime : rightmostPathTimes) {
-        boolean rightmost = fromTime == rightmostTime;
-
-        GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
-        AdjacencyListRow<LabelPair> row = graph.getRows().get(fromId);
-        String fromLabel = graph.getLabel(fromId);
-
-        // FOR EACH INCIDENT EDGE
-        for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
-          GradoopId toId = cell.getVertexId();
-
-          boolean loop = fromId.equals(toId);
-
-          // loop is always backwards
-          if (!loop || rightmost) {
-
-          GradoopId edgeId = cell.getEdgeId();
-
-            // edge not already contained
-            if (!edgeIds.contains(edgeId)) {
-
-              boolean backwards = loop || vertexIds.contains(toId);
-
-              // forwards or backwards from rightmost
-              if (!backwards || rightmost) {
-                String toLabel = cell.getValue().getVertexLabel();
-                String edgeLabel = cell.getValue().getEdgeLabel();
-
-                Traversal<String> singleEdgeTraversal = cell.isOutgoing() ?
-                  createSingleEdgeTraversal(fromLabel, edgeLabel, toLabel, loop) :
-                  createSingleEdgeTraversal(toLabel, edgeLabel, fromLabel, loop);
-
-                // valid branch by lexicographical order
-                if (singleEdgeTraversal.compareTo(singleEdgeParent) >= 0) {
-
-                  boolean outgoing = cell.isOutgoing();
-
-                  int toTime = backwards ?
-                    parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
-
-                  Traversal<String> extension = new Traversal<>(
-                    fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
-
-                  TraversalEmbedding childEmbedding = new TraversalEmbedding(parentEmbedding);
-                  childEmbedding.getEdgeIds().add(edgeId);
-
-                  if (!backwards) {
-                    childEmbedding.getVertexIds().add(toId);
-                  }
-
-                  Collection<TraversalEmbedding> embeddings =
-                    extensionEmbeddings.get(extension);
-
-                  if (embeddings == null) {
-                    extensionEmbeddings.put(extension, Lists.newArrayList(childEmbedding));
-                  } else {
-                    embeddings.add(childEmbedding);
-                  }
-                }
-              }
-            }
-          }
+        } else  {
+          valid = false;
         }
       }
     }
-    return extensionEmbeddings;
+
+    return valid;
   }
 
   @Override
   protected boolean getOutgoing(Traversal<String> traversal) {
-    return traversal.isOutgoing();
+    return true;
   }
 
 }

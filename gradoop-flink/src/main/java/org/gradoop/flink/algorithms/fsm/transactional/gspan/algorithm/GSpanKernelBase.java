@@ -2,6 +2,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
@@ -114,18 +116,93 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   protected abstract Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(
     GradoopId fromId, String fromLabel, AdjacencyListCell<LabelPair> cell);
 
-  /**
-   * Finds all extensions of a given pattern which are valid according to gSpan growth constraints.
-   *
-   * @param graph search space item
-   * @param parentPattern pattern to grow
-   * @param parentEmbeddings embeddings of pattern
-   *
-   * @return extension -> grown embeddings
-   */
-  protected abstract Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
+  protected Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
     AdjacencyList<LabelPair> graph, TraversalCode<String> parentPattern,
-    Collection<TraversalEmbedding> parentEmbeddings);
+    Collection<TraversalEmbedding> parentEmbeddings) {
+
+    Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
+      Maps.newHashMap();
+
+    Traversal<String> firstTraversal = parentPattern.getTraversals().get(0);
+
+    // DETERMINE RIGHTMOST PATH
+
+    List<Integer> rightmostPathTimes = getRightmostPathTimes(parentPattern);
+
+    int rightmostTime = rightmostPathTimes.get(0);
+
+
+    // FOR EACH EMBEDDING
+    for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
+
+      Set<GradoopId> vertexIds = Sets.newHashSet(parentEmbedding.getVertexIds());
+      Set<GradoopId> edgeIds = Sets.newHashSet(parentEmbedding.getEdgeIds());
+
+      int forwardTime = vertexIds.size();
+
+      // FOR EACH VERTEX ON RIGHTMOST PATH
+      for (int fromTime : rightmostPathTimes) {
+        boolean rightmost = fromTime == rightmostTime;
+
+        GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
+        AdjacencyListRow<LabelPair> row = graph.getRows().get(fromId);
+        String fromLabel = graph.getLabel(fromId);
+
+        // FOR EACH INCIDENT EDGE
+        for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
+          GradoopId toId = cell.getVertexId();
+
+          boolean loop = fromId.equals(toId);
+
+          // loop is always backwards
+          if (!loop || rightmost) {
+
+            GradoopId edgeId = cell.getEdgeId();
+
+            // edge not already contained
+            if (!edgeIds.contains(edgeId)) {
+
+              boolean backwards = loop || vertexIds.contains(toId);
+
+              // forwards or backwards from rightmost
+              if (!backwards || rightmost) {
+                boolean outgoing = cell.isOutgoing();
+                String edgeLabel = cell.getValue().getEdgeLabel();
+                String toLabel = cell.getValue().getVertexLabel();
+
+                // valid branch by lexicographical order
+                if (validBranch(firstTraversal, fromLabel, outgoing, edgeLabel, toLabel)) {
+
+                  int toTime = backwards ?
+                    parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
+
+                  Traversal<String> extension = new Traversal<>(
+                    fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
+
+                  TraversalEmbedding childEmbedding = new TraversalEmbedding(parentEmbedding);
+                  childEmbedding.getEdgeIds().add(edgeId);
+
+                  if (!backwards) {
+                    childEmbedding.getVertexIds().add(toId);
+                  }
+
+                  Collection<TraversalEmbedding> embeddings =
+                    extensionEmbeddings.get(extension);
+
+                  if (embeddings == null) {
+                    extensionEmbeddings.put(extension, Lists.newArrayList(childEmbedding));
+                  } else {
+                    embeddings.add(childEmbedding);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return extensionEmbeddings;
+  }
 
   /**
    * Calculates the rightmost path of a given pattern.
@@ -271,6 +348,9 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
     return new AdjacencyList<>(GradoopId.get(), labels, null, rows);
   }
+
+  protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
+    boolean outgoing, String edgeLabel, String toLabel);
 
   protected abstract boolean getOutgoing(Traversal<String> traversal);
 }
