@@ -40,7 +40,6 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   }
 
 
-
   @Override
   public void growChildren(GraphEmbeddingsPair graphEmbeddingsPair,
     Collection<TraversalCode<String>> frequentPatterns) {
@@ -85,17 +84,30 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   protected abstract Map<Traversal<String>,Collection<TraversalEmbedding>>
   getSingleEdgeTraversalEmbeddings(AdjacencyList<LabelPair> graph);
 
-
+  /**
+   * Finds all extensions of a given pattern which are valid according to gSpan growth constraints.
+   *
+   * @param graph search space item
+   * @param parentPattern pattern to grow
+   * @param parentEmbeddings embeddings of pattern
+   *
+   * @return extension -> grown embeddings
+   */
   protected abstract Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
-    AdjacencyList<LabelPair> adjacencyList, TraversalCode<String> parentCode,
+    AdjacencyList<LabelPair> graph, TraversalCode<String> parentPattern,
     Collection<TraversalEmbedding> parentEmbeddings);
 
-
-  protected List<Integer> getRightmostPathTimes(TraversalCode<String> traversalCode) {
+  /**
+   * Calculates the rightmost path of a given pattern.
+   *
+   * @param pattern input pattern
+   * @return rightmost path (vertex times)
+   */
+  protected List<Integer> getRightmostPathTimes(TraversalCode<String> pattern) {
 
     List<Integer> rightmostPathTimes;
 
-    List<Traversal<String>> traversals = traversalCode.getTraversals();
+    List<Traversal<String>> traversals = pattern.getTraversals();
 
     if (traversals.size() == 1) {
       if (traversals.get(0).isLoop()) {
@@ -125,6 +137,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return rightmostPathTimes;
   }
 
+  @Override
   public boolean isMinimal(TraversalCode<String> pattern) {
 
     AdjacencyList<LabelPair> adjacencyList = getAdjacencyList(pattern);
@@ -146,7 +159,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
       Traversal<String> inputExtension = iterator.next();
 
-      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> extensionOption : extensionOptions.entrySet()) {
+      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> extensionOption :
+        extensionOptions.entrySet()) {
         int comparison = inputExtension.compareTo(extensionOption.getKey());
 
         if (comparison == 0) {
@@ -164,7 +178,14 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return minimal;
   }
 
-  public AdjacencyList<LabelPair> getAdjacencyList(TraversalCode<String> traversalCode) {
+  /**
+   * Turns a pattern into a graph transaction in adjacency list representation.
+   *
+   * @param pattern pattern
+   *
+   * @return adjacency list
+   */
+  public AdjacencyList<LabelPair> getAdjacencyList(TraversalCode<String> pattern) {
 
     Map<GradoopId, String> labels = Maps.newHashMap();
 
@@ -175,7 +196,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     boolean first = true;
 
     // EDGES
-    for (Traversal<String> traversal : traversalCode.getTraversals()) {
+    for (Traversal<String> traversal : pattern.getTraversals()) {
 
       // FROM VERTEX
 
@@ -218,7 +239,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
         edgeId, !outgoing, fromId, new LabelPair(edgeLabel, labels.get(fromId))));
     }
 
-    return new AdjacencyList<>(GradoopId.get(), labels, null, rows);  }
+    return new AdjacencyList<>(GradoopId.get(), labels, null, rows);
+  }
 
   protected abstract boolean getOutgoing(Traversal<String> traversal);
 }

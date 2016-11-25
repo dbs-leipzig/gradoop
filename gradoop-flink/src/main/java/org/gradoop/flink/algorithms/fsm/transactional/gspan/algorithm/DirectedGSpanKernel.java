@@ -61,7 +61,17 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
     return traversalEmbeddings;
   }
 
-  protected Traversal<String> createSingleEdgeTraversal(String sourceLabel, String edgeLabel,
+  /**
+   * created a initial traversal of a pattern based on data of an edge an its incident vertices.
+   *
+   * @param sourceLabel source vertex label
+   * @param edgeLabel edge label
+   * @param targetLabel target vertex label
+   * @param loop true, if source and target are equal
+   *
+   * @return traversal, suitable to create an 1-edge minimum DFS code
+   */
+  private Traversal<String> createSingleEdgeTraversal(String sourceLabel, String edgeLabel,
     String targetLabel, boolean loop) {
 
     int fromTime = 0;
@@ -75,8 +85,19 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
     return new Traversal<>(fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
   }
 
-  public TraversalEmbedding createSingleEdgeEmbedding(
-    GradoopId sourceId, GradoopId edgeId, GradoopId targetId, Traversal<String> traversal) {
+  /**
+   * creates an initial embeddings of a 1-edge pattern
+   * based on data of an edge an its incident vertices.
+   *
+   * @param sourceId source vertex id
+   * @param edgeId edge id
+   * @param targetId target id
+   * @param traversal initial traversal
+   *
+   * @return embedding of a 1-edge pattern based on the given traversal
+   */
+  private TraversalEmbedding createSingleEdgeEmbedding(GradoopId sourceId, GradoopId edgeId,
+    GradoopId targetId, Traversal<String> traversal) {
 
     List<GradoopId> vertexIds;
 
@@ -95,17 +116,17 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
-    AdjacencyList<LabelPair> adjacencyList, TraversalCode<String> parentCode,
+    AdjacencyList<LabelPair> graph, TraversalCode<String> parentPattern,
     Collection<TraversalEmbedding> parentEmbeddings) {
 
     Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
       Maps.newHashMap();
 
-    Traversal<String> singleEdgeParent = parentCode.getTraversals().get(0);
+    Traversal<String> singleEdgeParent = parentPattern.getTraversals().get(0);
 
     // DETERMINE RIGHTMOST PATH
 
-    List<Integer> rightmostPathTimes = getRightmostPathTimes(parentCode);
+    List<Integer> rightmostPathTimes = getRightmostPathTimes(parentPattern);
 
     int rightmostTime = rightmostPathTimes.get(0);
 
@@ -123,8 +144,8 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
         boolean rightmost = fromTime == rightmostTime;
 
         GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
-        AdjacencyListRow<LabelPair> row = adjacencyList.getRows().get(fromId);
-        String fromLabel = adjacencyList.getLabel(fromId);
+        AdjacencyListRow<LabelPair> row = graph.getRows().get(fromId);
+        String fromLabel = graph.getLabel(fromId);
 
         // FOR EACH INCIDENT EDGE
         for (AdjacencyListCell<LabelPair> cell : row.getCells()) {
