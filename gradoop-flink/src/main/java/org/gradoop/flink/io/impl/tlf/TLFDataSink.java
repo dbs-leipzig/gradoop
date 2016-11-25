@@ -84,6 +84,7 @@ public class TLFDataSink extends TLFBase implements DataSink {
       vertexDictionary = graphTransactions.getTransactions()
         // get a vertex dictionary for each transaction
         .flatMap(new VertexLabelList())
+        .distinct()
         // reduce them to one dictionary without duplicates
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the vertex dictionary
@@ -96,6 +97,7 @@ public class TLFDataSink extends TLFBase implements DataSink {
       edgeDictionary = graphTransactions.getTransactions()
         // get an edge dictionary for each transaction
         .flatMap(new EdgeLabelList())
+        .distinct()
         // reduce them to one dictionary without duplicates
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the edge dictionary

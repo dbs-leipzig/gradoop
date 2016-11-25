@@ -9,13 +9,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
-
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListNullValueFactory;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.pojos.AdjacencyListNullValueFactory;
+import org.gradoop.flink.representation.tuples.AdjacencyList;
+import org.gradoop.flink.representation.tuples.GraphTransaction;
 import org.junit.Test;
 
 import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
 

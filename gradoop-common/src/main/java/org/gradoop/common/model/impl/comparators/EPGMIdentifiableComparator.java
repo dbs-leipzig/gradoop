@@ -15,24 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.io.impl.tlf.functions;
+package org.gradoop.common.model.impl.comparators;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Collects all edge labels.
+ * Id based EPGM element comparator.
  */
-public class EdgeLabelList implements
-  FlatMapFunction<GraphTransaction, String> {
+public class EPGMIdentifiableComparator implements Comparator<EPGMIdentifiable>, Serializable {
 
   @Override
-  public void flatMap(GraphTransaction graphTransaction, Collector<String> collector)
-    throws Exception {
-    for (Edge edge : graphTransaction.getEdges()) {
-      collector.collect(edge.getLabel());
-    }
+  public int compare(EPGMIdentifiable a, EPGMIdentifiable b) {
+    return a.getId().compareTo(b.getId());
   }
 }
