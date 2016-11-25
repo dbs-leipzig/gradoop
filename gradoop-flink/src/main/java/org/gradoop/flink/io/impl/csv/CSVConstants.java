@@ -51,9 +51,17 @@ public class CSVConstants {
    */
   public static final String SEPARATOR_ID = "@";
   /**
-   * Replacement string the id part of the label.
+   * Replacement string for the id part of the label.
    */
   public static final String ESCAPE_SEPARATOR_ID = "&commat;";
+  /**
+   * Separator for the start of the id part of the label.
+   */
+  public static final String SEPARATOR_ID_START = ":";
+  /**
+   * Replacement string for the start of the id part of the label.
+   */
+  public static final String ESCAPE_SEPARATOR_ID_START = "&colon;";
   /**
    * Property key for the value containing an edge's source.
    */

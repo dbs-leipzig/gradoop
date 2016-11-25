@@ -407,13 +407,15 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private String createKey(ReferenceTuple tuple) {
     return tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
-      CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
+      CSVConstants.ESCAPE_SEPARATOR_KEY) + CSVConstants.SEPARATOR_KEY +
       tuple.getDomainName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY)
+      + CSVConstants.SEPARATOR_KEY +
       tuple.getClassName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) + "_" +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY)
+      + CSVConstants.SEPARATOR_ID_START +
       tuple.getId().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY);
+        CSVConstants.SEPARATOR_ID_START, CSVConstants.ESCAPE_SEPARATOR_ID_START);
   }
 
   /**
