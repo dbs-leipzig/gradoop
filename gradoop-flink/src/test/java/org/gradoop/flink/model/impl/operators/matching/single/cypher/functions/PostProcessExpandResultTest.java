@@ -16,17 +16,20 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.util.ListCollector;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FilterExpandResultByCircleConditionTest {
+import static org.junit.Assert.assertEquals;
+
+public class PostProcessExpandResultTest {
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();
   private final GradoopId c = GradoopId.get();
@@ -34,19 +37,38 @@ public class FilterExpandResultByCircleConditionTest {
   private ExpandIntermediateResult expandIntermediateResult = new ExpandIntermediateResult(
     new Embedding(Lists.newArrayList(
       new IdEntry(a),
-      new IdEntry(b)
+      new IdEntry(b),
+      new IdEntry(c)
     )),
-    new GradoopId[]{c,a}
+    new GradoopId[]{GradoopId.get(),GradoopId.get(),GradoopId.get(),a}
   );
 
 
   @Test
-  public void testFailForNoneCirlces() throws Exception{
-    assertFalse(new FilterExpandResultByCircleCondition(1).filter(expandIntermediateResult));
+  public void testReturnNothingForFalseCircles() throws Exception{
+    List<Embedding> result = new ArrayList<>();
+    new PostProcessExpandResult(0,2).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    assertEquals(0, result.size());
   }
 
   @Test
-  public void testPassForCircles() throws Exception{
-    assertTrue(new FilterExpandResultByLowerBound(0).filter(expandIntermediateResult));
+  public void testDoTransformationForClosedCircles() throws Exception{
+    List<Embedding> result = new ArrayList<>();
+    new PostProcessExpandResult(0,0).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  public void testReturnNothingForShortsResults() throws Exception{
+    List<Embedding> result = new ArrayList<>();
+    new PostProcessExpandResult(3,-1).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    assertEquals(0, result.size());
+  }
+
+  @Test
+  public void testDoTransformationForResultsThatFitLowerBound() throws Exception{
+    List<Embedding> result = new ArrayList<>();
+    new PostProcessExpandResult(2,-1).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    assertEquals(1, result.size());
   }
 }

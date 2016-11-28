@@ -16,30 +16,32 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
-/**
- * Filters ExpandResults with the given circle pattern
- */
-public class FilterExpandResultByCircleCondition implements
-  FilterFunction<ExpandIntermediateResult> {
+public class PostProcessExpandResult
+  extends RichFlatMapFunction<ExpandIntermediateResult, Embedding> {
 
-  /**
-   * defines the column which should be equal with the paths end
-   */
-  private final int circle;
+  private final int minPathLength;
+  private final int circleColumn;
 
-  /**
-   * Create new filter
-   * @param circle defines the column which should be equal with the paths end
-   */
-  public FilterExpandResultByCircleCondition(int circle) {
-    this.circle = circle;
+  public PostProcessExpandResult(int lowerBound, int circleColumn) {
+    this.minPathLength = lowerBound * 2 - 1;
+    this.circleColumn = circleColumn;
   }
 
   @Override
-  public boolean filter(ExpandIntermediateResult value) throws Exception {
-    return value.getBase().getEntry(circle).contains(value.getEnd());
+  public void flatMap(ExpandIntermediateResult value, Collector<Embedding> out) throws Exception {
+    if (value.pathSize() < minPathLength) {
+      return;
+    }
+
+    if (circleColumn >= 0 && !value.getBase().getEntry(circleColumn).contains(value.getEnd())) {
+      return;
+    }
+
+    out.collect(value.toEmbedding());
   }
 }

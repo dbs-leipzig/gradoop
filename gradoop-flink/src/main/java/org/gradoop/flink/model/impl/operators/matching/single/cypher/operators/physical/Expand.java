@@ -23,16 +23,14 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CombineExpandIntermediateResults;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CreateInitialExpandIntermediateResult;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions  .FilterExpandResultByCircleCondition;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterExpandResultByLowerBound;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterOldExpandIterationResults;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.PostProcessExpandResult;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ReverseEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.EmbeddingKeySelector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
 import java.util.List;
-
 
 /**
  * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
@@ -82,7 +80,6 @@ public class Expand implements PhysicalOperator {
    * join hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
-
 
   /**
    * New Expand One Operator
@@ -209,15 +206,8 @@ public class Expand implements PhysicalOperator {
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
   private DataSet<Embedding> postprocess(DataSet<ExpandIntermediateResult> iterationResults) {
-    iterationResults = iterationResults.filter(new FilterExpandResultByLowerBound(lowerBound));
-
-    if (circle >= 0) {
-      iterationResults = iterationResults
-        .filter(new FilterExpandResultByCircleCondition(circle));
-    }
-
     DataSet<Embedding> results =
-      iterationResults.map(x -> x.toEmbedding()).returns(Embedding.class);
+      iterationResults.flatMap(new PostProcessExpandResult(lowerBound, circle));
 
     if (lowerBound == 0) {
       results = results.union(input);
