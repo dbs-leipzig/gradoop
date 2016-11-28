@@ -20,6 +20,10 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 
+/**
+ * Reverses an EdgeEmbedding, as it switches source and target
+ * This is used for traversing incoming edges
+ */
 public class ReverseEmbeddings extends RichMapFunction<Embedding, Embedding> {
 
   @Override
