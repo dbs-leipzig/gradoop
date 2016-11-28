@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker;
 
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -33,6 +36,7 @@ import org.gradoop.flink.datagen.foodbroker.functions.GraphIdsTupleFromEdge;
 import org.gradoop.flink.datagen.foodbroker.functions.MasterDataMapFromTuple;
 import org.gradoop.flink.datagen.foodbroker.functions.MasterDataQualityMapper;
 import org.gradoop.flink.datagen.foodbroker.functions.ProductPriceMapper;
+import org.gradoop.flink.datagen.foodbroker.functions.RelevantElementsFromBrokerage;
 import org.gradoop.flink.datagen.foodbroker.functions.SetMasterDataGraphIds;
 import org.gradoop.flink.datagen.foodbroker.process.ComplaintHandlingOld;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
@@ -48,6 +52,7 @@ import org.gradoop.model.api.operators.CollectionGenerator;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates a GraphCollection containing a foodbrokerage and a complaint
@@ -135,8 +140,12 @@ public class FoodBroker implements CollectionGenerator {
       e.printStackTrace();
     }
 
+
     // Phase 2.2: Run Complaint Handling
-    DataSet<GraphTransaction> complaintHandling =
+
+    DataSet<GraphTransaction> complaintHandling = brokerage
+      .map(new RelevantElementsFromBrokerage());
+
       .mapPartition(new ComplaintTuple(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
@@ -156,19 +165,19 @@ public class FoodBroker implements CollectionGenerator {
 //    complaintHandling.execute();
 
     DataSet<Vertex> transactionalVertices = brokerage
-      .union(complaintHandling.getTransactions())
+      .union(complaintHandling)
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionVertices())
       .returns(vertexTypeInfo);
 
     DataSet<Edge> transactionalEdges = brokerage
-      .union(complaintHandling.getTransactions())
+      .union(complaintHandling)
       .map(new GraphTransactionTriple())
       .flatMap(new TransactionEdges())
       .returns(edgeTypeInfo);
 
     DataSet<GraphHead> graphHeads = brokerage
-      .union(complaintHandling.getTransactions())
+      .union(complaintHandling)
       .map(new GraphTransactionTriple())
       .map(new TransactionGraphHead())
       .returns(graphHeadTypeInfo);
@@ -182,7 +191,7 @@ public class FoodBroker implements CollectionGenerator {
       .union(logistics)
       .union(employees)
       .union(products)
-      .union(complaintHandling.getNewMasterData())
+//      .union(complaintHandling)
       .map(new SetMasterDataGraphIds())
       .withBroadcastSet(graphIds, "graphIds");
 

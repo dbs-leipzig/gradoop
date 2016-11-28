@@ -280,7 +280,7 @@ public abstract class Process<S, T> extends
   }
 
   protected Set<Vertex> getVertices() {
-    return (Set<Vertex>) vertexMap.values();
+    return Sets.newHashSet(vertexMap.values());
   }
   protected Set<Edge> getEdges() {
     Set<Edge> edges = Sets.newHashSet();
