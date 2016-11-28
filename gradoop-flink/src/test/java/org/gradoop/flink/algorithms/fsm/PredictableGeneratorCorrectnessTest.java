@@ -31,7 +31,8 @@ public class PredictableGeneratorCorrectnessTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(threshold, true);
 
     DataSet<GraphTransaction> frequentSubgraphs = new GSpanEmbeddings(fsmConfig)
-      .execute(transactions);
+      .execute(transactions)
+      .getTransactions();
 
     Assert.assertEquals(
       PredictableTransactionsGenerator
@@ -56,7 +57,8 @@ public class PredictableGeneratorCorrectnessTest extends GradoopFlinkTestBase {
     FSMConfig fsmConfig = new FSMConfig(threshold, false);
 
     DataSet<GraphTransaction> frequentSubgraphs = new GSpanEmbeddings(fsmConfig)
-      .execute(transactions);
+      .execute(transactions)
+      .getTransactions();
 
     Assert.assertEquals(
       PredictableTransactionsGenerator

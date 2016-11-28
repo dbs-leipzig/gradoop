@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm_old.tfsm;
+package org.gradoop.flink.algorithms.fsm.transactional.cal;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
@@ -52,7 +52,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * abstract superclass of different implementations of the gSpan frequent
  * subgraph mining algorithm as Gradoop operator
  */
-public class TransactionalFSM
+public class CanonicalAdjacencyList
   extends TransactionalFSMBase<TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings>
 {
 
@@ -66,7 +66,7 @@ public class TransactionalFSM
    * @param fsmConfig frequent subgraph mining configuration
    *
    */
-  public TransactionalFSM(FSMConfig fsmConfig) {
+  public CanonicalAdjacencyList(FSMConfig fsmConfig) {
     super(fsmConfig);
   }
 

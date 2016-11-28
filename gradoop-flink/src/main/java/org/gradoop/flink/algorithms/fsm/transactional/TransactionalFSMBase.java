@@ -19,9 +19,6 @@ import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-/**
- * Created by peet on 23.11.16.
- */
 public abstract class TransactionalFSMBase
   implements UnaryCollectionToCollectionOperator {
   protected final FSMConfig fsmConfig;
@@ -29,6 +26,7 @@ public abstract class TransactionalFSMBase
    * minimum frequency for subgraphs to be considered to be frequent
    */
   protected DataSet<Long> minFrequency;
+  private GradoopFlinkConfig gradoopFlinkConfig;
 
   public TransactionalFSMBase(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
@@ -36,21 +34,30 @@ public abstract class TransactionalFSMBase
 
   @Override
   public GraphCollection execute(GraphCollection collection)  {
-    GradoopFlinkConfig gradoopFlinkConfig = collection.getConfig();
+    gradoopFlinkConfig = collection.getConfig();
 
-    // create transactions from graph collection
-    GraphTransactions transactions = collection
-      .toTransactions();
+    DataSet<GraphTransaction> input = collection
+      .toTransactions()
+      .getTransactions();
 
-    return GraphCollection.fromTransactions(
-      new GraphTransactions(execute(transactions), gradoopFlinkConfig));
+    DataSet<GraphTransaction> output = execute(input);
+
+    return GraphCollection.fromTransactions(new GraphTransactions(output, gradoopFlinkConfig));
   }
 
-  protected abstract DataSet<GraphTransaction> execute(GraphTransactions transactions);
+  public GraphTransactions execute(GraphTransactions transactions) {
+    this.gradoopFlinkConfig = transactions.getConfig();
 
-  protected DataSet<GraphTransaction> preProcess(GraphTransactions input) {
-    DataSet<GraphTransaction> transactions = input
-      .getTransactions()
+    DataSet<GraphTransaction> input = transactions.getTransactions();
+    DataSet<GraphTransaction> output = execute(input);
+
+    return new GraphTransactions(output, gradoopFlinkConfig);
+  }
+
+  protected abstract DataSet<GraphTransaction> execute(DataSet<GraphTransaction> transactions);
+
+  protected DataSet<GraphTransaction> preProcess(DataSet<GraphTransaction> transactions) {
+    transactions = transactions
       .map(new DropPropertiesAndGraphContainment());
 
     this.minFrequency = Count

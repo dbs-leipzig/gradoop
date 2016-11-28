@@ -15,13 +15,11 @@ import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTra
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
-import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public abstract class GSpanBase extends TransactionalFSMBase {
   protected final GSpanKernel gSpan;
@@ -34,15 +32,14 @@ public abstract class GSpanBase extends TransactionalFSMBase {
   /**
    * Encodes the search space before executing FSM.
    *
-   * @param input search space as Gradoop graph transactions
+   * @param transactions search space as Gradoop graph transactions
    *
    * @return frequent subgraphs as Gradoop graph transactions
    */
   @Override
-  public DataSet<GraphTransaction> execute(GraphTransactions input) {
+  public DataSet<GraphTransaction> execute(DataSet<GraphTransaction> transactions) {
 
-    DataSet<GraphTransaction> transactions = preProcess(input);
-    GradoopFlinkConfig config = input.getConfig();
+    transactions = preProcess(transactions);
 
     DataSet<AdjacencyList<LabelPair>> adjacencyLists = transactions
       .map(new ToAdjacencyList());
@@ -52,14 +49,13 @@ public abstract class GSpanBase extends TransactionalFSMBase {
         .map(new Undirect());
     }
 
-    DataSet<TraversalCode<String>> allFrequentPatterns = mine(adjacencyLists, config);
+    DataSet<TraversalCode<String>> allFrequentPatterns = mine(adjacencyLists);
 
     return allFrequentPatterns
       .map(new ToGraphTransaction());
   }
 
-  protected abstract DataSet<TraversalCode<String>> mine(
-    DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config);
+  protected abstract DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs);
 
   protected DataSet<TraversalCode<String>> getFrequentPatterns(
     FlatMapOperator<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> reports) {

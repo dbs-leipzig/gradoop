@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.SubgraphDecoder;
-import org.gradoop.flink.algorithms.fsm_old.tfsm.TransactionalFSM;
+import org.gradoop.flink.algorithms.fsm.transactional.cal.CanonicalAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
@@ -196,7 +196,7 @@ public class FrequentLossPatterns
     FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
     GraphCollection frequentSubgraphs = btgs
-      .callForCollection(new TransactionalFSM(fsmConfig));
+      .callForCollection(new CanonicalAdjacencyList(fsmConfig));
 
     // (7) Check, if frequent subgraph contains master data
 

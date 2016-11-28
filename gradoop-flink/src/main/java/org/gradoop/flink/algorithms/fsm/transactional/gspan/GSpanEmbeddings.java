@@ -34,7 +34,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent
@@ -52,12 +51,12 @@ public class GSpanEmbeddings extends GSpanBase {
   }
 
   @Override
-  protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs, GradoopFlinkConfig config) {
+  protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs) {
 
     DataSet<GraphEmbeddingsPair> searchSpace = graphs
       .map(new InitSingleEdgeEmbeddings(gSpan));
 
-    DataSet<GraphEmbeddingsPair> collector = config
+    DataSet<GraphEmbeddingsPair> collector = graphs
       .getExecutionEnvironment()
       .fromElements(true)
       .map(new EmptyGraphEmbeddingPair());
