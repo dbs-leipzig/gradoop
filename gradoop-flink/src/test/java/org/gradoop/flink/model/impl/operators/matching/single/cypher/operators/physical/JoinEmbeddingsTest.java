@@ -1,7 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -13,7 +12,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
@@ -68,19 +70,15 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0}, // join columns left
-      new int[] {0}, // join columns right
-      new int[] {0}, // adopt columns left
-      new int[] {},  // adopt columns right
-      new int[] {},  // distinct vertex columns
-      new int[] {},  // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0), Lists.newArrayList(0));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
 
     // expected: [Id(v0),Id(e0),Id(v1)]
-    Assert.assertEquals(Lists.newArrayList(rightEntries), resultList);
+    Assert.assertEquals(Lists.newArrayList(new Embedding(
+      Lists.newArrayList(new IdEntry(v0), new IdEntry(e0), new IdEntry(v1)))),
+      resultList);
   }
 
   /**
@@ -115,13 +113,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {2}, // join columns left
-      new int[] {0}, // join columns right
-      new int[] {2}, // adopt columns left
-      new int[] {},  // adopt columns right
-      new int[] {},  // distinct vertex columns
-      new int[] {},  // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(2), Lists.newArrayList(0));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -169,13 +161,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {2}, // join columns left
-      new int[] {2}, // join columns right
-      new int[] {2}, // adopt columns left
-      new int[] {},  // adopt columns right
-      new int[] {},  // distinct vertex columns
-      new int[] {},  // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(2), Lists.newArrayList(2));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -216,13 +202,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0,2}, // join columns left
-      new int[] {0,2}, // join columns right
-      new int[] {0,2}, // adopt columns left
-      new int[] {},    // adopt columns right
-      new int[] {},    // distinct vertex columns
-      new int[] {},    // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0, 2), Lists.newArrayList(0, 2));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -266,13 +246,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0,4}, // join columns left
-      new int[] {0,4}, // join columns right
-      new int[] {0,4}, // adopt columns left
-      new int[] {},    // adopt columns right
-      new int[] {},    // distinct vertex columns
-      new int[] {},    // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0, 4), Lists.newArrayList(0, 4));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -326,13 +300,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {2,4}, // join columns left
-      new int[] {2,4}, // join columns right
-      new int[] {2,4}, // adopt columns left
-      new int[] {},    // adopt columns right
-      new int[] {},    // distinct vertex columns
-      new int[] {},    // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(2, 4), Lists.newArrayList(2, 4));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -378,13 +346,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0}, // join columns left
-      new int[] {0}, // join columns right
-      new int[] {0}, // adopt columns left
-      new int[] {},  // adopt columns right
-      new int[] {},  // distinct vertex columns
-      new int[] {},  // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0), Lists.newArrayList(0));
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -408,7 +370,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    * [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
    */
   @Test
-  public void testAdoptRight() throws Exception {
+  public void testAdoptSameColumn() throws Exception {
     GradoopId v0 = GradoopId.get();
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
@@ -424,15 +386,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
       new ProjectionEntry(v0, properties), new IdEntry(e0), new IdEntry(v1));
     DataSet<Embedding> right = createEmbeddings(1, rightEntries);
 
+    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
+    adoptColumns.put(0, 0);
+
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0}, // join columns left
-      new int[] {0}, // join columns right
-      new int[] {},  // adopt columns left
-      new int[] {0}, // adopt columns right
-      new int[] {},  // distinct vertex columns
-      new int[] {},  // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0), Lists.newArrayList(0),
+      adoptColumns);
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -443,6 +403,52 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
           new ProjectionEntry(v0, properties),
           new IdEntry(e0),
           new IdEntry(v1)))),
+      resultList);
+  }
+
+  /**
+   * Tests the adoption of the right side columns
+   *
+   * [Id(v0),Id(e0),Id(v1)]
+   * |><|(2=0)
+   * [Projection(v1,{name:Alice})]
+   * ->
+   * [Id(v0),Id(e0),Projection(v1,{name:Alice})]
+   */
+  @Test
+  public void testAdoptDifferentColumn() throws Exception {
+    GradoopId v0 = GradoopId.get();
+    GradoopId e0 = GradoopId.get();
+    GradoopId v1 = GradoopId.get();
+
+    // [(Id(v0)]
+    List<EmbeddingEntry> leftEntries = Lists.newArrayList(
+      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1));
+    DataSet<Embedding> left = createEmbeddings(1, leftEntries);
+
+    // [Id(v0),Id(e0),Projection(v1,{name:Alice})]
+    Properties properties = Properties.create();
+    properties.set("name", "Alice");
+    List<EmbeddingEntry> rightEntries = Lists.newArrayList(new ProjectionEntry(v1, properties));
+    DataSet<Embedding> right = createEmbeddings(1, rightEntries);
+
+    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
+    adoptColumns.put(0, 2);
+
+    // join operator
+    PhysicalOperator join = new JoinEmbeddings(left, right,
+      Lists.newArrayList(2), Lists.newArrayList(0),
+      adoptColumns);
+
+    // get results
+    List<Embedding> resultList = join.evaluate().collect();
+
+    // expected: [Id(v0),Id(e0),Projection(v1,{name:Alice})]
+    Assert.assertEquals(Lists.newArrayList(new Embedding(
+        Lists.newArrayList(
+          new IdEntry(v0),
+          new IdEntry(e0),
+          new ProjectionEntry(v1, properties)))),
       resultList);
   }
 
@@ -481,15 +487,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     );
     DataSet<Embedding> right = createEmbeddings(1, rightEntries);
 
+    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
+    adoptColumns.put(0, 0);
+
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0,2}, // join columns left
-      new int[] {0,2}, // join columns right
-      new int[] {2},   // adopt columns left
-      new int[] {0},   // adopt columns right
-      new int[] {},    // distinct vertex columns
-      new int[] {},    // distinct edge columns
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0, 2), Lists.newArrayList(0, 2),
+      adoptColumns);
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
@@ -561,7 +565,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    */
   @Test
   public void testVertexHomomorphismEdgeHomomorphism() throws Exception {
-    testMorphisms(new int[0], new int[0], Lists.newArrayList(
+    testMorphisms(Lists.newArrayList(0), Lists.newArrayList(0), Lists.newArrayList(
       createEmbedding(v0, e0, v1, e0),
       createEmbedding(v0, e0, v1, e1),
       createEmbedding(v0, e1, v1, e0),
@@ -569,7 +573,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(v0, e2, v0, e2),
       createEmbedding(v0, e2, v0, e3),
       createEmbedding(v0, e3, v0, e2),
-      createEmbedding(v0, e1, v1, e3)));
+      createEmbedding(v0, e3, v0, e3)));
   }
 
   /**
@@ -584,7 +588,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    */
   @Test
   public void testVertexIsomorphismEdgeHomomorphism() throws Exception {
-    testMorphisms(new int[] {0, 2}, new int[0], Lists.newArrayList(
+    testMorphisms(Lists.newArrayList(0, 2), Lists.newArrayList(), Lists.newArrayList(
       createEmbedding(v0, e0, v1, e0),
       createEmbedding(v0, e0, v1, e1),
       createEmbedding(v0, e1, v1, e0),
@@ -603,7 +607,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    */
   @Test
   public void testVertexHomomorphismEdgeIsomorphism() throws Exception {
-    testMorphisms(new int[0], new int[] {1, 2}, Lists.newArrayList(
+    testMorphisms(Lists.newArrayList(), Lists.newArrayList(1, 3), Lists.newArrayList(
       createEmbedding(v0, e0, v1, e1),
       createEmbedding(v0, e1, v1, e0),
       createEmbedding(v0, e2, v0, e3),
@@ -620,7 +624,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    */
   @Test
   public void testVertexIsomorphismEdgeIsomorphism() throws Exception {
-    testMorphisms(new int[] {0, 2}, new int[] {1, 3}, Lists.newArrayList(
+    testMorphisms(Lists.newArrayList(0, 2), Lists.newArrayList(1, 3), Lists.newArrayList(
       createEmbedding(v0, e0, v1, e1),
       createEmbedding(v0, e1, v1, e0)));
   }
@@ -633,7 +637,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
    * @param expectedEmbedding expected result
    * @throws Exception
    */
-  private void testMorphisms(int[] distinctVertexColumns, int[] distinctEdgeColumns,
+  private void testMorphisms(List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
     List<Embedding> expectedEmbedding) throws Exception {
 
     DataSet<Embedding> left = getExecutionEnvironment().fromCollection(entries);
@@ -641,18 +645,31 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
-      new int[] {0, 2},
-      new int[] {0, 2},
-      new int[] {0, 2},
-      new int[] {},
-      distinctVertexColumns,
-      distinctEdgeColumns,
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      Lists.newArrayList(0, 2), Lists.newArrayList(0, 2),
+      distinctVertexColumns, distinctEdgeColumns);
 
     // get results
     List<Embedding> resultList = join.evaluate().collect();
 
+    resultList.sort(new EmbeddingComparator());
+    expectedEmbedding.sort(new EmbeddingComparator());
+
     // test list equality
     Assert.assertEquals(expectedEmbedding, resultList);
+  }
+
+  private static class EmbeddingComparator implements Comparator<Embedding> {
+
+    @Override
+    public int compare(Embedding o1, Embedding o2) {
+      for (int i = 0; i < o1.size(); i++) {
+        if (o1.getEntry(i).getId().compareTo(o2.getEntry(i).getId()) < 0) {
+          return -1;
+        } else if (o1.getEntry(i).getId().compareTo(o2.getEntry(i).getId()) > 0) {
+          return 1;
+        }
+      }
+      return 0;
+    }
   }
 }

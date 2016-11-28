@@ -45,6 +45,7 @@ public class Embedding {
 
   /**
    * Creates am embedding with the given entries
+   *
    * @param entries initial embedding entries
    */
   public Embedding(List<EmbeddingEntry> entries) {
@@ -53,6 +54,7 @@ public class Embedding {
 
   /**
    * Returns an entry specified by the index in the list
+   *
    * @param index the entries index in the list
    * @return the entry
    */
@@ -61,7 +63,17 @@ public class Embedding {
   }
 
   /**
-   * Returns a list of all entries
+   * Sets the entries for this embedding.
+   *
+   * @param entries embedding entries
+   */
+  public void setEntries(List<EmbeddingEntry> entries) {
+    this.entries = entries;
+  }
+
+  /**
+   * Returns a list of all entries.
+   *
    * @return entry list
    */
   public List<EmbeddingEntry> getEntries() {
@@ -70,6 +82,7 @@ public class Embedding {
 
   /**
    * Adds an entry at the end of the list.
+   *
    * @param entry entry that will be appended
    */
   public void addEntry(EmbeddingEntry entry) {
@@ -77,7 +90,8 @@ public class Embedding {
   }
 
   /**
-   * Adds a list of entries
+   * Adds a list of entries.
+   *
    * @param other entry list
    */
   public void addEntries(List<EmbeddingEntry> other) {
@@ -85,7 +99,8 @@ public class Embedding {
   }
 
   /**
-   * Add an entry to the list at a specified index, replace what was there before
+   * Add an entry to the list at a specified index, replace what was there before.
+   *
    * @param index the index where the entry will be inserted
    * @param entry the entry
    */
@@ -94,7 +109,8 @@ public class Embedding {
   }
 
   /**
-   * Returns number of entries in the embedding
+   * Returns number of entries in the embedding.
+   *
    * @return embedding size
    */
   public int size() {
@@ -102,7 +118,8 @@ public class Embedding {
   }
 
   /**
-   * Create an embedding from an Edge
+   * Create an embedding from an Edge.
+   *
    * @param edge the embedding
    * @return the embedding created from the edge
    */
@@ -114,7 +131,8 @@ public class Embedding {
   }
 
   /**
-   * Create an embedding from a vertex
+   * Create an embedding from a vertex.
+   *
    * @param vertex the vertex
    * @return the embedding created from the vertex
    */

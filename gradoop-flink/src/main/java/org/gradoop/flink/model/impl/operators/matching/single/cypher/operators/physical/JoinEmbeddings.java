@@ -17,10 +17,17 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ExtractJoinColumns;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.MergeEmbeddings;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Joins two embeddings at given columns and checks for vertex/edge isomorphism/homomorphism.
@@ -45,56 +52,98 @@ public class JoinEmbeddings implements PhysicalOperator {
   /**
    * left side join columns
    */
-  private final int[] leftColumns;
+  private final List<Integer> leftColumns;
   /**
    * right side join columns
    */
-  private final int[] rightColumns;
-  /**
-   * left side columns to adopt
-   */
-  private final int[] adoptLeft;
-  /**
-   * right side columns to adopt
-   */
-  private final int[] adoptRight;
+  private final List<Integer> rightColumns;
   /**
    * columns that represent vertices and need to be distinct
    */
-  private final int[] distinctVertexColumns;
+  private final List<Integer> distinctVertexColumns;
   /**
    * columns that represent edges and need to be distinct
    */
-  private final int[] distinctEdgeColumns;
+  private final List<Integer> distinctEdgeColumns;
+  /**
+   * Columns to adopt from the right side to the left side.
+   */
+  private final Map<Integer, Integer> adoptColumns;
   /**
    * Join Hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
 
   /**
-   * New Join Operator
+   * Instantiates a new join operator.
    *
    * @param left embeddings of the left side of the join
    * @param right embeddings of the right side of the join
    * @param leftColumns specifies the join columns of the left side
-   * @param rightColumns specifies the join columns of the left side
-   * @param adoptLeft columns that are adopted from the left side
-   * @param adoptRight columns that are adopted fom the right side
+   * @param rightColumns specifies the join columns of the right side
+   */
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    List<Integer> leftColumns, List<Integer> rightColumns) {
+    this(left, right, leftColumns, rightColumns,
+      new ArrayList<>(0), new ArrayList<>(0));
+  }
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param leftColumns specifies the join columns of the left side
+   * @param rightColumns specifies the join columns of the right side
+   * @param adoptColumns columns that are adopted from the right side to the left side
+   */
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    List<Integer> leftColumns, List<Integer> rightColumns, Map<Integer, Integer> adoptColumns) {
+    this(left, right, leftColumns, rightColumns,
+      new ArrayList<>(0), new ArrayList<>(0),
+      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+  }
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param leftJoinColumns specifies the join columns of the left side
+   * @param rightJoinColumns specifies the join columns of the right side
    * @param distinctVertexColumns distinct vertex columns
    * @param distinctEdgeColumns distinct edge columns
+   */
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns) {
+    this(left, right, leftJoinColumns, rightJoinColumns,
+      distinctVertexColumns, distinctEdgeColumns,
+      Maps.newHashMapWithExpectedSize(0), JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+  }
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param leftJoinColumns specifies the join columns of the left side
+   * @param rightJoinColumns specifies the join columns of the right side
+   * @param distinctVertexColumns distinct vertex columns
+   * @param distinctEdgeColumns distinct edge columns
+   * @param adoptColumns columns that are adopted from the right side to the left side
    * @param joinHint join strategy
    */
   public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
-    int[] leftColumns, int[] rightColumns,
-    int[] adoptLeft, int[] adoptRight,
-    int[] distinctVertexColumns, int[] distinctEdgeColumns,
+    List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
+    Map<Integer, Integer> adoptColumns,
     JoinOperatorBase.JoinHint joinHint) {
     this.left                  = left;
     this.right                 = right;
-    this.leftColumns           = leftColumns;
-    this.rightColumns          = rightColumns;
-    this.adoptLeft             = adoptLeft;
-    this.adoptRight            = adoptRight;
+    this.leftColumns           = leftJoinColumns;
+    this.rightColumns          = rightJoinColumns;
+    this.adoptColumns          = adoptColumns;
     this.distinctVertexColumns = distinctVertexColumns;
     this.distinctEdgeColumns   = distinctEdgeColumns;
     this.joinHint              = joinHint;
@@ -102,6 +151,9 @@ public class JoinEmbeddings implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return null;
+    return left.join(right, joinHint)
+      .where(new ExtractJoinColumns(leftColumns))
+      .equalTo(new ExtractJoinColumns(rightColumns))
+      .with(new MergeEmbeddings(rightColumns, distinctVertexColumns, distinctEdgeColumns, adoptColumns));
   }
 }
