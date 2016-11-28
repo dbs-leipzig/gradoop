@@ -19,8 +19,6 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -34,7 +32,6 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
@@ -46,8 +43,8 @@ import java.util.Map;
  * Map partition function which spreads the whole foodbrokerage process
  * equally to each worker.
  */
-public class FoodBrokerageTuple
-  extends ProcessTuple<Long, Tuple2<GraphTransaction, FoodBrokerMaps>> {
+public class Brokerage
+  extends Process<Long, GraphTransaction> {
 
   /**
    * Valued consturctor
@@ -57,7 +54,7 @@ public class FoodBrokerageTuple
    * @param edgeFactory EPGM edge factory
    * @param config Foodbroker configuration
    */
-  public FoodBrokerageTuple(GraphHeadFactory graphHeadFactory,
+  public Brokerage(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config) {
     super(edgeFactory, vertexFactory, config, graphHeadFactory);
@@ -76,7 +73,7 @@ public class FoodBrokerageTuple
 
   @Override
   public void mapPartition(Iterable<Long> iterable,
-    Collector<Tuple2<GraphTransaction, FoodBrokerMaps>> collector) throws
+    Collector<GraphTransaction> collector) throws
     Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
@@ -125,8 +122,7 @@ public class FoodBrokerageTuple
       graphTransaction.setGraphHead(graphHead);
       graphTransaction.setVertices(getVertices());
       graphTransaction.setEdges(getEdges());
-      collector.collect(new Tuple2<>(graphTransaction,
-        new FoodBrokerMaps(vertexMap, edgeMap)));
+      collector.collect(graphTransaction);
     }
   }
 
@@ -571,7 +567,7 @@ public class FoodBrokerageTuple
       currentId++, Constants.PURCHINVOICE_ACRONYM);
     properties.set("num", bid);
     properties.set("expense", total);
-    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
+    properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex purchInvoice = newVertex(label, properties);
 
@@ -603,7 +599,7 @@ public class FoodBrokerageTuple
       currentId++, Constants.SALESINVOICE_ACRONYM);
     properties.set("num", bid);
     properties.set("revenue", BigDecimal.ZERO);
-    properties.set("text", "*** TODO @ FoodBrokerageTuple ***");
+    properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex salesInvoice = newVertex(label, properties);
 
