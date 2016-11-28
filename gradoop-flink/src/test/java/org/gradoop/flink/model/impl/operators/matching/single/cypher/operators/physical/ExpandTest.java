@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.apache.jasper.tagplugins.jstl.core.Out;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
@@ -27,21 +26,68 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Expan
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class ExpandTest extends PhysicalOperatorTest  {
-  @Test
-  public void testResultForOutExpansion() throws Exception{
-    GradoopId a =  GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId b =  GradoopId.get();
-    GradoopId e2 = GradoopId.get();
-    GradoopId c =  GradoopId.get();
-    GradoopId e3 = GradoopId.get();
-    GradoopId d =  GradoopId.get();
+  //define some vertices
+  private final GradoopId a = GradoopId.get();
+  private final GradoopId b = GradoopId.get();
+  private final GradoopId c = GradoopId.get();
+  private final GradoopId d = GradoopId.get();
+  private final GradoopId m = GradoopId.get();
+  private final GradoopId n = GradoopId.get();
 
+  //define some edges
+  private final GradoopId e0 = GradoopId.get();
+  private final GradoopId e1 = GradoopId.get();
+  private final GradoopId e2 = GradoopId.get();
+  private final GradoopId e3 = GradoopId.get();
+
+  @Test
+  public void testOutputFormat() throws Exception {
+    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+      createEmbedding(m,e0,n)
+    );
+
+    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+      createEmbedding(n,e1,a),
+      createEmbedding(a,e2,b),
+      createEmbedding(b,e3,c)
+    );
+
+
+    DataSet<Embedding> result = new Expand(
+      input, candidateEdges, 2, 1, 3,
+      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
+    ).evaluate();
+
+    assertEquals(3, result.count());
+
+    assertEveryEmbedding(result, (embedding -> {
+      assertEquals(5,embedding.size());
+      assertEquals(IdListEntry.class, embedding.getEntry(3).getClass());
+      assertEquals(IdEntry.class,     embedding.getEntry(4).getClass());
+    }));
+
+    assertEmbeddingExists(
+      result,
+      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 1
+    );
+
+    assertEmbeddingExists(
+      result,
+      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 3
+    );
+
+    assertEmbeddingExists(
+      result,
+      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 5
+    );
+  }
+
+  @Test
+  public void testResultForOutExpansion() throws Exception {
     DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
@@ -52,34 +98,16 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
     DataSet<Embedding> result = new Expand(
       input, candidateEdges, 0, 2, 4,
-      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>()
+      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEquals(2, result.count());
-
-    assertEmbeddingExists(result, (embedding) ->
-      a.equals(embedding.getEntry(0).getId()) &&
-      Lists.newArrayList(e1,b,e2).equals(((IdListEntry) embedding.getEntry(1)).getIds()) &&
-      c.equals(embedding.getEntry(2).getId())
-    );
-
-    assertEmbeddingExists(result, (embedding) ->
-      a.equals(embedding.getEntry(0).getId()) &&
-      Lists.newArrayList(e1,b,e2,c,e3).equals(((IdListEntry) embedding.getEntry(1)).getIds()) &&
-      d.equals(embedding.getEntry(2).getId())
-    );
+    assertEmbeddingExists(result, a,e1,b,e2,c);
+    assertEmbeddingExists(result, a,e1,b,e2,c,e3,d);
   }
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    GradoopId a =  GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId b =  GradoopId.get();
-    GradoopId e2 = GradoopId.get();
-    GradoopId c =  GradoopId.get();
-    GradoopId e3 = GradoopId.get();
-    GradoopId d =  GradoopId.get();
-
     DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
@@ -90,34 +118,16 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
     DataSet<Embedding> result = new Expand(
       input, candidateEdges, 0, 2, 4,
-      ExpandDirection.IN, new ArrayList<>(), new ArrayList<>()
+      ExpandDirection.IN, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEquals(2, result.count());
-
-    assertEmbeddingExists(result, (embedding) ->
-      a.equals(embedding.getEntry(0).getId()) &&
-      Lists.newArrayList(e1,b,e2).equals(((IdListEntry) embedding.getEntry(1)).getIds()) &&
-      c.equals(embedding.getEntry(2).getId())
-    );
-
-    assertEmbeddingExists(result, (embedding) ->
-      a.equals(embedding.getEntry(0).getId()) &&
-      Lists.newArrayList(e1,b,e2,c,e3).equals(((IdListEntry) embedding.getEntry(1)).getIds()) &&
-      d.equals(embedding.getEntry(2).getId())
-    );
+    assertEmbeddingExists(result, a,e1,b,e2,c);
+    assertEmbeddingExists(result, a,e1,b,e2,c,e3,d);
   }
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    GradoopId a = GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId b = GradoopId.get();
-    GradoopId e2 = GradoopId.get();
-    GradoopId c = GradoopId.get();
-    GradoopId e3 = GradoopId.get();
-    GradoopId d = GradoopId.get();
-
     DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
@@ -128,7 +138,7 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
     DataSet<Embedding> result = new Expand(
       input,candidateEdges, 0, 2, 2,
-      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>()
+      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
@@ -138,12 +148,6 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    GradoopId a = GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId b = GradoopId.get();
-    GradoopId e2 = GradoopId.get();
-    GradoopId c = GradoopId.get();
-
     DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
@@ -153,7 +157,7 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
     DataSet<Embedding> result = new Expand(
       input,candidateEdges, 0, 2, 2,
-      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>()
+      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
@@ -163,11 +167,6 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
   @Test
   public void testLowerBound0() throws Exception{
-    GradoopId a =  GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId b =  GradoopId.get();
-
-
     DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
@@ -176,7 +175,7 @@ public class ExpandTest extends PhysicalOperatorTest  {
 
     DataSet<Embedding> result = new Expand(
       input,candidateEdges, 0, 0, 3,
-      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>()
+      ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
 
     assertEquals(2, result.count());
@@ -186,36 +185,78 @@ public class ExpandTest extends PhysicalOperatorTest  {
     );
   }
 
-
   @Test
   public void testFilterDistinctVertices() throws Exception {
-    GradoopId v0 = GradoopId.get();
-    GradoopId e0 = GradoopId.get();
-    GradoopId v1 = GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-    GradoopId v2 = GradoopId.get();
-    GradoopId e2 = GradoopId.get();
-
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
-      createEmbedding(v1,e1,v2),
-      createEmbedding(v2,e2,v0)
+      createEmbedding(a,e1,b),
+      createEmbedding(b,e2,a)
     );
 
     DataSet<Embedding> input = getExecutionEnvironment().fromElements(
-      createEmbedding(v0,e0,v1)
+      createEmbedding(a,e0,b)
     );
 
     Expand op = new Expand(
       input, candidateEdges,
       2, 2, 3,
       ExpandDirection.OUT,
-      Lists.newArrayList(0,2,3,4),
-      new ArrayList<>()
+      Lists.newArrayList(0,2),
+      new ArrayList<>(), -1
     );
-
 
     DataSet<Embedding> result = op.evaluate();
 
     assertEquals(0, result.count());
+  }
+
+  @Test
+  public void testFilterDistinctEdges() throws Exception {
+    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+      createEmbedding(a,e0,b),
+      createEmbedding(b,e1,a)
+    );
+
+    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+      createEmbedding(a,e0,b)
+    );
+
+    Expand op = new Expand(
+      input, candidateEdges,
+      2, 1, 2,
+      ExpandDirection.OUT,
+      new ArrayList<>(),
+      Lists.newArrayList(1,2), -1
+    );
+
+    DataSet<Embedding> result = op.evaluate();
+
+    assertEquals(1, result.count());
+    assertEmbeddingExists(result, a,e0,b,e1,a);
+  }
+
+  @Test
+  public void testCircleCondition() throws Exception {
+    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+      createEmbedding(b,e1,c),
+      createEmbedding(b,e2,a)
+    );
+
+    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+      createEmbedding(a,e0,b)
+    );
+
+    Expand op = new Expand(
+      input, candidateEdges,
+      2, 1, 2,
+      ExpandDirection.OUT,
+      new ArrayList<>(),
+      new ArrayList<>(),
+      0
+    );
+
+    DataSet<Embedding> result = op.evaluate();
+
+    assertEquals(1, result.count());
+    assertEmbeddingExists(result, a,e0,b,e2,a);
   }
 }

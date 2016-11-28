@@ -21,14 +21,15 @@ import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CombineExpandEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CreateInitialExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CombineExpandIntermediateResults;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.CreateInitialExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions  .FilterExpandResultByCircleCondition;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterExpandResultByLowerBound;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterOldExpandIterationResults;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ProduceExpandResult;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ReverseEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.EmbeddingKeySelector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
 import java.util.List;
 
@@ -74,6 +75,10 @@ public class Expand implements PhysicalOperator {
    */
   private final List<Integer> distinctEdgeColumns;
   /**
+   * Define the column which should be equal with the paths end
+   */
+  private final int circle;
+  /**
    * join hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
@@ -90,11 +95,12 @@ public class Expand implements PhysicalOperator {
    * @param direction direction of the expansion {@see ExpandDirection}
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
+   * @param circle defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int circle,
     JoinOperatorBase.JoinHint joinHint) {
 
     this.input = input;
@@ -105,6 +111,7 @@ public class Expand implements PhysicalOperator {
     this.direction = direction;
     this.distinctVertexColumns = distinctVertexColumns;
     this.distinctEdgeColumns = distinctEdgeColumns;
+    this.circle = circle;
     this.joinHint = joinHint;
   }
 
@@ -119,10 +126,11 @@ public class Expand implements PhysicalOperator {
    * @param direction direction of the expansion {@see ExpandDirection}
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
+   * @param circle defines the column which should be equal with the paths end
    */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns) {
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int circle) {
 
     this.input = input;
     this.candidateEdges = candidateEdges;
@@ -132,6 +140,7 @@ public class Expand implements PhysicalOperator {
     this.direction = direction;
     this.distinctVertexColumns = distinctVertexColumns;
     this.distinctEdgeColumns = distinctEdgeColumns;
+    this.circle = circle;
     this.joinHint = JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
   }
 
@@ -141,9 +150,9 @@ public class Expand implements PhysicalOperator {
    */
   @Override
   public DataSet<Embedding> evaluate() {
-    DataSet<Embedding> initialWorkingSet = preprocess();
+    DataSet<ExpandIntermediateResult> initialWorkingSet = preprocess();
 
-    DataSet<Embedding> iterationResults = iterate(initialWorkingSet);
+    DataSet<ExpandIntermediateResult> iterationResults = iterate(initialWorkingSet);
 
     return postprocess(iterationResults);
   }
@@ -152,7 +161,7 @@ public class Expand implements PhysicalOperator {
    * creates the initial working set from the edge candidates
    * @return initial working set with the expand embeddings
    */
-  private DataSet<Embedding> preprocess() {
+  private DataSet<ExpandIntermediateResult> preprocess() {
     if (direction == ExpandDirection.IN) {
       candidateEdges = candidateEdges.map(new ReverseEmbeddings());
     }
@@ -160,7 +169,11 @@ public class Expand implements PhysicalOperator {
     return input.join(candidateEdges, joinHint)
       .where(new EmbeddingKeySelector(expandColumn))
       .equalTo(new EmbeddingKeySelector(0))
-      .with(new CreateInitialExpandEmbedding(distinctVertexColumns, distinctEdgeColumns));
+      .with(new CreateInitialExpandIntermediateResult(
+        distinctVertexColumns,
+        distinctEdgeColumns,
+        circle
+      ));
   }
 
   /**
@@ -168,17 +181,24 @@ public class Expand implements PhysicalOperator {
    * @param initialWorkingSet the initial edges which are used as starting points for the traversal
    * @return set of paths produced by the iteration (length 1..upperBound)
    */
-  private DataSet<Embedding> iterate(DataSet<Embedding> initialWorkingSet) {
-    IterativeDataSet<Embedding> iteration = initialWorkingSet.iterate(upperBound - 1);
+  private DataSet<ExpandIntermediateResult>
+  iterate(DataSet<ExpandIntermediateResult> initialWorkingSet) {
 
-    DataSet<Embedding> nextWorkingSet = iteration
+    IterativeDataSet<ExpandIntermediateResult> iteration =
+      initialWorkingSet.iterate(upperBound - 1);
+
+    DataSet<ExpandIntermediateResult> nextWorkingSet = iteration
       .filter(new FilterOldExpandIterationResults())
       .join(candidateEdges, joinHint)
-        .where(new EmbeddingKeySelector(EmbeddingKeySelector.LAST))
+        .where(2)
         .equalTo(new EmbeddingKeySelector(0))
-        .with(new CombineExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns));
+        .with(new CombineExpandIntermediateResults(
+          distinctVertexColumns,
+          distinctEdgeColumns,
+          circle
+        ));
 
-    DataSet<Embedding> solutionSet = nextWorkingSet.union(iteration);
+    DataSet<ExpandIntermediateResult> solutionSet = nextWorkingSet.union(iteration);
 
     return iteration.closeWith(solutionSet, nextWorkingSet);
   }
@@ -188,13 +208,16 @@ public class Expand implements PhysicalOperator {
    * @param iterationResults the results produced by the iteration
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
-  private DataSet<Embedding> postprocess(DataSet<Embedding> iterationResults) {
+  private DataSet<Embedding> postprocess(DataSet<ExpandIntermediateResult> iterationResults) {
     iterationResults = iterationResults.filter(new FilterExpandResultByLowerBound(lowerBound));
 
-    DataSet<Embedding> results =  input.join(iterationResults)
-      .where(new EmbeddingKeySelector(expandColumn))
-      .equalTo(new EmbeddingKeySelector(0))
-      .with(new ProduceExpandResult());
+    if (circle >= 0) {
+      iterationResults = iterationResults
+        .filter(new FilterExpandResultByCircleCondition(circle));
+    }
+
+    DataSet<Embedding> results =
+      iterationResults.map(x -> x.toEmbedding()).returns(Embedding.class);
 
     if (lowerBound == 0) {
       results = results.union(input);

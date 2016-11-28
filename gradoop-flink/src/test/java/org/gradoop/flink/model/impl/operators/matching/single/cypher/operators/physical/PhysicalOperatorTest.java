@@ -31,15 +31,26 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdListEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
 abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
+
+  void assertEmbeddingExists(DataSet<Embedding> dataSet, GradoopId... path) throws Exception {
+    List<GradoopId> pathList = Lists.newArrayList(path);
+    assertTrue(
+      dataSet.collect()
+      .stream()
+      .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding)))
+    );
+  }
 
   void assertEmbeddingExists(DataSet<Embedding> dataSet, Predicate<Embedding> predicate)
   throws Exception {
@@ -109,5 +120,14 @@ abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   CNF predicateFromQuery(String query) {
     return new QueryHandler(query).getPredicates();
+  }
+
+  private List<GradoopId> embeddingToIdList(Embedding embedding) {
+    return embedding.getEntries().stream().flatMap(entry -> {
+      if(entry instanceof IdListEntry) {
+        return ((IdListEntry) entry).getIds().stream();
+      }
+      return Lists.newArrayList(entry.getId()).stream();
+    }).collect(Collectors.toList());
   }
 }

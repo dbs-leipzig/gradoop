@@ -20,11 +20,26 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 
+/**
+ * Selects the embedding entry specified by index
+ * It is also possible to use negative keys, which count from the back of the list.
+ * -1 specified the last element, -2 the one before the last.
+ */
 public class EmbeddingKeySelector implements KeySelector<Embedding, GradoopId> {
+  /**
+   * Shortcut to select the embeddings last element
+   */
   public static final int LAST = -1;
 
-  public final int column;
+  /**
+   * The specified column index
+   */
+  private final int column;
 
+  /**
+   * Creates a new embedding keys selector
+   * @param column index of the embedding entry
+   */
   public EmbeddingKeySelector(int column) {
     this.column = column;
   }

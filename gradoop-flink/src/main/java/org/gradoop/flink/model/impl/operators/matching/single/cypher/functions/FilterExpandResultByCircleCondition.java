@@ -16,17 +16,30 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
 /**
- * Filters results from previous iterations
+ * Filters ExpandResults with the given circle pattern
  */
-public class FilterOldExpandIterationResults extends RichFilterFunction<ExpandIntermediateResult> {
-  @Override
-  public boolean filter(ExpandIntermediateResult expandIntermediateResult) {
-    int superStep = getIterationRuntimeContext().getSuperstepNumber();
+public class FilterExpandResultByCircleCondition implements
+  FilterFunction<ExpandIntermediateResult> {
 
-    return expandIntermediateResult.pathSize() >= superStep * 2 - 1;
+  /**
+   * defines the column which should be equal with the paths end
+   */
+  private final int circle;
+
+  /**
+   * Create new filter
+   * @param circle defines the column which should be equal with the paths end
+   */
+  public FilterExpandResultByCircleCondition(int circle) {
+    this.circle = circle;
+  }
+
+  @Override
+  public boolean filter(ExpandIntermediateResult value) throws Exception {
+    return value.getBase().getEntry(circle).contains(value.getEnd());
   }
 }

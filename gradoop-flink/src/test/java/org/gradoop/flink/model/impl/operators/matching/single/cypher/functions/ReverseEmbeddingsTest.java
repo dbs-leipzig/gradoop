@@ -14,32 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
+import org.junit.Test;
 
-public class ExpansionKeyExtractor extends RichMapFunction<Embedding, Tuple2<GradoopId, Embedding>> {
-  private final ExpandDirection direction;
+import static org.junit.Assert.assertEquals;
 
-  public ExpansionKeyExtractor(ExpandDirection direction) {
-    this.direction = direction;
-  }
+public class ReverseEmbeddingsTest {
+  @Test
+  public void testReversingAnEdgeEmbedding() throws Exception{
+    IdEntry a = new IdEntry(GradoopId.get());
+    IdEntry e0 = new IdEntry(GradoopId.get());
+    IdEntry b = new IdEntry(GradoopId.get());
 
-  @Override
-  public Tuple2<GradoopId, Embedding> map(Embedding value) throws Exception {
-    int superStep = getIterationRuntimeContext().getSuperstepNumber();
-    int columnID;
+    Embedding edge = new Embedding(Lists.newArrayList(
+      a,e0,b
+    ));
 
-    if (direction == ExpandDirection.OUT) {
-      columnID = superStep * 2;
-    } else {
-      columnID = superStep == 1 ? 0 : (superStep * 2 - 1);
-    }
+    ReverseEmbeddings op = new ReverseEmbeddings();
 
-    return new Tuple2<>(value.getEntry(columnID).getId(), value);
+    Embedding reversed = op.map(edge);
+
+    assertEquals(Lists.newArrayList(b,e0,a), reversed.getEntries());
   }
 }

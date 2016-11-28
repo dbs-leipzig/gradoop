@@ -20,37 +20,33 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdListEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class ProduceExpandResultTest {
-  @Test
-  public void testJoinInputAndExpandResult() throws Exception{
-    GradoopId a = GradoopId.get();
-    GradoopId b = GradoopId.get();
-    GradoopId c = GradoopId.get();
-    GradoopId d = GradoopId.get();
-    GradoopId e = GradoopId.get();
+public class FilterExpandResultByCircleConditionTest {
+  private final GradoopId a = GradoopId.get();
+  private final GradoopId b = GradoopId.get();
+  private final GradoopId c = GradoopId.get();
 
-    Embedding input = new Embedding(Lists.newArrayList(
-      new IdEntry(a)
-    ));
-
-    Embedding expandResult = new Embedding(Lists.newArrayList(
+  private ExpandIntermediateResult expandIntermediateResult = new ExpandIntermediateResult(
+    new Embedding(Lists.newArrayList(
       new IdEntry(a),
-      new IdListEntry(Lists.newArrayList(b,c,d)),
-      new IdEntry(e)
-    ));
+      new IdEntry(b)
+    )),
+    new GradoopId[]{c,a}
+  );
 
-    ProduceExpandResult op = new ProduceExpandResult();
 
-    Embedding combined = op.join(input,expandResult);
+  @Test
+  public void testFailForNoneCirlces() throws Exception{
+    assertFalse(new FilterExpandResultByCircleCondition(1).filter(expandIntermediateResult));
+  }
 
-    assertEquals(3, combined.size());
-    assertEquals(a, combined.getEntry(0).getId());
-    assertEquals(Lists.newArrayList(b,c,d), ((IdListEntry) combined.getEntry(1)).getIds());
-    assertEquals(e, combined.getEntry(2).getId());
+  @Test
+  public void testPassForCircles() throws Exception{
+    assertTrue(new FilterExpandResultByLowerBound(0).filter(expandIntermediateResult));
   }
 }

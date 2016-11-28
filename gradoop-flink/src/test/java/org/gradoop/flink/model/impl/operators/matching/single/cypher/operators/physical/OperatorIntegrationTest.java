@@ -29,6 +29,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection.*;
 
+@Ignore
 public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
   private FlinkAsciiGraphLoader testGraphs;
@@ -180,7 +182,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> n = new ProjectVertices(graph.getVertices()).evaluate();
     DataSet<Embedding> edges = new ProjectEdges(graph.getEdges()).evaluate();
 
-    DataSet<Embedding> res = new Expand(n,edges,0,2,3,OUT, new ArrayList<>(), new ArrayList<>()).evaluate();
+    DataSet<Embedding> res = new Expand(n,edges,0,2,3,OUT, new ArrayList<>(), new ArrayList<>(),-1).evaluate();
 
     System.out.println("res.collect() = " + res.collect());
   }

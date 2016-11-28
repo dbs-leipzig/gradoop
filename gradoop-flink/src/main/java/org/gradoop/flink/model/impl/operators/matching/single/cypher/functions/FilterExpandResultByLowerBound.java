@@ -17,19 +17,27 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdListEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
-public class FilterExpandResultByLowerBound extends RichFilterFunction<Embedding> {
-  private final int minIdListSize;
+/**
+ * Filters expand results that are shorter than the lower bound
+ */
+public class FilterExpandResultByLowerBound extends RichFilterFunction<ExpandIntermediateResult> {
+  /**
+   * The minimum path size
+   */
+  private final int minPathSize;
 
+  /**
+   * New Filter operator
+   * @param lowerBound lower bound path length
+   */
   public FilterExpandResultByLowerBound(int lowerBound) {
-    this.minIdListSize = lowerBound * 2 - 1;
+    this.minPathSize = lowerBound * 2 - 1;
   }
 
   @Override
-  public boolean filter(Embedding value) throws Exception {
-    IdListEntry idList = (IdListEntry) value.getEntry(value.size() - 2);
-    return idList.getIds().size() >= minIdListSize;
+  public boolean filter(ExpandIntermediateResult value) throws Exception {
+    return value.pathSize() >= minPathSize;
   }
 }
