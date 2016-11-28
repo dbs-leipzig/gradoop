@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ComplaintTuple
-  extends ProcessTuple<FoodBrokerMaps, Tuple2<GraphTransaction, Set<Vertex>>> {
+  extends Process<FoodBrokerMaps, Tuple2<GraphTransaction, Set<Vertex>>> {
 
   private List<Vertex> employees;
   private List<Vertex> customers;
@@ -233,7 +233,7 @@ public class ComplaintTuple
         currentId++, Constants.SALESINVOICE_ACRONYM);
       properties.set("num", bid);
       properties.set("revenue", refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
+      properties.set("text", "*** TODO @ ComplaintHandlingOld ***");
 
       Vertex salesInvoice = newVertex(label, properties);
 
@@ -277,7 +277,7 @@ public class ComplaintTuple
         currentId++, Constants.PURCHINVOICE_ACRONYM);
       properties.set("num", bid);
       properties.set("expense", refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
+      properties.set("text", "*** TODO @ ComplaintHandlingOld ***");
 
       Vertex purchInvoice = newVertex(label, properties);
 

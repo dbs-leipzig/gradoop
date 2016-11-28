@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public abstract class ProcessTuple<S, T> extends
+public abstract class Process<S, T> extends
   RichMapPartitionFunction<S, T> {
   /**
    * Foodbroker configuration
@@ -106,14 +106,16 @@ public abstract class ProcessTuple<S, T> extends
   protected long currentId = 1;
   protected long globalSeed;
 
-  public ProcessTuple(EdgeFactory edgeFactory, VertexFactory vertexFactory,
+  public Process(EdgeFactory edgeFactory, VertexFactory vertexFactory,
     FoodBrokerConfig config, GraphHeadFactory graphHeadFactory) {
-    this.edgeFactory = edgeFactory;
-    vertexMap = Maps.newHashMap();
-    this.vertexFactory = vertexFactory;
-    edgeMap = Maps.newHashMap();
-    this.config = config;
     this.graphHeadFactory = graphHeadFactory;
+    this.vertexFactory = vertexFactory;
+    this.edgeFactory = edgeFactory;
+
+    vertexMap = Maps.newHashMap();
+    edgeMap = Maps.newHashMap();
+
+    this.config = config;
   }
 
 
@@ -278,11 +280,7 @@ public abstract class ProcessTuple<S, T> extends
   }
 
   protected Set<Vertex> getVertices() {
-    Set<Vertex> vertices = Sets.newHashSet();
-    for(Map.Entry<GradoopId, Vertex> entry : vertexMap.entrySet()) {
-      vertices.add(entry.getValue());
-    }
-    return vertices;
+    return (Set<Vertex>) vertexMap.values();
   }
   protected Set<Edge> getEdges() {
     Set<Edge> edges = Sets.newHashSet();

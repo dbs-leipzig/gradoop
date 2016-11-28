@@ -30,16 +30,16 @@ import java.util.Set;
 /**
  *
  */
-public class ComplaintHandling extends AbstractBusinessProcess {
+public class ComplaintHandlingOld extends AbstractBusinessProcess {
 
   private DataSet<Vertex> userClients;
 
-  public ComplaintHandling(FoodBrokerConfig foodBrokerConfig,
+  public ComplaintHandlingOld(FoodBrokerConfig foodBrokerConfig,
     GradoopFlinkConfig gradoopFlinkConfig,
     DataSet<Vertex> customers, DataSet<Vertex> vendors,
     DataSet<Vertex> logistics, DataSet<Vertex> employees,
     DataSet<Vertex> products, DataSet<Long> caseSeeds,
-    DataSet<Tuple2<GraphTransaction, FoodBrokerMaps>> foodBrokerageTuple) {
+    DataSet<GraphTransaction> brokerageTransactions) {
     super(foodBrokerConfig, gradoopFlinkConfig, customers, vendors,
       logistics, employees, products, caseSeeds);
     this.foodBrokerageTuple = foodBrokerageTuple;
