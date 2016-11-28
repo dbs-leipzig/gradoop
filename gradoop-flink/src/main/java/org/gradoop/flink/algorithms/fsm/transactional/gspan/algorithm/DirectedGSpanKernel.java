@@ -6,8 +6,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
+
+import java.util.Map;
 
 /**
  * Provides methods for logic related to the gSpan algorithm in directed mode.
@@ -135,4 +138,17 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
     return traversal.isOutgoing();
   }
 
+  @Override
+  protected void addCells(Map<GradoopId, AdjacencyListRow<LabelPair>> rows,
+    GradoopId fromId, String fromLabel,
+    boolean outgoing, GradoopId edgeId, String edgeLabel,
+    GradoopId toId, String toLabel
+  ) {
+
+    rows.get(fromId).getCells().add(new AdjacencyListCell<>(
+      edgeId, outgoing, toId, new LabelPair(edgeLabel, toLabel)));
+
+    rows.get(toId).getCells().add(new AdjacencyListCell<>(
+      edgeId, !outgoing, fromId, new LabelPair(edgeLabel, fromLabel)));
+  }
 }

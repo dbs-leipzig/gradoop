@@ -335,22 +335,26 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
       // EDGE
 
+      String fromLabel = labels.get(fromId);
       GradoopId edgeId = GradoopId.get();
       boolean outgoing = getOutgoing(traversal);
       String edgeLabel = traversal.getEdgeValue();
+      String toLabel = labels.get(toId);
 
-      rows.get(fromId).getCells().add(new AdjacencyListCell<>(
-        edgeId, outgoing, toId, new LabelPair(edgeLabel, labels.get(toId))));
-
-      rows.get(toId).getCells().add(new AdjacencyListCell<>(
-        edgeId, !outgoing, fromId, new LabelPair(edgeLabel, labels.get(fromId))));
+      addCells(rows, fromId, fromLabel, outgoing, edgeId, edgeLabel, toId, toLabel);
     }
 
     return new AdjacencyList<>(GradoopId.get(), labels, null, rows);
   }
 
+
+
   protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
     boolean outgoing, String edgeLabel, String toLabel, boolean loop);
 
   protected abstract boolean getOutgoing(Traversal<String> traversal);
+
+  protected abstract void addCells(Map<GradoopId, AdjacencyListRow<LabelPair>> rows,
+    GradoopId fromId, String fromLabel, boolean outgoing, GradoopId edgeId, String edgeLabel,
+    GradoopId toId, String toLabel);
 }

@@ -6,6 +6,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Undirect;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.Frequent;
@@ -46,11 +47,12 @@ public abstract class GSpanBase extends TransactionalFSMBase {
     DataSet<AdjacencyList<LabelPair>> adjacencyLists = transactions
       .map(new ToAdjacencyList());
 
-    // from here
+    if (! fsmConfig.isDirected()) {
+      adjacencyLists = adjacencyLists
+        .map(new Undirect());
+    }
 
     DataSet<TraversalCode<String>> allFrequentPatterns = mine(adjacencyLists, config);
-
-    // end
 
     return allFrequentPatterns
       .map(new ToGraphTransaction());
