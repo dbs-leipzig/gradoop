@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
@@ -22,15 +22,15 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdListEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.Expand;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExpandTest extends PhysicalOperatorTest  {
+public class ExpandTest extends PhysicalOperatorTest {
   //define some vertices
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();

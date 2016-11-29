@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.util.ArrayList;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectVertices;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 

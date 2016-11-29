@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;

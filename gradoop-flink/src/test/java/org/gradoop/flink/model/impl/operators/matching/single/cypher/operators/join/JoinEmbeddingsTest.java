@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
@@ -8,8 +8,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Assert;
 import org.junit.Test;
 
