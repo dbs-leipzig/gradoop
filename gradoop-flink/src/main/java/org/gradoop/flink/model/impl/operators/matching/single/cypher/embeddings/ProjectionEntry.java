@@ -85,6 +85,11 @@ public class ProjectionEntry implements EmbeddingEntry {
   }
 
   @Override
+  public Boolean contains(GradoopId id) {
+    return this.id.equals(id);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -107,5 +112,10 @@ public class ProjectionEntry implements EmbeddingEntry {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (properties != null ? properties.hashCode() : 0);
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return "(" + id + " " + properties + ')';
   }
 }
