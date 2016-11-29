@@ -24,6 +24,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * Represents a (partial) embedding of a query.
  * An Embedding consists of a list of {@link EmbeddingEntry} which represent the vertices and edges
@@ -140,5 +142,10 @@ public class Embedding {
   @Override
   public int hashCode() {
     return entries != null ? entries.hashCode() : 0;
+  }
+
+  @Override
+  public String toString() {
+    return "[ " + entries.stream().map(EmbeddingEntry::toString).collect(joining(", ")) + " ]";
   }
 }
