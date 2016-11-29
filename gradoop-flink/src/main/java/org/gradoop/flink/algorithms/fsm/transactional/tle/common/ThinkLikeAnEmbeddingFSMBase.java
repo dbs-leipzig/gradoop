@@ -18,20 +18,18 @@
 package org.gradoop.flink.algorithms.fsm.transactional.tle.common;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
-import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FilterStrategy;
-import org.gradoop.flink.algorithms.fsm_old.common.config.GrowthStrategy;
-import org.gradoop.flink.algorithms.fsm_old.common.functions.CanonicalLabelOnly;
-import org.gradoop.flink.algorithms.fsm_old.common.functions.SubgraphIsFrequent;
-import org.gradoop.flink.algorithms.fsm_old.common.pojos.FSMGraph;
-import org.gradoop.flink.algorithms.fsm_old.common.tuples.Subgraph;
-import org.gradoop.flink.algorithms.fsm_old.common.tuples.SubgraphEmbeddings;
-import org.gradoop.flink.algorithms.fsm_old.common.functions.GraphId;
-import org.gradoop.flink.algorithms.fsm_old.common.functions.MergeEmbeddings;
-import org.gradoop.flink.algorithms.fsm_old.common.functions.PatternGrowth;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.GrowthStrategy;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.CanonicalLabelOnly;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.SubgraphIsFrequent;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.tuples.SubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.GraphId;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.MergeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.PatternGrowth;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 

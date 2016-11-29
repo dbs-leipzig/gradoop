@@ -4,7 +4,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs;
+import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.gradoop.flink.algorithms.fsm_old.ccs.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
+import static org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 import static org.junit.Assert.assertEquals;
 
 public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {

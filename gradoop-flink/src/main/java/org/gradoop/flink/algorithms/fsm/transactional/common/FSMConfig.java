@@ -17,15 +17,15 @@
 
 package org.gradoop.flink.algorithms.fsm.transactional.common;
 
-import org.gradoop.flink.algorithms.fsm_old.common.canonicalization.api.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.canonicalization.api.CanonicalLabeler;
 
 
-import org.gradoop.flink.algorithms.fsm_old.common.canonicalization.cam.CAMLabeler;
-import org.gradoop.flink.algorithms.fsm_old.common.canonicalization.gspan.MinDFSLabeler;
-import org.gradoop.flink.algorithms.fsm_old.common.config.CanonicalLabel;
-import org.gradoop.flink.algorithms.fsm_old.common.config.FilterStrategy;
-import org.gradoop.flink.algorithms.fsm_old.common.config.GrowthStrategy;
-import org.gradoop.flink.algorithms.fsm_old.common.config.IterationStrategy;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.canonicalization.cam.CAMLabeler;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.canonicalization.gspan.MinDFSLabeler;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.CanonicalLabel;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.FilterStrategy;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.GrowthStrategy;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.IterationStrategy;
 
 import java.io.Serializable;
 

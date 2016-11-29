@@ -1,7 +1,7 @@
 package org.gradoop.flink.algorithms.fsm;
 
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.GSpanEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.GSpanIterative;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -24,7 +24,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1"};
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(
+    GSpanIterative transactionalFSM = new GSpanIterative(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -48,7 +48,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2", "s3", "s4", "s5"};
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(fsmConfig);
+    GSpanIterative transactionalFSM = new GSpanIterative(fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
@@ -68,7 +68,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2"};
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(
+    GSpanIterative transactionalFSM = new GSpanIterative(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -91,7 +91,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1", "s2", "s3"};
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(
+    GSpanIterative transactionalFSM = new GSpanIterative(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -121,7 +121,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
       {"s1", "s2", "s3", "s4", "s5", "s6", "s7"};
 
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(
+    GSpanIterative transactionalFSM = new GSpanIterative(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -155,7 +155,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
     String[] expectedResultVariables =
       {"s11", "s12", "s21", "s22", "s23", "s31", "s32", "s33", "s34", "s41"};
 
-    GSpanEmbeddings transactionalFSM = new GSpanEmbeddings(
+    GSpanIterative transactionalFSM = new GSpanIterative(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
