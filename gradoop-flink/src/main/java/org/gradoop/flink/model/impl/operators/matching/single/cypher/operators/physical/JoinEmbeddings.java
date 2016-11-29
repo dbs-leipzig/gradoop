@@ -87,6 +87,20 @@ public class JoinEmbeddings implements PhysicalOperator {
    *
    * @param left embeddings of the left side of the join
    * @param right embeddings of the right side of the join
+   * @param leftJoinColumn join column left side
+   * @param rightJoinColumn join column right side
+   */
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    int leftJoinColumn, int rightJoinColumn) {
+    this(left, right,
+      Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn));
+  }
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
    * @param leftJoinColumns specifies the join columns of the left side
    * @param rightJoinColumns specifies the join columns of the right side
    */
@@ -96,6 +110,25 @@ public class JoinEmbeddings implements PhysicalOperator {
       leftJoinColumns, rightJoinColumns,
       Collections.emptyList(), Collections.emptyList(),
       Collections.emptyList(), Collections.emptyList());
+  }
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param leftJoinColumn specifies the join column of the left side
+   * @param rightJoinColumn specifies the join column of the right side
+   * @param adoptColumns columns that are adopted from the right side to the left side
+   */
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+    int leftJoinColumn, int rightJoinColumn,
+    Map<Integer, Integer> adoptColumns) {
+    this(left, right,
+      Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn),
+      Collections.emptyList(), Collections.emptyList(),
+      Collections.emptyList(), Collections.emptyList(),
+      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   /**

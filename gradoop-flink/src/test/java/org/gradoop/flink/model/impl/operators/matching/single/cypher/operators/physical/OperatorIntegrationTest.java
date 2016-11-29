@@ -104,7 +104,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
 
     DataSet<Embedding> aExpanded = new ExpandOne(vertices,edges,0, OUT).evaluate();
 
-    DataSet<Embedding> ab = new JoinEmbeddings(aExpanded,vertices,2,0).evaluate();
+    DataSet<Embedding> ab = new JoinEmbeddings(aExpanded,vertices, 2, 0).evaluate();
 
     HashMap<String, Integer> mapping = new HashMap<>();
     mapping.put("a",0);

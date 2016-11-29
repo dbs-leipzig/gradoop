@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 
@@ -76,7 +75,7 @@ public class Embedding {
    *
    * @return entry list
    */
-  public List<EmbeddingEntry> getEntries() {
+  public ArrayList<EmbeddingEntry> getEntries() {
     return entries;
   }
 
