@@ -34,7 +34,7 @@ public class Embedding {
   /**
    * List of entries in this embedding
    */
-  private List<EmbeddingEntry> entries;
+  private ArrayList<EmbeddingEntry> entries;
 
   /**
    * Creates a new empty Embedding
@@ -48,7 +48,7 @@ public class Embedding {
    *
    * @param entries initial embedding entries
    */
-  public Embedding(List<EmbeddingEntry> entries) {
+  public Embedding(ArrayList<EmbeddingEntry> entries) {
     this.entries = entries;
   }
 
@@ -67,7 +67,7 @@ public class Embedding {
    *
    * @param entries embedding entries
    */
-  public void setEntries(List<EmbeddingEntry> entries) {
+  public void setEntries(ArrayList<EmbeddingEntry> entries) {
     this.entries = entries;
   }
 
@@ -94,7 +94,7 @@ public class Embedding {
    *
    * @param other entry list
    */
-  public void addEntries(List<EmbeddingEntry> other) {
+  public void addEntries(ArrayList<EmbeddingEntry> other) {
     entries.addAll(other);
   }
 
