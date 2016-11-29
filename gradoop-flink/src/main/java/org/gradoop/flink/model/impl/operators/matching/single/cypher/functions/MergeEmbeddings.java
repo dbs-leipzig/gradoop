@@ -5,6 +5,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical.JoinEmbeddings;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,15 +13,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Given two input embeddings, the function merges them according to the given parameters.
+ * Given two input embeddings, the function merges them according to the given parameters and
+ * constraints.
  *
- * The result is always a new embedding with the following constraints.
- *
- * <ul>
- * <li>{@link EmbeddingEntry} elements of the right embedding are always appended to the left embedding</li>
- * <li>duplicate fields are removed, i.e., the join columns are stored once in the result</li>
- * <li>join columns are either adopted from the left or right side</li>
- * </ul>
+ * The constraints for merging are defined at {@link JoinEmbeddings}.
  */
 public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, Embedding> {
   /**
