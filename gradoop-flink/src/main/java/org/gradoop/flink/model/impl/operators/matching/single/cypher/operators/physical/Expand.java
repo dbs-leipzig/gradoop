@@ -175,6 +175,8 @@ public class Expand implements PhysicalOperator {
   private DataSet<ExpandIntermediateResult> preprocess() {
     if (direction == ExpandDirection.IN) {
       candidateEdges = candidateEdges.map(new ReverseEmbeddings());
+    } else  if (direction == ExpandDirection.ALL) {
+      candidateEdges = candidateEdges.union(candidateEdges.map(new ReverseEmbeddings()));
     }
 
     return input.join(candidateEdges, joinHint)

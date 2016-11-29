@@ -143,7 +143,7 @@ public class CombineExpandIntermediateResultsTest {
 
 
   private void testJoin(Embedding edge, List<Integer> distinctVertices, List<Integer> distinctEdges,
-    int circle, boolean isResult) throws Exception {
+    int closingColumn, boolean isResult) throws Exception {
 
     ExpandIntermediateResult expandIntermediateResult = new ExpandIntermediateResult(
       new Embedding(Lists.newArrayList(
@@ -154,7 +154,7 @@ public class CombineExpandIntermediateResultsTest {
     );
 
     CombineExpandIntermediateResults
-      op = new CombineExpandIntermediateResults(distinctVertices, distinctEdges, circle);
+      op = new CombineExpandIntermediateResults(distinctVertices, distinctEdges, closingColumn);
     
     List<ExpandIntermediateResult> results = new ArrayList<>();
     op.join(expandIntermediateResult, edge, new ListCollector<>(results));

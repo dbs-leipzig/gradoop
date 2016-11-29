@@ -72,10 +72,7 @@ public class OperatorIntegrationTest extends GradoopFlinkTestBase {
     DataSet<Embedding> r1 =
       new FilterEdges(graph.getEdges(), r1Predicate).evaluate();
 
-    System.out.println("p1.count() = " + p1.count());
-    System.out.println("r1.count() = " + r1.count());
-
-    //DataSet<Embedding> res = new ExpandOne(p1,r1,0, ExpandDirection.OUT).evaluate();
+    //DataSet<Embedding> res = new  JoinEmbeddings(p1,r1,0, ExpandDirection.OUT).evaluate();
 
     //System.out.println("res.collect() = " + res.collect());
   }

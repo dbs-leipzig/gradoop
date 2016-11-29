@@ -21,15 +21,33 @@ import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
+/**
+ * Postprocesses the expand iteration results
+ * 1. Remove paths below lower bound length
+ * 2. Remove results that do not match circle condition
+ * 3. Turn intermediate results into embeddings
+ */
 public class PostProcessExpandResult
   extends RichFlatMapFunction<ExpandIntermediateResult, Embedding> {
 
+  /**
+   * Holds the minimum path size calculated from lower bound
+   */
   private final int minPathLength;
-  private final int circleColumn;
+  /**
+   * Specifies the base column which should be equal to the paths end column
+   */
+  private final int closingColumn;
 
-  public PostProcessExpandResult(int lowerBound, int circleColumn) {
+  /**
+   * Create a new Postprocess function
+   *
+   * @param lowerBound the lower bound path length
+   * @param closingColumn the base column which should equal the paths end column
+   */
+  public PostProcessExpandResult(int lowerBound, int closingColumn) {
     this.minPathLength = lowerBound * 2 - 1;
-    this.circleColumn = circleColumn;
+    this.closingColumn = closingColumn;
   }
 
   @Override
@@ -38,7 +56,7 @@ public class PostProcessExpandResult
       return;
     }
 
-    if (circleColumn >= 0 && !value.getBase().getEntry(circleColumn).contains(value.getEnd())) {
+    if (closingColumn >= 0 && !value.getBase().getEntry(closingColumn).contains(value.getEnd())) {
       return;
     }
 
