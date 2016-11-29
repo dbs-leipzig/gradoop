@@ -14,24 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
+
+import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
 /**
- * Used to select the strategy used by the matching algorithms
+ * Filters results from previous iterations
  */
-public enum MatchStrategy {
-    /**
-     * If this strategy is used vertices and edges can only be
-     * mapped to one vertice/edge in the query graph
-     */
-    ISOMORPHISM,
-    /**
-     * If this strategy is used vertices and edges can be
-     * mapped to multiple verices/edges in the query graph
-     */
-    HOMOMORPHISM,
-    /**
-     * Match cypher style: Homomorphism for vertices, isomorphism for edges
-     */
-    CYPHER
+public class FilterOldExpandIterationResults extends RichFilterFunction<ExpandIntermediateResult> {
+  @Override
+  public boolean filter(ExpandIntermediateResult expandIntermediateResult) {
+    int superStep = getIterationRuntimeContext().getSuperstepNumber();
+
+    return expandIntermediateResult.pathSize() >= superStep * 2 - 1;
+  }
 }
