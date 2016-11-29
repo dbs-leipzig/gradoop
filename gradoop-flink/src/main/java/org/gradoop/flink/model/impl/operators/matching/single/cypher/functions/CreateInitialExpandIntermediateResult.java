@@ -41,21 +41,21 @@ public class CreateInitialExpandIntermediateResult extends
   /**
    * Specifies a base column that should be equal to the paths end node
    */
-  private final int circle;
+  private final int closingColumn;
 
 
   /**
    * Create new FlatJoin Function
    * @param distinctVertices indices of distinct vertex columns
    * @param distinctEdges indices of distinct edge columns
-   * @param circle base column that should be equal to a paths end node
+   * @param closingColumn base column that should be equal to a paths end node
    */
   public CreateInitialExpandIntermediateResult(List<Integer> distinctVertices,
-    List<Integer> distinctEdges, int circle) {
+    List<Integer> distinctEdges, int closingColumn) {
 
     this.distinctVertices = distinctVertices;
     this.distinctEdges = distinctEdges;
-    this.circle = circle;
+    this.closingColumn = closingColumn;
   }
 
   @Override
@@ -66,7 +66,6 @@ public class CreateInitialExpandIntermediateResult extends
       GradoopId[] path = new GradoopId[]{edge.getEntry(1).getId(), edge.getEntry(2).getId()};
       out.collect(new ExpandIntermediateResult(input, path));
     }
-
   }
 
   /**
@@ -80,7 +79,7 @@ public class CreateInitialExpandIntermediateResult extends
     GradoopId tgt = edge.getEntry(2).getId();
 
     for (int i : distinctVertices) {
-      if (input.getEntry(i).getId().equals(tgt) && i != circle) {
+      if (input.getEntry(i).getId().equals(tgt) && i != closingColumn) {
         return false;
       }
     }

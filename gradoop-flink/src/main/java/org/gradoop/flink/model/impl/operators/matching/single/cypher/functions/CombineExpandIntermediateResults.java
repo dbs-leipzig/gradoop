@@ -26,7 +26,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.Expan
 import java.util.List;
 
 /**
- * Expands a given Embedding by an Edge
+ * Combines the results of a join between ExpandIntermediateResults and an edge embedding by growing
+ * the intermediate result.
+ * Before growing it is checked whether distinctiveness conditions would still apply.
  */
 public class CombineExpandIntermediateResults
   extends RichFlatJoinFunction<ExpandIntermediateResult, Embedding, ExpandIntermediateResult> {
@@ -42,20 +44,20 @@ public class CombineExpandIntermediateResults
   /**
    * Specifies a base column that should be equal to the paths end node
    */
-  private final int circle;
+  private final int closingColumn;
 
   /**
    * Create a new Combine Expand Embeddings Operator
    * @param distinctVertices distinct vertex columns
    * @param distinctEdges distinct edge columns
-   * @param circle base column that should be equal to a paths end node
+   * @param closingColumn base column that should be equal to a paths end node
    */
   public CombineExpandIntermediateResults(List<Integer> distinctVertices,
-    List<Integer> distinctEdges, int circle) {
+    List<Integer> distinctEdges, int closingColumn) {
 
     this.distinctVertices = distinctVertices;
     this.distinctEdges = distinctEdges;
-    this.circle = circle;
+    this.closingColumn = closingColumn;
   }
 
   @Override
@@ -68,30 +70,29 @@ public class CombineExpandIntermediateResults
   }
 
   /**
-   * Checks the distinct criteria for the expansion
+   * Checks the distinctiveness criteria for the expansion
    * @param prev previous intermediate result
    * @param extension edge along which we expand
-   * @return true if distinct criteria hold for the expansion
+   * @return true if distinct criteria apply for the expansion
    */
   private boolean checkDistinctiveness(ExpandIntermediateResult prev, Embedding extension) {
     if (distinctVertices.isEmpty() && distinctEdges.isEmpty()) {
       return true;
     }
 
+    // the new edge is valid under vertex isomorphism
+    if (extension.getEntry(0).equals(extension.getEntry(2)) && !distinctVertices.isEmpty()) {
+      return false;
+    }
+
     GradoopId src = extension.getEntry(0).getId();
     GradoopId edge = extension.getEntry(1).getId();
     GradoopId tgt = extension.getEntry(2).getId();
-
-    // the new edge does hold for vertex isomorphism
-    if (src.equals(tgt) && !distinctVertices.isEmpty()) {
-      return false;
-    }
 
     // check if there are any clashes in the path
     for (GradoopId ref : prev.getPath()) {
       if ((ref.equals(src) || ref.equals(tgt) && !distinctVertices.isEmpty()) ||
           (ref.equals(edge) && !distinctEdges.isEmpty())) {
-
         return false;
       }
     }
@@ -99,7 +100,7 @@ public class CombineExpandIntermediateResults
     // check for clashes with distinct vertices in the base
     for (int i : distinctVertices) {
       GradoopId ref = prev.getBase().getEntry(i).getId();
-      if ((ref.equals(tgt) && i != circle) || ref.equals(src)) {
+      if ((ref.equals(tgt) && i != closingColumn) || ref.equals(src)) {
         return false;
       }
     }

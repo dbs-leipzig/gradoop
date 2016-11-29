@@ -107,7 +107,6 @@ public class CombineExpandIntermediateResultsTest {
     testJoin(buildEdge(a,e2,n), Lists.newArrayList(0,2), new ArrayList<>(), 2, true);
   }
 
-
   //EdgeIsomorphism
   @Test
   public void testEdgeIsomorphismWithoutDuplicates() throws Exception {

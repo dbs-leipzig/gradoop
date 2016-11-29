@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.FilterOldExpandIterationResults;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.PostProcessExpandResult;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ReverseEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.EmbeddingKeySelector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.EmbeddingKeySelector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandIntermediateResult;
 
@@ -65,17 +65,17 @@ public class Expand implements PhysicalOperator {
    */
   private final ExpandDirection direction;
   /**
-   * Holds indices of vertex columns that should be distinct
+   * Holds indices of input vertex columns that should be distinct
    */
   private final List<Integer> distinctVertexColumns;
   /**
-   * Holds indices of edge columns that should be distinct
+   * Holds indices of input edge columns that should be distinct
    */
   private final List<Integer> distinctEdgeColumns;
   /**
    * Define the column which should be equal with the paths end
    */
-  private final int circle;
+  private final int closingColumn;
   /**
    * join hint
    */
@@ -86,18 +86,18 @@ public class Expand implements PhysicalOperator {
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param expandColumn specifies the input column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
-   * @param distinctVertexColumns indices of distinct vertex columns
-   * @param distinctEdgeColumns indices of distinct edge columns
-   * @param circle defines the column which should be equal with the paths end
+   * @param distinctVertexColumns indices of distinct input vertex columns
+   * @param distinctEdgeColumns indices of distinct input edge columns
+   * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int circle,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
 
     this.input = input;
@@ -108,7 +108,7 @@ public class Expand implements PhysicalOperator {
     this.direction = direction;
     this.distinctVertexColumns = distinctVertexColumns;
     this.distinctEdgeColumns = distinctEdgeColumns;
-    this.circle = circle;
+    this.closingColumn = closingColumn;
     this.joinHint = joinHint;
   }
 
@@ -123,22 +123,36 @@ public class Expand implements PhysicalOperator {
    * @param direction direction of the expansion {@see ExpandDirection}
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
-   * @param circle defines the column which should be equal with the paths end
+   * @param closingColumn defines the column which should be equal with the paths end
    */
   public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int circle) {
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
-    this.input = input;
-    this.candidateEdges = candidateEdges;
-    this.expandColumn = expandColumn;
-    this.lowerBound = lowerBound;
-    this.upperBound = upperBound;
-    this.direction = direction;
-    this.distinctVertexColumns = distinctVertexColumns;
-    this.distinctEdgeColumns = distinctEdgeColumns;
-    this.circle = circle;
-    this.joinHint = JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
+    this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+  }
+
+  /**
+   * New Expand One Operator with no upper bound
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param lowerBound specifies the minimum hops we want to expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param distinctVertexColumns indices of distinct vertex columns
+   * @param distinctEdgeColumns indices of distinct edge columns
+   * @param closingColumn defines the column which should be equal with the paths end
+   */
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
+    int lowerBound, ExpandDirection direction,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
+
+    this(input, candidateEdges, expandColumn, lowerBound, Integer.MAX_VALUE, direction,
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   /**
@@ -169,7 +183,7 @@ public class Expand implements PhysicalOperator {
       .with(new CreateInitialExpandIntermediateResult(
         distinctVertexColumns,
         distinctEdgeColumns,
-        circle
+        closingColumn
       ));
   }
 
@@ -191,8 +205,7 @@ public class Expand implements PhysicalOperator {
         .equalTo(new EmbeddingKeySelector(0))
         .with(new CombineExpandIntermediateResults(
           distinctVertexColumns,
-          distinctEdgeColumns,
-          circle
+          distinctEdgeColumns, closingColumn
         ));
 
     DataSet<ExpandIntermediateResult> solutionSet = nextWorkingSet.union(iteration);
@@ -207,7 +220,7 @@ public class Expand implements PhysicalOperator {
    */
   private DataSet<Embedding> postprocess(DataSet<ExpandIntermediateResult> iterationResults) {
     DataSet<Embedding> results =
-      iterationResults.flatMap(new PostProcessExpandResult(lowerBound, circle));
+      iterationResults.flatMap(new PostProcessExpandResult(lowerBound, closingColumn));
 
     if (lowerBound == 0) {
       results = results.union(input);

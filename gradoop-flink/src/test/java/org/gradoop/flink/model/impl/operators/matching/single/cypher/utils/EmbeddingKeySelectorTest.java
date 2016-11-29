@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.EmbeddingKeySelector;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
