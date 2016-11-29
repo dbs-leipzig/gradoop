@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.junit.Assert;
 import org.junit.Test;
 

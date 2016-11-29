@@ -19,10 +19,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.IdListEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdListEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.Expand;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.junit.Test;
 
 import java.util.ArrayList;
