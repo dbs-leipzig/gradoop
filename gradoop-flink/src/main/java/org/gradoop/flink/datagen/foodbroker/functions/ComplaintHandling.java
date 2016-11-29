@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ComplaintTuple
-  extends Process<FoodBrokerMaps, Tuple2<GraphTransaction, Set<Vertex>>> {
+public class ComplaintHandling
+  extends Process<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
 
   private List<Vertex> employees;
   private List<Vertex> customers;
@@ -40,7 +40,7 @@ public class ComplaintTuple
   private Set<Edge> purchOrderLines;
   private Vertex salesOrder;
 
-  public ComplaintTuple(GraphHeadFactory graphHeadFactory,
+  public ComplaintHandling(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config, long globalSeed) {
     super(edgeFactory, vertexFactory, config, graphHeadFactory);
@@ -55,7 +55,7 @@ public class ComplaintTuple
   }
 
   @Override
-  public void mapPartition(Iterable<FoodBrokerMaps> iterable,
+  public void mapPartition(Iterable<GraphTransaction> iterable,
     Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
@@ -63,15 +63,15 @@ public class ComplaintTuple
     Set<Edge> edges;
     Set<Vertex> deliveryNotes;
 
-    for (FoodBrokerMaps maps: iterable) {
-      vertexMap = maps.getVertexMap();
-      edgeMap = maps.getEdgeMap();
+    for (GraphTransaction transaction: iterable) {
+      vertexMap = Maps.newHashMap();
+      edgeMap = Maps.newHashMap();
 
-      deliveryNotes = getVertexByLabel("DeliveryNote");
-      salesOrderLines = getEdgesByLabel("SalesOrderLine");
-      purchOrderLines = getEdgesByLabel("PurchOrderLine");
+      deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
+      salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
+      purchOrderLines = getEdgesByLabel(transaction, "PurchOrderLine");
 
-      salesOrder = getVertexByLabel("SalesOrder").iterator().next();
+      salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
       masterDataMap = Maps.newHashMap();
       userMap = Maps.newHashMap();
       graphHead = graphHeadFactory.createGraphHead();
@@ -286,22 +286,22 @@ public class ComplaintTuple
   }
 
 
-  private Set<Vertex> getVertexByLabel(String label) {
+  private Set<Vertex> getVertexByLabel(GraphTransaction transaction, String label) {
     Set<Vertex> vertices = Sets.newHashSet();
-    for (Map.Entry<GradoopId, Vertex> entry : vertexMap.entrySet()) {
-      if (entry.getValue().getLabel().equals(label)) {
-        vertices.add(entry.getValue());
+
+    for (Vertex vertex : transaction.getVertices()) {
+      if (vertex.getLabel().equals(label)) {
+        vertices.add(vertex);
       }
     }
     return vertices;
   }
 
-  private Set<Edge> getEdgesByLabel(String label) {
+  private Set<Edge> getEdgesByLabel(GraphTransaction transaction, String label) {
     Set<Edge> edges = Sets.newHashSet();
-    for (Map.Entry<Tuple2<String, GradoopId>, Set<Edge>> entry :
-      edgeMap.entrySet()) {
-      if (entry.getKey().f0.equals(label)) {
-        edges.addAll(entry.getValue());
+    for (Edge edge : transaction.getEdges()) {
+      if (edge.getLabel().equals(label)) {
+        edges.add(edge);
       }
     }
     return edges;
