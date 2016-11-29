@@ -56,6 +56,11 @@ public class IdEntry implements EmbeddingEntry {
   }
 
   @Override
+  public Boolean contains(GradoopId id) {
+    return this.id.equals(id);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -73,5 +78,10 @@ public class IdEntry implements EmbeddingEntry {
   @Override
   public int hashCode() {
     return id != null ? id.hashCode() : 0;
+  }
+
+  @Override
+  public String toString() {
+    return "(" + id + ")";
   }
 }
