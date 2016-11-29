@@ -68,6 +68,11 @@ public class GraphElementEntry implements EmbeddingEntry {
   }
 
   @Override
+  public Boolean contains(GradoopId id) {
+    return this.graphElement.getId().equals(id);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
