@@ -37,4 +37,11 @@ public interface EmbeddingEntry {
    * @return properties
    */
   Optional<Properties>  getProperties();
+
+  /**
+   * Checks if the embedding entry contains the specified id
+   * @param id the query id
+   * @return true if the id is contained in the embedding entry
+   */
+  Boolean contains(GradoopId id);
 }

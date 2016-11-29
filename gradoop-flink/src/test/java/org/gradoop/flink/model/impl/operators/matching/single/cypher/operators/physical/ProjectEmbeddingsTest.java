@@ -35,7 +35,7 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception{
-    DataSet<Embedding> embeddings = createEmbeddings(
+    DataSet<Embedding> embeddings = createEmbeddings(2,
       Lists.newArrayList(
         new IdEntry(GradoopId.get()),
         new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
@@ -66,7 +66,7 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
   public void testProjectMultipleEntriesAtOnce() throws Exception{
-    DataSet<Embedding> embeddings = createEmbeddings(
+    DataSet<Embedding> embeddings = createEmbeddings(2,
       Lists.newArrayList(
         new IdEntry(GradoopId.get()),
         new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),

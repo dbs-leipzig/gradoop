@@ -24,6 +24,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * Represents a path in an embedding.
  * This is used e.g. for paths with variable path length where the access specific
@@ -57,12 +59,46 @@ public class IdListEntry implements EmbeddingEntry {
   }
 
   /**
+   * Adds a list of ids to the path
+   * @param ids the ids that will be added
+   */
+  public void addIds(List<GradoopId> ids) {
+    path.addAll(ids);
+  }
+
+  /**
+   * Adds a new Id to the path
+   * @param id the id that will be added
+   */
+  public void addId(GradoopId id) {
+    path.add(id);
+  }
+
+  /**
    * ListEntries do not have properties so return nothing
    * @return empty optional
    */
   @Override
   public Optional<Properties> getProperties() {
     return Optional.empty();
+  }
+
+  @Override
+  public Boolean contains(GradoopId id) {
+    return path.stream().anyMatch(pathId -> pathId.equals(id));
+  }
+
+  /**
+   * Returns the path
+   * @return the path
+   */
+  public List<GradoopId> getIds() {
+    return path;
+  }
+
+  @Override
+  public String toString() {
+    return "(" + path.stream().map(GradoopId::toString).collect(joining(", ")) + ")";
   }
 }
 
