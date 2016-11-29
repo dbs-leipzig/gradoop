@@ -19,16 +19,19 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 /**
- * Postprocesses the expand iteration results
- * 1. Remove paths below lower bound length
- * 2. Remove results that do not match circle condition
- * 3. Turn intermediate results into embeddings
+ * Post-processes the expand iteration results
+ *
+ * <ol>
+ * <li>Remove paths below lower bound length</li>
+ * <li>Remove results that do not match circle condition</li>
+ * <li>Turn intermediate results into embeddings</li>
+ * </ol>
  */
-public class PostProcessExpandResult
-  extends RichFlatMapFunction<ExpandIntermediateResult, Embedding> {
+public class PostProcessExpandEmbedding
+  extends RichFlatMapFunction<ExpandEmbedding, Embedding> {
 
   /**
    * Holds the minimum path size calculated from lower bound
@@ -40,18 +43,18 @@ public class PostProcessExpandResult
   private final int closingColumn;
 
   /**
-   * Create a new Postprocess function
+   * Create a new Post-process function
    *
    * @param lowerBound the lower bound path length
    * @param closingColumn the base column which should equal the paths end column
    */
-  public PostProcessExpandResult(int lowerBound, int closingColumn) {
+  public PostProcessExpandEmbedding(int lowerBound, int closingColumn) {
     this.minPathLength = lowerBound * 2 - 1;
     this.closingColumn = closingColumn;
   }
 
   @Override
-  public void flatMap(ExpandIntermediateResult value, Collector<Embedding> out) throws Exception {
+  public void flatMap(ExpandEmbedding value, Collector<Embedding> out) throws Exception {
     if (value.pathSize() < minPathLength) {
       return;
     }

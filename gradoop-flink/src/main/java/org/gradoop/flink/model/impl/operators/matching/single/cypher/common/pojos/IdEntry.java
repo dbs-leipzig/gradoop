@@ -23,8 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import java.util.Optional;
 
 /**
- * This is the simplest form an embedding entry.
- * It consists only of the element id.
+ * This is the simplest form of an embedding entry. It consists only of the element id.
  */
 public class IdEntry implements EmbeddingEntry {
   /**
@@ -56,7 +55,7 @@ public class IdEntry implements EmbeddingEntry {
   }
 
   @Override
-  public Boolean contains(GradoopId id) {
+  public boolean contains(GradoopId id) {
     return this.id.equals(id);
   }
 

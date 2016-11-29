@@ -28,10 +28,10 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * Represents a path in an embedding.
- * This is used e.g. for paths with variable path length where the access specific
- * elements is not necessary.
+ *
+ * This is used for paths with variable length where access to specific elements is not necessary.
  */
-public class IdListEntry implements EmbeddingEntry {
+public class PathEntry implements EmbeddingEntry {
 
   /**
    * Contains the path represented by element ids
@@ -42,40 +42,57 @@ public class IdListEntry implements EmbeddingEntry {
    * Creates a new IdListEntry from a given path
    * @param path path representet bei element ids
    */
-  public IdListEntry(List<GradoopId> path) {
+  public PathEntry(List<GradoopId> path) {
     this.path = path;
   }
 
   /**
    * Creates a new IdListEntry with empty path
    */
-  public IdListEntry() {
+  public PathEntry() {
     this(Lists.newArrayList());
   }
 
+  /**
+   * Returns the first element of the path.
+   *
+   * @return first element of the path
+   */
   @Override
   public GradoopId getId() {
     return path.get(0);
   }
 
   /**
-   * Adds a list of ids to the path
-   * @param ids the ids that will be added
+   * Returns the path.
+   *
+   * @return path
    */
-  public void addIds(List<GradoopId> ids) {
+  public List<GradoopId> getPath() {
+    return path;
+  }
+
+  /**
+   * Adds a list of ids to the path.
+   *
+   * @param ids ids that will be added
+   */
+  public void addAll(List<GradoopId> ids) {
     path.addAll(ids);
   }
 
   /**
    * Adds a new Id to the path
-   * @param id the id that will be added
+   *
+   * @param id id that will be added
    */
-  public void addId(GradoopId id) {
+  public void add(GradoopId id) {
     path.add(id);
   }
 
   /**
-   * ListEntries do not have properties so return nothing
+   * Paths have no properties, this method returns an empty optional.
+   *
    * @return empty optional
    */
   @Override
@@ -84,16 +101,8 @@ public class IdListEntry implements EmbeddingEntry {
   }
 
   @Override
-  public Boolean contains(GradoopId id) {
+  public boolean contains(GradoopId id) {
     return path.stream().anyMatch(pathId -> pathId.equals(id));
-  }
-
-  /**
-   * Returns the path
-   * @return the path
-   */
-  public List<GradoopId> getIds() {
-    return path;
   }
 
   @Override

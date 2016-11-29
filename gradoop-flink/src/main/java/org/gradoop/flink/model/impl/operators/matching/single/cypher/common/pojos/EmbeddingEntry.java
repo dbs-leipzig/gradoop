@@ -23,25 +23,28 @@ import org.gradoop.common.model.impl.properties.Properties;
 import java.util.Optional;
 
 /**
- * Represents an entry in an embedding
+ * Represents an entry in an {@link Embedding}.
  */
 public interface EmbeddingEntry {
   /**
-   * Returns the identifier of the element
+   * Returns the identifier of the element represented by this entry.
+   *
    * @return id
    */
   GradoopId getId();
 
   /**
-   * Returns the list of properties of this element
+   * Returns the list of properties of the element represented by this entry.
+   *
    * @return properties
    */
   Optional<Properties>  getProperties();
 
   /**
-   * Checks if the embedding entry contains the specified id
+   * Checks if the embedding entry contains the specified id.
+   *
    * @param id the query id
    * @return true if the id is contained in the embedding entry
    */
-  Boolean contains(GradoopId id);
+  boolean contains(GradoopId id);
 }

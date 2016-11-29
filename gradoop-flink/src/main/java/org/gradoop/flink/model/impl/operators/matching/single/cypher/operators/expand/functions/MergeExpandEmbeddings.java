@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
 
@@ -30,8 +30,8 @@ import java.util.List;
  * the intermediate result.
  * Before growing it is checked whether distinctiveness conditions would still apply.
  */
-public class MergeExpandIntermediateResults
-  extends RichFlatJoinFunction<ExpandIntermediateResult, Embedding, ExpandIntermediateResult> {
+public class MergeExpandEmbeddings
+  extends RichFlatJoinFunction<ExpandEmbedding, Embedding, ExpandEmbedding> {
 
   /**
    * Holds the index of all vertex columns that should be distinct
@@ -52,7 +52,7 @@ public class MergeExpandIntermediateResults
    * @param distinctEdges distinct edge columns
    * @param closingColumn base column that should be equal to a paths end node
    */
-  public MergeExpandIntermediateResults(List<Integer> distinctVertices,
+  public MergeExpandEmbeddings(List<Integer> distinctVertices,
     List<Integer> distinctEdges, int closingColumn) {
 
     this.distinctVertices = distinctVertices;
@@ -61,8 +61,8 @@ public class MergeExpandIntermediateResults
   }
 
   @Override
-  public void join(ExpandIntermediateResult base, Embedding extension,
-    Collector<ExpandIntermediateResult> out) throws Exception {
+  public void join(ExpandEmbedding base, Embedding extension,
+    Collector<ExpandEmbedding> out) throws Exception {
 
     if (checkDistinctiveness(base, extension)) {
       out.collect(base.grow(extension));
@@ -75,7 +75,7 @@ public class MergeExpandIntermediateResults
    * @param extension edge along which we expand
    * @return true if distinct criteria apply for the expansion
    */
-  private boolean checkDistinctiveness(ExpandIntermediateResult prev, Embedding extension) {
+  private boolean checkDistinctiveness(ExpandEmbedding prev, Embedding extension) {
     if (distinctVertices.isEmpty() && distinctEdges.isEmpty()) {
       return true;
     }

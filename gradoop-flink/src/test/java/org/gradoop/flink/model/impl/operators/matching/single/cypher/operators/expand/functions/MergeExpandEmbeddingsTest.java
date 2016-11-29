@@ -21,8 +21,7 @@ import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandIntermediateResults;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import java.util.List;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class MergeExpandIntermediateResultsTest {
+public class MergeExpandEmbeddingsTest {
   private final GradoopId m = GradoopId.get();
   private final GradoopId n = GradoopId.get();
   private final GradoopId a = GradoopId.get();
@@ -145,7 +144,7 @@ public class MergeExpandIntermediateResultsTest {
   private void testJoin(Embedding edge, List<Integer> distinctVertices, List<Integer> distinctEdges,
     int closingColumn, boolean isResult) throws Exception {
 
-    ExpandIntermediateResult expandIntermediateResult = new ExpandIntermediateResult(
+    ExpandEmbedding expandEmbedding = new ExpandEmbedding(
       new Embedding(Lists.newArrayList(
         new IdEntry(m),
         new IdEntry(e0),
@@ -153,11 +152,11 @@ public class MergeExpandIntermediateResultsTest {
       )), new GradoopId[]{e1,a}
     );
 
-    MergeExpandIntermediateResults
-      op = new MergeExpandIntermediateResults(distinctVertices, distinctEdges, closingColumn);
+    MergeExpandEmbeddings
+      op = new MergeExpandEmbeddings(distinctVertices, distinctEdges, closingColumn);
     
-    List<ExpandIntermediateResult> results = new ArrayList<>();
-    op.join(expandIntermediateResult, edge, new ListCollector<>(results));
+    List<ExpandEmbedding> results = new ArrayList<>();
+    op.join(expandEmbedding, edge, new ListCollector<>(results));
     
     assertEquals(isResult ? 1:0, results.size());
     

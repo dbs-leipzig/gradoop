@@ -34,7 +34,8 @@ import java.util.Map;
 public class Projector {
 
   /**
-   * Projects an embedding
+   * Projects an embedding.
+   *
    * @param embedding the embedding to project
    * @param propertyKeyMap mapping of embedding entries to property keys
    * @return the projected embedding
@@ -57,15 +58,15 @@ public class Projector {
   }
 
   /**
-   * projects Properties to include only specified properties
+   * projects Properties to include only specified properties.
+   *
    * @param properties the properties which will be kept
    * @param propertyKeys List of property names that will be kept in the projection
    * @return the projected property list
    */
-  private static Properties projectProperties(Properties properties,
-    List<String> propertyKeys) {
+  private static Properties projectProperties(Properties properties, List<String> propertyKeys) {
 
-    Properties projectedList = new Properties();
+    Properties projectedList = Properties.createWithCapacity(propertyKeys.size());
     List<String> remainingKeys = new ArrayList<>(propertyKeys);
 
     // add existing properties to projection

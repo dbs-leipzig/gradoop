@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdListEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
@@ -67,23 +67,23 @@ public class ExpandTest extends PhysicalOperatorTest {
 
     assertEveryEmbedding(result, (embedding -> {
       assertEquals(5,embedding.size());
-      assertEquals(IdListEntry.class, embedding.getEntry(3).getClass());
+      assertEquals(PathEntry.class, embedding.getEntry(3).getClass());
       assertEquals(IdEntry.class,     embedding.getEntry(4).getClass());
     }));
 
     assertEmbeddingExists(
       result,
-      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 1
+      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 1
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 3
+      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 3
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((IdListEntry) embedding.getEntry(3)).getIds().size() == 5
+      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 5
     );
   }
 
@@ -143,7 +143,7 @@ public class ExpandTest extends PhysicalOperatorTest {
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((IdListEntry) embedding.getEntry(1)).getIds().size());
+      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
     });
   }
 
@@ -162,7 +162,7 @@ public class ExpandTest extends PhysicalOperatorTest {
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((IdListEntry) embedding.getEntry(1)).getIds().size());
+      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
     });
   }
 

@@ -20,15 +20,15 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
 
 /**
  * Creates the initial expand embeddings
  */
-public class CreateInitialExpandIntermediateResult extends
-  RichFlatJoinFunction<Embedding, Embedding, ExpandIntermediateResult> {
+public class CreateExpandEmbedding
+  extends RichFlatJoinFunction<Embedding, Embedding, ExpandEmbedding> {
 
   /**
    * Holds the index of all base vertex columns that should be distinct
@@ -50,7 +50,7 @@ public class CreateInitialExpandIntermediateResult extends
    * @param distinctEdges indices of distinct edge columns
    * @param closingColumn base column that should be equal to a paths end node
    */
-  public CreateInitialExpandIntermediateResult(List<Integer> distinctVertices,
+  public CreateExpandEmbedding(List<Integer> distinctVertices,
     List<Integer> distinctEdges, int closingColumn) {
 
     this.distinctVertices = distinctVertices;
@@ -59,12 +59,12 @@ public class CreateInitialExpandIntermediateResult extends
   }
 
   @Override
-  public void join(Embedding input, Embedding edge, Collector<ExpandIntermediateResult> out)
+  public void join(Embedding input, Embedding edge, Collector<ExpandEmbedding> out)
       throws Exception {
 
     if (checkDistinctiveness(input, edge)) {
       GradoopId[] path = new GradoopId[]{edge.getEntry(1).getId(), edge.getEntry(2).getId()};
-      out.collect(new ExpandIntermediateResult(input, path));
+      out.collect(new ExpandEmbedding(input, path));
     }
   }
 

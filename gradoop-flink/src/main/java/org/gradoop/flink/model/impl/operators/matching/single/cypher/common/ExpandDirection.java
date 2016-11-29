@@ -30,7 +30,7 @@ public enum ExpandDirection {
    */
   OUT,
   /**
-   * Expand along both, incoming and outgoing, edges
+   * Expand along both incoming and outgoing edges
    */
   ALL
 }

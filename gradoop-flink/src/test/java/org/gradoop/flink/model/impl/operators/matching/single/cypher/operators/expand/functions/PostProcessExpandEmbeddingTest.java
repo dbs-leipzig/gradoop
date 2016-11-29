@@ -21,9 +21,7 @@ import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions
-  .PostProcessExpandResult;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -31,12 +29,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PostProcessExpandResultTest {
+public class PostProcessExpandEmbeddingTest {
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();
   private final GradoopId c = GradoopId.get();
 
-  private ExpandIntermediateResult expandIntermediateResult = new ExpandIntermediateResult(
+  private ExpandEmbedding expandEmbedding = new ExpandEmbedding(
     new Embedding(Lists.newArrayList(
       new IdEntry(a),
       new IdEntry(b),
@@ -49,28 +47,28 @@ public class PostProcessExpandResultTest {
   @Test
   public void testReturnNothingForFalseCircles() throws Exception{
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandResult(0,2).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    new PostProcessExpandEmbedding(0,2).flatMap(expandEmbedding, new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
   public void testDoTransformationForClosedCircles() throws Exception{
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandResult(0,0).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    new PostProcessExpandEmbedding(0,0).flatMap(expandEmbedding, new ListCollector<>(result));
     assertEquals(1, result.size());
   }
 
   @Test
   public void testReturnNothingForShortsResults() throws Exception{
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandResult(3,-1).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    new PostProcessExpandEmbedding(3,-1).flatMap(expandEmbedding, new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
   public void testDoTransformationForResultsThatFitLowerBound() throws Exception{
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandResult(2,-1).flatMap(expandIntermediateResult, new ListCollector<>(result));
+    new PostProcessExpandEmbedding(2,-1).flatMap(expandEmbedding, new ListCollector<>(result));
     assertEquals(1, result.size());
   }
 }

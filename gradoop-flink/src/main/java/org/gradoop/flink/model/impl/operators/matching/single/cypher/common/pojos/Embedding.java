@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Represents a (partial) embedding of a query.
+ * Represents a (possibly partial) embedding of a query.
+ *
  * An Embedding consists of a list of {@link EmbeddingEntry} which represent the vertices and edges
+ * found during query execution.
  */
 public class Embedding {
   /**
@@ -98,10 +100,10 @@ public class Embedding {
   }
 
   /**
-   * Add an entry to the list at a specified index, replace what was there before.
+   * Replaces the entry at the specified position in this list with the specified entry.
    *
-   * @param index the index where the entry will be inserted
-   * @param entry the entry
+   * @param index index of the entry to replace
+   * @param entry entry
    */
   public void setEntry(Integer index, EmbeddingEntry entry) {
     entries.set(index, entry);
@@ -117,10 +119,10 @@ public class Embedding {
   }
 
   /**
-   * Create an embedding from an Edge.
+   * Create an embedding from the specified {@link Edge}.
    *
-   * @param edge the embedding
-   * @return the embedding created from the edge
+   * @param edge data edge
+   * @return embedding created from the specified edge
    */
   public static Embedding fromEdge(Edge edge) {
     return new Embedding(Lists.newArrayList(
@@ -130,10 +132,10 @@ public class Embedding {
   }
 
   /**
-   * Create an embedding from a vertex.
+   * Create an embedding from the specified {@link Vertex}.
    *
-   * @param vertex the vertex
-   * @return the embedding created from the vertex
+   * @param vertex data vertex
+   * @return embedding created from the specified vertex
    */
   public static Embedding fromVertex(Vertex vertex) {
     return new Embedding(Lists.newArrayList(
@@ -153,7 +155,6 @@ public class Embedding {
     Embedding embedding = (Embedding) o;
 
     return entries != null ? entries.equals(embedding.entries) : embedding.entries == null;
-
   }
 
   @Override

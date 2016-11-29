@@ -21,9 +21,7 @@ import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions
-  .CreateInitialExpandIntermediateResult;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ import java.util.List;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class CreateInitialExpandIntermediateResultTest {
+public class CreateInitialExpandEmbeddingTest {
   private final GradoopId m = GradoopId.get();
   private final GradoopId n = GradoopId.get();
   private final GradoopId a = GradoopId.get();
@@ -119,10 +117,10 @@ public class CreateInitialExpandIntermediateResultTest {
         new IdEntry(n)
     ));
 
-    CreateInitialExpandIntermediateResult op =
-      new CreateInitialExpandIntermediateResult(distinctVertices, distinctEdges, closingColumn);
+    CreateExpandEmbedding op =
+      new CreateExpandEmbedding(distinctVertices, distinctEdges, closingColumn);
 
-    List<ExpandIntermediateResult> results = new ArrayList<>();
+    List<ExpandEmbedding> results = new ArrayList<>();
     op.join(base, edge, new ListCollector<>(results));
 
     assertEquals(isResult ? 1:0, results.size());

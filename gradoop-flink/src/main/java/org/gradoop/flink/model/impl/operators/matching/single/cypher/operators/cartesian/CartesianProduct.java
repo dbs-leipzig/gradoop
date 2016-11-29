@@ -30,11 +30,11 @@ public class CartesianProduct implements PhysicalOperator {
   /**
    * Left hand side embeddings
    */
-  private final DataSet<Embedding> lhs;
+  private final DataSet<Embedding> left;
   /**
    * right hand side embeddings
    */
-  private final DataSet<Embedding> rhs;
+  private final DataSet<Embedding> right;
   /**
    * Cross Hint
    */
@@ -43,24 +43,24 @@ public class CartesianProduct implements PhysicalOperator {
   /**
    * New Cartesian Product Operator
    *
-   * @param lhs the left hand side embedding
-   * @param rhs the right hand side embedding
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
    * @param crossHint cross hint
    */
-  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs,
+  public CartesianProduct(DataSet<Embedding> left, DataSet<Embedding> right,
     CrossOperatorBase.CrossHint crossHint) {
-    this.lhs = lhs;
-    this.rhs = rhs;
+    this.left = left;
+    this.right = right;
     this.crossHint = crossHint;
   }
 
   /**
    * New Cartesian Product Operator with default cross hint
-   * @param lhs left hand side embedding
-   * @param rhs right hand side embedding
+   * @param left left hand side embedding
+   * @param right right hand side embedding
    */
-  public CartesianProduct(DataSet<Embedding> lhs, DataSet<Embedding> rhs) {
-    this(lhs, rhs, CrossOperatorBase.CrossHint.OPTIMIZER_CHOOSES);
+  public CartesianProduct(DataSet<Embedding> left, DataSet<Embedding> right) {
+    this(left, right, CrossOperatorBase.CrossHint.OPTIMIZER_CHOOSES);
   }
 
   @Override

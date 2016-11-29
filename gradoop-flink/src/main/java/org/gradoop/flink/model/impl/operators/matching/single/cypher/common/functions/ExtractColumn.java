@@ -27,11 +27,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
  */
 public class ExtractColumn implements KeySelector<Embedding, GradoopId> {
   /**
-   * Shortcut to select the embeddings last element
-   */
-  public static final int LAST = -1;
-
-  /**
    * The specified column index
    */
   private final int column;

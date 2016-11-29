@@ -31,6 +31,7 @@ public class Filter {
 
   /**
    * Evaluates the predicate with respect to the embedding and the mapping
+   *
    * @param predicates the predicate in CNF
    * @param embedding the embedding
    * @param columnMapping mapping of variables to embedding entries

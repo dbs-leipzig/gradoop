@@ -17,16 +17,26 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandIntermediateResult;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 /**
  * Filters results from previous iterations
  */
-public class FilterOldExpandIterationResults extends RichFilterFunction<ExpandIntermediateResult> {
-  @Override
-  public boolean filter(ExpandIntermediateResult expandIntermediateResult) {
-    int superStep = getIterationRuntimeContext().getSuperstepNumber();
+public class FilterPreviousExpandEmbedding extends RichFilterFunction<ExpandEmbedding> {
+  /**
+   * super step
+   */
+  private int superStep;
 
-    return expandIntermediateResult.pathSize() >= superStep * 2 - 1;
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    superStep = getIterationRuntimeContext().getSuperstepNumber();
+  }
+
+  @Override
+  public boolean filter(ExpandEmbedding expandEmbedding) {
+    return expandEmbedding.pathSize() >= superStep * 2 - 1;
   }
 }

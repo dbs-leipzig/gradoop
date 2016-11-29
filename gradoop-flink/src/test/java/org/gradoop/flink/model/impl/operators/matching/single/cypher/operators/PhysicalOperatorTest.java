@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdListEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,8 +124,8 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   private List<GradoopId> embeddingToIdList(Embedding embedding) {
     return embedding.getEntries().stream().flatMap(entry -> {
-      if(entry instanceof IdListEntry) {
-        return ((IdListEntry) entry).getIds().stream();
+      if(entry instanceof PathEntry) {
+        return ((PathEntry) entry).getPath().stream();
       }
       return Lists.newArrayList(entry.getId()).stream();
     }).collect(Collectors.toList());

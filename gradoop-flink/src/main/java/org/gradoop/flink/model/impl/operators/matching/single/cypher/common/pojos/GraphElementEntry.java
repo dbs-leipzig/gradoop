@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.util.Optional;
 
 /**
- * This embedding entry wraps a graph element like vertex or edge
+ * This embedding entry wraps a {@link GraphElement}.
  */
 public class GraphElementEntry implements EmbeddingEntry {
   /**
@@ -68,7 +68,7 @@ public class GraphElementEntry implements EmbeddingEntry {
   }
 
   @Override
-  public Boolean contains(GradoopId id) {
+  public boolean contains(GradoopId id) {
     return this.graphElement.getId().equals(id);
   }
 

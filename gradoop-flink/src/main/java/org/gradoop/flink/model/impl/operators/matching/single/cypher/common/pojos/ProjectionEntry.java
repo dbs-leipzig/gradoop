@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.properties.Property;
 import java.util.Optional;
 
 /**
- * Represents an element with attached properties
+ * Represents an element with attached properties.
  */
 public class ProjectionEntry implements EmbeddingEntry {
   /**
@@ -38,6 +38,7 @@ public class ProjectionEntry implements EmbeddingEntry {
 
   /**
    * Create a new projection entry with empty property list
+   *
    * @param id element id
    */
   public ProjectionEntry(GradoopId id) {
@@ -46,6 +47,7 @@ public class ProjectionEntry implements EmbeddingEntry {
 
   /**
    * Create a new projection entry
+   *
    * @param id element id
    * @param properties property list
    */
@@ -85,7 +87,7 @@ public class ProjectionEntry implements EmbeddingEntry {
   }
 
   @Override
-  public Boolean contains(GradoopId id) {
+  public boolean contains(GradoopId id) {
     return this.id.equals(id);
   }
 
