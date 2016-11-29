@@ -15,16 +15,16 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.cam;
+package org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Set;
  * Creates a canonical label for a given graph embedding that represents its
  * adjacency matrix.
  */
-public class CAMLabeler implements CanonicalLabeler {
+public class CanonicalLabeler implements Serializable {
 
   /**
    * separator among adjacency lists
@@ -72,11 +72,10 @@ public class CAMLabeler implements CanonicalLabeler {
    *
    * @param directed true for directed mode
    */
-  public CAMLabeler(boolean directed) {
+  public CanonicalLabeler(boolean directed) {
     this.directed = directed;
   }
 
-  @Override
   public String label(Embedding embedding) {
 
     Map<Integer, String> vertices = embedding.getVertices();

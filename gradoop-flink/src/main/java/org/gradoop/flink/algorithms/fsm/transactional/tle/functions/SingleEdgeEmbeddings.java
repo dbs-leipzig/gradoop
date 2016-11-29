@@ -19,8 +19,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
@@ -46,7 +46,7 @@ public abstract class SingleEdgeEmbeddings implements Serializable {
    * @param fsmConfig FSM configuration
    */
   public SingleEdgeEmbeddings(FSMConfig fsmConfig) {
-    canonicalLabeler = fsmConfig.getCanonicalLabeler();
+    canonicalLabeler = new CanonicalLabeler(fsmConfig.isDirected());
   }
 
   /**

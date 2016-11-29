@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.model.api.tuples.Countable;
 
 /**

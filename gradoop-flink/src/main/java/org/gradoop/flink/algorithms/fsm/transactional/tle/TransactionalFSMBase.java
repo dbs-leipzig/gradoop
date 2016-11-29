@@ -4,7 +4,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;

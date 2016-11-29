@@ -15,22 +15,35 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.transactional.tle.config;
+package org.gradoop.flink.algorithms.fsm.transactional.common;
 
 /**
- * Different strategies to filter embeddings by frequent subgraphs.
+ * Collection of broadcast dataset names used for frequent subgraph mining.
  */
-public enum FilterStrategy {
+public class Constants {
+
   /**
-   * embeddings.join(frequentSubgraphs)
+   * Cache counter name for the total number of graphs.
    */
-  DEFAULT_JOIN,
+  public static final String GRAPH_COUNT = "graphCount";
+
   /**
-   * embeddings.joinWithTiny(frequentSubgraphs)
+   * 1-element set with minimum frequency
    */
-  BROADCAST_JOIN,
+  public static final String MIN_FREQUENCY = "minFrequency";
+
   /**
-   * embeddings.filter(..).withBroadcastSet(frequentSubgraphs,..)
+   * vertex label dictionary
    */
-  BROADCAST_FILTER
+  public static final String FREQUENT_VERTEX_LABELS = "frequentVertexLabels";
+
+  /**
+   * vertex label dictionary
+   */
+  public static final String FREQUENT_EDGE_LABELS = "frequentEdgeLabels";
+
+  /**
+   * set of frequent subgraphs
+   */
+  public static final String FREQUENT_SUBGRAPHS = "frequentSubgraphs";
 }

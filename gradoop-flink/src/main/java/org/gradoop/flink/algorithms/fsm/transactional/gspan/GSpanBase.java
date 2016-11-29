@@ -7,7 +7,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGS
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Undirect;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToAdjacencyList;

@@ -18,18 +18,13 @@
 package org.gradoop.flink.algorithms.fsm.transactional.tle;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.FilterStrategy;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.GrowthStrategy;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CanonicalLabelOnly;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.SubgraphIsFrequent;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.GraphId;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MergeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddings;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 
@@ -68,17 +63,12 @@ public abstract class ThinkLikeAnEmbeddingFSMBase
 
     parents = parents
       .groupBy(0)
-      .reduceGroup(new MergeEmbeddings<SE>());
+      .reduceGroup(new MergeEmbeddings<>());
 
-    if (fsmConfig.getGrowthStrategy() == GrowthStrategy.JOIN) {
-      parents = parents
-        .join(graphs)
-        .where(0).equalTo(new GraphId<G>())
-        .with(new PatternGrowth<G, SE>(fsmConfig));
-    } else {
-      parents = parents
-        .flatMap(new PatternGrowth<G, SE>(fsmConfig));
-    }
+    parents = parents
+      .join(graphs)
+      .where(0).equalTo(new GraphId<>())
+      .with(new PatternGrowth<>(fsmConfig));
 
     return parents;
   }
@@ -95,24 +85,9 @@ public abstract class ThinkLikeAnEmbeddingFSMBase
     DataSet<SE> embeddings,
     DataSet<S> frequentSubgraphs) {
 
-    if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_FILTER) {
-      return embeddings
-        .filter(new SubgraphIsFrequent<SE>())
-        .withBroadcastSet(
-          frequentSubgraphs
-            .map(new CanonicalLabelOnly<S>()),
-          Constants.FREQUENT_SUBGRAPHS
-        );
-    } else if (fsmConfig.getFilterStrategy() == FilterStrategy.BROADCAST_JOIN) {
-      return embeddings
-        .joinWithTiny(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<SE, S>());
-    } else {
-      return embeddings
-        .join(frequentSubgraphs)
-        .where(2).equalTo(0) // on canonical label
-        .with(new LeftSide<SE, S>());
-    }
+    return embeddings
+      .joinWithTiny(frequentSubgraphs)
+      .where(2).equalTo(0) // on canonical label
+      .with(new LeftSide<>());
   }
 }

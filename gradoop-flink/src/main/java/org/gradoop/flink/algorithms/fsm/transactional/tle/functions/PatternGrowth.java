@@ -23,8 +23,8 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.api.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.CanonicalLabeler;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
@@ -56,7 +56,7 @@ public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
    * @param fsmConfig FSM configuration.
    */
   public PatternGrowth(FSMConfig fsmConfig) {
-    this.canonicalLabeler = fsmConfig.getCanonicalLabeler();
+    this.canonicalLabeler = new CanonicalLabeler(fsmConfig.isDirected());
   }
 
   @Override

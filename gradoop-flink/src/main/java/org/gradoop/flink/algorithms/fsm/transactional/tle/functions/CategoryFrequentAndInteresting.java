@@ -24,7 +24,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.interestingness.Interestingness;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 
 import java.util.Collection;
 import java.util.Map;

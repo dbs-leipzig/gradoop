@@ -17,16 +17,6 @@
 
 package org.gradoop.flink.algorithms.fsm.transactional.common;
 
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.api.CanonicalLabeler;
-
-
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.cam.CAMLabeler;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.gspan.MinDFSLabeler;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.CanonicalLabel;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.FilterStrategy;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.GrowthStrategy;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.config.IterationStrategy;
-
 import java.io.Serializable;
 
 /**
@@ -60,26 +50,6 @@ public class FSMConfig implements Serializable {
   private final boolean preprocessingEnbabled;
 
   /**
-   * labeler used to generate canonical labels
-   */
-  private final CanonicalLabel canonicalLabel;
-
-  /**
-   * Strategy used to filter embeddings by frequent subgraphs
-   */
-  private final FilterStrategy filterStrategy;
-
-  /**
-   * Strategy used to grow children of frequent subgraphs
-   */
-  private final GrowthStrategy growthStrategy;
-
-  /**
-   * Strategy for distributed iteration
-   */
-  private final IterationStrategy iterationStrategy;
-
-  /**
    * Constructor.
    *
    * @param minSupport min support
@@ -87,31 +57,19 @@ public class FSMConfig implements Serializable {
    * @param minEdgeCount min number of edges
    * @param maxEdgeCount max number of edges
    * @param preprocessingEnbabled true, to enable preprocessingEnbabled
-   * @param canonicalLabel canonical label
-   * @param filterStrategy frequent subgraph filter strategy
-   * @param growthStrategy children growth strategy
-   * @param iterationStrategy iteration strategy
    */
   public FSMConfig(
     float minSupport,
     boolean directed,
     int minEdgeCount,
     int maxEdgeCount,
-    boolean preprocessingEnbabled,
-    CanonicalLabel canonicalLabel,
-    FilterStrategy filterStrategy,
-    GrowthStrategy growthStrategy,
-    IterationStrategy iterationStrategy
+    boolean preprocessingEnbabled
   ) {
     this.minSupport = minSupport;
     this.directed = directed;
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
     this.preprocessingEnbabled = preprocessingEnbabled;
-    this.canonicalLabel = canonicalLabel;
-    this.filterStrategy = filterStrategy;
-    this.growthStrategy = growthStrategy;
-    this.iterationStrategy = iterationStrategy;
   }
 
   /**
@@ -133,10 +91,6 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
     this.preprocessingEnbabled = true;
-    this.canonicalLabel = CanonicalLabel.MIN_DFS;
-    this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
-    this.growthStrategy = GrowthStrategy.FUSION;
-    this.iterationStrategy = IterationStrategy.BULK_ITERATION;
   }
 
   /**
@@ -150,10 +104,6 @@ public class FSMConfig implements Serializable {
     this.minEdgeCount = 1;
     this.maxEdgeCount = 16;
     this.preprocessingEnbabled = true;
-    this.canonicalLabel = CanonicalLabel.MIN_DFS;
-    this.filterStrategy = FilterStrategy.BROADCAST_JOIN;
-    this.growthStrategy = GrowthStrategy.FUSION;
-    this.iterationStrategy = IterationStrategy.BULK_ITERATION;
   }
 
   public float getMinSupport() {
@@ -179,23 +129,6 @@ public class FSMConfig implements Serializable {
    */
   public boolean isPreprocessingEnabled() {
     return preprocessingEnbabled;
-  }
-
-  public CanonicalLabeler getCanonicalLabeler() {
-    return canonicalLabel == CanonicalLabel.ADJACENCY_MATRIX ?
-      new CAMLabeler(directed) : new MinDFSLabeler(directed);
-  }
-
-  public FilterStrategy getFilterStrategy() {
-    return filterStrategy;
-  }
-
-  public GrowthStrategy getGrowthStrategy() {
-    return growthStrategy;
-  }
-
-  public IterationStrategy getIterationStrategy() {
-    return iterationStrategy;
   }
 
 }
