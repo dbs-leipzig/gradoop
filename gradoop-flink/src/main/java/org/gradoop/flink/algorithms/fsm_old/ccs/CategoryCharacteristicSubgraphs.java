@@ -20,7 +20,6 @@ package org.gradoop.flink.algorithms.fsm_old.ccs;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.flink.algorithms.fsm_old.ccs.functions.CCSSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm_old.ccs.functions.CCSSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm_old.ccs.functions.CCSSubgraphOnly;
@@ -38,7 +37,7 @@ import org.gradoop.flink.algorithms.fsm_old.ccs.functions.ToCCSGraph;
 import org.gradoop.flink.algorithms.fsm_old.ccs.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm_old.ccs.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm_old.ccs.tuples.CCSSubgraphEmbeddings;
-import org.gradoop.flink.algorithms.fsm_old.common.TransactionalFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.common.ThinkLikeAnEmbeddingFSMBase;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.config.IterationStrategy;
@@ -46,11 +45,8 @@ import org.gradoop.flink.algorithms.fsm_old.common.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.WithoutInfrequentEdgeLabels;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm_old.common.functions.IsResult;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Map;
 
@@ -59,7 +55,7 @@ import java.util.Map;
  * subgraph mining algorithm as Gradoop operator
  */
 public class CategoryCharacteristicSubgraphs
-  extends TransactionalFSMBase<CCSGraph, CCSSubgraph, CCSSubgraphEmbeddings> {
+  extends ThinkLikeAnEmbeddingFSMBase<CCSGraph, CCSSubgraph, CCSSubgraphEmbeddings> {
 
   /**
    * Property key to store a category association.
@@ -93,58 +89,22 @@ public class CategoryCharacteristicSubgraphs
     this.minInterestingness = minInterestingness;
   }
 
-  @Override
-  public GraphCollection execute(GraphCollection collection)  {
-    GradoopFlinkConfig gradoopFlinkConfig = collection.getConfig();
-
-    // create transactions from graph collection
-    GraphTransactions transactions = collection
-      .toTransactions();
-
-    transactions = execute(transactions);
-
-    return GraphCollection.fromTransactions(
-      new GraphTransactions(
-        transactions.getTransactions(), gradoopFlinkConfig));
-  }
-
-  /**
-   * Encodes the search space before executing FSM.
-   *
-   * @param transactions search space as Gradoop graph transactions
-   *
-   * @return frequent subgraphs as Gradoop graph transactions
-   */
-  public GraphTransactions execute(GraphTransactions transactions) {
-    DataSet<CCSGraph> graphs = transactions
-      .getTransactions()
-      .map(new ToCCSGraph())
-      .returns(TypeExtractor.getForClass(CCSGraph.class));
-
-    GradoopFlinkConfig gradoopConfig = transactions.getConfig();
-
-    DataSet<GraphTransaction> dataSet = execute(graphs, gradoopConfig);
-
-    return new GraphTransactions(dataSet, gradoopConfig);
-  }
-
   /**
    * Core mining method.
    *
-   * @param graphs search space
-   * @param gradoopConfig Gradoop Flink configuration
-   *
    * @return frequent subgraphs
    */
-  public DataSet<GraphTransaction> execute(
-    DataSet<CCSGraph> graphs, GradoopFlinkConfig gradoopConfig) {
+  public DataSet<GraphTransaction> execute(DataSet<GraphTransaction> transactions) {
+
+    DataSet<CCSGraph>  graphs = transactions
+      .map(new ToCCSGraph());
 
     setCategoryCounts(graphs);
 
     setMinFrequencies();
 
     if (fsmConfig.isPreprocessingEnabled()) {
-      graphs = preProcess(graphs);
+      graphs = preProcessCategories(graphs);
     }
 
     DataSet<CCSSubgraphEmbeddings>
@@ -161,11 +121,11 @@ public class CategoryCharacteristicSubgraphs
 
     if (fsmConfig.getMinEdgeCount() > 1) {
       characteristicSubgraphs = characteristicSubgraphs
-        .filter(new MinEdgeCount<CCSSubgraph>(fsmConfig));
+        .filter(new MinEdgeCount<>(fsmConfig));
     }
 
     return characteristicSubgraphs
-      .map(new CCSSubgraphDecoder(gradoopConfig));
+      .map(new CCSSubgraphDecoder(gradoopFlinkConfig));
   }
 
   /**
@@ -197,7 +157,7 @@ public class CategoryCharacteristicSubgraphs
    * @param graphs graph collection
    * @return processed graph collection
    */
-  private DataSet<CCSGraph> preProcess(DataSet<CCSGraph> graphs) {
+  private DataSet<CCSGraph> preProcessCategories(DataSet<CCSGraph> graphs) {
     DataSet<String> frequentVertexLabels = graphs
       .flatMap(new CategoryVertexLabels())
       .groupBy(0, 1)

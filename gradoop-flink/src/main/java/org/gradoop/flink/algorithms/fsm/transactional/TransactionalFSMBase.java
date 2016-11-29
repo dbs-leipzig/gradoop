@@ -26,7 +26,7 @@ public abstract class TransactionalFSMBase
    * minimum frequency for subgraphs to be considered to be frequent
    */
   protected DataSet<Long> minFrequency;
-  private GradoopFlinkConfig gradoopFlinkConfig;
+  protected GradoopFlinkConfig gradoopFlinkConfig;
 
   public TransactionalFSMBase(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;

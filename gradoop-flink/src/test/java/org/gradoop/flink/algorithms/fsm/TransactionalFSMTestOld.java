@@ -1,6 +1,6 @@
 package org.gradoop.flink.algorithms.fsm;
 
-import org.gradoop.flink.algorithms.fsm.transactional.cal.CanonicalAdjacencyList;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingTFSM;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
@@ -24,7 +24,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1"};
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(fsmConfig);
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
@@ -47,7 +47,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2", "s3", "s4", "s5"};
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(fsmConfig);
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
       asciiGraphs, searchSpaceVariables, expectedResultVariables);
@@ -67,7 +67,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3"};
     String[] expectedResultVariables = {"s1", "s2"};
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -90,7 +90,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
     String[] searchSpaceVariables = {"g1", "g2", "g3", "g4"};
     String[] expectedResultVariables = {"s1", "s2", "s3"};
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -120,7 +120,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
       {"s1", "s2", "s3", "s4", "s5", "s6", "s7"};
 
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,
@@ -154,7 +154,7 @@ public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
     String[] expectedResultVariables =
       {"s11", "s12", "s21", "s22", "s23", "s31", "s32", "s33", "s34", "s41"};
 
-    CanonicalAdjacencyList transactionalFSM = new CanonicalAdjacencyList(
+    ThinkLikeAnEmbeddingTFSM transactionalFSM = new ThinkLikeAnEmbeddingTFSM(
       fsmConfig);
 
     compareExpectationAndResult(transactionalFSM,

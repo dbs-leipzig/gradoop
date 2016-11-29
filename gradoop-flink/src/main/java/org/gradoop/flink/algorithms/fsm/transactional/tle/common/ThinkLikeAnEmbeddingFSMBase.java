@@ -15,9 +15,10 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm_old.common;
+package org.gradoop.flink.algorithms.fsm.transactional.tle.common;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.algorithms.fsm.transactional.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm_old.common.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm_old.common.config.FilterStrategy;
@@ -41,22 +42,17 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
  * @param <S> subgraph type
  * @param <SE> subgraph embeddings type
  */
-public abstract class TransactionalFSMBase
+public abstract class ThinkLikeAnEmbeddingFSMBase
   <G extends FSMGraph, S extends Subgraph, SE extends SubgraphEmbeddings>
-  implements UnaryCollectionToCollectionOperator {
-
-  /**
-   * frequent subgraph mining configuration
-   */
-  protected final FSMConfig fsmConfig;
+  extends TransactionalFSMBase {
 
   /**
    * Constructor.
    *
    * @param fsmConfig FSM configuration
    */
-  public TransactionalFSMBase(FSMConfig fsmConfig) {
-    this.fsmConfig = fsmConfig;
+  public ThinkLikeAnEmbeddingFSMBase(FSMConfig fsmConfig) {
+    super(fsmConfig);
   }
 
   /**
