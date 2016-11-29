@@ -19,9 +19,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.GraphId;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MergeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.PatternGrowth;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.JoinEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddings;
@@ -51,26 +50,21 @@ public abstract class ThinkLikeAnEmbeddingFSMBase
   /**
    * Grows children of embeddings of frequent subgraphs.
    *
-   * @param graphs search space
    * @param parents parent embeddings
    * @param frequentSubgraphs frequent subgraphs
    * @return child embeddings
    */
   protected DataSet<SE> growEmbeddingsOfFrequentSubgraphs(
-    DataSet<G> graphs, DataSet<SE> parents,
-    DataSet<S> frequentSubgraphs) {
+    DataSet<SE> parents,  DataSet<S> frequentSubgraphs) {
+
     parents = filterByFrequentSubgraphs(parents, frequentSubgraphs);
 
     parents = parents
       .groupBy(0)
       .reduceGroup(new MergeEmbeddings<>());
 
-    parents = parents
-      .join(graphs)
-      .where(0).equalTo(new GraphId<>())
-      .with(new PatternGrowth<>(fsmConfig));
-
-    return parents;
+    return parents
+      .flatMap(new JoinEmbeddings<>(fsmConfig));
   }
 
   /**

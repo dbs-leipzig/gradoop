@@ -86,7 +86,7 @@ public class ThinkLikeAnEmbeddingTFSM
       filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
 
     DataSet<TFSMSubgraphEmbeddings> childEmbeddings =
-      growEmbeddingsOfFrequentSubgraphs(graphs, parentEmbeddings, frequentSubgraphs);
+      growEmbeddingsOfFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
 
     DataSet<TFSMSubgraphEmbeddings> resultIncrement = frequentSubgraphs
       .map(new TFSMWrapInSubgraphEmbeddings());

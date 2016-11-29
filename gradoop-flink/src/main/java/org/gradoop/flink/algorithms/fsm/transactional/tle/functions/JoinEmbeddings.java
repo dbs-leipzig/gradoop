@@ -42,7 +42,7 @@ import java.util.TreeSet;
  * @param <G> graph type
  * @param <SE> subgraph type
  */
-public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
+public class JoinEmbeddings<G extends FSMGraph, SE extends SubgraphEmbeddings>
   implements FlatJoinFunction<SE, G, SE>, FlatMapFunction<SE, SE> {
 
   /**
@@ -55,7 +55,7 @@ public class PatternGrowth<G extends FSMGraph, SE extends SubgraphEmbeddings>
    *
    * @param fsmConfig FSM configuration.
    */
-  public PatternGrowth(FSMConfig fsmConfig) {
+  public JoinEmbeddings(FSMConfig fsmConfig) {
     this.canonicalLabeler = new CanonicalLabeler(fsmConfig.isDirected());
   }
 

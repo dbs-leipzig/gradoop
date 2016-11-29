@@ -130,8 +130,7 @@ public class CategoryCharacteristicSubgraphs
       filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);
 
     DataSet<CCSSubgraphEmbeddings> childEmbeddings =
-      growEmbeddingsOfFrequentSubgraphs(
-        graphs, parentEmbeddings, frequentSubgraphs
+      growEmbeddingsOfFrequentSubgraphs(parentEmbeddings, frequentSubgraphs
       );
 
     DataSet<CCSSubgraphEmbeddings> resultIncrement =
