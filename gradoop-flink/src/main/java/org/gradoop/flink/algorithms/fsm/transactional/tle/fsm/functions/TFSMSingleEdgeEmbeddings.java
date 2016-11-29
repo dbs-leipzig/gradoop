@@ -20,8 +20,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.SingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.Embedding;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.pojos.TFSMGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.tuples.TFSMSubgraphEmbeddings;
 

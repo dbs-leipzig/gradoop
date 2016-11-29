@@ -22,8 +22,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.pojos.CCSGraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.ToFSMGraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.ToFSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.Map;

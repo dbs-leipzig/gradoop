@@ -18,7 +18,7 @@
 package org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.SubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.SubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.tuples.TFSMSubgraph;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;

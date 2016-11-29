@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.functions;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.tuples.CategoryCountableLabel;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
 
 import java.util.Map;
 

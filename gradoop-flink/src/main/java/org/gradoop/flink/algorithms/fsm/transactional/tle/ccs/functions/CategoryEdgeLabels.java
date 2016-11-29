@@ -22,7 +22,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.tuples.CategoryCountableLabel;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 
 import java.util.Set;
 

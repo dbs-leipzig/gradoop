@@ -6,7 +6,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.Collection;

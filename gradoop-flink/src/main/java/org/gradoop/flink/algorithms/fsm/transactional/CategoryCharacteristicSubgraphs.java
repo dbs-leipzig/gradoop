@@ -37,13 +37,13 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.functions.ToCCSGra
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.tuples.CCSSubgraphEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.ThinkLikeAnEmbeddingFSMBase;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.MinEdgeCount;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.WithoutInfrequentEdgeLabels;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.WithoutInfrequentVertexLabels;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.IsResult;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 

@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.SubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.SubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.transactional.ThinkLikeAnEmbeddingTFSM;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;

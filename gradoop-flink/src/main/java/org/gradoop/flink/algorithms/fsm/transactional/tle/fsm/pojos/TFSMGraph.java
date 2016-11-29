@@ -18,9 +18,9 @@
 package org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.pojos;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.FSMEdge;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
 
 import java.util.Map;
 

@@ -2,14 +2,14 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.TransactionalFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Undirect;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.config.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.config.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;

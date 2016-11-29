@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.MinFrequency;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
 
 import java.util.Map;
 

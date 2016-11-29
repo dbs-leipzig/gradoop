@@ -22,8 +22,8 @@ import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ccs.tuples.CCSSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.functions.SingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.common.pojos.Embedding;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.SingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 
 import java.util.List;
 import java.util.Map;
