@@ -25,14 +25,14 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions.TFSMSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions.TFSMSubgraphDecoder;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions.TFSMSubgraphOnly;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions.ToTFSMGraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.functions.TFSMWrapInSubgraphEmbeddings;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.pojos.TFSMGraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.tuples.TFSMSubgraph;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.fsm.tuples.TFSMSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSubgraphOnly;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.ToTFSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMWrapInSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.TFSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 /**
