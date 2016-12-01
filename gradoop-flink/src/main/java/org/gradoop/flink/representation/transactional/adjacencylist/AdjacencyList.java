@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
- * 
+ *
  * @param <ID> ID type
  * @param <L> label type
  * @param <ED> edge data type
@@ -44,15 +44,15 @@ public class AdjacencyList<ID extends Comparable<ID>, L, ED, VD>
 
   /**
    * Constructor.
-   *  @param graphId graph id
+   * @param graphId graph id
    * @param labels graph, vertex and edge labels
    * @param properties graph, vertex and edge properties
-   * @param outgoingRows adjacency list rows
-   * @param incomingRows
+   * @param outgoingRows outgoing adjacency list rows
+   * @param incomingRows incoming adjacency list rows
    */
   public AdjacencyList(GradoopId graphId, Map<ID, L> labels, Map<ID, Properties> properties,
-    Map<ID, AdjacencyListRow<ED, VD>> outgoingRows, Map<ID, AdjacencyListRow<ED, VD>> incomingRows) {
-
+    Map<ID, AdjacencyListRow<ED, VD>> outgoingRows, Map<ID, AdjacencyListRow<ED, VD>> incomingRows)
+  {
     this.f0 = graphId;
     this.f1 = labels;
     this.f2 = properties;

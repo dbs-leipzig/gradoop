@@ -30,7 +30,6 @@ import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.adjacencylist.DefaultAdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.Map;
@@ -99,10 +98,10 @@ public class RepresentationConverters {
       AdjacencyListRow<ED, VD> targetRows = incomingRows.get(target.getId());
 
       sourceRows.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.createValue(edge), vertexDataFactory.createValue(target)));
+        edgeDataFactory.createData(edge), vertexDataFactory.createData(target)));
 
       targetRows.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.createValue(edge), vertexDataFactory.createValue(source)));
+        edgeDataFactory.createData(edge), vertexDataFactory.createData(source)));
     }
 
     return new AdjacencyList<>(graphHead.getId(), labels, properties, outgoingRows, incomingRows);

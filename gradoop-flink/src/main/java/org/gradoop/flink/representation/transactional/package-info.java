@@ -15,17 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.common.elementdata;
-
-import org.gradoop.common.model.impl.pojo.Element;
-
 /**
- * Factory to create (id, label) pairs from EPGM elements.
+ * Classes related transactional graph representations.
  */
-public class IdLabelFactory implements ElementDataFactory<IdLabel> {
-
-  @Override
-  public IdLabel createData(Element element) {
-    return new IdLabel(element.getId(), element.getLabel());
-  }
-}
+package org.gradoop.flink.representation.transactional;

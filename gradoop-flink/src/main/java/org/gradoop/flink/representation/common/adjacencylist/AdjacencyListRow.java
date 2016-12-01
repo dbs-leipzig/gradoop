@@ -24,7 +24,9 @@ import java.util.Collection;
 
 /**
  * Traversal optimized representation of a vertex.
- * @param <ED> type of algorithm specific cell value
+ *
+ * @param <ED> edge data type
+ * @param <VD> vertex data type
  */
 public class AdjacencyListRow<ED, VD> implements Serializable {
 

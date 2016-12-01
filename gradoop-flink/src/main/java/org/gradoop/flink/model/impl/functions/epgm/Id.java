@@ -44,7 +44,7 @@ public class Id<EL extends Element>
   }
 
   @Override
-  public GradoopId createValue(Element element) {
+  public GradoopId createData(Element element) {
     return element.getId();
   }
 }
