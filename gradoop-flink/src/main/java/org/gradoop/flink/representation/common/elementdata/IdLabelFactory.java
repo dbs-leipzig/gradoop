@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.representation.common.elementdata;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Element;
 
 /**
@@ -24,10 +25,10 @@ import org.gradoop.common.model.impl.pojo.Element;
  *
  * @param <EL> element type
  */
-public class IdLabelFactory<EL extends Element> implements ElementDataFactory<EL, IdLabel> {
+public class IdLabelFactory<EL extends Element> implements MapFunction<EL, IdLabel> {
 
   @Override
-  public IdLabel createData(EL element) {
+  public IdLabel map(EL element) {
     return new IdLabel(element.getId(), element.getLabel());
   }
 }

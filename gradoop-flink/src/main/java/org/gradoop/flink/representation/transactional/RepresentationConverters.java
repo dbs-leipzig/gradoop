@@ -19,6 +19,7 @@ package org.gradoop.flink.representation.transactional;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -26,7 +27,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
@@ -55,9 +55,9 @@ public class RepresentationConverters {
    */
   public static <ED, VD> AdjacencyList<GradoopId, String, ED, VD> getAdjacencyList(
     GraphTransaction transaction,
-    ElementDataFactory<Edge, ED> edgeDataFactory,
-    ElementDataFactory<Vertex, VD> vertexDataFactory
-  ) {
+    MapFunction<Edge, ED> edgeDataFactory,
+    MapFunction<Vertex, VD> vertexDataFactory
+  ) throws Exception {
 
     GraphHead graphHead = transaction.getGraphHead();
     Set<Vertex> vertices = transaction.getVertices();
@@ -100,10 +100,10 @@ public class RepresentationConverters {
       AdjacencyListRow<ED, VD> targetRows = incomingRows.get(target.getId());
 
       sourceRows.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.createData(edge), vertexDataFactory.createData(target)));
+        edgeDataFactory.map(edge), vertexDataFactory.map(target)));
 
       targetRows.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.createData(edge), vertexDataFactory.createData(source)));
+        edgeDataFactory.map(edge), vertexDataFactory.map(source)));
     }
 
     return new AdjacencyList<>(graphHead.getId(), labels, properties, outgoingRows, incomingRows);

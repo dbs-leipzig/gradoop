@@ -22,7 +22,6 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
 
 /**
  * element => elementId
@@ -31,7 +30,7 @@ import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
  */
 @FunctionAnnotation.ForwardedFields("id->*")
 public class Id<EL extends Element> implements
-  MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId>, ElementDataFactory<EL, GradoopId> {
+  MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
 
   @Override
   public GradoopId map(EL element) throws Exception {
@@ -43,8 +42,4 @@ public class Id<EL extends Element> implements
     return element.getId();
   }
 
-  @Override
-  public GradoopId createData(EL element) {
-    return element.getId();
-  }
 }
