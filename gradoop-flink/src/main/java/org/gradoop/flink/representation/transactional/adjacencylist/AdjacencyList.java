@@ -26,35 +26,14 @@ import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
- * @param <T> type of algorithm specific cell value
+ * @param <ED> type of algorithm specific cell value
  */
-public class AdjacencyList<T> extends Tuple4<
+public class AdjacencyList<ED, VD> extends Tuple4<
   GradoopId,
   Map<GradoopId, String>,
   Map<GradoopId, Properties>,
-  Map<GradoopId, AdjacencyListRow<T>>
+  Map<GradoopId, AdjacencyListRow<ED, VD>>
   > {
-
-//  /**
-//   * Graph Id
-//   */
-//  private GradoopId f0;
-//
-//  /**
-//   * graph / vertex / edge id => label
-//   */
-//  private Map<GradoopId, String> f1;
-//
-//  /**
-//   * graph / vertex / edge id => properties
-//   */
-//  private Map<GradoopId, Properties> f2;
-//
-//  /**
-//   * vertex id => adjacency list row
-//   */
-//  private Map<GradoopId, AdjacencyListRow<T>> f3;
-
 
   /**
    * Default constructor.
@@ -71,7 +50,7 @@ public class AdjacencyList<T> extends Tuple4<
    * @param rows adjacency list rows
    */
   public AdjacencyList(GradoopId graphId, Map<GradoopId, String> labels,
-    Map<GradoopId, Properties> properties, Map<GradoopId, AdjacencyListRow<T>> rows) {
+    Map<GradoopId, Properties> properties, Map<GradoopId, AdjacencyListRow<ED, VD>> rows) {
     this.f0 = graphId;
     this.f1 = labels;
     this.f2 = properties;
@@ -99,16 +78,6 @@ public class AdjacencyList<T> extends Tuple4<
     return f2.get(elementId);
   }
 
-  /**
-   * Convenience method to get the adjacency list of a vertex.
-   *
-   * @param vertexId vertex id
-   * @return adjacency list
-   */
-  public AdjacencyListRow<T> getRows(GradoopId vertexId) {
-    return f3.get(vertexId);
-  }
-
   public GradoopId getGraphId() {
     return f0;
   }
@@ -117,7 +86,7 @@ public class AdjacencyList<T> extends Tuple4<
     this.f0 = graphId;
   }
 
-  public Map<GradoopId, AdjacencyListRow<T>> getRows() {
+  public Map<GradoopId, AdjacencyListRow<ED, VD>> getRows() {
     return f3;
   }
 }

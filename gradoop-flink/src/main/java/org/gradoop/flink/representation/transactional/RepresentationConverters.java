@@ -26,9 +26,11 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
+import org.gradoop.flink.representation.common.adjacencylist.EdgeDataFactory;
+import org.gradoop.flink.representation.common.adjacencylist.ElementDataFactory;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.common.adjacencylist.IdDirection;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
@@ -43,13 +45,15 @@ public class RepresentationConverters {
   /**
    * transaction => adjacency list
    *
+   * @param <ED> edge data
+   * @param <VD> vertex data
+   *
    * @param transaction transaction
-   * @param cellValueFactory factory for algorithm-specific cell values
-   * @param <T> cell value type
+   * @param edgeDataFactory
    * @return adjacency list
    */
-  public static <T> AdjacencyList<T> getAdjacencyList(
-    GraphTransaction transaction, AdjacencyListCellValueFactory<T> cellValueFactory) {
+  public static <ED, VD> AdjacencyList<ED, VD> getAdjacencyList(GraphTransaction transaction,
+    EdgeDataFactory<ED> edgeDataFactory, ElementDataFactory<VD> vertexDataFactory) {
 
     GraphHead graphHead = transaction.getGraphHead();
     Set<Vertex> vertices = transaction.getVertices();
@@ -61,7 +65,7 @@ public class RepresentationConverters {
     Map<GradoopId, Properties> properties =
       Maps.newHashMap();
 
-    Map<GradoopId, AdjacencyListRow<T>> rows =
+    Map<GradoopId, AdjacencyListRow<ED, VD>> rows =
       Maps.newHashMapWithExpectedSize(vertices.size());
 
     Map<GradoopId, Vertex> vertexIndex =
@@ -82,16 +86,16 @@ public class RepresentationConverters {
       addLabelsAndProperties(edge, labels, properties);
 
       Vertex source = vertexIndex.get(edge.getSourceId());
-      AdjacencyListRow<T> sourceRows = rows.get(source.getId());
+      AdjacencyListRow<ED, VD> sourceRows = rows.get(source.getId());
 
       Vertex target = vertexIndex.get(edge.getTargetId());
-      AdjacencyListRow<T> targetRows = rows.get(target.getId());
+      AdjacencyListRow<ED, VD> targetRows = rows.get(target.getId());
 
       sourceRows.getCells().add(new AdjacencyListCell<>(
-        edge.getId(), true, target.getId(), cellValueFactory.createValue(source, edge, target)));
+        edgeDataFactory.createValue(edge, true), vertexDataFactory.createValue(target)));
 
       targetRows.getCells().add(new AdjacencyListCell<>(
-        edge.getId(), false, source.getId(), cellValueFactory.createValue(target, edge, source)));
+        edgeDataFactory.createValue(edge, false), vertexDataFactory.createValue(source)));
     }
 
     return new AdjacencyList<>(graphHead.getId(), labels, properties, rows);
@@ -121,10 +125,10 @@ public class RepresentationConverters {
    * adjacency list => transaction
    *
    * @param adjacencyList adjacency list
-   * @param <T> cell value type
    * @return transaction
    */
-  public static <T> GraphTransaction getGraphTransaction(AdjacencyList<T>  adjacencyList) {
+  public static GraphTransaction getGraphTransaction(
+    AdjacencyList<IdDirection, GradoopId> adjacencyList) {
 
     // GRAPH HEAD
     GradoopId graphId = adjacencyList.getGraphId();
@@ -137,20 +141,22 @@ public class RepresentationConverters {
     Set<Edge> edges = Sets.newHashSet();
 
     // VERTICES
-    for (Map.Entry<GradoopId, AdjacencyListRow<T>> entry : adjacencyList.getRows().entrySet()) {
+    for (Map.Entry<GradoopId, AdjacencyListRow<IdDirection, GradoopId>> entry :
+      adjacencyList.getRows().entrySet()) {
+
       GradoopId sourceId = entry.getKey();
       Properties properties = adjacencyList.getProperties(sourceId);
       String label = adjacencyList.getLabel(sourceId);
       vertices.add(new Vertex(sourceId, label, properties, graphIds));
 
       // EDGES
-      for (AdjacencyListCell<T> cell : entry.getValue().getCells()) {
+      for (AdjacencyListCell<IdDirection, GradoopId> cell : entry.getValue().getCells()) {
 
-        if (cell.isOutgoing()) {
-          GradoopId edgeId = cell.getEdgeId();
+        if (cell.getEdgeData().isOutgoing()) {
+          GradoopId edgeId = cell.getEdgeData().getId();
           label = adjacencyList.getLabel(edgeId);
           properties = adjacencyList.getProperties(edgeId);
-          GradoopId targetId = cell.getVertexId();
+          GradoopId targetId = cell.getVertexData();
 
           edges.add(new Edge(edgeId, label, sourceId, targetId, properties, graphIds));
         }

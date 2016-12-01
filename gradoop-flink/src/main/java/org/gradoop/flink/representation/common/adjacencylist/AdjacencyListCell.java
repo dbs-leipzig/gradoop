@@ -17,50 +17,38 @@
 
 package org.gradoop.flink.representation.common.adjacencylist;
 
-import org.gradoop.common.model.impl.id.GradoopId;
-
 import java.io.Serializable;
 
 /**
  * Entry of an adjacency list.
- * @param <T> type of algorithm specific cell value
+ * @param <VD> vertex data
+ * @param <ED> edge data
  */
-public class AdjacencyListCell<T> implements Serializable {
+public class AdjacencyListCell<ED, VD> implements Serializable {
 
   /**
-   * edge id
+   * edge data
    */
-  private GradoopId edgeId;
+  private ED edgeData;
+
   /**
-   * true, if outgoing, false, if incoming
+   * referenced vertex data
    */
-  private boolean outgoing;
-  /**
-   * target id (outgoing) or source id (incoming)
-   */
-  private GradoopId vertexId;
-  /**
-   * algorithm specific cell value
-   */
-  private T value;
+  private VD vertexData;
 
   /**
    * Constructor.
-   *  @param edgeId edge id
-   * @param outgoing true, if outgoing, false, if incoming
-   * @param vertexId target id (outgoing) or source id (incoming)
-   * @param value algorithm-specific value
+   * @param edgeData edge id
+   * @param vertexData target id (outgoing) or source id (incoming)
    */
-  public AdjacencyListCell(GradoopId edgeId, boolean outgoing, GradoopId vertexId, T value) {
-    this.outgoing = outgoing;
-    this.edgeId = edgeId;
-    this.vertexId = vertexId;
-    this.value = value;
+  public AdjacencyListCell(ED edgeData, VD vertexData) {
+    this.edgeData = edgeData;
+    this.vertexData = vertexData;
   }
 
   @Override
   public String toString() {
-    return edgeId + (outgoing ? ">" : "<") + vertexId;
+    return edgeData.toString() + vertexData;
   }
 
   @Override
@@ -72,55 +60,35 @@ public class AdjacencyListCell<T> implements Serializable {
       return false;
     }
 
-    AdjacencyListCell<?> that = (AdjacencyListCell<?>) o;
+    AdjacencyListCell<?, ?> that = (AdjacencyListCell<?, ?>) o;
 
-    if (outgoing != that.outgoing) {
+    if (!edgeData.equals(that.edgeData)) {
       return false;
     }
-    if (!edgeId.equals(that.edgeId)) {
-      return false;
-    }
-    return value != null ? value.equals(that.value) : that.value == null;
-
+    return vertexData.equals(that.vertexData);
   }
 
   @Override
   public int hashCode() {
-    int result = edgeId.hashCode();
-    result = 31 * result + (outgoing ? 1 : 0);
-    result = 31 * result + (value != null ? value.hashCode() : 0);
+    int result = edgeData.hashCode();
+    result = 31 * result + vertexData.hashCode();
     return result;
   }
 
-  public GradoopId getEdgeId() {
-    return edgeId;
+  public ED getEdgeData() {
+    return edgeData;
   }
 
-  public void setEdgeId(GradoopId edgeId) {
-    this.edgeId = edgeId;
+  public void setEdgeData(ED edgeData) {
+    this.edgeData = edgeData;
   }
 
-  public boolean isOutgoing() {
-    return outgoing;
+  public VD getVertexData() {
+    return vertexData;
   }
 
-  public void setOutgoing(boolean outgoing) {
-    this.outgoing = outgoing;
+  public void setVertexData(VD vertexData) {
+    this.vertexData = vertexData;
   }
 
-  public GradoopId getVertexId() {
-    return vertexId;
-  }
-
-  public void setVertexId(GradoopId vertexId) {
-    this.vertexId = vertexId;
-  }
-
-  public T getValue() {
-    return value;
-  }
-
-  public void setValue(T value) {
-    this.value = value;
-  }
 }

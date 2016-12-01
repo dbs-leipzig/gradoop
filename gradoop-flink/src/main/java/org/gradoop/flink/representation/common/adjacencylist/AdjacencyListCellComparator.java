@@ -21,23 +21,24 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Id-based comparator for adjacency list cells.
- * order: vertex id, edge id, direction
+ * Comparator for adjacency list cells.
+ * order: edge data, vertex data
  *
- * @param <T> algorithm-specific cell value type.
+ * @param <ED> edge data type.
+ * @param <VD> vertex data type.
  */
-public class AdjacencyListCellComparator<T>
-  implements Comparator<AdjacencyListCell<T>>, Serializable {
+public class AdjacencyListCellComparator<ED extends Comparable<ED>, VD extends Comparable<VD>>
+  implements Comparator<AdjacencyListCell<ED, VD>>, Serializable {
 
   @Override
-  public int compare(AdjacencyListCell<T> a, AdjacencyListCell<T> b) {
-    int comparison = a.getVertexId().compareTo(b.getVertexId());
+  public int compare(AdjacencyListCell<ED, VD> a, AdjacencyListCell<ED, VD> b) {
+    int comparison = a.getVertexData().compareTo(b.getVertexData());
 
     if (comparison == 0) {
-      comparison = a.getEdgeId().compareTo(b.getEdgeId());
+      comparison = a.getEdgeData().compareTo(b.getEdgeData());
 
-      if (comparison == 0 && a.isOutgoing() != b.isOutgoing()) {
-        comparison = a.isOutgoing() ? -1 : 1;
+      if (comparison == 0) {
+        comparison = a.getVertexData().compareTo(b.getVertexData());
       }
     }
 

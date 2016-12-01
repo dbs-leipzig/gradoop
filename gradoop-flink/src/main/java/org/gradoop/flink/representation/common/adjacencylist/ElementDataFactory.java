@@ -15,24 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.api.pojos;
+package org.gradoop.flink.representation.common.adjacencylist;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 
 /**
- * A factory to create algorithm-specific value of adjacency list cells.
- * @param <T> algorithm-specific value type
+ * A factory to create algorithm-specific vertex value for adjacency list cells.
+ * @param <VD> algorithm-specific value type
  */
-public interface AdjacencyListCellValueFactory<T> {
+public interface ElementDataFactory<VD> {
   /**
    * Returns algorithm-specific value for an edge triple
    *
-   * @param source source vertex
-   * @param edge edge
-   * @param target target vertex
+   * @param element element
    *
    * @return cell value
    */
-  T createValue(Vertex source, Edge edge, Vertex target);
+  VD createValue(Element element);
 }
