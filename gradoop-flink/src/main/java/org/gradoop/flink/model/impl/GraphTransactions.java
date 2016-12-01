@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.model.api.operators.GraphTransactionsOperators;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 /**
  * Represents a logical graph inside the EPGM.

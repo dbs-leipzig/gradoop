@@ -29,8 +29,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.Map;
 import java.util.Set;

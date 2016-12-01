@@ -23,8 +23,8 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCellComparator;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Collection;
 import java.util.List;
