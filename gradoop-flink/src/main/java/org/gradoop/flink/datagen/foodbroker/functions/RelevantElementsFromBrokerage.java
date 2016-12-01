@@ -1,7 +1,9 @@
 package org.gradoop.flink.datagen.foodbroker.functions;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Sets;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
@@ -9,9 +11,11 @@ import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 import java.util.Set;
 
 
-public class RelevantElementsFromBrokerage implements MapFunction<GraphTransaction, GraphTransaction> {
+public class RelevantElementsFromBrokerage implements FlatMapFunction<GraphTransaction,
+  GraphTransaction> {
   @Override
-  public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
+  public void flatMap(GraphTransaction graphTransaction,
+    Collector<GraphTransaction> collector) throws Exception {
     Set<Vertex> vertices = Sets.newHashSet();
     for (Vertex vertex : graphTransaction.getVertices()) {
       if (vertex.getLabel().equals("DeliveryNote") || vertex.getLabel().equals("SalesOrder")) {
@@ -26,8 +30,10 @@ public class RelevantElementsFromBrokerage implements MapFunction<GraphTransacti
         edges.add(edge);
       }
     }
-    graphTransaction.setVertices(vertices);
-    graphTransaction.setEdges(edges);
-    return graphTransaction;
+    if (!vertices.isEmpty()) {
+      graphTransaction.setVertices(vertices);
+      graphTransaction.setEdges(edges);
+      collector.collect(graphTransaction);
+    }
   }
 }

@@ -138,7 +138,7 @@ public class FoodBroker implements CollectionGenerator {
 
     // Phase 2.2: Run Complaint Handling
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple = brokerage
-      .map(new RelevantElementsFromBrokerage())
+      .flatMap(new RelevantElementsFromBrokerage())
       .mapPartition(new ComplaintHandling(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
