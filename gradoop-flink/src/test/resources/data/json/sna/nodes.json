@@ -1,11 +1,11 @@
-{"id":"0-0-0-0","data":{"gender":"m","city":"Dresden","name":"Dave","age":40},"meta":{"label":"Person","graphs":["0-0-2-4","0-0-2-0","0-0-2-2","0-0-2-1"]}}
-{"id":"0-0-0-1","data":{"name":"Hadoop"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
-{"id":"0-0-0-2","data":{"locIP":"127.0.0.1","gender":"m","city":"Berlin","name":"Frank","age":35},"meta":{"label":"Person","graphs":["0-0-2-1","0-0-2-4"]}}
-{"id":"0-0-0-3","data":{"name":"Databases"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
-{"id":"0-0-0-4","data":{"gender":"f","city":"Dresden","name":"Carol","age":30},"meta":{"label":"Person","graphs":["0-0-2-4","0-0-2-0","0-0-2-2","0-0-2-1"]}}
-{"id":"0-0-0-5","data":{"title":"Graph Databases"},"meta":{"label":"Forum","graphs":["0-0-2-4"]}}
-{"id":"0-0-0-6","data":{"gender":"f","city":"Leipzig","name":"Alice","age":20},"meta":{"label":"Person","graphs":["0-0-2-0","0-0-2-3","0-0-2-4"]}}
-{"id":"0-0-0-7","data":{"gender":"m","city":"Leipzig","name":"Bob","age":30},"meta":{"label":"Person","graphs":["0-0-2-0","0-0-2-3","0-0-2-4"]}}
-{"id":"0-0-0-8","data":{"gender":"f","city":"Dresden","speaks":"English","name":"Eve","age":35},"meta":{"label":"Person","graphs":["0-0-2-3","0-0-2-4"]}}
-{"id":"0-0-0-9","data":{"title":"Graph Processing"},"meta":{"label":"Forum","graphs":["0-0-2-2","0-0-2-4"]}}
-{"id":"0-0-0-10","data":{"name":"Graphs"},"meta":{"label":"Tag","graphs":["0-0-2-4"]}}
+{"id":"000000000000000000000000","data":{"name":"Dave","gender":"m","city":"Dresden","age":40},"meta":{"label":"Person","graphs":["000000000000000002000000","000000000000000002000001","000000000000000002000002","000000000000000002000004"]}}
+{"id":"000000000000000000000001","data":{"name":"Hadoop"},"meta":{"label":"Tag","graphs":["000000000000000002000004"]}}
+{"id":"000000000000000000000002","data":{"name":"Frank","locIP":"127.0.0.1","gender":"m","city":"Berlin","age":35},"meta":{"label":"Person","graphs":["000000000000000002000001","000000000000000002000004"]}}
+{"id":"000000000000000000000003","data":{"name":"Databases"},"meta":{"label":"Tag","graphs":["000000000000000002000004"]}}
+{"id":"000000000000000000000004","data":{"name":"Carol","gender":"f","city":"Dresden","age":30},"meta":{"label":"Person","graphs":["000000000000000002000000","000000000000000002000001","000000000000000002000002","000000000000000002000004"]}}
+{"id":"000000000000000000000005","data":{"title":"Graph Databases"},"meta":{"label":"Forum","graphs":["000000000000000002000004"]}}
+{"id":"000000000000000000000006","data":{"name":"Alice","gender":"f","city":"Leipzig","age":20},"meta":{"label":"Person","graphs":["000000000000000002000000","000000000000000002000003","000000000000000002000004"]}}
+{"id":"000000000000000000000007","data":{"name":"Bob","gender":"m","city":"Leipzig","age":30},"meta":{"label":"Person","graphs":["000000000000000002000000","000000000000000002000003","000000000000000002000004"]}}
+{"id":"000000000000000000000008","data":{"name":"Eve","gender":"f","city":"Dresden","age":35,"speaks":"English"},"meta":{"label":"Person","graphs":["000000000000000002000003","000000000000000002000004"]}}
+{"id":"000000000000000000000009","data":{"title":"Graph Processing"},"meta":{"label":"Forum","graphs":["000000000000000002000002","000000000000000002000004"]}}
+{"id":"00000000000000000000000a","data":{"name":"Graphs"},"meta":{"label":"Tag","graphs":["000000000000000002000004"]}}

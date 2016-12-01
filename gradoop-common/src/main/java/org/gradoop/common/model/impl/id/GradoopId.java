@@ -22,7 +22,6 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.NormalizableKey;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.bson.types.ObjectId;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
@@ -30,8 +29,6 @@ import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * inside its domain, i.e. a graph is unique among all graphs, a vertex among
  * all vertices and an edge among all edges.
  *
- * This implementation uses MongoDBs BSON ObjectId to guarantee uniqueness.
+ * This implementation uses MongoDBs BSON {@link ObjectId} to guarantee uniqueness.
  *
  * @see EPGMIdentifiable
  */
@@ -51,7 +48,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    * Represents a null id.
    */
   public static final GradoopId NULL_VALUE =
-    new GradoopId(new ObjectId(0, 0, (short) 0, 0));
+    new GradoopId(new ObjectId(0, 0, (short) 0, 0).toByteArray());
 
   /**
    * Highest possible Gradoop Id.
@@ -62,7 +59,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
         Integer.MAX_VALUE,
         16777215,
         Short.MAX_VALUE,
-        16777215));
+        16777215).toByteArray());
 
   /**
    * Lowest possible Gradoop Id.
@@ -72,7 +69,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
       Integer.MIN_VALUE,
       0,
       Short.MIN_VALUE,
-      0));
+      0).toByteArray());
 
   /**
    * Number of bytes to represent an id internally.
@@ -82,7 +79,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   /**
    * Internal representation
    */
-  private byte[] rawBytes = new byte[ID_SIZE];
+  private ObjectId objectId;
 
   /**
    * Create a new ObjectId.
@@ -97,19 +94,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    */
   GradoopId(ObjectId objectId) {
     checkNotNull(objectId, "ObjectId was null");
-    ByteBuffer buffer = ByteBuffer.wrap(rawBytes);
-    int timestamp = objectId.getTimestamp();
-    int machineId = objectId.getMachineIdentifier();
-    short processId = objectId.getProcessIdentifier();
-    int counter = objectId.getCounter();
-    buffer.putInt(timestamp);
-    buffer.put((byte) (machineId >> 16));
-    buffer.put((byte) (machineId >> 8));
-    buffer.put((byte) machineId);
-    buffer.putShort(processId);
-    buffer.put((byte) (counter >> 16));
-    buffer.put((byte) (counter >> 8));
-    buffer.put((byte) counter);
+    this.objectId = objectId;
   }
 
   /**
@@ -117,8 +102,8 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    *
    * @param bytes the GradoopId represented by the byte array
    */
-  private GradoopId(byte[] bytes) {
-    this.rawBytes = bytes;
+  GradoopId(byte[] bytes) {
+    this.objectId = new ObjectId(bytes);
   }
 
   /**
@@ -139,6 +124,12 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   public static GradoopId fromString(String string) {
     checkNotNull(string, "ID string was null");
     checkArgument(!string.isEmpty(), "ID string was empty");
+    return new GradoopId(new ObjectId(string));
+  }
+
+  public static GradoopId fromLegacyString(String string) {
+    checkNotNull(string, "ID string was null");
+    checkArgument(!string.isEmpty(), "ID string was empty");
     String[] split = string.split("-");
     return new GradoopId(new ObjectId(
       Integer.parseInt(split[0]),
@@ -155,8 +146,6 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    * @return Gradoop ID
    */
   public static GradoopId fromBytes(byte[] bytes) {
-    checkNotNull(bytes, "Byte array was null");
-    checkArgument(bytes.length == ID_SIZE, "Byte array has wrong size");
     return new GradoopId(bytes);
   }
 
@@ -167,7 +156,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    */
   @SuppressWarnings({"EI_EXPOSE_REP"})
   public byte[] getRawBytes() {
-    return rawBytes;
+    return objectId.toByteArray();
   }
 
   @Override
@@ -179,50 +168,34 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
       return false;
     }
     GradoopId that = (GradoopId) o;
-    return Arrays.equals(rawBytes, that.rawBytes);
+    return this.objectId.equals(that.objectId);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(rawBytes);
+    return objectId.hashCode();
   }
 
   @Override
   public int compareTo(GradoopId o) {
-    return Bytes.compareTo(rawBytes, o.rawBytes);
+    return this.objectId.compareTo(o.objectId);
   }
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.write(rawBytes);
+    dataOutput.write(objectId.toByteArray());
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    dataInput.readFully(rawBytes);
+    byte[] buffer = new byte[ID_SIZE];
+    dataInput.readFully(buffer);
+    this.objectId = new ObjectId(buffer);
   }
 
   @Override
   public String toString() {
-    ByteBuffer optimus = ByteBuffer.wrap(rawBytes);
-    int timestamp = optimus.getInt();
-    byte[] machineIdBytes = new byte[4];
-    machineIdBytes[0] = (byte) 0;
-    machineIdBytes[1] = optimus.get();
-    machineIdBytes[2] = optimus.get();
-    machineIdBytes[3] = optimus.get();
-    ByteBuffer prime = ByteBuffer.wrap(machineIdBytes);
-    int machineId = prime.getInt();
-    short processId = optimus.getShort();
-    byte[] counterBytes = new byte[4];
-    counterBytes[0] = (byte) 0;
-    counterBytes[1] = optimus.get();
-    counterBytes[2] = optimus.get();
-    counterBytes[3] = optimus.get();
-    prime = ByteBuffer.wrap(counterBytes);
-    int counter = prime.getInt();
-    return String.format("%s-%s-%s-%s",
-      timestamp, machineId, processId, counter);
+    return this.objectId.toString();
   }
 
   @Override
@@ -232,16 +205,18 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
 
   @Override
   public void copyNormalizedKey(MemorySegment target, int offset, int len) {
-    target.put(offset, rawBytes, 0, len);
+    target.put(offset, objectId.toByteArray(), 0, len);
   }
 
   @Override
   public void write(DataOutputView out) throws IOException {
-    out.write(rawBytes);
+    out.write(objectId.toByteArray());
   }
 
   @Override
   public void read(DataInputView in) throws IOException {
-    in.readFully(rawBytes);
+    byte[] buffer = new byte[ID_SIZE];
+    in.readFully(buffer);
+    this.objectId = new ObjectId(buffer);
   }
 }

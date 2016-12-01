@@ -35,29 +35,24 @@ public class JSONDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testRead() throws Exception {
+    String graphFile =
+      JSONDataSourceTest.class.getResource("/data/json/sna/graphs.json").getFile();
     String vertexFile =
       JSONDataSourceTest.class.getResource("/data/json/sna/nodes.json").getFile();
     String edgeFile =
       JSONDataSourceTest.class.getResource("/data/json/sna/edges.json").getFile();
-    String graphFile =
-      JSONDataSourceTest.class.getResource("/data/json/sna/graphs.json").getFile();
 
-    DataSource dataSource = new JSONDataSource(
-      graphFile, vertexFile, edgeFile, config);
+    DataSource dataSource = new JSONDataSource(graphFile, vertexFile, edgeFile, config);
 
-    GraphCollection
-      collection = dataSource.getGraphCollection();
+    GraphCollection collection = dataSource.getGraphCollection();
 
     Collection<GraphHead> graphHeads = Lists.newArrayList();
     Collection<Vertex> vertices = Lists.newArrayList();
     Collection<Edge> edges = Lists.newArrayList();
 
-    collection.getGraphHeads()
-      .output(new LocalCollectionOutputFormat<>(graphHeads));
-    collection.getVertices()
-      .output(new LocalCollectionOutputFormat<>(vertices));
-    collection.getEdges()
-      .output(new LocalCollectionOutputFormat<>(edges));
+    collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));
+    collection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
+    collection.getEdges().output(new LocalCollectionOutputFormat<>(edges));
 
     getExecutionEnvironment().execute();
 
