@@ -17,11 +17,9 @@
 
 package org.gradoop.flink.datagen.foodbroker;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -139,7 +137,7 @@ public class FoodBroker implements CollectionGenerator {
     // Phase 2.2: Run Complaint Handling
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple = brokerage
       .flatMap(new RelevantElementsFromBrokerage())
-      .mapPartition(new ComplaintHandling(
+      .flatMap(new ComplaintHandling(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig, complaintSeed))
