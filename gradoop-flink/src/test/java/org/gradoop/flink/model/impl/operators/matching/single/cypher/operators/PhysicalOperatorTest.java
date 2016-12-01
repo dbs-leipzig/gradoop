@@ -43,17 +43,18 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
-  protected void assertEmbeddingExists(DataSet<Embedding> dataSet, GradoopId... path) throws Exception {
+  protected void assertEmbeddingExists(DataSet<Embedding> dataSet, GradoopId... path)
+    throws Exception {
     List<GradoopId> pathList = Lists.newArrayList(path);
     assertTrue(
       dataSet.collect()
-      .stream()
-      .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding)))
+        .stream()
+        .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding)))
     );
   }
 
   protected void assertEmbeddingExists(DataSet<Embedding> dataSet, Predicate<Embedding> predicate)
-  throws Exception {
+    throws Exception {
 
     assertTrue(dataSet.collect().stream().anyMatch(predicate::test));
   }
@@ -61,7 +62,7 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
   protected void assertEveryEmbedding(DataSet<Embedding> dataSet, Consumer<Embedding> consumer)
     throws Exception {
 
-    dataSet.collect().forEach(consumer::accept);
+    dataSet.collect().forEach(consumer);
   }
 
   protected Embedding createEmbedding(GradoopId... ids) {
