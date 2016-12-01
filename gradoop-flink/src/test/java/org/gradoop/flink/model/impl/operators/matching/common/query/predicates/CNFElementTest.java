@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.embeddings.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
 import org.junit.Test;
 
 import java.util.HashMap;
