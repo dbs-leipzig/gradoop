@@ -2,7 +2,7 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.RichMapPartitionFunction;
+import org.apache.flink.api.common.functions.AbstractRichFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -21,9 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-
-public abstract class Process<S, T> extends
-  RichMapPartitionFunction<S, T> {
+public abstract class Process<S, T>
+  extends AbstractRichFunction {
   /**
    * Foodbroker configuration
    */

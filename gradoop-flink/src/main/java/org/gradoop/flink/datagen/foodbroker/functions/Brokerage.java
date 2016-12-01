@@ -19,6 +19,7 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.MapPartitionFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -44,7 +45,8 @@ import java.util.Map;
  * equally to each worker.
  */
 public class Brokerage
-  extends Process<Long, GraphTransaction> {
+  extends Process<Long, GraphTransaction>
+  implements MapPartitionFunction<Long, GraphTransaction>{
 
   /**
    * Valued consturctor

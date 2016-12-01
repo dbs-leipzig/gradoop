@@ -3,6 +3,7 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
@@ -19,7 +20,6 @@ import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.foodbroker.masterdata.Customer;
 import org.gradoop.flink.datagen.foodbroker.masterdata.Employee;
-import org.gradoop.flink.datagen.foodbroker.tuples.FoodBrokerMaps;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ComplaintHandling
-  extends Process<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
+  extends Process<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>>
+  implements FlatMapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
 
   private List<Vertex> employees;
   private List<Vertex> customers;
@@ -55,7 +56,7 @@ public class ComplaintHandling
   }
 
   @Override
-  public void mapPartition(Iterable<GraphTransaction> iterable,
+  public void flatMap(GraphTransaction transaction,
     Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
@@ -63,34 +64,32 @@ public class ComplaintHandling
     Set<Edge> edges;
     Set<Vertex> deliveryNotes;
 
-    for (GraphTransaction transaction: iterable) {
-      vertexMap = Maps.newHashMap();
-      edgeMap = createEdgeMap(transaction);
+    vertexMap = Maps.newHashMap();
+    edgeMap = createEdgeMap(transaction);
 
-      deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
-      salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
-      purchOrderLines = getEdgesByLabel(transaction, "PurchOrderLine");
+    deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
+    salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
+    purchOrderLines = getEdgesByLabel(transaction, "PurchOrderLine");
 
-      salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
-      masterDataMap = Maps.newHashMap();
-      userMap = Maps.newHashMap();
-      graphHead = graphHeadFactory.createGraphHead();
-      graphIds = new GradoopIdSet();
-      graphIds.add(graphHead.getId());
-      graphTransaction = new GraphTransaction();
+    salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
+    masterDataMap = Maps.newHashMap();
+    userMap = Maps.newHashMap();
+    graphHead = graphHeadFactory.createGraphHead();
+    graphIds = new GradoopIdSet();
+    graphIds.add(graphHead.getId());
+    graphTransaction = new GraphTransaction();
 
-      badQuality(deliveryNotes);
-      lateDelivery(deliveryNotes);
+    badQuality(deliveryNotes);
+    lateDelivery(deliveryNotes);
 
-      vertices = getVertices();
-      edges = getEdges();
-      if ((vertices.size() > 0) && (edges.size() > 0)) {
-        graphTransaction.setGraphHead(graphHead);
-        graphTransaction.setVertices(vertices);
-        graphTransaction.setEdges(edges);
-        collector.collect(new Tuple2<>(graphTransaction, getMasterData()));
-        globalSeed++;
-      }
+    vertices = getVertices();
+    edges = getEdges();
+    if ((vertices.size() > 0) && (edges.size() > 0)) {
+      graphTransaction.setGraphHead(graphHead);
+      graphTransaction.setVertices(vertices);
+      graphTransaction.setEdges(edges);
+      collector.collect(new Tuple2<>(graphTransaction, getMasterData()));
+      globalSeed++;
     }
   }
 
