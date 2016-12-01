@@ -76,9 +76,6 @@ public class RepresentationConverters {
     Map<GradoopId, Vertex> vertexIndex =
       Maps.newHashMapWithExpectedSize(vertices.size());
 
-    // GRAPH HEAD
-    addLabelsAndProperties(graphHead, labels, properties);
-
     // VERTICES
     for (Vertex vertex : vertices) {
       addLabelsAndProperties(vertex, labels, properties);
@@ -104,7 +101,7 @@ public class RepresentationConverters {
         edgeDataFactory.map(edge), vertexDataFactory.map(source)));
     }
 
-    return new AdjacencyList<>(graphHead.getId(), labels, properties, outgoingRows, incomingRows);
+    return new AdjacencyList<>(graphHead, labels, properties, outgoingRows, incomingRows);
   }
 
   /**
@@ -137,11 +134,9 @@ public class RepresentationConverters {
     GradoopId> adjacencyList) {
 
     // GRAPH HEAD
-    GradoopId graphId = adjacencyList.getGraphId();
-    GraphHead graphHead =
-      new GraphHead(graphId, adjacencyList.getLabel(graphId), adjacencyList.getProperties(graphId));
+    GraphHead graphHead = adjacencyList.getGraphHead();
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphId);
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();

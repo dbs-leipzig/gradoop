@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.common.elementdata;
+package org.gradoop.flink.model.impl.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * (Id, Label)
  */
-public class IdLabel extends Tuple2<GradoopId, String> {
+public class IdWithLabel extends Tuple2<GradoopId, String> {
 
   /**
    * Constructor.
@@ -31,8 +31,14 @@ public class IdLabel extends Tuple2<GradoopId, String> {
    * @param id element id
    * @param label element label
    */
-  public IdLabel(GradoopId id, String label) {
+  public IdWithLabel(GradoopId id, String label) {
     super(id, label);
+  }
+
+  /**
+   * Default Constructor
+   */
+  public IdWithLabel() {
   }
 
   public GradoopId getId() {

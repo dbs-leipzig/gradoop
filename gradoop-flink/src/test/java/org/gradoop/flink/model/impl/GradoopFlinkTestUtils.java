@@ -165,9 +165,9 @@ public class GradoopFlinkTestUtils {
   public static void assertEquals(AdjacencyList<GradoopId, String, GradoopId, GradoopId> a,
     AdjacencyList<GradoopId, String, GradoopId, GradoopId> b) {
 
-    assertTrue(a.getGraphId().equals(b.getGraphId()));
+    assertEqualElements(a.getGraphHead(), b.getGraphHead());
 
-    Set<GradoopId> ids = Sets.newHashSet(a.getGraphId());
+    Set<GradoopId> ids = Sets.newHashSet();
 
     Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> aRows = a.getOutgoingRows();
     Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> bRows = b.getOutgoingRows();
