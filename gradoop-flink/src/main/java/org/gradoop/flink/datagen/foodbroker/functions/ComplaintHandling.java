@@ -65,7 +65,7 @@ public class ComplaintHandling
 
     for (GraphTransaction transaction: iterable) {
       vertexMap = Maps.newHashMap();
-      edgeMap = Maps.newHashMap();
+      edgeMap = createEdgeMap(transaction);
 
       deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
       salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
@@ -405,4 +405,20 @@ public class ComplaintHandling
     return Sets.newHashSet(masterDataMap.values());
   }
 
+
+  private Map<Tuple2<String, GradoopId>, Set<Edge>> createEdgeMap(GraphTransaction transaction) {
+    Map<Tuple2<String, GradoopId>, Set<Edge>> edgeMap = Maps.newHashMap();
+    Set<Edge> edges;
+    Tuple2<String, GradoopId> key;
+    for (Edge edge : transaction.getEdges()) {
+      edges = Sets.newHashSet();
+      key = new Tuple2<>(edge.getLabel(), edge.getSourceId());
+      if (edgeMap.containsKey(key)) {
+        edges.addAll(edgeMap.get(key));
+      }
+      edges.add(edge);
+      edgeMap.put(key, edges);
+    }
+    return edgeMap;
+  }
 }
