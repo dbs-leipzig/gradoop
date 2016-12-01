@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.transactional.adjacencylist;
 
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
 

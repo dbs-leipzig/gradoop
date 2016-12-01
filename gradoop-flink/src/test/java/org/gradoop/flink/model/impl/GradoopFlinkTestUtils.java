@@ -20,7 +20,7 @@ import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixB
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.flink.representation.pojos.AdjacencyListCellComparator;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCellComparator;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
