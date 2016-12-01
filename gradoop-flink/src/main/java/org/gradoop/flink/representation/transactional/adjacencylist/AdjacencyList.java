@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.representation.transactional.adjacencylist;
 
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
@@ -26,14 +26,15 @@ import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
- * @param <ED> type of algorithm specific cell value
+ * 
+ * @param <ID> ID type
+ * @param <L> label type
+ * @param <ED> edge data type
+ * @param <VD> vertex data type
  */
-public class AdjacencyList<ED, VD> extends Tuple4<
-  GradoopId,
-  Map<GradoopId, String>,
-  Map<GradoopId, Properties>,
-  Map<GradoopId, AdjacencyListRow<ED, VD>>
-  > {
+public class AdjacencyList<ID extends Comparable<ID>, L, ED, VD>
+  extends Tuple5<GradoopId, Map<ID, L>, Map<ID, Properties>,
+    Map<ID, AdjacencyListRow<ED, VD>>, Map<ID, AdjacencyListRow<ED, VD>>> {
 
   /**
    * Default constructor.
@@ -43,18 +44,20 @@ public class AdjacencyList<ED, VD> extends Tuple4<
 
   /**
    * Constructor.
-   *
-   * @param graphId graph id
+   *  @param graphId graph id
    * @param labels graph, vertex and edge labels
    * @param properties graph, vertex and edge properties
-   * @param rows adjacency list rows
+   * @param outgoingRows adjacency list rows
+   * @param incomingRows
    */
-  public AdjacencyList(GradoopId graphId, Map<GradoopId, String> labels,
-    Map<GradoopId, Properties> properties, Map<GradoopId, AdjacencyListRow<ED, VD>> rows) {
+  public AdjacencyList(GradoopId graphId, Map<ID, L> labels, Map<ID, Properties> properties,
+    Map<ID, AdjacencyListRow<ED, VD>> outgoingRows, Map<ID, AdjacencyListRow<ED, VD>> incomingRows) {
+
     this.f0 = graphId;
     this.f1 = labels;
     this.f2 = properties;
-    this.f3 = rows;
+    this.f3 = outgoingRows;
+    this.f4 = incomingRows;
   }
 
   /**
@@ -64,7 +67,7 @@ public class AdjacencyList<ED, VD> extends Tuple4<
    *
    * @return label
    */
-  public String getLabel(GradoopId elementId) {
+  public L getLabel(ID elementId) {
     return f1.get(elementId);
   }
 
@@ -74,7 +77,7 @@ public class AdjacencyList<ED, VD> extends Tuple4<
    *
    * @return property list
    */
-  public Properties getProperties(GradoopId elementId) {
+  public Properties getProperties(ID elementId) {
     return f2.get(elementId);
   }
 
@@ -86,7 +89,11 @@ public class AdjacencyList<ED, VD> extends Tuple4<
     this.f0 = graphId;
   }
 
-  public Map<GradoopId, AdjacencyListRow<ED, VD>> getRows() {
+  public Map<ID, AdjacencyListRow<ED, VD>> getOutgoingRows() {
+    return f3;
+  }
+
+  public Map<ID, AdjacencyListRow<ED, VD>> getIncomingRows() {
     return f3;
   }
 }

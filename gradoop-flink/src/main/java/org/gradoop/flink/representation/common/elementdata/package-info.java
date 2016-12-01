@@ -15,23 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.common.elementdata;
-
-import org.gradoop.common.model.impl.pojo.Edge;
-
 /**
- * A factory to create algorithm-specific edge value for adjacency list cells.
- * @param <VD> algorithm-specific value type
+ * Classes related to partial EPGM element data.
  */
-public interface EdgeDataFactory<VD> {
-  /**
-   * Returns algorithm-specific value for an edge triple
-   *
-   *
-   * @param edge edge
-   *
-   * @param outgoing
-   * @return cell value
-   */
-  VD createValue(Edge edge, boolean outgoing);
-}
+package org.gradoop.flink.representation.common.elementdata;

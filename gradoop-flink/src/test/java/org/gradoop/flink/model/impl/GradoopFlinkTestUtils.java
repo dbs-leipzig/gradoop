@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCellComparator;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
-import org.gradoop.flink.representation.common.elementdata.IdDirection;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
@@ -163,25 +162,25 @@ public class GradoopFlinkTestUtils {
       a.getProperties().equals(b.getProperties()));
   }
 
-  public static void assertEquals(
-    AdjacencyList<IdDirection, GradoopId> a, AdjacencyList<IdDirection, GradoopId> b) {
+  public static void assertEquals(AdjacencyList<GradoopId, String, GradoopId, GradoopId> a,
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> b) {
 
     assertTrue(a.getGraphId().equals(b.getGraphId()));
 
     Set<GradoopId> ids = Sets.newHashSet(a.getGraphId());
 
-    Map<GradoopId, AdjacencyListRow<IdDirection, GradoopId>> aRows = a.getRows();
-    Map<GradoopId, AdjacencyListRow<IdDirection, GradoopId>> bRows = b.getRows();
+    Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> aRows = a.getOutgoingRows();
+    Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> bRows = b.getOutgoingRows();
 
     assertTrue(aRows.size() == bRows.size());
 
     for (GradoopId vertexId : aRows.keySet()) {
       ids.add(vertexId);
 
-      List<AdjacencyListCell<IdDirection, GradoopId>> aCells = 
+      List<AdjacencyListCell<GradoopId, GradoopId>> aCells =
         Lists.newArrayList(aRows.get(vertexId).getCells());
       
-      List<AdjacencyListCell<IdDirection, GradoopId>> bCells = 
+      List<AdjacencyListCell<GradoopId, GradoopId>> bCells =
         Lists.newArrayList(aRows.get(vertexId).getCells());
 
       assertTrue(aCells.size() == bCells.size());
@@ -191,10 +190,8 @@ public class GradoopFlinkTestUtils {
 
       assertTrue(aCells.equals(bCells));
 
-      for (AdjacencyListCell<IdDirection, GradoopId> cell : aCells) {
-        if (cell.getEdgeData().isOutgoing()) {
-          ids.add(cell.getVertexData());
-        }
+      for (AdjacencyListCell<GradoopId, GradoopId> cell : aCells) {
+        ids.add(cell.getVertexData());
       }
     }
 
