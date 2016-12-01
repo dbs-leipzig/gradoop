@@ -1,4 +1,4 @@
-package org.gradoop.flink.representation.common.adjacencylist;
+package org.gradoop.flink.representation.common.elementdata;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;

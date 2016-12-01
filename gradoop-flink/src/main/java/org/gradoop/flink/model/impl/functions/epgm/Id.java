@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.representation.common.adjacencylist.ElementDataFactory;
+import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
 
 /**
  * element => elementId

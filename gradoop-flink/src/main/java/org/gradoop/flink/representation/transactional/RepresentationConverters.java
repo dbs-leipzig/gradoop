@@ -26,11 +26,11 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.representation.common.adjacencylist.EdgeDataFactory;
-import org.gradoop.flink.representation.common.adjacencylist.ElementDataFactory;
+import org.gradoop.flink.representation.common.elementdata.EdgeDataFactory;
+import org.gradoop.flink.representation.common.elementdata.ElementDataFactory;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
-import org.gradoop.flink.representation.common.adjacencylist.IdDirection;
+import org.gradoop.flink.representation.common.elementdata.IdDirection;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 

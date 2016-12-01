@@ -10,14 +10,10 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.representation.common.adjacencylist.IdDirection;
-import org.gradoop.flink.representation.common.adjacencylist.IdDirectionFactory;
-import org.gradoop.flink.representation.common.adjacencylist.IdDirectionLabelFactory;
-import org.gradoop.flink.representation.common.adjacencylist.IdLabelFactory;
+import org.gradoop.flink.representation.common.elementdata.IdDirection;
+import org.gradoop.flink.representation.common.elementdata.IdDirectionFactory;
 import org.gradoop.flink.representation.transactional.RepresentationConverters;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.adjacencylist.IdDirectionLabel;
-import org.gradoop.flink.representation.transactional.adjacencylist.IdLabel;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.junit.Test;
 
