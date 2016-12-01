@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**

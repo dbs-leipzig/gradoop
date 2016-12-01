@@ -16,6 +16,6 @@
  */
 
 /**
- * Pojo classes related to graph representations.
+ * Classes related to graph representations.
  */
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.transactional.sets;

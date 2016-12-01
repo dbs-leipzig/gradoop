@@ -27,10 +27,10 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
-import org.gradoop.flink.representation.pojos.AdjacencyListCell;
-import org.gradoop.flink.representation.pojos.AdjacencyListRow;
-import org.gradoop.flink.representation.tuples.AdjacencyList;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
 import java.util.Map;
 import java.util.Set;

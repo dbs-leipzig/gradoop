@@ -16,6 +16,6 @@
  */
 
 /**
- * Classes related to graph representations.
+ * Pojo classes related to graph representations.
  */
-package org.gradoop.flink.representation.tuples;
+package org.gradoop.flink.representation.transactional.adjacencylist;
