@@ -37,11 +37,9 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception{
     DataSet<Embedding> embeddings = createEmbeddings(2,
-      Lists.newArrayList(
-        new IdEntry(GradoopId.get()),
-        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
-        new IdEntry(GradoopId.get())
-      )
+      new IdEntry(GradoopId.get()),
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
+      new IdEntry(GradoopId.get())
     );
 
     HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();
@@ -68,11 +66,9 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void testProjectMultipleEntriesAtOnce() throws Exception{
     DataSet<Embedding> embeddings = createEmbeddings(2,
-      Lists.newArrayList(
-        new IdEntry(GradoopId.get()),
-        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
-        new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("a", "b", "c")))
-      )
+      new IdEntry(GradoopId.get()),
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
+      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("a", "b", "c")))
     );
 
     HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();

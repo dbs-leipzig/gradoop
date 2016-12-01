@@ -74,11 +74,13 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return embedding;
   }
 
-  protected DataSet<Embedding> createEmbeddings(Integer size, ArrayList<EmbeddingEntry> entries) {
+  protected DataSet<Embedding> createEmbeddings(Integer size, EmbeddingEntry... entries) {
     List<Embedding> embeddings = new ArrayList<>(size);
 
+    ArrayList<EmbeddingEntry> embeddingEntries = Lists.newArrayList(entries);
+
     for (int i = 0; i < size; i++) {
-      embeddings.add(new Embedding(entries));
+      embeddings.add(new Embedding(embeddingEntries));
     }
 
     return getExecutionEnvironment().fromCollection(embeddings);

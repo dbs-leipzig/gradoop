@@ -27,16 +27,16 @@ public class FilterPreviousExpandEmbedding extends RichFilterFunction<ExpandEmbe
   /**
    * super step
    */
-  private int superStep;
+  private int currentIteration;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    superStep = getIterationRuntimeContext().getSuperstepNumber();
+    currentIteration = getIterationRuntimeContext().getSuperstepNumber() * 2 - 1;
   }
 
   @Override
   public boolean filter(ExpandEmbedding expandEmbedding) {
-    return expandEmbedding.pathSize() >= superStep * 2 - 1;
+    return expandEmbedding.pathSize() >= currentIteration;
   }
 }

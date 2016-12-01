@@ -89,7 +89,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForOutExpansion() throws Exception {
-    DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
+    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -109,7 +109,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
+    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,a),
@@ -129,7 +129,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
+    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -149,7 +149,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
+    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -168,7 +168,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBound0() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, Lists.newArrayList(new IdEntry(a)));
+    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b)
