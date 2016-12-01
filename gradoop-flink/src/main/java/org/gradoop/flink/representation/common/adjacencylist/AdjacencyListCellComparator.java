@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.transactional.adjacencylist;
+package org.gradoop.flink.representation.common.adjacencylist;
 
 import java.io.Serializable;
 import java.util.Comparator;

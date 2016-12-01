@@ -20,6 +20,7 @@ package org.gradoop.flink.representation.transactional.adjacencylist;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 
 import java.util.Map;
 

@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation;
+package org.gradoop.flink.representation.transactional;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -27,8 +27,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.pojos.AdjacencyListCellValueFactory;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 
