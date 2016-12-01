@@ -21,11 +21,13 @@ import org.gradoop.common.model.impl.pojo.Element;
 
 /**
  * Factory to create (id, label) pairs from EPGM elements.
+ *
+ * @param <EL> element type
  */
-public class IdLabelFactory implements ElementDataFactory<IdLabel> {
+public class IdLabelFactory<EL extends Element> implements ElementDataFactory<EL, IdLabel> {
 
   @Override
-  public IdLabel createData(Element element) {
+  public IdLabel createData(EL element) {
     return new IdLabel(element.getId(), element.getLabel());
   }
 }

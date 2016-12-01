@@ -55,7 +55,9 @@ public class RepresentationConverters {
    */
   public static <ED, VD> AdjacencyList<GradoopId, String, ED, VD> getAdjacencyList(
     GraphTransaction transaction,
-    ElementDataFactory<ED> edgeDataFactory, ElementDataFactory<VD> vertexDataFactory) {
+    ElementDataFactory<Edge, ED> edgeDataFactory,
+    ElementDataFactory<Vertex, VD> vertexDataFactory
+  ) {
 
     GraphHead graphHead = transaction.getGraphHead();
     Set<Vertex> vertices = transaction.getVertices();

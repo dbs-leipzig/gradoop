@@ -17,13 +17,12 @@
 
 package org.gradoop.flink.representation.common.elementdata;
 
-import org.gradoop.common.model.impl.pojo.Element;
-
 /**
  * A factory to create algorithm-specific element data attached to adjacency list cells.
- * @param <ED> algorithm-specific value type
+ * @param <EL> element type
+ * @param <ED> element data type
  */
-public interface ElementDataFactory<ED> {
+public interface ElementDataFactory<EL, ED> {
   /**
    * Returns algorithm-specific value for an edge triple
    *
@@ -31,5 +30,5 @@ public interface ElementDataFactory<ED> {
    *
    * @return element data
    */
-  ED createData(Element element);
+  ED createData(EL element);
 }

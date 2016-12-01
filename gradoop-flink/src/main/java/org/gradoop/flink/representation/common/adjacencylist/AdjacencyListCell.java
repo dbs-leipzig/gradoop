@@ -17,24 +17,14 @@
 
 package org.gradoop.flink.representation.common.adjacencylist;
 
-import java.io.Serializable;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Entry of an adjacency list.
  * @param <VD> vertex data
  * @param <ED> edge data
  */
-public class AdjacencyListCell<ED, VD> implements Serializable {
-
-  /**
-   * edge data
-   */
-  private ED edgeData;
-
-  /**
-   * referenced vertex data
-   */
-  private VD vertexData;
+public class AdjacencyListCell<ED, VD> extends Tuple2<ED, VD> {
 
   /**
    * Constructor.
@@ -42,53 +32,24 @@ public class AdjacencyListCell<ED, VD> implements Serializable {
    * @param vertexData target id (outgoing) or source id (incoming)
    */
   public AdjacencyListCell(ED edgeData, VD vertexData) {
-    this.edgeData = edgeData;
-    this.vertexData = vertexData;
-  }
-
-  @Override
-  public String toString() {
-    return edgeData.toString() + vertexData;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    AdjacencyListCell<?, ?> that = (AdjacencyListCell<?, ?>) o;
-
-    if (!edgeData.equals(that.edgeData)) {
-      return false;
-    }
-    return vertexData.equals(that.vertexData);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = edgeData.hashCode();
-    result = 31 * result + vertexData.hashCode();
-    return result;
+    this.f0 = edgeData;
+    this.f1 = vertexData;
   }
 
   public ED getEdgeData() {
-    return edgeData;
+    return f0;
   }
 
-  public void setEdgeData(ED edgeData) {
-    this.edgeData = edgeData;
+  public void setEdgeData(ED f0) {
+    this.f0 = f0;
   }
 
   public VD getVertexData() {
-    return vertexData;
+    return f1;
   }
 
-  public void setVertexData(VD vertexData) {
-    this.vertexData = vertexData;
+  public void setVertexData(VD f1) {
+    this.f1 = f1;
   }
 
 }
