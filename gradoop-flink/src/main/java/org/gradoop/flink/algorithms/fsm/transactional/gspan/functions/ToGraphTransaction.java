@@ -1,7 +1,7 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.representation.RepresentationConverters;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernelBase;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
@@ -11,6 +11,6 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalCod
 public class ToGraphTransaction implements MapFunction<TraversalCode<String>, GraphTransaction> {
   @Override
   public GraphTransaction map(TraversalCode<String> stringTraversalCode) throws Exception {
-    return RepresentationConverters.createGraphTransaction(stringTraversalCode);
+    return GSpanKernelBase.createGraphTransaction(stringTraversalCode);
   }
 }

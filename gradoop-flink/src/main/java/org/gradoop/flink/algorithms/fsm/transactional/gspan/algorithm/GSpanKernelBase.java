@@ -5,11 +5,16 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
@@ -357,4 +362,45 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   protected abstract void addCells(Map<GradoopId, AdjacencyListRow<LabelPair>> rows,
     GradoopId fromId, String fromLabel, boolean outgoing, GradoopId edgeId, String edgeLabel,
     GradoopId toId, String toLabel);
+
+  public static GraphTransaction createGraphTransaction(TraversalCode<String> traversalCode) {
+
+    GraphHead graphHead = new GraphHead(GradoopId.get(), "FSG", null);
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+
+    Map<Integer, GradoopId> vertexIdMap = Maps.newHashMap();
+
+    Set<Vertex> vertices = Sets.newHashSet();
+    Set<Edge> edges = Sets.newHashSet();
+
+    for (Traversal<String> traversal : traversalCode.getTraversals()) {
+      Integer fromTime = traversal.getFromTime();
+      GradoopId fromId = vertexIdMap.get(fromTime);
+
+      if (fromId == null) {
+        Vertex fromVertex = new Vertex(GradoopId.get(), traversal.getFromValue(), null, graphIds);
+        fromId = fromVertex.getId();
+        vertexIdMap.put(fromTime, fromId);
+        vertices.add(fromVertex);
+      }
+
+      Integer toTime = traversal.getToTime();
+      GradoopId toId = vertexIdMap.get(toTime);
+
+      if (toId == null) {
+        Vertex toVertex = new Vertex(GradoopId.get(), traversal.getToValue(), null, graphIds);
+        toId = toVertex.getId();
+        vertexIdMap.put(toTime, toId);
+        vertices.add(toVertex);
+      }
+
+      GradoopId sourceId = traversal.isOutgoing() ? fromId : toId;
+      GradoopId targetId = traversal.isOutgoing() ? toId : fromId;
+
+      edges.add(
+        new Edge(GradoopId.get(), traversal.getEdgeValue(), sourceId, targetId, null, graphIds));
+    }
+
+    return new GraphTransaction(graphHead, vertices, edges);
+  }
 }

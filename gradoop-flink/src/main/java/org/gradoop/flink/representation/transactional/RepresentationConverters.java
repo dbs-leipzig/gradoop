@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation;
+package org.gradoop.flink.representation.transactional;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

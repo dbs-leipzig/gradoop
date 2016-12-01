@@ -13,11 +13,11 @@ import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListNullVa
 import org.gradoop.flink.representation.transactional.RepresentationConverters;
 import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
 import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+
 import org.junit.Test;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
 

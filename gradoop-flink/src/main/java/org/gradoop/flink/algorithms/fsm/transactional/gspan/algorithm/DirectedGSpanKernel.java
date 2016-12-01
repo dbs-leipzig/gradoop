@@ -5,8 +5,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListCell;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
 
