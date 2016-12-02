@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -26,27 +27,77 @@ import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Creates a employee vertex.
+ */
 public class Employee
   extends RichMapFunction<MasterDataSeed, Vertex> {
-
+  /**
+   * Class name of the vertex.
+   */
   public static final String CLASS_NAME = "Employee";
+  /**
+   * Broadcast variable for male employees first name.
+   */
   public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
+  /**
+   * Broadcast variable for female employees first name.
+   */
   public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
+  /**
+   * Broadcast variable for employees last name.
+   */
   public static final String LAST_NAMES_BC = "nouns";
+  /**
+   * Broadcast variable for employees cities.
+   */
   public static final String CITIES_BC = "cities";
-  private static String ACRONYM = "EMP";
-
+  /**
+   * Acronym for employee.
+   */
+  private static final String ACRONYM = "EMP";
+  /**
+   * List of possible first female names.
+   */
   private List<String> firstNamesFemale;
+  /**
+   * List of possible first male names.
+   */
   private List<String> firstNamesMale;
+  /**
+   * List of possible last names.
+   */
   private List<String> lastNames;
+  /**
+   * List of possible cities.
+   */
   private List<String> cities;
+  /**
+   * Amount of possible female first names.
+   */
   private Integer firstNameCountFemale;
+  /**
+   * Amount of possible male first names.
+   */
   private Integer firstNameCountMale;
+  /**
+   * Amount of possible last names.
+   */
   private Integer lastNameCount;
+  /**
+   * Amount of possible cities.
+   */
   private Integer cityCount;
-
+  /**
+   * EPGM vertex factory.
+   */
   private final VertexFactory vertexFactory;
 
+  /**
+   * Valued constructor.
+   *
+   * @param vertexFactory EPGM vertex factory.
+   */
   public Employee(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
@@ -54,7 +105,7 @@ public class Employee
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-
+    //load broadcast maps
     firstNamesFemale = getRuntimeContext()
       .getBroadcastVariable(FIRST_NAMES_FEMALE_BC);
     firstNamesMale = getRuntimeContext()
@@ -63,7 +114,7 @@ public class Employee
       .getBroadcastVariable(LAST_NAMES_BC);
     cities = getRuntimeContext()
       .getBroadcastVariable(CITIES_BC);
-
+    //get their sizes.
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();
     lastNameCount = lastNames.size();
@@ -72,10 +123,10 @@ public class Employee
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    PropertyList properties = MasterData.createDefaultProperties(ACRONYM, seed);
-
+    //create standard properties from acronym and seed
+    PropertyList properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
-
+    //set rnd city, name and gender
     properties.set("city", cities.get(random.nextInt(cityCount)));
 
     String gender;
@@ -90,10 +141,8 @@ public class Employee
       name = firstNamesMale.get(random.nextInt(firstNameCountMale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
-
     properties.set("name", name);
     properties.set("gender", gender);
-
     return vertexFactory.createVertex(Employee.CLASS_NAME, properties);
   }
 }

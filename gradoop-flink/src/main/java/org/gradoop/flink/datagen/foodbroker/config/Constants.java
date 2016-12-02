@@ -20,65 +20,80 @@ package org.gradoop.flink.datagen.foodbroker.config;
  * Constants used for the FoodBroker data generator
  */
 public class Constants {
-
   /**
-   * reserved property key referring to master or transactional data
+   * Reserved property key referring to master or transactional data.
    */
   public static final String SUPERTYPE_KEY = "superType";
   /**
-   * reserved property value to mark master data
+   * Reserved property value to mark master data.
    */
   public static final String SUPERCLASS_VALUE_MASTER = "M";
   /**
-   * reserved property value to mark transactional data
+   * Reserved property value to mark transactional data.
    */
   public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
   /**
-   * reserved property key referring to the source identifier of vertices
+   * Reserved property key referring to the source identifier of vertices.
    */
   public static final String SOURCEID_KEY = "sid";
-
   /**
-   * property key for master data quality
+   * Property key for master data quality.
    */
   public static final String QUALITY = "quality";
-
   /**
-   * property key for product price
+   * Property key for product price.
    */
   public static final String PRICE = "price";
-
   /**
-   * broadcast variable which is needed to find and set all graph ids for the
-   * masterdata
-   */
-  public static final String EDGES = "edges";
-
-  /**
-   * broadcast variable which is needed spread the precalculated customer map
+   * Broadcast variable which is needed to spread the precalculated customer map.
    */
   public static final String CUSTOMER_MAP = "customerMap";
-
+  /**
+   * Broadcast variable which is needed to spread the precalculated vendor map.
+   */
   public static final String VENDOR_MAP = "vendorMap";
-
+  /**
+   * Broadcast variable which is needed to spread the precalculated logistic map.
+   */
   public static final String LOGISTIC_MAP = "logisticMap";
-
+  /**
+   * Broadcast variable which is needed to spread the precalculated employee map.
+   */
   public static final String EMPLOYEE_MAP = "employeeMap";
-
+  /**
+   * Broadcast variable which is needed to spread the precalculated product quality map.
+   */
   public static final String PRODUCT_QUALITY_MAP = "productQualityMap";
-
+  /**
+   * Broadcast variable which is needed to spread the precalculated product price map.
+   */
   public static final String PRODUCT_PRICE_MAP = "productPriceMap";
-
+  /**
+   * Used to select the map which is then used to get the object from a gradoop id.
+   */
   public static final String USER_MAP = "userMap";
-
-  public static final String VERTEX_MAP = "vertexMap";
-
-  public static final String EDGE_MAP = "edgeMap";
-
+  /**
+   * Acronym for sales quotation.
+   */
   public static final String SALESQUOTATION_ACRONYM = "SQN";
+  /**
+   * Acronym for sales order.
+   */
   public static final String SALESORDER_ACRONYM = "SOR";
+  /**
+   * Acronym for purch order.
+   */
   public static final String PURCHORDER_ACRONYM = "POR";
+  /**
+   * Acronym for delivery note.
+   */
   public static final String DELIVERYNOTE_ACRONYM = "DLV";
+  /**
+   * Acronym for purch invoice.
+   */
   public static final String PURCHINVOICE_ACRONYM = "PIN";
+  /**
+   * Acronym for sales invoice.
+   */
   public static final String SALESINVOICE_ACRONYM = "SIN";
 }

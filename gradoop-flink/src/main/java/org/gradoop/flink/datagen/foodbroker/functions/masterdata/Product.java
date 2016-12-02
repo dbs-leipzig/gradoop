@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
+package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -31,47 +31,80 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Creates a product vertex.
+ */
 public class Product
   extends RichMapFunction<MasterDataSeed, Vertex> {
-
+  /**
+   * Class name of the vertex.
+   */
   public static final String CLASS_NAME = "Product";
+  /**
+   * Broadcast variable for product names.
+   */
   public static final String NAMES_GROUPS_BC = "nameGroupPairs";
+  /**
+   * Broadcast variable for the products adjectives.
+   */
   public static final String ADJECTIVES_BC = "adjectives";
+  /**
+   * Acronym for product.
+   */
   private static final String ACRONYM = "PRD";
-
+  /**
+   * List of possible product names and the corresponding type.
+   */
   private List<Tuple2<String, String>> nameGroupPairs;
+  /**
+   * List of possible adjectives.
+   */
   private List<String> adjectives;
-
+  /**
+   * Amount of possible names.
+   */
   private Integer nameGroupPairCount;
+  /**
+   * Amount odf possible adjectives.
+   */
   private Integer adjectiveCount;
-
+  /**
+   * EPGM vertex facoty.
+   */
   private final VertexFactory vertexFactory;
-
+  /**
+   * FoodBroker configuration.
+   */
   private FoodBrokerConfig config;
 
+  /**
+   * Valued constructor.
+   *
+   * @param vertexFactory EPGM vertex factory
+   * @param config FoodBroker configuration
+   */
   public Product(VertexFactory vertexFactory, FoodBrokerConfig config) {
     this.vertexFactory = vertexFactory;
     this.config = config;
   }
 
-
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-
+    //get broadcasted lists
     nameGroupPairs = getRuntimeContext().getBroadcastVariable(NAMES_GROUPS_BC);
     adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
-
+    //get their sizes
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
   }
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    PropertyList properties = MasterData.createDefaultProperties(ACRONYM, seed);
-
+    //create standard properties from acronym and seed
+    PropertyList properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
-
+    //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs
       .get(random.nextInt(nameGroupPairCount));
 
@@ -80,26 +113,20 @@ public class Product
     properties.set("name",
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nameGroupPair.f0);
-    this.setPrice(properties);
-
+    properties.set(Constants.PRICE, generatePrice());
     return vertexFactory.createVertex(Product.CLASS_NAME, properties);
   }
 
-  private void setPrice(PropertyList properties) {
-//    PropertiesConfiguration config = null;
-//    try {
-//      config = new PropertiesConfiguration("config.properties");
-//    } catch (ConfigurationException e) {
-//      e.printStackTrace();
-//    }
-
+  /**
+   * Generates a price for the product.
+   *
+   * @return product price
+   */
+  private BigDecimal generatePrice() {
     float minPrice = config.getProductMinPrice();
     float maxPrice = config.getProductMaxPrice();
 
-    BigDecimal price = BigDecimal.valueOf(
-      minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice))
-    ).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-    properties.set(Constants.PRICE,price);
+    return  BigDecimal.valueOf(minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice)))
+      .setScale(2, BigDecimal.ROUND_HALF_UP);
   }
 }
