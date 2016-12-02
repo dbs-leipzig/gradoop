@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.pojos;
+package org.gradoop.flink.representation.common.adjacencylist;
 
 import com.google.common.collect.Lists;
 
@@ -24,14 +24,16 @@ import java.util.Collection;
 
 /**
  * Traversal optimized representation of a vertex.
- * @param <T> type of algorithm specific cell value
+ *
+ * @param <ED> edge data type
+ * @param <VD> vertex data type
  */
-public class AdjacencyListRow<T> implements Serializable {
+public class AdjacencyListRow<ED, VD> implements Serializable {
 
   /**
    * collection of adjacency list cells
    */
-  private Collection<AdjacencyListCell<T>> cells;
+  private Collection<AdjacencyListCell<ED, VD>> cells;
 
   /**
    * Default constructor.
@@ -45,7 +47,7 @@ public class AdjacencyListRow<T> implements Serializable {
    *
    * @param cells collection of adjacency list cells
    */
-  public AdjacencyListRow(Collection<AdjacencyListCell<T>> cells) {
+  public AdjacencyListRow(Collection<AdjacencyListCell<ED, VD>> cells) {
     this.cells = cells;
   }
 
@@ -73,11 +75,11 @@ public class AdjacencyListRow<T> implements Serializable {
     return cells.hashCode();
   }
 
-  public Collection<AdjacencyListCell<T>> getCells() {
+  public Collection<AdjacencyListCell<ED, VD>> getCells() {
     return cells;
   }
 
-  public void setCells(Collection<AdjacencyListCell<T>> cells) {
+  public void setCells(Collection<AdjacencyListCell<ED, VD>> cells) {
     this.cells = cells;
   }
 }

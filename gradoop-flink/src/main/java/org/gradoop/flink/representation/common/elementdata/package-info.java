@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains general pojo interfaces used by Gradoop operators.
+ * Classes related to partial EPGM element data.
  */
-package org.gradoop.flink.model.api.pojos;
+package org.gradoop.flink.representation.common.elementdata;

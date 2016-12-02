@@ -20,7 +20,7 @@ package org.gradoop.flink.datagen.transactions.predictable;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.api.operators.GraphTransactionsGenerator;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**

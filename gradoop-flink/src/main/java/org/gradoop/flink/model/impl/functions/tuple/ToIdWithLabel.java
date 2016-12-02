@@ -15,31 +15,30 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.epgm;
+package org.gradoop.flink.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 
 /**
- * element => elementId
+ * Factory to create (id, label) pairs from EPGM elements.
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ForwardedFields("id->*")
-public class Id<EL extends Element> implements
-  MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
+@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
+public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
+
+  /**
+   * Reuse tuple
+   */
+  private final IdWithLabel reuseTuple = new IdWithLabel();
 
   @Override
-  public GradoopId map(EL element) throws Exception {
-    return element.getId();
+  public IdWithLabel map(EL element) {
+    reuseTuple.f0 = element.getId();
+    reuseTuple.f1 = element.getLabel();
+    return reuseTuple;
   }
-
-  @Override
-  public GradoopId getKey(EL element) throws Exception {
-    return element.getId();
-  }
-
 }

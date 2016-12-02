@@ -15,24 +15,33 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.api.pojos;
+package org.gradoop.flink.model.impl.tuples;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * A factory to create algorithm-specific value of adjacency list cells.
- * @param <T> algorithm-specific value type
+ * (Id, Label)
  */
-public interface AdjacencyListCellValueFactory<T> {
+public class IdWithLabel extends Tuple2<GradoopId, String> {
+
   /**
-   * Returns algorithm-specific value for an edge triple
+   * Constructor.
    *
-   * @param source source vertex
-   * @param edge edge
-   * @param target target vertex
-   *
-   * @return cell value
+   * @param id element id
+   * @param label element label
    */
-  T createValue(Vertex source, Edge edge, Vertex target);
+  public IdWithLabel(GradoopId id, String label) {
+    super(id, label);
+  }
+
+  /**
+   * Default Constructor
+   */
+  public IdWithLabel() {
+  }
+
+  public GradoopId getId() {
+    return f0;
+  }
 }

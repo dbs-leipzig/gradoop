@@ -16,6 +16,6 @@
  */
 
 /**
- * Classes related to graph representations.
+ * Contains general pojo interfaces used by Gradoop operators.
  */
-package org.gradoop.flink.representation.tuples;
+package org.gradoop.flink.representation.common.adjacencylist;
