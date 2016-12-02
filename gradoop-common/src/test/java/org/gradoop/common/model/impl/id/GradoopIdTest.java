@@ -1,11 +1,13 @@
 package org.gradoop.common.model.impl.id;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.nio.ByteBuffer;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -83,38 +85,38 @@ public class GradoopIdTest {
     );
   }
 
-//  @Test
-//  public void testFromBytes() {
-//    byte[] bsonId = ObjectId.get().toByteArray();
-//    GradoopId expectedId = new GradoopId(bsonId);
-//
-//    byte[] bytes = new byte[GradoopId.ID_SIZE];
-//    ByteBuffer buffer = ByteBuffer.wrap(bytes);
-//
-//    buffer.putInt(bsonId.getTimestamp());
-//
-//    byte b1,b2,b3;
-//
-//    int machineId = bsonId.getMachineIdentifier();
-//    b3 = (byte)(machineId & 0xFF);
-//    b2 = (byte)((machineId >> 8) & 0xFF);
-//    b1 = (byte)((machineId >> 16) & 0xFF);
-//    buffer.put(b1);
-//    buffer.put(b2);
-//    buffer.put(b3);
-//
-//    buffer.putShort(bsonId.getProcessIdentifier());
-//
-//    int counter = bsonId.getCounter();
-//    b3 = (byte)(counter & 0xFF);
-//    b2 = (byte)((counter >> 8) & 0xFF);
-//    b1 = (byte)((counter >> 16) & 0xFF);
-//    buffer.put(b1);
-//    buffer.put(b2);
-//    buffer.put(b3);
-//
-//    GradoopId newId = GradoopId.fromBytes(bytes);
-//
-//    assertEquals(expectedId, newId);
-//  }
+  @Test
+  public void testFromBytes() {
+    ObjectId bsonId = ObjectId.get();
+    GradoopId expectedId = new GradoopId(bsonId);
+
+    byte[] bytes = new byte[GradoopId.ID_SIZE];
+    ByteBuffer buffer = ByteBuffer.wrap(bytes);
+
+    buffer.putInt(bsonId.getTimestamp());
+
+    byte b1,b2,b3;
+
+    int machineId = bsonId.getMachineIdentifier();
+    b3 = (byte)(machineId & 0xFF);
+    b2 = (byte)((machineId >> 8) & 0xFF);
+    b1 = (byte)((machineId >> 16) & 0xFF);
+    buffer.put(b1);
+    buffer.put(b2);
+    buffer.put(b3);
+
+    buffer.putShort(bsonId.getProcessIdentifier());
+
+    int counter = bsonId.getCounter();
+    b3 = (byte)(counter & 0xFF);
+    b2 = (byte)((counter >> 8) & 0xFF);
+    b1 = (byte)((counter >> 16) & 0xFF);
+    buffer.put(b1);
+    buffer.put(b2);
+    buffer.put(b3);
+
+    GradoopId newId = GradoopId.fromBytes(bytes);
+
+    assertEquals(expectedId, newId);
+  }
 }
