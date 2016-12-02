@@ -1,4 +1,4 @@
-package org.gradoop.flink.datagen.foodbroker.masterdata;
+package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 
 import org.gradoop.common.model.impl.properties.PropertyList;

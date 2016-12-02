@@ -1,4 +1,4 @@
-package org.gradoop.flink.datagen.foodbroker.functions;
+package org.gradoop.flink.datagen.foodbroker.functions.process;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Process<S, T>
+public abstract class AbstractProcess
   extends AbstractRichFunction {
   /**
    * Foodbroker configuration
@@ -105,7 +105,7 @@ public abstract class Process<S, T>
   protected long currentId = 1;
   protected long globalSeed;
 
-  public Process(EdgeFactory edgeFactory, VertexFactory vertexFactory,
+  public AbstractProcess(EdgeFactory edgeFactory, VertexFactory vertexFactory,
     FoodBrokerConfig config, GraphHeadFactory graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;

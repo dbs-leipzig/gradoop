@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.datagen.foodbroker.masterdata;
+package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -22,20 +22,17 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.flink.datagen.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
 import java.util.Random;
 
-public class Vendor
+public class Logistics
   extends RichMapFunction<MasterDataSeed, Vertex> {
 
-  public static final String CLASS_NAME = "Vendor";
-  public static final String ADJECTIVES_BC = "adjectives";
-  public static final String NOUNS_BC = "nouns";
-  public static final String CITIES_BC = "cities";
-  private static final String ACRONYM = "VEN";
-
+  public static final String CLASS_NAME = "Logistics";
+  private static final String ACRONYM = "LOG";
   private List<String> adjectives;
   private List<String> nouns;
   private List<String> cities;
@@ -45,17 +42,21 @@ public class Vendor
 
   private final VertexFactory vertexFactory;
 
-  public Vendor(VertexFactory vertexFactory) {
+  public Logistics(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
+
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(NOUNS_BC);
-    cities = getRuntimeContext().getBroadcastVariable(CITIES_BC);
+    adjectives = getRuntimeContext()
+      .getBroadcastVariable(LogisticsGenerator.ADJECTIVES_BC);
+    nouns = getRuntimeContext()
+      .getBroadcastVariable(LogisticsGenerator.NOUNS_BC);
+    cities = getRuntimeContext()
+      .getBroadcastVariable(LogisticsGenerator.CITIES_BC);
 
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -73,6 +74,6 @@ public class Vendor
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount)));
 
-    return vertexFactory.createVertex(Vendor.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Logistics.CLASS_NAME, properties);
   }
 }

@@ -1,4 +1,4 @@
-package org.gradoop.flink.datagen.foodbroker.functions;
+package org.gradoop.flink.datagen.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,8 +18,8 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyList;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.masterdata.Customer;
-import org.gradoop.flink.datagen.foodbroker.masterdata.Employee;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Customer;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.model.impl.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ComplaintHandling
-  extends Process<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>>
+  extends AbstractProcess
   implements FlatMapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
 
   private List<Vertex> employees;

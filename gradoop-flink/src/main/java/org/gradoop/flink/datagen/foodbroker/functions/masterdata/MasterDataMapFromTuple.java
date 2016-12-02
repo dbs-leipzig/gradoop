@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.datagen.foodbroker.functions;
+package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.GroupReduceFunction;

@@ -14,38 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.datagen.foodbroker.masterdata;
+package org.gradoop.flink.datagen.foodbroker.generators;
+
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Vendor;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
 
-public class CustomerGenerator
+public class VendorGenerator
   extends AbstractMasterDataGenerator {
 
-
-  public CustomerGenerator(
+  public VendorGenerator(
     GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
     super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
   public DataSet<Vertex> generate() {
 
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Customer.CLASS_NAME);
+    String className = Vendor.CLASS_NAME;
+
+    List<MasterDataSeed> seeds = getMasterDataSeeds(className);
 
     List<String> cities = getStringValuesFromFile("cities");
-    List<String> adjectives = getStringValuesFromFile("customer.adjectives");
-    List<String> nouns = getStringValuesFromFile("customer.nouns");
+    List<String> adjectives = getStringValuesFromFile("vendor.adjectives");
+    List<String> nouns = getStringValuesFromFile("vendor.nouns");
 
     return env.fromCollection(seeds)
-      .map(new Customer(vertexFactory))
-      .withBroadcastSet(env.fromCollection(adjectives), Customer.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Customer.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(cities), Customer.CITIES_BC)
+      .map(new Vendor(vertexFactory))
+      .withBroadcastSet(
+        env.fromCollection(adjectives), Vendor.ADJECTIVES_BC)
+      .withBroadcastSet(
+        env.fromCollection(nouns), Vendor.NOUNS_BC)
+      .withBroadcastSet(
+        env.fromCollection(cities), Vendor.CITIES_BC)
       .returns(vertexFactory.getType());
   }
 }

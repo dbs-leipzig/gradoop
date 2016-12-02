@@ -1,4 +1,4 @@
-package org.gradoop.flink.datagen.foodbroker.functions;
+package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;

@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.datagen.foodbroker.functions;
+package org.gradoop.flink.datagen.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,7 +45,7 @@ import java.util.Map;
  * equally to each worker.
  */
 public class Brokerage
-  extends Process<Long, GraphTransaction>
+  extends AbstractProcess
   implements MapPartitionFunction<Long, GraphTransaction>{
 
   /**

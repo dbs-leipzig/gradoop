@@ -14,24 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.gradoop.flink.datagen.foodbroker.generators;
 
-package org.gradoop.flink.datagen.foodbroker.functions;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.foodbroker.config.Constants;
 
-/**
- * Creates a master data tuple from the given vertex.
- */
-public class MasterDataQualityMapper
-  implements MapFunction<Vertex, Tuple2<GradoopId, Float>> {
+public interface MasterDataGenerator {
 
-  @Override
-  public Tuple2<GradoopId, Float> map(Vertex v) throws Exception {
-    return new Tuple2<>(v.getId(), v.getPropertyValue(
-      Constants.QUALITY).getFloat());
-  }
+  DataSet<Vertex> generate();
 }
