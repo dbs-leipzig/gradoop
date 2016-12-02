@@ -27,7 +27,7 @@ import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.flink.io.impl.tlf.functions.VertexLabelList;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
 import org.gradoop.flink.model.impl.GraphCollection;

@@ -9,15 +9,13 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
-import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListNullValueFactory;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.representation.transactional.RepresentationConverters;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
-
+import org.gradoop.flink.representation.transactional.AdjacencyList;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 
 import java.util.Set;
-
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
@@ -27,14 +25,15 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
     GraphTransaction transaction = getGraphTransaction();
 
-    AdjacencyList<Object> adjacencyList = RepresentationConverters
-      .getAdjacencyList(transaction, new AdjacencyListNullValueFactory());
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> adjacencyList =
+      RepresentationConverters.getAdjacencyList(transaction, new Id<Edge>(), new Id<Vertex>());
 
-    GraphTransaction convertedTransaction = RepresentationConverters
-      .getGraphTransaction(adjacencyList);
+    GraphTransaction convertedTransaction =
+      RepresentationConverters.getGraphTransaction(adjacencyList);
 
-    AdjacencyList<Object> convertedAdjacencyList = RepresentationConverters
-      .getAdjacencyList(convertedTransaction, new AdjacencyListNullValueFactory());
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> convertedAdjacencyList =
+      RepresentationConverters
+        .getAdjacencyList(convertedTransaction, new Id<Edge>(), new Id<Vertex>());
 
     GradoopFlinkTestUtils.assertEquals(transaction, convertedTransaction);
     GradoopFlinkTestUtils.assertEquals(adjacencyList, convertedAdjacencyList);
