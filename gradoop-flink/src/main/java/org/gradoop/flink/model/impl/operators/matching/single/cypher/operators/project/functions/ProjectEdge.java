@@ -50,7 +50,11 @@ public class ProjectEdge extends RichMapFunction<Edge, Embedding> {
   @Override
   public Embedding map(Edge edge) {
     if (propertyKeyMapping.get(1).isEmpty()) {
-      return new Embedding(Lists.newArrayList(new IdEntry(edge.getId())));
+      return new Embedding(Lists.newArrayList(
+        new IdEntry(edge.getSourceId()),
+        new IdEntry(edge.getId()),
+        new IdEntry(edge.getTargetId())
+      ));
     } else {
       return Projector.project(Embedding.fromEdge(edge), propertyKeyMapping);
     }
