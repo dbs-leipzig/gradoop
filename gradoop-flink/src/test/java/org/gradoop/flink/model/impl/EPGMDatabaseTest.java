@@ -16,21 +16,19 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGetExistingGraph() throws Exception {
-    FlinkAsciiGraphLoader loader =
-      getSocialNetworkLoader();
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     String graphVariable = "g0";
 
     GraphHead g = loader.getGraphHeadByVariable(graphVariable);
-    LogicalGraph graphFromLoader =
-      loader.getLogicalGraphByVariable(graphVariable);
+    LogicalGraph graphFromLoader = loader.getLogicalGraphByVariable(graphVariable);
 
     LogicalGraph graphFromDB = loader.getDatabase().getGraph(g.getId());
 
     // head <> head
     collectAndAssertTrue(graphFromLoader.getGraphHead()
       .cross(graphFromDB.getGraphHead())
-      .with(new Equals<GraphHead>())
+      .with(new Equals<>())
     );
 
     // elements <> elements
@@ -40,7 +38,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
   @Test
   public void testNonExistingGraph() throws Exception {
     collectAndAssertTrue(getSocialNetworkLoader().getDatabase()
-      .getGraph(new GradoopId()).isEmpty());
+      .getGraph(GradoopId.get()).isEmpty());
   }
 
   @Test
