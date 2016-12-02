@@ -13,7 +13,7 @@ public class Report
   public void flatMap(GraphEmbeddingsPair graphEmbeddings,
     Collector<WithCount<TraversalCode<String>>> collector) throws Exception {
 
-    if (!graphEmbeddings.getAdjacencyList().getRows().isEmpty()) {
+    if (!graphEmbeddings.getAdjacencyList().getOutgoingRows().isEmpty()) {
       for (TraversalCode<String> code : graphEmbeddings.getCodeEmbeddings().keySet()) {
         collector.collect(new WithCount<>(code));
       }

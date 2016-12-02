@@ -15,14 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.tfsm.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphDecoder;
-import org.gradoop.flink.algorithms.fsm.tfsm.tuples.TFSMSubgraph;
+
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**

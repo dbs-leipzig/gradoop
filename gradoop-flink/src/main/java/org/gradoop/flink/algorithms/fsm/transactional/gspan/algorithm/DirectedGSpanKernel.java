@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
@@ -19,20 +19,20 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(GradoopId fromId,
-    String fromLabel, AdjacencyListCell<LabelPair> cell) {
-    GradoopId toId = cell.getVertexId();
-    String toLabel = cell.getValue().getVertexLabel();
+    String fromLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell) {
+    GradoopId toId = cell.getVertexData().getId();
+    String toLabel = cell.getVertexData().getLabel();
 
     boolean loop = fromId.equals(toId);
 
-    GradoopId edgeId = cell.getEdgeId();
-    String edgeLabel = cell.getValue().getEdgeLabel();
+    GradoopId edgeId = cell.getEdgeData().getId();
+    String edgeLabel = cell.getEdgeData().getLabel();
 
     Pair<Traversal<String>, TraversalEmbedding> traversalEmbedding = null;
 
     Traversal<String> traversal;
     TraversalEmbedding embedding;
-    boolean outgoing = cell.isOutgoing();
+    boolean outgoing = true;
 
     if (loop) {
       if (outgoing) {
@@ -139,16 +139,17 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
   }
 
   @Override
-  protected void addCells(Map<GradoopId, AdjacencyListRow<LabelPair>> rows,
+  protected void addCells(Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> rows,
     GradoopId fromId, String fromLabel,
     boolean outgoing, GradoopId edgeId, String edgeLabel,
     GradoopId toId, String toLabel
   ) {
 
-    rows.get(fromId).getCells().add(new AdjacencyListCell<>(
-      edgeId, outgoing, toId, new LabelPair(edgeLabel, toLabel)));
+    rows.get(fromId).getCells().add(
+      new AdjacencyListCell<>(new IdWithLabel(edgeId, edgeLabel), new IdWithLabel(toId, toLabel)));
 
-    rows.get(toId).getCells().add(new AdjacencyListCell<>(
-      edgeId, !outgoing, fromId, new LabelPair(edgeLabel, fromLabel)));
+    rows.get(toId).getCells().add(
+      new AdjacencyListCell<>(new IdWithLabel(edgeId, edgeLabel), new IdWithLabel(fromId, fromLabel)));
+
   }
 }

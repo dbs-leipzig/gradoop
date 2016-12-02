@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**

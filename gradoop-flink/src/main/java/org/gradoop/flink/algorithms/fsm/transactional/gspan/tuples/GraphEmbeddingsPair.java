@@ -2,8 +2,9 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
 
@@ -11,10 +12,10 @@ import java.util.Collection;
 import java.util.Map;
 
 public class GraphEmbeddingsPair extends
-  Tuple2<AdjacencyList<LabelPair>, Map<TraversalCode<String>, Collection<TraversalEmbedding>>> {
+  Tuple2<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>, Map<TraversalCode<String>, Collection<TraversalEmbedding>>> {
 
 
-  public GraphEmbeddingsPair(AdjacencyList<LabelPair> adjacencyLists,
+  public GraphEmbeddingsPair(AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyLists,
     Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings) {
     super(adjacencyLists, codeEmbeddings);
   }
@@ -23,7 +24,7 @@ public class GraphEmbeddingsPair extends
     super(new AdjacencyList<>(), Maps.newHashMap());
   }
 
-  public AdjacencyList<LabelPair> getAdjacencyList() {
+  public AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> getAdjacencyList() {
     return f0;
   }
 

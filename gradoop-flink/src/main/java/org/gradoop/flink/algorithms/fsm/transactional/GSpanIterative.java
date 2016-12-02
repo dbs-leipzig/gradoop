@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.GSpanBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.EmptyGraphEmbeddingPair;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ExpandResult;
@@ -31,9 +32,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Report;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
-import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 /**
@@ -52,7 +53,8 @@ public class GSpanIterative extends GSpanBase {
   }
 
   @Override
-  protected DataSet<TraversalCode<String>> mine(DataSet<AdjacencyList<LabelPair>> graphs) {
+  protected DataSet<TraversalCode<String>> mine(
+    DataSet<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>> graphs) {
 
     DataSet<GraphEmbeddingsPair> searchSpace = graphs
       .map(new InitSingleEdgeEmbeddings(gSpan));

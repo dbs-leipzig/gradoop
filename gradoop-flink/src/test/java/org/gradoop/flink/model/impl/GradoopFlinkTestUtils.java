@@ -23,8 +23,8 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCellComparator;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Collection;
 import java.util.List;
@@ -162,34 +162,36 @@ public class GradoopFlinkTestUtils {
       a.getProperties().equals(b.getProperties()));
   }
 
-  public static <T> void assertEquals(AdjacencyList<T> a, AdjacencyList<T> b) {
+  public static void assertEquals(AdjacencyList<GradoopId, String, GradoopId, GradoopId> a,
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> b) {
 
-    assertTrue(a.getGraphId().equals(b.getGraphId()));
+    assertEqualElements(a.getGraphHead(), b.getGraphHead());
 
-    Set<GradoopId> ids = Sets.newHashSet(a.getGraphId());
+    Set<GradoopId> ids = Sets.newHashSet();
 
-    Map<GradoopId, AdjacencyListRow<T>> aRows = a.getRows();
-    Map<GradoopId, AdjacencyListRow<T>> bRows = b.getRows();
+    Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> aRows = a.getOutgoingRows();
+    Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> bRows = b.getOutgoingRows();
 
     assertTrue(aRows.size() == bRows.size());
 
     for (GradoopId vertexId : aRows.keySet()) {
       ids.add(vertexId);
 
-      List<AdjacencyListCell<T>> aCells = Lists.newArrayList(aRows.get(vertexId).getCells());
-      List<AdjacencyListCell<T>> bCells = Lists.newArrayList(aRows.get(vertexId).getCells());
+      List<AdjacencyListCell<GradoopId, GradoopId>> aCells =
+        Lists.newArrayList(aRows.get(vertexId).getCells());
+
+      List<AdjacencyListCell<GradoopId, GradoopId>> bCells =
+        Lists.newArrayList(aRows.get(vertexId).getCells());
 
       assertTrue(aCells.size() == bCells.size());
 
-      Collections.sort(aCells, new AdjacencyListCellComparator<>());
-      Collections.sort(bCells, new AdjacencyListCellComparator<>());
+      aCells.sort(new AdjacencyListCellComparator<>());
+      bCells.sort(new AdjacencyListCellComparator<>());
 
       assertTrue(aCells.equals(bCells));
 
-      for (AdjacencyListCell<T> cell : aCells) {
-        if (cell.isOutgoing()) {
-          ids.add(cell.getVertexId());
-        }
+      for (AdjacencyListCell<GradoopId, GradoopId> cell : aCells) {
+        ids.add(cell.getVertexData());
       }
     }
 
@@ -198,7 +200,8 @@ public class GradoopFlinkTestUtils {
       Properties aProperties = a.getProperties(id);
       Properties bProperties = b.getProperties(id);
 
-      assertTrue(aProperties == null && bProperties == null || aProperties.equals(bProperties));
+      assertTrue(aProperties == null && bProperties == null
+        || aProperties.equals(bProperties));
 
     }
   }

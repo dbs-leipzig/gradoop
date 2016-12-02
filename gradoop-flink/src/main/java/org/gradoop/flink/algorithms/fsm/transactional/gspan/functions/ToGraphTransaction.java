@@ -2,7 +2,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernelBase;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 /**

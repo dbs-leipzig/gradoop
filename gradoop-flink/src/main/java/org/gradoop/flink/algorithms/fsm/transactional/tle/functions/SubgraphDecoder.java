@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
-import org.gradoop.flink.algorithms.fsm.common.tuples.Subgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 

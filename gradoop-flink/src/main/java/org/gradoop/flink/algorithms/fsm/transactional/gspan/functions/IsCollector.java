@@ -7,7 +7,7 @@ public class IsCollector implements FilterFunction<GraphEmbeddingsPair> {
 
   @Override
   public boolean filter(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
-    return graphEmbeddingsPair.getAdjacencyList().getRows().isEmpty();
+    return graphEmbeddingsPair.getAdjacencyList().getOutgoingRows().isEmpty();
   }
 
 }

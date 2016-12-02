@@ -29,7 +29,7 @@ public class PatternGrowth
   @Override
   public GraphEmbeddingsPair map(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
 
-    if (graphEmbeddingsPair.getAdjacencyList().getRows().isEmpty()) {
+    if (graphEmbeddingsPair.getAdjacencyList().getOutgoingRows().isEmpty()) {
       for (TraversalCode<String> code : frequentSubgraphs) {
         graphEmbeddingsPair.getCodeEmbeddings().put(code, null);
       }

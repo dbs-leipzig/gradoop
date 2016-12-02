@@ -44,4 +44,8 @@ public class IdWithLabel extends Tuple2<GradoopId, String> {
   public GradoopId getId() {
     return f0;
   }
+
+  public String getLabel() {
+    return f1;
+  }
 }

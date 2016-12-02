@@ -33,7 +33,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMWrapInSu
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.TFSMGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent

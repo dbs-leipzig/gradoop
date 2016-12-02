@@ -15,15 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.common.functions;
+package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Maps;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
-import org.gradoop.flink.representation.transactional.sets.GraphTransaction;
-import org.gradoop.flink.algorithms.fsm.common.pojos.FSMEdge;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Map;

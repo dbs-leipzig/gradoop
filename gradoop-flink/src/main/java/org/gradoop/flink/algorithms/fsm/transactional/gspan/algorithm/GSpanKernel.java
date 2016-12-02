@@ -1,8 +1,9 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
-import org.gradoop.flink.algorithms.fsm.transactional.common.tuples.LabelPair;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
-import org.gradoop.flink.representation.transactional.adjacencylist.AdjacencyList;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
 
@@ -21,7 +22,7 @@ public interface GSpanKernel {
    * @return pattern -> embeddings
    */
   Map<TraversalCode<String>,Collection<TraversalEmbedding>> getSingleEdgePatternEmbeddings(
-    AdjacencyList<LabelPair> graph);
+    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph);
 
   /**
    * Grows children of supported frequent patterns in a graph.
