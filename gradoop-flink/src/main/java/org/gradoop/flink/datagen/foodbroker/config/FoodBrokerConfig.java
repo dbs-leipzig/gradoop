@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker.config;
 
 import org.apache.commons.io.FileUtils;
@@ -89,7 +90,6 @@ public class FoodBrokerConfig implements Serializable {
    * @return double representation of the value
    */
   public Double getMasterDataGoodRatio(String className)  {
-
     Double good = null;
 
     try {
@@ -97,7 +97,6 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return good;
   }
 
@@ -115,7 +114,6 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return bad;
   }
 
@@ -133,7 +131,6 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return offset;
   }
 
@@ -151,7 +148,6 @@ public class FoodBrokerConfig implements Serializable {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return growth;
   }
 
@@ -164,12 +160,10 @@ public class FoodBrokerConfig implements Serializable {
     Float minPrice = Float.MIN_VALUE;
 
     try {
-      minPrice = (float) getMasterDataConfigNode("Product")
-        .getDouble("minPrice");
+      minPrice = (float) getMasterDataConfigNode("Product").getDouble("minPrice");
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return minPrice;
   }
 
@@ -182,12 +176,10 @@ public class FoodBrokerConfig implements Serializable {
     Float maxPrice = Float.MIN_VALUE;
 
     try {
-      maxPrice = (float) getMasterDataConfigNode("Product")
-        .getDouble("maxPrice");
+      maxPrice = (float) getMasterDataConfigNode("Product").getDouble("maxPrice");
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
     return maxPrice;
   }
 
@@ -215,22 +207,18 @@ public class FoodBrokerConfig implements Serializable {
    * @return the case count
    */
   public Integer getCaseCount() {
-
     Integer casesPerScaleFactor = 0;
+    int caseCount;
 
     try {
-      casesPerScaleFactor = root
-        .getJSONObject("Process").getInt("casesPerScaleFactor");
+      casesPerScaleFactor = root.getJSONObject("Process").getInt("casesPerScaleFactor");
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
-    int caseCount = scaleFactor * casesPerScaleFactor;
-
+    caseCount = scaleFactor * casesPerScaleFactor;
     if (caseCount == 0) {
       caseCount = 10;
     }
-
     return caseCount;
   }
 
@@ -245,16 +233,12 @@ public class FoodBrokerConfig implements Serializable {
     Date date = null;
 
     try {
-      startDate = root.getJSONObject("Process")
-        .getString("startDate");
+      startDate = root.getJSONObject("Process").getString("startDate");
       formatter = new SimpleDateFormat("yyyy-MM-dd");
       date = formatter.parse(startDate);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    } catch (ParseException e) {
+    } catch (JSONException | ParseException e) {
       e.printStackTrace();
     }
-
     return date.getTime();
   }
 
@@ -266,8 +250,7 @@ public class FoodBrokerConfig implements Serializable {
    * @return amount of master data to be created
    */
   public Integer getMasterDataCount(String className) {
-    return getMasterDataOffset(className) +
-      (getMasterDataGrowth(className) * scaleFactor);
+    return getMasterDataOffset(className) + (getMasterDataGrowth(className) * scaleFactor);
   }
 
   /**
@@ -276,11 +259,9 @@ public class FoodBrokerConfig implements Serializable {
    * @return json object of the transactional data nodes
    * @throws JSONException
    */
-  protected JSONObject getTransactionalNodes() throws JSONException {
+  private JSONObject getTransactionalNodes() throws JSONException {
     return root.getJSONObject("TransactionalData");
   }
-
-// Quality
 
   /**
    * Loads the "Quality" object.
@@ -299,9 +280,9 @@ public class FoodBrokerConfig implements Serializable {
    */
   public Float getQualityGood() {
     Float quality = null;
+
     try {
-      quality = (float)
-        getQualityNode().getDouble("good");
+      quality = (float) getQualityNode().getDouble("good");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -315,9 +296,9 @@ public class FoodBrokerConfig implements Serializable {
    */
   public Float getQualityNormal() {
     Float quality = null;
+
     try {
-      quality = (float)
-        getQualityNode().getDouble("normal");
+      quality = (float) getQualityNode().getDouble("normal");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -331,9 +312,9 @@ public class FoodBrokerConfig implements Serializable {
    */
   public Float getQualityBad() {
     Float quality = null;
+
     try {
-      quality = (float)
-        getQualityNode().getDouble("bad");
+      quality = (float) getQualityNode().getDouble("bad");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -349,12 +330,11 @@ public class FoodBrokerConfig implements Serializable {
    * @param defaultValue default value
    * @return loaded boolean value or default if none was found
    */
-  private boolean getHigherIsBetter(String node, String key,
-    boolean defaultValue) {
+  private boolean getHigherIsBetter(String node, String key, boolean defaultValue) {
     Boolean value;
+
     try {
-      value = getTransactionalNodes().getJSONObject(node)
-        .getBoolean(key + "HigherIsBetter");
+      value = getTransactionalNodes().getJSONObject(node).getBoolean(key + "HigherIsBetter");
     } catch (JSONException e) {
       value = defaultValue;
     }
@@ -372,9 +352,9 @@ public class FoodBrokerConfig implements Serializable {
    */
   private Float getInfluence(String node, String key, Float defaultValue) {
     Float value;
+
     try {
-      value = (float) getTransactionalNodes().getJSONObject(node)
-        .getDouble(key + "Influence");
+      value = (float) getTransactionalNodes().getJSONObject(node).getDouble(key + "Influence");
     } catch (JSONException e) {
       value = defaultValue;
     }
@@ -392,8 +372,8 @@ public class FoodBrokerConfig implements Serializable {
    * @param startValue the start value
    * @return aggregated start value
    */
-  private Float getValue(List<Float> influencingMasterDataQuality,
-    boolean higherIsBetter, Float influence, Float startValue) {
+  private Float getValue(List<Float> influencingMasterDataQuality, boolean higherIsBetter,
+    Float influence, Float startValue) {
     Float value = startValue;
 
     for (float quality : influencingMasterDataQuality) {
@@ -422,12 +402,14 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return integer value
    */
-  public Integer getIntRangeConfigurationValue(
-    List<Float> influencingMasterDataQuality, String node, String key) {
+  public Integer getIntRangeConfigurationValue(List<Float> influencingMasterDataQuality,
+    String node, String key) {
     Integer min = 0;
     Integer max = 0;
     Boolean higherIsBetter = null;
     Float influence = null;
+    Integer startValue;
+    Integer value;
 
     try {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
@@ -439,10 +421,10 @@ public class FoodBrokerConfig implements Serializable {
       e.printStackTrace();
     }
 
-    Integer startValue = 1 + (int) ((double) (max - min) * Math.random()) + min;
+    startValue = 1 + (int) ((double) (max - min) * Math.random()) + min;
 
-    Integer value = getValue(influencingMasterDataQuality, higherIsBetter,
-      influence, startValue.floatValue()).intValue();
+    value = getValue(
+      influencingMasterDataQuality, higherIsBetter, influence, startValue.floatValue()).intValue();
 
     if (value < min) {
       value = min;
@@ -461,24 +443,22 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return BigDecimal value
    */
-  public BigDecimal getDecimalVariationConfigurationValue(
-    List<Float> influencingMasterDataQuality, String node, String key) {
+  public BigDecimal getDecimalVariationConfigurationValue(List<Float> influencingMasterDataQuality,
+    String node, String key) {
     Float baseValue = null;
     Boolean higherIsBetter = null;
     Float influence = null;
+    Float value;
 
     try {
-      baseValue = (float) getTransactionalNodes().getJSONObject(node)
-        .getDouble(key);
+      baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
       higherIsBetter = getTransactionalNodes().getJSONObject(node)
         .getBoolean(key + "HigherIsBetter");
-      influence = (float) getTransactionalNodes().getJSONObject(node)
-        .getDouble(key + "Influence");
+      influence = (float) getTransactionalNodes().getJSONObject(node).getDouble(key + "Influence");
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Float value = getValue(influencingMasterDataQuality, higherIsBetter,
-      influence, baseValue);
+    value = getValue(influencingMasterDataQuality, higherIsBetter, influence, baseValue);
 
     return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
   }
@@ -492,26 +472,22 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return true of transactions happens
    */
-  public boolean happensTransitionConfiguration(
-    List<Float> influencingMasterDataQuality, String node, String key) {
-
+  public boolean happensTransitionConfiguration(List<Float> influencingMasterDataQuality,
+    String node, String key) {
     Float baseValue = null;
     Boolean higherIsBetter = null;
     Float influence = null;
+    Float value;
 
     try {
-      baseValue =
-        (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
+      baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
       higherIsBetter = getTransactionalNodes().getJSONObject(node)
         .getBoolean(key + "HigherIsBetter");
-      influence = (float) getTransactionalNodes().getJSONObject(node)
-        .getDouble(key + "Influence");
+      influence = (float) getTransactionalNodes().getJSONObject(node).getDouble(key + "Influence");
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Float value =
-      getValue(influencingMasterDataQuality, higherIsBetter, influence,
-        baseValue);
+    value = getValue(influencingMasterDataQuality, higherIsBetter, influence, baseValue);
 
     return (float) Math.random() <= value;
   }
@@ -526,10 +502,9 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date,
-    List<Float> influencingMasterDataQuality, String node, String key) {
-    int delay = getIntRangeConfigurationValue(influencingMasterDataQuality,
-      node, key);
+  public long delayDelayConfiguration(long date, List<Float> influencingMasterDataQuality,
+    String node, String key) {
+    int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key);
 
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(date);
@@ -548,11 +523,10 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date,
-    Float influencingMasterDataQuality, String node, String key) {
+  public long delayDelayConfiguration(long date, Float influencingMasterDataQuality,
+    String node, String key) {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
-    return delayDelayConfiguration(
-      date, influencingMasterDataQualities, node, key);
+    return delayDelayConfiguration(date, influencingMasterDataQualities, node, key);
   }
 }
