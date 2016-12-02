@@ -20,7 +20,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
@@ -55,5 +57,32 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
         embedding.getEntry(1).getProperties().get().getKeys()
       );
     });
+  }
+
+  @Test
+  public void returnsIdEntriesIfNoPropertiesAreSupplied() throws Exception{
+    Edge edge = new EdgeFactory().initEdge(GradoopId.get(), GradoopId.get(), GradoopId.get());
+
+    DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromElements(edge);
+
+    ProjectEdges operator = new ProjectEdges(edgeDataSet);
+
+    DataSet<Embedding> results = operator.evaluate();
+
+    assertEquals(1,results.count());
+    assertEveryEmbedding(results, (embedding) -> {
+      assertEquals(3,embedding.size());
+
+      assertEquals(IdEntry.class, embedding.getEntry(0).getClass());
+      assertEquals(edge.getSourceId(), embedding.getEntry(0).getId());
+
+      assertEquals(IdEntry.class, embedding.getEntry(1).getClass());
+      assertEquals(edge.getId(), embedding.getEntry(1).getId());
+
+      assertEquals(IdEntry.class, embedding.getEntry(2).getClass());
+      assertEquals(edge.getTargetId(), embedding.getEntry(2).getId());
+    });
+
+
   }
 }
