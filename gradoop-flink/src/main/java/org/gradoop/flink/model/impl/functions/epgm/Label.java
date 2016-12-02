@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.functions.epgm;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -29,7 +30,26 @@ import org.gradoop.common.model.api.entities.EPGMLabeled;
  */
 @FunctionAnnotation.ForwardedFields("label->*")
 public class Label<L extends EPGMLabeled>
-  implements MapFunction<L, String>, KeySelector<L, String> {
+  implements MapFunction<L, String>, KeySelector<L, String>, FilterFunction<L> {
+  /**
+   * Label to be filtered on.
+   */
+  private String label;
+
+  /**
+   * Empty constructor, used for map function and key selector.
+   */
+  public Label() {
+  }
+
+  /**
+   * Valued constructor, used for filter function.
+   *
+   * @param label label to be filtered on
+   */
+  public Label(String label) {
+    this.label = label;
+  }
 
   @Override
   public String map(L l) throws Exception {
@@ -39,5 +59,10 @@ public class Label<L extends EPGMLabeled>
   @Override
   public String getKey(L l) throws Exception {
     return l.getLabel();
+  }
+
+  @Override
+  public boolean filter(L l) throws Exception {
+    return l.getLabel().equals(label);
   }
 }
