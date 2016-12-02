@@ -41,7 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Map partition function which spreads the whole brokerage process equally to each worker.
+ * Map partition function which spreads the whole foodbrokerage process
+ * equally to each worker.
  */
 public class Brokerage
   extends AbstractProcess
@@ -58,7 +59,7 @@ public class Brokerage
   public Brokerage(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config) {
-    super(graphHeadFactory, vertexFactory, edgeFactory, config);
+    super(edgeFactory, vertexFactory, config, graphHeadFactory);
   }
 
 
@@ -73,8 +74,9 @@ public class Brokerage
   }
 
   @Override
-  public void mapPartition(Iterable<Long> iterable, Collector<GraphTransaction> collector)
-    throws Exception {
+  public void mapPartition(Iterable<Long> iterable,
+    Collector<GraphTransaction> collector) throws
+    Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
 
@@ -619,4 +621,6 @@ public class Brokerage
 
     return salesInvoice;
   }
+
+
 }

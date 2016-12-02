@@ -1,20 +1,3 @@
-/*
- * This file is part of Gradoop.
- *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.gradoop.flink.datagen.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
@@ -45,51 +28,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Returns transactional data created in a complaint handling process together with new created
- * master data (user, clients).
- */
 public class ComplaintHandling
   extends AbstractProcess
   implements FlatMapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
-  /**
-   * List of employees. Used to create new user.
-   */
+
   private List<Vertex> employees;
-  /**
-   * List of customers. Used to create new clients.
-   */
   private List<Vertex> customers;
-  /**
-   * Map wich stores the vertex for each gradoop id.
-   */
+
   private Map<GradoopId, Vertex> masterDataMap;
-  /**
-   * Set containing all sales order lines for one graph transaction.
-   */
+
   private Set<Edge> salesOrderLines;
-  /**
-   * Set containing all purch order lines for one graph transaction.
-   */
   private Set<Edge> purchOrderLines;
-  /**
-   * The sales order from one graph transaction.
-   */
   private Vertex salesOrder;
 
-  /**
-   * Valued constructor.
-   *
-   * @param graphHeadFactory EPGM graph head factory
-   * @param vertexFactory EPGM vertex factory
-   * @param edgeFactory EPGM edge factory
-   * @param config FoodBroker configuration
-   * @param globalSeed global seed
-   */
   public ComplaintHandling(GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory, EdgeFactory edgeFactory,
     FoodBrokerConfig config, long globalSeed) {
-    super(graphHeadFactory, vertexFactory, edgeFactory, config);
+    super(edgeFactory, vertexFactory, config, graphHeadFactory);
     this.globalSeed = globalSeed;
   }
 
@@ -108,30 +63,27 @@ public class ComplaintHandling
     Set<Vertex> vertices;
     Set<Edge> edges;
     Set<Vertex> deliveryNotes;
-    //init new maps
-    vertexMap = Maps.newHashMap();
-    masterDataMap = Maps.newHashMap();
-    userMap = Maps.newHashMap();
 
+    vertexMap = Maps.newHashMap();
     edgeMap = createEdgeMap(transaction);
-    //get needed transactional objects created during brokerage process
+
     deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
     salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
     purchOrderLines = getEdgesByLabel(transaction, "PurchOrderLine");
-    salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
 
-    //create new graph head
+    salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
+    masterDataMap = Maps.newHashMap();
+    userMap = Maps.newHashMap();
     graphHead = graphHeadFactory.createGraphHead();
     graphIds = new GradoopIdSet();
     graphIds.add(graphHead.getId());
     graphTransaction = new GraphTransaction();
-    //the complaint handling process
+
     badQuality(deliveryNotes);
     lateDelivery(deliveryNotes);
-    //get all created vertices and edges
+
     vertices = getVertices();
     edges = getEdges();
-    //if one or more tickets were created
     if ((vertices.size() > 0) && (edges.size() > 0)) {
       graphTransaction.setGraphHead(graphHead);
       graphTransaction.setVertices(vertices);
@@ -141,11 +93,6 @@ public class ComplaintHandling
     }
   }
 
-  /**
-   * Creates a ticket if bad quality occurs.
-   *
-   * @param deliveryNotes all deliverynotes from the brokerage process
-   */
   private void badQuality(Set<Vertex> deliveryNotes) {
     GradoopId purchOrderId;
     List<Float> influencingMasterQuality;
@@ -153,11 +100,10 @@ public class ComplaintHandling
     Set<Edge> badSalesOrderLines;
 
     for (Vertex deliveryNote : deliveryNotes) {
-      influencingMasterQuality = Lists.newArrayList();
-      badSalesOrderLines = Sets.newHashSet();
-      //get the corresponding purch order and purch order lines
       purchOrderId = getEdgeTargetId("contains", deliveryNote.getId());
       purchOrderLines = this.getPurchOrderLinesByPurchOrder(purchOrderId);
+      influencingMasterQuality = Lists.newArrayList();
+      badSalesOrderLines = Sets.newHashSet();
 
       for (Edge purchOrderLine : purchOrderLines){
         influencingMasterQuality.add(productQualityMap.get(purchOrderLine.getTargetId()));
@@ -186,11 +132,6 @@ public class ComplaintHandling
     }
   }
 
-  /**
-   * Creates a ticket if late delivery occurs.
-   *
-   * @param deliveryNotes all deliverynotes from the brokerage process
-   */
   private void lateDelivery(Set<Vertex> deliveryNotes) {
     Set<Edge> lateSalesOrderLines = Sets.newHashSet();
 

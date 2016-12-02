@@ -29,11 +29,13 @@ import java.util.Map;
  * Returns a map from each gradoop id to the object.
  */
 public class MasterDataMapFromTuple<T>
-  implements GroupReduceFunction<Tuple2<GradoopId, T>, Map<GradoopId, T>> {
+  implements GroupReduceFunction<Tuple2<GradoopId, T>,
+    Map<GradoopId, T>> {
 
   @Override
   public void reduce(Iterable<Tuple2<GradoopId, T>> iterable,
-    Collector<Map<GradoopId, T>> collector) throws Exception {
+    Collector<Map<GradoopId, T>> collector) throws
+    Exception {
     Map<GradoopId, T> map = Maps.newHashMap();
     for(Tuple2<GradoopId, T> tuple : iterable) {
       map.put(tuple.f0, tuple.f1);
