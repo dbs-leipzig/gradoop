@@ -17,7 +17,6 @@
 
 package org.gradoop.common.model.impl.id;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
@@ -48,7 +47,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    * Represents a null id.
    */
   public static final GradoopId NULL_VALUE =
-    new GradoopId(new ObjectId(0, 0, (short) 0, 0).toByteArray());
+    new GradoopId(new ObjectId(0, 0, (short) 0, 0));
 
   /**
    * Highest possible Gradoop Id.
@@ -59,7 +58,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
         Integer.MAX_VALUE,
         16777215,
         Short.MAX_VALUE,
-        16777215).toByteArray());
+        16777215));
 
   /**
    * Lowest possible Gradoop Id.
@@ -69,7 +68,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
       Integer.MIN_VALUE,
       0,
       Short.MIN_VALUE,
-      0).toByteArray());
+      0));
 
   /**
    * Number of bytes to represent an id internally.
@@ -127,18 +126,6 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
     return new GradoopId(new ObjectId(string));
   }
 
-  public static GradoopId fromLegacyString(String string) {
-    checkNotNull(string, "ID string was null");
-    checkArgument(!string.isEmpty(), "ID string was empty");
-    String[] split = string.split("-");
-    return new GradoopId(new ObjectId(
-      Integer.parseInt(split[0]),
-      Integer.parseInt(split[1]),
-      Short.parseShort(split[2]),
-      Integer.parseInt(split[3])
-    ));
-  }
-
   /**
    * Returns the Gradoop ID represented by a byte array
    *
@@ -154,7 +141,6 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    *
    * @return Byte representation
    */
-  @SuppressWarnings({"EI_EXPOSE_REP"})
   public byte[] getRawBytes() {
     return objectId.toByteArray();
   }
