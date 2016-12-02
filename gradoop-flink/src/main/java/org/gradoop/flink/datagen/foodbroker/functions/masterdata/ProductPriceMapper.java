@@ -26,7 +26,8 @@ import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import java.math.BigDecimal;
 
 /**
- * Creates a product price tuple from the given vertex.
+ * Creates a product price tuple from the given vertex. The tuple consists of the gradoop id and
+ * the price.
  */
 public class ProductPriceMapper implements
   MapFunction<Vertex, Tuple2<GradoopId, BigDecimal>> {

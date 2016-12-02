@@ -24,7 +24,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 
 /**
- * Creates a master data tuple from the given vertex.
+ * Creates a master data tuple from the given vertex. The tuple consists of the gradoop id and
+ * the quality.
  */
 public class MasterDataQualityMapper
   implements MapFunction<Vertex, Tuple2<GradoopId, Float>> {

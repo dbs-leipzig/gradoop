@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -26,24 +27,65 @@ import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Creates a customer vertex.
+ */
 public class Customer
   extends RichMapFunction<MasterDataSeed, Vertex> {
-
+  /**
+   * Class name of the vertex.
+   */
   public static final String CLASS_NAME = "Customer";
+  /**
+   * Broadcast variable for the customers adjectives.
+   */
   public static final String ADJECTIVES_BC = "adjectives";
+  /**
+   * Broadcast variable for the customers nouns.
+   */
   public static final String NOUNS_BC = "nouns";
+  /**
+   * Broadcast variable for the customers cities.
+   */
   public static final String CITIES_BC = "cities";
+  /**
+   * Acronym for customer.
+   */
   private static final String ACRONYM = "CUS";
-
+  /**
+   * List of possible adjectives.
+   */
   private List<String> adjectives;
+  /**
+   * List of possible nouns.
+   */
   private List<String> nouns;
+  /**
+   * List of possible cities.
+   */
   private List<String> cities;
+  /**
+   * Amount of possible adjectives.
+   */
   private Integer adjectiveCount;
+  /**
+   * Amount of possible nouns.
+   */
   private Integer nounCount;
+  /**
+   * Amount of pissible cities.
+   */
   private Integer cityCount;
-
+  /**
+   * EPGM vertex factory.
+   */
   private final VertexFactory vertexFactory;
 
+  /**
+   * Valued constructor.
+   *
+   * @param vertexFactory EPGM vertex factory
+   */
   public Customer(VertexFactory vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
@@ -51,11 +93,11 @@ public class Customer
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-
+    //load broadcasted lists
     adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
     nouns = getRuntimeContext().getBroadcastVariable(NOUNS_BC);
     cities = getRuntimeContext().getBroadcastVariable(CITIES_BC);
-
+    //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
     cityCount = cities.size();
@@ -63,16 +105,14 @@ public class Customer
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    PropertyList properties = MasterData.createDefaultProperties(ACRONYM, seed);
-
+    //create standard properties from acronym and seed
+    PropertyList properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
-
+    //set rnd city and name
     properties.set("city", cities.get(random.nextInt(cityCount)));
-
     properties.set("name",
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nouns.get(random.nextInt(nounCount)));
-
     return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
 
