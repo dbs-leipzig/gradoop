@@ -38,7 +38,7 @@ public class Property<E extends EPGMElement>
   private PropertyValue value;
 
   /**
-   * Valued constructor, accepts all elements containing a Property with the given key.
+   * Valued constructor, accepts all elements containing a property with the given key.
    *
    * @param key property key
    */
@@ -56,7 +56,7 @@ public class Property<E extends EPGMElement>
   }
 
   /**
-   * Valued constructor, accepts all elements containing a Property with the given key and the
+   * Valued constructor, accepts all elements containing a property with the given key and the
    * corresponding value.
    *
    * @param key property key
