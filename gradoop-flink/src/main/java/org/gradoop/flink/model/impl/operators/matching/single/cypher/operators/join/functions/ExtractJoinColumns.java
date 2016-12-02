@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -52,18 +53,6 @@ public class ExtractJoinColumns implements KeySelector<Embedding, byte[]> {
   }
 
   /**
-   * Returns the internal representation.
-   *
-   * This getter is necessary since the find bugs annotation is not respected when added to getKey
-   *
-   * @return the internal byte array
-   */
-  @SuppressWarnings("EI_EXPOSE_REP")
-  private byte[] getKeysInternal() {
-    return keys;
-  }
-
-  /**
    * Combines the selected columns to a byte array and returns it.
    *
    * Note, that since the byte array is never modified, we can suppress the findbugs error here.
@@ -73,6 +62,7 @@ public class ExtractJoinColumns implements KeySelector<Embedding, byte[]> {
    * @throws Exception
    */
   @Override
+  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getKey(Embedding embedding) throws Exception {
     byte[] idBytes; // stores the raw bytes of a single GradoopId
     int offset; // offset to write in the final byte array
@@ -86,6 +76,6 @@ public class ExtractJoinColumns implements KeySelector<Embedding, byte[]> {
         this.keys[j] = idBytes[k++];
       }
     }
-    return getKeysInternal();
+    return this.keys;
   }
 }
