@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -26,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  *
  * @param <E> EPGM element
  */
-public class Property<E extends EPGMElement>
+public class ByProperty<E extends EPGMElement>
   implements FilterFunction<E> {
   /**
    * PropertyKey to be filtered on.
@@ -42,7 +43,7 @@ public class Property<E extends EPGMElement>
    *
    * @param key property key
    */
-  public Property(String key) {
+  public ByProperty(String key) {
     this(key, null);
   }
 
@@ -51,7 +52,7 @@ public class Property<E extends EPGMElement>
    *
    * @param property property, containing of key and value
    */
-  public Property(org.gradoop.common.model.impl.properties.Property property) {
+  public ByProperty(Property property) {
     this(property.getKey(), property.getValue());
   }
 
@@ -62,7 +63,7 @@ public class Property<E extends EPGMElement>
    * @param key property key
    * @param value property value
    */
-  public Property(String key, PropertyValue value) {
+  public ByProperty(String key, PropertyValue value) {
     this.key = key;
     this.value = value;
   }
