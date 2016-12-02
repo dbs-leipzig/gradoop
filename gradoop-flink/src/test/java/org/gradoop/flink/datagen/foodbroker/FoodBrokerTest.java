@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker;
 
 import org.apache.flink.api.java.DataSet;
@@ -21,13 +22,10 @@ import org.codehaus.jettison.json.JSONException;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.functions
-  .LabledVerticesFromVertices;
-import org.gradoop.flink.datagen.foodbroker.functions
-  .TransactionalVerticesFromVertices;
+import org.gradoop.flink.datagen.foodbroker.functions.LabledVerticesFromVertices;
+import org.gradoop.flink.datagen.foodbroker.functions.TransactionalVerticesFromVertices;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
-import org.gradoop.flink.io.impl.tlf.TLFIOTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;

@@ -30,10 +30,11 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class Brokerage
    */
   private Vertex newSalesQuotation(long startDate) {
     String label = "SalesQuotation";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     String bid = createBusinessIdentifier(
       currentId++, Constants.SALESQUOTATION_ACRONYM);
@@ -209,7 +210,7 @@ public class Brokerage
    */
   private Edge newSalesQuotationLine(Vertex salesQuotation, GradoopId product) {
     String label = "SalesQuotationLine";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
@@ -246,7 +247,7 @@ public class Brokerage
    */
   private Vertex newSalesOrder(Vertex salesQuotation) {
     String label = "SalesOrder";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
@@ -312,7 +313,7 @@ public class Brokerage
    */
   private Edge newSalesOrderLine(Vertex salesOrder, Edge salesQuotationLine) {
     String label = "SalesOrderLine";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("salesPrice", salesQuotationLine.getPropertyValue(
@@ -355,7 +356,7 @@ public class Brokerage
    */
   private Vertex newPurchOrder(Vertex salesOrder, GradoopId processedBy) {
     String label = "PurchOrder";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();
@@ -418,7 +419,7 @@ public class Brokerage
   private Edge newPurchOrderLine(Vertex purchOrder, Edge salesOrderLine) {
     String label = "PurchOrderLine";
     Edge purchOrderLine;
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     BigDecimal price = productPriceMap.get(salesOrderLine.getTargetId());
 
@@ -475,7 +476,7 @@ public class Brokerage
    */
   private Vertex newDeliveryNote(Vertex purchOrder) {
     String label = "DeliveryNote";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     long purchOrderDate = purchOrder.getPropertyValue("date").getLong();
     GradoopId operatedBy = getNextLogistic();
@@ -553,7 +554,7 @@ public class Brokerage
    */
   private Vertex newPurchInvoice(Vertex purchOrder, BigDecimal total) {
     String label = "PurchInvoice";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     long purchOrderDate = purchOrder.getPropertyValue("date")
         .getLong();
@@ -585,7 +586,7 @@ public class Brokerage
   private Vertex newSalesInvoice(List<Edge> salesOrderLines) {
     String label = "SalesInvoice";
     Vertex salesOrder = vertexMap.get(salesOrderLines.get(0).getSourceId());
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     long salesOrderDate = salesOrder.getPropertyValue("date")
         .getLong();

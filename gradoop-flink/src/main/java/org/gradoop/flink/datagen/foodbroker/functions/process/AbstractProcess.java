@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 
@@ -219,7 +219,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    * @param properties the edge properties
    */
   protected Edge newEdge(String label, GradoopId source, GradoopId target,
-    PropertyList properties) {
+    Properties properties) {
     Edge edge;
     if (properties == null) {
       edge = edgeFactory.createEdge(label, source, target, graphIds);
@@ -240,7 +240,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    * Stores a newly created vertex.
    *
    */
-  protected Vertex newVertex(String label, PropertyList properties) {
+  protected Vertex newVertex(String label, Properties properties) {
     Vertex vertex = vertexFactory.createVertex(label, properties, graphIds);
     vertexMap.put(vertex.getId(), vertex);
     return vertex;

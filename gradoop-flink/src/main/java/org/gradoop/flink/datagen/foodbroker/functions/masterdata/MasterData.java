@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
@@ -49,9 +49,9 @@ public class MasterData {
    * @param acronym the master data acronym
    * @return property list with default master data properties
    */
-  public static PropertyList createDefaultProperties(MasterDataSeed seed, String acronym) {
+  public static Properties createDefaultProperties(MasterDataSeed seed, String acronym) {
     String bid = createBusinessIdentifier(seed, acronym);
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     properties.set(Constants.SUPERTYPE_KEY,
       Constants.SUPERCLASS_VALUE_MASTER);

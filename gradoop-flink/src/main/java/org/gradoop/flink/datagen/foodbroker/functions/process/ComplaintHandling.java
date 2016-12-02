@@ -32,12 +32,12 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Customer;
 import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Employee;
-import org.gradoop.flink.model.impl.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -226,7 +226,7 @@ public class ComplaintHandling
 
   private Vertex newTicket(String problem, long createdAt) {
     String label = "Ticket";
-    PropertyList properties = new PropertyList();
+    Properties properties = new Properties();
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("createdAt", createdAt);
@@ -284,7 +284,7 @@ public class ComplaintHandling
     if (refundAmount.floatValue() < 0) {
       String label = "SalesInvoice";
 
-      PropertyList properties = new PropertyList();
+      Properties properties = new Properties();
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
       String bid = createBusinessIdentifier(
@@ -327,7 +327,7 @@ public class ComplaintHandling
 
     if (refundAmount.floatValue() < 0) {
       String label = "PurchInvoice";
-      PropertyList properties = new PropertyList();
+      Properties properties = new Properties();
 
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
@@ -417,7 +417,7 @@ public class ComplaintHandling
     if (masterDataMap.containsKey(employeeId)) {
       return masterDataMap.get(employeeId);
     } else {
-      PropertyList properties;
+      Properties properties;
       Vertex employee = getEmployeeById(employeeId);
       properties = employee.getProperties();
       properties.set("erpEmplNum", employee.getId().toString());
@@ -441,7 +441,7 @@ public class ComplaintHandling
     if (masterDataMap.containsKey(customerId)) {
       return masterDataMap.get(customerId);
     } else {
-      PropertyList properties;
+      Properties properties;
       Vertex customer = getCustomerById(customerId);
       properties = customer.getProperties();
       properties.set("erpCustNum", customer.getId().toString());

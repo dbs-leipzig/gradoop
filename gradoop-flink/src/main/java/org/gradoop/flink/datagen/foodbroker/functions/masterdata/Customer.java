@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyList;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -106,7 +106,7 @@ public class Customer
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
     //create standard properties from acronym and seed
-    PropertyList properties = MasterData.createDefaultProperties(seed, ACRONYM);
+    Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set rnd city and name
     properties.set("city", cities.get(random.nextInt(cityCount)));
