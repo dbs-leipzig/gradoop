@@ -38,8 +38,7 @@ public class SetMasterDataGraphIds extends RichMapFunction<Vertex, Vertex> {
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    map = getRuntimeContext().<Map<GradoopId, GradoopIdSet>>
-      getBroadcastVariable("graphIds").get(0);
+    map = getRuntimeContext().<Map<GradoopId, GradoopIdSet>>getBroadcastVariable("graphIds").get(0);
   }
 
   @Override

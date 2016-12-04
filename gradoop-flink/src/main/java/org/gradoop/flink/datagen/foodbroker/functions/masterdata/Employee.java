@@ -30,8 +30,7 @@ import java.util.Random;
 /**
  * Creates a employee vertex.
  */
-public class Employee
-  extends RichMapFunction<MasterDataSeed, Vertex> {
+public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Class name of the vertex.
    */

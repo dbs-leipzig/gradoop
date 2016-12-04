@@ -31,8 +31,7 @@ import java.util.Random;
 /**
  * Creates a logistic vertex.
  */
-public class Logistics
-  extends RichMapFunction<MasterDataSeed, Vertex> {
+public class Logistics extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Class name of the vertex.
    */

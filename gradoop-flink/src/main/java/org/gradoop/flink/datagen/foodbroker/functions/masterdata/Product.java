@@ -34,8 +34,7 @@ import java.util.Random;
 /**
  * Creates a product vertex.
  */
-public class Product
-  extends RichMapFunction<MasterDataSeed, Vertex> {
+public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Class name of the vertex.
    */
@@ -105,11 +104,8 @@ public class Product
     Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set category, name and price
-    Tuple2<String, String> nameGroupPair = nameGroupPairs
-      .get(random.nextInt(nameGroupPairCount));
-
+    Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
     properties.set("category", nameGroupPair.f1);
-
     properties.set("name",
       adjectives.get(random.nextInt(adjectiveCount)) +
       " " + nameGroupPair.f0);

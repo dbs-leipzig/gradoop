@@ -26,8 +26,7 @@ import java.util.Set;
 /**
  * Collects all users and clients given by sets into one dataset.
  */
-public class UserClients
-  implements FlatMapFunction<Set<Vertex>, Vertex> {
+public class UserClients implements FlatMapFunction<Set<Vertex>, Vertex> {
 
   @Override
   public void flatMap(Set<Vertex> vertices,

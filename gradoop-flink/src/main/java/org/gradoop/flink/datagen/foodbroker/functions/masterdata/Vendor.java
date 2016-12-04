@@ -30,8 +30,7 @@ import java.util.Random;
 /**
  * Creates a vendor vertex.
  */
-public class Vendor
-  extends RichMapFunction<MasterDataSeed, Vertex> {
+public class Vendor extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Class name of the vertex.
    */

@@ -362,7 +362,7 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Adds positiv or negative influence to the start value, depending on the
+   * Adds positive or negative influence to the start value, depending on the
    * quality of the master data objects.
    *
    * @param influencingMasterDataQuality list of influencing master data quality
