@@ -174,12 +174,10 @@ public class ComplaintHandling
         "badQualityProbability")) {
 
         for (Edge purchOrderLine : purchOrderLines) {
-          badSalesOrderLines.add(getCorrespondingSalesOrderLine(
-            purchOrderLine.getId()));
+          badSalesOrderLines.add(getCorrespondingSalesOrderLine(purchOrderLine.getId()));
         }
 
-        Vertex ticket = newTicket("bad quality", deliveryNote
-          .getPropertyValue("date").getLong());
+        Vertex ticket = newTicket("bad quality", deliveryNote.getPropertyValue("date").getLong());
         grantSalesRefund(badSalesOrderLines, ticket);
         claimPurchRefund(purchOrderLines, ticket);
       }
@@ -208,8 +206,7 @@ public class ComplaintHandling
       // Collect the respective late purch order lines
       Set<Edge> latePurchOrderLines = Sets.newHashSet();
       for (Edge salesOrderLine : lateSalesOrderLines) {
-        latePurchOrderLines
-          .add(getCorrespondingPurchOrderLine(salesOrderLine.getId()));
+        latePurchOrderLines.add(getCorrespondingPurchOrderLine(salesOrderLine.getId()));
       }
       Calendar calendar = Calendar.getInstance();
       calendar.setTimeInMillis(salesOrder.getPropertyValue("deliveryDate").getLong());
@@ -223,11 +220,17 @@ public class ComplaintHandling
     }
   }
 
-
+  /**
+   * Create the ticket itself and corresponding master data with edges.
+   *
+   * @param problem the reason for the ticket, either bad quality or late delivery
+   * @param createdAt creation date
+   * @return the ticket
+   */
   private Vertex newTicket(String problem, long createdAt) {
     String label = "Ticket";
     Properties properties = new Properties();
-
+    // properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("createdAt", createdAt);
     properties.set("problem", problem);
@@ -239,18 +242,15 @@ public class ComplaintHandling
     Vertex ticket = newVertex(label, properties);
 
     newEdge("concerns", ticket.getId(), salesOrder.getId());
-
+    //new master data, user
     Vertex user = getUserFromEmployeeId(employeeId);
-
     newEdge("createdBy", ticket.getId(), user.getId());
-
+    //new master data, user
     employeeId = getNextEmployee();
     user = getUserFromEmployeeId(employeeId);
-
     newEdge("allocatedTo", ticket.getId(), user.getId());
-
+    //new master data, client
     Vertex client = getClientFromCustomerId(customerId);
-
     newEdge("openedBy", ticket.getId(), client.getId());
 
     return ticket;

@@ -49,7 +49,7 @@ public class Brokerage
   implements MapPartitionFunction<Long, GraphTransaction>{
 
   /**
-   * Valued consturctor
+   * Valued constructor
    *
    * @param graphHeadFactory EPGM graph head facroty
    * @param vertexFactory EPGM vertex factory
@@ -108,8 +108,7 @@ public class Brokerage
         List<Vertex> purchOrders = newPurchOrders(salesOrder, salesOrderLines);
 
         // PurchOrderLines
-        List<Edge> purchOrderLines = newPurchOrderLines(purchOrders,
-          salesOrderLines);
+        List<Edge> purchOrderLines = newPurchOrderLines(purchOrders, salesOrderLines);
 
         // DeliveryNotes
         List<Vertex> deliveryNotes = newDeliveryNotes(purchOrders);
@@ -154,8 +153,7 @@ public class Brokerage
     String label = "SalesQuotation";
     Properties properties = new Properties();
 
-    String bid = createBusinessIdentifier(
-      currentId++, Constants.SALESQUOTATION_ACRONYM);
+    String bid = createBusinessIdentifier(currentId++, Constants.SALESQUOTATION_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("date", startDate);
@@ -194,8 +192,7 @@ public class Brokerage
 
     for (int i = 0; i < numberOfQuotationLines; i++) {
       product = getNextProduct();
-      salesQuotationLine = newSalesQuotationLine(salesQuotation,
-        product);
+      salesQuotationLine = newSalesQuotationLine(salesQuotation, product);
       salesQuotationLines.add(salesQuotationLine);
     }
     return salesQuotationLines;
@@ -235,8 +232,7 @@ public class Brokerage
     );
     properties.set("quantity", quantity);
 
-    return newEdge(label, salesQuotation.getId(),
-      product, properties);
+    return newEdge(label, salesQuotation.getId(), product, properties);
   }
 
   /**
@@ -266,7 +262,7 @@ public class Brokerage
     influencingMasterQuality.clear();
     influencingMasterQuality.add(getEdgeTargetQuality(
       "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
-    influencingMasterQuality.add(emplyoeeMap.get(rndEmployee));
+    influencingMasterQuality.add(employeeMap.get(rndEmployee));
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("date", date);
@@ -438,15 +434,13 @@ public class Brokerage
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("salesOrderLine", salesOrderLine.getId().toString());
-    properties.set("quantity", salesOrderLine.getPropertyValue("quantity")
-      .getInt());
+    properties.set("quantity", salesOrderLine.getPropertyValue("quantity").getInt());
     properties.set("purchPrice", purchPrice);
 
     purchOrderLine = newEdge(label, purchOrder.getId(), salesOrderLine.getTargetId(),
       properties);
 
-    salesOrderLine.setProperty(
-      "purchOrderLine", purchOrderLine.getId().toString());
+    salesOrderLine.setProperty("purchOrderLine", purchOrderLine.getId().toString());
 
     return purchOrderLine;
   }
@@ -488,8 +482,7 @@ public class Brokerage
 
     long date = config.delayDelayConfiguration(purchOrderDate,
       influencingMasterQuality, "PurchOrder", "deliveryDelay");
-    String bid = createBusinessIdentifier(
-      currentId++, Constants.DELIVERYNOTE_ACRONYM);
+    String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("date", date);
@@ -534,8 +527,7 @@ public class Brokerage
 
     List<Vertex> purchInvoices = Lists.newArrayList();
 
-    for (Map.Entry<Vertex, BigDecimal> purchOrderTotal :
-      purchOrderTotals.entrySet()) {
+    for (Map.Entry<Vertex, BigDecimal> purchOrderTotal : purchOrderTotals.entrySet()) {
       purchInvoices.add(newPurchInvoice(
         purchOrderTotal.getKey(),
         purchOrderTotal.getValue()
@@ -556,16 +548,14 @@ public class Brokerage
     String label = "PurchInvoice";
     Properties properties = new Properties();
 
-    long purchOrderDate = purchOrder.getPropertyValue("date")
-        .getLong();
+    long purchOrderDate = purchOrder.getPropertyValue("date").getLong();
     long date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality("placedAt", purchOrder.getId(),
         Constants.VENDOR_MAP), "PurchOrder", "invoiceDelay");
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("date", date);
-    String bid = createBusinessIdentifier(
-      currentId++, Constants.PURCHINVOICE_ACRONYM);
+    String bid = createBusinessIdentifier(currentId++, Constants.PURCHINVOICE_ACRONYM);
     properties.set("num", bid);
     properties.set("expense", total);
     properties.set("text", "*** TODO @ Brokerage ***");
@@ -588,16 +578,14 @@ public class Brokerage
     Vertex salesOrder = vertexMap.get(salesOrderLines.get(0).getSourceId());
     Properties properties = new Properties();
 
-    long salesOrderDate = salesOrder.getPropertyValue("date")
-        .getLong();
+    long salesOrderDate = salesOrder.getPropertyValue("date").getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality("processedBy", salesOrder.getId(),
         Constants.EMPLOYEE_MAP), "SalesOrder", "invoiceDelay");
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("date", date);
-    String bid = createBusinessIdentifier(
-      currentId++, Constants.SALESINVOICE_ACRONYM);
+    String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
     properties.set("num", bid);
     properties.set("revenue", BigDecimal.ZERO);
     properties.set("text", "*** TODO @ Brokerage ***");

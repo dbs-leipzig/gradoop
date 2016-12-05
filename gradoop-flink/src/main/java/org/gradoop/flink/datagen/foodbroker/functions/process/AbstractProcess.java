@@ -110,7 +110,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the employee quality of a given gradoop id.
    */
-  Map<GradoopId, Float> emplyoeeMap;
+  Map<GradoopId, Float> employeeMap;
   /**
    * Map to get the product quality of a given gradoop id.
    */
@@ -165,7 +165,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.LOGISTIC_MAP).get(0);
 
-    emplyoeeMap = getRuntimeContext().<Map<GradoopId, Float>>
+    employeeMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.EMPLOYEE_MAP).get(0);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
@@ -174,7 +174,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     customerIterator = customerMap.entrySet().iterator();
     vendorIterator = vendorMap.entrySet().iterator();
     logisticIterator = logisticMap.entrySet().iterator();
-    employeeIterator = emplyoeeMap.entrySet().iterator();
+    employeeIterator = employeeMap.entrySet().iterator();
     productQualityIterator = productQualityMap.entrySet().iterator();
   }
 
@@ -237,8 +237,11 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   }
 
   /**
-   * Stores a newly created vertex.
+   * Creates a new vertex and stores it in a map.
    *
+   * @param label the new vertex label
+   * @param properties the new vertex properties
+   * @return the created vertex.
    */
   protected Vertex newVertex(String label, Properties properties) {
     Vertex vertex = vertexFactory.createVertex(label, properties, graphIds);
@@ -247,7 +250,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   }
 
   /**
-   * Searches the master data tupel which is the edge target of the given edge parameter.
+   * Searches the master data tuple which is the edge target of the given edge parameter.
    *
    * @param edgeLabel label of the edge
    * @param source source id
@@ -277,7 +280,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     case Constants.LOGISTIC_MAP:
       return logisticMap.get(target);
     case Constants.EMPLOYEE_MAP:
-      return emplyoeeMap.get(target);
+      return employeeMap.get(target);
     case Constants.USER_MAP:
       return userMap.get(target);
     default:
@@ -328,7 +331,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    */
   protected GradoopId getNextEmployee() {
     if (!employeeIterator.hasNext()) {
-      employeeIterator = emplyoeeMap.entrySet().iterator();
+      employeeIterator = employeeMap.entrySet().iterator();
     }
     return employeeIterator.next().getKey();
   }
