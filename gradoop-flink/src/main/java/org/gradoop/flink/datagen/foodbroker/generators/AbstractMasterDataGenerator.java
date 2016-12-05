@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker.generators;
 
 import org.apache.commons.io.FileUtils;
@@ -24,24 +25,37 @@ import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Abstract generator for master data object generators.
+ */
 public abstract class AbstractMasterDataGenerator
   implements MasterDataGenerator {
-
-  static final Integer GOOD_VALUE = 1;
-  static final Integer NORMAL_VALUE = 0;
-  static final Integer BAD_VALUE = -1;
-
+  /**
+   * FoodBroker configuration.
+   */
   final FoodBrokerConfig foodBrokerConfig;
+  /**
+   * Flink execution environment.
+   */
   final ExecutionEnvironment env ;
+  /**
+   * EPGM vertex factory.
+   */
   final VertexFactory vertexFactory;
 
-
+  /**
+   * Valued constructor.
+   *
+   * @param gradoopFlinkConfig Gradoop Flink configuration
+   * @param foodBrokerConfig FoodBroker configuration
+   */
   AbstractMasterDataGenerator(
     GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
     this.foodBrokerConfig = foodBrokerConfig;
@@ -49,6 +63,12 @@ public abstract class AbstractMasterDataGenerator
     this.vertexFactory = gradoopFlinkConfig.getVertexFactory();
   }
 
+  /**
+   * Generates seeds for master data objects.
+   *
+   * @param className class name of the master data object
+   * @return list of master data seeds
+   */
   List<MasterDataSeed> getMasterDataSeeds(String className) {
     Double goodRatio = foodBrokerConfig.getMasterDataGoodRatio(className);
 
@@ -67,7 +87,7 @@ public abstract class AbstractMasterDataGenerator
     qualityCounts.put(foodBrokerConfig.getQualityGood(), goodCount);
     qualityCounts.put(foodBrokerConfig.getQualityNormal(), normalCount);
     qualityCounts.put(foodBrokerConfig.getQualityBad(), badCount);
-
+    //create for each quality the amount of seeds, amount defined by config file
     int j = 0;
     for(Map.Entry<Float, Integer> qualityCount : qualityCounts.entrySet()) {
 
@@ -84,6 +104,12 @@ public abstract class AbstractMasterDataGenerator
     return seedList;
   }
 
+  /**
+   * Returns list of all lines from the given file which is located in the foodbroker folder
+   *
+   * @param fileName name of the file
+   * @return list of String
+   */
   List<String> getStringValuesFromFile(String fileName) {
     fileName = "/foodbroker/" + fileName;
 

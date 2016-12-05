@@ -256,14 +256,19 @@ public class ComplaintHandling
     return ticket;
   }
 
-
+  /**
+   * Calculates the refund amount to grant and creates a sales invoice with corresponding edges.
+   *
+   * @param salesOrderLines sales order lines to calculate refund amount
+   * @param ticket the ticket created for the refund
+   */
   private void grantSalesRefund(Set<Edge> salesOrderLines, Vertex ticket) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality("allocatedTo", ticket
       .getId(), Constants.USER_MAP));
     influencingMasterQuality.add(getEdgeTargetQuality("receivedFrom",
       salesOrder.getId(), Constants.CUSTOMER_MAP));
-
+    //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
         "salesRefund");
@@ -280,7 +285,7 @@ public class ComplaintHandling
     refundAmount =
       refundAmount.multiply(BigDecimal.valueOf(-1)).multiply(refundHeight)
         .setScale(2, BigDecimal.ROUND_HALF_UP);
-
+    //create sales invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
       String label = "SalesInvoice";
 
@@ -299,6 +304,12 @@ public class ComplaintHandling
     }
   }
 
+  /**
+   * Calculates the refund amount to claim and creates a purch invoice with corresponding edges.
+   *
+   * @param purchOrderLines purch order lines to calculate refund amount
+   * @param ticket the ticket created for the refund
+   */
   private void claimPurchRefund(Set<Edge> purchOrderLines, Vertex ticket) {
     GradoopId purchOrderId = purchOrderLines.iterator().next().getSourceId();
 
@@ -307,7 +318,7 @@ public class ComplaintHandling
       .getId(), Constants.USER_MAP));
     influencingMasterQuality.add(getEdgeTargetQuality("placedAt",
       purchOrderId, Constants.VENDOR_MAP));
-
+    //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
         "purchRefund");
@@ -324,7 +335,7 @@ public class ComplaintHandling
     refundAmount =
       refundAmount.multiply(BigDecimal.valueOf(-1)).multiply(refundHeight)
         .setScale(2, BigDecimal.ROUND_HALF_UP);
-
+    //create purch invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
       String label = "PurchInvoice";
       Properties properties = new Properties();
@@ -343,7 +354,13 @@ public class ComplaintHandling
     }
   }
 
-
+  /**
+   * Returns set of all vertices with the given label.
+   *
+   * @param transaction the graph transaction containing the vertices
+   * @param label the label to be searched on
+   * @return set of vertices with the given label
+   */
   private Set<Vertex> getVertexByLabel(GraphTransaction transaction, String label) {
     Set<Vertex> vertices = Sets.newHashSet();
 
@@ -355,6 +372,13 @@ public class ComplaintHandling
     return vertices;
   }
 
+  /**
+   * Returns set of all edges with the given label.
+   *
+   * @param transaction the graph transaction containing the edges
+   * @param label the label to be searched on
+   * @return set of edges with the given label
+   */
   private Set<Edge> getEdgesByLabel(GraphTransaction transaction, String label) {
     Set<Edge> edges = Sets.newHashSet();
     for (Edge edge : transaction.getEdges()) {
@@ -365,6 +389,12 @@ public class ComplaintHandling
     return edges;
   }
 
+  /**
+   * Returns set of all purch order lines where the source id is equal to the given purch order id.
+   *
+   * @param purchOrderId gradoop id of the purch order
+   * @return set of purch order lines
+   */
   private Set<Edge> getPurchOrderLinesByPurchOrder(GradoopId purchOrderId) {
     Set<Edge> purchOrderLines = Sets.newHashSet();
     for (Edge purchOrderLine : this.purchOrderLines) {
@@ -375,6 +405,12 @@ public class ComplaintHandling
     return purchOrderLines;
   }
 
+  /**
+   * Returns all purch order lines which correspond to the given sales order line id.
+   *
+   * @param salesOrderLineId gradoop id of the sales order line
+   * @return set of sales oder lines
+   */
   private Edge getCorrespondingPurchOrderLine(GradoopId salesOrderLineId) {
     for (Edge purchOrderLine : this.purchOrderLines) {
       if (purchOrderLine.getPropertyValue("salesOrderLine").getString()
@@ -385,6 +421,12 @@ public class ComplaintHandling
     return null;
   }
 
+  /**
+   * Returns the sales order line which correspond to the given purch order line id.
+   *
+   * @param purchOrderLineId gradoop id of the purch order line
+   * @return sales order line
+   */
   private Edge getCorrespondingSalesOrderLine(GradoopId purchOrderLineId) {
     for (Edge salesOrderLine : this.salesOrderLines) {
       if (salesOrderLine.getPropertyValue("purchOrderLine").getString()
@@ -395,6 +437,12 @@ public class ComplaintHandling
     return null;
   }
 
+  /**
+   * Returns the vertex to the given customer id.
+   *
+   * @param id gradoop id of the customer
+   * @return the vertex representing a customer
+   */
   private Vertex getCustomerById(GradoopId id) {
     for (Vertex vertex : customers) {
       if (vertex.getId().equals(id)) {
@@ -404,6 +452,12 @@ public class ComplaintHandling
     return null;
   }
 
+  /**
+   * Returns the vertex to the given employee id.
+   *
+   * @param id gradoop id of the employee
+   * @return the vertex representing an employee
+   */
   private Vertex getEmployeeById(GradoopId id) {
     for (Vertex vertex : employees) {
       if (vertex.getId().equals(id)) {
@@ -413,10 +467,18 @@ public class ComplaintHandling
     return null;
   }
 
+  /**
+   * Creates, if not already existing, and returns the corresponding user vertex to the given
+   * employee id.
+   *
+   * @param employeeId gradoop id of the employee
+   * @return the vertex representing an user
+   */
   private Vertex getUserFromEmployeeId(GradoopId employeeId) {
     if (masterDataMap.containsKey(employeeId)) {
       return masterDataMap.get(employeeId);
     } else {
+      //create properties
       Properties properties;
       Vertex employee = getEmployeeById(employeeId);
       properties = employee.getProperties();
@@ -427,8 +489,8 @@ public class ComplaintHandling
       properties.set("email", email);
       properties.remove("num");
       properties.remove("sid");
+      //create the vertex and store it in a map for fast access
       Vertex user = vertexFactory.createVertex("User", properties, graphIds);
-
       masterDataMap.put(employeeId, user);
       userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY).getFloat());
 
@@ -437,10 +499,18 @@ public class ComplaintHandling
     }
   }
 
+  /**
+   * Creates, if not already existing, and returns the corresponding client vertex to the given
+   * customer id.
+   *
+   * @param customerId gradoop id of the customer
+   * @return the vertex representing a client
+   */
   private Vertex getClientFromCustomerId(GradoopId customerId) {
     if (masterDataMap.containsKey(customerId)) {
       return masterDataMap.get(customerId);
     } else {
+      //create properties
       Properties properties;
       Vertex customer = getCustomerById(customerId);
       properties = customer.getProperties();
@@ -449,8 +519,8 @@ public class ComplaintHandling
       properties.set("account", "CL" + customer.getId().toString());
       properties.remove("num");
       properties.remove("sid");
+      //create the vertex and store it in a map for fast access
       Vertex client = vertexFactory.createVertex("Client", properties, graphIds);
-
       masterDataMap.put(customerId, client);
 
       newEdge("sameAs", client.getId(), customerId);
@@ -458,12 +528,22 @@ public class ComplaintHandling
     }
   }
 
-
+  /**
+   * Returns set of vertices which contains all in this process created master data.
+   *
+   * @return set of vertices
+   */
   private Set<Vertex> getMasterData() {
     return Sets.newHashSet(masterDataMap.values());
   }
 
-
+  /**
+   * Creates a map from label and source id of an edge to a set of all edges which meet the
+   * criteria.
+   *
+   * @param transaction the graph transaction containing all the edges
+   * @return HashMap from (String, GradoopId) -> Set(Edge)
+   */
   private Map<Tuple2<String, GradoopId>, Set<Edge>> createEdgeMap(GraphTransaction transaction) {
     Map<Tuple2<String, GradoopId>, Set<Edge>> edgeMap = Maps.newHashMap();
     Set<Edge> edges;
