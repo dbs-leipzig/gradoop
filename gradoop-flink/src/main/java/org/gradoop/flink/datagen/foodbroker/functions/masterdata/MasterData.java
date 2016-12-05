@@ -36,7 +36,7 @@ public class MasterData {
     String idString = String.valueOf(seed.getNumber());
     long count = 8 - idString.length();
 
-    for(int i = 1; i <= (count); i++) {
+    for (int i = 1; i <= count; i++) {
       idString = "0" + idString;
     }
     return acronym + idString;

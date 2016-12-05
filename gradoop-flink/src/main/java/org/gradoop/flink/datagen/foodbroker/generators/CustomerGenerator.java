@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.datagen.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
@@ -25,19 +26,25 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
 
-public class CustomerGenerator
-  extends AbstractMasterDataGenerator {
+/**
+ * Generator for vertices which represent customers.
+ */
+public class CustomerGenerator extends AbstractMasterDataGenerator {
 
-
+  /**
+   * Valued constructor.
+   *
+   * @param gradoopFlinkConfig Gradoop Flink configuration.
+   * @param foodBrokerConfig FoodBroker configuration.
+   */
   public CustomerGenerator(
     GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
     super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
+  @Override
   public DataSet<Vertex> generate() {
-
     List<MasterDataSeed> seeds = getMasterDataSeeds(Customer.CLASS_NAME);
-
     List<String> cities = getStringValuesFromFile("cities");
     List<String> adjectives = getStringValuesFromFile("customer.adjectives");
     List<String> nouns = getStringValuesFromFile("customer.nouns");

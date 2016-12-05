@@ -47,6 +47,11 @@ public class FoodBrokerConfig implements Serializable {
   private Integer scaleFactor = 0;
 
   /**
+   * Path to the config file.
+   */
+  private String path;
+
+  /**
    * Valued constructor.
    *
    * @param path path to config file
@@ -54,6 +59,7 @@ public class FoodBrokerConfig implements Serializable {
    * @throws JSONException
    */
   public FoodBrokerConfig(String path) throws IOException, JSONException {
+    this.path = path;
     File file = FileUtils.getFile(path);
     root = new JSONObject(FileUtils.readFileToString(file));
   }
@@ -528,5 +534,14 @@ public class FoodBrokerConfig implements Serializable {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
     return delayDelayConfiguration(date, influencingMasterDataQualities, node, key);
+  }
+
+  /**
+   * Returns the path to the config file.
+   *
+   * @return path to config file
+   */
+  public String getPath() {
+    return path;
   }
 }

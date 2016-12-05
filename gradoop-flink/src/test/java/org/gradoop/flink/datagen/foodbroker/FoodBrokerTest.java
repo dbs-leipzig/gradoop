@@ -21,14 +21,15 @@ import org.apache.flink.api.java.DataSet;
 import org.codehaus.jettison.json.JSONException;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.functions.LabledVerticesFromVertices;
-import org.gradoop.flink.datagen.foodbroker.functions.TransactionalVerticesFromVertices;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
+import org.gradoop.flink.model.impl.functions.epgm.Label;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,8 +50,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesQuotationLineCount() throws IOException, JSONException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
-      .filter(
-        new LabledVerticesFromVertices("SalesQuotationLine"));
+      .filter(new Label<Vertex>("SalesQuotationLine"));
     int min = 1;
     int max = 20;
     int casesCount = 10;
@@ -70,11 +70,9 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesOrderCount() throws IOException, JSONException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
-      .filter(
-        new LabledVerticesFromVertices("SalesQuotation"));
+      .filter(new Label<Vertex>("SalesQuotation"));
     DataSet<Vertex> salesOrders = cases.getVertices()
-      .filter(
-        new LabledVerticesFromVertices("SalesOrder"));
+      .filter(new Label<Vertex>("SalesOrder"));
 
     double actual = 0;
     double expected = 0;
@@ -105,7 +103,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     double max = 63 * casesCount;
     try {
       actual = cases.getVertices()
-        .filter(new TransactionalVerticesFromVertices())
+        .filter(new ByProperty<Vertex>("kind", PropertyValue.create("TransData")))
         .count();
     } catch (Exception e) {
       e.printStackTrace();
@@ -142,7 +140,11 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     FoodBroker foodBroker =
       new FoodBroker(getExecutionEnvironment(), getConfig(), config);
 
-    return foodBroker.execute();
+    try {
+      return foodBroker.execute();
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   @Test

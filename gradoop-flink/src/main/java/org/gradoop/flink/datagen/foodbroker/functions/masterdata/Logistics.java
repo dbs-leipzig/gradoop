@@ -22,7 +22,6 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -36,6 +35,18 @@ public class Logistics extends RichMapFunction<MasterDataSeed, Vertex> {
    * Class name of the vertex.
    */
   public static final String CLASS_NAME = "Logistics";
+  /**
+   * Broadcast variable for the logistics adjectives.
+   */
+  public static final String ADJECTIVES_BC = "adjectives";
+  /**
+   * Broadcast variable for the logistics nouns.
+   */
+  public static final String NOUNS_BC = "nouns";
+  /**
+   * Broadcast variable for the logistics cities.
+   */
+  public static final String CITIES_BC = "cities";
   /**
    * Acronym for logistics.
    */
@@ -83,12 +94,9 @@ public class Logistics extends RichMapFunction<MasterDataSeed, Vertex> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcast lists
-    adjectives = getRuntimeContext()
-      .getBroadcastVariable(LogisticsGenerator.ADJECTIVES_BC);
-    nouns = getRuntimeContext()
-      .getBroadcastVariable(LogisticsGenerator.NOUNS_BC);
-    cities = getRuntimeContext()
-      .getBroadcastVariable(LogisticsGenerator.CITIES_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(NOUNS_BC);
+    cities = getRuntimeContext().getBroadcastVariable(CITIES_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();

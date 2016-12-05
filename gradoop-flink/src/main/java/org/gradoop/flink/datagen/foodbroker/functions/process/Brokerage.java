@@ -46,7 +46,7 @@ import java.util.Map;
  */
 public class Brokerage
   extends AbstractProcess
-  implements MapPartitionFunction<Long, GraphTransaction>{
+  implements MapPartitionFunction<Long, GraphTransaction> {
 
   /**
    * Valued constructor

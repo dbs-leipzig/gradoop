@@ -27,6 +27,8 @@ import java.util.Map;
 
 /**
  * Returns a map from each gradoop id to the object.
+ *
+ * @param <T> Type of the maps value
  */
 public class MasterDataMapFromTuple<T>
   implements GroupReduceFunction<Tuple2<GradoopId, T>, Map<GradoopId, T>> {
@@ -35,7 +37,7 @@ public class MasterDataMapFromTuple<T>
   public void reduce(Iterable<Tuple2<GradoopId, T>> iterable,
     Collector<Map<GradoopId, T>> collector) throws Exception {
     Map<GradoopId, T> map = Maps.newHashMap();
-    for(Tuple2<GradoopId, T> tuple : iterable) {
+    for (Tuple2<GradoopId, T> tuple : iterable) {
       map.put(tuple.f0, tuple.f1);
     }
     collector.collect(map);

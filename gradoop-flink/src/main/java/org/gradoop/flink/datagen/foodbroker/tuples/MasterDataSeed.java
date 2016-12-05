@@ -19,18 +19,20 @@ package org.gradoop.flink.datagen.foodbroker.tuples;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * (number, quality)
+ * Tuple which contains the basic information of a master data object i.e. the sequence number
+ * and its quality.
  */
 public class MasterDataSeed extends Tuple2<Integer, Float> {
 
   /**
-   * default constructor
+   * Default constructor.
    */
   public MasterDataSeed() {
   }
 
   /**
-   * valued constructor
+   * Valued constructor.
+   *
    * @param number sequence number
    * @param quality master data quality
    */

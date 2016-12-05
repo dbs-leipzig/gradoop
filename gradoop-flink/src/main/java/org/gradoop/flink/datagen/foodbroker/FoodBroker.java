@@ -29,9 +29,17 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
-import org.gradoop.flink.datagen.foodbroker.functions.*;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.foodbroker.functions.masterdata.*;
+import org.gradoop.flink.datagen.foodbroker.functions.GraphIdsMapFromTuple;
+import org.gradoop.flink.datagen.foodbroker.functions.GraphIdsTupleFromEdge;
+import org.gradoop.flink.datagen.foodbroker.functions.RelevantElementsFromBrokerage;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Customer;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.Employee;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.MasterDataMapFromTuple;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.MasterDataQualityMapper;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.ProductPriceMapper;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.SetMasterDataGraphIds;
+import org.gradoop.flink.datagen.foodbroker.functions.masterdata.UserClients;
 import org.gradoop.flink.datagen.foodbroker.functions.process.Brokerage;
 import org.gradoop.flink.datagen.foodbroker.functions.process.ComplaintHandling;
 import org.gradoop.flink.datagen.foodbroker.generators.CustomerGenerator;
@@ -39,6 +47,7 @@ import org.gradoop.flink.datagen.foodbroker.generators.EmployeeGenerator;
 import org.gradoop.flink.datagen.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.foodbroker.generators.ProductGenerator;
 import org.gradoop.flink.datagen.foodbroker.generators.VendorGenerator;
+import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
@@ -48,7 +57,6 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.model.api.operators.CollectionGenerator;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -58,32 +66,64 @@ import java.util.Set;
  * Generates a GraphCollection containing a foodbrokerage and a complaint
  * handling process.
  */
-public class FoodBroker implements CollectionGenerator {
+public class FoodBroker implements GraphCollectionGenerator {
   /**
-   * Execution environment
+   * Flink execution environment.
    */
   protected final ExecutionEnvironment env;
   /**
-   * Gradoop Flink configuration
+   * Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig gradoopFlinkConfig;
   /**
-   * Foodbroker configuration
+   * Foodbroker configuration.
    */
   private final FoodBrokerConfig foodBrokerConfig;
 
-
-  DataSet<Vertex> customers;
-  DataSet<Vertex> vendors;
-  DataSet<Vertex> logistics;
-  DataSet<Vertex> employees;
-  DataSet<Vertex> products;
-  DataSet<Map<GradoopId, Float>> customerDataMap;
-  DataSet<Map<GradoopId, Float>> vendorDataMap;
-  DataSet<Map<GradoopId, Float>> logisticsDataMap;
-  DataSet<Map<GradoopId, Float>> employeesDataMap;
-  DataSet<Map<GradoopId, Float>> productsQualityDataMap;
-  DataSet<Map<GradoopId, BigDecimal>> productsPriceDataMap;
+  /**
+   * Set which contains all customer vertices.
+   */
+  private DataSet<Vertex> customers;
+  /**
+   * Set which contains all vendor vertices.
+   */
+  private DataSet<Vertex> vendors;
+  /**
+   * Set which contains all logistic vertices.
+   */
+  private DataSet<Vertex> logistics;
+  /**
+   * Set which contains all employee vertices.
+   */
+  private DataSet<Vertex> employees;
+  /**
+   * Set which contains all product vertices.
+   */
+  private DataSet<Vertex> products;
+  /**
+   * Set which contains one map from the gradoop id to the quality of a customer vertex.
+   */
+  private DataSet<Map<GradoopId, Float>> customerDataMap;
+  /**
+   * Set which contains one map from the gradoop id to the quality of a vendor vertex.
+   */
+  private DataSet<Map<GradoopId, Float>> vendorDataMap;
+  /**
+   * Set which contains one map from the gradoop id to the quality of a logistic vertex.
+   */
+  private DataSet<Map<GradoopId, Float>> logisticsDataMap;
+  /**
+   * Set which contains one map from the gradoop id to the quality of an employee vertex.
+   */
+  private DataSet<Map<GradoopId, Float>> employeesDataMap;
+  /**
+   * Set which contains one map from the gradoop id to the quality of a product vertex.
+   */
+  private DataSet<Map<GradoopId, Float>> productsQualityDataMap;
+  /**
+   * Set which contains one map from the gradoop id to the price of a product vertex.
+   */
+  private DataSet<Map<GradoopId, BigDecimal>> productsPriceDataMap;
 
 
   /**
@@ -93,8 +133,7 @@ public class FoodBroker implements CollectionGenerator {
    * @param gradoopFlinkConfig Gradoop Flink configuration
    * @param foodBrokerConfig Foodbroker configuration
    */
-  public FoodBroker(ExecutionEnvironment env,
-    GradoopFlinkConfig gradoopFlinkConfig,
+  public FoodBroker(ExecutionEnvironment env, GradoopFlinkConfig gradoopFlinkConfig,
     FoodBrokerConfig foodBrokerConfig) {
 
     this.env = env;
@@ -104,7 +143,6 @@ public class FoodBroker implements CollectionGenerator {
 
   @Override
   public GraphCollection execute() {
-
     // used for type hinting when loading graph head data
     TypeInformation<GraphHead> graphHeadTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
@@ -114,7 +152,6 @@ public class FoodBroker implements CollectionGenerator {
     // used for type hinting when loading edge data
     TypeInformation<Edge> edgeTypeInfo = TypeExtractor
       .createTypeInfo(gradoopFlinkConfig.getEdgeFactory().getType());
-
 
     // Phase 1: Create MasterData
     initMasterData();
@@ -134,12 +171,8 @@ public class FoodBroker implements CollectionGenerator {
       .withBroadcastSet(productsPriceDataMap, Constants.PRODUCT_PRICE_MAP);
 
     long complaintSeed = 0;
-    try {
-      complaintSeed = caseSeeds.count();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
 
+    complaintSeed = foodBrokerConfig.getCaseCount();
 
     // Phase 2.2: Run Complaint Handling
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple = brokerage
@@ -197,8 +230,8 @@ public class FoodBroker implements CollectionGenerator {
     DataSet<Vertex> vertices = masterData
       .union(transactionalVertices);
 
-    return GraphCollection.fromDataSets(graphHeads, vertices,
-      transactionalEdges, gradoopFlinkConfig);
+    return GraphCollection.fromDataSets(graphHeads, vertices, transactionalEdges,
+      gradoopFlinkConfig);
   }
 
   @Override
@@ -206,18 +239,14 @@ public class FoodBroker implements CollectionGenerator {
     return "FoodBroker Data Generator";
   }
 
-
-
-
+  /**
+   * Initialises all maps which store reduced vertex information.
+   */
   private void initMasterData() {
     customers = new CustomerGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-
     vendors = new VendorGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-
     logistics = new LogisticsGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-
     employees = new EmployeeGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-
     products = new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
     customerDataMap = customers
@@ -240,6 +269,5 @@ public class FoodBroker implements CollectionGenerator {
       .reduceGroup(new MasterDataMapFromTuple<BigDecimal>());
 
   }
-
 
 }

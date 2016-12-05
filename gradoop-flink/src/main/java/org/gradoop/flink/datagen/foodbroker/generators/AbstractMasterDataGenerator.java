@@ -40,15 +40,15 @@ public abstract class AbstractMasterDataGenerator
   /**
    * FoodBroker configuration.
    */
-  final FoodBrokerConfig foodBrokerConfig;
+  protected final FoodBrokerConfig foodBrokerConfig;
   /**
    * Flink execution environment.
    */
-  final ExecutionEnvironment env ;
+  protected final ExecutionEnvironment env;
   /**
    * EPGM vertex factory.
    */
-  final VertexFactory vertexFactory;
+  protected final VertexFactory vertexFactory;
 
   /**
    * Valued constructor.
@@ -89,16 +89,13 @@ public abstract class AbstractMasterDataGenerator
     qualityCounts.put(foodBrokerConfig.getQualityBad(), badCount);
     //create for each quality the amount of seeds, amount defined by config file
     int j = 0;
-    for(Map.Entry<Float, Integer> qualityCount : qualityCounts.entrySet()) {
-
+    for (Map.Entry<Float, Integer> qualityCount : qualityCounts.entrySet()) {
       Float quality = qualityCount.getKey();
-
-      for(int i = 1; i <= qualityCount.getValue(); i++) {
+      for (int i = 1; i <= qualityCount.getValue(); i++) {
         seedList.add(new MasterDataSeed(i + j , quality));
       }
       j += qualityCount.getValue();
     }
-
     Collections.shuffle(seedList);
 
     return seedList;
@@ -111,18 +108,12 @@ public abstract class AbstractMasterDataGenerator
    * @return list of String
    */
   List<String> getStringValuesFromFile(String fileName) {
-    fileName = "/foodbroker/" + fileName;
-
-
     List<String> values = null;
 
+    String adjectivesPath = Paths.get(foodBrokerConfig.getPath()).getParent().toString() + "/" +
+      fileName;
     try {
-      String adjectivesPath = EmployeeGenerator.class
-        .getResource(fileName).getFile();
-
-      values = FileUtils.readLines(FileUtils.getFile
-        (adjectivesPath));
-
+      values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
     } catch (IOException e) {
       e.printStackTrace();
     }

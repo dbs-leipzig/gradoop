@@ -26,6 +26,9 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.util.Map;
 
+/**
+ * Creates a map from a gradoop id to all graph ids the corresponding graph element is part of.
+ */
 public class GraphIdsMapFromTuple implements
   GroupReduceFunction<Tuple2<GradoopId, GradoopIdSet>, Map<GradoopId, GradoopIdSet>> {
 

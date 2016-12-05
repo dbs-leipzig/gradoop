@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.datagen.foodbroker.generators;
 
+package org.gradoop.flink.datagen.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -28,41 +28,45 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductGenerator
-  extends AbstractMasterDataGenerator {
+/**
+ * Generator for vertices which represent products.
+ */
+public class ProductGenerator extends AbstractMasterDataGenerator {
 
+  /**
+   * Valued constructor.
+   *
+   * @param gradoopFlinkConfig Gradoop Flink configuration.
+   * @param foodBrokerConfig FoodBroker configuration.
+   */
   public ProductGenerator(
     GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
     super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
+  @Override
   public DataSet<Vertex> generate() {
-
     List<MasterDataSeed> seeds = getMasterDataSeeds(Product.CLASS_NAME);
-
     List<String> adjectives = getStringValuesFromFile("product.adjectives");
     List<String> fruits = getStringValuesFromFile("product.fruits");
     List<String> vegetables = getStringValuesFromFile("product.vegetables");
     List<String> nuts = getStringValuesFromFile("product.nuts");
-
     List<Tuple2<String, String>> nameGroupPairs = new ArrayList<>();
 
-    for(String name : fruits) {
+    for (String name : fruits) {
       nameGroupPairs.add(new Tuple2<>(name, "fruits"));
     }
-    for(String name : vegetables) {
+    for (String name : vegetables) {
       nameGroupPairs.add(new Tuple2<>(name, "vegetables"));
     }
-    for(String name : nuts) {
+    for (String name : nuts) {
       nameGroupPairs.add(new Tuple2<>(name, "nuts"));
     }
 
     return env.fromCollection(seeds)
       .map(new Product(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(
-        env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
-      .withBroadcastSet(
-        env.fromCollection(adjectives), Product.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
+      .withBroadcastSet(env.fromCollection(adjectives), Product.ADJECTIVES_BC)
       .returns(vertexFactory.getType());
   }
 }

@@ -33,7 +33,7 @@ public class SetMasterDataGraphIds extends RichMapFunction<Vertex, Vertex> {
    * Hashmap from a gradoop id to a gradoop id set, which contains all graph ids the key id is
    * part of.
    */
-  Map<GradoopId, GradoopIdSet> map;
+  private Map<GradoopId, GradoopIdSet> map;
 
   @Override
   public void open(Configuration parameters) throws Exception {

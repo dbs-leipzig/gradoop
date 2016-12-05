@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.datagen.foodbroker.generators;
 
+package org.gradoop.flink.datagen.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -26,37 +26,35 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
 
+/**
+ * Generator for vertices which represent logistics.
+ */
 public class LogisticsGenerator
   extends AbstractMasterDataGenerator {
 
-  public static final String CLASS_NAME = "Logistics";
-  public static final String ADJECTIVES_BC = "adjectives";
-  public static final String NOUNS_BC = "nouns";
-  public static final String CITIES_BC = "cities";
-
+  /**
+   * Valued constructor.
+   *
+   * @param gradoopFlinkConfig Gradoop Flink configuration.
+   * @param foodBrokerConfig FoodBroker configuration.
+   */
   public LogisticsGenerator(
     GradoopFlinkConfig gradoopFlinkConfig, FoodBrokerConfig foodBrokerConfig) {
     super(gradoopFlinkConfig, foodBrokerConfig);
   }
 
+  @Override
   public DataSet<Vertex> generate() {
-
-    String className = LogisticsGenerator.CLASS_NAME;
-
-    List<MasterDataSeed> seeds = getMasterDataSeeds(className);
-
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Logistics.CLASS_NAME);
     List<String> cities = getStringValuesFromFile("cities");
     List<String> adjectives = getStringValuesFromFile("logistics.adjectives");
     List<String> nouns = getStringValuesFromFile("logistics.nouns");
 
     return env.fromCollection(seeds)
       .map(new Logistics(vertexFactory))
-      .withBroadcastSet(
-        env.fromCollection(adjectives), LogisticsGenerator.ADJECTIVES_BC)
-      .withBroadcastSet(
-        env.fromCollection(nouns), LogisticsGenerator.NOUNS_BC)
-      .withBroadcastSet(
-        env.fromCollection(cities), LogisticsGenerator.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(adjectives), Logistics.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nouns), Logistics.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(cities), Logistics.CITIES_BC)
       .returns(vertexFactory.getType());
   }
 }

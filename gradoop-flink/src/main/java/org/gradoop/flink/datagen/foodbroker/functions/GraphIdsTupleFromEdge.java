@@ -23,6 +23,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 
+/**
+ * Creates a tuple containing the gradoop id of an edges target and the edges graph ids.
+ */
 public class GraphIdsTupleFromEdge implements
   MapFunction<Edge, Tuple2<GradoopId, GradoopIdSet>> {
 
@@ -31,6 +34,5 @@ public class GraphIdsTupleFromEdge implements
     return
       new Tuple2<GradoopId, GradoopIdSet>(
         edge.getTargetId(), edge.getGraphIds());
-
   }
 }

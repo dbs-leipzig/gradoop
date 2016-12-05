@@ -19,7 +19,15 @@ package org.gradoop.flink.datagen.foodbroker.generators;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
+/**
+ * Interface for generators of master data objects.
+ */
 public interface MasterDataGenerator {
 
+  /**
+   * Generates the master data vertices.
+   *
+   * @return data set of vertices
+   */
   DataSet<Vertex> generate();
 }

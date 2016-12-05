@@ -149,7 +149,7 @@ public class ComplaintHandling
   private void badQuality(Set<Vertex> deliveryNotes) {
     GradoopId purchOrderId;
     List<Float> influencingMasterQuality;
-    Set<Edge> purchOrderLines;
+    Set<Edge> currentPurchOrderLines;
     Set<Edge> badSalesOrderLines;
 
     for (Vertex deliveryNote : deliveryNotes) {
@@ -157,14 +157,14 @@ public class ComplaintHandling
       badSalesOrderLines = Sets.newHashSet();
       //get the corresponding purch order and purch order lines
       purchOrderId = getEdgeTargetId("contains", deliveryNote.getId());
-      purchOrderLines = this.getPurchOrderLinesByPurchOrder(purchOrderId);
+      currentPurchOrderLines = getPurchOrderLinesByPurchOrder(purchOrderId);
 
-      for (Edge purchOrderLine : purchOrderLines){
+      for (Edge purchOrderLine : currentPurchOrderLines) {
         influencingMasterQuality.add(productQualityMap.get(purchOrderLine.getTargetId()));
       }
       int containedProducts = influencingMasterQuality.size();
       // increase relative influence of vendor and logistics
-      for(int i = 1; i <= containedProducts / 2; i++){
+      for (int i = 1; i <= containedProducts / 2; i++) {
         influencingMasterQuality.add(getEdgeTargetQuality("operatedBy",
           deliveryNote.getId(), Constants.LOGISTIC_MAP));
         influencingMasterQuality.add(getEdgeTargetQuality("placedAt",
@@ -173,13 +173,13 @@ public class ComplaintHandling
       if (config.happensTransitionConfiguration(influencingMasterQuality, "Ticket",
         "badQualityProbability")) {
 
-        for (Edge purchOrderLine : purchOrderLines) {
+        for (Edge purchOrderLine : currentPurchOrderLines) {
           badSalesOrderLines.add(getCorrespondingSalesOrderLine(purchOrderLine.getId()));
         }
 
         Vertex ticket = newTicket("bad quality", deliveryNote.getPropertyValue("date").getLong());
         grantSalesRefund(badSalesOrderLines, ticket);
-        claimPurchRefund(purchOrderLines, ticket);
+        claimPurchRefund(currentPurchOrderLines, ticket);
       }
     }
   }
@@ -396,13 +396,13 @@ public class ComplaintHandling
    * @return set of purch order lines
    */
   private Set<Edge> getPurchOrderLinesByPurchOrder(GradoopId purchOrderId) {
-    Set<Edge> purchOrderLines = Sets.newHashSet();
-    for (Edge purchOrderLine : this.purchOrderLines) {
+    Set<Edge> currentPurchOrderLines = Sets.newHashSet();
+    for (Edge purchOrderLine : purchOrderLines) {
       if (purchOrderId.equals(purchOrderLine.getSourceId())) {
-        purchOrderLines.add(purchOrderLine);
+        currentPurchOrderLines.add(purchOrderLine);
       }
     }
-    return purchOrderLines;
+    return currentPurchOrderLines;
   }
 
   /**
@@ -412,7 +412,7 @@ public class ComplaintHandling
    * @return set of sales oder lines
    */
   private Edge getCorrespondingPurchOrderLine(GradoopId salesOrderLineId) {
-    for (Edge purchOrderLine : this.purchOrderLines) {
+    for (Edge purchOrderLine : purchOrderLines) {
       if (purchOrderLine.getPropertyValue("salesOrderLine").getString()
         .equals(salesOrderLineId.toString())) {
         return purchOrderLine;
@@ -428,7 +428,7 @@ public class ComplaintHandling
    * @return sales order line
    */
   private Edge getCorrespondingSalesOrderLine(GradoopId purchOrderLineId) {
-    for (Edge salesOrderLine : this.salesOrderLines) {
+    for (Edge salesOrderLine : salesOrderLines) {
       if (salesOrderLine.getPropertyValue("purchOrderLine").getString()
         .equals(purchOrderLineId.toString())) {
         return salesOrderLine;
