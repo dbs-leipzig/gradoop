@@ -28,10 +28,12 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Configuration class which loads a json config
@@ -129,7 +131,7 @@ public class FoodBrokerConfig implements Serializable {
    * @param className class name of the master data
    * @return integer representation of the value
    */
-  public Integer getMasterDataOffset(String className)  {
+  private Integer getMasterDataOffset(String className)  {
     Integer offset = null;
 
     try {
@@ -146,7 +148,7 @@ public class FoodBrokerConfig implements Serializable {
    * @param className class name of the master data
    * @return integer representation of the value
    */
-  public Integer getMasterDataGrowth(String className) {
+  private Integer getMasterDataGrowth(String className) {
     Integer growth = null;
 
     try {
@@ -236,7 +238,7 @@ public class FoodBrokerConfig implements Serializable {
   public Long getStartDate() {
     String startDate;
     DateFormat formatter;
-    Date date = null;
+    Date date = Date.from(Instant.MIN);
 
     try {
       startDate = root.getJSONObject("Process").getString("startDate");
@@ -275,7 +277,7 @@ public class FoodBrokerConfig implements Serializable {
    * @return json object containing the quality settings
    * @throws JSONException
    */
-  protected JSONObject getQualityNode() throws JSONException {
+  private JSONObject getQualityNode() throws JSONException {
     return root.getJSONObject("Quality");
   }
 
@@ -416,6 +418,7 @@ public class FoodBrokerConfig implements Serializable {
     Float influence = null;
     Integer startValue;
     Integer value;
+    Random random = new Random();
 
     try {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
@@ -427,7 +430,7 @@ public class FoodBrokerConfig implements Serializable {
       e.printStackTrace();
     }
 
-    startValue = 1 + (int) ((double) (max - min) * Math.random()) + min;
+    startValue = 1 + random.nextInt((max - min) + 1) + min;
 
     value = getValue(
       influencingMasterDataQuality, higherIsBetter, influence, startValue.floatValue()).intValue();
