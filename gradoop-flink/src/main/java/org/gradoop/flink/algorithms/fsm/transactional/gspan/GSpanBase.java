@@ -3,6 +3,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToUndirectedAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
@@ -10,7 +11,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.Undirected
 import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
-import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToAdjacencyList;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToDirectedAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
@@ -42,13 +43,10 @@ public abstract class GSpanBase extends TransactionalFSMBase {
 
     transactions = preProcess(transactions);
 
-    DataSet<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>> adjacencyLists = transactions
-      .map(new ToAdjacencyList());
-
-//    if (! fsmConfig.isDirected()) {
-//      adjacencyLists = adjacencyLists
-//        .map(new Undirect());
-//    }
+    DataSet<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>> adjacencyLists =
+      transactions
+        .map(fsmConfig.isDirected() ?
+          new ToDirectedAdjacencyList() : new ToUndirectedAdjacencyList());
 
     DataSet<TraversalCode<String>> allFrequentPatterns = mine(adjacencyLists);
 
