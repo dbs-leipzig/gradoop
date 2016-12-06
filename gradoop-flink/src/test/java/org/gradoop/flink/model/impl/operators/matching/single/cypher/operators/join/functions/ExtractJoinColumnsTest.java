@@ -6,7 +6,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -21,13 +20,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Collections.singletonList(0));
 
-    byte[] keys = udf.getKey(embedding);
-    ByteBuffer b = ByteBuffer.wrap(keys);
-    byte[] idBuffer = new byte[GradoopId.ID_SIZE];
-
-    Assert.assertEquals(GradoopId.ID_SIZE, keys.length);
-    b.get(idBuffer);
-    Assert.assertArrayEquals(idBuffer, v0.getRawBytes());
+    Assert.assertEquals(v0.toString(), udf.getKey(embedding));
   }
 
   @Test
@@ -39,16 +32,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(0, 1));
 
-    byte[] keys = udf.getKey(embedding);
-    ByteBuffer b = ByteBuffer.wrap(keys);
-    byte[] idBuffer = new byte[GradoopId.ID_SIZE];
-
-    Assert.assertEquals(2 * GradoopId.ID_SIZE, keys.length);
-
-    b.get(idBuffer);
-    Assert.assertArrayEquals(idBuffer, v0.getRawBytes());
-    b.get(idBuffer);
-    Assert.assertArrayEquals(idBuffer, v1.getRawBytes());
+    Assert.assertEquals(v0.toString() + v1.toString(), udf.getKey(embedding));
   }
 
   @Test
@@ -60,15 +44,6 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(1, 0));
 
-    byte[] keys = udf.getKey(embedding);
-    ByteBuffer b = ByteBuffer.wrap(keys);
-    byte[] idBuffer = new byte[GradoopId.ID_SIZE];
-
-    Assert.assertEquals(2 * GradoopId.ID_SIZE, keys.length);
-
-    b.get(idBuffer);
-    Assert.assertArrayEquals(idBuffer, v1.getRawBytes());
-    b.get(idBuffer);
-    Assert.assertArrayEquals(idBuffer, v0.getRawBytes());
+    Assert.assertEquals(v1.toString() + v0.toString(), udf.getKey(embedding));
   }
 }

@@ -17,29 +17,26 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.List;
 
 /**
- * Computes a combines hash value from given columns.
+ * Given a set of columns, this key selector returns a concatenated string containing the
+ * identifiers of the specified columns.
+ *
+ * (id0,id1,...,idn),[0,2] -> "id0id2"
  */
-public class ExtractJoinColumns implements KeySelector<Embedding, byte[]> {
+public class ExtractJoinColumns implements KeySelector<Embedding, String> {
   /**
-   * Columns to create hash code from.
+   * Columns to concatenate ids from
    */
   private final List<Integer> columns;
   /**
-   * Number of columns to select
+   * Stores the concatenated id string
    */
-  private final int columnCount;
-  /**
-   * Resulting column values
-   */
-  private final byte[] keys;
+  private final StringBuilder sb;
 
   /**
    * Creates the key selector
@@ -47,35 +44,16 @@ public class ExtractJoinColumns implements KeySelector<Embedding, byte[]> {
    * @param columns columns to create hash code from
    */
   public ExtractJoinColumns(List<Integer> columns) {
-    this.columns     = columns;
-    this.columnCount = columns.size();
-    this.keys        = new byte[columnCount * GradoopId.ID_SIZE];
+    this.columns = columns;
+    this.sb = new StringBuilder();
   }
 
-  /**
-   * Combines the selected columns to a byte array and returns it.
-   *
-   * Note, that since the byte array is never modified, we can suppress the findbugs error here.
-   *
-   * @param embedding embedding to select key from
-   * @return key possibly representing multiple columns in the embedding
-   * @throws Exception
-   */
   @Override
-  @SuppressWarnings("EI_EXPOSE_REP")
-  public byte[] getKey(Embedding embedding) throws Exception {
-    byte[] idBytes; // stores the raw bytes of a single GradoopId
-    int offset; // offset to write in the final byte array
-    int k; // index to access the single bytes in idBytes
-
-    for (int i = 0; i < columnCount; i++) {
-      idBytes = embedding.getEntry(columns.get(i)).getId().getRawBytes();
-      offset = i * GradoopId.ID_SIZE;
-      k = 0;
-      for (int j = offset; j < offset + GradoopId.ID_SIZE; j++) {
-        this.keys[j] = idBytes[k++];
-      }
+  public String getKey(Embedding value) throws Exception {
+    sb.delete(0, sb.length());
+    for (Integer column : columns) {
+      sb.append(value.getEntry(column).getId().toString());
     }
-    return this.keys;
+    return sb.toString();
   }
 }
