@@ -89,7 +89,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings = Maps.newHashMap();
 
     // FOR EACH VERTEX
-    for (Map.Entry<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> vertexRow : graph.getOutgoingRows().entrySet()) {
+    for (Map.Entry<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> vertexRow :
+      graph.getOutgoingRows().entrySet()) {
 
       GradoopId fromId = vertexRow.getKey();
       String fromLabel = graph.getLabel(fromId);
@@ -102,16 +103,14 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
         Pair<Traversal<String>, TraversalEmbedding> traversalEmbedding =
           getTraversalEmbedding(fromId, fromLabel, cell);
 
-        if (traversalEmbedding != null) {
-          Collection<TraversalEmbedding> embeddings = traversalEmbeddings
-            .get(traversalEmbedding.getKey());
+        Collection<TraversalEmbedding> embeddings = traversalEmbeddings
+          .get(traversalEmbedding.getKey());
 
-          if (embeddings == null) {
-            traversalEmbeddings.put(traversalEmbedding.getKey(), Lists.newArrayList
-              (traversalEmbedding.getValue()));
-          } else {
-            embeddings.add(traversalEmbedding.getValue());
-          }
+        if (embeddings == null) {
+          traversalEmbeddings.put(traversalEmbedding.getKey(), Lists.newArrayList
+            (traversalEmbedding.getValue()));
+        } else {
+          embeddings.add(traversalEmbedding.getValue());
         }
       }
     }

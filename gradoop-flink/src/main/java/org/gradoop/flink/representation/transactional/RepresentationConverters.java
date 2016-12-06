@@ -57,24 +57,24 @@ public class RepresentationConverters {
     MapFunction<Vertex, VD> vertexDataFactory
   ) throws Exception {
 
-    GraphHead graphHead = transaction.getGraphHead();
     Set<Vertex> vertices = transaction.getVertices();
     Set<Edge> edges = transaction.getEdges();
 
+    int vertexCount = vertices.size();
+
     Map<GradoopId, String> labels =
-      Maps.newHashMapWithExpectedSize(1 + vertices.size() + edges.size());
+      Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());
 
     Map<GradoopId, Properties> properties =
       Maps.newHashMap();
 
     Map<GradoopId, AdjacencyListRow<ED, VD>> outgoingRows =
-      Maps.newHashMapWithExpectedSize(vertices.size());
+      Maps.newHashMapWithExpectedSize(vertexCount);
 
     Map<GradoopId, AdjacencyListRow<ED, VD>> incomingRows =
-      Maps.newHashMapWithExpectedSize(vertices.size());
+      Maps.newHashMapWithExpectedSize(vertexCount);
 
-    Map<GradoopId, Vertex> vertexIndex =
-      Maps.newHashMapWithExpectedSize(vertices.size());
+    Map<GradoopId, Vertex> vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);
 
     // VERTICES
     for (Vertex vertex : vertices) {
@@ -85,23 +85,25 @@ public class RepresentationConverters {
     }
 
     // EDGES
+
     for (Edge edge : edges) {
       addLabelsAndProperties(edge, labels, properties);
 
       Vertex source = vertexIndex.get(edge.getSourceId());
-      AdjacencyListRow<ED, VD> sourceRows = outgoingRows.get(source.getId());
+      AdjacencyListRow<ED, VD> outgoingRow = outgoingRows.get(source.getId());
 
       Vertex target = vertexIndex.get(edge.getTargetId());
-      AdjacencyListRow<ED, VD> targetRows = incomingRows.get(target.getId());
+      AdjacencyListRow<ED, VD> incomingRow = incomingRows.get(target.getId());
 
-      sourceRows.getCells().add(new AdjacencyListCell<>(
+      outgoingRow.getCells().add(new AdjacencyListCell<>(
         edgeDataFactory.map(edge), vertexDataFactory.map(target)));
 
-      targetRows.getCells().add(new AdjacencyListCell<>(
+      incomingRow.getCells().add(new AdjacencyListCell<>(
         edgeDataFactory.map(edge), vertexDataFactory.map(source)));
     }
 
-    return new AdjacencyList<>(graphHead, labels, properties, outgoingRows, incomingRows);
+    return new AdjacencyList<>(
+      transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);
   }
 
   /**
