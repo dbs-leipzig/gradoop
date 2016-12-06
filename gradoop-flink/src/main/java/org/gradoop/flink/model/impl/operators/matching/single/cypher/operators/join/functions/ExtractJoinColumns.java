@@ -23,14 +23,20 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.util.List;
 
 /**
- * Computes a combines hash value from given columns.
+ * Given a set of columns, this key selector returns a concatenated string containing the
+ * identifiers of the specified columns.
+ *
+ * (id0,id1,...,idn),[0,2] -> "id0id2"
  */
-public class ExtractJoinColumns implements KeySelector<Embedding, Integer> {
-
+public class ExtractJoinColumns implements KeySelector<Embedding, String> {
   /**
-   * Columns to create hash code from.
+   * Columns to concatenate ids from
    */
   private final List<Integer> columns;
+  /**
+   * Stores the concatenated id string
+   */
+  private final StringBuilder sb;
 
   /**
    * Creates the key selector
@@ -39,14 +45,15 @@ public class ExtractJoinColumns implements KeySelector<Embedding, Integer> {
    */
   public ExtractJoinColumns(List<Integer> columns) {
     this.columns = columns;
+    this.sb = new StringBuilder();
   }
 
   @Override
-  public Integer getKey(Embedding embedding) throws Exception {
-    int hashCode = 17;
-    for (int column : columns) {
-      hashCode = 31 * hashCode + embedding.getEntry(column).getId().hashCode();
+  public String getKey(Embedding value) throws Exception {
+    sb.delete(0, sb.length());
+    for (Integer column : columns) {
+      sb.append(value.getEntry(column).getId().toString());
     }
-    return hashCode;
+    return sb.toString();
   }
 }

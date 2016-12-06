@@ -34,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -73,6 +74,10 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     }
 
     return embedding;
+  }
+
+  protected DataSet<Embedding> createEmbeddings(int size, GradoopId... idEntries) {
+    return createEmbeddings(size, (EmbeddingEntry[]) Arrays.stream(idEntries).map(IdEntry::new).toArray());
   }
 
   protected DataSet<Embedding> createEmbeddings(Integer size, EmbeddingEntry... entries) {
