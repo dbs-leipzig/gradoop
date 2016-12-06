@@ -64,11 +64,7 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
   public AdjacencyList(GraphHead graphHead, Map<ID, L> labels, Map<ID, Properties> properties,
     Map<ID, AdjacencyListRow<ED, VD>> outgoingRows, Map<ID, AdjacencyListRow<ED, VD>> incomingRows)
   {
-    this.f0 = graphHead;
-    this.f1 = labels;
-    this.f2 = properties;
-    this.f3 = outgoingRows;
-    this.f4 = incomingRows;
+    super(graphHead, labels, properties, outgoingRows, incomingRows);
   }
 
   /**
@@ -105,6 +101,6 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
   }
 
   public Map<ID, AdjacencyListRow<ED, VD>> getIncomingRows() {
-    return f3;
+    return f4;
   }
 }

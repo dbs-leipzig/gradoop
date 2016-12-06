@@ -1,13 +1,16 @@
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
 import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
+import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmbedding;
 
 import java.util.Map;
@@ -122,18 +125,64 @@ public class UndirectedGSpanKernel extends GSpanKernelBase {
   }
 
   @Override
-  protected void addCells(Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> rows,
-    GradoopId fromId, String fromLabel,
-    boolean outgoing, GradoopId edgeId, String edgeLabel,
-    GradoopId toId, String toLabel
-  ) {
+  protected void addCells(Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> outgoingRows,
+    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> incomingRows, GradoopId fromId,
+    String fromLabel, boolean outgoing, GradoopId edgeId, String edgeLabel, GradoopId toId, String toLabel) {
 
-    rows.get(fromId).getCells().add(
+    outgoingRows.get(fromId).getCells().add(
       new AdjacencyListCell<>(new IdWithLabel(edgeId, edgeLabel), new IdWithLabel(toId, toLabel)));
 
-    rows.get(toId).getCells().add(
+    outgoingRows.get(toId).getCells().add(
       new AdjacencyListCell<>(new IdWithLabel(edgeId, edgeLabel), new IdWithLabel(fromId, fromLabel)));
 
+  }
+
+  @Override
+  public AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> getAdjacencyList(
+    TraversalCode<String> pattern) {
+
+    Map<GradoopId, String> labels = Maps.newHashMap();
+
+    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> rows = Maps.newHashMap();
+
+    Map<Integer, GradoopId> timeVertexMap = Maps.newHashMap();
+
+    // EDGES
+    for (Traversal<String> traversal : pattern.getTraversals()) {
+
+      int fromTime = traversal.getFromTime();
+      String fromLabel = traversal.getFromValue();
+      int toTime = traversal.getToTime();
+      String toLabel = traversal.getToValue();
+
+      GradoopId fromId = timeVertexMap.computeIfAbsent(fromTime, k -> GradoopId.get());
+      labels.putIfAbsent(fromId, fromLabel);
+
+      GradoopId toId = timeVertexMap.computeIfAbsent(toTime, k -> GradoopId.get());
+      labels.putIfAbsent(toId, toLabel);
+      IdWithLabel toData = new IdWithLabel(toId, toLabel);
+
+      GradoopId edgeId = GradoopId.get();
+      String edgeLabel = traversal.getEdgeValue();
+      labels.put(edgeId, edgeLabel);
+      IdWithLabel edgeData = new IdWithLabel(edgeId, edgeLabel);
+
+      AdjacencyListRow<IdWithLabel, IdWithLabel> fromRow =
+        rows.computeIfAbsent(fromId, k -> new AdjacencyListRow<>());
+
+      fromRow.getCells().add(new AdjacencyListCell<>(edgeData, toData));
+
+      if (! traversal.isLoop()) {
+        IdWithLabel fromData = new IdWithLabel(fromId, fromLabel);
+
+        AdjacencyListRow<IdWithLabel, IdWithLabel> targetRow =
+          rows.computeIfAbsent(toId, k -> new AdjacencyListRow<>());
+
+        targetRow.getCells().add(new AdjacencyListCell<>(edgeData, fromData));
+      }
+    }
+
+    return new AdjacencyList<>(null, labels, null, rows, Maps.newHashMap());
   }
 
 }

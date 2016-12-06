@@ -135,7 +135,6 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
     int rightmostTime = rightmostPathTimes.get(0);
 
-
     // FOR EACH EMBEDDING
     for (TraversalEmbedding parentEmbedding : parentEmbeddings) {
 
@@ -149,11 +148,29 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
         boolean rightmost = fromTime == rightmostTime;
 
         GradoopId fromId = parentEmbedding.getVertexIds().get(fromTime);
-        AdjacencyListRow<IdWithLabel, IdWithLabel> row = graph.getOutgoingRows().get(fromId);
         String fromLabel = graph.getLabel(fromId);
 
+        AdjacencyListRow<IdWithLabel, IdWithLabel> outgoingRow =
+          graph.getOutgoingRows().get(fromId);
+
+        AdjacencyListRow<IdWithLabel, IdWithLabel> incomingRow =
+          graph.getIncomingRows().get(fromId);
+
+        boolean outgoing;
+        Iterator<AdjacencyListCell<IdWithLabel, IdWithLabel>> iterator;
+
+        if (outgoingRow != null) {
+          outgoing = true;
+          iterator = outgoingRow.getCells().iterator();
+        } else {
+          outgoing = false;
+          iterator = incomingRow.getCells().iterator();
+        }
+
         // FOR EACH INCIDENT EDGE
-        for (AdjacencyListCell<IdWithLabel, IdWithLabel> cell : row.getCells()) {
+        while (iterator.hasNext()) {
+          AdjacencyListCell<IdWithLabel, IdWithLabel> cell = iterator.next();
+
           GradoopId toId = cell.getVertexData().getId();
 
           boolean loop = fromId.equals(toId);
@@ -170,7 +187,6 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
               // forwards or backwards from rightmost
               if (!backwards || rightmost) {
-                boolean outgoing = true;
                 String edgeLabel = cell.getEdgeData().getLabel();
                 String toLabel = cell.getVertexData().getLabel();
 
@@ -201,6 +217,11 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
                 }
               }
             }
+          }
+
+          if (!iterator.hasNext() && outgoing && incomingRow != null) {
+            outgoing = false;
+            iterator = incomingRow.getCells().iterator();
           }
         }
       }
@@ -251,7 +272,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   @Override
   public boolean isMinimal(TraversalCode<String> pattern) {
 
-    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList = getAdjacencyList(pattern);
+    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList =
+      getAdjacencyList(pattern);
 
     Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings =
       getSingleEdgeTraversalEmbeddings(adjacencyList);
@@ -289,78 +311,18 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return minimal;
   }
 
-  /**
-   * Turns a pattern into a graph transaction in adjacency list representation.
-   *
-   * @param pattern pattern
-   *
-   * @return adjacency list
-   */
-  public AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> getAdjacencyList(TraversalCode<String> pattern) {
-
-    Map<GradoopId, String> labels = Maps.newHashMap();
-
-    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> rows = Maps.newHashMap();
-
-    Map<Integer, GradoopId> timeVertexMap = Maps.newHashMap();
-
-    boolean first = true;
-
-    // EDGES
-    for (Traversal<String> traversal : pattern.getTraversals()) {
-
-      // FROM VERTEX
-
-      GradoopId fromId;
-
-      if (first) {
-        fromId = GradoopId.get();
-        timeVertexMap.put(0, fromId);
-        labels.put(fromId, traversal.getFromValue());
-        rows.put(fromId, new AdjacencyListRow<>());
-        first = false;
-      } else {
-        fromId = timeVertexMap.get(traversal.getFromTime());
-      }
-
-      // TO VERTEX
-
-      int toTime = traversal.getToTime();
-      GradoopId toId;
-
-      if (traversal.isForwards()) {
-        toId = GradoopId.get();
-        timeVertexMap.put(toTime, toId);
-        labels.put(toId, traversal.getToValue());
-        rows.put(toId, new AdjacencyListRow<>());
-      } else {
-        toId = timeVertexMap.get(toTime);
-      }
-
-      // EDGE
-
-      String fromLabel = labels.get(fromId);
-      GradoopId edgeId = GradoopId.get();
-      boolean outgoing = getOutgoing(traversal);
-      String edgeLabel = traversal.getEdgeValue();
-      String toLabel = labels.get(toId);
-
-      addCells(rows, fromId, fromLabel, outgoing, edgeId, edgeLabel, toId, toLabel);
-    }
-
-    return new AdjacencyList<>(null, labels, null, rows, null);
-  }
-
-
-
   protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
     boolean outgoing, String edgeLabel, String toLabel, boolean loop);
 
   protected abstract boolean getOutgoing(Traversal<String> traversal);
 
-  protected abstract void addCells(Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> rows,
-    GradoopId fromId, String fromLabel, boolean outgoing, GradoopId edgeId, String edgeLabel,
-    GradoopId toId, String toLabel);
+  protected abstract void addCells(
+    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> outgoingRows,
+    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> incomingRows,
+    GradoopId fromId, String fromLabel,
+    boolean outgoing, GradoopId edgeId, String edgeLabel,
+    GradoopId toId, String toLabel
+  );
 
   public static GraphTransaction createGraphTransaction(TraversalCode<String> traversalCode) {
 
@@ -377,7 +339,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
       GradoopId fromId = vertexIdMap.get(fromTime);
 
       if (fromId == null) {
-        Vertex fromVertex = new Vertex(GradoopId.get(), traversal.getFromValue(), null, graphIds);
+        Vertex fromVertex =
+          new Vertex(GradoopId.get(), traversal.getFromValue(), null, graphIds);
         fromId = fromVertex.getId();
         vertexIdMap.put(fromTime, fromId);
         vertices.add(fromVertex);
@@ -387,7 +350,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
       GradoopId toId = vertexIdMap.get(toTime);
 
       if (toId == null) {
-        Vertex toVertex = new Vertex(GradoopId.get(), traversal.getToValue(), null, graphIds);
+        Vertex toVertex =
+          new Vertex(GradoopId.get(), traversal.getToValue(), null, graphIds);
         toId = toVertex.getId();
         vertexIdMap.put(toTime, toId);
         vertices.add(toVertex);
@@ -396,10 +360,20 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
       GradoopId sourceId = traversal.isOutgoing() ? fromId : toId;
       GradoopId targetId = traversal.isOutgoing() ? toId : fromId;
 
-      edges.add(
-        new Edge(GradoopId.get(), traversal.getEdgeValue(), sourceId, targetId, null, graphIds));
+      edges.add(new Edge(
+        GradoopId.get(), traversal.getEdgeValue(), sourceId, targetId, null, graphIds));
     }
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
+
+  /**
+   * Turns a pattern into a graph transaction in adjacency list representation.
+   *
+   * @param pattern pattern
+   *
+   * @return adjacency list
+   */
+  public abstract AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> getAdjacencyList(
+    TraversalCode<String> pattern);
 }
