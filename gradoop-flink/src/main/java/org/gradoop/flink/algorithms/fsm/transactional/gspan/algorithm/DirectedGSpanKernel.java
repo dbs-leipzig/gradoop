@@ -18,46 +18,44 @@ import java.util.Map;
 public class DirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
-  protected Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(GradoopId fromId,
-    String fromLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell) {
-    GradoopId toId = cell.getVertexData().getId();
-    String toLabel = cell.getVertexData().getLabel();
+  protected Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(
+    GradoopId sourceId, String sourceLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell) {
 
-    boolean loop = fromId.equals(toId);
+    GradoopId targetId = cell.getVertexData().getId();
+    String targetLabel = cell.getVertexData().getLabel();
 
     GradoopId edgeId = cell.getEdgeData().getId();
     String edgeLabel = cell.getEdgeData().getLabel();
 
-    Pair<Traversal<String>, TraversalEmbedding> traversalEmbedding = null;
-
     Traversal<String> traversal;
     TraversalEmbedding embedding;
-    boolean outgoing = true;
 
-    if (loop) {
-      if (outgoing) {
-        traversal = new Traversal<>(
-          0, fromLabel, true, edgeLabel, 0, toLabel);
+    // LOOP
+    if (sourceId.equals(targetId)) {
+      traversal = new Traversal<>(
+        0, sourceLabel, true, edgeLabel, 0, targetLabel);
 
-        embedding = new TraversalEmbedding(
-          Lists.newArrayList(fromId), Lists.newArrayList(edgeId));
+      embedding = new TraversalEmbedding(
+        Lists.newArrayList(sourceId), Lists.newArrayList(edgeId));
 
-        traversalEmbedding = new ImmutablePair<>(traversal, embedding);
-      }
+      // OUTGOING
+    } else if (sourceLabel.compareTo(targetLabel) <= 0) {
+      traversal = new Traversal<>(
+        0, sourceLabel, true, edgeLabel, 1, targetLabel);
+
+      embedding = new TraversalEmbedding(
+        Lists.newArrayList(sourceId, targetId), Lists.newArrayList(edgeId));
+
+      // INCOMING
     } else {
-      int labelComparison = fromLabel.compareTo(toLabel);
+      traversal = new Traversal<>(
+        0, targetLabel, false, edgeLabel, 1, sourceLabel);
 
-      if (labelComparison < 0 || labelComparison == 0 && outgoing) {
-        traversal = new Traversal<>(
-          0, fromLabel, outgoing, edgeLabel, 1, toLabel);
-
-        embedding = new TraversalEmbedding(
-          Lists.newArrayList(fromId, toId), Lists.newArrayList(edgeId));
-
-        traversalEmbedding = new ImmutablePair<>(traversal, embedding);
-      }
+      embedding = new TraversalEmbedding(
+        Lists.newArrayList(targetId, sourceId), Lists.newArrayList(edgeId));
     }
-    return traversalEmbedding;
+
+    return new ImmutablePair<>(traversal, embedding);
   }
 
   @Override

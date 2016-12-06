@@ -91,15 +91,17 @@ public class RepresentationConverters {
 
       Vertex source = vertexIndex.get(edge.getSourceId());
       AdjacencyListRow<ED, VD> outgoingRow = outgoingRows.get(source.getId());
+      VD sourceData = vertexDataFactory.map(source);
 
       Vertex target = vertexIndex.get(edge.getTargetId());
       AdjacencyListRow<ED, VD> incomingRow = incomingRows.get(target.getId());
+      VD targetData = vertexDataFactory.map(target);
 
       outgoingRow.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.map(edge), vertexDataFactory.map(target)));
+        edgeDataFactory.map(edge), targetData));
 
       incomingRow.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.map(edge), vertexDataFactory.map(source)));
+        edgeDataFactory.map(edge), sourceData));
     }
 
     return new AdjacencyList<>(

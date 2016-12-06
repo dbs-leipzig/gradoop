@@ -19,12 +19,12 @@ public class UndirectedGSpanKernel extends GSpanKernelBase {
 
   @Override
   protected Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(
-    GradoopId fromId, String fromLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell) {
+    GradoopId sourceId, String sourceLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell) {
 
     GradoopId toId = cell.getVertexData().getId();
     String toLabel = cell.getVertexData().getLabel();
 
-    boolean loop = fromId.equals(toId);
+    boolean loop = sourceId.equals(toId);
 
     GradoopId edgeId = cell.getEdgeData().getId();
     String edgeLabel = cell.getEdgeData().getLabel();
@@ -35,18 +35,18 @@ public class UndirectedGSpanKernel extends GSpanKernelBase {
 
     if (loop) {
       traversal = new Traversal<>(
-        0, fromLabel, true, edgeLabel, 0, toLabel);
+        0, sourceLabel, true, edgeLabel, 0, toLabel);
 
       embedding = new TraversalEmbedding(
-        Lists.newArrayList(fromId), Lists.newArrayList(edgeId));
+        Lists.newArrayList(sourceId), Lists.newArrayList(edgeId));
 
       traversalEmbedding = new ImmutablePair<>(traversal, embedding);
-    } else if (fromLabel.compareTo(toLabel) <= 0) {
+    } else if (sourceLabel.compareTo(toLabel) <= 0) {
       traversal = new Traversal<>(
-        0, fromLabel, true, edgeLabel, 1, toLabel);
+        0, sourceLabel, true, edgeLabel, 1, toLabel);
 
       embedding = new TraversalEmbedding(
-        Lists.newArrayList(fromId, toId), Lists.newArrayList(edgeId));
+        Lists.newArrayList(sourceId, toId), Lists.newArrayList(edgeId));
 
       traversalEmbedding = new ImmutablePair<>(traversal, embedding);
     }

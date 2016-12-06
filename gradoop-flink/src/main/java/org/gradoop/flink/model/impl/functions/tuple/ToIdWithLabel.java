@@ -30,15 +30,16 @@ import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 @FunctionAnnotation.ForwardedFields("id->f0;label->f1")
 public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
 
-  /**
-   * Reuse tuple
-   */
-  private final IdWithLabel reuseTuple = new IdWithLabel();
+//  /**
+//   * Reuse tuple
+//   */
+//  private final IdWithLabel reuseTuple = new IdWithLabel();
 
   @Override
   public IdWithLabel map(EL element) {
-    reuseTuple.f0 = element.getId();
-    reuseTuple.f1 = element.getLabel();
-    return reuseTuple;
+//    reuseTuple.f0 = element.getId();
+//    reuseTuple.f1 = element.getLabel();
+//    return reuseTuple;
+    return new IdWithLabel(element.getId(), element.getLabel());
   }
 }
