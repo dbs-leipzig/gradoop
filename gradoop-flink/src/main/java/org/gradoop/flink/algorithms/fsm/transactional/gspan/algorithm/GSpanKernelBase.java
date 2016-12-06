@@ -187,6 +187,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
               // forwards or backwards from rightmost
               if (!backwards || rightmost) {
+
                 String edgeLabel = cell.getEdgeData().getLabel();
                 String toLabel = cell.getVertexData().getLabel();
 
@@ -206,8 +207,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
                     childEmbedding.getVertexIds().add(toId);
                   }
 
-                  Collection<TraversalEmbedding> embeddings =
-                    extensionEmbeddings.get(extension);
+                  Collection<TraversalEmbedding> embeddings = extensionEmbeddings.get(extension);
 
                   if (embeddings == null) {
                     extensionEmbeddings.put(extension, Lists.newArrayList(childEmbedding));

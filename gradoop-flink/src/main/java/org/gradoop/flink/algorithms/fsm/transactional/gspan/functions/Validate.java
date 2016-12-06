@@ -17,6 +17,11 @@ public class Validate implements FilterFunction<WithCount<TraversalCode<String>>
   public boolean filter(WithCount<TraversalCode<String>> traversalCodeWithCount) throws Exception {
     TraversalCode<String> code = traversalCodeWithCount.getObject();
 
-    return code.getTraversals().size() == 1 || gSpan.isMinimal(code);
+    boolean valid = true;
+
+    if (code.getTraversals().size() > 1 ) {
+      valid = gSpan.isMinimal(code);
+    }
+    return valid;
   }
 }

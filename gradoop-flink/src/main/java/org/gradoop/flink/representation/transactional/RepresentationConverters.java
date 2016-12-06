@@ -80,8 +80,6 @@ public class RepresentationConverters {
     for (Vertex vertex : vertices) {
       addLabelsAndProperties(vertex, labels, properties);
       vertexIndex.put(vertex.getId(), vertex);
-      outgoingRows.put(vertex.getId(), new AdjacencyListRow<>());
-      incomingRows.put(vertex.getId(), new AdjacencyListRow<>());
     }
 
     // EDGES
@@ -90,18 +88,20 @@ public class RepresentationConverters {
       addLabelsAndProperties(edge, labels, properties);
 
       Vertex source = vertexIndex.get(edge.getSourceId());
-      AdjacencyListRow<ED, VD> outgoingRow = outgoingRows.get(source.getId());
+      AdjacencyListRow<ED, VD> outgoingRow =
+        outgoingRows.computeIfAbsent(source.getId(), k -> new AdjacencyListRow<>());
+
       VD sourceData = vertexDataFactory.map(source);
 
       Vertex target = vertexIndex.get(edge.getTargetId());
-      AdjacencyListRow<ED, VD> incomingRow = incomingRows.get(target.getId());
+      AdjacencyListRow<ED, VD> incomingRow =
+        incomingRows.computeIfAbsent(target.getId(), k -> new AdjacencyListRow<>());
       VD targetData = vertexDataFactory.map(target);
 
-      outgoingRow.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.map(edge), targetData));
+      ED edgeData = edgeDataFactory.map(edge);
 
-      incomingRow.getCells().add(new AdjacencyListCell<>(
-        edgeDataFactory.map(edge), sourceData));
+      outgoingRow.getCells().add(new AdjacencyListCell<>(edgeData, targetData));
+      incomingRow.getCells().add(new AdjacencyListCell<>(edgeData, sourceData));
     }
 
     return new AdjacencyList<>(
