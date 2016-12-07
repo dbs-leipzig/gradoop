@@ -238,7 +238,7 @@ public class FoodBrokerConfig implements Serializable {
   public Long getStartDate() {
     String startDate;
     DateFormat formatter;
-    Date date = Date.from(Instant.MIN);
+    Date date = Date.from(Instant.EPOCH);
 
     try {
       startDate = root.getJSONObject("Process").getString("startDate");
@@ -408,24 +408,22 @@ public class FoodBrokerConfig implements Serializable {
    * @param influencingMasterDataQuality list of influencing master data quality
    * @param node the transactional data node
    * @param key the key to load from
+   * @param higherIsBetterDefault default value to define that a higher value is better or not
    * @return integer value
    */
   public Integer getIntRangeConfigurationValue(List<Float> influencingMasterDataQuality,
-    String node, String key) {
+    String node, String key, boolean higherIsBetterDefault) {
     Integer min = 0;
     Integer max = 0;
-    Boolean higherIsBetter = null;
-    Float influence = null;
     Integer startValue;
     Integer value;
     Random random = new Random();
+    Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
+    Float influence = getInfluence(node, key, 0.0f);
 
     try {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
       max = getTransactionalNodes().getJSONObject(node).getInt(key + "Max");
-      higherIsBetter = getHigherIsBetter(node, key, true);
-      influence = getInfluence(node, key, 0.0f);
-
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -450,20 +448,18 @@ public class FoodBrokerConfig implements Serializable {
    * @param influencingMasterDataQuality list of influencing master data quality
    * @param node the transactional data node
    * @param key the key to load from
+   * @param higherIsBetterDefault default value to define that a higher value is better or not
    * @return BigDecimal value
    */
   public BigDecimal getDecimalVariationConfigurationValue(List<Float> influencingMasterDataQuality,
-    String node, String key) {
+    String node, String key, boolean higherIsBetterDefault) {
     Float baseValue = null;
-    Boolean higherIsBetter = null;
-    Float influence = null;
     Float value;
+    Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
+    Float influence = getInfluence(node, key, null);
 
     try {
       baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
-      higherIsBetter = getTransactionalNodes().getJSONObject(node)
-        .getBoolean(key + "HigherIsBetter");
-      influence = (float) getTransactionalNodes().getJSONObject(node).getDouble(key + "Influence");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -479,20 +475,18 @@ public class FoodBrokerConfig implements Serializable {
    * @param influencingMasterDataQuality list of influencing master data quality
    * @param node the transactional data node
    * @param key the key to load from
+   * @param higherIsBetterDefault default value to define that a higher value is better or not
    * @return true of transactions happens
    */
   public boolean happensTransitionConfiguration(List<Float> influencingMasterDataQuality,
-    String node, String key) {
+    String node, String key, boolean higherIsBetterDefault) {
     Float baseValue = null;
-    Boolean higherIsBetter = null;
-    Float influence = null;
     Float value;
+    Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
+    Float influence = getInfluence(node, key, null);
 
     try {
       baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
-      higherIsBetter = getTransactionalNodes().getJSONObject(node)
-        .getBoolean(key + "HigherIsBetter");
-      influence = (float) getTransactionalNodes().getJSONObject(node).getDouble(key + "Influence");
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -513,7 +507,7 @@ public class FoodBrokerConfig implements Serializable {
    */
   public long delayDelayConfiguration(long date, List<Float> influencingMasterDataQuality,
     String node, String key) {
-    int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key);
+    int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key, false);
 
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(date);

@@ -25,6 +25,7 @@ import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,9 +110,11 @@ public abstract class AbstractMasterDataGenerator
    */
   List<String> getStringValuesFromFile(String fileName) {
     List<String> values = null;
-
-    String adjectivesPath = Paths.get(foodBrokerConfig.getPath()).getParent().toString() + "/" +
-      fileName;
+    String adjectivesPath = null;
+    Path parentDirectory = Paths.get(foodBrokerConfig.getPath()).getParent();
+    if (parentDirectory != null) {
+      adjectivesPath = parentDirectory.toString() + "/" + fileName;
+    }
     try {
       values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
     } catch (IOException e) {

@@ -140,7 +140,7 @@ public class Brokerage
       "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
     return config.happensTransitionConfiguration(influencingMasterQuality,
-      "SalesQuotation", "confirmationProbability");
+      "SalesQuotation", "confirmationProbability", false);
   }
 
   /**
@@ -188,7 +188,7 @@ public class Brokerage
       "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP));
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
-      influencingMasterQuality, "SalesQuotation", "lines");
+      influencingMasterQuality, "SalesQuotation", "lines", true);
 
     for (int i = 0; i < numberOfQuotationLines; i++) {
       product = getNextProduct();
@@ -217,10 +217,10 @@ public class Brokerage
     influencingMasterQuality.add(productQualityMap.get(product));
 
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, "SalesQuotation", "salesMargin");
+      influencingMasterQuality, "SalesQuotation", "salesMargin", true);
 
     int quantity = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), "SalesQuotation", "lineQuantity");
+      new ArrayList<Float>(), "SalesQuotation", "lineQuantity", true);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set("purchPrice", productPriceMap.get(product));
@@ -333,7 +333,7 @@ public class Brokerage
     Vertex purchOrder;
 
     int numberOfVendors = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), "PurchOrder", "numberOfVendors");
+      new ArrayList<Float>(), "PurchOrder", "numberOfVendors", true);
     for (int i = 0; i < (numberOfVendors > salesOrderLines.size() ?
       salesOrderLines.size() : numberOfVendors); i++) {
       purchOrder = newPurchOrder(salesOrder, getNextEmployee());
@@ -427,7 +427,7 @@ public class Brokerage
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, "PurchOrder", "priceVariation")
+      influencingMasterQuality, "PurchOrder", "priceVariation", false)
       .add(BigDecimal.ONE)
       .multiply(purchPrice)
       .setScale(2, BigDecimal.ROUND_HALF_UP);

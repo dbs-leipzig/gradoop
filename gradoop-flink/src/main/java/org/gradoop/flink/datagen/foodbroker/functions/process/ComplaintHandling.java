@@ -171,7 +171,7 @@ public class ComplaintHandling
           purchOrderId, Constants.VENDOR_MAP));
       }
       if (config.happensTransitionConfiguration(influencingMasterQuality, "Ticket",
-        "badQualityProbability")) {
+        "badQualityProbability", false)) {
 
         for (Edge purchOrderLine : currentPurchOrderLines) {
           badSalesOrderLines.add(getCorrespondingSalesOrderLine(purchOrderLine.getId()));
@@ -271,7 +271,7 @@ public class ComplaintHandling
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
-        "salesRefund");
+        "salesRefund", false);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal salesAmount;
 
@@ -321,7 +321,7 @@ public class ComplaintHandling
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
-        "purchRefund");
+        "purchRefund", true);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal purchAmount;
 
