@@ -24,12 +24,19 @@ import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-
+/**
+ * Example workflow of FoodBroker generating data for benchmarking
+ *
+ * To execute the example:
+ * 1. checkout Gradoop
+ * 2. mvn clean package
+ * 3. run main method and define config and master data directory
+ */
 public class FoodBrokerRunner extends AbstractRunner
   implements ProgramDescription {
 
   /**
-   * Starts 10 FoddBroker executions with the given config parameters and
+   * Starts 10 FoodBroker executions with the given config parameters and
    * scalefactor.
    *
    * @param args [0] scalefactor for foodbroker
