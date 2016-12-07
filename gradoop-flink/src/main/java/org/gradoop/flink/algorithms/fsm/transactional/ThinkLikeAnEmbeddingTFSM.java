@@ -19,8 +19,8 @@ package org.gradoop.flink.algorithms.fsm.transactional;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
@@ -125,7 +125,7 @@ public class ThinkLikeAnEmbeddingTFSM
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<>())
-        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY);
+        .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY);
   }
 
   @Override

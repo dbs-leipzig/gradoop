@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
@@ -9,6 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
@@ -26,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Superclass of gŚpan implementations.
+ */
 public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
   @Override
@@ -35,8 +56,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings =
       getSingleEdgeTraversalEmbeddings(graph);
 
-    Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings = Maps
-      .newHashMapWithExpectedSize(traversalEmbeddings.size());
+    Map<TraversalCode<String>, Collection<TraversalEmbedding>> codeEmbeddings =
+      Maps.newHashMapWithExpectedSize(traversalEmbeddings.size());
 
     for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry :
       traversalEmbeddings.entrySet()) {
@@ -52,26 +73,27 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   public void growChildren(GraphEmbeddingsPair graphEmbeddingsPair,
     Collection<TraversalCode<String>> frequentPatterns) {
 
-    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList = graphEmbeddingsPair.getAdjacencyList();
+    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList =
+      graphEmbeddingsPair.getAdjacencyList();
 
     Map<TraversalCode<String>, Collection<TraversalEmbedding>> childEmbeddings =
       Maps.newHashMap();
 
     // FOR EACH FREQUENT SUBGRAPH
-    for (TraversalCode<String> parentCode : frequentPatterns) {
+    for (TraversalCode<String> parentPattern : frequentPatterns) {
 
       Collection<TraversalEmbedding> parentEmbeddings =
-        graphEmbeddingsPair.getCodeEmbeddings().get(parentCode);
+        graphEmbeddingsPair.getPatternEmbeddings().get(parentPattern);
 
       // IF GRAPH CONTAINS FREQUENT SUBGRAPH
       if (parentEmbeddings != null) {
         Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
-          getValidExtensions(adjacencyList, parentCode, parentEmbeddings);
+          getValidExtensions(adjacencyList, parentPattern, parentEmbeddings);
 
         for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> entry :
           extensionEmbeddings.entrySet()) {
 
-          TraversalCode<String> childCode = new TraversalCode<>(parentCode);
+          TraversalCode<String> childCode = new TraversalCode<>(parentPattern);
 
           childCode.getTraversals().add(entry.getKey());
 
@@ -80,9 +102,15 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
       }
     }
 
-    graphEmbeddingsPair.setCodeEmbeddings(childEmbeddings);
+    graphEmbeddingsPair.setPatternEmbeddings(childEmbeddings);
   }
 
+  /**
+   * Finds all 1-edge patterns and embeddings of a graph.
+   *
+   * @param graph graph
+   * @return 1-edge patterns and embeddings
+   */
   protected Map<Traversal<String>, Collection<TraversalEmbedding>> getSingleEdgeTraversalEmbeddings(
     AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph) {
 
@@ -117,12 +145,30 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return traversalEmbeddings;
   }
 
+  /**
+   * Creates a traversal-embedding pair of vertex id, vertex label and an outgoing adjacency row
+   * cell.
+   *
+   * @param sourceId vertex id
+   * @param sourceLabel vertex label
+   * @param cell outgoing adjacency row cell
+   *
+   * @return traversal-embedding pair
+   */
   protected abstract Pair<Traversal<String>, TraversalEmbedding> getTraversalEmbedding(
     GradoopId sourceId, String sourceLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell);
 
+  /**
+   * Finds all valid extensions
+   *
+   * @param graph
+   * @param parentPattern
+   * @param parentEmbeddings
+   * @return
+   */
   protected Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
-    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph, TraversalCode<String> parentPattern,
-    Collection<TraversalEmbedding> parentEmbeddings) {
+    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph,
+    TraversalCode<String> parentPattern, Collection<TraversalEmbedding> parentEmbeddings) {
 
     Map<Traversal<String>, Collection<TraversalEmbedding>> extensionEmbeddings =
       Maps.newHashMap();
@@ -314,19 +360,10 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
     boolean outgoing, String edgeLabel, String toLabel, boolean loop);
 
-  protected abstract boolean getOutgoing(Traversal<String> traversal);
-
-  protected abstract void addCells(
-    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> outgoingRows,
-    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> incomingRows,
-    GradoopId fromId, String fromLabel,
-    boolean outgoing, GradoopId edgeId, String edgeLabel,
-    GradoopId toId, String toLabel
-  );
-
   public static GraphTransaction createGraphTransaction(TraversalCode<String> traversalCode) {
 
-    GraphHead graphHead = new GraphHead(GradoopId.get(), "FSG", null);
+    GraphHead graphHead =
+      new GraphHead(GradoopId.get(), TFSMConstants.FREQUENT_SUBGRAPH_LABEL, null);
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
     Map<Integer, GradoopId> vertexIdMap = Maps.newHashMap();

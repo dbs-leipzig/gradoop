@@ -4,7 +4,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
@@ -69,24 +69,24 @@ public abstract class TransactionalFSMBase
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions
       .map(new FilterVerticesByLabel())
-      .withBroadcastSet(frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+      .withBroadcastSet(frequentVertexLabels, TFSMConstants.FREQUENT_VERTEX_LABELS);
 
     DataSet<String> frequentEdgeLabels = transactions
       .flatMap(new EdgeLabels())
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions
       .map(new FilterEdgesByLabel())
-      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+      .withBroadcastSet(frequentEdgeLabels, TFSMConstants.FREQUENT_EDGE_LABELS);
 
     transactions = transactions
       .filter(new NotEmpty());

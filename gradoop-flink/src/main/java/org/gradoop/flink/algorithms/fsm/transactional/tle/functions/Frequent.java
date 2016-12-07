@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.model.api.tuples.Countable;
 
 /**
@@ -39,7 +39,7 @@ public class Frequent<T extends Countable> extends RichFilterFunction<T> {
     super.open(parameters);
 
     this.minFrequency = getRuntimeContext()
-      .<Long>getBroadcastVariable(Constants.MIN_FREQUENCY).get(0);
+      .<Long>getBroadcastVariable(TFSMConstants.MIN_FREQUENCY).get(0);
   }
 
   @Override

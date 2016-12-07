@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.common;
 /**
  * Collection of broadcast dataset names used for frequent subgraph mining.
  */
-public class Constants {
+public class TFSMConstants {
 
   /**
    * Cache counter name for the total number of graphs.
@@ -33,17 +33,22 @@ public class Constants {
   public static final String MIN_FREQUENCY = "minFrequency";
 
   /**
-   * vertex label dictionary
+   * frequent vertex labels
    */
-  public static final String FREQUENT_VERTEX_LABELS = "frequentVertexLabels";
+  public static final String FREQUENT_VERTEX_LABELS = "fvl";
 
   /**
-   * vertex label dictionary
+   * frequent edge labels
    */
-  public static final String FREQUENT_EDGE_LABELS = "frequentEdgeLabels";
+  public static final String FREQUENT_EDGE_LABELS = "fel";
 
   /**
-   * set of frequent subgraphs
+   * set of frequent patterns
    */
-  public static final String FREQUENT_SUBGRAPHS = "frequentSubgraphs";
+  public static final String FREQUENT_PATTERNS = "fp";
+
+  /**
+   * Graph head label of frequent subgraphs
+   */
+  public static final String FREQUENT_SUBGRAPH_LABEL = "FrequentSubgraph";
 }

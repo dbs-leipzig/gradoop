@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
 
@@ -48,7 +48,7 @@ public class WithoutInfrequentVertexLabels<G extends FSMGraph>
     super.open(parameters);
 
     this.frequentVertexLabels = getRuntimeContext()
-      .getBroadcastVariable(Constants.FREQUENT_VERTEX_LABELS);
+      .getBroadcastVariable(TFSMConstants.FREQUENT_VERTEX_LABELS);
 
     this.frequentVertexLabels = Sets.newHashSet(frequentVertexLabels);
   }

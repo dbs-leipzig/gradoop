@@ -15,18 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
-
 /**
- * (graph, pattern->embeddings) => true, if graph is empty
+ * Classes related to the gSpan algorithm.
  */
-public class IsCollector implements FilterFunction<GraphEmbeddingsPair> {
-
-  @Override
-  public boolean filter(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
-    return graphEmbeddingsPair.getAdjacencyList().getOutgoingRows().isEmpty();
-  }
-}
+package org.gradoop.flink.algorithms.fsm.transactional.gspan;

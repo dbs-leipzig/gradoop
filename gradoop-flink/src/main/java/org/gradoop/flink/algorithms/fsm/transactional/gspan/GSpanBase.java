@@ -8,7 +8,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToDirectedAdjacencyList;
@@ -65,7 +65,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<>())
-        .withBroadcastSet(minFrequency, Constants.MIN_FREQUENCY)
+        .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
         .map(new ValueOfWithCount<>());
   }
 }

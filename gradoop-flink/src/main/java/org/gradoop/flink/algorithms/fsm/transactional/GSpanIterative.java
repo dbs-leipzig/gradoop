@@ -22,12 +22,12 @@ import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.GSpanBase;
-import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.EmptyGraphEmbeddingPair;
+import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.CreateCollector;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ExpandResult;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.HasEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.IsCollector;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.PatternGrowth;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.InitSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Report;
@@ -62,7 +62,7 @@ public class GSpanIterative extends GSpanBase {
     DataSet<GraphEmbeddingsPair> collector = graphs
       .getExecutionEnvironment()
       .fromElements(true)
-      .map(new EmptyGraphEmbeddingPair());
+      .map(new CreateCollector());
 
     searchSpace = searchSpace.union(collector);
 
@@ -80,7 +80,7 @@ public class GSpanIterative extends GSpanBase {
 
     DataSet<GraphEmbeddingsPair> grownEmbeddings = iterative
       .map(new PatternGrowth(gSpan))
-      .withBroadcastSet(frequentPatterns, Constants.FREQUENT_SUBGRAPHS)
+      .withBroadcastSet(frequentPatterns, TFSMConstants.FREQUENT_PATTERNS)
       .filter(new HasEmbeddings());
 
     // ITERATION FOOTER

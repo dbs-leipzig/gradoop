@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSingleEdgeEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSubgraphDecoder;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSubgraphOnly;
@@ -38,7 +39,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.CCSGraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraphEmbeddings;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
-import org.gradoop.flink.algorithms.fsm.transactional.common.Constants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentEdgeLabels;
@@ -193,27 +193,27 @@ public class CategoryCharacteristicSubgraphs
       .groupBy(0, 1)
       .sum(2)
       .filter(new CategoryFrequent())
-      .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
+      .withBroadcastSet(categoryMinFrequencies, TFSMConstants.MIN_FREQUENCY)
       .map(new LabelOnly())
       .distinct();
 
     graphs = graphs
       .map(new WithoutInfrequentVertexLabels<CCSGraph>())
       .withBroadcastSet(
-        frequentVertexLabels, Constants.FREQUENT_VERTEX_LABELS);
+        frequentVertexLabels, TFSMConstants.FREQUENT_VERTEX_LABELS);
 
     DataSet<String> frequentEdgeLabels = graphs
       .flatMap(new CategoryEdgeLabels())
       .groupBy(0, 1)
       .sum(2)
       .filter(new CategoryFrequent())
-      .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY)
+      .withBroadcastSet(categoryMinFrequencies, TFSMConstants.MIN_FREQUENCY)
       .map(new LabelOnly())
       .distinct();
 
     graphs = graphs
       .map(new WithoutInfrequentEdgeLabels<CCSGraph>())
-      .withBroadcastSet(frequentEdgeLabels, Constants.FREQUENT_EDGE_LABELS);
+      .withBroadcastSet(frequentEdgeLabels, TFSMConstants.FREQUENT_EDGE_LABELS);
 
     return graphs;
   }
@@ -244,8 +244,8 @@ public class CategoryCharacteristicSubgraphs
       .sum(1)
       .groupBy(0)
       .reduceGroup(new CategoryFrequentAndInteresting(minInterestingness))
-      .withBroadcastSet(categoryCounts, Constants.GRAPH_COUNT)
-      .withBroadcastSet(categoryMinFrequencies, Constants.MIN_FREQUENCY);
+      .withBroadcastSet(categoryCounts, TFSMConstants.GRAPH_COUNT)
+      .withBroadcastSet(categoryMinFrequencies, TFSMConstants.MIN_FREQUENCY);
   }
 
   @Override
