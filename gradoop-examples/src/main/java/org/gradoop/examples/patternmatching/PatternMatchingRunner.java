@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulation;
 
 import java.util.concurrent.TimeUnit;
@@ -193,7 +193,7 @@ public class PatternMatchingRunner extends AbstractRunner
         .setQuery(query)
         .setAttachData(attachData)
         .setMatchStrategy(MatchStrategy.ISOMORPHISM)
-        .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+        .setTraverserStrategy(TraverserStrategy.SET_PAIR_BULK_ITERATION)
         .setEdgeStepJoinStrategy(BROADCAST_HASH_FIRST)
         .setVertexStepJoinStrategy(BROADCAST_HASH_FIRST)
         .build();

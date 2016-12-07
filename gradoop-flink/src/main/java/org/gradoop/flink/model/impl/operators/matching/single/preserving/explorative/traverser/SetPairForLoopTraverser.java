@@ -19,28 +19,28 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.functions.utils.Superstep;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
 /**
  * Extracts {@link Embedding}s iteratively from a given graph by traversing the
  * graph according to a given {@link TraversalCode}.
  *
- * For the iteration the traverser uses Flink bulk iteration.
+ * For the iteration the traverser uses a basic for loop.
  *
  * @param <K> key type
  */
-public class BulkTraverser<K> extends DistributedTraverser<K> {
+public class SetPairForLoopTraverser<K> extends SetPairTraverser<K> {
+
   /**
    * Creates a new distributed traverser.
    *
@@ -49,7 +49,7 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
    * @param edgeCount     number of query edges
    * @param keyClazz      needed for embedding initialization
    */
-  public BulkTraverser(TraversalCode traversalCode,
+  public SetPairForLoopTraverser(TraversalCode traversalCode,
     int vertexCount, int edgeCount, Class<K> keyClazz) {
     this(traversalCode, MatchStrategy.ISOMORPHISM,
       vertexCount, edgeCount,
@@ -72,77 +72,67 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
    * @param vertexMapping          used for debug
    * @param edgeMapping            used for debug
    */
-  public BulkTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
+  public SetPairForLoopTraverser(TraversalCode traversalCode,
+    MatchStrategy matchStrategy,
     int vertexCount, int edgeCount,
     Class<K> keyClazz,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy,
     DataSet<Tuple2<K, PropertyValue>> vertexMapping,
     DataSet<Tuple2<K, PropertyValue>> edgeMapping) {
-
     super(traversalCode, matchStrategy, vertexCount, edgeCount, keyClazz,
       edgeStepJoinStrategy, vertexStepJoinStrategy, vertexMapping, edgeMapping);
   }
 
-  /**
-   * Traverses the graph according to the provided traversal code.
-   *
-   * @param vertices vertices including their query candidates
-   * @param edges    edges including their query candidates
-   * @return found embeddings
-   */
   @Override
   public DataSet<Tuple1<Embedding<K>>> traverse(
     DataSet<IdWithCandidates<K>> vertices,
     DataSet<TripleWithCandidates<K>> edges) {
-
     return iterate(vertices, edges, buildInitialEmbeddings(vertices))
       .project(1);
   }
 
   @Override
   boolean isIterative() {
-    return true;
+    return false;
   }
 
   /**
    * Explores the data graph iteratively using the provided traversal code.
    *
-   * @param vertices          vertex candidates
-   * @param edges             edge candidates
-   * @param initialEmbeddings initial embeddings which are extended in each
-   *                          iteration
+   * @param vertices   vertex candidates
+   * @param edges      edge candidates
+   * @param embeddings initial embeddings which are extended in each iteration
    * @return final embeddings
    */
   private DataSet<EmbeddingWithTiePoint<K>> iterate(
     DataSet<IdWithCandidates<K>> vertices,
     DataSet<TripleWithCandidates<K>> edges,
-    DataSet<EmbeddingWithTiePoint<K>> initialEmbeddings) {
+    DataSet<EmbeddingWithTiePoint<K>> embeddings) {
 
-    // ITERATION HEAD
-    IterativeDataSet<EmbeddingWithTiePoint<K>> embeddings = initialEmbeddings
-      .iterate(getTraversalCode().getSteps().size());
+    TraversalCode traversalCode = getTraversalCode();
 
-    // ITERATION BODY
+    for (int i = 0; i < traversalCode.getSteps().size(); i++) {
+      Step step = traversalCode.getStep(i);
 
-    // get current superstep
-    DataSet<Integer> superstep = embeddings
-      .first(1)
-      .map(new Superstep<>());
+      DataSet<Integer> superstep = vertices.getExecutionEnvironment()
+        .fromElements(i + 1);
 
-    // traverse to outgoing/incoming edges
-    String[] forwardedFieldsEdgeSteps = new String[] {
-        "f0" // forward edge id
-    };
-    DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = traverseEdges(edges,
-      embeddings, superstep, IterationStrategy.BULK_ITERATION,
-      forwardedFieldsEdgeSteps);
+      String[] forwardedFieldEdgeSteps = new String[] {
+          // forward edge id
+          "f0",
+          // forward source or target id to tie point id
+          step.isOutgoing() ? "f1->f1" : "f2->f1",
+          // forward source or target id to next id
+          step.isOutgoing() ? "f2->f2" : "f1->f2"
+      };
 
-    // traverse to vertices
-    nextWorkSet = traverseVertices(vertices, nextWorkSet, superstep,
-      IterationStrategy.BULK_ITERATION);
+      embeddings = traverseEdges(edges, embeddings, superstep,
+        TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION, forwardedFieldEdgeSteps);
+      embeddings = traverseVertices(vertices, embeddings, superstep,
+        TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION);
+    }
 
-    // ITERATION FOOTER
-    return embeddings.closeWith(nextWorkSet, nextWorkSet);
+    return embeddings;
   }
 }

@@ -31,10 +31,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.BulkTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.ForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairTraverser;
 
 import java.util.concurrent.TimeUnit;
 
@@ -90,10 +91,10 @@ public class TraverserBenchmark extends AbstractRunner {
     }
     String inputPath   = cmd.getOptionValue(OPTION_INPUT_PATH);
     String queryString = cmd.getOptionValue(OPTION_QUERY);
-    String itStrategy  = cmd.getOptionValue(OPTION_TRAVERSER);
+    String traverserStrategyString  = cmd.getOptionValue(OPTION_TRAVERSER);
 
-    IterationStrategy iterationStrategy = (itStrategy.equals("bulk")) ?
-      IterationStrategy.BULK_ITERATION : IterationStrategy.LOOP_UNROLLING;
+    TraverserStrategy traverserStrategy = (traverserStrategyString.equals("bulk")) ?
+      TraverserStrategy.SET_PAIR_BULK_ITERATION : TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION;
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
@@ -130,23 +131,19 @@ public class TraverserBenchmark extends AbstractRunner {
       .map(new GetTriplesWithCandidates(edgeCount));
 
     // create distributed traverser
-    DistributedTraverser<Long> distributedTraverser;
-    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
-      distributedTraverser = new BulkTraverser<>(tc,
-        vertexCount, edgeCount, Long.class);
+    SetPairTraverser<Long> distributedTraverser;
+    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
+      distributedTraverser = new SetPairBulkTraverser<>(tc, vertexCount, edgeCount, Long.class);
     } else {
-      distributedTraverser = new ForLoopTraverser<>(tc,
-        vertexCount, edgeCount, Long.class);
+      distributedTraverser = new SetPairForLoopTraverser<>(tc, vertexCount, edgeCount, Long.class);
     }
 
     // print embedding count
-    long embeddingCount = distributedTraverser
-      .traverse(vertices, edges).count();
+    long embeddingCount = distributedTraverser.traverse(vertices, edges).count();
 
     System.out.println("embeddingCount = " + embeddingCount);
 
-    long duration = env.getLastJobExecutionResult()
-      .getNetRuntime(TimeUnit.SECONDS);
+    long duration = env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS);
 
     System.out.println("duration = " + duration);
   }

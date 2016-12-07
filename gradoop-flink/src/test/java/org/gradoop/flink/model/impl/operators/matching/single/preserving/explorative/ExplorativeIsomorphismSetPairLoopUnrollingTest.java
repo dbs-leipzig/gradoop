@@ -5,9 +5,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving
   .SubgraphIsomorphismTest;
 
-public class ExplorativeIsomorphismLoopUnrollingTest extends SubgraphIsomorphismTest {
+public class ExplorativeIsomorphismSetPairLoopUnrollingTest extends SubgraphIsomorphismTest {
 
-  public ExplorativeIsomorphismLoopUnrollingTest(String testName, String dataGraph,
+  public ExplorativeIsomorphismSetPairLoopUnrollingTest(String testName, String dataGraph,
     String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -20,7 +20,7 @@ public class ExplorativeIsomorphismLoopUnrollingTest extends SubgraphIsomorphism
       .setQuery(queryGraph)
       .setAttachData(attachData)
       .setMatchStrategy(MatchStrategy.ISOMORPHISM)
-      .setIterationStrategy(IterationStrategy.LOOP_UNROLLING)
+      .setTraverserStrategy(TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION)
       .build();
   }
 }

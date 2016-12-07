@@ -2,12 +2,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .SubgraphHomomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphHomomorphismTest;
 
-public class ExplorativeHomomorphismLoopUnrollingTest extends SubgraphHomomorphismTest {
+public class ExplorativeHomomorphismTriplesForLoopTest extends SubgraphHomomorphismTest {
 
-  public ExplorativeHomomorphismLoopUnrollingTest(String testName,
+  public ExplorativeHomomorphismTriplesForLoopTest(String testName,
     String dataGraph, String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -20,7 +19,7 @@ public class ExplorativeHomomorphismLoopUnrollingTest extends SubgraphHomomorphi
       .setQuery(queryGraph)
       .setAttachData(attachData)
       .setMatchStrategy(MatchStrategy.HOMOMORPHISM)
-      .setIterationStrategy(IterationStrategy.LOOP_UNROLLING)
+      .setTraverserStrategy(TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION)
       .build();
   }
 }

@@ -2,12 +2,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphIsomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphHomomorphismTest;
 
-public class ExplorativeIsomorphismBulkTest extends SubgraphIsomorphismTest {
+public class ExplorativeHomomorphismSetPairBulkTest extends SubgraphHomomorphismTest {
 
-  public ExplorativeIsomorphismBulkTest(String testName, String dataGraph,
-    String queryGraph, String expectedGraphVariables,
+  public ExplorativeHomomorphismSetPairBulkTest(String testName,
+    String dataGraph, String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
@@ -15,12 +15,11 @@ public class ExplorativeIsomorphismBulkTest extends SubgraphIsomorphismTest {
 
   @Override
   public PatternMatching getImplementation(String queryGraph, boolean attachData) {
-
     return new ExplorativePatternMatching.Builder()
       .setQuery(queryGraph)
       .setAttachData(attachData)
-      .setMatchStrategy(MatchStrategy.ISOMORPHISM)
-      .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+      .setMatchStrategy(MatchStrategy.HOMOMORPHISM)
+      .setTraverserStrategy(TraverserStrategy.SET_PAIR_BULK_ITERATION)
       .build();
   }
 }
