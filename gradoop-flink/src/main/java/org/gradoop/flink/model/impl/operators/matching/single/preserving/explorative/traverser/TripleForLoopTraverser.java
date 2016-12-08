@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
  *
  * @param <K> key type
  */
-public class ForLoopTripleTraverser<K> extends TripleTraverser<K> {
+public class TripleForLoopTraverser<K> extends TripleTraverser<K> {
 
   /**
    * Creates a new distributed traverser.
@@ -49,7 +49,7 @@ public class ForLoopTripleTraverser<K> extends TripleTraverser<K> {
    * @param vertexMapping        used for debug
    * @param edgeMapping          used for debug
    */
-  public ForLoopTripleTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
+  public TripleForLoopTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
     int vertexCount, int edgeCount, Class<K> keyClazz,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     DataSet<Tuple2<K, PropertyValue>> vertexMapping,

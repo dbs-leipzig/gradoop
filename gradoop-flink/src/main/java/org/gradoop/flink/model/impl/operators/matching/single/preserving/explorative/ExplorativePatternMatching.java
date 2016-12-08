@@ -52,8 +52,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .ForLoopTripleTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
 
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
@@ -207,7 +206,7 @@ public class ExplorativePatternMatching extends PatternMatching
       DataSet<TripleWithCandidates<GradoopId>> triples = PreProcessor
         .filterTriplets(graph, getQuery());
 
-      TripleTraverser<GradoopId> distributedTraverser = new ForLoopTripleTraverser<>(
+      TripleTraverser<GradoopId> distributedTraverser = new TripleForLoopTraverser<>(
         traversalCode, matchStrategy,
         traverser.getQueryHandler().getVertexCount(),
         traverser.getQueryHandler().getEdgeCount(),
