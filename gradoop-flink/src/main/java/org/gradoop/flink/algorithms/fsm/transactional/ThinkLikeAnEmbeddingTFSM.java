@@ -40,8 +40,7 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
  * subgraph mining algorithm as Gradoop operator
  */
 public class ThinkLikeAnEmbeddingTFSM
-  extends ThinkLikeAnEmbeddingFSMBase<TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings >
-{
+  extends ThinkLikeAnEmbeddingFSMBase<TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings> {
 
   /**
    * constructor

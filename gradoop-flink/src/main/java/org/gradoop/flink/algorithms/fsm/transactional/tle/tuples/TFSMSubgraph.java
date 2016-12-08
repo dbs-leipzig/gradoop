@@ -19,7 +19,6 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
 
 /**
  * Representation of a subgraph.

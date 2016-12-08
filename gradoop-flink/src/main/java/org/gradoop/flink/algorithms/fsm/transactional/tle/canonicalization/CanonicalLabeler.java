@@ -76,6 +76,13 @@ public class CanonicalLabeler implements Serializable {
     this.directed = directed;
   }
 
+  /**
+   * Creates a canonical subgraph graph label
+   *
+   * @param embedding subgraph
+   *
+   * @return canonical label
+   */
   public String label(Embedding embedding) {
 
     Map<Integer, String> vertices = embedding.getVertices();

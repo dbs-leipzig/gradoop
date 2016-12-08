@@ -89,9 +89,10 @@ public class CategoryCharacteristicSubgraphs
   }
 
   /**
-   * Core mining method.
+   * Executes the algorithm based on transactional representation.
    *
-   * @return frequent subgraphs
+   * @param transactions search space
+   * @return category characteristic subgraphs
    */
   public DataSet<GraphTransaction> execute(DataSet<GraphTransaction> transactions) {
 

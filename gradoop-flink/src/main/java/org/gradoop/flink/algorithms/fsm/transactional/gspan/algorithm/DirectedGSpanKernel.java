@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm;
 
 import com.google.common.collect.Lists;
@@ -62,12 +79,12 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
   }
 
   @Override
-  protected boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
-    boolean outgoing, String edgeLabel, String toLabel, boolean loop) {
+  protected boolean validBranch(Traversal<String> firstExtension, String fromLabel,
+    boolean outgoing, boolean loop, String edgeLabel, String toLabel) {
 
-    String filterFromLabel = firstTraversal.getFromValue();
-    String filterEdgeLabel = firstTraversal.getEdgeValue();
-    String filterToLabel = firstTraversal.getToValue();
+    String filterFromLabel = firstExtension.getFromValue();
+    String filterEdgeLabel = firstExtension.getEdgeValue();
+    String filterToLabel = firstExtension.getToValue();
 
     int labelComparison = fromLabel.compareTo(toLabel);
     boolean flip = labelComparison > 0 || labelComparison == 0 && !outgoing;
@@ -83,7 +100,7 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
     int fromLabelComparison = filterFromLabel.compareTo(fromLabel);
 
-    if (fromLabelComparison < 0 ) {
+    if (fromLabelComparison < 0) {
       valid = true;
 
     } else if (fromLabelComparison > 0) {
@@ -91,10 +108,10 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
 
     } else {
 
-      boolean filterLoop = firstTraversal.isLoop();
+      boolean filterLoop = firstExtension.isLoop();
       if (filterLoop == loop) {
 
-        boolean filterOutgoing = firstTraversal.isOutgoing();
+        boolean filterOutgoing = firstExtension.isOutgoing();
         if (filterOutgoing == outgoing) {
           int edgeLabelComparison = filterEdgeLabel.compareTo(edgeLabel);
 
@@ -132,47 +149,6 @@ public class DirectedGSpanKernel extends GSpanKernelBase {
     }
 
     return valid;
-  }
-
-  @Override
-  protected boolean getOutgoing(Traversal<String> traversal) {
-    return traversal.isOutgoing();
-  }
-
-  @Override
-  protected void addCells(
-    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> outgoingRows,
-    Map<GradoopId, AdjacencyListRow<IdWithLabel, IdWithLabel>> incomingRows,
-    GradoopId fromId, String fromLabel,
-    boolean outgoing, GradoopId edgeId, String edgeLabel,
-    GradoopId toId, String toLabel
-    ) {
-
-    GradoopId sourceId;
-    String sourceLabel;
-
-    GradoopId targetId;
-    String targetLabel;
-
-    if (outgoing) {
-      sourceId = fromId;
-      sourceLabel = fromLabel;
-      targetId = toId;
-      targetLabel = toLabel;
-    } else {
-      sourceId = toId;
-      sourceLabel = toLabel;
-      targetId = fromId;
-      targetLabel = fromLabel;
-    }
-
-    IdWithLabel edgeData = new IdWithLabel(edgeId, edgeLabel);
-
-    outgoingRows.get(sourceId).getCells().add(
-      new AdjacencyListCell<>(edgeData, new IdWithLabel(targetId, targetLabel)));
-
-    incomingRows.get(targetId).getCells().add(
-      new AdjacencyListCell<>(edgeData, new IdWithLabel(sourceId, sourceLabel)));
   }
 
   @Override

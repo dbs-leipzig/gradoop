@@ -105,6 +105,48 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     graphEmbeddingsPair.setPatternEmbeddings(childEmbeddings);
   }
 
+  @Override
+  public boolean isMinimal(TraversalCode<String> pattern) {
+
+    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList =
+      getAdjacencyList(pattern);
+
+    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings =
+      getSingleEdgeTraversalEmbeddings(adjacencyList);
+
+    Iterator<Traversal<String>> iterator = pattern.getTraversals().iterator();
+
+    Traversal<String> minTraversal = iterator.next();
+    TraversalCode<String> minCode = new TraversalCode<>(minTraversal);
+    Collection<TraversalEmbedding> minEmbeddings = traversalEmbeddings.get(minTraversal);
+
+    boolean minimal = true;
+
+    while (minimal && iterator.hasNext()) {
+      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionOptions =
+        getValidExtensions(adjacencyList, minCode, minEmbeddings);
+
+      Traversal<String> inputExtension = iterator.next();
+
+      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> extensionOption :
+        extensionOptions.entrySet()) {
+        int comparison = inputExtension.compareTo(extensionOption.getKey());
+
+        if (comparison == 0) {
+          minEmbeddings = extensionOption.getValue();
+        } else if (comparison > 0) {
+          minimal = false;
+        }
+      }
+
+      if (minimal) {
+        minCode.getTraversals().add(inputExtension);
+      }
+    }
+
+    return minimal;
+  }
+
   /**
    * Finds all 1-edge patterns and embeddings of a graph.
    *
@@ -159,12 +201,13 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     GradoopId sourceId, String sourceLabel, AdjacencyListCell<IdWithLabel, IdWithLabel> cell);
 
   /**
-   * Finds all valid extensions
+   * Finds all valid extensions of a parent pattern.
    *
-   * @param graph
-   * @param parentPattern
-   * @param parentEmbeddings
-   * @return
+   * @param graph graph
+   * @param parentPattern pattern that should be extended
+   * @param parentEmbeddings embeddings of the pattern
+   *
+   * @return childPattern->childEmbeddings
    */
   protected Map<Traversal<String>, Collection<TraversalEmbedding>> getValidExtensions(
     AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph,
@@ -238,7 +281,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
                 String toLabel = cell.getVertexData().getLabel();
 
                 // valid branch by lexicographical order
-                if (validBranch(firstTraversal, fromLabel, outgoing, edgeLabel, toLabel, loop)) {
+                if (validBranch(firstTraversal, fromLabel, outgoing, loop, edgeLabel, toLabel)) {
 
                   int toTime = backwards ?
                     parentEmbedding.getVertexIds().indexOf(toId) : forwardTime;
@@ -315,52 +358,29 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     return rightmostPathTimes;
   }
 
-  @Override
-  public boolean isMinimal(TraversalCode<String> pattern) {
+  /**
+   * Checks, if an extension will be valid according to vertex and edge labels.
+   *
+   * @param firstExtension initial extension of a pattern.
+   * @param fromLabel current extension start vertex label
+   * @param outgoing true, if current extension is outgoing
+   * @param loop true, if current extension is a loop
+   *
+   * @param edgeLabel current extension edge label
+   * @param toLabel current extension end vertex label
+   * @return true, if the current extension will be valid according to vertex and edge labels
+   */
+  protected abstract boolean validBranch(Traversal<String> firstExtension,
+    String fromLabel, boolean outgoing, boolean loop, String edgeLabel, String toLabel);
 
-    AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> adjacencyList =
-      getAdjacencyList(pattern);
-
-    Map<Traversal<String>, Collection<TraversalEmbedding>> traversalEmbeddings =
-      getSingleEdgeTraversalEmbeddings(adjacencyList);
-
-    Iterator<Traversal<String>> iterator = pattern.getTraversals().iterator();
-
-    Traversal<String> minTraversal = iterator.next();
-    TraversalCode<String> minCode = new TraversalCode<>(minTraversal);
-    Collection<TraversalEmbedding> minEmbeddings = traversalEmbeddings.get(minTraversal);
-
-    boolean minimal = true;
-
-    while (minimal && iterator.hasNext()) {
-      Map<Traversal<String>, Collection<TraversalEmbedding>> extensionOptions =
-        getValidExtensions(adjacencyList, minCode, minEmbeddings);
-
-      Traversal<String> inputExtension = iterator.next();
-
-      for (Map.Entry<Traversal<String>, Collection<TraversalEmbedding>> extensionOption :
-        extensionOptions.entrySet()) {
-        int comparison = inputExtension.compareTo(extensionOption.getKey());
-
-        if (comparison == 0) {
-          minEmbeddings = extensionOption.getValue();
-        } else if (comparison > 0) {
-          minimal = false;
-        }
-      }
-
-      if (minimal) {
-        minCode.getTraversals().add(inputExtension);
-      }
-    }
-
-    return minimal;
-  }
-
-  protected abstract boolean validBranch(Traversal<String> firstTraversal, String fromLabel,
-    boolean outgoing, String edgeLabel, String toLabel, boolean loop);
-
-  public static GraphTransaction createGraphTransaction(TraversalCode<String> traversalCode) {
+  /**
+   * Creates a graph transaction based on a given pattern.
+   *
+   * @param pattern pattern (DFS code)
+   *
+   * @return graph transaction
+   */
+  public static GraphTransaction createGraphTransaction(TraversalCode<String> pattern) {
 
     GraphHead graphHead =
       new GraphHead(GradoopId.get(), TFSMConstants.FREQUENT_SUBGRAPH_LABEL, null);
@@ -371,7 +391,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 
-    for (Traversal<String> traversal : traversalCode.getTraversals()) {
+    for (Traversal<String> traversal : pattern.getTraversals()) {
       Integer fromTime = traversal.getFromTime();
       GradoopId fromId = vertexIdMap.get(fromTime);
 

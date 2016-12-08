@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.algorithms.fsm.transactional.tle;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
@@ -6,9 +23,14 @@ import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.DropPropertiesAndGraphContainment;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.EdgeLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterEdgesByLabel;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterVerticesByLabel;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.NotEmpty;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLabels;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
-import org.gradoop.flink.algorithms.fsm.transactional.common.functions.*;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
@@ -19,15 +41,31 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-public abstract class TransactionalFSMBase
-  implements UnaryCollectionToCollectionOperator {
-  protected final FSMConfig fsmConfig;
+/**
+ * Superclass of frequent subgraph implementations in the graph transaction setting.
+ */
+public abstract class TransactionalFSMBase implements UnaryCollectionToCollectionOperator {
+
   /**
-   * minimum frequency for subgraphs to be considered to be frequent
+   * FSM configuration
+   */
+  protected final FSMConfig fsmConfig;
+
+  /**
+   * minimum frequency for patterns to be considered to be frequent
    */
   protected DataSet<Long> minFrequency;
+
+  /**
+   * Gradoop configuration
+   */
   protected GradoopFlinkConfig gradoopFlinkConfig;
 
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
   public TransactionalFSMBase(FSMConfig fsmConfig) {
     this.fsmConfig = fsmConfig;
   }
@@ -45,6 +83,13 @@ public abstract class TransactionalFSMBase
     return GraphCollection.fromTransactions(new GraphTransactions(output, gradoopFlinkConfig));
   }
 
+  /**
+   * Executes the algorithm for graphs in Gradoop transactional representation.
+   *
+   * @param transactions graphs in transactional representation
+   *
+   * @return frequent patterns in transactional representation
+   */
   public GraphTransactions execute(GraphTransactions transactions) {
     this.gradoopFlinkConfig = transactions.getConfig();
 
@@ -54,8 +99,21 @@ public abstract class TransactionalFSMBase
     return new GraphTransactions(output, gradoopFlinkConfig);
   }
 
+  /**
+   * Executes the algorithm for a dataset of graphs in transactional representation.
+   *
+   * @param transactions dataset of graphs
+   *
+   * @return frequent patterns as dataset of graphs
+   */
   protected abstract DataSet<GraphTransaction> execute(DataSet<GraphTransaction> transactions);
 
+  /**
+   * Triggers the label-frequency base preprocessing
+   *
+   * @param transactions input
+   * @return preprocessed input
+   */
   protected DataSet<GraphTransaction> preProcess(DataSet<GraphTransaction> transactions) {
     transactions = transactions
       .map(new DropPropertiesAndGraphContainment());
@@ -94,7 +152,13 @@ public abstract class TransactionalFSMBase
     return transactions;
   }
 
-  protected GroupCombineFunction<WithCount<TraversalCode<String>>, WithCount<TraversalCode<String>>> sumPartition() {
+  /**
+   * Creates a Flink sum aggregate function that can be applied in group combine operations.
+   *
+   * @return sum group combine function
+   */
+  protected GroupCombineFunction<WithCount<TraversalCode<String>>, WithCount<TraversalCode<String>>>
+  sumPartition() {
 
     SumAggregationFunction.LongSumAgg[] sum = { new SumAggregationFunction.LongSumAgg() };
 

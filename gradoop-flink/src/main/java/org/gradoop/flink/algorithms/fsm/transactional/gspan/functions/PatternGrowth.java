@@ -53,7 +53,8 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    this.frequentPatterns = getRuntimeContext().getBroadcastVariable(TFSMConstants.FREQUENT_PATTERNS);
+    this.frequentPatterns = getRuntimeContext()
+      .getBroadcastVariable(TFSMConstants.FREQUENT_PATTERNS);
   }
 
   @Override

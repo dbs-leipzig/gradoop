@@ -54,7 +54,7 @@ public interface GSpanKernel {
    * Checks if a pattern in DFS-code representation
    * is minimal according to gSpan lexicographic order.
    *
-   * @param pattern
+   * @param pattern pattern
    * @return true, if minimal
    */
   boolean isMinimal(TraversalCode<String> pattern);

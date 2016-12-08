@@ -27,16 +27,28 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalEmb
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * (graph, pattern->embeddings)
+ */
 public class GraphEmbeddingsPair extends
-  Tuple2<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>, Map<TraversalCode<String>, Collection<TraversalEmbedding>>> {
+  Tuple2<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>,
+    Map<TraversalCode<String>, Collection<TraversalEmbedding>>> {
 
+  /**
+   * Default constructor.
+   */
+  public GraphEmbeddingsPair() {
+  }
 
+  /**
+   * Constructor.
+   *
+   * @param graph graph
+   * @param patternEmbeddings pattern->embeddings
+   */
   public GraphEmbeddingsPair(AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> graph,
     Map<TraversalCode<String>, Collection<TraversalEmbedding>> patternEmbeddings) {
     super(graph, patternEmbeddings);
-  }
-
-  public GraphEmbeddingsPair() {
   }
 
   public AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> getAdjacencyList() {
