@@ -18,6 +18,7 @@
 package org.gradoop.flink.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelList;
@@ -32,6 +33,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
 import org.gradoop.flink.model.impl.GraphCollection;
 
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -65,17 +67,39 @@ public class TLFDataSink extends TLFBase implements DataSink {
   }
 
   @Override
-  public void write(LogicalGraph logicalGraph) {
-    write(GraphCollection.fromGraph(logicalGraph).toTransactions());
+  public void write(LogicalGraph logicalGraph) throws IOException {
+    write(logicalGraph, false);
   }
 
   @Override
-  public void write(GraphCollection graphCollection) {
-    write(graphCollection.toTransactions());
+  public void write(GraphCollection graphCollection) throws
+    IOException {
+    write(graphCollection, false);
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) {
+  public void write(GraphTransactions graphTransactions) throws
+    IOException {
+
+    write(graphTransactions, false);
+  }
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
+    write(GraphCollection.fromGraph(logicalGraph).toTransactions(), overWrite);
+  }
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+    write(graphCollection.toTransactions(), overWrite);
+  }
+
+  @Override
+  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
+
+    FileSystem.WriteMode writeMode =
+      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+
     DataSet<GraphTransaction> simpleLabelTransaction;
     DataSet<Map<String, Integer>> vertexDictionary = null;
     DataSet<Map<String, Integer>> edgeDictionary = null;
@@ -89,8 +113,8 @@ public class TLFDataSink extends TLFBase implements DataSink {
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the vertex dictionary
       vertexDictionary
-        .writeAsFormattedText(getTLFVertexDictionaryPath(),
-          new TLFDictionaryFileFormat());
+        .writeAsFormattedText(
+          getTLFVertexDictionaryPath(), writeMode, new TLFDictionaryFileFormat());
     }
 
     if (hasEdgeDictionary()) {
@@ -102,8 +126,7 @@ public class TLFDataSink extends TLFBase implements DataSink {
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the edge dictionary
       edgeDictionary
-        .writeAsFormattedText(getTLFEdgeDictionaryPath(),
-          new TLFDictionaryFileFormat());
+        .writeAsFormattedText(getTLFEdgeDictionaryPath(), writeMode, new TLFDictionaryFileFormat());
     }
 
 
@@ -134,13 +157,11 @@ public class TLFDataSink extends TLFBase implements DataSink {
       }
       // write the TLF format adjusted graphs to file
       simpleLabelTransaction
-        .writeAsFormattedText(getTLFPath(),
-          new TLFFileFormat());
-    // if there was no dictionary used the graphs can simply be written
+        .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());
+      // if there was no dictionary used the graphs can simply be written
     } else {
       graphTransactions.getTransactions()
-        .writeAsFormattedText(getTLFPath(),
-          new TLFFileFormat());
+        .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());
     }
   }
 }
