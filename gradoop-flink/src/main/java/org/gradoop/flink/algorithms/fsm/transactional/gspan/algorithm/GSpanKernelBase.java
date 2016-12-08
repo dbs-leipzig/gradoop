@@ -379,8 +379,8 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
    * Creates a graph transaction based on a given pattern.
    *
    * @param patternWithFrequency pattern (DFS code) with frequency
+   * @param graphCount search space size
    *
-   * @param graphCount
    * @return graph transaction
    */
   public static GraphTransaction createGraphTransaction(
