@@ -35,7 +35,7 @@ public class Constants {
   /**
    * Reserved property key referring to the source identifier of vertices.
    */
-  public static final String SOURCEID_KEY = "sid";
+  public static final String SOURCEID_KEY = "num";
   /**
    * Property key for master data quality.
    */

@@ -294,9 +294,9 @@ public class ComplaintHandling
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
       String bid = createBusinessIdentifier(
         currentId++, Constants.SALESINVOICE_ACRONYM);
-      properties.set("num", bid);
+      properties.set(Constants.SOURCEID_KEY, "CIT_" + bid);
       properties.set("revenue", refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandlingOld ***");
+      properties.set("text", "*** TODO @ ComplaintHandling ***");
 
       Vertex salesInvoice = newVertex(label, properties);
 
@@ -344,9 +344,9 @@ public class ComplaintHandling
       properties.set("date", ticket.getPropertyValue("createdAt").getLong());
       String bid = createBusinessIdentifier(
         currentId++, Constants.PURCHINVOICE_ACRONYM);
-      properties.set("num", bid);
+      properties.set(Constants.SOURCEID_KEY, "CIT_" + bid);
       properties.set("expense", refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandlingOld ***");
+      properties.set("text", "*** TODO @ ComplaintHandling ***");
 
       Vertex purchInvoice = newVertex(label, properties);
 
@@ -487,8 +487,6 @@ public class ComplaintHandling
       email = email.replace(" ", ".").toLowerCase();
       email += "@biiig.org";
       properties.set("email", email);
-      properties.remove("num");
-      properties.remove("sid");
       //create the vertex and store it in a map for fast access
       Vertex user = vertexFactory.createVertex("User", properties, graphIds);
       masterDataMap.put(employeeId, user);
@@ -517,8 +515,6 @@ public class ComplaintHandling
       properties.set("erpCustNum", customer.getId().toString());
       properties.set("contactPhone", "0123456789");
       properties.set("account", "CL" + customer.getId().toString());
-      properties.remove("num");
-      properties.remove("sid");
       //create the vertex and store it in a map for fast access
       Vertex client = vertexFactory.createVertex("Client", properties, graphIds);
       masterDataMap.put(customerId, client);
