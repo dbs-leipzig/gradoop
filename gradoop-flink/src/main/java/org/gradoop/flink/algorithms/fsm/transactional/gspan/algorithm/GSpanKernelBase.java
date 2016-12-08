@@ -27,7 +27,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
@@ -381,20 +380,20 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
    *
    * @param patternWithFrequency pattern (DFS code) with frequency
    *
+   * @param graphCount
    * @return graph transaction
    */
   public static GraphTransaction createGraphTransaction(
-    WithCount<TraversalCode<String>> patternWithFrequency) {
+    WithCount<TraversalCode<String>> patternWithFrequency, long graphCount) {
 
     TraversalCode<String> pattern = patternWithFrequency.getObject();
 
-
-    float frequency = 0.0f;
+    float frequency = ((float) patternWithFrequency.getCount()) / graphCount;
 
     String graphLabel = TFSMConstants.FREQUENT_PATTERN_LABEL;
     Properties graphProperties = new Properties();
 
-    graphProperties.set(TFSMConstants.FREQUENCY_KEY, frequency);
+    graphProperties.set(TFSMConstants.SUPPORT_KEY, frequency);
     graphProperties.set(TFSMConstants.CANONICAL_LABEL_KEY, pattern.toString());
 
     GraphHead graphHead = new GraphHead(GradoopId.get(), graphLabel, graphProperties);

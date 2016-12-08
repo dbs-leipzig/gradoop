@@ -52,6 +52,11 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
   protected final FSMConfig fsmConfig;
 
   /**
+   * search space size
+   */
+  protected DataSet<Long> graphCount;
+
+  /**
    * minimum frequency for patterns to be considered to be frequent
    */
   protected DataSet<Long> minFrequency;
@@ -118,8 +123,10 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
     transactions = transactions
       .map(new DropPropertiesAndGraphContainment());
 
-    this.minFrequency = Count
-      .count(transactions)
+    this.graphCount = Count
+      .count(transactions);
+
+    this.minFrequency = graphCount
       .map(new MinFrequency(fsmConfig));
 
     DataSet<String> frequentVertexLabels = transactions

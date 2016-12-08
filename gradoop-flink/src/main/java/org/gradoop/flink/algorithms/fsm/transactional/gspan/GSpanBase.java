@@ -79,7 +79,8 @@ public abstract class GSpanBase extends TransactionalFSMBase {
     DataSet<WithCount<TraversalCode<String>>> allFrequentPatterns = mine(adjacencyLists);
 
     return allFrequentPatterns
-      .map(new ToGraphTransaction());
+      .map(new ToGraphTransaction())
+      .withBroadcastSet(this.graphCount, TFSMConstants.GRAPH_COUNT);
   }
 
   /**

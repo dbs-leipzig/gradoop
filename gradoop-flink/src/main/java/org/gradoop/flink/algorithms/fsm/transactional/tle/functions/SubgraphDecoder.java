@@ -83,7 +83,7 @@ public abstract class SubgraphDecoder implements Serializable {
 
     Properties properties = new Properties();
 
-    properties.set(TFSMConstants.FREQUENCY_KEY, subgraph.getCount());
+    properties.set(TFSMConstants.SUPPORT_KEY, subgraph.getCount());
     properties.set(TFSMConstants.CANONICAL_LABEL_KEY, subgraph.getCanonicalLabel());
 
     GraphHead epgmGraphHead = graphHeadFactory

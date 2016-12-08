@@ -54,7 +54,7 @@ public class TFSMConstants {
   /**
    * Property key to store a frequent subgraphs's frequency.
    */
-  public static final String FREQUENCY_KEY = "frequency";
+  public static final String SUPPORT_KEY = "frequency";
   /**
    * Property key to store the canonical label.
    */

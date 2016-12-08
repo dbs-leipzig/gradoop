@@ -17,7 +17,9 @@
 
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernelBase;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
@@ -27,10 +29,23 @@ import org.gradoop.flink.representation.transactional.traversalcode.TraversalCod
  * DFS-code => (g, V, E)
  */
 public class ToGraphTransaction
-  implements MapFunction<WithCount<TraversalCode<String>>, GraphTransaction> {
+  extends RichMapFunction<WithCount<TraversalCode<String>>, GraphTransaction> {
+
+  /**
+   * graph count
+   */
+  private long graphCount;
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+
+    this.graphCount = getRuntimeContext()
+      .<Long>getBroadcastVariable(TFSMConstants.GRAPH_COUNT).get(0);
+  }
 
   @Override
   public GraphTransaction map(WithCount<TraversalCode<String>> patternWithCount) throws Exception {
-    return GSpanKernelBase.createGraphTransaction(patternWithCount);
+    return GSpanKernelBase.createGraphTransaction(patternWithCount, graphCount);
   }
 }

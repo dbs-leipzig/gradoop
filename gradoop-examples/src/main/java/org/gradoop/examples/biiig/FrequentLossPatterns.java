@@ -129,7 +129,7 @@ public class FrequentLossPatterns
     GraphHead transformed) {
 
     BigDecimal support = current
-      .getPropertyValue(TFSMConstants.FREQUENCY_KEY)
+      .getPropertyValue(TFSMConstants.SUPPORT_KEY)
       .getBigDecimal().setScale(2, ROUND_HALF_UP);
 
     String newLabel = current.getLabel() + " (" + support + ")";
