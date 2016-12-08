@@ -1,7 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
@@ -12,12 +11,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given edge triple.
  *
- * Forwarded fields:
- *
- * f0: edge id -> tie point
- *
  */
-@FunctionAnnotation.ForwardedFields("f0")
 public class BuildEmbeddingFromTriple<K>
   extends BuildEmbedding<K>
   implements FlatMapFunction<TripleWithCandidates<K>, EmbeddingWithTiePoint<K>> {
@@ -43,7 +37,7 @@ public class BuildEmbeddingFromTriple<K>
    */
   private int continueAt;
   /**
-   * True, iff the current step is a loop
+   * True, iff the initial step is a loop.
    */
   private boolean isQueryLoop;
 
@@ -84,7 +78,6 @@ public class BuildEmbeddingFromTriple<K>
         reuseEmbedding.getVertexMapping()[targetIndex] = t.getTargetId();
         reuseEmbeddingWithTiePoint.setTiePointId(reuseEmbedding.getVertexMapping()[continueAt]);
         out.collect(reuseEmbeddingWithTiePoint);
-      }
+    }
   }
-
 }

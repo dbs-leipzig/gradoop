@@ -28,13 +28,10 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingFromTriple;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
 import java.util.Objects;
-
-import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
  * Traverses a graph represented by one DataSets containing triplets.
@@ -83,9 +80,14 @@ public abstract class TripleTraverser<K> extends DistributedTraverser<K> {
    */
   public abstract DataSet<Tuple1<Embedding<K>>> traverse(DataSet<TripleWithCandidates<K>> triples);
 
-  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
-    DataSet<TripleWithCandidates<K>> triples) {
-    return triples
+  /**
+   * Initialize the embeddings from the given edge triples.
+   *
+   * @param t edge triple candidates for the first step in the traversal
+   * @return initial embeddings
+   */
+  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(DataSet<TripleWithCandidates<K>> t) {
+    return t
       .filter(new TripleHasCandidate<>((int) getTraversalCode().getStep(0).getVia()))
       .flatMap(new BuildEmbeddingFromTriple<>(getKeyClazz(), getTraversalCode(), getMatchStrategy(),
         getVertexCount(), getEdgeCount()));

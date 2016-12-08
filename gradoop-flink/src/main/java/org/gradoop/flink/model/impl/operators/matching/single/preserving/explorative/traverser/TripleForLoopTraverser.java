@@ -57,6 +57,21 @@ public class TripleForLoopTraverser<K> extends TripleTraverser<K> {
   /**
    * Creates a new distributed traverser.
    *
+   * @param traversalCode describes the graph traversal
+   * @param vertexCount   number of query vertices
+   * @param edgeCount     number of query edges
+   * @param keyClazz      key type for embedding initialization
+   */
+  public TripleForLoopTraverser(TraversalCode traversalCode,
+    int vertexCount, int edgeCount, Class<K> keyClazz) {
+    this(traversalCode, MatchStrategy.ISOMORPHISM,
+      vertexCount, edgeCount, keyClazz,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, null, null);
+  }
+
+  /**
+   * Creates a new distributed traverser.
+   *
    * @param traversalCode        describes the graph traversal
    * @param matchStrategy        matching strategy for vertices and edges
    * @param vertexCount          number of query vertices
