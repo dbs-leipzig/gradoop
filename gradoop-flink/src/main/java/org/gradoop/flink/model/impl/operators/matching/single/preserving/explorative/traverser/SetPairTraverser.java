@@ -25,6 +25,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -35,7 +36,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintVertexStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEdgeStep;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingFromVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildVertexStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.EdgeHasCandidate;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateEdgeMapping;
@@ -117,14 +118,13 @@ public abstract class SetPairTraverser<K> extends DistributedTraverser<K> {
    * @param vertices vertices and their query candidates
    * @return initial embeddings
    */
-  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
-    DataSet<IdWithCandidates<K>> vertices) {
+  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(DataSet<IdWithCandidates<K>> vertices) {
 
-    int initialCandidate = (int) getTraversalCode().getStep(0).getFrom();
+    Step initialStep = getTraversalCode().getStep(0);
 
     DataSet<EmbeddingWithTiePoint<K>> initialEmbeddings = vertices
-      .filter(new ElementHasCandidate<>(initialCandidate))
-      .map(new BuildEmbeddingWithTiePoint<>(getKeyClazz(), initialCandidate,
+      .filter(new ElementHasCandidate<>((int) initialStep.getFrom()))
+      .map(new BuildEmbeddingFromVertex<>(getKeyClazz(), initialStep,
         getVertexCount(), getEdgeCount()));
 
     return log(initialEmbeddings,

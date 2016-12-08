@@ -31,19 +31,19 @@ import org.apache.flink.api.java.tuple.Tuple2;
  */
 public class Embedding<K> extends Tuple2<K[], K[]> {
 
-  public K[] getVertexMappings() {
+  public K[] getVertexMapping() {
     return f0;
   }
 
-  public void setVertexMappings(K[] vertexMappings) {
+  public void setVertexMapping(K[] vertexMappings) {
     f0 = vertexMappings;
   }
 
-  public K[] getEdgeMappings() {
+  public K[] getEdgeMapping() {
     return f1;
   }
 
-  public void setEdgeMappings(K[] edgeMappings) {
+  public void setEdgeMapping(K[] edgeMappings) {
     f1 = edgeMappings;
   }
 }

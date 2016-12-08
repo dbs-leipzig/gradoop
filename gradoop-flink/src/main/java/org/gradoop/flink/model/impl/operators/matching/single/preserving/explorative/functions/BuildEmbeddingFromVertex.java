@@ -19,11 +19,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-import java.lang.reflect.Array;
 
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.
@@ -35,19 +34,12 @@ import java.lang.reflect.Array;
  * @param <K> key type
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class BuildEmbeddingWithTiePoint<K>
+public class BuildEmbeddingFromVertex<K>
+  extends BuildEmbedding<K>
   implements MapFunction<IdWithCandidates<K>, EmbeddingWithTiePoint<K>> {
-  /**
-   * Reduce instantiations
-   */
-  private final Embedding<K> reuseEmbedding;
-  /**
-   * Reduce instantiations
-   */
-  private final EmbeddingWithTiePoint<K> reuseEmbeddingWithTiePoint;
 
   /**
-   * Vertex candidate to start with
+   * Initial vertex candidate that determines the start of the traversal.
    */
   private final int candidate;
 
@@ -55,22 +47,14 @@ public class BuildEmbeddingWithTiePoint<K>
    * Constructor
    *
    * @param keyClazz      key type is needed for array initialization
-   * @param candidate     initial query candidate each vertex is mapped to
+   * @param initialStep   initial step in the traversal code
    * @param vertexCount   number of vertices in the query graph
    * @param edgeCount     number of edges in the query graph
    */
-  public BuildEmbeddingWithTiePoint(Class<K> keyClazz, int candidate,
+  public BuildEmbeddingFromVertex(Class<K> keyClazz, Step initialStep,
     long vertexCount, long edgeCount) {
-    this.candidate              = candidate;
-    reuseEmbedding              = new Embedding<>();
-    reuseEmbeddingWithTiePoint  = new EmbeddingWithTiePoint<>();
-    //noinspection unchecked
-    reuseEmbedding.setVertexMappings(
-      (K[]) Array.newInstance(keyClazz, (int) vertexCount));
-    //noinspection unchecked
-    reuseEmbedding.setEdgeMappings(
-      (K[]) Array.newInstance(keyClazz, (int) edgeCount));
-    reuseEmbeddingWithTiePoint.setEmbedding(reuseEmbedding);
+    super(keyClazz, vertexCount, edgeCount);
+    candidate = (int) initialStep.getFrom();
   }
 
   @Override
@@ -78,7 +62,7 @@ public class BuildEmbeddingWithTiePoint<K>
       throws Exception {
     reuseEmbeddingWithTiePoint.setTiePointId(v.getId());
     // candidate is same for all vertices
-    reuseEmbedding.getVertexMappings()[candidate] = v.getId();
+    reuseEmbedding.getVertexMapping()[candidate] = v.getId();
     return reuseEmbeddingWithTiePoint;
   }
 }

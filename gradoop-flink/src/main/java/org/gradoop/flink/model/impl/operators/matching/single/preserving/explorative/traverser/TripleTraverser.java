@@ -23,11 +23,18 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.TripleHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingFromTriple;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
 import java.util.Objects;
+
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
  * Traverses a graph represented by one DataSets containing triplets.
@@ -64,6 +71,10 @@ public abstract class TripleTraverser<K> extends DistributedTraverser<K> {
     this.edgeStepJoinStrategy = edgeStepJoinStrategy;
   }
 
+  JoinOperatorBase.JoinHint getEdgeStepJoinStrategy() {
+    return edgeStepJoinStrategy;
+  }
+
   /**
    * Traverses the graph, thereby extracting embeddings of a given pattern.
    *
@@ -71,4 +82,12 @@ public abstract class TripleTraverser<K> extends DistributedTraverser<K> {
    * @return embeddings contained in the graph
    */
   public abstract DataSet<Tuple1<Embedding<K>>> traverse(DataSet<TripleWithCandidates<K>> triples);
+
+  DataSet<EmbeddingWithTiePoint<K>> buildInitialEmbeddings(
+    DataSet<TripleWithCandidates<K>> triples) {
+    return triples
+      .filter(new TripleHasCandidate<>((int) getTraversalCode().getStep(0).getVia()))
+      .flatMap(new BuildEmbeddingFromTriple<>(getKeyClazz(), getTraversalCode(), getMatchStrategy(),
+        getVertexCount(), getEdgeCount()));
+  }
 }

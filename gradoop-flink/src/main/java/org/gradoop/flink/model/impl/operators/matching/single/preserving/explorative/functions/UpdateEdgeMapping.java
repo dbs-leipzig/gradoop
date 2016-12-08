@@ -125,7 +125,7 @@ public class UpdateEdgeMapping<K>
   public void join(EmbeddingWithTiePoint<K> embedding, EdgeStep<K> edgeStep,
     Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    K[] mapping = embedding.getEmbedding().getEdgeMappings();
+    K[] mapping = embedding.getEmbedding().getEdgeMapping();
     K id = edgeStep.getEdgeId();
 
     boolean isMapped = mapping[candidate] != null;
@@ -135,7 +135,7 @@ public class UpdateEdgeMapping<K>
     // traverse if no edge set for that step
     if (!isMapped && !seen) {
       mapping[candidate] = id;
-      embedding.getEmbedding().setEdgeMappings(mapping);
+      embedding.getEmbedding().setEdgeMapping(mapping);
       embedding.setTiePointId(edgeStep.getNextId());
       collector.collect(embedding);
     }

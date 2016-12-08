@@ -22,9 +22,12 @@ import java.util.Collection;
 /**
  * Interface for mapping updater
  *
+ * @TODO make package private after triple implementation
+ *
  * @param <K> key type
  */
-interface UpdateMapping<K> {
+
+public interface UpdateMapping<K> {
 
   /**
    * Check if the given id has been visited before.

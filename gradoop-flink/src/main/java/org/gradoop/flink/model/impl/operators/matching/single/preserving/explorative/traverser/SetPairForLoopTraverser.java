@@ -88,8 +88,7 @@ public class SetPairForLoopTraverser<K> extends SetPairTraverser<K> {
   public DataSet<Tuple1<Embedding<K>>> traverse(
     DataSet<IdWithCandidates<K>> vertices,
     DataSet<TripleWithCandidates<K>> edges) {
-    return iterate(vertices, edges, buildInitialEmbeddings(vertices))
-      .project(1);
+    return iterate(vertices, edges, buildInitialEmbeddings(vertices)).project(1);
   }
 
   @Override

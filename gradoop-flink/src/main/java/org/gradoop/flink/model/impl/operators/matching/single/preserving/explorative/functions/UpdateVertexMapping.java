@@ -140,7 +140,7 @@ public class UpdateVertexMapping<K>
   public void join(EmbeddingWithTiePoint<K> embedding, VertexStep<K> vertexStep,
     Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    K[] mapping = embedding.getEmbedding().getVertexMappings();
+    K[] mapping = embedding.getEmbedding().getVertexMapping();
     K id = vertexStep.getVertexId();
 
     boolean isMapped = mapping[candidate] != null;
@@ -151,7 +151,7 @@ public class UpdateVertexMapping<K>
     if ((!isMapped && !seen) || (isMapped && mapping[candidate].equals(id))) {
 
       mapping[candidate] = id;
-      embedding.getEmbedding().setVertexMappings(mapping);
+      embedding.getEmbedding().setVertexMapping(mapping);
 
       // set next tie point if there are more steps in the traversal
       if (hasMoreSteps()) {

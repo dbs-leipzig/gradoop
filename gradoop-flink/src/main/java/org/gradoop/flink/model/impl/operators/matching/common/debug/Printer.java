@@ -71,7 +71,10 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    * Used to differ between iterative and non-iterative runtime context.
    */
   protected final boolean isIterative;
-
+  /**
+   * Number to display if not in iterative context but iteration is set.
+   */
+  protected final int iterationNumber;
   /**
    * Constructor
    */
@@ -86,8 +89,21 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    * @param prefix prefix for output
    */
   public Printer(boolean isIterative, String prefix) {
-    this.isIterative  = isIterative;
-    this.prefix       = prefix;
+    this.isIterative     = isIterative;
+    this.iterationNumber = 0;
+    this.prefix          = prefix;
+  }
+
+  /**
+   * Constructor
+   *
+   * @param iterationNumber true, if used in iterative context
+   * @param prefix          prefix for debug string
+   */
+  public Printer(int iterationNumber, String prefix) {
+    this.isIterative     = false;
+    this.iterationNumber = iterationNumber;
+    this.prefix          = prefix;
   }
 
   @Override
@@ -130,7 +146,7 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    */
   protected String getHeader() {
     return String.format("[%d][%s]: ",
-      isIterative ? getIterationRuntimeContext().getSuperstepNumber() : 0,
+      isIterative ? getIterationRuntimeContext().getSuperstepNumber() : iterationNumber,
       prefix != null && !prefix.isEmpty() ? prefix : " ");
   }
 
