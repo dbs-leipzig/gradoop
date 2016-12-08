@@ -36,6 +36,7 @@ import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -112,25 +113,25 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    */
   private Map<GradoopId, Float> vendorMap;
   /**
-   * Iterator over all customers.
+   * List of all customers.
    */
-  private Iterator<Map.Entry<GradoopId, Float>> customerIterator;
+  private GradoopId[] customerList;
   /**
-   * Iterator over all vendors.
+   * List of all vendors.
    */
-  private Iterator<Map.Entry<GradoopId, Float>> vendorIterator;
+  private GradoopId[] vendorList;
   /**
-   * Iterator over all logistics.
+   * List of all logistics.
    */
-  private Iterator<Map.Entry<GradoopId, Float>> logisticIterator;
+  private GradoopId[] logisticList;
   /**
-   * Iterator over all employees.
+   * List of all employees.
    */
-  private Iterator<Map.Entry<GradoopId, Float>> employeeIterator;
+  private GradoopId[] employeeList;
   /**
-   * Iterator over all product prices.
+   * List of all product prices.
    */
-  private Iterator<Map.Entry<GradoopId, Float>> productQualityIterator;
+  private GradoopId[] productQualityList;
 
   /**
    * Valued constructor.
@@ -171,11 +172,11 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP).get(0);
     //get the iterator of each map
-    customerIterator = customerMap.entrySet().iterator();
-    vendorIterator = vendorMap.entrySet().iterator();
-    logisticIterator = logisticMap.entrySet().iterator();
-    employeeIterator = employeeMap.entrySet().iterator();
-    productQualityIterator = productQualityMap.entrySet().iterator();
+    customerList = customerMap.keySet().toArray(new GradoopId[customerMap.keySet().size()]);
+    vendorList = vendorMap.keySet().toArray(new GradoopId[vendorMap.keySet().size()]);
+    logisticList = logisticMap.keySet().toArray(new GradoopId[logisticMap.keySet().size()]);
+    employeeList = employeeMap.keySet().toArray(new GradoopId[employeeMap.keySet().size()]);
+    productQualityList = productQualityMap.keySet().toArray(new GradoopId[productQualityMap.keySet().size()]);
   }
 
   /**
@@ -291,66 +292,57 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   }
 
   /**
-   * Returns the next customer id in the list.
+   * Returns a random id in the array.
    *
-   * @return the next customer id
+   * @return a random entry
+   */
+  protected GradoopId getRandomEntryFromArray(GradoopId[] array) {
+    return array[new Random().nextInt(array.length)];
+  }
+
+  /**
+   * Returns the next random customer id in the list.
+   *
+   * @return the next random customer id
    */
   protected GradoopId getNextCustomer() {
-    if (!customerIterator.hasNext()) {
-      customerIterator = customerMap.entrySet().iterator();
-    }
-    return customerIterator.next().getKey();
+    return getRandomEntryFromArray(customerList);
   }
 
   /**
-   * Returns the next vendor id in the list.
+   * Returns the next random vendor id in the list.
    *
-   * @return the next vendor id
+   * @return the next random vendor id
    */
   protected GradoopId getNextVendor() {
-    if (!vendorIterator.hasNext()) {
-      vendorIterator = vendorMap.entrySet().iterator();
-    }
-    return vendorIterator.next().getKey();
+    return getRandomEntryFromArray(vendorList);
   }
 
   /**
-   * Returns the next logistic id in the list.
+   * Returns the next random logistic id in the list.
    *
-   * @return the next logistic id
+   * @return the next random logistic id
    */
   protected GradoopId getNextLogistic() {
-    if (!logisticIterator.hasNext()) {
-      logisticIterator = logisticMap.entrySet().iterator();
-    }
-    return logisticIterator.next().getKey();
+    return getRandomEntryFromArray(logisticList);
   }
 
   /**
-   * Returns the next employee id in the list.
+   * Returns the next random employee id in the list.
    *
-   * @return the next employee id
+   * @return the next random employee id
    */
   protected GradoopId getNextEmployee() {
-    if (!employeeIterator.hasNext()) {
-      employeeIterator = employeeMap.entrySet().iterator();
-    }
-    return employeeIterator.next().getKey();
+    return getRandomEntryFromArray(employeeList);
   }
 
   /**
-   * Returns the next product id in the list.
+   * Returns the next random product id in the list.
    *
-   * @return the next product id
+   * @return the next random product id
    */
   protected GradoopId getNextProduct() {
-    if (!productQualityIterator.hasNext()) {
-      productQualityIterator = productQualityMap.entrySet().iterator();
-      productPriceIterator = productPriceMap.entrySet().iterator();
-    }
-    //also apply to the price iterator
-    productPriceIterator.next();
-    return productQualityIterator.next().getKey();
+    return getRandomEntryFromArray(productQualityList);
   }
 
   /**
