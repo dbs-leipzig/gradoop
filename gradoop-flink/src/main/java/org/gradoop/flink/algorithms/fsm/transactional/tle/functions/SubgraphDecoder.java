@@ -28,6 +28,7 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.Subgraph;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
@@ -44,14 +45,6 @@ import java.util.Set;
  */
 public abstract class SubgraphDecoder implements Serializable {
 
-  /**
-   * Property key to store a frequent subgraphs's frequency.
-   */
-  public static final String FREQUENCY_KEY = "frequency";
-  /**
-   * Property key to store the canonical label.
-   */
-  public static final String CANONICAL_LABEL_KEY = "canonicalLabel";
   /**
    * graph Head Factory
    */
@@ -90,8 +83,8 @@ public abstract class SubgraphDecoder implements Serializable {
 
     Properties properties = new Properties();
 
-    properties.set(FREQUENCY_KEY, subgraph.getCount());
-    properties.set(CANONICAL_LABEL_KEY, subgraph.getCanonicalLabel());
+    properties.set(TFSMConstants.FREQUENCY_KEY, subgraph.getCount());
+    properties.set(TFSMConstants.CANONICAL_LABEL_KEY, subgraph.getCanonicalLabel());
 
     GraphHead epgmGraphHead = graphHeadFactory
       .createGraphHead(canonicalLabel, properties);

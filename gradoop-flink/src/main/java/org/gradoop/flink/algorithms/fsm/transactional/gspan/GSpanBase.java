@@ -32,7 +32,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToDirecte
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
-import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
@@ -77,7 +76,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
         .map(fsmConfig.isDirected() ?
           new ToDirectedAdjacencyList() : new ToUndirectedAdjacencyList());
 
-    DataSet<TraversalCode<String>> allFrequentPatterns = mine(adjacencyLists);
+    DataSet<WithCount<TraversalCode<String>>> allFrequentPatterns = mine(adjacencyLists);
 
     return allFrequentPatterns
       .map(new ToGraphTransaction());
@@ -89,7 +88,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
    * @param graphs search space
    * @return frequent patterns
    */
-  protected abstract DataSet<TraversalCode<String>> mine(
+  protected abstract DataSet<WithCount<TraversalCode<String>>> mine(
     DataSet<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>> graphs);
 
   /**
@@ -98,7 +97,7 @@ public abstract class GSpanBase extends TransactionalFSMBase {
    * @param patterns reported patterns
    * @return valid frequent patterns
    */
-  protected DataSet<TraversalCode<String>> getFrequentPatterns(
+  protected DataSet<WithCount<TraversalCode<String>>> getFrequentPatterns(
     FlatMapOperator<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> patterns) {
     return patterns
         .groupBy(0)
@@ -107,7 +106,6 @@ public abstract class GSpanBase extends TransactionalFSMBase {
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<>())
-        .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
-        .map(new ValueOfWithCount<>());
+        .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY);
   }
 }

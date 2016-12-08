@@ -19,15 +19,18 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernelBase;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 /**
  * DFS-code => (g, V, E)
  */
-public class ToGraphTransaction implements MapFunction<TraversalCode<String>, GraphTransaction> {
+public class ToGraphTransaction
+  implements MapFunction<WithCount<TraversalCode<String>>, GraphTransaction> {
+
   @Override
-  public GraphTransaction map(TraversalCode<String> stringTraversalCode) throws Exception {
-    return GSpanKernelBase.createGraphTransaction(stringTraversalCode);
+  public GraphTransaction map(WithCount<TraversalCode<String>> patternWithCount) throws Exception {
+    return GSpanKernelBase.createGraphTransaction(patternWithCount);
   }
 }

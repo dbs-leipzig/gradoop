@@ -50,5 +50,13 @@ public class TFSMConstants {
   /**
    * Graph head label of frequent subgraphs
    */
-  public static final String FREQUENT_SUBGRAPH_LABEL = "FrequentSubgraph";
+  public static final String FREQUENT_PATTERN_LABEL = "FrequentPattern";
+  /**
+   * Property key to store a frequent subgraphs's frequency.
+   */
+  public static final String FREQUENCY_KEY = "frequency";
+  /**
+   * Property key to store the canonical label.
+   */
+  public static final String CANONICAL_LABEL_KEY = "canonicalLabel";
 }

@@ -26,9 +26,12 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.AdjacencyList;
@@ -376,14 +379,26 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
   /**
    * Creates a graph transaction based on a given pattern.
    *
-   * @param pattern pattern (DFS code)
+   * @param patternWithFrequency pattern (DFS code) with frequency
    *
    * @return graph transaction
    */
-  public static GraphTransaction createGraphTransaction(TraversalCode<String> pattern) {
+  public static GraphTransaction createGraphTransaction(
+    WithCount<TraversalCode<String>> patternWithFrequency) {
 
-    GraphHead graphHead =
-      new GraphHead(GradoopId.get(), TFSMConstants.FREQUENT_SUBGRAPH_LABEL, null);
+    TraversalCode<String> pattern = patternWithFrequency.getObject();
+
+
+    float frequency = 0.0f;
+
+    String graphLabel = TFSMConstants.FREQUENT_PATTERN_LABEL;
+    Properties graphProperties = new Properties();
+
+    graphProperties.set(TFSMConstants.FREQUENCY_KEY, frequency);
+    graphProperties.set(TFSMConstants.CANONICAL_LABEL_KEY, pattern.toString());
+
+    GraphHead graphHead = new GraphHead(GradoopId.get(), graphLabel, graphProperties);
+
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
     Map<Integer, GradoopId> vertexIdMap = Maps.newHashMap();

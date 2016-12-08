@@ -17,11 +17,14 @@
 
 package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 
 import java.util.Collection;
@@ -35,6 +38,11 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
    * k-edge frequent patterns
    */
   private Collection<TraversalCode<String>> frequentPatterns;
+
+  /**
+   * k-edge frequent patterns with frequency
+   */
+  private Collection<WithCount<TraversalCode<String>>> frequentPatternsWithFrequency;
   /**
    * pattern growth logic
    */
@@ -53,16 +61,38 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    this.frequentPatterns = getRuntimeContext()
+    this.frequentPatternsWithFrequency = getRuntimeContext()
       .getBroadcastVariable(TFSMConstants.FREQUENT_PATTERNS);
+
+    frequentPatterns = Lists.newArrayListWithExpectedSize(frequentPatternsWithFrequency.size());
+
+    for (WithCount<TraversalCode<String>> patternWithFrequency : frequentPatternsWithFrequency) {
+      frequentPatterns.add(patternWithFrequency.getObject());
+    }
   }
 
   @Override
   public GraphEmbeddingsPair map(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
 
     if (graphEmbeddingsPair.getAdjacencyList().getOutgoingRows().isEmpty()) {
-      for (TraversalCode<String> code : frequentPatterns) {
-        graphEmbeddingsPair.getPatternEmbeddings().put(code, null);
+
+      // BULK ITERATION WORKAROUND
+
+      for (WithCount<TraversalCode<String>> patternWithFrequency : frequentPatternsWithFrequency) {
+        TraversalCode<String> pattern = patternWithFrequency.getObject();
+
+        pattern = new TraversalCode<>(pattern);
+
+        int frequency = (int) patternWithFrequency.getCount();
+
+        String fromValue = "";
+        String edgeValue = "";
+        String toValue = "";
+
+        pattern.getTraversals()
+          .add(new Traversal<>(frequency, fromValue, true, edgeValue, 0, toValue));
+
+        graphEmbeddingsPair.getPatternEmbeddings().put(pattern, null);
       }
     } else {
       gSpan.growChildren(graphEmbeddingsPair, frequentPatterns);

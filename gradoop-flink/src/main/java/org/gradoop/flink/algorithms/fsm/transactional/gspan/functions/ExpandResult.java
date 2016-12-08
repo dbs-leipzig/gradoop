@@ -20,20 +20,30 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.representation.transactional.traversalcode.Traversal;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
+
+import java.util.Iterator;
 
 /**
  * (graph, pattern -> embedding) => pattern, ...
  */
 public class ExpandResult
-  implements FlatMapFunction<GraphEmbeddingsPair, TraversalCode<String>> {
+  implements FlatMapFunction<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> {
 
   @Override
   public void flatMap(GraphEmbeddingsPair graphEmbeddingsPair,
-    Collector<TraversalCode<String>> collector) throws Exception {
+    Collector<WithCount<TraversalCode<String>>> collector) throws Exception {
 
     for (TraversalCode<String> code : graphEmbeddingsPair.getPatternEmbeddings().keySet()) {
-      collector.collect(code);
+
+      int frequencyIndex = code.getTraversals().size() - 1;
+      long frequency = code.getTraversals().get(frequencyIndex).getFromTime();
+
+      code.getTraversals().remove(frequencyIndex);
+
+      collector.collect(new WithCount<>(code, frequency));
     }
   }
 }

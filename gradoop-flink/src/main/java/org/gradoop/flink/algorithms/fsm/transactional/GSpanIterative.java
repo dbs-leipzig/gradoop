@@ -53,7 +53,7 @@ public class GSpanIterative extends GSpanBase {
   }
 
   @Override
-  protected DataSet<TraversalCode<String>> mine(
+  protected DataSet<WithCount<TraversalCode<String>>> mine(
     DataSet<AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel>> graphs) {
 
     DataSet<GraphEmbeddingsPair> searchSpace = graphs
@@ -76,7 +76,7 @@ public class GSpanIterative extends GSpanBase {
     FlatMapOperator<GraphEmbeddingsPair, WithCount<TraversalCode<String>>> reports = iterative
       .flatMap(new Report());
 
-    DataSet<TraversalCode<String>> frequentPatterns = getFrequentPatterns(reports);
+    DataSet<WithCount<TraversalCode<String>>> frequentPatterns = getFrequentPatterns(reports);
 
     DataSet<GraphEmbeddingsPair> grownEmbeddings = iterative
       .map(new PatternGrowth(gSpan))

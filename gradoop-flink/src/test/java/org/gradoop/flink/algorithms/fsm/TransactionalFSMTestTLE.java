@@ -8,7 +8,7 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class TransactionalFSMTestOld extends GradoopFlinkTestBase {
+public class TransactionalFSMTestTLE extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleEdges() throws Exception {
