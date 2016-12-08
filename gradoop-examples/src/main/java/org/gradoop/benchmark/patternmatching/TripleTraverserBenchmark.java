@@ -21,11 +21,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
 
-import java.util.concurrent.TimeUnit;
 
 /**
  * Used to benchmark different {@link DistributedTraverser} implementations.
@@ -38,28 +38,15 @@ import java.util.concurrent.TimeUnit;
  * All identifiers must be of type {@link Long}.
  */
 public class TripleTraverserBenchmark extends TraverserBenchmark {
-  /**
-   * Option to declare path to input graph
-   */
-  private static final String OPTION_INPUT_PATH = "i";
-  /**
-   * Option to declare path to input graph
-   */
-  private static final String OPTION_QUERY = "q";
-
-  static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
-    OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
-  }
 
   /**
    * Constructor
    *
-   * @param inputPath path to input graph data
+   * @param cmd command line
    *
    */
-  private TripleTraverserBenchmark(String inputPath) {
-    super(inputPath);
+  private TripleTraverserBenchmark(CommandLine cmd) {
+    super(cmd);
   }
 
   /**
@@ -82,12 +69,10 @@ public class TripleTraverserBenchmark extends TraverserBenchmark {
     if (cmd == null) {
       System.exit(1);
     }
+    TraverserBenchmark benchmark = new TripleTraverserBenchmark(cmd);
 
-    TraverserBenchmark benchmark = new TripleTraverserBenchmark(
-      cmd.getOptionValue(OPTION_INPUT_PATH));
-
-    benchmark.initialize(cmd.getOptionValue(OPTION_QUERY));
     benchmark.run();
+    benchmark.close();
   }
 
   @Override
@@ -104,12 +89,6 @@ public class TripleTraverserBenchmark extends TraverserBenchmark {
       new TripleForLoopTraverser<>(getTraversalCode(), getVertexCount(), getEdgeCount(), Long.class);
 
     // print embedding count
-    long embeddingCount = distributedTraverser.traverse(triples).count();
-
-    System.out.println("embeddingCount = " + embeddingCount);
-
-    long duration = getExecutionEnvironment().getLastJobExecutionResult().getNetRuntime();
-
-    System.out.println("duration = " + duration);
+    setEmbeddingCount(distributedTraverser.traverse(triples).count());
   }
 }

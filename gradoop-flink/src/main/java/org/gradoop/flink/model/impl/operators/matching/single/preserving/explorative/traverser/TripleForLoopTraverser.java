@@ -115,7 +115,6 @@ public class TripleForLoopTraverser<K> extends TripleTraverser<K> {
 
     for (int i = 1; i < traversalCode.getSteps().size(); i++) {
       Step step = traversalCode.getStep(i);
-      System.out.println("current step = " + step);
 
       embeddings = log(embeddings,
         new PrintEmbeddingWithTiePoint<>(i, "pre-join-embeddings"),
@@ -127,9 +126,6 @@ public class TripleForLoopTraverser<K> extends TripleTraverser<K> {
       filteredTriples = log(filteredTriples,
         new PrintTripleWithCandidates<>(i, "pre-join-triples"),
         getVertexMapping(), getEdgeMapping());
-
-      int joinField = step.isOutgoing() ? 1 : 2;
-      System.out.println("joinField = " + joinField);
 
       embeddings = embeddings
         .join(filteredTriples, getEdgeStepJoinStrategy())

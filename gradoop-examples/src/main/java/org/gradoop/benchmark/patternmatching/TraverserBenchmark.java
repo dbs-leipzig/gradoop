@@ -1,5 +1,24 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.benchmark.patternmatching;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
@@ -11,15 +30,57 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Base class for traverser benchmarks
  */
 abstract class TraverserBenchmark extends AbstractRunner {
   /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_QUERY = "q";
+  /**
+   * Option to set the traverser
+   */
+  private static final String OPTION_TRAVERSER = "t";
+  /**
+   * Path to CSV log file
+   */
+  private static final String OPTION_CSV_PATH = "csv";
+
+  static {
+    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
+    OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
+    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true, "[set-pair-for|set-pair-bulk|triple-for]");
+    OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path to output CSV file");
+  }
+
+  /**
    * Path to input graph data
    */
   private final String inputPath;
+  /**
+   * Query to execute.
+   */
+  private final String query;
+  /**
+   * Traverser strategy
+   */
+  private final TraverserStrategy traverserStrategy;
+  /**
+   * Path to CSV output
+   */
+  private String csvPath;
+
   /**
    * Number of query vertices
    */
@@ -29,6 +90,10 @@ abstract class TraverserBenchmark extends AbstractRunner {
    */
   private int edgeCount;
   /**
+   * Number of embeddings found by the traverser
+   */
+  private long embeddingCount;
+  /**
    * Traversal code to process the query.
    */
   private TraversalCode tc;
@@ -36,34 +101,84 @@ abstract class TraverserBenchmark extends AbstractRunner {
   /**
    * Constructor
    *
-   * @param inputPath path to input graph data
+   * @param cmd commandline
    */
-  TraverserBenchmark(String inputPath) {
-    this.inputPath = inputPath;
+  TraverserBenchmark(CommandLine cmd) {
+    this.inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
+    this.query = cmd.getOptionValue(OPTION_QUERY);
+
+    String traverserStrategyString = cmd.getOptionValue(OPTION_TRAVERSER).toLowerCase();
+
+    if (traverserStrategyString.equals("set-pair-bulk")) {
+      this.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
+    } else if (traverserStrategyString.equals("set-pair-for")) {
+      this.traverserStrategy = TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION;
+    } else if (traverserStrategyString.equals("triple-for")) {
+      this.traverserStrategy = TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION;
+    } else {
+      throw new IllegalArgumentException("Unknown traverser strategy: " + traverserStrategyString);
+    }
+
+    if (cmd.hasOption(OPTION_CSV_PATH)) {
+      csvPath = cmd.getOptionValue(OPTION_CSV_PATH);
+    }
+    initialize();
   }
 
   /**
    * Initialize the benchmark using a given query. The query can be a predefined one (e.g. q0) or
    * a GDL pattern (e.g. (a)-->(b)).
-   *
-   * @param queryString user given query string
    */
-  void initialize(String queryString) {
-    if (queryString.toLowerCase().startsWith("q")) {
+  private void initialize() {
+    if (query.toLowerCase().startsWith("q")) {
       // fixed query
-      Queries.Query query = getQuery(queryString.toLowerCase());
-      vertexCount = query.getVertexCount();
-      edgeCount = query.getEdgeCount();
-      tc = query.getTraversalCode();
+      Queries.Query q = getQuery(query.toLowerCase());
+      vertexCount = q.getVertexCount();
+      edgeCount = q.getEdgeCount();
+      tc = q.getTraversalCode();
     } else {
       // GDL query pattern
-      QueryHandler queryHandler = new QueryHandler(queryString);
+      QueryHandler queryHandler = new QueryHandler(query);
       vertexCount = queryHandler.getVertexCount();
       edgeCount = queryHandler.getEdgeCount();
       Traverser traverser = new DFSTraverser();
       traverser.setQueryHandler(queryHandler);
       tc = traverser.traverse();
     }
+  }
+
+  /**
+   * Returns a string containing information about the benchmark run.
+   *
+   * @return benchmark result string
+   */
+  private String getResultString() {
+    return String.format("%s|%s|%s|%s|%s|%s",
+      inputPath,
+      getExecutionEnvironment().getParallelism(),
+      traverserStrategy.name(),
+      query,
+      embeddingCount,
+      getExecutionEnvironment().getLastJobExecutionResult().getNetRuntime());
+  }
+
+  private void writeResults(String csvFile) throws IOException {
+    String header = "Input|Parallelism|Strategy|Query|Embeddings|Runtime[ms]";
+    String line = getResultString();
+
+    File f = new File(csvFile);
+    if (f.exists() && !f.isDirectory()) {
+      FileUtils.writeStringToFile(f, String.format("%s%n", line), true);
+    } else {
+      PrintWriter writer = new PrintWriter(csvFile, "UTF-8");
+      writer.println(header);
+      writer.println(line);
+      writer.close();
+    }
+  }
+
+  private void printResults() {
+    System.out.println(getResultString());
   }
 
   int getVertexCount() {
@@ -82,10 +197,32 @@ abstract class TraverserBenchmark extends AbstractRunner {
     return inputPath;
   }
 
+  void setEmbeddingCount(long embeddingCount) {
+    this.embeddingCount = embeddingCount;
+  }
+
+  TraverserStrategy getTraverserStrategy() {
+    return traverserStrategy;
+  }
+
+
   /**
    * Run the benchmark.
    */
   abstract void run() throws Exception;
+
+  /**
+   * Writes the results to file or prints it.
+   *
+   * @throws IOException
+   */
+  void close() throws IOException {
+    if (csvPath != null) {
+      writeResults(csvPath);
+    } else {
+      printResults();
+    }
+  }
 
   /**
    * Returns the query based on the input string

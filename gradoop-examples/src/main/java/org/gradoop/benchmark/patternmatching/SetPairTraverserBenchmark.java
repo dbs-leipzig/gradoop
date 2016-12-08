@@ -19,7 +19,6 @@ package org.gradoop.benchmark.patternmatching;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
@@ -28,8 +27,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairTraverser;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Used to benchmark different {@link DistributedTraverser} implementations.
@@ -43,39 +40,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class SetPairTraverserBenchmark extends TraverserBenchmark {
   /**
-   * Option to declare path to input graph
-   */
-  private static final String OPTION_INPUT_PATH = "i";
-  /**
-   * Option to declare path to input graph
-   */
-  private static final String OPTION_QUERY = "q";
-  /**
-   * Option to set the traverser
-   */
-  private static final String OPTION_TRAVERSER = "t";
-
-  static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
-    OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
-    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true, "[loop|bulk]");
-  }
-
-  /**
-   * Traverser strategy
-   */
-  private final TraverserStrategy traverserStrategy;
-
-  /**
    * Constructor
    *
-   * @param inputPath path to input graph data
-   * @param traverserStrategyString traverser strategy
+   * @param cmd command line
    */
-  private SetPairTraverserBenchmark(String inputPath, String traverserStrategyString) {
-    super(inputPath);
-    this.traverserStrategy = (traverserStrategyString.equals("bulk")) ?
-      TraverserStrategy.SET_PAIR_BULK_ITERATION : TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION;
+  private SetPairTraverserBenchmark(CommandLine cmd) {
+    super(cmd);
   }
 
   /**
@@ -99,12 +69,10 @@ public class SetPairTraverserBenchmark extends TraverserBenchmark {
       System.exit(1);
     }
 
-    TraverserBenchmark benchmark = new SetPairTraverserBenchmark(
-      cmd.getOptionValue(OPTION_INPUT_PATH),
-      cmd.getOptionValue(OPTION_TRAVERSER));
+    TraverserBenchmark benchmark = new SetPairTraverserBenchmark(cmd);
 
-    benchmark.initialize(cmd.getOptionValue(OPTION_QUERY));
     benchmark.run();
+    benchmark.close();
   }
 
   @Override
@@ -123,7 +91,7 @@ public class SetPairTraverserBenchmark extends TraverserBenchmark {
 
     // create distributed traverser
     SetPairTraverser<Long> distributedTraverser;
-    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
+    if (getTraverserStrategy() == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
       distributedTraverser = new SetPairBulkTraverser<>(getTraversalCode(),
         getVertexCount(), getEdgeCount(), Long.class);
     } else {
@@ -131,15 +99,6 @@ public class SetPairTraverserBenchmark extends TraverserBenchmark {
         getVertexCount(), getEdgeCount(), Long.class);
     }
 
-    // print embedding count
-    long embeddingCount = distributedTraverser.traverse(vertices, edges).count();
-
-    System.out.println("embeddingCount = " + embeddingCount);
-
-    long duration = getExecutionEnvironment()
-      .getLastJobExecutionResult()
-      .getNetRuntime(TimeUnit.SECONDS);
-
-    System.out.println("duration = " + duration);
+    setEmbeddingCount(distributedTraverser.traverse(vertices, edges).count());
   }
 }
