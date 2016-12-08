@@ -45,9 +45,9 @@ public class FSMConfig implements Serializable {
   private final int maxEdgeCount;
 
   /**
-   * flag to enable preprocessingEnbabled (true=enabled)
+   * flag to enable preprocessingEnabled (true=enabled)
    */
-  private final boolean preprocessingEnbabled;
+  private final boolean preprocessingEnabled;
 
   /**
    * Constructor.
@@ -56,20 +56,20 @@ public class FSMConfig implements Serializable {
    * @param directed true, for directed mode
    * @param minEdgeCount min number of edges
    * @param maxEdgeCount max number of edges
-   * @param preprocessingEnbabled true, to enable preprocessingEnbabled
+   * @param preprocessingEnabled true, to enable preprocessingEnabled
    */
   public FSMConfig(
     float minSupport,
     boolean directed,
     int minEdgeCount,
     int maxEdgeCount,
-    boolean preprocessingEnbabled
+    boolean preprocessingEnabled
   ) {
     this.minSupport = minSupport;
     this.directed = directed;
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
-    this.preprocessingEnbabled = preprocessingEnbabled;
+    this.preprocessingEnabled = preprocessingEnabled;
   }
 
   /**
@@ -90,7 +90,7 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.minEdgeCount = minEdgeCount;
     this.maxEdgeCount = maxEdgeCount;
-    this.preprocessingEnbabled = true;
+    this.preprocessingEnabled = true;
   }
 
   /**
@@ -103,7 +103,7 @@ public class FSMConfig implements Serializable {
     this.directed = directed;
     this.minEdgeCount = 1;
     this.maxEdgeCount = 16;
-    this.preprocessingEnbabled = true;
+    this.preprocessingEnabled = true;
   }
 
   public float getMinSupport() {
@@ -123,12 +123,12 @@ public class FSMConfig implements Serializable {
   }
 
   /**
-   * Getter for preprocessingEnbabled flag.
+   * Getter for preprocessingEnabled flag.
    *
-   * @return true, if preprocessingEnbabled is enabled
+   * @return true, if preprocessingEnabled is enabled
    */
   public boolean isPreprocessingEnabled() {
-    return preprocessingEnbabled;
+    return preprocessingEnabled;
   }
 
 }

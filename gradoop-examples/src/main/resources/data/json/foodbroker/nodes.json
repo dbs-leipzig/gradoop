@@ -1,146 +1,146 @@
-{"id":"0-0-1-0","data":{"date":"2014-02-01","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":228.15,"num":"PIN000000445"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-1","data":{"date":"2014-01-25","superType":"T","deliveryDate":"2014-01-27","num":"SOR000000540"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-2","data":{"date":"2014-02-09","superType":"T","num":"POR000000234"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-3","data":{"date":"2014-01-03","superType":"T","num":"SQN000000032"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-4","data":{"date":"2014-01-29","trackingCode":"***TODO***","superType":"T","num":"DLV000000442"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-5","data":{"date":"2014-01-22","revenue":157.85,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000072"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-6","data":{"date":"2014-01-20","superType":"T","num":"SQN000000225"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-7","data":{"date":"2014-02-19","revenue":43.95,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000719"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-8","data":{"date":"2014-01-22","revenue":-38.16,"text":"Refund Ticket 172","superType":"T","num":"SIN000000177"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-9","data":{"date":"2014-02-09","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":161.15,"num":"PIN000000632"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-10","data":{"date":"2014-02-21","superType":"T","deliveryDate":"2014-02-25","num":"SOR000000662"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-11","data":{"date":"2014-01-10","superType":"T","num":"SQN000000428"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-12","data":{"date":"2014-01-29","superType":"T","num":"SQN000000615"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-13","data":{"date":"2014-01-27","superType":"T","num":"POR000000545"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-14","data":{"date":"2014-02-04","trackingCode":"***TODO***","superType":"T","num":"DLV000000136"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-15","data":{"date":"2014-01-19","trackingCode":"***TODO***","superType":"T","num":"DLV000000193"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-16","data":{"date":"2014-02-08","revenue":161.15,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000634"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-17","data":{"date":"2014-01-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":74.55,"num":"PIN000000374"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-18","data":{"date":"2014-02-03","superType":"T","num":"POR000000131"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-19","data":{"date":"2014-01-20","superType":"T","deliveryDate":"2014-01-22","num":"SOR000000155"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-20","data":{"date":"2014-02-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":397.35,"num":"PIN000000675"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-21","data":{"date":"2014-01-27","trackingCode":"***TODO***","superType":"T","num":"DLV000000218"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-22","data":{"date":"2014-02-21","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":43.05,"num":"PIN000000717"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-23","data":{"date":"2014-01-24","superType":"T","num":"SQN000000266"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-24","data":{"date":"2014-01-22","revenue":-31.57,"text":"Refund Ticket 83","superType":"T","num":"SIN000000087"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-25","data":{"date":"2014-01-15","superType":"T","num":"SQN000000179"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-26","data":{"date":"2014-01-14","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":344.85,"num":"PIN000000049"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-27","data":{"date":"2014-02-21","superType":"T","num":"POR000000667"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-28","data":{"date":"2014-01-23","superType":"T","deliveryDate":"2014-01-26","num":"SOR000000361"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-29","data":{"date":"2014-02-22","revenue":420.75,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000677"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-30","data":{"date":"2014-02-07","superType":"T","deliveryDate":"2014-02-09","num":"SOR000000229"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-31","data":{"date":"2014-01-08","superType":"T","deliveryDate":"2014-01-12","num":"SOR000000036"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-32","data":{"date":"2014-02-05","superType":"T","num":"SQN000000700"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-33","data":{"date":"2014-02-18","text":"Refund Ticket 585","superType":"T","expense":-30.91,"num":"PIN000000592"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-34","data":{"date":"2014-02-03","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":49.84,"num":"PIN000000611"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-35","data":{"date":"2014-01-31","superType":"T","num":"POR000000275"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-36","data":{"date":"2014-02-05","superType":"T","deliveryDate":"2014-02-07","num":"SOR000000619"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-37","data":{"date":"2014-02-17","superType":"T","num":"POR000000573"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-38","data":{"date":"2014-02-02","revenue":24,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000285"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-39","data":{"date":"2014-01-31","superType":"T","num":"POR000000603"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-40","data":{"date":"2014-01-17","superType":"T","deliveryDate":"2014-01-20","num":"SOR000000183"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-41","data":{"date":"2014-02-01","trackingCode":"***TODO***","superType":"T","num":"DLV000000280"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-42","data":{"date":"2014-01-28","superType":"T","num":"POR000000437"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-43","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":190.8,"num":"PIN000000168"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-44","data":{"date":"2014-02-12","superType":"T","deliveryDate":"2014-02-15","num":"SOR000000683"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-45","data":{"date":"2014-01-22","trackingCode":"***TODO***","superType":"T","num":"DLV000000165"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-46","data":{"date":"2014-01-17","superType":"T","num":"SQN000000204"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-47","data":{"date":"2014-01-27","revenue":192.5,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000223"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-48","data":{"date":"2014-02-18","revenue":654.5,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000583"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-49","data":{"date":"2014-02-08","revenue":-24.17,"text":"Refund Ticket 636","superType":"T","num":"SIN000000640"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-50","data":{"date":"2014-01-27","revenue":232.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000447"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-51","data":{"date":"2014-02-03","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":22.26,"num":"PIN000000283"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-52","data":{"date":"2014-01-26","superType":"T","deliveryDate":"2014-01-30","num":"SOR000000208"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-53","data":{"date":"2014-02-01","trackingCode":"***TODO***","superType":"T","num":"DLV000000608"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-54","data":{"date":"2014-01-23","revenue":905.35,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000112"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-55","data":{"date":"2014-01-30","superType":"T","deliveryDate":"2014-02-03","num":"SOR000000270"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-56","data":{"date":"2014-01-24","superType":"T","num":"SQN000000536"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-57","data":{"date":"2014-02-04","text":"Refund Ticket 143","superType":"T","expense":-5.74,"num":"PIN000000149"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-58","data":{"date":"2014-02-01","revenue":51.84,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000613"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-59","data":{"date":"2014-02-10","revenue":-40.9,"text":"Refund Ticket 246","superType":"T","num":"SIN000000250"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-60","data":{"date":"2014-01-22","text":"Refund Ticket 74","superType":"T","expense":-8.2,"num":"PIN000000081"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-61","data":{"date":"2014-01-27","superType":"T","deliveryDate":"2014-01-31","num":"SOR000000432"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-62","data":{"date":"2014-01-24","superType":"T","num":"POR000000366"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-63","data":{"date":"2014-01-03","superType":"T","num":"SQN000000357"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-64","data":{"date":"2014-01-09","superType":"T","num":"POR000000041"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-65","data":{"date":"2014-01-27","superType":"T","num":"SQN000000564"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-66","data":{"date":"2014-02-04","superType":"T","num":"SQN000000679"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-67","data":{"date":"2014-02-15","revenue":291.6,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000698"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-68","data":{"date":"2014-02-21","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":618.1,"num":"PIN000000581"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-69","data":{"date":"2014-01-14","superType":"T","num":"SQN000000151"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-70","data":{"date":"2014-01-18","superType":"T","num":"POR000000188"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-71","data":{"date":"2014-02-18","revenue":-98.18,"text":"Refund Ticket 585","superType":"T","num":"SIN000000590"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-72","data":{"date":"2014-01-28","trackingCode":"***TODO***","superType":"T","num":"DLV000000550"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-73","data":{"date":"2014-01-29","superType":"T","deliveryDate":"2014-02-01","num":"SOR000000598"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-74","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":25.95,"num":"PIN000000196"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-75","data":{"date":"2014-02-18","trackingCode":"***TODO***","superType":"T","num":"DLV000000578"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-76","data":{"date":"2014-02-16","superType":"T","deliveryDate":"2014-02-18","num":"SOR000000704"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-77","data":{"date":"2014-01-13","superType":"T","num":"SQN000000122"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-78","data":{"date":"2014-01-26","superType":"T","num":"POR000000213"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-79","data":{"date":"2014-01-22","superType":"T","num":"POR000000102"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-80","data":{"date":"2014-01-22","trackingCode":"***TODO***","superType":"T","num":"DLV000000067"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-81","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":163.9,"num":"PIN000000070"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-82","data":{"date":"2014-01-23","trackingCode":"***TODO***","superType":"T","num":"DLV000000107"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-83","data":{"date":"2014-02-10","trackingCode":"***TODO***","superType":"T","num":"DLV000000239"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-84","data":{"date":"2014-02-16","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":286.2,"num":"PIN000000696"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-85","data":{"date":"2014-01-28","revenue":-34.9,"text":"Refund Ticket 557","superType":"T","num":"SIN000000562"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-86","data":{"date":"2014-02-02","revenue":117.2,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000141"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-87","data":{"date":"2014-02-19","text":"Refund Ticket 721","superType":"T","expense":-4.31,"num":"PIN000000727"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-88","data":{"date":"2014-01-29","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":228.15,"num":"PIN000000553"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-89","data":{"date":"2014-02-08","text":"Refund Ticket 636","superType":"T","expense":-8.06,"num":"PIN000000642"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-90","data":{"date":"2014-02-14","superType":"T","num":"POR000000688"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-91","data":{"date":"2014-02-01","superType":"T","deliveryDate":"2014-02-03","num":"SOR000000126"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-92","data":{"date":"2014-01-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":838.85,"num":"PIN000000110"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-93","data":{"date":"2014-01-08","superType":"T","num":"SQN000000093"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-94","data":{"date":"2014-02-07","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":114.8,"num":"PIN000000139"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-95","data":{"date":"2014-02-10","revenue":272.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000244"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-96","data":{"date":"2014-01-09","revenue":365.75,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000051"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-97","data":{"date":"2014-02-15","superType":"T","deliveryDate":"2014-02-17","num":"SOR000000568"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-98","data":{"date":"2014-01-21","superType":"T","num":"POR000000160"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-99","data":{"date":"2014-01-21","superType":"T","deliveryDate":"2014-01-25","num":"SOR000000097"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-100","data":{"date":"2014-01-28","revenue":232.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000555"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-101","data":{"date":"2014-01-19","superType":"T","deliveryDate":"2014-01-21","num":"SOR000000057"},"meta":{"label":"SalesOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-102","data":{"date":"2014-01-18","revenue":28.59,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000198"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-103","data":{"date":"2014-02-18","superType":"T","num":"POR000000709"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-104","data":{"date":"2014-02-08","trackingCode":"***TODO***","superType":"T","num":"DLV000000629"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-105","data":{"date":"2014-01-25","trackingCode":"***TODO***","superType":"T","num":"DLV000000371"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-106","data":{"date":"2014-02-15","trackingCode":"***TODO***","superType":"T","num":"DLV000000693"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-107","data":{"date":"2014-02-07","superType":"T","num":"POR000000624"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-108","data":{"date":"2014-01-21","revenue":190.8,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000170"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-109","data":{"date":"2014-01-28","superType":"T","num":"SQN000000594"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-110","data":{"date":"2014-01-06","superType":"T","num":"SQN000000053"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-111","data":{"date":"2014-01-28","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":189,"num":"PIN000000221"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-112","data":{"date":"2014-01-09","trackingCode":"***TODO***","superType":"T","num":"DLV000000046"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-113","data":{"date":"2014-02-10","text":"Refund Ticket 246","superType":"T","expense":-27.84,"num":"PIN000000252"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-114","data":{"date":"2014-01-22","revenue":-23.68,"text":"Refund Ticket 74","superType":"T","num":"SIN000000079"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-115","data":{"date":"2014-02-21","trackingCode":"***TODO***","superType":"T","num":"DLV000000672"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-116","data":{"date":"2014-02-03","superType":"T","num":"SQN000000658"},"meta":{"label":"SalesQuotation","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-117","data":{"date":"2014-02-19","trackingCode":"***TODO***","superType":"T","num":"DLV000000714"},"meta":{"label":"DeliveryNote","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-118","data":{"date":"2014-02-19","revenue":-6.59,"text":"Refund Ticket 721","superType":"T","num":"SIN000000725"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-119","data":{"date":"2014-02-08","revenue":-32.23,"text":"Refund Ticket 644","superType":"T","num":"SIN000000648"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-120","data":{"date":"2014-02-04","revenue":-23.44,"text":"Refund Ticket 143","superType":"T","num":"SIN000000147"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-121","data":{"date":"2014-01-21","superType":"T","num":"POR000000062"},"meta":{"label":"PurchOrder","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-122","data":{"date":"2014-02-13","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":278.35,"num":"PIN000000242"},"meta":{"label":"PurchInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-123","data":{"date":"2014-01-26","revenue":76.05,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000376"},"meta":{"label":"SalesInvoice","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-124","data":{"name":"sweet long Goji berry","superType":"M","category":"fruits","price":4.92,"num":"PRD0000007"},"meta":{"label":"Product","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-125","data":{"name":"natural deli San Jose","superType":"M","num":"CUS0000014"},"meta":{"label":"Customer","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-126","data":{"name":"rapid freight Los Angeles","superType":"M","num":"LOG0000016"},"meta":{"label":"Logistics","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-127","data":{"name":"best supplier Houston","superType":"M","num":"VEN0000019"},"meta":{"label":"Vendor","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-128","data":{"name":"spicy outlet Houston","superType":"M","num":"CUS0000012"},"meta":{"label":"Customer","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-129","data":{"name":"solid wholesale Yonkers","superType":"M","num":"VEN0000022"},"meta":{"label":"Vendor","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-130","data":{"name":"round small Rambutan","superType":"M","category":"fruits","price":6.17,"num":"PRD0000009"},"meta":{"label":"Product","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-131","data":{"name":"Christopher Hanson","superType":"M","gender":"male","num":"EMP0000002"},"meta":{"label":"Employee","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-132","data":{"name":"Quincy McCabe","superType":"M","gender":"male","num":"EMP0000003"},"meta":{"label":"Employee","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-133","data":{"name":"Keven Cooke","superType":"M","gender":"male","num":"EMP0000001"},"meta":{"label":"Employee","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-134","data":{"name":"good store Concord","superType":"M","num":"CUS0000011"},"meta":{"label":"Customer","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-135","data":{"name":"original common Carrot","superType":"M","category":"vegetables","price":8.74,"num":"PRD0000006"},"meta":{"label":"Product","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-136","data":{"name":"fresh merchant San Jose","superType":"M","num":"VEN0000021"},"meta":{"label":"Vendor","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-137","data":{"name":"low-priced trader Concord","superType":"M","num":"VEN0000018"},"meta":{"label":"Vendor","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-138","data":{"name":"dark rich Mung beans","superType":"M","category":"vegetables","price":3.67,"num":"PRD0000008"},"meta":{"label":"Product","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-139","data":{"name":"Zoey Young","superType":"M","gender":"female","num":"EMP0000005"},"meta":{"label":"Employee","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-140","data":{"name":"violet traditional Yam","superType":"M","category":"vegetables","price":2.84,"num":"PRD0000010"},"meta":{"label":"Product","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-141","data":{"name":"Guillermo Robson","superType":"M","gender":"male","num":"EMP0000004"},"meta":{"label":"Employee","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-142","data":{"name":"welcoming supermarket Yonkers","superType":"M","num":"CUS0000015"},"meta":{"label":"Customer","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-143","data":{"name":"reasonable provider Newport News","superType":"M","num":"VEN0000020"},"meta":{"label":"Vendor","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-144","data":{"name":"stable transport Yonkers","superType":"M","num":"LOG0000017"},"meta":{"label":"Logistics","graphs":["0-0-0-0"]}}
-{"id":"0-0-1-145","data":{"name":"crisp market Newport News","superType":"M","num":"CUS0000013"},"meta":{"label":"Customer","graphs":["0-0-0-0"]}}
+{"id":"000000000000000001000000","data":{"date":"2014-02-01","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":228.15,"num":"PIN000000445"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000001","data":{"date":"2014-01-25","superType":"T","deliveryDate":"2014-01-27","num":"SOR000000540"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000002","data":{"date":"2014-02-09","superType":"T","num":"POR000000234"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000003","data":{"date":"2014-01-03","superType":"T","num":"SQN000000032"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000004","data":{"date":"2014-01-29","trackingCode":"***TODO***","superType":"T","num":"DLV000000442"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000005","data":{"date":"2014-01-22","revenue":157.85,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000072"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000006","data":{"date":"2014-01-20","superType":"T","num":"SQN000000225"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000007","data":{"date":"2014-02-19","revenue":43.95,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000719"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000008","data":{"date":"2014-01-22","revenue":-38.16,"text":"Refund Ticket 172","superType":"T","num":"SIN000000177"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000009","data":{"date":"2014-02-09","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":161.15,"num":"PIN000000632"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000010","data":{"date":"2014-02-21","superType":"T","deliveryDate":"2014-02-25","num":"SOR000000662"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000011","data":{"date":"2014-01-10","superType":"T","num":"SQN000000428"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000012","data":{"date":"2014-01-29","superType":"T","num":"SQN000000615"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000013","data":{"date":"2014-01-27","superType":"T","num":"POR000000545"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000014","data":{"date":"2014-02-04","trackingCode":"***TODO***","superType":"T","num":"DLV000000136"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000015","data":{"date":"2014-01-19","trackingCode":"***TODO***","superType":"T","num":"DLV000000193"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000016","data":{"date":"2014-02-08","revenue":161.15,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000634"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000017","data":{"date":"2014-01-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":74.55,"num":"PIN000000374"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000018","data":{"date":"2014-02-03","superType":"T","num":"POR000000131"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000019","data":{"date":"2014-01-20","superType":"T","deliveryDate":"2014-01-22","num":"SOR000000155"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000020","data":{"date":"2014-02-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":397.35,"num":"PIN000000675"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000021","data":{"date":"2014-01-27","trackingCode":"***TODO***","superType":"T","num":"DLV000000218"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000022","data":{"date":"2014-02-21","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":43.05,"num":"PIN000000717"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000023","data":{"date":"2014-01-24","superType":"T","num":"SQN000000266"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000024","data":{"date":"2014-01-22","revenue":-31.57,"text":"Refund Ticket 83","superType":"T","num":"SIN000000087"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000025","data":{"date":"2014-01-15","superType":"T","num":"SQN000000179"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000026","data":{"date":"2014-01-14","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":344.85,"num":"PIN000000049"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000027","data":{"date":"2014-02-21","superType":"T","num":"POR000000667"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000028","data":{"date":"2014-01-23","superType":"T","deliveryDate":"2014-01-26","num":"SOR000000361"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000029","data":{"date":"2014-02-22","revenue":420.75,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000677"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000030","data":{"date":"2014-02-07","superType":"T","deliveryDate":"2014-02-09","num":"SOR000000229"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000031","data":{"date":"2014-01-08","superType":"T","deliveryDate":"2014-01-12","num":"SOR000000036"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000032","data":{"date":"2014-02-05","superType":"T","num":"SQN000000700"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000033","data":{"date":"2014-02-18","text":"Refund Ticket 585","superType":"T","expense":-30.91,"num":"PIN000000592"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000034","data":{"date":"2014-02-03","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":49.84,"num":"PIN000000611"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000035","data":{"date":"2014-01-31","superType":"T","num":"POR000000275"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000036","data":{"date":"2014-02-05","superType":"T","deliveryDate":"2014-02-07","num":"SOR000000619"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000037","data":{"date":"2014-02-17","superType":"T","num":"POR000000573"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000038","data":{"date":"2014-02-02","revenue":24,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000285"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000039","data":{"date":"2014-01-31","superType":"T","num":"POR000000603"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000040","data":{"date":"2014-01-17","superType":"T","deliveryDate":"2014-01-20","num":"SOR000000183"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000041","data":{"date":"2014-02-01","trackingCode":"***TODO***","superType":"T","num":"DLV000000280"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000042","data":{"date":"2014-01-28","superType":"T","num":"POR000000437"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000043","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":190.8,"num":"PIN000000168"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000044","data":{"date":"2014-02-12","superType":"T","deliveryDate":"2014-02-15","num":"SOR000000683"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000045","data":{"date":"2014-01-22","trackingCode":"***TODO***","superType":"T","num":"DLV000000165"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000046","data":{"date":"2014-01-17","superType":"T","num":"SQN000000204"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000047","data":{"date":"2014-01-27","revenue":192.5,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000223"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000048","data":{"date":"2014-02-18","revenue":654.5,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000583"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000049","data":{"date":"2014-02-08","revenue":-24.17,"text":"Refund Ticket 636","superType":"T","num":"SIN000000640"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000050","data":{"date":"2014-01-27","revenue":232.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000447"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000051","data":{"date":"2014-02-03","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":22.26,"num":"PIN000000283"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000052","data":{"date":"2014-01-26","superType":"T","deliveryDate":"2014-01-30","num":"SOR000000208"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000053","data":{"date":"2014-02-01","trackingCode":"***TODO***","superType":"T","num":"DLV000000608"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000054","data":{"date":"2014-01-23","revenue":905.35,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000112"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000055","data":{"date":"2014-01-30","superType":"T","deliveryDate":"2014-02-03","num":"SOR000000270"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000056","data":{"date":"2014-01-24","superType":"T","num":"SQN000000536"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000057","data":{"date":"2014-02-04","text":"Refund Ticket 143","superType":"T","expense":-5.74,"num":"PIN000000149"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000058","data":{"date":"2014-02-01","revenue":51.84,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000613"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000059","data":{"date":"2014-02-10","revenue":-40.9,"text":"Refund Ticket 246","superType":"T","num":"SIN000000250"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000060","data":{"date":"2014-01-22","text":"Refund Ticket 74","superType":"T","expense":-8.2,"num":"PIN000000081"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000061","data":{"date":"2014-01-27","superType":"T","deliveryDate":"2014-01-31","num":"SOR000000432"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000062","data":{"date":"2014-01-24","superType":"T","num":"POR000000366"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000063","data":{"date":"2014-01-03","superType":"T","num":"SQN000000357"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000064","data":{"date":"2014-01-09","superType":"T","num":"POR000000041"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000065","data":{"date":"2014-01-27","superType":"T","num":"SQN000000564"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000066","data":{"date":"2014-02-04","superType":"T","num":"SQN000000679"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000067","data":{"date":"2014-02-15","revenue":291.6,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000698"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000068","data":{"date":"2014-02-21","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":618.1,"num":"PIN000000581"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000069","data":{"date":"2014-01-14","superType":"T","num":"SQN000000151"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000070","data":{"date":"2014-01-18","superType":"T","num":"POR000000188"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000071","data":{"date":"2014-02-18","revenue":-98.18,"text":"Refund Ticket 585","superType":"T","num":"SIN000000590"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000072","data":{"date":"2014-01-28","trackingCode":"***TODO***","superType":"T","num":"DLV000000550"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000073","data":{"date":"2014-01-29","superType":"T","deliveryDate":"2014-02-01","num":"SOR000000598"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000074","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":25.95,"num":"PIN000000196"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000075","data":{"date":"2014-02-18","trackingCode":"***TODO***","superType":"T","num":"DLV000000578"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000076","data":{"date":"2014-02-16","superType":"T","deliveryDate":"2014-02-18","num":"SOR000000704"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000077","data":{"date":"2014-01-13","superType":"T","num":"SQN000000122"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000078","data":{"date":"2014-01-26","superType":"T","num":"POR000000213"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000079","data":{"date":"2014-01-22","superType":"T","num":"POR000000102"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000080","data":{"date":"2014-01-22","trackingCode":"***TODO***","superType":"T","num":"DLV000000067"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000081","data":{"date":"2014-01-23","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":163.9,"num":"PIN000000070"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000082","data":{"date":"2014-01-23","trackingCode":"***TODO***","superType":"T","num":"DLV000000107"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000083","data":{"date":"2014-02-10","trackingCode":"***TODO***","superType":"T","num":"DLV000000239"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000084","data":{"date":"2014-02-16","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":286.2,"num":"PIN000000696"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000085","data":{"date":"2014-01-28","revenue":-34.9,"text":"Refund Ticket 557","superType":"T","num":"SIN000000562"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000086","data":{"date":"2014-02-02","revenue":117.2,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000141"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000087","data":{"date":"2014-02-19","text":"Refund Ticket 721","superType":"T","expense":-4.31,"num":"PIN000000727"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000088","data":{"date":"2014-01-29","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":228.15,"num":"PIN000000553"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000089","data":{"date":"2014-02-08","text":"Refund Ticket 636","superType":"T","expense":-8.06,"num":"PIN000000642"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000090","data":{"date":"2014-02-14","superType":"T","num":"POR000000688"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000091","data":{"date":"2014-02-01","superType":"T","deliveryDate":"2014-02-03","num":"SOR000000126"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000092","data":{"date":"2014-01-26","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":838.85,"num":"PIN000000110"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000093","data":{"date":"2014-01-08","superType":"T","num":"SQN000000093"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000094","data":{"date":"2014-02-07","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":114.8,"num":"PIN000000139"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000095","data":{"date":"2014-02-10","revenue":272.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000244"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000096","data":{"date":"2014-01-09","revenue":365.75,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000051"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000097","data":{"date":"2014-02-15","superType":"T","deliveryDate":"2014-02-17","num":"SOR000000568"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000098","data":{"date":"2014-01-21","superType":"T","num":"POR000000160"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000099","data":{"date":"2014-01-21","superType":"T","deliveryDate":"2014-01-25","num":"SOR000000097"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000100","data":{"date":"2014-01-28","revenue":232.65,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000555"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000101","data":{"date":"2014-01-19","superType":"T","deliveryDate":"2014-01-21","num":"SOR000000057"},"meta":{"label":"SalesOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000102","data":{"date":"2014-01-18","revenue":28.59,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000198"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000103","data":{"date":"2014-02-18","superType":"T","num":"POR000000709"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000104","data":{"date":"2014-02-08","trackingCode":"***TODO***","superType":"T","num":"DLV000000629"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000105","data":{"date":"2014-01-25","trackingCode":"***TODO***","superType":"T","num":"DLV000000371"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000106","data":{"date":"2014-02-15","trackingCode":"***TODO***","superType":"T","num":"DLV000000693"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000107","data":{"date":"2014-02-07","superType":"T","num":"POR000000624"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000108","data":{"date":"2014-01-21","revenue":190.8,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000170"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000109","data":{"date":"2014-01-28","superType":"T","num":"SQN000000594"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000110","data":{"date":"2014-01-06","superType":"T","num":"SQN000000053"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000111","data":{"date":"2014-01-28","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":189,"num":"PIN000000221"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000112","data":{"date":"2014-01-09","trackingCode":"***TODO***","superType":"T","num":"DLV000000046"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000113","data":{"date":"2014-02-10","text":"Refund Ticket 246","superType":"T","expense":-27.84,"num":"PIN000000252"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000114","data":{"date":"2014-01-22","revenue":-23.68,"text":"Refund Ticket 74","superType":"T","num":"SIN000000079"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000115","data":{"date":"2014-02-21","trackingCode":"***TODO***","superType":"T","num":"DLV000000672"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000116","data":{"date":"2014-02-03","superType":"T","num":"SQN000000658"},"meta":{"label":"SalesQuotation","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000117","data":{"date":"2014-02-19","trackingCode":"***TODO***","superType":"T","num":"DLV000000714"},"meta":{"label":"DeliveryNote","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000118","data":{"date":"2014-02-19","revenue":-6.59,"text":"Refund Ticket 721","superType":"T","num":"SIN000000725"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000119","data":{"date":"2014-02-08","revenue":-32.23,"text":"Refund Ticket 644","superType":"T","num":"SIN000000648"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000120","data":{"date":"2014-02-04","revenue":-23.44,"text":"Refund Ticket 143","superType":"T","num":"SIN000000147"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000121","data":{"date":"2014-01-21","superType":"T","num":"POR000000062"},"meta":{"label":"PurchOrder","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000122","data":{"date":"2014-02-13","text":"*** TODO @ FoodBrokerage ***","superType":"T","expense":278.35,"num":"PIN000000242"},"meta":{"label":"PurchInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000123","data":{"date":"2014-01-26","revenue":76.05,"text":"*** TODO @ FoodBrokerage ***","superType":"T","num":"SIN000000376"},"meta":{"label":"SalesInvoice","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000124","data":{"name":"sweet long Goji berry","superType":"M","category":"fruits","price":4.92,"num":"PRD0000007"},"meta":{"label":"Product","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000125","data":{"name":"natural deli San Jose","superType":"M","num":"CUS0000014"},"meta":{"label":"Customer","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000126","data":{"name":"rapid freight Los Angeles","superType":"M","num":"LOG0000016"},"meta":{"label":"Logistics","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000127","data":{"name":"best supplier Houston","superType":"M","num":"VEN0000019"},"meta":{"label":"Vendor","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000128","data":{"name":"spicy outlet Houston","superType":"M","num":"CUS0000012"},"meta":{"label":"Customer","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000129","data":{"name":"solid wholesale Yonkers","superType":"M","num":"VEN0000022"},"meta":{"label":"Vendor","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000130","data":{"name":"round small Rambutan","superType":"M","category":"fruits","price":6.17,"num":"PRD0000009"},"meta":{"label":"Product","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000131","data":{"name":"Christopher Hanson","superType":"M","gender":"male","num":"EMP0000002"},"meta":{"label":"Employee","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000132","data":{"name":"Quincy McCabe","superType":"M","gender":"male","num":"EMP0000003"},"meta":{"label":"Employee","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000133","data":{"name":"Keven Cooke","superType":"M","gender":"male","num":"EMP0000001"},"meta":{"label":"Employee","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000134","data":{"name":"good store Concord","superType":"M","num":"CUS0000011"},"meta":{"label":"Customer","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000135","data":{"name":"original common Carrot","superType":"M","category":"vegetables","price":8.74,"num":"PRD0000006"},"meta":{"label":"Product","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000136","data":{"name":"fresh merchant San Jose","superType":"M","num":"VEN0000021"},"meta":{"label":"Vendor","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000137","data":{"name":"low-priced trader Concord","superType":"M","num":"VEN0000018"},"meta":{"label":"Vendor","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000138","data":{"name":"dark rich Mung beans","superType":"M","category":"vegetables","price":3.67,"num":"PRD0000008"},"meta":{"label":"Product","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000139","data":{"name":"Zoey Young","superType":"M","gender":"female","num":"EMP0000005"},"meta":{"label":"Employee","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000140","data":{"name":"violet traditional Yam","superType":"M","category":"vegetables","price":2.84,"num":"PRD0000010"},"meta":{"label":"Product","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000141","data":{"name":"Guillermo Robson","superType":"M","gender":"male","num":"EMP0000004"},"meta":{"label":"Employee","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000142","data":{"name":"welcoming supermarket Yonkers","superType":"M","num":"CUS0000015"},"meta":{"label":"Customer","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000143","data":{"name":"reasonable provider Newport News","superType":"M","num":"VEN0000020"},"meta":{"label":"Vendor","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000144","data":{"name":"stable transport Yonkers","superType":"M","num":"LOG0000017"},"meta":{"label":"Logistics","graphs":["000000000000000000000000"]}}
+{"id":"000000000000000001000145","data":{"name":"crisp market Newport News","superType":"M","num":"CUS0000013"},"meta":{"label":"Customer","graphs":["000000000000000000000000"]}}
