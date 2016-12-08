@@ -26,9 +26,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.flink.algorithms.fsm.common.functions.SubgraphDecoder;
-import org.gradoop.flink.algorithms.fsm.tfsm.TransactionalFSM;
-import org.gradoop.flink.algorithms.fsm.common.config.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.GSpanIterative;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -129,7 +129,7 @@ public class FrequentLossPatterns
     GraphHead transformed) {
 
     BigDecimal support = current
-      .getPropertyValue(SubgraphDecoder.FREQUENCY_KEY)
+      .getPropertyValue(TFSMConstants.SUPPORT_KEY)
       .getBigDecimal().setScale(2, ROUND_HALF_UP);
 
     String newLabel = current.getLabel() + " (" + support + ")";
@@ -196,7 +196,7 @@ public class FrequentLossPatterns
     FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
     GraphCollection frequentSubgraphs = btgs
-      .callForCollection(new TransactionalFSM(fsmConfig));
+      .callForCollection(new GSpanIterative(fsmConfig));
 
     // (7) Check, if frequent subgraph contains master data
 

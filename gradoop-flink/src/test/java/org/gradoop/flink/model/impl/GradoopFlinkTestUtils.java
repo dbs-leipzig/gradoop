@@ -179,7 +179,7 @@ public class GradoopFlinkTestUtils {
 
       List<AdjacencyListCell<GradoopId, GradoopId>> aCells =
         Lists.newArrayList(aRows.get(vertexId).getCells());
-      
+
       List<AdjacencyListCell<GradoopId, GradoopId>> bCells =
         Lists.newArrayList(aRows.get(vertexId).getCells());
 
@@ -200,7 +200,7 @@ public class GradoopFlinkTestUtils {
       Properties aProperties = a.getProperties(id);
       Properties bProperties = b.getProperties(id);
 
-      assertTrue(aProperties == null && bProperties == null 
+      assertTrue(aProperties == null && bProperties == null
         || aProperties.equals(bProperties));
 
     }
