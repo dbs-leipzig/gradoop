@@ -482,6 +482,10 @@ public class ComplaintHandling
       Properties properties;
       Vertex employee = getEmployeeById(employeeId);
       properties = employee.getProperties();
+      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+      sourceIdKey = sourceIdKey.replace("EMP", "USE");
+      sourceIdKey = sourceIdKey.replace("ERP", "CIT");
+      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
       properties.set("erpEmplNum", employee.getId().toString());
       String email = properties.get("name").getString();
       email = email.replace(" ", ".").toLowerCase();
@@ -512,6 +516,10 @@ public class ComplaintHandling
       Properties properties;
       Vertex customer = getCustomerById(customerId);
       properties = customer.getProperties();
+      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+      sourceIdKey = sourceIdKey.replace("CUS", "CLI");
+      sourceIdKey = sourceIdKey.replace("ERP", "CIT");
+      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
       properties.set("erpCustNum", customer.getId().toString());
       properties.set("contactPhone", "0123456789");
       properties.set("account", "CL" + customer.getId().toString());
