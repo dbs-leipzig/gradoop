@@ -33,7 +33,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSimpleGraphs() throws Exception {
-    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
     String asciiGraphs = "" +
       "g1[(:A)-[:a]->(v1:B)-[:b]->(:C),(v1)-[:c]->(:D)]" +
@@ -56,7 +56,7 @@ public class TransactionalFSMTest extends GradoopFlinkTestBase {
 
   @Test
   public void testParallelEdges() throws Exception {
-    FSMConfig fsmConfig = new FSMConfig(0.7f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(:A)-[:a]->(v1:A)]" +

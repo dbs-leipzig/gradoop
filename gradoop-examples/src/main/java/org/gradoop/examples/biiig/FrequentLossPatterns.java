@@ -194,7 +194,7 @@ public class FrequentLossPatterns
 
     // (6) mine frequent subgraphs
 
-    FSMConfig fsmConfig = new FSMConfig(0.6f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.55f, true);
 
     GraphCollection frequentSubgraphs = btgs
       .callForCollection(new GSpanIterative(fsmConfig));
