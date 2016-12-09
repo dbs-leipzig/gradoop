@@ -17,12 +17,10 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
 
-import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
@@ -32,15 +30,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateMapping;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexEdgeMapping;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
-
-
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
@@ -130,113 +121,12 @@ public class TripleForLoopTraverser<K> extends TripleTraverser<K> {
       embeddings = embeddings
         .join(filteredTriples, getEdgeStepJoinStrategy())
         .where(0).equalTo(step.isOutgoing() ? 1 : 2)
-        .with(new UpdateEmbedding<>(traversalCode, i, getMatchStrategy()));
+        .with(new UpdateVertexEdgeMapping<>(traversalCode, i, getMatchStrategy()));
     }
 
     return log(embeddings,
       new PrintEmbeddingWithTiePoint<>(isIterative(), "final-embeddings"),
       getVertexMapping(), getEdgeMapping());
-  }
-
-  public static class UpdateEmbedding<K> implements
-    FlatJoinFunction<EmbeddingWithTiePoint<K>, TripleWithCandidates<K>, EmbeddingWithTiePoint<K>>,
-    UpdateMapping<K> {
-
-    private final int sourceIndex;
-
-    private final int edgeIndex;
-
-    private final int targetIndex;
-
-    private final boolean isOutgoing;
-
-    private final MatchStrategy matchStrategy;
-
-    private List<Integer> previousEdgeCandidates;
-
-    private Set<Integer> previousVertexCandidates;
-
-    private boolean hasMoreSteps;
-
-    private int nextFrom;
-
-    public UpdateEmbedding(TraversalCode traversalCode, int currentStepId,
-      MatchStrategy matchStrategy) {
-
-      Step currentStep = traversalCode.getStep(currentStepId);
-
-      this.isOutgoing = currentStep.isOutgoing();
-      this.edgeIndex = (int) currentStep.getVia();
-      this.sourceIndex = isOutgoing ? (int) currentStep.getFrom() : (int) currentStep.getTo();
-      this.targetIndex = isOutgoing ? (int) currentStep.getTo() : (int) currentStep.getFrom();
-      this.matchStrategy = matchStrategy;
-
-      this.hasMoreSteps = currentStepId < traversalCode.getSteps().size() - 1;
-
-      if (hasMoreSteps) {
-        this.nextFrom = (int) traversalCode
-          .getStep(currentStepId + 1)
-          .getFrom();
-      }
-
-      // need to check previous candidates in case of isomorphism
-      if (matchStrategy == MatchStrategy.ISOMORPHISM) {
-        // determine previous edge candidates
-        previousEdgeCandidates = new ArrayList<>(currentStepId);
-        for (int i = 0; i < currentStepId; i++) {
-          previousEdgeCandidates.add((int) traversalCode.getStep(i).getVia());
-        }
-        // determine previous vertex candidates
-        // find previous positions (limited by two times the number steps (edges))
-        previousVertexCandidates = new HashSet<>(traversalCode.getSteps().size() * 2);
-        for (int i = 0; i < currentStepId; i++) {
-          Step s = traversalCode.getStep(i);
-          previousVertexCandidates.add((int) s.getFrom());
-          previousVertexCandidates.add((int) s.getTo());
-        }
-        // add from field of current step
-        previousVertexCandidates.add((int) currentStep.getFrom());
-      }
-    }
-
-    @Override
-    public void join(EmbeddingWithTiePoint<K> embedding, TripleWithCandidates<K> t,
-      Collector<EmbeddingWithTiePoint<K>> out) throws Exception {
-
-      K edgeId = t.getEdgeId();
-      K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();
-
-      boolean isMapped = edgeMapping[edgeIndex] != null;
-      boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &&
-        seenBefore(edgeMapping, edgeId, previousEdgeCandidates);
-
-      if (!isMapped && !seen) {
-
-        // check vertices
-        K[] vertexMapping = embedding.getEmbedding().getVertexMapping();
-
-        if (isValidVertex(t.getSourceId(), vertexMapping, sourceIndex) &&
-          isValidVertex(t.getTargetId(), vertexMapping, targetIndex)) {
-          edgeMapping[edgeIndex] = edgeId;
-          vertexMapping[sourceIndex] = t.getSourceId();
-          vertexMapping[targetIndex] = t.getTargetId();
-
-          // update tie point and collect updated embedding
-          if (hasMoreSteps) {
-            embedding.setTiePointId(vertexMapping[nextFrom]);
-          }
-          out.collect(embedding);
-        }
-      }
-    }
-
-    private boolean isValidVertex(K vertexId, K[] vertexMapping, int index) {
-      boolean isMapped = vertexMapping[index] != null;
-      boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &&
-        seenBefore(vertexMapping, vertexId, previousVertexCandidates);
-
-      return (!isMapped && !seen) || (isMapped && vertexMapping[index].equals(vertexId));
-    }
   }
 }
 

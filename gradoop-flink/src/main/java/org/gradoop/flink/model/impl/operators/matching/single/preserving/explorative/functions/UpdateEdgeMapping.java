@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
-import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
@@ -28,8 +28,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Extends an embedding with an edge if possible.
@@ -58,17 +56,8 @@ import java.util.List;
 @FunctionAnnotation.ForwardedFieldsFirst("f1.f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f2->f0")
 public class UpdateEdgeMapping<K>
-  extends RichFlatJoinFunction
-    <EmbeddingWithTiePoint<K>, EdgeStep<K>, EmbeddingWithTiePoint<K>>
-  implements UpdateMapping<K> {
-  /**
-   * Traversal code for the current exploration
-   */
-  private final TraversalCode traversalCode;
-  /**
-   * Match strategy
-   */
-  private final MatchStrategy matchStrategy;
+  extends UpdateMapping<K>
+  implements FlatJoinFunction<EmbeddingWithTiePoint<K>, EdgeStep<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Iteration strategy
    */
@@ -76,12 +65,7 @@ public class UpdateEdgeMapping<K>
   /**
    * Index to check in the edge mapping
    */
-  private int candidate;
-  /**
-   * List of edge candidates that have been previously processed. This is needed
-   * for isomorphism checks.
-   */
-  private List<Integer> previousCandidates;
+  private int edgeCandidate;
 
   /**
    * Constructor
@@ -92,8 +76,7 @@ public class UpdateEdgeMapping<K>
    */
   public UpdateEdgeMapping(TraversalCode traversalCode,
     MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
-    this.traversalCode      = traversalCode;
-    this.matchStrategy      = matchStrategy;
+    super(traversalCode, matchStrategy);
     this.traverserStrategy = traverserStrategy;
   }
 
@@ -101,41 +84,29 @@ public class UpdateEdgeMapping<K>
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    int currentStep = 0;
     // get current step in the traversal
     if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
-      currentStep = getIterationRuntimeContext().getSuperstepNumber() - 1;
+      setCurrentStepId(getIterationRuntimeContext().getSuperstepNumber() - 1);
     } else if (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
-      currentStep = (int) getRuntimeContext().getBroadcastVariable(
-        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1;
+      setCurrentStepId((int) getRuntimeContext().getBroadcastVariable(
+        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1);
     }
+    initializeVisited();
 
-    candidate = (int) traversalCode.getStep(currentStep).getVia();
-
-    // get previous candidates
-    if (matchStrategy == MatchStrategy.ISOMORPHISM) {
-      previousCandidates = new ArrayList<>(currentStep);
-      for (int i = 0; i < currentStep; i++) {
-        previousCandidates.add((int) traversalCode.getStep(i).getVia());
-      }
-    }
+    edgeCandidate = (int) getCurrentStep().getVia();
   }
 
   @Override
   public void join(EmbeddingWithTiePoint<K> embedding, EdgeStep<K> edgeStep,
     Collector<EmbeddingWithTiePoint<K>> collector) throws Exception {
 
-    K[] mapping = embedding.getEmbedding().getEdgeMapping();
-    K id = edgeStep.getEdgeId();
-
-    boolean isMapped = mapping[candidate] != null;
-    boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &&
-      seenBefore(mapping, id, previousCandidates);
+    K edgeId = edgeStep.getEdgeId();
+    K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();
 
     // traverse if no edge set for that step
-    if (!isMapped && !seen) {
-      mapping[candidate] = id;
-      embedding.getEmbedding().setEdgeMapping(mapping);
+    if (isValidEdge(edgeId, edgeMapping, edgeCandidate)) {
+      edgeMapping[edgeCandidate] = edgeId;
+      embedding.getEmbedding().setEdgeMapping(edgeMapping);
       embedding.setTiePointId(edgeStep.getNextId());
       collector.collect(embedding);
     }
