@@ -20,6 +20,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 
+import java.math.BigDecimal;
+
 /**
  * Calculates the min frequency based on a configured min support.
  */
@@ -39,7 +41,13 @@ public class MinFrequency implements MapFunction<Long, Long> {
   }
 
   @Override
-  public Long map(Long value) throws Exception {
-    return (long) Math.round((float) value * fsmConfig.getMinSupport());
+  public Long map(Long count) throws Exception {
+    return BigDecimal.valueOf(count)
+      .multiply(
+        BigDecimal.valueOf(fsmConfig.getMinSupport())
+          .setScale(2, BigDecimal.ROUND_HALF_UP)
+      )
+      .setScale(0, BigDecimal.ROUND_UP)
+      .longValue();
   }
 }
