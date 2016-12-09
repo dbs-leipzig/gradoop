@@ -21,11 +21,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
-
 
 /**
  * Used to benchmark different {@link DistributedTraverser} implementations.
@@ -85,8 +83,8 @@ public class TripleTraverserBenchmark extends TraverserBenchmark {
       .map(new GetTriplesWithCandidates(getEdgeCount()));
 
     // create distributed traverser
-    TripleTraverser<Long> distributedTraverser =
-      new TripleForLoopTraverser<>(getTraversalCode(), getVertexCount(), getEdgeCount(), Long.class);
+    TripleTraverser<Long> distributedTraverser = new TripleForLoopTraverser<>(
+      getTraversalCode(), getVertexCount(), getEdgeCount(), Long.class);
 
     // print embedding count
     setEmbeddingCount(distributedTraverser.traverse(triples).count());

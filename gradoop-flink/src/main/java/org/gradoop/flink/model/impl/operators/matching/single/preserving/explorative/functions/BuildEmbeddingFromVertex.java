@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.
  *
@@ -41,7 +40,7 @@ public class BuildEmbeddingFromVertex<K>
   /**
    * Initial vertex candidate that determines the start of the traversal.
    */
-  private final int candidate;
+  private final int vertexCandidate;
 
   /**
    * Constructor
@@ -54,15 +53,14 @@ public class BuildEmbeddingFromVertex<K>
   public BuildEmbeddingFromVertex(Class<K> keyClazz, Step initialStep,
     long vertexCount, long edgeCount) {
     super(keyClazz, vertexCount, edgeCount);
-    candidate = (int) initialStep.getFrom();
+    vertexCandidate = (int) initialStep.getFrom();
   }
 
   @Override
-  public EmbeddingWithTiePoint<K> map(IdWithCandidates<K> v)
-      throws Exception {
+  public EmbeddingWithTiePoint<K> map(IdWithCandidates<K> v) throws Exception {
     reuseEmbeddingWithTiePoint.setTiePointId(v.getId());
     // candidate is same for all vertices
-    reuseEmbedding.getVertexMapping()[candidate] = v.getId();
+    reuseEmbedding.getVertexMapping()[vertexCandidate] = v.getId();
     return reuseEmbeddingWithTiePoint;
   }
 }

@@ -60,7 +60,8 @@ abstract class TraverserBenchmark extends AbstractRunner {
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
     OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
-    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true, "[set-pair-for|set-pair-bulk|triple-for]");
+    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true,
+      "[set-pair-for|set-pair-bulk|triple-for]");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path to output CSV file");
   }
 
@@ -109,13 +110,17 @@ abstract class TraverserBenchmark extends AbstractRunner {
 
     String traverserStrategyString = cmd.getOptionValue(OPTION_TRAVERSER).toLowerCase();
 
-    if (traverserStrategyString.equals("set-pair-bulk")) {
+    switch (traverserStrategyString) {
+    case "set-pair-bulk":
       this.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
-    } else if (traverserStrategyString.equals("set-pair-for")) {
+      break;
+    case "set-pair-for":
       this.traverserStrategy = TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION;
-    } else if (traverserStrategyString.equals("triple-for")) {
+      break;
+    case "triple-for":
       this.traverserStrategy = TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION;
-    } else {
+      break;
+    default:
       throw new IllegalArgumentException("Unknown traverser strategy: " + traverserStrategyString);
     }
 
@@ -162,6 +167,13 @@ abstract class TraverserBenchmark extends AbstractRunner {
       getExecutionEnvironment().getLastJobExecutionResult().getNetRuntime());
   }
 
+  /**
+   * Writes the results of the benchmark into the given csv file. If the file already exists,
+   * the results are appended.
+   *
+   * @param csvFile path to csv file
+   * @throws IOException
+   */
   private void writeResults(String csvFile) throws IOException {
     String header = "Input|Parallelism|Strategy|Query|Embeddings|Runtime[ms]";
     String line = getResultString();
@@ -177,6 +189,9 @@ abstract class TraverserBenchmark extends AbstractRunner {
     }
   }
 
+  /**
+   * Prints the results of the benchmark to system out.
+   */
   private void printResults() {
     System.out.println(getResultString());
   }

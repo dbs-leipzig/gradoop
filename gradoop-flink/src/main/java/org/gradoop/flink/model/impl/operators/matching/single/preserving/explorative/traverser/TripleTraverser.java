@@ -24,7 +24,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.TripleHasCandidate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;

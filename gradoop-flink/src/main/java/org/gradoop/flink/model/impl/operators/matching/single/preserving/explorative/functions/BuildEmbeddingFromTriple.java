@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -11,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given edge triple.
  *
+ * @param <K> key type
  */
 public class BuildEmbeddingFromTriple<K>
   extends BuildEmbedding<K>
@@ -32,10 +50,9 @@ public class BuildEmbeddingFromTriple<K>
    */
   private final int targetIndex;
   /**
-   * True, if the next step continues at the source vertex of the current step.
-   * False, if the next step continues at the target vertex of the current step.
+   * Vertex candidate to continue traversal from
    */
-  private int continueAt;
+  private int nextFrom;
   /**
    * True, iff the initial step is a loop.
    */
@@ -45,6 +62,8 @@ public class BuildEmbeddingFromTriple<K>
    * Constructor
    *
    * @param keyClazz    key type is needed for array initialization
+   * @param traversalCode traversal code for the current query
+   * @param matchStrategy strategy used for morphism checks
    * @param vertexCount number of vertices in the query graph
    * @param edgeCount   number of edges in the query graph
    */
@@ -63,21 +82,31 @@ public class BuildEmbeddingFromTriple<K>
     this.isQueryLoop = sourceIndex == targetIndex;
 
     if (traversalCode.getSteps().size() > 1) {
-      continueAt = (int) traversalCode.getStep(1).getFrom();
+      nextFrom = (int) traversalCode.getStep(1).getFrom();
     }
   }
 
   @Override
-  public void flatMap(TripleWithCandidates<K> t, Collector<EmbeddingWithTiePoint<K>> out) throws
-    Exception {
-    if ((matchStrategy == MatchStrategy.HOMOMORPHISM) ||
-      (isQueryLoop && t.getSourceId().equals(t.getTargetId())) ||
-      (!isQueryLoop && !t.getSourceId().equals(t.getTargetId()))) {
-        reuseEmbedding.getEdgeMapping()[edgeIndex] = t.getEdgeId();
-        reuseEmbedding.getVertexMapping()[sourceIndex] = t.getSourceId();
-        reuseEmbedding.getVertexMapping()[targetIndex] = t.getTargetId();
-        reuseEmbeddingWithTiePoint.setTiePointId(reuseEmbedding.getVertexMapping()[continueAt]);
-        out.collect(reuseEmbeddingWithTiePoint);
+  public void flatMap(TripleWithCandidates<K> triple, Collector<EmbeddingWithTiePoint<K>> out)
+    throws Exception {
+    if (isValidTriple(triple)) {
+      reuseEmbedding.getEdgeMapping()[edgeIndex] = triple.getEdgeId();
+      reuseEmbedding.getVertexMapping()[sourceIndex] = triple.getSourceId();
+      reuseEmbedding.getVertexMapping()[targetIndex] = triple.getTargetId();
+      reuseEmbeddingWithTiePoint.setTiePointId(reuseEmbedding.getVertexMapping()[nextFrom]);
+      out.collect(reuseEmbeddingWithTiePoint);
     }
+  }
+
+  /**
+   * Checks if the given triple is valid according to the match strategy and query characteristics.
+   *
+   * @param triple triple to check validity for
+   * @return true, iff the triple is a valid initial candidate
+   */
+  private boolean isValidTriple(TripleWithCandidates<K> triple) {
+    return (matchStrategy == MatchStrategy.HOMOMORPHISM) ||
+      (isQueryLoop && triple.getSourceId().equals(triple.getTargetId())) ||
+      (!isQueryLoop && !triple.getSourceId().equals(triple.getTargetId()));
   }
 }

@@ -1,9 +1,27 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.AbstractRichFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +29,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Base class for updating vertex and edge mappings in an {@link Embedding}.
+ *
+ * @param <K>
+ */
 abstract class UpdateMapping<K> extends AbstractRichFunction {
   /**
    * Traversal code representing the graph query
@@ -104,6 +127,12 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
     return matchStrategy;
   }
 
+  /**
+   * Sets the current step to the specified value. The current step needs to be provided
+   * by the inheriting classes.
+   *
+   * @param currentStepId current step
+   */
   void setCurrentStepId(int currentStepId) {
     this.currentStepId = currentStepId;
     this.hasMoreSteps = currentStepId < stepCount - 1;
@@ -146,7 +175,6 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
     boolean isMapped = vertexMapping[candidateIndex] != null;
     boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &&
       seenBefore(vertexMapping, vertexId, previousVertexCandidates);
-
     return (!isMapped && !seen) || (isMapped && vertexMapping[candidateIndex].equals(vertexId));
   }
 
@@ -157,11 +185,10 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
    * @param candidateIndex position in the mapping to check validity for
    * @return true, iff the specified edge is a valid candidate for the specified candidateIndex
    */
-   boolean isValidEdge(K edgeId, K[] edgeMapping, int candidateIndex) {
-     boolean isMapped = edgeMapping[candidateIndex] != null;
-     boolean seen = getMatchStrategy() == MatchStrategy.ISOMORPHISM &&
-       seenBefore(edgeMapping, edgeId, previousEdgeCandidates);
-
-     return !isMapped && !seen;
-   }
+  boolean isValidEdge(K edgeId, K[] edgeMapping, int candidateIndex) {
+    boolean isMapped = edgeMapping[candidateIndex] != null;
+    boolean seen = getMatchStrategy() == MatchStrategy.ISOMORPHISM &&
+      seenBefore(edgeMapping, edgeId, previousEdgeCandidates);
+    return !isMapped && !seen;
+  }
 }

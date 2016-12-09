@@ -19,7 +19,6 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 /**

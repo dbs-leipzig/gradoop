@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
@@ -8,20 +25,39 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-
+/**
+ * Extends an embedding with an edge and its source and target vertices if possible.
+ *
+ * @param <K> key type
+ */
 public class UpdateVertexEdgeMapping<K>
   extends UpdateMapping<K>
   implements
   FlatJoinFunction<EmbeddingWithTiePoint<K>, TripleWithCandidates<K>, EmbeddingWithTiePoint<K>> {
-
+  /**
+   * Query candidate for the source vertex
+   */
   private final int sourceCandidate;
-
+  /**
+   * Query candidate for the edge
+   */
   private final int edgeCandidate;
-
+  /**
+   * Query candidate for the target vertex
+   */
   private final int targetCandidate;
-
+  /**
+   * From field of the next traversal step (if there is one)
+   */
   private int nextFrom;
 
+  /**
+   * Constructor
+   *
+   * @param traversalCode traversal code for the current query
+   * @param currentStepId step if of the current traversal step
+   * @param matchStrategy strategy for morphism testing
+   */
   public UpdateVertexEdgeMapping(TraversalCode traversalCode, int currentStepId,
     MatchStrategy matchStrategy) {
     super(traversalCode, matchStrategy);
@@ -46,7 +82,6 @@ public class UpdateVertexEdgeMapping<K>
     K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();
 
     if (isValidEdge(edgeId, edgeMapping, edgeCandidate)) {
-
       // check vertices
       K[] vertexMapping = embedding.getEmbedding().getVertexMapping();
 
@@ -56,7 +91,6 @@ public class UpdateVertexEdgeMapping<K>
         vertexMapping[sourceCandidate] = t.getSourceId();
         vertexMapping[targetCandidate] = t.getTargetId();
 
-        // update tie point and collect updated embedding
         if (hasMoreSteps()) {
           embedding.setTiePointId(vertexMapping[nextFrom]);
         }

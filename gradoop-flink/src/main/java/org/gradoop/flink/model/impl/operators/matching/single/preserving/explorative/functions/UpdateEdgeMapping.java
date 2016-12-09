@@ -28,7 +28,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
-
 /**
  * Extends an embedding with an edge if possible.
  *
