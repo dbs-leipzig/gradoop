@@ -75,11 +75,32 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph));
+    write(logicalGraph, false);
   }
 
   @Override
-  public void write(GraphCollection graphCollection) throws IOException {
+  public void write(GraphCollection graphCollection) throws
+    IOException {
+    write(graphCollection, false);
+  }
+
+  @Override
+  public void write(GraphTransactions graphTransactions) throws
+    IOException {
+
+    write(graphTransactions, false);
+  }
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
+    write(GraphCollection.fromGraph(logicalGraph), overWrite);
+
+  }
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+
+    // TODO: interpret overWrite
 
     // transform graph data to persistent graph data and write it
     writeGraphHeads(graphCollection);
@@ -92,8 +113,9 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws IOException {
-    write(GraphCollection.fromTransactions(graphTransactions));
+  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
+    write(GraphCollection.fromTransactions(graphTransactions), overWrite);
+
   }
 
   /**

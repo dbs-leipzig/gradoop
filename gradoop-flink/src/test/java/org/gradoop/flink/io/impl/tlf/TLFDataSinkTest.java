@@ -46,16 +46,12 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
-    File file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, config);
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport, getConfig());
-    dataSink.write(dataSource.getGraphTransactions());
+    dataSink.write(dataSource.getGraphTransactions(), true);
     // read from output path
     DataSource dataSource2 = new TLFDataSource(tlfFileExport, config);
 
@@ -80,17 +76,10 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
-    File file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
+
     String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_vertex_dictionary");
-    file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, 
@@ -98,7 +87,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     // write to output path
     DataSink dataSink = new TLFDataSink(tlfFileExport, 
       tlfVertexDictionaryFileExport, "", getConfig());
-    dataSink.write(dataSource.getGraphTransactions());
+    dataSink.write(dataSource.getGraphTransactions(), true);
     // read from output path
     dataSource = new TLFDataSource(tlfFileExport, config);
     GraphTransactions graphTransactions = dataSource.getGraphTransactions();
@@ -140,24 +129,14 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     String tlfFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
-    File file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
+
     String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_vertex_dictionary");
-    file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
+
     String tlfEdgeDictionaryFileExport = TLFDataSinkTest.class
       .getResource("/data/tlf").toURI().getPath()
       .concat("/dictionaries/io_test_output_edge_dictionary");
-    file = new File(tlfFileExport);
-    if (!file.exists()) {
-      file.createNewFile();
-    }
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport,
@@ -165,7 +144,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport,
       tlfVertexDictionaryFileExport, tlfEdgeDictionaryFileExport, getConfig());
-    dataSink.write(dataSource.getGraphTransactions());
+    dataSink.write(dataSource.getGraphTransactions(), true);
     // read from output path
     dataSource = new TLFDataSource(tlfFileExport, config);
     GraphTransactions graphTransactions = dataSource.getGraphTransactions();

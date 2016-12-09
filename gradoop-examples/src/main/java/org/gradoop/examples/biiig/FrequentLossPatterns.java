@@ -18,7 +18,6 @@
 package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.hadoop.util.Time;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -27,8 +26,8 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.GSpanIterative;
-import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -50,9 +49,11 @@ import static java.math.BigDecimal.ZERO;
  * Collections" submitted to IT special issue on Big Data Analytics
  *
  * To execute the example:
- * 1. checkout Gradoop
- * 2. mvn clean package
- * 3. run main method
+ * 1. install Graphviz (e.g., sudo apt-get install graphviz)
+ *    See {@link <a href="http://www.graphviz.org/">Graphviz</a>}
+ * 2. checkout Gradoop
+ * 3. mvn clean package
+ * 4. run main method
  */
 public class FrequentLossPatterns
   extends AbstractRunner implements ProgramDescription {
@@ -218,15 +219,20 @@ public class FrequentLossPatterns
 
     // (10) write data sink
 
-    String outPath =
-      System.getProperty("user.home") + "/lossPatterns_" + Time.now() + ".dot";
+    String pathPrefix = System.getProperty("user.home") + "/lossPatterns";
+    String dotPath = pathPrefix + ".dot";
+    String psPath = pathPrefix + ".ps";
 
-    new DOTDataSink(outPath, true).write(frequentSubgraphs);
+    new DOTDataSink(dotPath, true).write(frequentSubgraphs, true);
 
     // END DEMONSTRATION PROGRAM
 
     // trigger execution
     getExecutionEnvironment().execute();
+
+    String cmd = "dot -Tps " + dotPath + " -o " + psPath;
+
+    Runtime.getRuntime().exec(cmd);
   }
 
   // AGGREGATE FUNCTIONS
