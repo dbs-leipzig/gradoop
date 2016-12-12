@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import java.util.Map;
 
 /**
- * Sets the graph ids for each master data vertex. The ids a taken from a broadcasted map.
+ * Sets the graph ids for each master data vertex. The ids are taken from a broadcasted map.
  */
 public class SetMasterDataGraphIds extends RichMapFunction<Vertex, Vertex> {
   /**
