@@ -22,6 +22,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.foodbroker.config.Constants;
 
 import java.util.Map;
 
@@ -38,7 +39,8 @@ public class SetMasterDataGraphIds extends RichMapFunction<Vertex, Vertex> {
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    map = getRuntimeContext().<Map<GradoopId, GradoopIdSet>>getBroadcastVariable("graphIds").get(0);
+    map = getRuntimeContext()
+      .<Map<GradoopId, GradoopIdSet>>getBroadcastVariable(Constants.GRAPH_IDS_BC).get(0);
   }
 
   @Override

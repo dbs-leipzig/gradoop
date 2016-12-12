@@ -22,6 +22,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -54,7 +55,7 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Acronym for employee.
    */
-  private static final String ACRONYM = "EMP";
+  public static final String ACRONYM = "EMP";
   /**
    * List of possible first female names.
    */
@@ -126,7 +127,7 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
     Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set rnd city, name and gender
-    properties.set("city", cities.get(random.nextInt(cityCount)));
+    properties.set(Constants.CITY, cities.get(random.nextInt(cityCount)));
 
     String gender;
     String name;
@@ -140,8 +141,8 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
       name = firstNamesMale.get(random.nextInt(firstNameCountMale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
-    properties.set("name", name);
-    properties.set("gender", gender);
+    properties.set(Constants.NAME, name);
+    properties.set(Constants.GENDER, gender);
     return vertexFactory.createVertex(Employee.CLASS_NAME, properties);
   }
 }

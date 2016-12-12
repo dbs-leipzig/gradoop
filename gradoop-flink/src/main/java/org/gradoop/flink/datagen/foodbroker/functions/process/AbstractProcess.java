@@ -158,25 +158,26 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     super.open(parameters);
     //get broadcasted maps
     customerMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.CUSTOMER_MAP).get(0);
+      getBroadcastVariable(Constants.CUSTOMER_MAP_BC).get(0);
 
     vendorMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.VENDOR_MAP).get(0);
+      getBroadcastVariable(Constants.VENDOR_MAP_BC).get(0);
 
     logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.LOGISTIC_MAP).get(0);
+      getBroadcastVariable(Constants.LOGISTIC_MAP_BC).get(0);
 
     employeeMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.EMPLOYEE_MAP).get(0);
+      getBroadcastVariable(Constants.EMPLOYEE_MAP_BC).get(0);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP).get(0);
+      getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP_BC).get(0);
     //get the iterator of each map
     customerList = customerMap.keySet().toArray(new GradoopId[customerMap.keySet().size()]);
     vendorList = vendorMap.keySet().toArray(new GradoopId[vendorMap.keySet().size()]);
     logisticList = logisticMap.keySet().toArray(new GradoopId[logisticMap.keySet().size()]);
     employeeList = employeeMap.keySet().toArray(new GradoopId[employeeMap.keySet().size()]);
-    productQualityList = productQualityMap.keySet().toArray(new GradoopId[productQualityMap.keySet().size()]);
+    productQualityList = productQualityMap.keySet()
+      .toArray(new GradoopId[productQualityMap.keySet().size()]);
   }
 
   /**
@@ -276,13 +277,13 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     GradoopId target = getEdgeTargetId(edgeLabel, source);
 
     switch (masterDataMap) {
-    case Constants.CUSTOMER_MAP:
+    case Constants.CUSTOMER_MAP_BC:
       return customerMap.get(target);
-    case Constants.VENDOR_MAP:
+    case Constants.VENDOR_MAP_BC:
       return vendorMap.get(target);
-    case Constants.LOGISTIC_MAP:
+    case Constants.LOGISTIC_MAP_BC:
       return logisticMap.get(target);
-    case Constants.EMPLOYEE_MAP:
+    case Constants.EMPLOYEE_MAP_BC:
       return employeeMap.get(target);
     case Constants.USER_MAP:
       return userMap.get(target);

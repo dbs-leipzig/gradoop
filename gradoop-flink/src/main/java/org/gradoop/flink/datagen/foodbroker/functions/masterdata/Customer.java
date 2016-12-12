@@ -22,6 +22,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class Customer extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Acronym for customer.
    */
-  private static final String ACRONYM = "CUS";
+  public static final String ACRONYM = "CUS";
   /**
    * List of possible adjectives.
    */
@@ -108,12 +109,9 @@ public class Customer extends RichMapFunction<MasterDataSeed, Vertex> {
     Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set rnd city and name
-    properties.set("city", cities.get(random.nextInt(cityCount)));
-    properties.set("name",
-      adjectives.get(random.nextInt(adjectiveCount)) +
-      " " + nouns.get(random.nextInt(nounCount)));
+    properties.set(Constants.CITY, cities.get(random.nextInt(cityCount)));
+    properties.set(Constants.NAME, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+      nouns.get(random.nextInt(nounCount)));
     return vertexFactory.createVertex(Customer.CLASS_NAME, properties);
   }
-
-
 }

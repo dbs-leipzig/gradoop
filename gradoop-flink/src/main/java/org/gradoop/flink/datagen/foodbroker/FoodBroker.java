@@ -163,12 +163,12 @@ public class FoodBroker implements GraphCollectionGenerator {
     DataSet<GraphTransaction> brokerage = caseSeeds
       .mapPartition(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
         .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
-      .withBroadcastSet(customerDataMap, Constants.CUSTOMER_MAP)
-      .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP)
-      .withBroadcastSet(logisticsDataMap, Constants.LOGISTIC_MAP)
-      .withBroadcastSet(employeesDataMap, Constants.EMPLOYEE_MAP)
-      .withBroadcastSet(productsQualityDataMap, Constants.PRODUCT_QUALITY_MAP)
-      .withBroadcastSet(productsPriceDataMap, Constants.PRODUCT_PRICE_MAP);
+      .withBroadcastSet(customerDataMap, Constants.CUSTOMER_MAP_BC)
+      .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP_BC)
+      .withBroadcastSet(logisticsDataMap, Constants.LOGISTIC_MAP_BC)
+      .withBroadcastSet(employeesDataMap, Constants.EMPLOYEE_MAP_BC)
+      .withBroadcastSet(productsQualityDataMap, Constants.PRODUCT_QUALITY_MAP_BC)
+      .withBroadcastSet(productsPriceDataMap, Constants.PRODUCT_PRICE_MAP_BC);
 
     long complaintSeed = 0;
 
@@ -181,11 +181,11 @@ public class FoodBroker implements GraphCollectionGenerator {
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig, complaintSeed))
-      .withBroadcastSet(customerDataMap, Constants.CUSTOMER_MAP)
-      .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP)
-      .withBroadcastSet(logisticsDataMap, Constants.LOGISTIC_MAP)
-      .withBroadcastSet(employeesDataMap, Constants.EMPLOYEE_MAP)
-      .withBroadcastSet(productsQualityDataMap, Constants.PRODUCT_QUALITY_MAP)
+      .withBroadcastSet(customerDataMap, Constants.CUSTOMER_MAP_BC)
+      .withBroadcastSet(vendorDataMap, Constants.VENDOR_MAP_BC)
+      .withBroadcastSet(logisticsDataMap, Constants.LOGISTIC_MAP_BC)
+      .withBroadcastSet(employeesDataMap, Constants.EMPLOYEE_MAP_BC)
+      .withBroadcastSet(productsQualityDataMap, Constants.PRODUCT_QUALITY_MAP_BC)
       .withBroadcastSet(employees, Employee.CLASS_NAME)
       .withBroadcastSet(customers, Customer.CLASS_NAME);
 
@@ -225,7 +225,7 @@ public class FoodBroker implements GraphCollectionGenerator {
       .union(products)
       .union(complaintHandlingMasterData)
       .map(new SetMasterDataGraphIds())
-      .withBroadcastSet(graphIds, "graphIds");
+      .withBroadcastSet(graphIds, Constants.GRAPH_IDS_BC);
 
     DataSet<Vertex> vertices = masterData
       .union(transactionalVertices);
