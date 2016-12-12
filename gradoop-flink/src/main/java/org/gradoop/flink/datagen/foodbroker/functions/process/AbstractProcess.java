@@ -295,6 +295,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Returns a random id in the array.
    *
+   * @param array array containing gradoop ids
    * @return a random entry
    */
   protected GradoopId getRandomEntryFromArray(GradoopId[] array) {
