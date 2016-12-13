@@ -23,16 +23,13 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Base class for updating vertex and edge mappings in an {@link Embedding}.
  *
- * @param <K>
+ * @param <K> key type
  */
 abstract class UpdateMapping<K> extends AbstractRichFunction {
   /**
@@ -58,13 +55,14 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
   /**
    * Represents a list of all edge candidates visited in previous traversal steps
    */
-  private List<Integer> previousEdgeCandidates;
+  private int[] previousEdgeCandidates;
   /**
    * Represents a set of all vertex candidates visited in previous traversal steps
    */
-  private Set<Integer> previousVertexCandidates;
+  private int[] previousVertexCandidates;
 
   /**
+   * Constructor
    *
    * @param traversalCode traversal code representing the graph query
    * @param matchStrategy morphism strategy
@@ -83,10 +81,10 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
    * @param fields  fields to check
    * @return true, if id was visited before
    */
-  private boolean seenBefore(K[] mapping, K id, Collection<Integer> fields) {
+  private boolean seenBefore(K[] mapping, K id, int[] fields) {
     boolean result = false;
 
-    for (Integer field : fields) {
+    for (int field : fields) {
       if (mapping[field].equals(id)) {
         result = true;
         break;
@@ -102,20 +100,26 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
   void initializeVisited() {
     if (getMatchStrategy() == MatchStrategy.ISOMORPHISM) {
       // get previous edge candidates
-      previousEdgeCandidates = new ArrayList<>(currentStepId);
+      previousEdgeCandidates = new int[currentStepId];
       for (int i = 0; i < currentStepId; i++) {
-        previousEdgeCandidates.add((int) getTraversalCode().getStep(i).getVia());
+        previousEdgeCandidates[i] = (int) getTraversalCode().getStep(i).getVia();
       }
 
       // get previous vertex candidates (limited by two times the number steps (edges))
-      previousVertexCandidates = new HashSet<>(stepCount * 2);
+      Set<Integer> visitedVertices = new HashSet<>(stepCount * 2);
       for (int i = 0; i < currentStepId; i++) {
         Step s = getTraversalCode().getStep(i);
-        previousVertexCandidates.add((int) s.getFrom());
-        previousVertexCandidates.add((int) s.getTo());
+        visitedVertices.add((int) s.getFrom());
+        visitedVertices.add((int) s.getTo());
       }
       // add from field of current step
-      previousVertexCandidates.add((int) getCurrentStep().getFrom());
+      visitedVertices.add((int) getCurrentStep().getFrom());
+      // initialize array from unique vertex ids
+      previousVertexCandidates = new int[visitedVertices.size()];
+      int i = 0;
+      for (Integer visitedVertex : visitedVertices) {
+        previousVertexCandidates[i++] = visitedVertex;
+      }
     }
   }
 
@@ -180,6 +184,7 @@ abstract class UpdateMapping<K> extends AbstractRichFunction {
 
   /**
    * Checks of the given edge is a valid candidate for the specified mapping index.
+   *
    * @param edgeId edge id to check for validity
    * @param edgeMapping current edge mapping
    * @param candidateIndex position in the mapping to check validity for
