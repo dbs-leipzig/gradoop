@@ -28,8 +28,7 @@ import java.util.Arrays;
  *
  * @param <K> key type
  */
-public class PrintEmbedding<K extends Comparable<K>>
-  extends Printer<Embedding<K>, K> {
+public class PrintEmbedding<K extends Comparable<K>> extends Printer<Embedding<K>, K> {
   /**
    * Logger
    */

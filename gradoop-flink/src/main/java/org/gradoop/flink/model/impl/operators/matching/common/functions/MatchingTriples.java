@@ -46,22 +46,18 @@ import org.s1ck.gdl.model.Edge;
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3->f2")
 public class MatchingTriples extends RichFlatJoinFunction<TripleWithSourceEdgeCandidates<GradoopId>,
   IdWithCandidates<GradoopId>, TripleWithCandidates<GradoopId>> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * GDL query
    */
   private final String query;
-
   /**
    * Query handler
    */
   private transient QueryHandler queryHandler;
-
   /**
    * Reduce instantiations
    */

@@ -27,8 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
  *
  * @param <EL>  EPGM element type
  */
-public abstract class AbstractFilter<EL extends Element>
-  extends RichFilterFunction<EL> {
+public abstract class AbstractFilter<EL extends Element> extends RichFilterFunction<EL> {
 
   /**
    * GDL query

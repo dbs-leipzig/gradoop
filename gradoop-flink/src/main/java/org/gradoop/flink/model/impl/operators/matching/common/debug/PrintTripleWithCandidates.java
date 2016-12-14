@@ -27,13 +27,11 @@ import java.util.Arrays;
  *
  * @param <K> key type
  */
-public class PrintTripleWithCandidates<K>
-  extends Printer<TripleWithCandidates<K>, K> {
+public class PrintTripleWithCandidates<K> extends Printer<TripleWithCandidates<K>, K> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    PrintTripleWithCandidates.class);
+  private static final Logger LOG = Logger.getLogger(PrintTripleWithCandidates.class);
 
   /**
    * Constructor

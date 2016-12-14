@@ -52,6 +52,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
+  .TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
 
@@ -71,7 +73,8 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativePatternMatching extends PatternMatching
+public class ExplorativePatternMatching
+  extends PatternMatching
   implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.

@@ -4,6 +4,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving
   .SubgraphIsomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
+  .TraverserStrategy;
 
 public class ExplorativeIsomorphismSetPairForLoopTest extends SubgraphIsomorphismTest {
 

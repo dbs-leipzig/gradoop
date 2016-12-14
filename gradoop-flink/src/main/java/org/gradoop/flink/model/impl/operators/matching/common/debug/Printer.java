@@ -74,7 +74,7 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   /**
    * Number to display if not in iterative context but iteration is set.
    */
-  protected final int iterationNumber;
+  private final int iterationNumber;
   /**
    * Constructor
    */
@@ -85,8 +85,10 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   /**
    * Constructor
    *
-   * @param isIterative true, if called in iterative context
-   * @param prefix prefix for output
+   * Automatically determines the current iteration when instantiated in Flink iteration.
+   *
+   * @param isIterative true, if called in a Flink iterative context (i.e. bulk/delta iteration)
+   * @param prefix      prefix for output
    */
   public Printer(boolean isIterative, String prefix) {
     this.isIterative     = isIterative;
@@ -97,7 +99,10 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   /**
    * Constructor
    *
-   * @param iterationNumber true, if used in iterative context
+   * Requires the manual definition of the current iteration. This is necessary when called
+   * outside a Flink iteration, but in an iterative context (e.g. a Java loop).
+   *
+   * @param iterationNumber current iteration
    * @param prefix          prefix for debug string
    */
   public Printer(int iterationNumber, String prefix) {
@@ -144,7 +149,7 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    *
    * @return debug header
    */
-  protected String getHeader() {
+  private String getHeader() {
     return String.format("[%d][%s]: ",
       isIterative ? getIterationRuntimeContext().getSuperstepNumber() : iterationNumber,
       prefix != null && !prefix.isEmpty() ? prefix : " ");
@@ -166,8 +171,7 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   }
 
   /**
-   * Converts a list of ids into a list of corresponding property
-   * values.
+   * Converts a list of ids into a list of corresponding property values.
    *
    * @param ids       gradoop ids
    * @param isVertex  true - use vertex mapping, false - use edge mapping
@@ -196,10 +200,10 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   }
 
   /**
-   * Prints out logging information if necessary.
+   * Prints out logging information if logging is enabled and mapping information is available.
    *
    * @param dataSet       dataset to be logged
-   * @param printer       prints each dataset row (or subset of it)
+   * @param printer       prints each dataset row (or a subset of it)
    * @param vertexMapping mapping between vertex id and debug property value
    * @param edgeMapping   mapping between edge id and debug property value
    * @param <T>           dataset type

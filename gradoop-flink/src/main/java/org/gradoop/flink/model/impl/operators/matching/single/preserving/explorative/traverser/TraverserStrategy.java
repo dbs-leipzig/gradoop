@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative;
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
 
 /**
  * Defines the strategy to traverse the graph.

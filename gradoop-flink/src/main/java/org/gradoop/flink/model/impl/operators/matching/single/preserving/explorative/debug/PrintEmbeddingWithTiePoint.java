@@ -29,8 +29,7 @@ import java.util.Arrays;
  *
  * @param <K> key type
  */
-public class PrintEmbeddingWithTiePoint<K>
-  extends Printer<EmbeddingWithTiePoint<K>, K> {
+public class PrintEmbeddingWithTiePoint<K> extends Printer<EmbeddingWithTiePoint<K>, K> {
   /**
    * Logger
    */

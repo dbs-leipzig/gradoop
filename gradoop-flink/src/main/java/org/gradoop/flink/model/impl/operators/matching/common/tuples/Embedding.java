@@ -21,11 +21,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Represents an embedding of a query pattern in the search graph. Vertex and
- * edge embeddings are represented by two arrays where the index in the array
+ * edge mappings are represented by two arrays where the index in the array
  * refers to the index of the query vertex/edge.
  *
- * f0: vertex mappings
- * f1: edge mappings
+ * f0: vertex mapping
+ * f1: edge mapping
  *
  * @param <K> key type
  */

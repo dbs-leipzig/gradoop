@@ -120,11 +120,9 @@ public abstract class DistributedTraverser<K> {
   }
 
   /**
-   * True, if the traverser runs in an bulk or delta iteration.
+   * True, if the traverser runs in a bulk or delta iteration.
    *
-   * @return true, if bulk or delta iteration based
+   * @return true, if traverser is using Flink bulk or delta iteration
    */
   abstract boolean isIterative();
-
-
 }

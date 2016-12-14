@@ -32,8 +32,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples
  * @param <K> key type
  */
 @FunctionAnnotation.ReadFields("f1")
-public class ElementHasCandidate<K>
-  implements FilterFunction<IdWithCandidates<K>> {
+public class ElementHasCandidate<K> implements FilterFunction<IdWithCandidates<K>> {
 
   /**
    * Candidate to test on

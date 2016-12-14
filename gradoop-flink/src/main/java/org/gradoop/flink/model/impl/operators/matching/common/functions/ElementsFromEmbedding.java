@@ -40,8 +40,8 @@ import java.util.Map;
 /**
  * Extracts {@link Element} instances from an {@link Embedding}.
  */
-public class ElementsFromEmbedding implements
-  FlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
+public class ElementsFromEmbedding
+  implements FlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed

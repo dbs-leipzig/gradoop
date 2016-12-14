@@ -32,7 +32,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
  */
 @FunctionAnnotation.ReadFields("f3")
 public class TripleHasCandidate<K> implements FilterFunction<TripleWithCandidates<K>> {
-
   /**
    * Candidate to test on
    */

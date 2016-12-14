@@ -37,14 +37,11 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  * @param <K> key type
  */
 @FunctionAnnotation.ReadFields("f1")
-public class VertexHasCandidate<K>
-  extends RichFilterFunction<IdWithCandidates<K>> {
-
+public class VertexHasCandidate<K> extends RichFilterFunction<IdWithCandidates<K>> {
   /**
    * Traversal code
    */
   private final TraversalCode traversalCode;
-
   /**
    * Candidate to test on
    */
