@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.transactional;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -29,6 +30,7 @@ import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Project4To0And1;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -40,12 +42,12 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.function.Bu
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.ConstructGraphs;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.ExpandFirstField;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.FindEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.GraphIdFilter;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.HasEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.InitGraphHeadWithLineage;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.MergeSecondField;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
+
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
 
@@ -101,13 +103,14 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     // generate mapping from graph-id to vertex candidates
     //--------------------------------------------------------------------------
     DataSet<Tuple2<GradoopId, IdWithCandidates<GradoopId>>>
-      vertexCandidatesWithGraphs =
-      collection.getVertices()
+      vertexCandidatesWithGraphs = collection.getVertices()
         .filter(new MatchingVertices<>(query))
         .map(new BuildIdWithCandidatesAndGraphs<>(query))
         .flatMap(new ExpandFirstField<>())
-        .filter(new GraphIdFilter<>())
-        .withBroadcastSet(graphIds, "graph-ids");
+        .join(graphIds)
+        .where(0).equalTo("*")
+        .with(new LeftSide<>());
+
 
     //--------------------------------------------------------------------------
     // generate mapping from graph-id to edge candidates
@@ -118,8 +121,9 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
         .filter(new MatchingEdges<>(query))
         .map(new BuildTripleWithCandidatesAndGraphs<>(query))
         .flatMap(new ExpandFirstField<>())
-        .filter(new GraphIdFilter<>())
-        .withBroadcastSet(graphIds, "graph-ids");
+        .join(graphIds)
+        .where(0).equalTo("*")
+        .with(new LeftSide<>());
 
     //--------------------------------------------------------------------------
     // generate graphs with the candidates for their elements
