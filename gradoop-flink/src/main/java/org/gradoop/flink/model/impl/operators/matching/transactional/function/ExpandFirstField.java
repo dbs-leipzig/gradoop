@@ -38,9 +38,9 @@ public class ExpandFirstField<T>
   private Tuple2<GradoopId, T> reuseTuple = new Tuple2<>();
 
   @Override
-  public void flatMap(
-    Tuple2<GradoopIdSet, T> tuple2,
-    Collector<Tuple2<GradoopId, T>> collector) throws Exception {
+  public void flatMap(Tuple2<GradoopIdSet, T> tuple2, Collector<Tuple2<GradoopId, T>> collector)
+    throws Exception {
+
     reuseTuple.f1 = tuple2.f1;
     for (GradoopId id : tuple2.f0) {
       reuseTuple.f0 = id;
