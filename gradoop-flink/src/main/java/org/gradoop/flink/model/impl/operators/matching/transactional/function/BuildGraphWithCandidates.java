@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.Grap
  * Constructs GraphWithCandidates from sets of vertices and edges with their
  * candidates.
  */
-public class ConstructGraphs implements
+public class BuildGraphWithCandidates implements
   CoGroupFunction<Tuple2<GradoopId, IdWithCandidates<GradoopId>>,
     Tuple2<GradoopId, TripleWithCandidates<GradoopId>>, GraphWithCandidates> {
 

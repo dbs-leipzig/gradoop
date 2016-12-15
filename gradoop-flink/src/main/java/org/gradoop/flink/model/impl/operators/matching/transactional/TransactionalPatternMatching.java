@@ -29,6 +29,7 @@ import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Project4To0And1;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -37,10 +38,9 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.P
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildIdWithCandidatesAndGraphs;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildTripleWithCandidatesAndGraphs;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.ConstructGraphs;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildGraphWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.ExpandFirstField;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.FindEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.GraphIdFilter;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.HasEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.InitGraphHeadWithLineage;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.MergeSecondField;
@@ -93,42 +93,41 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
   public GraphCollection execute(GraphCollection collection) {
 
     //--------------------------------------------------------------------------
-    // generate graph-id set witch will be used for broadcasting
+    // generate graph-id set witch will be used for generating mappings
     //--------------------------------------------------------------------------
     DataSet<GradoopId> graphIds = collection.getGraphHeads().map(new Id<>());
 
     //--------------------------------------------------------------------------
     // generate mapping from graph-id to vertex candidates
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, IdWithCandidates<GradoopId>>>
-      vertexCandidatesWithGraphs =
+    DataSet<Tuple2<GradoopId, IdWithCandidates<GradoopId>>> vertexCandidatesWithGraphs =
       collection.getVertices()
         .filter(new MatchingVertices<>(query))
         .map(new BuildIdWithCandidatesAndGraphs<>(query))
         .flatMap(new ExpandFirstField<>())
-        .filter(new GraphIdFilter<>())
-        .withBroadcastSet(graphIds, "graph-ids");
+        .join(graphIds)
+        .where(0).equalTo("*")
+        .with(new LeftSide<>());
 
     //--------------------------------------------------------------------------
     // generate mapping from graph-id to edge candidates
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, TripleWithCandidates<GradoopId>>>
-      edgeCandidatesWithGraphs =
+    DataSet<Tuple2<GradoopId, TripleWithCandidates<GradoopId>>> edgeCandidatesWithGraphs =
       collection.getEdges()
         .filter(new MatchingEdges<>(query))
         .map(new BuildTripleWithCandidatesAndGraphs<>(query))
         .flatMap(new ExpandFirstField<>())
-        .filter(new GraphIdFilter<>())
-        .withBroadcastSet(graphIds, "graph-ids");
+        .join(graphIds)
+        .where(0).equalTo("*")
+        .with(new LeftSide<>());
 
     //--------------------------------------------------------------------------
     // generate graphs with the candidates for their elements
     //--------------------------------------------------------------------------
-    DataSet<GraphWithCandidates> graphs =
-      vertexCandidatesWithGraphs
-        .coGroup(edgeCandidatesWithGraphs)
-        .where(0).equalTo(0)
-        .with(new ConstructGraphs());
+    DataSet<GraphWithCandidates> graphs = vertexCandidatesWithGraphs
+      .coGroup(edgeCandidatesWithGraphs)
+      .where(0).equalTo(0)
+      .with(new BuildGraphWithCandidates());
 
     if (findEmbeddings) {
       return findEmbeddings(collection, graphs);
@@ -149,18 +148,15 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // run matching algorithm
     //--------------------------------------------------------------------------
-
     DataSet<Tuple2<GradoopId, Boolean>> matches = graphs.map(new HasEmbeddings(algorithm, query));
 
     //--------------------------------------------------------------------------
     // join matches to graph heads
     //--------------------------------------------------------------------------
-
-    DataSet<GraphHead> newHeads =
-      collection.getGraphHeads()
-        .coGroup(matches)
-        .where(new Id<>()).equalTo(0)
-        .with(new AddMatchesToProperties());
+    DataSet<GraphHead> newHeads = collection.getGraphHeads()
+      .coGroup(matches)
+      .where(new Id<>()).equalTo(0)
+      .with(new AddMatchesToProperties());
 
     //--------------------------------------------------------------------------
     // return updated graph collection
@@ -184,7 +180,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     // run the matching algorithm
     //--------------------------------------------------------------------------
     DataSet<Tuple4<GradoopId, GradoopId, GradoopIdSet, GradoopIdSet>> embeddings = graphs
-        .flatMap(new FindEmbeddings(algorithm, query));
+      .flatMap(new FindEmbeddings(algorithm, query));
 
     //--------------------------------------------------------------------------
     // create new graph heads
@@ -193,37 +189,31 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .map(new Project4To0And1<>())
       .map(new InitGraphHeadWithLineage(collection.getConfig().getGraphHeadFactory()));
 
-
     //--------------------------------------------------------------------------
     // update vertex graphs
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> verticesWithGraphs =
-      embeddings
-        .map(new Project4To0And2AndSwitch<>())
-        .flatMap(new ExpandFirstField<>()).groupBy(0)
-        .reduceGroup(new MergeSecondField<>());
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> verticesWithGraphs = embeddings
+      .map(new Project4To0And2AndSwitch<>())
+      .flatMap(new ExpandFirstField<>()).groupBy(0)
+      .reduceGroup(new MergeSecondField<>());
 
-    DataSet<Vertex> newVertices =
-      verticesWithGraphs
-        .join(collection.getVertices())
-        .where(0).equalTo(new Id<>())
-        .with(new AddGraphsToElements<>());
+    DataSet<Vertex> newVertices = verticesWithGraphs
+      .join(collection.getVertices())
+      .where(0).equalTo(new Id<>())
+      .with(new AddGraphsToElements<>());
 
     //--------------------------------------------------------------------------
     // update edge graphs
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgesWithGraphs =
-      embeddings
-        .map(new Project4To0And3AndSwitch<>())
-        .flatMap(new ExpandFirstField<>()).groupBy(0)
-        .reduceGroup(new MergeSecondField<>());
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgesWithGraphs = embeddings
+      .map(new Project4To0And3AndSwitch<>())
+      .flatMap(new ExpandFirstField<>()).groupBy(0)
+      .reduceGroup(new MergeSecondField<>());
 
-    DataSet<Edge> newEdges =
-      edgesWithGraphs
-        .join(collection.getEdges())
-        .where(0).equalTo(new Id<>())
-        .with(new AddGraphsToElements<>());
-
+    DataSet<Edge> newEdges = edgesWithGraphs
+      .join(collection.getEdges())
+      .where(0).equalTo(new Id<>())
+      .with(new AddGraphsToElements<>());
 
     //--------------------------------------------------------------------------
     // return the embeddings
