@@ -146,11 +146,15 @@ public class DOTFileFormat
         DOT_GRAPH_TAG));
 
       // write dot attributes if existent
+      Properties graphProperties = graphHead.getProperties();
+
       if (!graphHead.getLabel().equals(GConstants.DEFAULT_GRAPH_LABEL) ||
-        graphHead.getProperties().size() > 0) {
+        graphProperties != null && graphProperties.size() > 0) {
 
         builder.append(writeDOTAttributes(
-          graphHead.getLabel(), graphHead.getProperties()));
+          graphHead.getLabel(), graphProperties));
+      } else {
+        builder.append("[]");
       }
 
       // writes:
