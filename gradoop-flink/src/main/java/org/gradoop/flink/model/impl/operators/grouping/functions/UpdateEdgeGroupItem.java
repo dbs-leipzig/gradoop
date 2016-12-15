@@ -26,15 +26,13 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
  * Takes a projected edge and an (vertex-id, group-representative) tuple
  * and replaces the edge-target-id with the group-representative.
  */
-public class UpdateEdgeGroupItem implements
-  JoinFunction<EdgeGroupItem, VertexWithSuperVertex, EdgeGroupItem> {
-
+public class UpdateEdgeGroupItem
+  implements JoinFunction<EdgeGroupItem, VertexWithSuperVertex, EdgeGroupItem> {
   /**
    * Field in {@link EdgeGroupItem} which is overridden by the group
    * representative id.
    */
   private final int field;
-
   /**
    * Creates new join function.
    *
@@ -48,8 +46,7 @@ public class UpdateEdgeGroupItem implements
    * {@inheritDoc}
    */
   @Override
-  public EdgeGroupItem join(EdgeGroupItem edge, VertexWithSuperVertex idTuple)
-      throws Exception {
+  public EdgeGroupItem join(EdgeGroupItem edge, VertexWithSuperVertex idTuple) throws Exception {
     edge.setField(idTuple.getSuperVertexId(), field);
     return edge;
   }

@@ -36,9 +36,9 @@ import java.util.List;
  * group label, the group property value and the aggregate values for its group.
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
-public class ReduceEdgeGroupItems extends BuildSuperEdge
-  implements GroupReduceFunction<EdgeGroupItem, Edge>,
-  ResultTypeQueryable<Edge> {
+public class ReduceEdgeGroupItems
+  extends BuildSuperEdge
+  implements GroupReduceFunction<EdgeGroupItem, Edge>, ResultTypeQueryable<Edge> {
 
   /**
    * Edge factory.

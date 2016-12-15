@@ -31,8 +31,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f4: edge group aggregate values
  */
 public class EdgeGroupItem
-  extends
-  Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList> {
+  extends Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList> {
 
   public GradoopId getSourceId() {
     return f0;
