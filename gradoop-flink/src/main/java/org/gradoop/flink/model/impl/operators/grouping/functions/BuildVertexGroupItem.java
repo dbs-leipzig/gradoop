@@ -36,7 +36,8 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildVertexGroupItem extends BuildBase
+public class BuildVertexGroupItem
+  extends BuildBase
   implements MapFunction<Vertex, VertexGroupItem> {
 
   /**
