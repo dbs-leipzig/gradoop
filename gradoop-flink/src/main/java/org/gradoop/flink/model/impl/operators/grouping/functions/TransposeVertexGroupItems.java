@@ -55,8 +55,7 @@ import java.util.Set;
 )
 public class TransposeVertexGroupItems
   extends ReduceVertexGroupItemBase
-  implements GroupReduceFunction
-  <VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {
+  implements GroupReduceFunction<VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {
   /**
    * Reduce object instantiation
    */

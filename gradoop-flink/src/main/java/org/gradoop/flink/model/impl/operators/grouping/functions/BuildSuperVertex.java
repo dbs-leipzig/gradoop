@@ -36,8 +36,9 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("f1->id")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4")
-public class BuildSuperVertex extends BuildBase implements
-  MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
+public class BuildSuperVertex
+  extends BuildBase
+  implements MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
 
   /**
    * Vertex vertexFactory.

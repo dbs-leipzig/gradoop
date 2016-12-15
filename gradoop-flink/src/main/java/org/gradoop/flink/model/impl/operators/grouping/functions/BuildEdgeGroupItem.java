@@ -33,8 +33,7 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildEdgeGroupItem extends BuildBase implements
-  MapFunction<Edge, EdgeGroupItem> {
+public class BuildEdgeGroupItem extends BuildBase implements MapFunction<Edge, EdgeGroupItem> {
 
   /**
    * Avoid object initialization in each call.
