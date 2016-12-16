@@ -34,8 +34,8 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIdSet implements Iterable<GradoopId>,
-  WritableComparable<GradoopIdSet>, Serializable {
+public class GradoopIdSet
+  implements Iterable<GradoopId>, WritableComparable<GradoopIdSet>, Serializable {
 
   /**
    * Holds the identifiers.
@@ -67,11 +67,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
    */
   public static GradoopIdSet fromExisting(Collection<GradoopId> ids) {
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
-
-    for (GradoopId id : ids) {
-      gradoopIdSet.add(id);
-    }
-
+    gradoopIdSet.addAll(ids);
     return gradoopIdSet;
   }
 
@@ -156,7 +152,6 @@ public class GradoopIdSet implements Iterable<GradoopId>,
     return containsAny(ids);
   }
 
-
   /**
    * checks if empty
    * @return true, if empty
@@ -177,7 +172,7 @@ public class GradoopIdSet implements Iterable<GradoopId>,
   public void write(DataOutput dataOutput) throws IOException {
     dataOutput.writeInt(identifiers.size());
     for (GradoopId id : identifiers) {
-      id.write(dataOutput);
+      dataOutput.write(id.toByteArray());
     }
   }
 
@@ -186,10 +181,12 @@ public class GradoopIdSet implements Iterable<GradoopId>,
     int count = dataInput.readInt();
     identifiers = Sets.newTreeSet();
 
+    byte[] f;
     for (int i = 0; i < count; i++) {
-      GradoopId id = new GradoopId();
-      id.readFields(dataInput);
-      identifiers.add(id);
+      f = new byte[GradoopId.ID_SIZE];
+
+      dataInput.readFully(f, 0, GradoopId.ID_SIZE);
+      identifiers.add(GradoopId.fromByteArray(f));
     }
   }
 

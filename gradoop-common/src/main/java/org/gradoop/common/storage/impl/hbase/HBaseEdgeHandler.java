@@ -24,7 +24,6 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMVertex;
@@ -63,13 +62,11 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Byte array representation of the source vertex column identifier.
    */
-  private static final byte[] COL_SOURCE_BYTES =
-    Bytes.toBytes(GConstants.COL_SOURCE);
+  private static final byte[] COL_SOURCE_BYTES = Bytes.toBytes(GConstants.COL_SOURCE);
   /**
    * Byte array representation of the target vertex column identifier.
    */
-  private static final byte[] COL_TARGET_BYTES =
-    Bytes.toBytes(GConstants.COL_TARGET);
+  private static final byte[] COL_TARGET_BYTES = Bytes.toBytes(GConstants.COL_TARGET);
 
   /**
    * Creates edge data objects from the rows.
@@ -89,8 +86,8 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public void createTable(final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor) throws IOException {
+  public void createTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
+    throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     admin.createTable(tableDescriptor);
@@ -110,11 +107,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    */
   @Override
   public GradoopId readSourceId(Result res) throws IOException {
-    GradoopId sourceVertexId = new GradoopId();
-    Writables.getWritable(
-      res.getValue(CF_META_BYTES, COL_SOURCE_BYTES), sourceVertexId);
-
-    return sourceVertexId;
+    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));
   }
 
   /**
@@ -131,19 +124,14 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    */
   @Override
   public GradoopId readTargetId(Result res) throws IOException {
-    GradoopId targetVertexId = new GradoopId();
-    Writables.getWritable(
-      res.getValue(CF_META_BYTES, COL_TARGET_BYTES), targetVertexId);
-
-    return targetVertexId;
+    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws
-    IOException {
+  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws IOException {
     writeLabel(put, edgeData);
     writeSource(put, edgeData.getSource());
     writeTarget(put, edgeData.getTarget());
@@ -185,9 +173,8 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * @param vertex vertex
    * @return byte representation of the vertex identifier
    */
-  private byte[] createVertexIdentifier(final V vertex) throws
-    IOException {
-    byte[] vertexKeyBytes = Writables.getBytes(vertex.getId());
+  private byte[] createVertexIdentifier(final V vertex) throws IOException {
+    byte[] vertexKeyBytes = vertex.getId().toByteArray();
     byte[] labelBytes = Bytes.toBytes(vertex.getLabel());
 
     ArrayUtils.addAll(vertexKeyBytes, labelBytes);

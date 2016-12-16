@@ -23,7 +23,6 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.GraphHeadHandler;
@@ -61,14 +60,12 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
   /**
    * Byte array representation of the vertices column family.
    */
-  private static final byte[] CF_VERTICES_BYTES =
-    Bytes.toBytes(GConstants.CF_VERTICES);
+  private static final byte[] CF_VERTICES_BYTES = Bytes.toBytes(GConstants.CF_VERTICES);
 
   /**
    * Byte array representation of the edges column family.
    */
-  private static final byte[] CF_EDGES_BYTES =
-    Bytes.toBytes(GConstants.CF_EDGES);
+  private static final byte[] CF_EDGES_BYTES = Bytes.toBytes(GConstants.CF_EDGES);
 
   /**
    * Creates graph data objects from the rows.
@@ -88,8 +85,8 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public void createTable(final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor) throws IOException {
+  public void createTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
+    throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_VERTICES));
@@ -97,16 +94,13 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
     admin.createTable(tableDescriptor);
   }
 
-
   /**
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertices(
-    final Put put, final PersistentGraphHead graphData) throws IOException {
-
+  public Put writeVertices(final Put put, final PersistentGraphHead graphData) throws IOException {
     for (GradoopId vertexId : graphData.getVertexIds()) {
-      put.add(CF_VERTICES_BYTES, Writables.getBytes(vertexId), null);
+      put.add(CF_VERTICES_BYTES, vertexId.toByteArray(), null);
     }
     return put;
   }
@@ -123,10 +117,9 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdges(Put put, PersistentGraphHead graphData) throws
-    IOException {
+  public Put writeEdges(Put put, PersistentGraphHead graphData) throws IOException {
     for (GradoopId edgeId : graphData.getEdgeIds()) {
-      put.add(CF_EDGES_BYTES, Writables.getBytes(edgeId), null);
+      put.add(CF_EDGES_BYTES, edgeId.toByteArray(), null);
     }
     return put;
   }
@@ -143,8 +136,7 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphHead(final Put put, final PersistentGraphHead
-    graphData) throws IOException {
+  public Put writeGraphHead(final Put put, final PersistentGraphHead graphData) throws IOException {
     writeLabel(put, graphData);
     writeProperties(put, graphData);
     writeVertices(put, graphData);

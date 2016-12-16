@@ -22,14 +22,11 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.CopyableValue;
 import org.apache.flink.types.NormalizableKey;
-import org.apache.hadoop.io.WritableComparable;
 import org.bson.types.ObjectId;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 
 /**
@@ -41,8 +38,7 @@ import java.io.IOException;
  *
  * @see EPGMIdentifiable
  */
-public class GradoopId
-  implements WritableComparable<GradoopId>, NormalizableKey<GradoopId>, CopyableValue<GradoopId> {
+public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<GradoopId> {
 
   /**
    * Represents a null id.
@@ -248,20 +244,6 @@ public class GradoopId
       chars[i++] = HEX_CHARS[b & 0xF];
     }
     return new String(chars);
-  }
-
-  //------------------------------------------------------------------------------------------------
-  // methods inherited from WritableComparable
-  //------------------------------------------------------------------------------------------------
-
-  @Override
-  public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.write(bytes);
-  }
-
-  @Override
-  public void readFields(DataInput dataInput) throws IOException {
-    dataInput.readFully(bytes);
   }
 
   //------------------------------------------------------------------------------------------------
