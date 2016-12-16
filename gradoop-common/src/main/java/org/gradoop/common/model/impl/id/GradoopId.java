@@ -20,28 +20,29 @@ package org.gradoop.common.model.impl.id;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
+import org.apache.flink.types.CopyableValue;
 import org.apache.flink.types.NormalizableKey;
 import org.apache.hadoop.io.WritableComparable;
 import org.bson.types.ObjectId;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * Primary key for an EPGM entity. A GradoopId uniquely identifies an entity
- * inside its domain, i.e. a graph is unique among all graphs, a vertex among
- * all vertices and an edge among all edges.
+ * Primary key for an EPGM element.
  *
- * This implementation uses MongoDBs BSON {@link ObjectId} to guarantee uniqueness.
+ * This implementation uses a BSON {@link ObjectId} to guarantee uniqueness. Performance critical
+ * methods, e.g. {@link GradoopId#equals(Object)} and {@link GradoopId#hashCode()} contain code
+ * copied from {@link ObjectId} to avoid unnecessary object instantiations.
  *
  * @see EPGMIdentifiable
  */
-public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey<GradoopId> {
+public class GradoopId
+  implements WritableComparable<GradoopId>, NormalizableKey<GradoopId>, CopyableValue<GradoopId> {
 
   /**
    * Represents a null id.
@@ -52,23 +53,14 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   /**
    * Highest possible Gradoop Id.
    */
-  public static final GradoopId MAX_VALUE =
-    new GradoopId(
-      new ObjectId(
-        Integer.MAX_VALUE,
-        16777215,
-        Short.MAX_VALUE,
-        16777215));
+  public static final GradoopId MAX_VALUE = new GradoopId(
+    new ObjectId(Integer.MAX_VALUE, 16777215, Short.MAX_VALUE, 16777215));
 
   /**
    * Lowest possible Gradoop Id.
    */
-  public static final GradoopId MIN_VALUE =
-    new GradoopId(new ObjectId(
-      Integer.MIN_VALUE,
-      0,
-      Short.MIN_VALUE,
-      0));
+  public static final GradoopId MIN_VALUE = new GradoopId(
+    new ObjectId(Integer.MIN_VALUE, 0, Short.MIN_VALUE, 0));
 
   /**
    * Number of bytes to represent an id internally.
@@ -76,14 +68,22 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   public static final int ID_SIZE = 12;
 
   /**
-   * Internal representation
+   * Required for {@link GradoopId#toString()}
    */
-  private ObjectId objectId;
+  private static final char[] HEX_CHARS = new char[] {
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   /**
-   * Create a new ObjectId.
+   * Internal byte representation
+   */
+  private byte[] bytes;
+
+  /**
+   * Required default constructor for instantiation by serialization logic.
    */
   public GradoopId() {
+    bytes = new byte[ID_SIZE];
   }
 
   /**
@@ -92,8 +92,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    * @param objectId ObjectId
    */
   GradoopId(ObjectId objectId) {
-    checkNotNull(objectId, "ObjectId was null");
-    this.objectId = objectId;
+    this.bytes = objectId.toByteArray();
   }
 
   /**
@@ -101,8 +100,8 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    *
    * @param bytes the GradoopId represented by the byte array
    */
-  GradoopId(byte[] bytes) {
-    this.objectId = new ObjectId(bytes);
+  private GradoopId(byte[] bytes) {
+    this.bytes = bytes;
   }
 
   /**
@@ -115,15 +114,25 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
   }
 
   /**
-   * Returns the Gradoop ID represented by a string.
+   * Returns the Gradoop ID represented by a specified hexadecimal string.
    *
-   * @param string string representation
-   * @return Gradoop ID
+   * Note: Implementation taken from {@link ObjectId#ObjectId(String)} to avoid object
+   * instantiation.
+   *
+   * @param string hexadecimal GradoopId representation
+   * @return GradoopId
    */
   public static GradoopId fromString(String string) {
-    checkNotNull(string, "ID string was null");
-    checkArgument(!string.isEmpty(), "ID string was empty");
-    return new GradoopId(new ObjectId(string));
+    if (!ObjectId.isValid(string)) {
+      throw new IllegalArgumentException(
+        "invalid hexadecimal representation of a GradoopId: [" + string + "]");
+    }
+
+    byte[] b = new byte[12];
+    for (int i = 0; i < b.length; i++) {
+      b[i] = (byte) Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16);
+    }
+    return new GradoopId(b);
   }
 
   /**
@@ -132,7 +141,7 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    * @param bytes byte representation
    * @return Gradoop ID
    */
-  public static GradoopId fromBytes(byte[] bytes) {
+  public static GradoopId fromByteArray(byte[] bytes) {
     return new GradoopId(bytes);
   }
 
@@ -141,48 +150,123 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
    *
    * @return Byte representation
    */
-  public byte[] getRawBytes() {
-    return objectId.toByteArray();
+  @SuppressWarnings(value = "EI_EXPOSE_REP", justification = "never mutated")
+  public byte[] toByteArray() {
+    return bytes;
   }
 
+  /**
+   * Checks if the specified object is equal to the current id.
+   *
+   * Note: The order in which the id components are compared is taken from
+   * {@link ObjectId#equals(Object)}. However, we compare the values of the byte array directly.
+   *
+   * @param o the object to be compared
+   * @return true, iff the specified id is equal to this id
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof GradoopId)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GradoopId that = (GradoopId) o;
-    return this.objectId.equals(that.objectId);
+
+    GradoopId other = (GradoopId) o;
+
+    // compare counter (byte 9 to 11)
+    if (!equalsInRange(bytes, other.bytes, 9, 11)) {
+      return false;
+    }
+    // compare machine identifier (byte 4 to 6)
+    if (!equalsInRange(bytes, other.bytes, 4, 6)) {
+      return false;
+    }
+    // compare process identifier (byte 7 to 8)
+    if (!equalsInRange(bytes, other.bytes, 7, 8)) {
+      return false;
+    }
+    // compare timestamp (byte 0 to 3)
+    if (!equalsInRange(bytes, other.bytes, 0, 3)) {
+      return false;
+    }
+
+    return true;
   }
 
+  /**
+   * Returns the hash code of this GradoopId.
+   *
+   * Note: Implementation is taken from {@link ObjectId#hashCode()} to avoid object instantiation.
+   *
+   * @return hash code
+   */
   @Override
   public int hashCode() {
-    return objectId.hashCode();
+    int result = getTimeStamp();
+    result = 31 * result + getMachineIdentifier();
+    result = 31 * result + (int) getProcessIdentifier();
+    result = 31 * result + getCounter();
+    return result;
   }
 
+  /**
+   * Performs a byte-wise comparison of this and the specified GradoopId.
+   *
+   * Note: Implementation is taken from {@link ObjectId#compareTo(Object)} to avoid object
+   * instantiation.
+   *
+   * @param o the object to be compared.
+   * @return  a negative integer, zero, or a positive integer as this object
+   *          is less than, equal to, or greater than the specified object.
+   */
   @Override
   public int compareTo(GradoopId o) {
-    return this.objectId.compareTo(o.objectId);
+    byte[] otherByteArray = o.bytes;
+    for (int i = 0; i < 12; i++) {
+      if (bytes[i] != otherByteArray[i]) {
+        return ((bytes[i] & 0xff) < (otherByteArray[i] & 0xff)) ? -1 : 1;
+      }
+    }
+    return 0;
   }
+
+  /**
+   * Returns hex string representation of a GradoopId.
+   *
+   * Note: Implementation is taken from {@link ObjectId#toString()} to avoid object instantiation.
+   *
+   * @return GradoopId string representation.
+   */
+  @Override
+  public String toString() {
+    char[] chars = new char[24];
+    int i = 0;
+    for (byte b : toByteArray()) {
+      chars[i++] = HEX_CHARS[b >> 4 & 0xF];
+      chars[i++] = HEX_CHARS[b & 0xF];
+    }
+    return new String(chars);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // methods inherited from WritableComparable
+  //------------------------------------------------------------------------------------------------
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.write(objectId.toByteArray());
+    dataOutput.write(bytes);
   }
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    byte[] buffer = new byte[ID_SIZE];
-    dataInput.readFully(buffer);
-    this.objectId = new ObjectId(buffer);
+    dataInput.readFully(bytes);
   }
 
-  @Override
-  public String toString() {
-    return this.objectId.toString();
-  }
+  //------------------------------------------------------------------------------------------------
+  // methods inherited from NormalizableKey
+  //------------------------------------------------------------------------------------------------
 
   @Override
   public int getMaxNormalizedKeyLen() {
@@ -191,18 +275,113 @@ public class GradoopId implements WritableComparable<GradoopId>, NormalizableKey
 
   @Override
   public void copyNormalizedKey(MemorySegment target, int offset, int len) {
-    target.put(offset, objectId.toByteArray(), 0, len);
+    target.put(offset, bytes, 0, len);
   }
 
   @Override
   public void write(DataOutputView out) throws IOException {
-    out.write(objectId.toByteArray());
+    out.write(bytes);
   }
 
   @Override
   public void read(DataInputView in) throws IOException {
-    byte[] buffer = new byte[ID_SIZE];
-    in.readFully(buffer);
-    this.objectId = new ObjectId(buffer);
+    in.readFully(bytes);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // methods inherited from CopyableValue
+  //------------------------------------------------------------------------------------------------
+
+  @Override
+  public int getBinaryLength() {
+    return ID_SIZE;
+  }
+
+  @Override
+  public void copyTo(GradoopId target) {
+    target.bytes = this.bytes;
+  }
+
+  @Override
+  public GradoopId copy() {
+    return new GradoopId(this.bytes);
+  }
+
+  @Override
+  public void copy(DataInputView source, DataOutputView target) throws IOException {
+    target.write(source, ID_SIZE);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // private little helpers
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Returns the timestamp component of the id.
+   *
+   * @return the timestamp
+   */
+  private int getTimeStamp() {
+    return makeInt(bytes[0], bytes[1], bytes[2], bytes[3]);
+  }
+
+  /**
+   * Returns the machine identifier component of the id.
+   *
+   * @return the machine identifier
+   */
+  private int getMachineIdentifier() {
+    return makeInt((byte) 0, bytes[4], bytes[5], bytes[6]);
+  }
+
+  /**
+   * Returns the process identifier component of the id.
+   *
+   * @return the process identifier
+   */
+  private short getProcessIdentifier() {
+    return (short) makeInt((byte) 0, (byte) 0, bytes[7], bytes[8]);
+  }
+
+  /**
+   * Returns the counter component of the id.
+   *
+   * @return the counter
+   */
+  private int getCounter() {
+    return makeInt((byte) 0, bytes[9], bytes[10], bytes[11]);
+  }
+
+  /**
+   * Returns a primitive int represented by the given 4 bytes.
+   *
+   * @param b3 byte 3
+   * @param b2 byte 2
+   * @param b1 byte 1
+   * @param b0 byte 0
+   *
+   * @return int value
+   */
+  private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {
+    return (((b3) << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | ((b0 & 0xff)));
+  }
+
+  /**
+   * Checks if the given byte arrays contain equal elements in specified given range.
+   *
+   * @param first first array
+   * @param second second array
+   * @param from from index
+   * @param to to index (included)
+   * @return true, iff both arrays have equal values in the specified range
+   */
+  private boolean equalsInRange (byte[] first, byte[] second, int from, int to) {
+    while (from <= to) {
+      if (first[from] != second[from]) {
+        return false;
+      }
+      ++from;
+    }
+    return true;
   }
 }
