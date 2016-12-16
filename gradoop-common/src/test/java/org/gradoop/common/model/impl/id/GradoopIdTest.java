@@ -77,11 +77,11 @@ public class GradoopIdTest {
   @Test
   public void testGetRawBytes() {
     GradoopId originalId = GradoopId.get();
-    assertEquals(GradoopId.ID_SIZE, originalId.getRawBytes().length);
+    assertEquals(GradoopId.ID_SIZE, originalId.toByteArray().length);
     assertEquals(
       "Reconstruction failed",
       originalId,
-      GradoopId.fromBytes(originalId.getRawBytes())
+      GradoopId.fromByteArray(originalId.toByteArray())
     );
   }
 
@@ -115,7 +115,7 @@ public class GradoopIdTest {
     buffer.put(b2);
     buffer.put(b3);
 
-    GradoopId newId = GradoopId.fromBytes(bytes);
+    GradoopId newId = GradoopId.fromByteArray(bytes);
 
     assertEquals(expectedId, newId);
   }

@@ -306,7 +306,8 @@ public class PropertyValue
    * @return {@code GradoopId} value
    */
   public GradoopId getGradoopId() {
-    return GradoopId.fromBytes(Arrays.copyOfRange(rawBytes, OFFSET, GradoopId.ID_SIZE + OFFSET));
+    return GradoopId.fromByteArray(
+      Arrays.copyOfRange(rawBytes, OFFSET, GradoopId.ID_SIZE + OFFSET));
   }
 
   //----------------------------------------------------------------------------
@@ -420,7 +421,7 @@ public class PropertyValue
    * @param gradoopIdValue value
    */
   public void setGradoopId(GradoopId gradoopIdValue) {
-    byte[] valueBytes = gradoopIdValue.getRawBytes();
+    byte[] valueBytes = gradoopIdValue.toByteArray();
     rawBytes = new byte[OFFSET + GradoopId.ID_SIZE];
     rawBytes[0] = TYPE_GRADOOP_ID;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
