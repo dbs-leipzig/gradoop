@@ -62,13 +62,11 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Byte array representation of the outgoing edges column family.
    */
-  private static final byte[] CF_OUT_EDGES_BYTES =
-    Bytes.toBytes(GConstants.CF_OUT_EDGES);
+  private static final byte[] CF_OUT_EDGES_BYTES = Bytes.toBytes(GConstants.CF_OUT_EDGES);
   /**
    * Byte array representation of the incoming edges column family.
    */
-  private static final byte[] CF_IN_EDGES_BYTES =
-    Bytes.toBytes(GConstants.CF_IN_EDGES);
+  private static final byte[] CF_IN_EDGES_BYTES = Bytes.toBytes(GConstants.CF_IN_EDGES);
 
   /**
    * Creates vertex data objects from the rows.
@@ -88,8 +86,8 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public void createTable(final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor) throws IOException {
+  public void createTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
+    throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_PROPERTIES));
     tableDescriptor.addFamily(new HColumnDescriptor(GConstants.CF_OUT_EDGES));
@@ -101,8 +99,7 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeOutgoingEdges(final Put put, final Set<E> outgoingEdgeData)
-      throws IOException {
+  public Put writeOutgoingEdges(final Put put, final Set<E> outgoingEdgeData) throws IOException {
     return writeEdges(put, CF_OUT_EDGES_BYTES, outgoingEdgeData, true);
   }
 
@@ -110,8 +107,7 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeIncomingEdges(final Put put, final Set<E> incomingEdgeData)
-      throws IOException {
+  public Put writeIncomingEdges(final Put put, final Set<E> incomingEdgeData) throws IOException {
     return writeEdges(put, CF_IN_EDGES_BYTES, incomingEdgeData, false);
   }
 
@@ -119,8 +115,7 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertex(
-    final Put put, final PersistentVertex<E> vertexData) throws IOException {
+  public Put writeVertex(final Put put, final PersistentVertex<E> vertexData) throws IOException {
     writeLabel(put, vertexData);
     writeProperties(put, vertexData);
     writeOutgoingEdges(put, vertexData.getOutgoingEdges());
@@ -180,8 +175,8 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    *                     incoming
    * @return the updated put
    */
-  private Put writeEdges(Put put, final byte[] columnFamily,
-    final Set<E> edgeDataSet, boolean isOutgoing) throws IOException {
+  private Put writeEdges(Put put, final byte[] columnFamily, final Set<E> edgeDataSet,
+    boolean isOutgoing) throws IOException {
     if (edgeDataSet != null) {
       for (E edge : edgeDataSet) {
         put = writeEdge(put, columnFamily, edge, isOutgoing);
@@ -197,13 +192,13 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    *                     write the
    *                     edge to
    * @param columnFamily CF where the edges shall be stored
-   * @param edge     edge to store
+   * @param edge         edge to store
    * @param isOutgoing   true, if the edge is an outgoing edge, false if
    *                     incoming
    * @return the updated put
    */
-  private Put writeEdge(final Put put, final byte[] columnFamily,
-    final E edge, boolean isOutgoing) throws IOException {
+  private Put writeEdge(final Put put, final byte[] columnFamily, final E edge, boolean isOutgoing)
+    throws IOException {
     byte[] edgeKey = createEdgeIdentifier(edge, isOutgoing);
     put.add(columnFamily, edgeKey, null);
     return put;
@@ -219,15 +214,16 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    *                   incoming
    * @return byte representation of the edge identifier
    */
-  private byte[] createEdgeIdentifier(final E edge, boolean isOutgoing)
-      throws IOException {
+  private byte[] createEdgeIdentifier(final E edge, boolean isOutgoing) throws IOException {
 
     // initially only GradoopId
-    byte[] edgeIdentifier = Writables.getBytes(edge.getId());
+    byte[] edgeIdentifier = edge.getId().toByteArray();
 
     // extend by source or vertex id
-    byte[] otherVertexIdBytes = Writables.getBytes(
-      isOutgoing ? edge.getTargetId() : edge.getSourceId());
+    byte[] otherVertexIdBytes = isOutgoing
+      ? edge.getTargetId().toByteArray()
+      : edge.getSourceId().toByteArray();
+
     ArrayUtils.addAll(edgeIdentifier, otherVertexIdBytes);
 
     // extend by label

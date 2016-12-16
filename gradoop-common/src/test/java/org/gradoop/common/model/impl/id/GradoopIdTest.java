@@ -1,12 +1,8 @@
 package org.gradoop.common.model.impl.id;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 
 import static org.hamcrest.core.Is.is;
@@ -43,24 +39,6 @@ public class GradoopIdTest {
 
     assertThat(id1.compareTo(id1), is(0));
     assertTrue(id1.compareTo(id2) != 0);
-  }
-
-  @Test
-  public void testWriteAndReadFields() throws Exception {
-    GradoopId id1 = GradoopId.get();
-
-    // write to byte[]
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(out);
-    id1.write(dataOut);
-
-    // read from byte[]
-    GradoopId id2 = new GradoopId();
-    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-    DataInputStream dataIn = new DataInputStream(in);
-    id2.readFields(dataIn);
-
-    assertEquals(id1, id2);
   }
 
   @Test
