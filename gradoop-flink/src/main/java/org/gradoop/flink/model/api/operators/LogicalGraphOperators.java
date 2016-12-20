@@ -30,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 
 import java.util.List;
 
@@ -91,7 +91,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return subgraphs of the input graph that match the given graph pattern
    */
   GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, IterationStrategy iterationStrategy);
+    MatchStrategy matchStrategy, TraverserStrategy iterationStrategy);
 
   /**
    * Creates a copy of the logical graph.
