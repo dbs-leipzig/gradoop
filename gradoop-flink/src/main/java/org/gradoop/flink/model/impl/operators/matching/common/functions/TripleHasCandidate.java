@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
  *
  * Read fields:
  *
- * f1: candidates
+ * f3: edge query candidates
  *
  * @param <K> key type
  */
