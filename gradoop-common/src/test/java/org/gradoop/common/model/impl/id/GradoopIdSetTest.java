@@ -1,14 +1,14 @@
 package org.gradoop.common.model.impl.id;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -185,14 +185,14 @@ public class GradoopIdSetTest {
 
     // write to byte[]
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(out);
-    idsWrite.write(dataOut);
+    DataOutputView dataOutputView = new DataOutputViewStreamWrapper(out);
+    idsWrite.write(dataOutputView);
 
     // read from byte[]
     GradoopIdSet idsRead = new GradoopIdSet();
     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-    DataInputStream dataIn = new DataInputStream(in);
-    idsRead.readFields(dataIn);
+    DataInputView dataInputView = new DataInputViewStreamWrapper(in);
+    idsRead.read(dataInputView);
 
     assertThat(idsRead.size(), is(2));
     assertTrue(idsRead.contains(id1));

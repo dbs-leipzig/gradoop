@@ -18,12 +18,11 @@
 package org.gradoop.common.model.impl.id;
 
 import com.google.common.collect.Sets;
-import org.apache.hadoop.io.WritableComparable;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,8 +33,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIdSet
-  implements Iterable<GradoopId>, WritableComparable<GradoopIdSet>, Serializable {
+public class GradoopIdSet implements Iterable<GradoopId>, Comparable<GradoopIdSet>, Value {
 
   /**
    * Holds the identifiers.
@@ -69,6 +67,17 @@ public class GradoopIdSet
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
     gradoopIdSet.addAll(ids);
     return gradoopIdSet;
+  }
+
+
+  public static GradoopIdSet fromByteArray(byte[] graphIds) {
+    int n = graphIds.length / GradoopId.ID_SIZE;
+    GradoopId[] ids = new GradoopId[n];
+    for (int i = 0; i < n; i++) {
+      int offset = GradoopId.ID_SIZE * i;
+      ids[i] = GradoopId.fromByteArray(Arrays.copyOfRange(graphIds, offset, GradoopId.ID_SIZE));
+    }
+    return GradoopIdSet.fromExisting(ids);
   }
 
   /**
@@ -169,28 +178,6 @@ public class GradoopIdSet
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeInt(identifiers.size());
-    for (GradoopId id : identifiers) {
-      dataOutput.write(id.toByteArray());
-    }
-  }
-
-  @Override
-  public void readFields(DataInput dataInput) throws IOException {
-    int count = dataInput.readInt();
-    identifiers = Sets.newTreeSet();
-
-    byte[] f;
-    for (int i = 0; i < count; i++) {
-      f = new byte[GradoopId.ID_SIZE];
-
-      dataInput.readFully(f, 0, GradoopId.ID_SIZE);
-      identifiers.add(GradoopId.fromByteArray(f));
-    }
-  }
-
-  @Override
   public Iterator<GradoopId> iterator() {
     return identifiers.iterator();
   }
@@ -240,5 +227,37 @@ public class GradoopIdSet
   @Override
   public String toString() {
     return identifiers.toString();
+  }
+
+  public byte[] toByteArray() {
+    byte[] result = new byte[GradoopId.ID_SIZE * identifiers.size()];
+    int i = 0;
+    for (GradoopId id : identifiers) {
+      System.arraycopy(id.toByteArray(), 0, result, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
+      i++;
+    }
+    return result;
+  }
+
+  @Override
+  public void write(DataOutputView out) throws IOException {
+    out.writeInt(identifiers.size());
+    for (GradoopId id : identifiers) {
+      out.write(id.toByteArray());
+    }
+  }
+
+  @Override
+  public void read(DataInputView in) throws IOException {
+    int count = in.readInt();
+    identifiers = Sets.newTreeSet();
+
+    byte[] f;
+    for (int i = 0; i < count; i++) {
+      f = new byte[GradoopId.ID_SIZE];
+
+      in.readFully(f, 0, GradoopId.ID_SIZE);
+      identifiers.add(GradoopId.fromByteArray(f));
+    }
   }
 }
