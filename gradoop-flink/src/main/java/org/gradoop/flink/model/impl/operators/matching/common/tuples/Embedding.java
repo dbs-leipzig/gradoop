@@ -21,29 +21,29 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Represents an embedding of a query pattern in the search graph. Vertex and
- * edge embeddings are represented by two arrays where the index in the array
+ * edge mappings are represented by two arrays where the index in the array
  * refers to the index of the query vertex/edge.
  *
- * f0: vertex mappings
- * f1: edge mappings
+ * f0: vertex mapping
+ * f1: edge mapping
  *
  * @param <K> key type
  */
 public class Embedding<K> extends Tuple2<K[], K[]> {
 
-  public K[] getVertexMappings() {
+  public K[] getVertexMapping() {
     return f0;
   }
 
-  public void setVertexMappings(K[] vertexMappings) {
+  public void setVertexMapping(K[] vertexMappings) {
     f0 = vertexMappings;
   }
 
-  public K[] getEdgeMappings() {
+  public K[] getEdgeMapping() {
     return f1;
   }
 
-  public void setEdgeMappings(K[] edgeMappings) {
+  public void setEdgeMapping(K[] edgeMappings) {
     f1 = edgeMappings;
   }
 }

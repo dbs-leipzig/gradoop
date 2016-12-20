@@ -3,10 +3,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphIsomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
+  .TraverserStrategy;
 
-public class ExplorativeIsomorphismBulkTest extends SubgraphIsomorphismTest {
+public class ExplorativeIsomorphismSetPairBulkTest extends SubgraphIsomorphismTest {
 
-  public ExplorativeIsomorphismBulkTest(String testName, String dataGraph,
+  public ExplorativeIsomorphismSetPairBulkTest(String testName, String dataGraph,
     String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -20,7 +22,7 @@ public class ExplorativeIsomorphismBulkTest extends SubgraphIsomorphismTest {
       .setQuery(queryGraph)
       .setAttachData(attachData)
       .setMatchStrategy(MatchStrategy.ISOMORPHISM)
-      .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+      .setTraverserStrategy(TraverserStrategy.SET_PAIR_BULK_ITERATION)
       .build();
   }
 }

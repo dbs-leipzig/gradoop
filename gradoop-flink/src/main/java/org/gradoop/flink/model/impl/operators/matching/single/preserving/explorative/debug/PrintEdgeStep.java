@@ -26,8 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
  *
  * @param <K> key type
  */
-public class PrintEdgeStep<K>
-  extends Printer<EdgeStep<K>, K> {
+public class PrintEdgeStep<K> extends Printer<EdgeStep<K>, K> {
   /**
    * Logger
    */

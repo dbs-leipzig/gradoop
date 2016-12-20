@@ -33,17 +33,14 @@ import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
  */
 @FunctionAnnotation.ReadFields("label;properties")
 public class MatchingVertices<V extends Vertex> extends AbstractFilter<V> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Query vertices to match against.
    */
   private transient Collection<org.s1ck.gdl.model.Vertex> queryVertices;
-
   /**
    * Create new filter.
    *

@@ -38,12 +38,10 @@ import java.util.Set;
  * processing during graph pattern matching.
  */
 public class QueryHandler {
-
   /**
    * GDL handler
    */
   private final GDLHandler gdlHandler;
-
   /**
    * Graph diameter
    */

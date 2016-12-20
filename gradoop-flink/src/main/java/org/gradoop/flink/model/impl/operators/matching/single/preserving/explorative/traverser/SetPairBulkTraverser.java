@@ -29,7 +29,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
 /**
@@ -40,7 +39,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  *
  * @param <K> key type
  */
-public class BulkTraverser<K> extends DistributedTraverser<K> {
+public class SetPairBulkTraverser<K> extends SetPairTraverser<K> {
   /**
    * Creates a new distributed traverser.
    *
@@ -49,7 +48,7 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
    * @param edgeCount     number of query edges
    * @param keyClazz      needed for embedding initialization
    */
-  public BulkTraverser(TraversalCode traversalCode,
+  public SetPairBulkTraverser(TraversalCode traversalCode,
     int vertexCount, int edgeCount, Class<K> keyClazz) {
     this(traversalCode, MatchStrategy.ISOMORPHISM,
       vertexCount, edgeCount,
@@ -72,7 +71,7 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
    * @param vertexMapping          used for debug
    * @param edgeMapping            used for debug
    */
-  public BulkTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
+  public SetPairBulkTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
     int vertexCount, int edgeCount,
     Class<K> keyClazz,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
@@ -135,12 +134,12 @@ public class BulkTraverser<K> extends DistributedTraverser<K> {
         "f0" // forward edge id
     };
     DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = traverseEdges(edges,
-      embeddings, superstep, IterationStrategy.BULK_ITERATION,
+      embeddings, superstep, TraverserStrategy.SET_PAIR_BULK_ITERATION,
       forwardedFieldsEdgeSteps);
 
     // traverse to vertices
     nextWorkSet = traverseVertices(vertices, nextWorkSet, superstep,
-      IterationStrategy.BULK_ITERATION);
+      TraverserStrategy.SET_PAIR_BULK_ITERATION);
 
     // ITERATION FOOTER
     return embeddings.closeWith(nextWorkSet, nextWorkSet);

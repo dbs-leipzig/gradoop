@@ -1,12 +1,14 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative;
 
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphHomomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
+  .TraverserStrategy;
 
-public class ExplorativeHomomorphismBulkTest extends SubgraphHomomorphismTest {
+public class ExplorativeHomomorphismTriplesForLoopTest extends SubgraphHomomorphismTest {
 
-  public ExplorativeHomomorphismBulkTest(String testName,
+  public ExplorativeHomomorphismTriplesForLoopTest(String testName,
     String dataGraph, String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
@@ -19,7 +21,7 @@ public class ExplorativeHomomorphismBulkTest extends SubgraphHomomorphismTest {
       .setQuery(queryGraph)
       .setAttachData(attachData)
       .setMatchStrategy(MatchStrategy.HOMOMORPHISM)
-      .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+      .setTraverserStrategy(TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION)
       .build();
   }
 }

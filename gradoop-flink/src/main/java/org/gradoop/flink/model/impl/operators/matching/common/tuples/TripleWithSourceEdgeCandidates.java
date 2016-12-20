@@ -30,8 +30,7 @@ import org.apache.flink.api.java.tuple.Tuple5;
  *
  * @param <K> key type
  */
-public class TripleWithSourceEdgeCandidates<K>
-  extends Tuple5<K, K, boolean[], K, boolean[]> {
+public class TripleWithSourceEdgeCandidates<K> extends Tuple5<K, K, boolean[], K, boolean[]> {
 
   public K getEdgeId() {
     return f0;

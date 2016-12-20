@@ -26,12 +26,10 @@ import java.util.List;
  * A traversal code represents a traversal through a query graph.
  */
 public class TraversalCode implements Serializable {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Steps represent the traversal code.
    */
@@ -74,9 +72,6 @@ public class TraversalCode implements Serializable {
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("TraversalCode{");
-    sb.append("steps=").append(steps);
-    sb.append('}');
-    return sb.toString();
+    return "TraversalCode{steps=" + steps + '}';
   }
 }

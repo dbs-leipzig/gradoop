@@ -23,27 +23,22 @@ import java.io.Serializable;
  * Class representing a single step in a {@link TraversalCode}.
  */
 public class Step implements Serializable {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Long id of the starting vertex of this step
    */
   private long from;
-
   /**
    * Long id of the edge this step traverses
    */
   private long via;
-
   /**
    * Long id of the target vertex of this step
    */
   private long to;
-
   /**
    * Boolean containing if the traversed edge was outgoing from starting
    * vertex

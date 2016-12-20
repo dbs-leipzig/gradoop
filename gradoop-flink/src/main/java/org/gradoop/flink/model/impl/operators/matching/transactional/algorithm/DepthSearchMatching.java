@@ -102,8 +102,8 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
 
     // construct an empty embedding
     Embedding<GradoopId> firstEmbedding = new Embedding<>();
-    firstEmbedding.setVertexMappings(new GradoopId[handler.getVertexCount()]);
-    firstEmbedding.setEdgeMappings(new GradoopId[handler.getEdgeCount()]);
+    firstEmbedding.setVertexMapping(new GradoopId[handler.getVertexCount()]);
+    firstEmbedding.setEdgeMapping(new GradoopId[handler.getEdgeCount()]);
     embeddings.push(firstEmbedding);
 
     // initialize the vertex, edge, source and target maps
@@ -118,7 +118,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
       // find the first step in the plan that has not been applied yet
       int nextStep = -1;
       for (int step : plan) {
-        if (embedding.getVertexMappings()[step] == null) {
+        if (embedding.getVertexMapping()[step] == null) {
           nextStep = step;
           break;
         }
@@ -160,8 +160,8 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
 
     // construct an empty embedding
     Embedding<GradoopId> firstEmbedding = new Embedding<>();
-    firstEmbedding.setVertexMappings(new GradoopId[handler.getVertexCount()]);
-    firstEmbedding.setEdgeMappings(new GradoopId[handler.getEdgeCount()]);
+    firstEmbedding.setVertexMapping(new GradoopId[handler.getVertexCount()]);
+    firstEmbedding.setEdgeMapping(new GradoopId[handler.getEdgeCount()]);
     embeddings.push(firstEmbedding);
 
     // initialize the vertex, edge, source and target maps
@@ -174,7 +174,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
       // find the first step in the plan that has not been applied yet
       int nextStep = -1;
       for (int step : plan) {
-        if (embedding.getVertexMappings()[step] == null) {
+        if (embedding.getVertexMapping()[step] == null) {
           nextStep = step;
           break;
         }
@@ -233,7 +233,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
       boolean failed = false;
 
       // if the vertex is already in the embedding, skip it
-      if (Arrays.asList(embedding.getVertexMappings()).contains(id)) {
+      if (Arrays.asList(embedding.getVertexMapping()).contains(id)) {
         continue;
       }
 
@@ -261,7 +261,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
             edgeDict.get(edgeCandidateId);
 
           // get the target vertex of the edge
-          GradoopId target = embedding.getVertexMappings()[
+          GradoopId target = embedding.getVertexMapping()[
             Math.toIntExact(patternEdge.getTargetVertexId())];
 
           // if the pattern edge and the edge candidate are both loops
@@ -310,7 +310,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
             edgeDict.get(edgeCandidateId);
 
           // get the target vertex of the edge
-          GradoopId source = embedding.getVertexMappings()[
+          GradoopId source = embedding.getVertexMapping()[
             Math.toIntExact(patternEdge.getSourceVertexId())];
 
           // if the pattern edge and the edge candidate are both loops
@@ -377,7 +377,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     for (int i = 0; i < patternEdges.size(); i++) {
       long sourceId = patternEdges.get(i).getSourceVertexId();
       long targetId = patternEdges.get(i).getTargetVertexId();
-      GradoopId[] vertexMapping = embedding.getVertexMappings();
+      GradoopId[] vertexMapping = embedding.getVertexMapping();
       if ((vertexMapping[(int) sourceId] == null) &&
         (vertexMapping[(int) targetId] == null)) {
         if (sourceId != targetId) {
@@ -419,7 +419,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     // one vertex
     if (entries.isEmpty()) {
       Embedding<GradoopId> newEmbedding = copyEmbedding(startEmbedding);
-      newEmbedding.getVertexMappings()[step] = vertexMatch;
+      newEmbedding.getVertexMapping()[step] = vertexMatch;
       result.clear();
       result.add(newEmbedding);
     }
@@ -433,7 +433,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
         for (GradoopId id : entry.getValue()) {
           // check if the edge match already occurs in the embedding
           boolean contains = false;
-          for (GradoopId edgeId : embedding.getEdgeMappings()) {
+          for (GradoopId edgeId : embedding.getEdgeMapping()) {
             if (edgeId == null) {
               continue;
             }
@@ -449,8 +449,8 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
           // else, copy the embedding, add the edge match and add it to the
           // results in the next iteration
           Embedding<GradoopId> newEmbedding = copyEmbedding(embedding);
-          newEmbedding.getVertexMappings()[step] = vertexMatch;
-          newEmbedding.getEdgeMappings()[Math.toIntExact(entry.getKey())] = id;
+          newEmbedding.getVertexMapping()[step] = vertexMatch;
+          newEmbedding.getEdgeMapping()[Math.toIntExact(entry.getKey())] = id;
           temporaryEmbeddings.add(newEmbedding);
         }
       }
@@ -468,16 +468,16 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
   private Embedding<GradoopId> copyEmbedding(Embedding<GradoopId> existing) {
     Embedding<GradoopId> newEmbedding = new Embedding<>();
 
-    GradoopId[] vertexCopy = new GradoopId[existing.getVertexMappings().length];
-    System.arraycopy(existing.getVertexMappings(), 0, vertexCopy, 0,
-      existing.getVertexMappings().length);
+    GradoopId[] vertexCopy = new GradoopId[existing.getVertexMapping().length];
+    System.arraycopy(existing.getVertexMapping(), 0, vertexCopy, 0,
+      existing.getVertexMapping().length);
 
-    GradoopId[] edgeCopy = new GradoopId[existing.getEdgeMappings().length];
-    System.arraycopy(existing.getEdgeMappings(), 0, edgeCopy, 0,
-      existing.getEdgeMappings().length);
+    GradoopId[] edgeCopy = new GradoopId[existing.getEdgeMapping().length];
+    System.arraycopy(existing.getEdgeMapping(), 0, edgeCopy, 0,
+      existing.getEdgeMapping().length);
 
-    newEmbedding.setVertexMappings(vertexCopy);
-    newEmbedding.setEdgeMappings(edgeCopy);
+    newEmbedding.setVertexMapping(vertexCopy);
+    newEmbedding.setEdgeMapping(edgeCopy);
     return newEmbedding;
   }
 

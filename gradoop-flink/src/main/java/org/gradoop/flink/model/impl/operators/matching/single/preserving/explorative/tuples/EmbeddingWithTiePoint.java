@@ -28,8 +28,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
  *
  * @param <K> key type
  */
-public class EmbeddingWithTiePoint<K>
-  extends Tuple2<K, Embedding<K>> {
+public class EmbeddingWithTiePoint<K> extends Tuple2<K, Embedding<K>> {
 
   public K getTiePointId() {
     return f0;

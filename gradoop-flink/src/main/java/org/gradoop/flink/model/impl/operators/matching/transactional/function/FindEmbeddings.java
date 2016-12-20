@@ -70,8 +70,8 @@ public class FindEmbeddings
       GradoopId newGraphId = GradoopId.get();
       collector.collect(new Tuple4<>(newGraphId,
         graphWithCandidates.f0,
-        GradoopIdSet.fromExisting(embedding.getVertexMappings()),
-        GradoopIdSet.fromExisting(embedding.getEdgeMappings())));
+        GradoopIdSet.fromExisting(embedding.getVertexMapping()),
+        GradoopIdSet.fromExisting(embedding.getEdgeMapping())));
     }
   }
 }

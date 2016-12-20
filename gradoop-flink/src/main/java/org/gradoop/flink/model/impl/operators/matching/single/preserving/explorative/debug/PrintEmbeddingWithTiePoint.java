@@ -29,8 +29,7 @@ import java.util.Arrays;
  *
  * @param <K> key type
  */
-public class PrintEmbeddingWithTiePoint<K>
-  extends Printer<EmbeddingWithTiePoint<K>, K> {
+public class PrintEmbeddingWithTiePoint<K> extends Printer<EmbeddingWithTiePoint<K>, K> {
   /**
    * Logger
    */
@@ -63,13 +62,23 @@ public class PrintEmbeddingWithTiePoint<K>
     super(isIterative, prefix);
   }
 
+  /**
+   * Constructor
+   *
+   * @param iterationNumber true, if used in iterative context
+   * @param prefix          prefix for debug string
+   */
+  public PrintEmbeddingWithTiePoint(int iterationNumber, String prefix) {
+    super(iterationNumber, prefix);
+  }
+
   @Override
   protected String getDebugString(EmbeddingWithTiePoint<K> embedding) {
     return String.format("(([%s],[%s]),%s)",
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getEmbedding().getVertexMappings()), true), ','),
+        embedding.getEmbedding().getVertexMapping()), true), ','),
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getEmbedding().getEdgeMappings()), false), ','),
+        embedding.getEmbedding().getEdgeMapping()), false), ','),
       vertexMap.get(embedding.getTiePointId()));
   }
 

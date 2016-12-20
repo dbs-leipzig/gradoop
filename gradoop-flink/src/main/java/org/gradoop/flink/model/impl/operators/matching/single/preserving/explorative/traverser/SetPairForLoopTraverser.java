@@ -28,7 +28,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
 /**
@@ -39,7 +38,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  *
  * @param <K> key type
  */
-public class ForLoopTraverser<K> extends DistributedTraverser<K> {
+public class SetPairForLoopTraverser<K> extends SetPairTraverser<K> {
 
   /**
    * Creates a new distributed traverser.
@@ -49,7 +48,7 @@ public class ForLoopTraverser<K> extends DistributedTraverser<K> {
    * @param edgeCount     number of query edges
    * @param keyClazz      needed for embedding initialization
    */
-  public ForLoopTraverser(TraversalCode traversalCode,
+  public SetPairForLoopTraverser(TraversalCode traversalCode,
     int vertexCount, int edgeCount, Class<K> keyClazz) {
     this(traversalCode, MatchStrategy.ISOMORPHISM,
       vertexCount, edgeCount,
@@ -72,7 +71,7 @@ public class ForLoopTraverser<K> extends DistributedTraverser<K> {
    * @param vertexMapping          used for debug
    * @param edgeMapping            used for debug
    */
-  public ForLoopTraverser(TraversalCode traversalCode,
+  public SetPairForLoopTraverser(TraversalCode traversalCode,
     MatchStrategy matchStrategy,
     int vertexCount, int edgeCount,
     Class<K> keyClazz,
@@ -88,8 +87,7 @@ public class ForLoopTraverser<K> extends DistributedTraverser<K> {
   public DataSet<Tuple1<Embedding<K>>> traverse(
     DataSet<IdWithCandidates<K>> vertices,
     DataSet<TripleWithCandidates<K>> edges) {
-    return iterate(vertices, edges, buildInitialEmbeddings(vertices))
-      .project(1);
+    return iterate(vertices, edges, buildInitialEmbeddings(vertices)).project(1);
   }
 
   @Override
@@ -128,9 +126,9 @@ public class ForLoopTraverser<K> extends DistributedTraverser<K> {
       };
 
       embeddings = traverseEdges(edges, embeddings, superstep,
-        IterationStrategy.LOOP_UNROLLING, forwardedFieldEdgeSteps);
+        TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION, forwardedFieldEdgeSteps);
       embeddings = traverseVertices(vertices, embeddings, superstep,
-        IterationStrategy.LOOP_UNROLLING);
+        TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION);
     }
 
     return embeddings;

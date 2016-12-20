@@ -2,13 +2,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.preserving.explor
 
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .SubgraphHomomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.SubgraphIsomorphismTest;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
+  .TraverserStrategy;
 
-public class ExplorativeHomomorphismLoopUnrollingTest extends SubgraphHomomorphismTest {
+public class ExplorativeIsomorphismTriplesForLoopTest extends SubgraphIsomorphismTest {
 
-  public ExplorativeHomomorphismLoopUnrollingTest(String testName,
-    String dataGraph, String queryGraph, String expectedGraphVariables,
+  public ExplorativeIsomorphismTriplesForLoopTest(String testName, String dataGraph,
+    String queryGraph, String expectedGraphVariables,
     String expectedCollection) {
     super(testName, dataGraph, queryGraph, expectedGraphVariables,
       expectedCollection);
@@ -19,8 +20,8 @@ public class ExplorativeHomomorphismLoopUnrollingTest extends SubgraphHomomorphi
     return new ExplorativePatternMatching.Builder()
       .setQuery(queryGraph)
       .setAttachData(attachData)
-      .setMatchStrategy(MatchStrategy.HOMOMORPHISM)
-      .setIterationStrategy(IterationStrategy.LOOP_UNROLLING)
+      .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+      .setTraverserStrategy(TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION)
       .build();
   }
 }
