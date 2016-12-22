@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm;
+package org.gradoop.flink.algorithms.fsm.generator;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;

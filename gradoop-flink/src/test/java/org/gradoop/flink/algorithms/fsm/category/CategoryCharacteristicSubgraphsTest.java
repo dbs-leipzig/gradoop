@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm;
+package org.gradoop.flink.algorithms.fsm.category;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -80,7 +80,7 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
 
     collection = bGraphs.union(cGraphs);
 
-    FSMConfig fsmConfig = new FSMConfig(0.8f, true);
+    FSMConfig fsmConfig = new FSMConfig(0.6f, true);
 
     collection = collection
       .callForCollection(new CategoryCharacteristicSubgraphs(fsmConfig, 2.0f));
