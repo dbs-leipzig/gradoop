@@ -25,7 +25,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -99,7 +99,7 @@ public class PredictableTransaction implements
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+    GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
     Vertex centerVertex = vertexFactory.createVertex("S", graphIds);
     vertices.add(centerVertex);

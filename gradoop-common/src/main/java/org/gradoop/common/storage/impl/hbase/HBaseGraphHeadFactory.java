@@ -18,7 +18,7 @@
 package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +41,7 @@ public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
    */
   @Override
   public HBaseGraphHead<G> createGraphHead(G inputGraphHead,
-    GradoopIdSet vertices, GradoopIdSet edges) {
+    GradoopIdList vertices, GradoopIdList edges) {
     checkNotNull(inputGraphHead, "EPGMGraphHead was null");
     checkNotNull(vertices, "EPGMVertex identifiers were null");
     checkNotNull(edges, "EPGMEdge identifiers were null");

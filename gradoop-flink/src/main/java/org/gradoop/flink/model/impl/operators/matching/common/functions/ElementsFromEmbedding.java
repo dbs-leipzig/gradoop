@@ -76,41 +76,63 @@ public class ElementsFromEmbedding
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
 
-    List<Step> steps    = traversalCode.getSteps();
-    edgeToStep          = Maps.newHashMapWithExpectedSize(steps.size());
+    List<Step> steps = traversalCode.getSteps();
+    edgeToStep = Maps.newHashMapWithExpectedSize(steps.size());
+
     for (Step step : steps) {
       edgeToStep.put((int) step.getVia(), step);
     }
   }
 
   @Override
-  public void flatMap(Tuple1<Embedding<GradoopId>> embedding,
-    Collector<Element> out) throws Exception {
-    GradoopId[] vertexEmbeddings  = embedding.f0.getVertexMapping();
-    GradoopId[] edgeEmbeddings    = embedding.f0.getEdgeMapping();
+  public void flatMap(Tuple1<Embedding<GradoopId>> embedding, Collector<Element> out)
+    throws Exception {
 
-    // create graph head
+    GradoopId[] vertexMapping = embedding.f0.getVertexMapping();
+    GradoopId[] edgeMapping = embedding.f0.getEdgeMapping();
+
+    // create graph head for this embedding
     GraphHead graphHead = graphHeadFactory.createGraphHead();
     out.collect(graphHead);
 
     // collect vertices (and assign to graph head)
-    for (GradoopId vertexId : vertexEmbeddings) {
-      Vertex v = vertexFactory.initVertex(vertexId);
-      v.addGraphId(graphHead.getId());
-      out.collect(v);
+    for (int i = 0; i < vertexMapping.length; i++) {
+      if (!isProcessed(vertexMapping, i)) {
+        Vertex v = vertexFactory.initVertex(vertexMapping[i]);
+        v.addGraphId(graphHead.getId());
+        out.collect(v);
+      }
     }
 
     // collect edges (and assign to graph head)
-    for (int i = 0; i < edgeEmbeddings.length; i++) {
-      Step s = edgeToStep.get(i);
-      // get sourceId/targetId according to traversal step
-      GradoopId sourceId = s.isOutgoing() ?
-        vertexEmbeddings[(int) s.getFrom()] : vertexEmbeddings[(int) s.getTo()];
-      GradoopId targetId = s.isOutgoing() ?
-        vertexEmbeddings[(int) s.getTo()] : vertexEmbeddings[(int) s.getFrom()];
-      Edge e = edgeFactory.initEdge(edgeEmbeddings[i], sourceId, targetId);
-      e.addGraphId(graphHead.getId());
-      out.collect(e);
+    for (int i = 0; i < edgeMapping.length; i++) {
+      if (!isProcessed(edgeMapping, i)) {
+        Step s = edgeToStep.get(i);
+        // get sourceId/targetId according to traversal step
+        GradoopId sourceId = s.isOutgoing() ?
+          vertexMapping[(int) s.getFrom()] : vertexMapping[(int) s.getTo()];
+        GradoopId targetId = s.isOutgoing() ?
+          vertexMapping[(int) s.getTo()] : vertexMapping[(int) s.getFrom()];
+        Edge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);
+        e.addGraphId(graphHead.getId());
+        out.collect(e);
+      }
     }
+  }
+
+  /**
+   * Checks if the the id at the specified index has been processed before.
+   *
+   * @param mapping id mapping
+   * @param i index
+   * @return true, iff the element at position i is present at a position between 0 and i
+   */
+  private boolean isProcessed(GradoopId[] mapping, int i) {
+    for (int j = 0; j < i; j++) {
+      if (mapping[j].equals(mapping[i])) {
+        return true;
+      }
+    }
+    return false;
   }
 }

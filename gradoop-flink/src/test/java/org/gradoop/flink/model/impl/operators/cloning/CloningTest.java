@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.IdAsIdSet;
 import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIdSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.functions.epgm.IdSetCombiner;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class CloningTest extends GradoopFlinkTestBase {
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
 
-    List<GradoopIdSet> resultGraphIds = Lists.newArrayList();
+    List<GradoopIdList> resultGraphIds = Lists.newArrayList();
 
     result.getVertices()
       .map(new ExpandGraphsToIdSet<>())

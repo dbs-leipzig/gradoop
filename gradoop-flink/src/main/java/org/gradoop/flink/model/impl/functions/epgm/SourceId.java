@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("sourceId->*")
-public class SourceId<E extends Edge>
-  implements KeySelector<E, GradoopId> {
+public class SourceId<E extends Edge> implements KeySelector<E, GradoopId> {
+
   @Override
   public GradoopId getKey(E edge) throws Exception {
     return edge.getSourceId();

@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
@@ -39,7 +39,7 @@ import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
  * @param <V> EPGM vertex type
  */
 public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
-  extends AbstractBuilder<V, Tuple2<GradoopIdSet, IdWithCandidates<GradoopId>>> {
+  extends AbstractBuilder<V, Tuple2<GradoopIdList, IdWithCandidates<GradoopId>>> {
   /**
    * serial version uid
    */
@@ -55,7 +55,7 @@ public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
   /**
    * Reduce instantiations
    */
-  private final Tuple2<GradoopIdSet, IdWithCandidates<GradoopId>> reuseTuple;
+  private final Tuple2<GradoopIdList, IdWithCandidates<GradoopId>> reuseTuple;
 
   /**
    * Constructor
@@ -76,7 +76,7 @@ public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
   }
 
   @Override
-  public Tuple2<GradoopIdSet, IdWithCandidates<GradoopId>> map(V v)
+  public Tuple2<GradoopIdList, IdWithCandidates<GradoopId>> map(V v)
     throws Exception {
     reuseTuple.f0 = v.getGraphIds();
     reuseTuple.f1.setId(v.getId());

@@ -32,7 +32,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Map;
@@ -94,7 +94,7 @@ public class GraphTransactionFromTLFGraph implements
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+    GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
     Map<Integer, GradoopId> vertexIdMap;
 

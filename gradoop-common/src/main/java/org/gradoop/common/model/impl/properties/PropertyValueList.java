@@ -141,8 +141,7 @@ public class PropertyValueList
   /**
    * Used to iterate over the stored values.
    */
-  private static class PropertyValueListIterator
-    implements Iterator<PropertyValue> {
+  private static class PropertyValueListIterator implements Iterator<PropertyValue> {
 
     /**
      * Used to wrap the byte array of PropertyValueList

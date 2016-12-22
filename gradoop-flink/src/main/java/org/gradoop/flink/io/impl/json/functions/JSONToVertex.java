@@ -22,7 +22,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -72,7 +72,7 @@ public class JSONToVertex extends JSONToEntity
     String label = getLabel(jsonVertex);
     Properties properties = Properties.createFromMap(
       getProperties(jsonVertex));
-    GradoopIdSet graphs = getGraphs(jsonVertex);
+    GradoopIdList graphs = getGraphs(jsonVertex);
 
     return vertexFactory.initVertex(vertexID, label, properties, graphs);
   }

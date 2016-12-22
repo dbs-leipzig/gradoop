@@ -154,9 +154,6 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   /**
    * Checks if the specified object is equal to the current id.
    *
-   * Note: The order in which the id components are compared is taken from
-   * {@link ObjectId#equals(Object)}. However, we compare the values of the byte array directly.
-   *
    * @param o the object to be compared
    * @return true, iff the specified id is equal to this id
    */
@@ -169,26 +166,7 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
       return false;
     }
 
-    GradoopId other = (GradoopId) o;
-
-    // compare counter (byte 9 to 11)
-    if (!equalsInRange(bytes, other.bytes, 9, 11)) {
-      return false;
-    }
-    // compare machine identifier (byte 4 to 6)
-    if (!equalsInRange(bytes, other.bytes, 4, 6)) {
-      return false;
-    }
-    // compare process identifier (byte 7 to 8)
-    if (!equalsInRange(bytes, other.bytes, 7, 8)) {
-      return false;
-    }
-    // compare timestamp (byte 0 to 3)
-    if (!equalsInRange(bytes, other.bytes, 0, 3)) {
-      return false;
-    }
-
-    return true;
+    return equals(bytes, ((GradoopId) o).bytes, 0, 0);
   }
 
   /**
@@ -210,22 +188,13 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   /**
    * Performs a byte-wise comparison of this and the specified GradoopId.
    *
-   * Note: Implementation is taken from {@link ObjectId#compareTo(Object)} to avoid object
-   * instantiation.
-   *
    * @param o the object to be compared.
    * @return  a negative integer, zero, or a positive integer as this object
    *          is less than, equal to, or greater than the specified object.
    */
   @Override
   public int compareTo(GradoopId o) {
-    byte[] otherByteArray = o.bytes;
-    for (int i = 0; i < 12; i++) {
-      if (bytes[i] != otherByteArray[i]) {
-        return ((bytes[i] & 0xff) < (otherByteArray[i] & 0xff)) ? -1 : 1;
-      }
-    }
-    return 0;
+    return compare(this.bytes, o.bytes);
   }
 
   /**
@@ -239,7 +208,7 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   public String toString() {
     char[] chars = new char[24];
     int i = 0;
-    for (byte b : toByteArray()) {
+    for (byte b : bytes) {
       chars[i++] = HEX_CHARS[b >> 4 & 0xF];
       chars[i++] = HEX_CHARS[b & 0xF];
     }
@@ -334,6 +303,119 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
     return makeInt((byte) 0, bytes[9], bytes[10], bytes[11]);
   }
 
+
+  //------------------------------------------------------------------------------------------------
+  // static helper functions
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Compares the given GradoopIds and returns the smaller one. It both are equal, the first
+   * argument is returned.
+   *
+   * @param first first GradoopId
+   * @param second second GradoopId
+   * @return smaller GradoopId or first if equal
+   */
+  public static GradoopId min(GradoopId first, GradoopId second) {
+    int comparison = first.compareTo(second);
+    return comparison == 0 ? first : (comparison == -1 ? first : second);
+  }
+
+  /**
+   * Checks if the Gradoop ids stored at the specified positions are equal.
+   *
+   * Note: The order in which the id components are compared is taken from
+   * {@link ObjectId#equals(Object)}. However, we compare the values of the byte arrays directly.
+   *
+   * @param first first gradoop id
+   * @param second second gradoop id
+   * @param firstPos start index in the first byte array
+   * @param secondPos start index in the second byte array
+   *
+   * @return true, iff first is equal to second
+   */
+  static boolean equals(byte[] first, byte[] second, int firstPos, int secondPos) {
+    // compare counter (byte 9 to 11)
+    if (!equalsInRange(first, second, firstPos + 9, secondPos + 9, 3)) {
+      return false;
+    }
+    // compare machine identifier (byte 4 to 6)
+    if (!equalsInRange(first, second, firstPos + 4, secondPos + 4, 2)) {
+      return false;
+    }
+    // compare process identifier (byte 7 to 8)
+    if (!equalsInRange(first, second, firstPos + 7, secondPos + 7, 1)) {
+      return false;
+    }
+    // compare timestamp (byte 0 to 3)
+    if (!equalsInRange(first, second, firstPos, secondPos,3)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Compares the specified GradoopIds based on their byte representation
+   * (to avoid object instantiation).
+   *
+   * Note: Implementation is taken from {@link ObjectId#compareTo(Object)} to avoid object
+   * instantiation.
+   *
+   * @param first first GradoopId
+   * @param second second GradoopId
+   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+   *         or greater than the specified object.
+   */
+  private static int compare(byte[] first, byte[] second) {
+    return compare(first, second, 0, 0, GradoopId.ID_SIZE);
+  }
+
+  /**
+   * Compares multiple GradoopIds represented a byte arrays at the specified ranges.
+   *
+   * @param first first byte representation of multiple gradoop ids
+   * @param second second byte representation of multiple gradoop ids
+   * @param firstPos start index in the first array
+   * @param secondPos start index in the second array
+   * @param length length of the range
+   *
+   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+   *         or greater than the specified object.
+   */
+  private static int compare(byte[] first, byte[] second, int firstPos, int secondPos, int length) {
+    for (int i = 0; i < length; i++) {
+      if (first[firstPos + i] != second[secondPos + i]) {
+        return ((first[firstPos + i] & 0xff) < (second[secondPos + i] & 0xff)) ? -1 : 1;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * Checks if the given byte arrays contain equal elements in specified given range.
+   *
+   * @param first first array
+   * @param second second array
+   * @param firstPos start index in the first array
+   * @param secondPos start index in the second array
+   * @param length number of bytes to compare for equality
+   *
+   * @return true, iff both arrays have equal values in the specified range
+   */
+  private static boolean equalsInRange(byte[] first, byte[] second, int firstPos, int secondPos,
+    int length) {
+    int upperBound = firstPos + length;
+    while (firstPos < upperBound) {
+      if (first[firstPos] != second[secondPos]) {
+        return false;
+      }
+      ++firstPos;
+      ++secondPos;
+    }
+    return true;
+  }
+
   /**
    * Returns a primitive int represented by the given 4 bytes.
    *
@@ -346,24 +428,5 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    */
   private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {
     return (((b3) << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | ((b0 & 0xff)));
-  }
-
-  /**
-   * Checks if the given byte arrays contain equal elements in specified given range.
-   *
-   * @param first first array
-   * @param second second array
-   * @param from from index
-   * @param to to index (included)
-   * @return true, iff both arrays have equal values in the specified range
-   */
-  private boolean equalsInRange (byte[] first, byte[] second, int from, int to) {
-    while (from <= to) {
-      if (first[from] != second[from]) {
-        return false;
-      }
-      ++from;
-    }
-    return true;
   }
 }
