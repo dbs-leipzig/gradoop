@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -398,7 +398,7 @@ public abstract class GSpanKernelBase implements GSpanKernel, Serializable {
 
     GraphHead graphHead = new GraphHead(GradoopId.get(), graphLabel, graphProperties);
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+    GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
     Map<Integer, GradoopId> vertexIdMap = Maps.newHashMap();
 

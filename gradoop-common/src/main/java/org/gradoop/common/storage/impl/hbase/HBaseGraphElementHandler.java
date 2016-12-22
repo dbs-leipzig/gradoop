@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.storage.api.GraphElementHandler;
 import org.gradoop.common.util.GConstants;
 
@@ -57,15 +57,15 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdSet readGraphIds(Result res) throws IOException {
+  public GradoopIdList readGraphIds(Result res) throws IOException {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
 
-    GradoopIdSet graphIds;
+    GradoopIdList graphIds;
 
     if (graphBytes != null) {
-      graphIds = GradoopIdSet.fromByteArray(graphBytes);
+      graphIds = GradoopIdList.fromByteArray(graphBytes);
     } else {
-      graphIds = new GradoopIdSet();
+      graphIds = new GradoopIdList();
     }
 
     return graphIds;

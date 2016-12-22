@@ -19,7 +19,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GConstants;
 import org.hamcrest.core.Is;
@@ -50,7 +50,7 @@ public class VertexTest {
     GradoopId graphId1 = GradoopId.get();
     GradoopId graphId2 = GradoopId.get();
 
-    GradoopIdSet graphIds = new GradoopIdSet();
+    GradoopIdList graphIds = new GradoopIdList();
     graphIds.add(graphId1);
     graphIds.add(graphId2);
 

@@ -32,15 +32,11 @@ public class HBaseDataSinkSourceTest extends FlinkHBaseTestBase {
 
   @Test
   public void testRead() throws Exception {
-    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore =
-      GradoopHBaseTestBase.createEmptyEPGMStore();
+    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore = GradoopHBaseTestBase.createEmptyEPGMStore();
 
-    List<PersistentVertex<Edge>> vertices =
-      Lists.newArrayList(getSocialPersistentVertices());
-    List<PersistentEdge<Vertex>> edges =
-      Lists.newArrayList(getSocialPersistentEdges());
-    List<PersistentGraphHead> graphHeads =
-      Lists.newArrayList(getSocialPersistentGraphHeads());
+    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
+    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
+    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
 
     // write social graph to HBase
     for (PersistentGraphHead g : graphHeads) {
@@ -56,19 +52,15 @@ public class HBaseDataSinkSourceTest extends FlinkHBaseTestBase {
     epgmStore.flush();
 
     // read social graph from HBase via EPGMDatabase
-    GraphCollection collection = new HBaseDataSource(epgmStore,
-      getConfig()).getGraphCollection();
+    GraphCollection collection = new HBaseDataSource(epgmStore, getConfig()).getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
     Collection<Vertex>    loadedVertices      = Lists.newArrayList();
     Collection<Edge>      loadedEdges         = Lists.newArrayList();
 
-    collection.getGraphHeads()
-      .output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
-    collection.getVertices()
-      .output(new LocalCollectionOutputFormat<>(loadedVertices));
-    collection.getEdges()
-      .output(new LocalCollectionOutputFormat<>(loadedEdges));
+    collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    collection.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
 
@@ -84,8 +76,7 @@ public class HBaseDataSinkSourceTest extends FlinkHBaseTestBase {
   @Test
   public void testWrite() throws Exception {
     // create empty EPGM store
-    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore =
-      GradoopHBaseTestBase.createEmptyEPGMStore();
+    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore = GradoopHBaseTestBase.createEmptyEPGMStore();
 
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 

@@ -20,7 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -89,7 +89,7 @@ public abstract class SubgraphDecoder implements Serializable {
     GraphHead epgmGraphHead = graphHeadFactory
       .createGraphHead(canonicalLabel, properties);
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(epgmGraphHead.getId());
+    GradoopIdList graphIds = GradoopIdList.fromExisting(epgmGraphHead.getId());
 
     // VERTICES
 

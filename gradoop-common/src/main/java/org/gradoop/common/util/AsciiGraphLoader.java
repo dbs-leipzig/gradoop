@@ -26,7 +26,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
@@ -297,7 +297,7 @@ public class AsciiGraphLoader
    * @param graphIds graph identifiers
    * @return vertices that are contained in the graphs
    */
-  public Collection<V> getVerticesByGraphIds(GradoopIdSet graphIds) {
+  public Collection<V> getVerticesByGraphIds(GradoopIdList graphIds) {
     Collection<V> result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (V vertex : vertices.values()) {
       if (vertex.getGraphIds().containsAny(graphIds)) {
@@ -314,7 +314,7 @@ public class AsciiGraphLoader
    * @return vertices that are contained in the graphs
    */
   public Collection<V> getVerticesByGraphVariables(String... graphVariables) {
-    GradoopIdSet graphIds = new GradoopIdSet();
+    GradoopIdList graphIds = new GradoopIdList();
     for (G graphHead : getGraphHeadsByVariables(graphVariables)) {
       graphIds.add(graphHead.getId());
     }
@@ -367,7 +367,7 @@ public class AsciiGraphLoader
    * @param graphIds Graph identifiers
    * @return edges
    */
-  public Collection<E>  getEdgesByGraphIds(GradoopIdSet graphIds) {
+  public Collection<E>  getEdgesByGraphIds(GradoopIdList graphIds) {
     Collection<E>  result = Sets.newHashSetWithExpectedSize(graphIds.size());
     for (E edge : edges.values()) {
       if (edge.getGraphIds().containsAny(graphIds)) {
@@ -384,7 +384,7 @@ public class AsciiGraphLoader
    * @return edges
    */
   public Collection<E>  getEdgesByGraphVariables(String... variables) {
-    GradoopIdSet graphIds = new GradoopIdSet();
+    GradoopIdList graphIds = new GradoopIdList();
     for (G graphHead : getGraphHeadsByVariables(variables)) {
       graphIds.add(graphHead.getId());
     }
@@ -575,8 +575,8 @@ public class AsciiGraphLoader
    * @param e graph element
    * @return GradoopIDSet for the given element
    */
-  private GradoopIdSet createGradoopIdSet(GraphElement e) {
-    GradoopIdSet result = new GradoopIdSet();
+  private GradoopIdList createGradoopIdSet(GraphElement e) {
+    GradoopIdList result = new GradoopIdList();
     for (Long graphId : e.getGraphs()) {
       result.add(graphHeadIds.get(graphId));
     }

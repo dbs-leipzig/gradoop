@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Replaces the graph set of each element by a new one, containing only the
@@ -56,7 +56,7 @@ public class ElementGraphUpdater<EL extends GraphElement>
    */
   @Override
   public EL map(EL element) {
-    element.setGraphIds(GradoopIdSet.fromExisting(graphId));
+    element.setGraphIds(GradoopIdList.fromExisting(graphId));
     return element;
   }
 }

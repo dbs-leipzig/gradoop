@@ -52,9 +52,7 @@ public class BuildPersistentEdge<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public PersistentEdge<V> join(Tuple2<V, E> sourceVertexAndEdge,
-    V targetVertex) throws Exception {
-    return edgeFactory.createEdge(sourceVertexAndEdge.f1,
-      sourceVertexAndEdge.f0, targetVertex);
+  public PersistentEdge<V> join(Tuple2<V, E> sourceVertexAndEdge, V targetVertex) throws Exception {
+    return edgeFactory.createEdge(sourceVertexAndEdge.f1, sourceVertexAndEdge.f0, targetVertex);
   }
 }

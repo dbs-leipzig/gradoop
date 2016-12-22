@@ -49,8 +49,7 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
    * @param epgmStore HBase store
    * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSource(HBaseEPGMStore epgmStore,
-    GradoopFlinkConfig config) {
+  public HBaseDataSource(HBaseEPGMStore epgmStore, GradoopFlinkConfig config) {
     super(epgmStore, config);
   }
 
@@ -90,9 +89,9 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
         store.getEdgeTableName()), edgeTypeInfo);
 
     return GraphCollection.fromDataSets(
-      graphHeads.map(new ValueOf1<GraphHead>()),
-      vertices.map(new ValueOf1<Vertex>()),
-      edges.map(new ValueOf1<Edge>()),
+      graphHeads.map(new ValueOf1<>()),
+      vertices.map(new ValueOf1<>()),
+      edges.map(new ValueOf1<>()),
       config);
   }
 

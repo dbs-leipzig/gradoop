@@ -23,7 +23,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -85,10 +85,10 @@ public class JSONToEntity {
    * @return graph identifiers
    * @throws JSONException
    */
-  protected GradoopIdSet getGraphs(JSONObject object) throws JSONException {
-    GradoopIdSet result;
+  protected GradoopIdList getGraphs(JSONObject object) throws JSONException {
+    GradoopIdList result;
     if (!object.getJSONObject(JSONConstants.META).has(JSONConstants.GRAPHS)) {
-      result = new GradoopIdSet();
+      result = new GradoopIdList();
     } else {
       result = getArrayValues(object
           .getJSONObject(JSONConstants.META)
@@ -104,10 +104,10 @@ public class JSONToEntity {
    * @return long values
    * @throws JSONException
    */
-  protected GradoopIdSet getArrayValues(JSONArray array) throws
+  protected GradoopIdList getArrayValues(JSONArray array) throws
     JSONException {
 
-    GradoopIdSet result = new GradoopIdSet();
+    GradoopIdList result = new GradoopIdList();
 
     for (int i = 0; i < array.length(); i++) {
       result.add(GradoopId.fromString(array.getString(i)));

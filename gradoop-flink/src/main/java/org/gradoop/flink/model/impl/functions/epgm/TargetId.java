@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("targetId->*")
-public class TargetId<E extends Edge>
-  implements KeySelector<E, GradoopId> {
+public class TargetId<E extends Edge> implements KeySelector<E, GradoopId> {
+
   @Override
   public GradoopId getKey(E edge) throws Exception {
     return edge.getTargetId();

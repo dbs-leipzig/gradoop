@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -37,7 +37,7 @@ import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
  * @param <E> EPGM edge type
  */
 public class BuildTripleWithCandidatesAndGraphs<E extends Edge>
-  extends AbstractBuilder<E, Tuple2<GradoopIdSet, TripleWithCandidates<GradoopId>>> {
+  extends AbstractBuilder<E, Tuple2<GradoopIdList, TripleWithCandidates<GradoopId>>> {
 
   /**
    * serial version uid
@@ -54,7 +54,7 @@ public class BuildTripleWithCandidatesAndGraphs<E extends Edge>
   /**
    * Reduce instantiations
    */
-  private final Tuple2<GradoopIdSet, TripleWithCandidates<GradoopId>>
+  private final Tuple2<GradoopIdList, TripleWithCandidates<GradoopId>>
     reuseTuple;
 
   /**
@@ -76,7 +76,7 @@ public class BuildTripleWithCandidatesAndGraphs<E extends Edge>
   }
 
   @Override
-  public Tuple2<GradoopIdSet, TripleWithCandidates<GradoopId>> map(E e)
+  public Tuple2<GradoopIdList, TripleWithCandidates<GradoopId>> map(E e)
     throws Exception {
     reuseTuple.f0 = e.getGraphIds();
     reuseTuple.f1.setEdgeId(e.getId());
