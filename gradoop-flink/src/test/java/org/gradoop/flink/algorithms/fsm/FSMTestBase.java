@@ -2,6 +2,7 @@ package org.gradoop.flink.algorithms.fsm;
 
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -43,8 +44,10 @@ public abstract class FSMTestBase extends GradoopFlinkTestBase {
     GraphCollection expectation =
       loader.getGraphCollectionByVariables(expectedResultVariables);
 
-    // execute and validate
-    collectAndAssertTrue(getImplementation().execute(searchSpace)
-      .equalsByGraphElementData(expectation));
+    GraphCollection result = getImplementation().execute(searchSpace);
+
+    GradoopFlinkTestUtils.printGraphCollection(result);
+
+    collectAndAssertTrue(result.equalsByGraphElementData(expectation));
   }
 }

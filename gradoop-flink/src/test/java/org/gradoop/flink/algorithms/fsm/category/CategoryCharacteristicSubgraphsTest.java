@@ -9,6 +9,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
@@ -53,7 +54,6 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
 
     GraphCollection cGraphs = bGraphs.select(hasVertexLabelC);
 
-    bGraphs = bGraphs.difference(cGraphs);
     bGraphs = bGraphs.difference(cGraphs);
 
     bGraphs = bGraphs

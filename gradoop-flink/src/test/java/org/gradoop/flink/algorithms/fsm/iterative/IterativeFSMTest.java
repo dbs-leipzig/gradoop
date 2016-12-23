@@ -10,8 +10,8 @@ import static org.gradoop.flink.algorithms.fsm.TestData.*;
 
 public abstract class IterativeFSMTest extends FSMTestBase {
 
-  IterativeFSMTest(String testName, String dataGraph, String searchSpace, String
-    expectedCollection) {
+  IterativeFSMTest(String testName, String dataGraph, String searchSpace,
+    String expectedCollection) {
     super(testName, dataGraph, searchSpace, expectedCollection);
   }
 
