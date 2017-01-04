@@ -22,7 +22,7 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.CopyableValue;
 import org.apache.flink.types.Value;
-import org.gradoop.common.model.impl.id.GradoopIdLong;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   /**
    * Stores the byte size of a id entry
    */
-  public static final transient int ID_ENTRY_SIZE = Integer.BYTES + GradoopIdLong.ID_SIZE + 1;
+  public static final transient int ID_ENTRY_SIZE = Integer.BYTES + GradoopId.ID_SIZE + 1;
 
   /**
    * Holds the entry data represented as byte array
@@ -72,7 +72,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     this.size = size;
   }
 
-  public void add(GradoopIdLong id) {
+  public void add(GradoopId id) {
     byte[] entry = new byte[ID_ENTRY_SIZE];
     writeInt(ID_ENTRY_SIZE, entry, 0);
     entry[Integer.BYTES] = ID_ENTRY_TYPE;
@@ -82,7 +82,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     this.size++;
   }
 
-  public void add(GradoopIdLong id, List<PropertyValue> properties) {
+  public void add(GradoopId id, List<PropertyValue> properties) {
     int size = ID_ENTRY_SIZE
       + properties.stream().mapToInt(PropertyValue::getByteSize).sum()
       + properties.size() * Integer.BYTES;
@@ -104,17 +104,17 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     this.size++;
   }
 
-  public void add(GradoopIdLong[] ids) {
-    int size = 1 + Integer.BYTES + GradoopIdLong.ID_SIZE * ids.length;
+  public void add(GradoopId[] ids) {
+    int size = 1 + Integer.BYTES + GradoopId.ID_SIZE * ids.length;
     byte[] entry = new byte[size];
 
     writeInt(size, entry, 0);
     entry[4] = LIST_ENTRY_TYPE;
 
     int offset = Integer.BYTES + 1;
-    for(GradoopIdLong id : ids) {
+    for(GradoopId id : ids) {
       writeId(id, entry, offset);
-      offset += GradoopIdLong.ID_SIZE;
+      offset += GradoopId.ID_SIZE;
     }
 
     this.data = ArrayUtils.addAll(data, entry);
@@ -125,8 +125,8 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     return this.size;
   }
 
-  public GradoopIdLong getId(int column) {
-    return GradoopIdLong.fromBytes(getRawId(column));
+  public GradoopId getId(int column) {
+    return GradoopId.fromByteArray(getRawId(column));
   }
 
   public byte[] getRawId(int column) {
@@ -137,7 +137,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     }
 
     offset++;
-    return ArrayUtils.subarray(data, offset, offset + GradoopIdLong.ID_SIZE);
+    return ArrayUtils.subarray(data, offset, offset + GradoopId.ID_SIZE);
   }
 
   public PropertyValue getProperty(int column, int propertyIndex) {
@@ -165,9 +165,11 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     }
   }
 
-  public GradoopIdLong[] getListEntry(int column) {
+  public GradoopId[] getListEntry(int column) {
     int offset = getOffset(column);
-    int count = (Ints.fromByteArray(ArrayUtils.subarray(data, offset, offset + Integer.BYTES)) - 5) / 8;
+    int count =
+      (Ints.fromByteArray(ArrayUtils.subarray(data, offset, offset + Integer.BYTES)) - 5)
+        / GradoopId.ID_SIZE;
 
     if(data[offset+4] != LIST_ENTRY_TYPE) {
       throw new UnsupportedOperationException("Can't return ListEntry for non ListEntry");
@@ -175,11 +177,11 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
 
     offset += 1 + Integer.BYTES;
 
-    GradoopIdLong[] ids = new GradoopIdLong[count];
+    GradoopId[] ids = new GradoopId[count];
 
     for(int i = 0; i < count; i++) {
-      ids[i] = GradoopIdLong.fromBytes(ArrayUtils.subarray(data,offset, offset + 8));
-      offset += GradoopIdLong.ID_SIZE;
+      ids[i] = GradoopId.fromByteArray(ArrayUtils.subarray(data,offset, offset + GradoopId.ID_SIZE));
+      offset += GradoopId.ID_SIZE;
     }
 
     return ids;
@@ -209,8 +211,8 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     System.arraycopy(Ints.toByteArray(value), 0, target, offset, Integer.BYTES);
   }
 
-  private void writeId(GradoopIdLong value, byte[] target, int offset) {
-    System.arraycopy(value.getRawBytes(), 0, target, offset, GradoopIdLong.ID_SIZE);
+  private void writeId(GradoopId value, byte[] target, int offset) {
+    System.arraycopy(value.toByteArray(), 0, target, offset, GradoopId.ID_SIZE);
   }
 
   @Override
