@@ -99,6 +99,11 @@ public class PropertyValue
    */
   public PropertyValue() { }
 
+
+  private PropertyValue(byte[] rawBytes) {
+    this.rawBytes = rawBytes;
+  }
+
   /**
    * Creates a new property value from the given value.
    *
@@ -441,6 +446,18 @@ public class PropertyValue
       String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
       BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
       GradoopId.class   : null;
+  }
+
+  public int getByteSize() {
+    return rawBytes.length;
+  }
+
+  public byte[] getRawBytes() {
+    return this.rawBytes;
+  }
+
+  public static PropertyValue fromRawBytes(byte[] rawBytes) {
+    return new PropertyValue(rawBytes);
   }
 
   @Override
