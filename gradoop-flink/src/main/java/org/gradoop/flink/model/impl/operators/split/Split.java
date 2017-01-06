@@ -130,7 +130,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     DataSet<Tuple3<Edge, GradoopIdList, GradoopIdList>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
-        .where(new SourceId()).equalTo(0)
+        .where(new SourceId<>()).equalTo(0)
         .with(new JoinEdgeTupleWithSourceGraphs<>())
         .join(vertexIdWithGraphIds)
         .where("f0.targetId").equalTo(0)

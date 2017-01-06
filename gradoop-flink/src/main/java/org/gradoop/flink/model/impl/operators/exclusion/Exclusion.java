@@ -66,23 +66,23 @@ public class Exclusion implements BinaryGraphToGraphOperator {
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
     DataSet<GradoopId> graphId = secondGraph.getGraphHead()
-      .map(new Id<GraphHead>());
+      .map(new Id<>());
 
     DataSet<Vertex> newVertexSet = firstGraph.getVertices()
-      .filter(new NotInGraphBroadcast<Vertex>())
+      .filter(new NotInGraphBroadcast<>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID);
 
     DataSet<Edge> newEdgeSet = firstGraph.getEdges()
-      .filter(new NotInGraphBroadcast<Edge>())
+      .filter(new NotInGraphBroadcast<>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID)
       .join(newVertexSet)
-      .where(new SourceId())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .where(new SourceId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
       .join(newVertexSet)
-      .where(new TargetId())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>());
+      .where(new TargetId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());
