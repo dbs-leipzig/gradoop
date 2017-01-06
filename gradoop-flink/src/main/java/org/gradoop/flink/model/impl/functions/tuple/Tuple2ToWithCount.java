@@ -19,25 +19,25 @@ package org.gradoop.flink.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Factory to create (id, label) pairs from EPGM elements.
+ * (object, count) -> WithCount(object, count)
  *
- * @param <EL> element type
+ * @param <T> object type
  */
-@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
-public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
+@FunctionAnnotation.ForwardedFields("f0;f1")
+public class Tuple2ToWithCount<T> implements MapFunction<Tuple2<T, Long>, WithCount<T>> {
   /**
-   * Reuse tuple
+   * Reduce object instantiations
    */
-  private final IdWithLabel reuseTuple = new IdWithLabel();
+  private final WithCount<T> reuseTuple = new WithCount<>();
 
   @Override
-  public IdWithLabel map(EL element) {
-    reuseTuple.setId(element.getId());
-    reuseTuple.setLabel(element.getLabel());
+  public WithCount<T> map(Tuple2<T, Long> value) throws Exception {
+    reuseTuple.setObject(value.f0);
+    reuseTuple.setCount(value.f1);
     return reuseTuple;
   }
 }

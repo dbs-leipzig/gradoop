@@ -81,11 +81,11 @@ public abstract class SetOperatorBase extends
   @Override
   protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges().join(newVertices)
-      .where(new SourceId<>())
+      .where(new SourceId())
       .equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>())
       .join(newVertices)
-      .where(new TargetId<>())
+      .where(new TargetId())
       .equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>())
       .distinct(new Id<Edge>());

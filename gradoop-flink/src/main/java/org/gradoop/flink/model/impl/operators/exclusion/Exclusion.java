@@ -76,11 +76,11 @@ public class Exclusion implements BinaryGraphToGraphOperator {
       .filter(new NotInGraphBroadcast<Edge>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID)
       .join(newVertexSet)
-      .where(new SourceId<>())
+      .where(new SourceId())
       .equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>())
       .join(newVertexSet)
-      .where(new TargetId<>())
+      .where(new TargetId())
       .equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>());
 

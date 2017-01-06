@@ -15,29 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.tuple;
+package org.gradoop.flink.model.impl.operators.count.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Factory to create (id, label) pairs from EPGM elements.
+ * (object) -> (object, 1L)
  *
- * @param <EL> element type
+ * @param <T> type of object
  */
-@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
-public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
+public class Tuple2FromTupleWithObjectAnd1L<T> implements MapFunction<Tuple1<T>, Tuple2<T, Long>> {
   /**
-   * Reuse tuple
+   * Reduce object instantiations
    */
-  private final IdWithLabel reuseTuple = new IdWithLabel();
+  private final Tuple2<T, Long> reuseTuple;
+
+  /**
+   * Constructor
+   */
+  public Tuple2FromTupleWithObjectAnd1L() {
+    reuseTuple = new Tuple2<>();
+    reuseTuple.f1 = 1L;
+  }
 
   @Override
-  public IdWithLabel map(EL element) {
-    reuseTuple.setId(element.getId());
-    reuseTuple.setLabel(element.getLabel());
+  public Tuple2<T, Long> map(Tuple1<T> value) throws Exception {
+    reuseTuple.f0 = value.f0;
     return reuseTuple;
   }
 }

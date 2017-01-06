@@ -22,6 +22,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * (Id, Label)
+ *
+ * f0: id
+ * f1: label
  */
 public class IdWithLabel extends Tuple2<GradoopId, String> {
 
@@ -41,8 +44,16 @@ public class IdWithLabel extends Tuple2<GradoopId, String> {
   public IdWithLabel() {
   }
 
+  public void setId(GradoopId id) {
+    f0 = id;
+  }
+
   public GradoopId getId() {
     return f0;
+  }
+
+  public void setLabel(String label) {
+    f1 = label;
   }
 
   public String getLabel() {
