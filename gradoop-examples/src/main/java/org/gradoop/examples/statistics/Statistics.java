@@ -22,12 +22,17 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeLabelDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegreeDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.SourceLabelAndEdgeLabelDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.TargetLabelAndEdgeLabelDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegreeDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.VertexLabelDistribution;
 
@@ -47,6 +52,24 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     String outputDir = args[1];
 
     LogicalGraph graph = readLogicalGraph(inputDir);
+
+    //----------------------------------------------------------------------------------------------
+    // Vertex Count
+    //----------------------------------------------------------------------------------------------
+    new VertexCount()
+      .execute(graph)
+      .map(new ObjectTo1<>())
+      .writeAsCsv(outputDir + "vertex_count")
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Edge Count
+    //----------------------------------------------------------------------------------------------
+    new EdgeCount()
+      .execute(graph)
+      .map(new ObjectTo1<>())
+      .writeAsCsv(outputDir + "edge_count")
+      .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
     // Vertex Label Distribution
@@ -86,6 +109,24 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     new OutgoingVertexDegreeDistribution()
       .execute(graph)
       .writeAsCsv(outputDir + "incoming_vertex_degree_distribution")
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct Source Vertices
+    //----------------------------------------------------------------------------------------------
+    new DistinctSourceIds()
+      .execute(graph)
+      .map(new ObjectTo1<>())
+      .writeAsCsv(outputDir + "distinct_source_vertices")
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct Target Vertices
+    //----------------------------------------------------------------------------------------------
+    new DistinctTargetIds()
+      .execute(graph)
+      .map(new ObjectTo1<>())
+      .writeAsCsv(outputDir + "distinct_target_vertices")
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------

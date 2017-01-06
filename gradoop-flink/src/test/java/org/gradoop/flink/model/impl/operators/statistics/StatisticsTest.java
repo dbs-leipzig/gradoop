@@ -18,6 +18,30 @@ import static org.junit.Assert.assertThat;
 public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
+  public void testVertexCount() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    Long vertexCount = new VertexCount()
+      .execute(db)
+      .collect()
+      .get(0);
+
+    assertThat(vertexCount, is(11L));
+  }
+
+  @Test
+  public void testEdgeCount() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    Long edgeCount = new EdgeCount()
+      .execute(db)
+      .collect()
+      .get(0);
+
+    assertThat(edgeCount, is(24L));
+  }
+
+  @Test
   public void testVertexLabelDistribution() throws Exception {
     LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
@@ -178,6 +202,30 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     assertThat(cache.get(2L), is(1L));
     assertThat(cache.get(3L), is(2L));
     assertThat(cache.get(4L), is(4L));
+  }
+
+  @Test
+  public void testDistinctSourceIds() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    Long result = new DistinctSourceIds()
+      .execute(db)
+      .collect()
+      .get(0);
+
+    assertThat(result, is(8L));
+  }
+
+  @Test
+  public void testDistinctTargetIds() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    Long result = new DistinctTargetIds()
+      .execute(db)
+      .collect()
+      .get(0);
+
+    assertThat(result, is(7L));
   }
 
   @Test
