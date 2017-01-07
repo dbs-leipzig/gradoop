@@ -23,6 +23,9 @@ import org.gradoop.flink.model.api.tuples.Countable;
 /**
  * (t,count)
  *
+ * f0: object
+ * f1: count
+ *
  * @param <T> data type of t
  */
 public class WithCount<T> extends Tuple2<T, Long> implements Countable {

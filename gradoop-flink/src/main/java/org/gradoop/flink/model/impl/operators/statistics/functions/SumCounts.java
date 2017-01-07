@@ -15,29 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.tuple;
+package org.gradoop.flink.model.impl.operators.statistics.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Factory to create (id, label) pairs from EPGM elements.
+ * (object,count1),(object,count2) -> (object,count1 + count2)
  *
- * @param <EL> element type
+ * @param <T> object type
  */
-@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
-public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
-  /**
-   * Reuse tuple
-   */
-  private final IdWithLabel reuseTuple = new IdWithLabel();
+@FunctionAnnotation.ForwardedFieldsFirst("f0")
+@FunctionAnnotation.ReadFieldsSecond("f1")
+public class SumCounts<T> implements JoinFunction<WithCount<T>, WithCount<T>, WithCount<T>> {
 
   @Override
-  public IdWithLabel map(EL element) {
-    reuseTuple.setId(element.getId());
-    reuseTuple.setLabel(element.getLabel());
-    return reuseTuple;
+  public WithCount<T> join(WithCount<T> first, WithCount<T> second) throws Exception {
+    first.setCount(first.getCount() + second.getCount());
+    return first;
   }
 }

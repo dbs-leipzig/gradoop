@@ -15,29 +15,32 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.tuple;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Factory to create (id, label) pairs from EPGM elements.
+ * Extracts an arbitrary value (e.g. label, property key/value, ...) from an edge and computes its
+ * distribution among all edges.
  *
- * @param <EL> element type
+ * @param <T> value type
  */
-@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
-public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
+public class EdgeValueDistribution<T> extends ValueDistribution<Edge, T> {
   /**
-   * Reuse tuple
+   * Constructor
+   *
+   * @param valueFunction extracts a value from a edge
    */
-  private final IdWithLabel reuseTuple = new IdWithLabel();
+  public EdgeValueDistribution(MapFunction<Edge, T> valueFunction) {
+    super(valueFunction);
+  }
 
   @Override
-  public IdWithLabel map(EL element) {
-    reuseTuple.setId(element.getId());
-    reuseTuple.setLabel(element.getLabel());
-    return reuseTuple;
+  public DataSet<WithCount<T>> execute(LogicalGraph graph) {
+    return compute(graph.getEdges());
   }
 }

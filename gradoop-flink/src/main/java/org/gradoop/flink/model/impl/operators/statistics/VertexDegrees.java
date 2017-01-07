@@ -15,30 +15,26 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.epgm;
+package org.gradoop.flink.model.impl.operators.statistics;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.functions.SumCounts;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Used to select the source vertex id of an edge.
- *
- * @param <E> EPGM edge type
+ * Computes the vertex degree for each vertex.
  */
-@FunctionAnnotation.ForwardedFields("sourceId->*")
-public class SourceId<E extends Edge>
-  implements KeySelector<E, GradoopId>, MapFunction<E, GradoopId> {
+public class VertexDegrees implements UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> {
 
   @Override
-  public GradoopId getKey(E edge) throws Exception {
-    return edge.getSourceId();
-  }
-
-  @Override
-  public GradoopId map(E edge) throws Exception {
-    return edge.getSourceId();
+  public DataSet<WithCount<GradoopId>> execute(LogicalGraph graph) {
+    return new OutgoingVertexDegrees()
+      .execute(graph)
+      .join(new IncomingVertexDegrees().execute(graph))
+      .where(0).equalTo(0)
+      .with(new SumCounts<>());
   }
 }

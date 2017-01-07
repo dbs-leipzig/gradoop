@@ -15,48 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.tuples;
+package org.gradoop.flink.model.api.operators;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.LogicalGraph;
 
 /**
- * (Id, Label)
+ * Creates a value from one input {@link org.gradoop.flink.model.impl.LogicalGraph}.
  *
- * f0: id
- * f1: label
+ * @param <T> result type
  */
-public class IdWithLabel extends Tuple2<GradoopId, String> {
-
+public interface UnaryGraphToValueOperator<T> {
   /**
-   * Constructor.
+   * Executes the operator.
    *
-   * @param id element id
-   * @param label element label
+   * @param graph input graph
+   * @return operator result
    */
-  public IdWithLabel(GradoopId id, String label) {
-    super(id, label);
-  }
-
-  /**
-   * Default Constructor
-   */
-  public IdWithLabel() {
-  }
-
-  public void setId(GradoopId id) {
-    f0 = id;
-  }
-
-  public GradoopId getId() {
-    return f0;
-  }
-
-  public void setLabel(String label) {
-    f1 = label;
-  }
-
-  public String getLabel() {
-    return f1;
-  }
+  T execute(LogicalGraph graph);
 }
