@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized;
  * Base class for Transactional Frequent Subgraph Mining Tests.
  */
 @RunWith(Parameterized.class)
-public abstract class FSMTestBase extends GradoopFlinkTestBase {
+public abstract class TransactionalFSMTestBase extends GradoopFlinkTestBase {
 
   private final String testName;
 
@@ -23,7 +23,7 @@ public abstract class FSMTestBase extends GradoopFlinkTestBase {
 
   private final String[] expectedResultVariables;
 
-  public FSMTestBase(String testName, String asciiGraphs,
+  public TransactionalFSMTestBase(String testName, String asciiGraphs,
     String searchSpaceVariables, String expectedResultVariables) {
     this.testName = testName;
     this.asciiGraphs = asciiGraphs;
@@ -45,8 +45,6 @@ public abstract class FSMTestBase extends GradoopFlinkTestBase {
       loader.getGraphCollectionByVariables(expectedResultVariables);
 
     GraphCollection result = getImplementation().execute(searchSpace);
-
-    GradoopFlinkTestUtils.printGraphCollection(result);
 
     collectAndAssertTrue(result.equalsByGraphElementData(expectation));
   }

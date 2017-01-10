@@ -1,6 +1,6 @@
 package org.gradoop.flink.algorithms.fsm.iterative;
 
-import org.gradoop.flink.algorithms.fsm.FSMTestBase;
+import org.gradoop.flink.algorithms.fsm.TransactionalFSMTestBase;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
@@ -8,9 +8,9 @@ import java.util.Arrays;
 import static org.gradoop.flink.algorithms.fsm.TestData.*;
 
 
-public abstract class IterativeFSMTest extends FSMTestBase {
+public abstract class IterativeFSMTestBase extends TransactionalFSMTestBase {
 
-  IterativeFSMTest(String testName, String dataGraph, String searchSpace,
+  IterativeFSMTestBase(String testName, String dataGraph, String searchSpace,
     String expectedCollection) {
     super(testName, dataGraph, searchSpace, expectedCollection);
   }

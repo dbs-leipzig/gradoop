@@ -7,9 +7,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 /**
  * Creates an {@ThinkLikeAnEmbeddingTFSM} instance for test cases
  */
-public class ThinkLikeAnEmbeddingTFSMTest extends IterativeFSMTest {
+public class TransactionalThinkLikeAnEmbeddingTest extends IterativeFSMTestBase {
 
-  public ThinkLikeAnEmbeddingTFSMTest(String testName, String dataGraph,
+  public TransactionalThinkLikeAnEmbeddingTest(String testName, String dataGraph,
     String expectedGraphVariables, String expectedCollection) {
     super(testName, dataGraph, expectedGraphVariables, expectedCollection);
   }

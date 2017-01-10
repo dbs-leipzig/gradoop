@@ -7,9 +7,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 /**
  * Creates an {@GSpanIterative} instance for test cases
  */
-public class GSpanIterativeTest extends IterativeFSMTest {
+public class TransactionalGSpanIterativeTest extends IterativeFSMTestBase {
 
-  public GSpanIterativeTest(String testName, String dataGraph,
+  public TransactionalGSpanIterativeTest(String testName, String dataGraph,
     String expectedGraphVariables, String expectedCollection) {
     super(testName, dataGraph, expectedGraphVariables, expectedCollection);
   }
