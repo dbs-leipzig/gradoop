@@ -9,8 +9,8 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
  */
 public class TransactionalThinkLikeAnEmbeddingWithGeneratorTest extends WithGeneratorTestBase {
 
-  public TransactionalThinkLikeAnEmbeddingWithGeneratorTest(String testName, String directed, String threshold,
-    String graphCount){
+  public TransactionalThinkLikeAnEmbeddingWithGeneratorTest(String testName, String directed,
+    String threshold, String graphCount){
     super(testName, directed, threshold, graphCount);
   }
 
