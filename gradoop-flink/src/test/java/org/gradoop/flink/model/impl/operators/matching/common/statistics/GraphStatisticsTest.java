@@ -10,7 +10,6 @@ import static org.junit.Assert.assertThat;
  * against the example social network in "dev-support/social-network.pdf".
  */
 public abstract class GraphStatisticsTest {
-
   /**
    * Must be initialized in sub-classes using @BeforeClass or @Before
    */
