@@ -23,6 +23,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
@@ -59,7 +60,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     new VertexCount()
       .execute(graph)
       .map(new ObjectTo1<>())
-      .writeAsCsv(outputDir + "vertex_count")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_VERTEX_COUNT,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -68,7 +70,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     new EdgeCount()
       .execute(graph)
       .map(new ObjectTo1<>())
-      .writeAsCsv(outputDir + "edge_count")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_EDGE_COUNT,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -76,7 +79,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     //----------------------------------------------------------------------------------------------
     new VertexLabelDistribution()
       .execute(graph)
-      .writeAsCsv(outputDir + "vertex_label_distribution")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_VERTEX_COUNT_BY_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -84,7 +88,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     //----------------------------------------------------------------------------------------------
     new EdgeLabelDistribution()
       .execute(graph)
-      .writeAsCsv(outputDir + "edge_label_distribution")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_EDGE_COUNT_BY_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -117,7 +122,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     new DistinctSourceIds()
       .execute(graph)
       .map(new ObjectTo1<>())
-      .writeAsCsv(outputDir + "distinct_source_vertices")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -126,7 +132,8 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     new DistinctTargetIds()
       .execute(graph)
       .map(new ObjectTo1<>())
-      .writeAsCsv(outputDir + "distinct_target_vertices")
+      .writeAsCsv(outputDir + GraphStatisticsLocalFSReader.FILE_DISTINCT_TARGET_VERTEX_COUNT,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -134,7 +141,9 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     //----------------------------------------------------------------------------------------------
     new DistinctSourceIdsByEdgeLabel()
       .execute(graph)
-      .writeAsCsv(outputDir + "distinct_source_vertices_by_edge_label")
+      .writeAsCsv(
+        outputDir + GraphStatisticsLocalFSReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -142,7 +151,9 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
     //----------------------------------------------------------------------------------------------
     new DistinctTargetIdsByEdgeLabel()
       .execute(graph)
-      .writeAsCsv(outputDir + "distinct_target_vertices_by_edge_label")
+      .writeAsCsv(
+        outputDir + GraphStatisticsLocalFSReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -152,7 +163,9 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
       .execute(graph)
       .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
       .returns(new TypeHint<Tuple3<String, String, Long>>() { })
-      .writeAsCsv(outputDir + "source_label_and_edge_label_distribution")
+      .writeAsCsv(
+        outputDir + GraphStatisticsLocalFSReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     //----------------------------------------------------------------------------------------------
@@ -162,7 +175,9 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
       .execute(graph)
       .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
       .returns(new TypeHint<Tuple3<String, String, Long>>() { })
-      .writeAsCsv(outputDir + "target_label_and_edge_label_distribution")
+      .writeAsCsv(
+        outputDir + GraphStatisticsLocalFSReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL,
+        System.lineSeparator(), GraphStatisticsLocalFSReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 
     getExecutionEnvironment().execute();

@@ -137,24 +137,19 @@ public abstract class GradoopFlinkTestBase {
   //----------------------------------------------------------------------------
 
   protected FlinkAsciiGraphLoader getLoaderFromString(String asciiString) {
-    FlinkAsciiGraphLoader
-      loader = getNewLoader();
+    FlinkAsciiGraphLoader loader = getNewLoader();
     loader.initDatabaseFromString(asciiString);
     return loader;
   }
 
-  protected FlinkAsciiGraphLoader
-  getLoaderFromFile(
-    String fileName) throws IOException {
-    FlinkAsciiGraphLoader
-      loader = getNewLoader();
+  protected FlinkAsciiGraphLoader getLoaderFromFile(String fileName) throws IOException {
+    FlinkAsciiGraphLoader loader = getNewLoader();
 
     loader.initDatabaseFromFile(fileName);
     return loader;
   }
 
-  protected FlinkAsciiGraphLoader getLoaderFromStream(InputStream inputStream)
-    throws IOException {
+  protected FlinkAsciiGraphLoader getLoaderFromStream(InputStream inputStream) throws IOException {
     FlinkAsciiGraphLoader loader = getNewLoader();
 
     loader.initDatabaseFromStream(inputStream);
