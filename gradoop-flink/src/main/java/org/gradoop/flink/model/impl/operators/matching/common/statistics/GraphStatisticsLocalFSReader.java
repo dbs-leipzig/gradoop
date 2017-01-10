@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Reads {@link GraphStatistics} from dedicated files in the local file system.
  */
-public class GraphStatisticsLocalFSReader {
+public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {
   /**
    * Reads statistics from files contains in the specified directory and creates a
    * {@link GraphStatistics} object from them.
@@ -44,42 +44,40 @@ public class GraphStatisticsLocalFSReader {
     Charset charset = Charset.forName("UTF-8");
 
     Path p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_VERTEX_COUNT));
-    long vertexCount = GraphStatisticsReader.readSingleValue(Files.lines(p, charset));
+    long vertexCount = readSingleValue(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT));
-    long edgeCount = GraphStatisticsReader.readSingleValue(Files.lines(p, charset));
+    long edgeCount = readSingleValue(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL));
-    Map<String, Long> vertexCountByLabel = GraphStatisticsReader.readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> vertexCountByLabel = readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL));
-    Map<String, Long> edgeCountByLabel = GraphStatisticsReader.readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> edgeCountByLabel = readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL));
-    Map<String, Map<String, Long>> edgeCountBySourceVertexAndEdgeLabel = GraphStatisticsReader
-      .readNestedKeyValueMap(Files.lines(p, charset));
+    Map<String, Map<String, Long>> edgeCountBySourceVertexAndEdgeLabel =
+      readNestedKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL));
-    Map<String, Map<String, Long>> edgeCountByTargetVertexAndEdgeLabel = GraphStatisticsReader
-      .readNestedKeyValueMap(Files.lines(p, charset));
+    Map<String, Map<String, Long>> edgeCountByTargetVertexAndEdgeLabel =
+      readNestedKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT));
-    long distinctSourceVertexCount = GraphStatisticsReader.readSingleValue(Files.lines(p, charset));
+    long distinctSourceVertexCount = readSingleValue(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT));
-    long distinctTargetVertexCount = GraphStatisticsReader.readSingleValue(Files.lines(p, charset));
+    long distinctTargetVertexCount = readSingleValue(Files.lines(p, charset));
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL));
-    Map<String, Long> distinctSourceVertexCountByEdgeLabel = GraphStatisticsReader
-      .readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> distinctSourceVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL));
-    Map<String, Long> distinctTargetVertexCountByEdgeLabel = GraphStatisticsReader
-      .readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> distinctTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
     return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,
       edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
