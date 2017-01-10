@@ -73,16 +73,16 @@ public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL));
-    Map<String, Long> distinctSourceVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> distSourceVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir
       .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL));
-    Map<String, Long> distinctTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
+    Map<String, Long> distTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
     return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,
       edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
       distinctSourceVertexCount, distinctTargetVertexCount,
-      distinctSourceVertexCountByEdgeLabel, distinctTargetVertexCountByEdgeLabel);
+      distSourceVertexCountByEdgeLabel, distTargetVertexCountByEdgeLabel);
   }
 
 }
