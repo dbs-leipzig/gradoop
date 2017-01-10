@@ -5,7 +5,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 
 /**
- * Creates an {@GSpanIterative} instance for test cases
+ * Creates an {@link GSpanIterative} instance for test cases
  */
 public class TransactionalGSpanIterativeTest extends IterativeFSMTestBase {
 
