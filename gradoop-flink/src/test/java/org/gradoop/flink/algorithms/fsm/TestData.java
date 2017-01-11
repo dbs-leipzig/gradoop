@@ -1,8 +1,9 @@
 package org.gradoop.flink.algorithms.fsm;
 
-
+/**
+ * Class to provide test data for fsm tests
+ */
 public class TestData {
-
 
   public static final String FSM_SINGLE_EDGE =
     "g1[(v1:A)-[e1:a]->(v2:A)]" +
@@ -36,7 +37,6 @@ public class TestData {
     "s1[(:A)-[:a]->(:A)]" +
     "s2[(v3:A)-[:a]->(v3)]" +
     "s3[(v4:A)-[:a]->(v4)-[:a]->(:A)]";
-
 
   public static final String FSM_DIAMOND =
     "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
