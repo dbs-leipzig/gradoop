@@ -20,9 +20,10 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecord;
+
+import java.util.ArrayList;
 
 /**
  * Represents an intermediate result for the expand operator
@@ -32,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
  * The end node (f2) is the last element in expanded path (a node). It is stored separately
  * to enable using it as a join column
  */
-public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
+public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], GradoopId> {
 
   /**
    * Create a new ExpandIntermediateResult
@@ -46,7 +47,7 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @param base the base part
    * @param path the path along we expanded
    */
-  public ExpandEmbedding(Embedding base, GradoopId[] path) {
+  public ExpandEmbedding(EmbeddingRecord base, GradoopId[] path) {
     super(base, ArrayUtils.subarray(path, 0, path.length - 1), path[path.length - 1]);
   }
 
@@ -54,7 +55,7 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * Returns the base part
    * @return the base part
    */
-  public Embedding getBase() {
+  public EmbeddingRecord getBase() {
     return f0;
   }
 
@@ -81,10 +82,10 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @param edge the edge along which we expand
    * @return new expanded intermediate result
    */
-  public ExpandEmbedding grow(Embedding edge) {
+  public ExpandEmbedding grow(EmbeddingRecord edge) {
     return new ExpandEmbedding(
       f0,
-      ArrayUtils.addAll(f1, f2, edge.getEntry(1).getId(), edge.getEntry(2).getId())
+      ArrayUtils.addAll(f1, f2, edge.getId(1), edge.getId(2))
     );
   }
 
@@ -102,12 +103,11 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    *
    * @return embedding representation of the expand intermediate result
    */
-  public Embedding toEmbedding() {
-    Embedding embedding = new Embedding();
+  public EmbeddingRecord toEmbedding() {
+    EmbeddingRecord embedding = getBase().copy();
 
-    embedding.addEntries(f0.getEntries());
-    embedding.addEntry(new PathEntry(Lists.newArrayList(f1)));
-    embedding.addEntry(new IdEntry(f2));
+    embedding.add(Lists.newArrayList(f1));
+    embedding.add(f2);
 
     return embedding;
   }

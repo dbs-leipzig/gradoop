@@ -18,7 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecord;
 
 /**
  * Physical Operators are used to transform input data into Embeddings
@@ -30,6 +31,6 @@ public interface PhysicalOperator {
    * Runs the operator on the input data
    * @return The resulting embedding
    */
-  DataSet<Embedding> evaluate();
+  DataSet<EmbeddingRecord> evaluate();
 
 }

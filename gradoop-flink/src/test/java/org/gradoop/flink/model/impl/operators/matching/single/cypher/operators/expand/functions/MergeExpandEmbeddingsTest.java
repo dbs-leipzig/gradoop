@@ -19,8 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
@@ -141,19 +140,21 @@ public class MergeExpandEmbeddingsTest {
   }
 
 
-  private void testJoin(Embedding edge, List<Integer> distinctVertices, List<Integer> distinctEdges,
+  private void testJoin(EmbeddingRecord edge, List<Integer> distinctVertices, List<Integer>
+    distinctEdges,
     int closingColumn, boolean isResult) throws Exception {
 
+    EmbeddingRecord base = new EmbeddingRecord();
+    base.add(m);
+    base.add(e0);
+    base.add(n);
+
     ExpandEmbedding expandEmbedding = new ExpandEmbedding(
-      new Embedding(Lists.newArrayList(
-        new IdEntry(m),
-        new IdEntry(e0),
-        new IdEntry(n)
-      )), new GradoopId[]{e1,a}
+      base, new GradoopId[]{e1,a}
     );
 
-    MergeExpandEmbeddings
-      op = new MergeExpandEmbeddings(distinctVertices, distinctEdges, closingColumn);
+    MergeExpandEmbeddings op =
+      new MergeExpandEmbeddings(distinctVertices, distinctEdges, closingColumn);
     
     List<ExpandEmbedding> results = new ArrayList<>();
     op.join(expandEmbedding, edge, new ListCollector<>(results));
@@ -161,16 +162,17 @@ public class MergeExpandEmbeddingsTest {
     assertEquals(isResult ? 1:0, results.size());
     
     if (isResult) {
-      assertArrayEquals(new GradoopId[]{e1,a,edge.getEntry(1).getId()}, results.get(0).getPath());
-      assertEquals(edge.getEntry(2).getId(), results.get(0).getEnd());
+      assertArrayEquals(new GradoopId[]{e1,a,edge.getId(1)}, results.get(0).getPath());
+      assertEquals(edge.getId(2), results.get(0).getEnd());
     }
   }
-  
-  private Embedding buildEdge(GradoopId src, GradoopId edge, GradoopId tgt) {
-    return new Embedding(Lists.newArrayList(
-      new IdEntry(src),
-      new IdEntry(edge),
-      new IdEntry(tgt)
-    ));
+
+  private EmbeddingRecord buildEdge(GradoopId src, GradoopId edgeId, GradoopId tgt) {
+    EmbeddingRecord edge = new EmbeddingRecord();
+    edge.add(src);
+    edge.add(edgeId);
+    edge.add(tgt);
+
+    return edge;
   }
 }

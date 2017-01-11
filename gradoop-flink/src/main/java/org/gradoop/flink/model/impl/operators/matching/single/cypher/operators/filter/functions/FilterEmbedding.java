@@ -19,15 +19,15 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Filter;
-
-import java.util.Map;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecordMetaData;
 
 /**
  * Filters a set of embedding by given predicates
  */
-public class FilterEmbedding extends RichFilterFunction<Embedding> {
+public class FilterEmbedding extends RichFilterFunction<EmbeddingRecord> {
   /**
    * Predicates used for filtering
    */
@@ -35,20 +35,20 @@ public class FilterEmbedding extends RichFilterFunction<Embedding> {
   /**
    * Mapping of variables names to embedding column
    */
-  private final Map<String, Integer> columnMapping;
+  private final EmbeddingRecordMetaData metaData;
 
   /**
    * New embedding filter function
    * @param predicates predicates used for filtering
-   * @param columnMapping mapping of variable names to embedding column
+   * @param metaData mapping of variable names to embedding column
    */
-  public FilterEmbedding(CNF predicates, Map<String, Integer> columnMapping) {
+  public FilterEmbedding(CNF predicates,EmbeddingRecordMetaData metaData) {
     this.predicates = predicates;
-    this.columnMapping = columnMapping;
+    this.metaData = metaData;
   }
 
   @Override
-  public boolean filter(Embedding embedding) {
-    return Filter.filter(predicates, embedding, columnMapping);
+  public boolean filter(EmbeddingRecord embedding) {
+    return predicates.evaluate(embedding, metaData);
   }
 }

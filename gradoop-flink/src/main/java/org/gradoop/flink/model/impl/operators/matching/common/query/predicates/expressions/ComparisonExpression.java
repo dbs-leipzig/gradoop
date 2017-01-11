@@ -22,11 +22,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -63,13 +63,14 @@ public class ComparisonExpression extends QueryPredicate {
   }
 
   /**
-   * Evaluates the comparison with respect to the given data
-   * @param values mapping of variables to embedding entries
-   * @return result of the evaluation
+   *
+   * @param embedding the embedding record holding the data
+   * @param metaData the embedding meta data
+   * @return evaluation result
    */
-  public boolean evaluate(Map<String, EmbeddingEntry> values) {
-    PropertyValue lhsValue = getLhs().evaluate(values);
-    PropertyValue rhsValue = getRhs().evaluate(values);
+  public boolean evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
+    PropertyValue lhsValue = getLhs().evaluate(embedding, metaData);
+    PropertyValue rhsValue = getRhs().evaluate(embedding, metaData);
 
     try {
       int result = lhsValue.compareTo(rhsValue);
@@ -93,6 +94,18 @@ public class ComparisonExpression extends QueryPredicate {
    */
   public Set<String> getVariables() {
     return comparison.getVariables();
+  }
+
+  /**
+   * Returns the properties referenced by the expression for a given variable
+   * @param variable the variable
+   * @return set of referenced properties
+   */
+  public Set<String> getProperties(String variable) {
+    Set<String> properties = getLhs().getProperties(variable);
+    properties.addAll(getRhs().getProperties(variable));
+
+    return properties;
   }
 
   /**

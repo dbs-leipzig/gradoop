@@ -17,12 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -81,9 +81,9 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   @Override
-  public boolean evaluate(Map<String, EmbeddingEntry> values) {
+  public boolean evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
     for (CNFElement element : predicates) {
-      if (!element.evaluate(values)) {
+      if (!element.evaluate(embedding, metaData)) {
         return false;
       }
     }
@@ -113,10 +113,7 @@ public class CNF extends PredicateCollection<CNFElement> {
     return subCNF;
   }
 
-  /**
-   * Returns a set of variables referenced by the predicates
-   * @return set of variables
-   */
+
   @Override
   public Set<String> getVariables() {
     Set<String> variables = new HashSet<>();
@@ -124,5 +121,14 @@ public class CNF extends PredicateCollection<CNFElement> {
       variables.addAll(cnfElement.getVariables());
     }
     return variables;
+  }
+
+  @Override
+  public Set<String> getProperties(String variable) {
+    Set<String> properties = new HashSet<>();
+    for (CNFElement cnfElement : predicates) {
+      properties.addAll(cnfElement.getProperties(variable));
+    }
+    return properties;
   }
 }

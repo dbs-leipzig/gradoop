@@ -19,9 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
@@ -47,18 +45,18 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testOutputFormat() throws Exception {
-    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> input = getExecutionEnvironment().fromElements(
       createEmbedding(m,e0,n)
     );
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(n,e1,a),
       createEmbedding(a,e2,b),
       createEmbedding(b,e3,c)
     );
 
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input, candidateEdges, 2, 1, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -67,37 +65,36 @@ public class ExpandTest extends PhysicalOperatorTest {
 
     assertEveryEmbedding(result, (embedding -> {
       assertEquals(5,embedding.size());
-      assertEquals(PathEntry.class, embedding.getEntry(3).getClass());
-      assertEquals(IdEntry.class,     embedding.getEntry(4).getClass());
+      embedding.getIdList(3);
     }));
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 1
+      embedding -> (embedding.getIdList(3)).size() == 1
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 3
+      embedding -> (embedding.getIdList(3)).size() == 3
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 5
+      embedding -> (embedding.getIdList(3)).size() == 5
     );
   }
 
   @Test
   public void testResultForOutExpansion() throws Exception {
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<EmbeddingRecord> input = createEmbeddings(1, a);
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
       createEmbedding(b,e2,c),
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -109,15 +106,15 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<EmbeddingRecord> input = createEmbeddings(1, a);
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,a),
       createEmbedding(c,e2,b),
       createEmbedding(d,e3,c)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.IN, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -129,52 +126,52 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<EmbeddingRecord> input = createEmbeddings(1, a);
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
       createEmbedding(b,e2,c),
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
+      assertEquals(3, embedding.getIdList(1).size());
     });
   }
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<EmbeddingRecord> input = createEmbeddings(1, a);
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
       createEmbedding(b,e2,c)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
+      assertEquals(3, embedding.getIdList(1).size());
     });
   }
 
   @Test
   public void testLowerBound0() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<EmbeddingRecord> input = createEmbeddings(1, a);
 
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<EmbeddingRecord> result = new Expand(
       input,candidateEdges, 0, 0, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
@@ -182,18 +179,18 @@ public class ExpandTest extends PhysicalOperatorTest {
     assertEquals(2, result.count());
 
     assertEmbeddingExists(result, (embedding) ->
-      embedding.size() == 1 &&  embedding.getEntry(0).getId().equals(a)
+      embedding.size() == 1 &&  embedding.getId(0).equals(a)
     );
   }
 
   @Test
   public void testFilterDistinctVertices() throws Exception {
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
       createEmbedding(b,e2,a)
     );
 
-    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> input = getExecutionEnvironment().fromElements(
       createEmbedding(a,e0,b)
     );
 
@@ -205,19 +202,19 @@ public class ExpandTest extends PhysicalOperatorTest {
       new ArrayList<>(), -1
     );
 
-    DataSet<Embedding> result = op.evaluate();
+    DataSet<EmbeddingRecord> result = op.evaluate();
 
     assertEquals(0, result.count());
   }
 
   @Test
   public void testFilterDistinctEdges() throws Exception {
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e0,b),
       createEmbedding(b,e1,a)
     );
 
-    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> input = getExecutionEnvironment().fromElements(
       createEmbedding(a,e0,b)
     );
 
@@ -229,7 +226,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       Lists.newArrayList(1,2), -1
     );
 
-    DataSet<Embedding> result = op.evaluate();
+    DataSet<EmbeddingRecord> result = op.evaluate();
 
     assertEquals(1, result.count());
     assertEmbeddingExists(result, a,e0,b,e1,a);
@@ -237,12 +234,12 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testCircleCondition() throws Exception {
-    DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,c),
       createEmbedding(b,e2,a)
     );
 
-    DataSet<Embedding> input = getExecutionEnvironment().fromElements(
+    DataSet<EmbeddingRecord> input = getExecutionEnvironment().fromElements(
       createEmbedding(a,e0,b)
     );
 
@@ -255,7 +252,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       0
     );
 
-    DataSet<Embedding> result = op.evaluate();
+    DataSet<EmbeddingRecord> result = op.evaluate();
 
     assertEquals(1, result.count());
     assertEmbeddingExists(result, a,e0,b,e2,a);

@@ -24,8 +24,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -114,14 +113,10 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
 
     FilterEdges filter = new FilterEdges(edgeDataSet, predicates);
 
-    List<Embedding> result = filter.evaluate().collect();
+    List<EmbeddingRecord> result = filter.evaluate().collect();
 
-    assertEquals(IdEntry.class, result.get(0).getEntry(0).getClass());
-    assertEquals(IdEntry.class, result.get(0).getEntry(1).getClass());
-    assertEquals(IdEntry.class, result.get(0).getEntry(2).getClass());
-
-    assertEquals(edge.getSourceId(), result.get(0).getEntry(0).getId());
-    assertEquals(edge.getId(),       result.get(0).getEntry(1).getId());
-    assertEquals(edge.getTargetId(), result.get(0).getEntry(2).getId());
+    assertEquals(edge.getSourceId(), result.get(0).getId(0));
+    assertEquals(edge.getId(),       result.get(0).getId(1));
+    assertEquals(edge.getTargetId(), result.get(0).getId(2));
   }
 }

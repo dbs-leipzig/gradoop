@@ -14,37 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
+
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 
 /**
- * Selects the embedding entry specified by index
- * It is also possible to use negative keys, which count from the back of the list.
- * -1 specified the last element, -2 the one before the last.
+ * Extracts a join key from an id stored in an embedding record
+ * The id is referenced via its column index.
  */
-public class ExtractColumn implements KeySelector<Embedding, GradoopId> {
+public class ExtractExpandColumn implements KeySelector<EmbeddingRecord, GradoopId> {
   /**
-   * The specified column index
+   * Column that holds the id which will be used as key
    */
-  private final int column;
+  private final Integer column;
 
   /**
-   * Creates a new embedding keys selector
-   * @param column index of the embedding entry
+   * Creates the key selector
+   *
+   * @param column column that holds the id which will be used as key
    */
-  public ExtractColumn(int column) {
+  public ExtractExpandColumn(Integer column) {
     this.column = column;
   }
 
   @Override
-  public GradoopId getKey(Embedding value) throws Exception {
-    if (column < 0) {
-      return value.getEntry(value.size() + column).getId();
-    } else {
-      return value.getEntry(column).getId();
-    }
+  public GradoopId getKey(EmbeddingRecord value) throws Exception {
+    return value.getId(column);
   }
 }

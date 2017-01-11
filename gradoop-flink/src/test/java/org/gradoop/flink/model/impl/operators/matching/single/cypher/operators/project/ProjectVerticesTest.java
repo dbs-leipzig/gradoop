@@ -18,37 +18,36 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import java.util.ArrayList;
-
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
+
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 
 public class ProjectVerticesTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception{
-    DataSet<Vertex> vertexDataSet =
-      createVerticesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
+    DataSet<Vertex> edgeDataSet = createVerticesWithProperties(
+      Lists.newArrayList("foo", "bar","baz")
+    );
 
-    ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
-    ProjectVertices operator = new ProjectVertices(vertexDataSet, extractedPropertyKeys);
+    ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "baz");
 
-    DataSet<Embedding> results = operator.evaluate();
+    ProjectVertices operator = new ProjectVertices(edgeDataSet, extractedPropertyKeys);
+    DataSet<EmbeddingRecord> results = operator.evaluate();
 
-    assertEquals(2, results.count());
+    assertEquals(2,results.count());
 
     assertEveryEmbedding(results, (embedding) -> {
       assertEquals(1, embedding.size());
-      assertEquals(ProjectionEntry.class, embedding.getEntry(0).getClass());
-      assertEquals(Sets.newHashSet(extractedPropertyKeys),
-        embedding.getEntry(0).getProperties().get().getKeys()
-      );
+      assertEquals(PropertyValue.create("foo"), embedding.getProperty(0));
+      assertEquals(PropertyValue.create("baz"), embedding.getProperty(1));
     });
   }
 }

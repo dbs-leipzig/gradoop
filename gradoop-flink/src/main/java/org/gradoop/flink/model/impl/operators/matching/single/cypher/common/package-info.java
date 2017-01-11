@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains classes used by all cypher pattern matching operators.
+ * Contains classes used by all cypher_old pattern matching operators.
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common;
 

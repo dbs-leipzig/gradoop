@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
@@ -23,24 +22,26 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ReverseEdgeEmbeddingTest {
+public class ExtractExpandColumnTest {
+
   @Test
-  public void testReversingAnEdgeEmbedding() throws Exception{
+  public void testSelectIdOfSpecifiedEmbeddingEntry() throws Exception {
     GradoopId a = GradoopId.get();
-    GradoopId e = GradoopId.get();
     GradoopId b = GradoopId.get();
+    GradoopId c = GradoopId.get();
 
-    EmbeddingRecord edge = new EmbeddingRecord();
-    edge.add(a);
-    edge.add(e);
-    edge.add(b);
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(a); 
+    embedding.add(b); 
+    embedding.add(c);
 
-    ReverseEdgeEmbedding op = new ReverseEdgeEmbedding();
+    ExtractExpandColumn selector = new ExtractExpandColumn(0);
+    assertEquals(a, selector.getKey(embedding));
 
-    EmbeddingRecord reversed = op.map(edge);
+    selector = new ExtractExpandColumn(1);
+    assertEquals(b, selector.getKey(embedding));
 
-    assertEquals(b, reversed.getId(0));
-    assertEquals(e, reversed.getId(1));
-    assertEquals(a, reversed.getId(2));
+    selector = new ExtractExpandColumn(2);
+    assertEquals(c, selector.getKey(embedding));
   }
 }

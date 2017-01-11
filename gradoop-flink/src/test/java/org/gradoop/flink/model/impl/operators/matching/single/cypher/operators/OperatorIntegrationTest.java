@@ -15,7 +15,7 @@
 // * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
 // */
 //
-//package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.physical;
+//package org.gradoop.flink.model.impl.operators.matching.single.cypher_old.operators.physical;
 //
 //import com.google.common.collect.Lists;
 //import com.google.common.collect.Sets;
@@ -26,11 +26,11 @@
 //import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 //import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 //import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-//import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-//import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.*;
-//import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.cartesian
+//import org.gradoop.flink.model.impl.operators.matching.single.cypher_old.common.pojos.Embedding;
+//import org.gradoop.flink.model.impl.operators.matching.single.cypher_old.operators.*;
+//import org.gradoop.flink.model.impl.operators.matching.single.cypher_old.operators.cartesian
 //  .CartesianProduct;
-//import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.Expand;
+//import org.gradoop.flink.model.impl.operators.matching.single.cypher_old.operators.expand.Expand;
 //import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 //import org.junit.Before;
 //import org.junit.Ignore;
@@ -39,7 +39,7 @@
 //import java.util.ArrayList;
 //import java.util.HashMap;
 //
-//import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection.*;
+//import static org.gradoop.flink.model.impl.operators.matching.single.cypher_old.common.ExpandDirection.*;
 //
 //@Ignore
 //public class OperatorIntegrationTest extends GradoopFlinkTestBase {

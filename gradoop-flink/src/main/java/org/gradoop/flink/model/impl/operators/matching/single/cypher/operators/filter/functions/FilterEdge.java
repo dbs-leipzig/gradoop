@@ -17,31 +17,31 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Filter;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Filters a set of edges by given predicates
  */
-public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
+public class FilterEdge extends RichFlatMapFunction<Edge, EmbeddingRecord> {
   /**
    * Predicates used for filtering
    */
   private final CNF predicates;
-  /**
-   * Mapping of variables names to embedding column
-   * The predicate should only hold one variables which we map to column 1
-   */
-  private final Map<String, Integer> columnMapping = new HashMap<>();
+
+  private final List<String> propertyKeys;
+
+  private final EmbeddingRecordMetaData metaData;
+
 
   /**
    * New edge filter function
@@ -50,21 +50,28 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
   public FilterEdge(CNF predicates) {
     this.predicates = predicates;
 
-    String variable = Lists.newArrayList(predicates.getVariables()).get(0);
-    columnMapping.put(variable, 1);
+    String variable = (String) predicates.getVariables().toArray()[0];
+
+    this.propertyKeys = new ArrayList<>();
+    propertyKeys.addAll(predicates.getProperties(variable));
+
+    metaData = new EmbeddingRecordMetaData();
+    metaData.updateColumnMapping(variable,0);
+
+    int i = 0;
+    for(String propertyKey : propertyKeys) {
+      metaData.updatePropertyMapping(variable, propertyKey, i++);
+    }
   }
 
   @Override
-  public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    if (Filter.filter(predicates, Embedding.fromEdge(edge), columnMapping)) {
+  public void flatMap(Edge edge, Collector<EmbeddingRecord> out) throws Exception {
+    EmbeddingRecord embedding = GraphElementToEmbedding.convert(edge, propertyKeys);
 
-      Embedding embedding = new Embedding();
-      embedding.addEntry(new IdEntry(edge.getSourceId()));
-      embedding.addEntry(new IdEntry(edge.getId()));
-      embedding.addEntry(new IdEntry(edge.getTargetId()));
-
+    if (predicates.evaluate(embedding, metaData)) {
+      embedding.clearPropertyData();
+      embedding.clearIdListData();
       out.collect(embedding);
-
     }
   }
 }

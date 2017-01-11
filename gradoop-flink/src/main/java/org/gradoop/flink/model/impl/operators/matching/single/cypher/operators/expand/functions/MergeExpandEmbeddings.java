@@ -17,10 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
  * Before growing it is checked whether distinctiveness conditions would still apply.
  */
 public class MergeExpandEmbeddings
-  extends RichFlatJoinFunction<ExpandEmbedding, Embedding, ExpandEmbedding> {
+  extends RichFlatJoinFunction<ExpandEmbedding, EmbeddingRecord, ExpandEmbedding> {
 
   /**
    * Holds the index of all vertex columns that should be distinct
@@ -61,7 +62,7 @@ public class MergeExpandEmbeddings
   }
 
   @Override
-  public void join(ExpandEmbedding base, Embedding extension,
+  public void join(ExpandEmbedding base, EmbeddingRecord extension,
     Collector<ExpandEmbedding> out) throws Exception {
 
     if (checkDistinctiveness(base, extension)) {
@@ -75,19 +76,20 @@ public class MergeExpandEmbeddings
    * @param extension edge along which we expand
    * @return true if distinct criteria apply for the expansion
    */
-  private boolean checkDistinctiveness(ExpandEmbedding prev, Embedding extension) {
+  private boolean checkDistinctiveness(ExpandEmbedding prev, EmbeddingRecord extension) {
     if (distinctVertices.isEmpty() && distinctEdges.isEmpty()) {
       return true;
     }
 
-    // the new edge is valid under vertex isomorphism
-    if (extension.getEntry(0).equals(extension.getEntry(2)) && !distinctVertices.isEmpty()) {
+    // the new candidate is invalid under vertex isomorphism
+    if (ArrayUtils.isEquals(extension.getRawId(0), extension.getRawId(2))
+      && !distinctVertices.isEmpty()) {
       return false;
     }
 
-    GradoopId src = extension.getEntry(0).getId();
-    GradoopId edge = extension.getEntry(1).getId();
-    GradoopId tgt = extension.getEntry(2).getId();
+    GradoopId src = extension.getId(0);
+    GradoopId edge = extension.getId(1);
+    GradoopId tgt = extension.getId(2);
 
     // check if there are any clashes in the path
     for (GradoopId ref : prev.getPath()) {
@@ -97,20 +99,20 @@ public class MergeExpandEmbeddings
       }
     }
 
+    List<GradoopId> ref;
+
     // check for clashes with distinct vertices in the base
-    for (int i : distinctVertices) {
-      GradoopId ref = prev.getBase().getEntry(i).getId();
-      if ((ref.equals(tgt) && i != closingColumn) || ref.equals(src)) {
+    for(int i : distinctVertices) {
+      ref = prev.getBase().getIdAsList(i);
+      if ((ref.contains(tgt) && i != closingColumn) || ref.contains(src)) {
         return false;
       }
     }
 
     // check for clashes with distinct edges in the base
-    for (int i : distinctEdges) {
-      GradoopId ref = prev.getBase().getEntry(i).getId();
-      if (ref.equals(edge)) {
-        return false;
-      }
+    ref = prev.getBase().getIdsAsList(distinctEdges);
+    if (ref.contains(edge)) {
+      return false;
     }
 
     return true;

@@ -18,7 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples
+  .ExpandEmbedding;
 
 /**
  * Filters results from previous iterations

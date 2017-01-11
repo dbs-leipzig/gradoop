@@ -19,7 +19,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
  * Creates the initial expand embeddings
  */
 public class CreateExpandEmbedding
-  extends RichFlatJoinFunction<Embedding, Embedding, ExpandEmbedding> {
+  extends RichFlatJoinFunction<EmbeddingRecord, EmbeddingRecord, ExpandEmbedding> {
 
   /**
    * Holds the index of all base vertex columns that should be distinct
@@ -59,11 +60,11 @@ public class CreateExpandEmbedding
   }
 
   @Override
-  public void join(Embedding input, Embedding edge, Collector<ExpandEmbedding> out)
+  public void join(EmbeddingRecord input, EmbeddingRecord edge, Collector<ExpandEmbedding> out)
       throws Exception {
 
     if (checkDistinctiveness(input, edge)) {
-      GradoopId[] path = new GradoopId[]{edge.getEntry(1).getId(), edge.getEntry(2).getId()};
+      GradoopId[] path = new GradoopId[]{edge.getId(1), edge.getId(2)};
       out.collect(new ExpandEmbedding(input, path));
     }
   }
@@ -74,19 +75,18 @@ public class CreateExpandEmbedding
    * @param edge edge along which we expand
    * @return true if distinct criteria hold for the expansion
    */
-  private boolean checkDistinctiveness(Embedding input, Embedding edge) {
-    GradoopId edgeId = edge.getEntry(1).getId();
-    GradoopId tgt = edge.getEntry(2).getId();
+  private boolean checkDistinctiveness(EmbeddingRecord input, EmbeddingRecord edge) {
+    GradoopId edgeId = edge.getId(1);
+    GradoopId tgt = edge.getId(2);
 
     for (int i : distinctVertices) {
-      if (input.getEntry(i).getId().equals(tgt) && i != closingColumn) {
+      if (input.getIdAsList(i).contains(tgt) && i != closingColumn) {
         return false;
       }
     }
 
     for (int i : distinctEdges) {
-      GradoopId ref = input.getEntry(i).getId();
-      if (ref.equals(edgeId)) {
+      if (input.getIdAsList(i).contains(edgeId)) {
         return false;
       }
     }

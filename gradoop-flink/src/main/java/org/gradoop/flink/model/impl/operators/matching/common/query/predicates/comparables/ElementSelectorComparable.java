@@ -20,10 +20,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Wraps an {@link org.s1ck.gdl.model.comparables.ElementSelector}
@@ -46,19 +48,25 @@ public class ElementSelectorComparable extends QueryComparable {
   /**
    * Returns a property values that wraps the elements id
    *
-   * @param values mapping of variables to embedding elements
+   * @param embedding the embedding holding the data
+   * @param metaData meta data describing the embedding
    * @return property value of element id
    * @throws MissingElementException if element is not specified in values mapping
    */
   @Override
-  public PropertyValue evaluate(Map<String, EmbeddingEntry> values) {
-    EmbeddingEntry entry = values.get(elementSelector.getVariable());
+  public PropertyValue evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
+    int column = metaData.getColumn(elementSelector.getVariable());
 
-    if (entry == null) {
+    if (column == -1) {
       throw new MissingElementException(elementSelector.getVariable());
     }
 
-    return PropertyValue.create(entry.getId());
+    return PropertyValue.create(embedding.getId(column));
+  }
+
+  @Override
+  public Set<String> getProperties(String variable) {
+    return new HashSet<>();
   }
 
   @Override

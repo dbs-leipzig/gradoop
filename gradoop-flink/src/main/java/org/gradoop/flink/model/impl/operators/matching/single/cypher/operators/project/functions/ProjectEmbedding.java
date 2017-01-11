@@ -18,33 +18,31 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Projector;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecord;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Projects an Embedding by a set of properties.
  * For each entry in the embedding a different property set can be specified
  */
-public class ProjectEmbedding extends RichMapFunction<Embedding, Embedding> {
+public class ProjectEmbedding extends RichMapFunction<EmbeddingRecord, EmbeddingRecord> {
   /**
-   * Names of the properties that will be kept in the projection
+   * Indices of the properties that will be kept in the projection
    */
-  private final Map<Integer, List<String>> propertyKeyMapping;
+  private final List<Integer> propertyWhiteList;
 
   /**
    * Creates a new embedding projection operator
-   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
-   *                           values are property keys
+   * @param propertyWhiteList includes all property indexes that whill be kept in the projection
    */
-  public ProjectEmbedding(Map<Integer, List<String>> propertyKeyMapping) {
-    this.propertyKeyMapping = propertyKeyMapping;
+  public ProjectEmbedding(List<Integer> propertyWhiteList) {
+    this.propertyWhiteList = propertyWhiteList;
   }
 
   @Override
-  public Embedding map(Embedding embedding) {
-    return Projector.project(embedding, propertyKeyMapping);
+  public EmbeddingRecord map(EmbeddingRecord embedding) {
+    return embedding.project(propertyWhiteList);
   }
 }

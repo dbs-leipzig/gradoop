@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEdge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEdge;
 
 /**
  * Filters a List of edges by predicates
@@ -49,7 +49,7 @@ public class FilterEdges implements PhysicalOperator {
   }
 
   @Override
-  public DataSet<Embedding> evaluate() {
+  public DataSet<EmbeddingRecord> evaluate() {
     return input.flatMap(new FilterEdge(predicates));
   }
 }

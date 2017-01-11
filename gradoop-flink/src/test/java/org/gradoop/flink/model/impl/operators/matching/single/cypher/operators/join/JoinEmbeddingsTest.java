@@ -3,10 +3,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Assert;
@@ -16,9 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
 public class JoinEmbeddingsTest extends PhysicalOperatorTest {
@@ -44,16 +40,16 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
 
     // [Id(v0)]
-    DataSet<Embedding> left = createEmbeddings(1, new IdEntry(v0));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1,v0);
 
     // [Id(v0),Id(e0),Id(v1)]
-    DataSet<Embedding> right = createEmbeddings(1, new IdEntry(v0), new IdEntry(e0), new IdEntry(v1));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v0, e0, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1)]
     Assert.assertEquals(createEmbedding(v0, e0, v1), result);
@@ -80,18 +76,16 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e2 = GradoopId.get();
 
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1), new IdEntry(e1), new IdEntry(v2));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1, v0, e0, v1, e1, v2);
 
     // [Id(v1),Id(e2),Id(v3)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v1), new IdEntry(e2), new IdEntry(v3));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v1, e2 ,v3);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right, 2, 0);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3)]
     Assert.assertEquals(createEmbedding(v0, e0, v1, e1, v2, e2, v3), result);
@@ -121,18 +115,16 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
 
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1), new IdEntry(e1), new IdEntry(v2));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1, v0, e0, v1, e1, v2);
 
     // [Id(v3),Id(e2),Id(v1),Id(e3),Id(v4)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v3), new IdEntry(e2), new IdEntry(v1), new IdEntry(e3), new IdEntry(v4));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v3, e2, v1, e3, v4);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right, 2, 2);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(v3),Id(e2),Id(e3),Id(v4)]
     Assert.assertEquals(createEmbedding(v0, e0, v1, e1, v2, v3, e2, e3, v4), result);
@@ -155,19 +147,17 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e1 = GradoopId.get();
 
     // [Id(v0),Id(e0),Id(v1)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1, v0, e0, v1);
 
     // [Id(v0),Id(e1),Id(v1)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e1), new IdEntry(v1));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v0, e1, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
       Arrays.asList(0, 2), Arrays.asList(0, 2));
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1),Id(e1)]
     Assert.assertEquals(createEmbedding(v0, e0, v1, e1), result);
@@ -195,19 +185,19 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e3 = GradoopId.get();
 
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1), new IdEntry(e1), new IdEntry(v2));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1,
+      v0, e0, v1, e1, v2);
 
     // [Id(v0),Id(e2),Id(v3),Id(e3),Id(v2)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e2), new IdEntry(v3), new IdEntry(e3), new IdEntry(v2));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1,
+      v0, e2, v3, e3, v2);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
       Arrays.asList(0, 4), Arrays.asList(0, 4));
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3),Id(e3)]
     Assert.assertEquals(createEmbedding(v0, e0, v1, e1, v2, e2, v3, e3), result);
@@ -239,21 +229,17 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e5 = GradoopId.get();
 
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1), new IdEntry(e1),
-      new IdEntry(v2), new IdEntry(e2), new IdEntry(v3));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1, v0, e0, v1, e1, v2, e2, v3);
 
     // [Id(v4),Id(e3),Id(v1),Id(e4),Id(v2),Id(e5),Id(v5)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v4), new IdEntry(e3), new IdEntry(v1), new IdEntry(e4),
-      new IdEntry(v2), new IdEntry(e5), new IdEntry(v5));
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v4, e3, v1, e4, v2, e5, v5);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
       Arrays.asList(2, 4), Arrays.asList(2, 4));
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
     // expected: [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3),Id(v4),Id(e3),Id(e4),Id(e5),Id(v5)]
     Assert.assertEquals(createEmbedding(v0, e0, v1, e1, v2, e2, v3, v4, e3, e4, e5, v5), result);
@@ -264,13 +250,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
   //------------------------------------------------------------------------------------------------
 
   /**
-   * Tests the adoption of the left side columns
-   *
-   * [Projection(v0,{name:Alice})]
-   * |><|(0=0)
-   * [(Id(v0),Id(e0),Id(v1)]
-   * ->
-   * [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
+   * Tests keep all properties from the left side
    */
   @Test
   public void testAdoptLeft() throws Exception {
@@ -278,78 +258,52 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    // [Projection(v0,{name:Alice})]
-    Properties properties = Properties.create();
-    properties.set("name", "Alice");
-    DataSet<Embedding> left = createEmbeddings(1, new ProjectionEntry(v0, properties));
+    List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
 
-    // [Id(v0),Id(e0),Id(v1)]
-    DataSet<Embedding> right = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1));
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(v0, properties);
+    DataSet<EmbeddingRecord> left = getExecutionEnvironment().fromElements(embedding);
+
+    // [v0, e0, v1]
+    DataSet<EmbeddingRecord> right = createEmbeddings(1, v0, e0, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
-    // expected: [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
-    Assert.assertEquals(new Embedding(Lists.newArrayList(
-      new ProjectionEntry(v0, properties),
-      new IdEntry(e0),
-      new IdEntry(v1))),
-      result);
+    Assert.assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
   }
 
   /**
-   * Tests the adoption of the right side columns
-   *
-   * [(Id(v0)]
-   * |><|(0=0)
-   * [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
-   * ->
-   * [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
+   * Tests keep all properties from the right side
    */
   @Test
   public void testAdoptSameColumn() throws Exception {
     GradoopId v0 = GradoopId.get();
-    GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
     // [(Id(v0)]
-    DataSet<Embedding> left = createEmbeddings(1, new IdEntry(v0));
+    DataSet<EmbeddingRecord> left = createEmbeddings(1, v0);
 
-    // [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
-    Properties properties = Properties.create();
-    properties.set("name", "Alice");
-    DataSet<Embedding> right = createEmbeddings(1,
-      new ProjectionEntry(v0, properties), new IdEntry(e0), new IdEntry(v1));
-
-    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
-    adoptColumns.put(0, 0);
+    List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(v0);
+    embedding.add(v1, properties);
+    DataSet<EmbeddingRecord> right = getExecutionEnvironment().fromElements(embedding);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right, 0, 0, adoptColumns);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 0, 0);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
-    // expected: [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
-    Assert.assertEquals(new Embedding(Lists.newArrayList(
-      new ProjectionEntry(v0, properties),
-      new IdEntry(e0),
-      new IdEntry(v1))),
-      result);
+    Assert.assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
   }
 
   /**
-   * Tests the adoption of the right side columns
-   *
-   * [Id(v0),Id(e0),Id(v1)]
-   * |><|(2=0)
-   * [Projection(v1,{name:Alice})]
-   * ->
-   * [Id(v0),Id(e0),Projection(v1,{name:Alice})]
+   * Test keep properties from both sides
    */
   @Test
   public void testAdoptDifferentColumn() throws Exception {
@@ -357,78 +311,26 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    // [(Id(v0)]
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new IdEntry(v1));
+    List<PropertyValue> propertiesLeft = Lists.newArrayList(PropertyValue.create("Alice"));
+    EmbeddingRecord embeddingLeft = new EmbeddingRecord();
+    embeddingLeft.add(v0);
+    embeddingLeft.add(e0);
+    embeddingLeft.add(v1, propertiesLeft);
+    DataSet<EmbeddingRecord> left = getExecutionEnvironment().fromElements(embeddingLeft);
 
-    // [Id(v0),Id(e0),Projection(v1,{name:Alice})]
-    Properties properties = Properties.create();
-    properties.set("name", "Alice");
-    DataSet<Embedding> right = createEmbeddings(1, new ProjectionEntry(v1, properties));
-
-    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
-    adoptColumns.put(0, 2);
-
-    // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,2, 0, adoptColumns);
-
-    // get results
-    Embedding result = join.evaluate().collect().get(0);
-
-    // expected: [Id(v0),Id(e0),Projection(v1,{name:Alice})]
-    Assert.assertEquals(new Embedding(Lists.newArrayList(
-      new IdEntry(v0),
-      new IdEntry(e0),
-      new ProjectionEntry(v1, properties))),
-      result);
-  }
-
-  /**
-   * Tests the adoption of left and right side columns
-   *
-   * [(Id(v0),Id(e0),Projection(v1,{name:Alice})]
-   * |><|(0=0 AND 2=2)
-   * [Projection(v0,{name:Bob}),Id(e1),Id(v1)]
-   * ->
-   * [Projection(v0,{name:Bob}),Id(e0),Projection(v1,{name:Alice}),Id(e1)]
-   */
-  @Test
-  public void testAdoptLeftAndRight() throws Exception {
-    GradoopId v0 = GradoopId.get();
-    GradoopId e0 = GradoopId.get();
-    GradoopId v1 = GradoopId.get();
-    GradoopId e1 = GradoopId.get();
-
-    // [(Id(v0),Id(e0),Projection(v1,{name:Alice})]
-    Properties propertiesLeft = Properties.create();
-    propertiesLeft.set("name", "Alice");
-    DataSet<Embedding> left = createEmbeddings(1,
-      new IdEntry(v0), new IdEntry(e0), new ProjectionEntry(v1, propertiesLeft));
-
-    // [Projection(v0,{name:Bob}),Id(e1),Id(v1)]
-    Properties propertiesRight = Properties.create();
-    propertiesLeft.set("name", "Bob");
-    DataSet<Embedding> right = createEmbeddings(1,
-      new ProjectionEntry(v0, propertiesRight), new IdEntry(e1), new IdEntry(v1));
-
-    Map<Integer, Integer> adoptColumns = new HashMap<>(0);
-    adoptColumns.put(0, 0);
+    List<PropertyValue> propertiesRight = Lists.newArrayList(PropertyValue.create(42));
+    EmbeddingRecord embeddingRight = new EmbeddingRecord();
+    embeddingRight.add(v1, propertiesRight);
+    DataSet<EmbeddingRecord> right = getExecutionEnvironment().fromElements(embeddingRight);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,
-      Arrays.asList(0, 2), Arrays.asList(0, 2),
-      adoptColumns);
+    PhysicalOperator join = new JoinEmbeddings(left, right,2, 0);
 
     // get results
-    Embedding result = join.evaluate().collect().get(0);
+    EmbeddingRecord result = join.evaluate().collect().get(0);
 
-    // expected: [Projection(v0,{name:Alice}),Id(e0),Id(v1)]
-    Assert.assertEquals(new Embedding(Lists.newArrayList(
-      new ProjectionEntry(v0, propertiesRight),
-      new IdEntry(e0),
-      new ProjectionEntry(v1, propertiesLeft),
-      new IdEntry(e1))),
-      result);
+    Assert.assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
+    Assert.assertEquals(PropertyValue.create(42), result.getProperty(1));
   }
 
   //------------------------------------------------------------------------------------------------
@@ -569,17 +471,17 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft,
     List<Integer> distinctEdgeColumnsRight,
-    List<Embedding> expectedEmbedding) throws Exception {
+    List<EmbeddingRecord> expectedEmbedding) throws Exception {
 
-    List<Embedding> entries = new ArrayList<>();
+    List<EmbeddingRecord> entries = new ArrayList<>();
 
     entries.add(createEmbedding(v0, e0, v1));
     entries.add(createEmbedding(v0, e1, v1));
     entries.add(createEmbedding(v0, e2, v0));
     entries.add(createEmbedding(v0, e3, v0));
 
-    DataSet<Embedding> left = getExecutionEnvironment().fromCollection(entries);
-    DataSet<Embedding> right = getExecutionEnvironment().fromCollection(entries);
+    DataSet<EmbeddingRecord> left = getExecutionEnvironment().fromCollection(entries);
+    DataSet<EmbeddingRecord> right = getExecutionEnvironment().fromCollection(entries);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
@@ -588,7 +490,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
       distinctEdgeColumnsLeft, distinctEdgeColumnsRight);
 
     // get results
-    List<Embedding> resultList = join.evaluate().collect();
+    List<EmbeddingRecord> resultList = join.evaluate().collect();
 
     resultList.sort(new EmbeddingComparator());
     expectedEmbedding.sort(new EmbeddingComparator());
@@ -600,14 +502,14 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
   /**
    * Compares two embeddings based on the contained ids.
    */
-  private static class EmbeddingComparator implements Comparator<Embedding> {
+  private static class EmbeddingComparator implements Comparator<EmbeddingRecord> {
 
     @Override
-    public int compare(Embedding o1, Embedding o2) {
+    public int compare(EmbeddingRecord o1, EmbeddingRecord o2) {
       for (int i = 0; i < o1.size(); i++) {
-        if (o1.getEntry(i).getId().compareTo(o2.getEntry(i).getId()) < 0) {
+        if (o1.getId(i).compareTo(o2.getId(i)) < 0) {
           return -1;
-        } else if (o1.getEntry(i).getId().compareTo(o2.getEntry(i).getId()) > 0) {
+        } else if (o1.getId(i).compareTo(o2.getId(i)) > 0) {
           return 1;
         }
       }

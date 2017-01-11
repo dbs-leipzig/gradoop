@@ -20,15 +20,15 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.PostProcessExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ExtractColumn;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractExpandColumn;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.PostProcessExpandEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -44,11 +44,11 @@ public class Expand implements PhysicalOperator {
   /**
    * Input Embeddings
    */
-  private final DataSet<Embedding> input;
+  private final DataSet<EmbeddingRecord> input;
   /**
    * Candidate edges
    */
-  private DataSet<Embedding> candidateEdges;
+  private DataSet<EmbeddingRecord> candidateEdges;
   /**
    * specifies the input column that will be expanded
    */
@@ -96,7 +96,7 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -126,7 +126,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
     int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -147,7 +147,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
     int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -161,7 +161,7 @@ public class Expand implements PhysicalOperator {
    * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
    */
   @Override
-  public DataSet<Embedding> evaluate() {
+  public DataSet<EmbeddingRecord> evaluate() {
     DataSet<ExpandEmbedding> initialWorkingSet = preProcess();
 
     DataSet<ExpandEmbedding> iterationResults = iterate(initialWorkingSet);
@@ -181,8 +181,8 @@ public class Expand implements PhysicalOperator {
     }
 
     return input.join(candidateEdges, joinHint)
-      .where(new ExtractColumn(expandColumn))
-      .equalTo(new ExtractColumn(0))
+      .where(new ExtractExpandColumn(expandColumn))
+      .equalTo(new ExtractExpandColumn(0))
       .with(new CreateExpandEmbedding(
         distinctVertexColumns,
         distinctEdgeColumns,
@@ -204,10 +204,11 @@ public class Expand implements PhysicalOperator {
       .filter(new FilterPreviousExpandEmbedding())
       .join(candidateEdges, joinHint)
         .where(2)
-        .equalTo(new ExtractColumn(0))
+        .equalTo(new ExtractExpandColumn(0))
         .with(new MergeExpandEmbeddings(
           distinctVertexColumns,
-          distinctEdgeColumns, closingColumn
+          distinctEdgeColumns,
+          closingColumn
         ));
 
     DataSet<ExpandEmbedding> solutionSet = nextWorkingSet.union(iteration);
@@ -220,8 +221,8 @@ public class Expand implements PhysicalOperator {
    * @param iterationResults the results produced by the iteration
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
-  private DataSet<Embedding> postProcess(DataSet<ExpandEmbedding> iterationResults) {
-    DataSet<Embedding> results =
+  private DataSet<EmbeddingRecord> postProcess(DataSet<ExpandEmbedding> iterationResults) {
+    DataSet<EmbeddingRecord> results =
       iterationResults.flatMap(new PostProcessExpandEmbedding(lowerBound, closingColumn));
 
     if (lowerBound == 0) {

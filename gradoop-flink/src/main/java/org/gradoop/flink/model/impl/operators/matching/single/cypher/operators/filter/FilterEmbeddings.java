@@ -19,11 +19,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-
-import java.util.Map;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
+  .EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions
+  .FilterEmbedding;
 
 /**
  * Filters a set of Embeddings by the given predicates
@@ -33,7 +34,7 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * Candidate Embeddings
    */
-  private final DataSet<Embedding> input;
+  private final DataSet<EmbeddingRecord> input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -41,26 +42,25 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * Maps variable names to embedding entries;
    */
-  private final Map<String, Integer> columnMapping;
-
+  private final EmbeddingRecordMetaData metaData;
 
   /**
    * New embedding filter operator
    * @param input Candidate embeddings
    * @param predicates Predicates to used for filtering
-   * @param columnMapping Maps variable names to embedding entries
+   * @param metaData Maps variable names to embedding entries
    */
-  public FilterEmbeddings(DataSet<Embedding> input, CNF predicates,
-    Map<String, Integer> columnMapping) {
+  public FilterEmbeddings(DataSet<EmbeddingRecord> input, CNF predicates,
+    EmbeddingRecordMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
-    this.columnMapping = columnMapping;
+    this.metaData = metaData;
   }
 
   /**
    * {@inheritDoc}
    */
-  public DataSet<Embedding> evaluate() {
-    return input.filter(new FilterEmbedding(predicates, columnMapping));
+  public DataSet<EmbeddingRecord> evaluate() {
+    return input.filter(new FilterEmbedding(predicates, metaData));
   }
 }

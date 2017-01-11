@@ -19,10 +19,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.s1ck.gdl.model.comparables.Literal;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
@@ -45,12 +47,18 @@ public class LiteralComparable extends QueryComparable {
   /**
    * Returns a property value that wraps the represented literal
    *
-   * @param values can be empty
+   * @param embedding the embedding holding the data
+   * @param metaData meta data describing the embedding
    * @return property value of literal value
    */
   @Override
-  public PropertyValue evaluate(Map<String, EmbeddingEntry> values) {
+  public PropertyValue evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
     return PropertyValue.create(literal.getValue());
+  }
+
+  @Override
+  public Set<String> getProperties(String variable) {
+    return new HashSet<>();
   }
 
   @Override

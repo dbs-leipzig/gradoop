@@ -14,19 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+package org.gradoop.flink.model.impl.operators.matching.common.query.exceptions;
 
 /**
- * Reverses an EdgeEmbedding, as it switches source and target
- * This is used for traversing incoming edges
+ * Used during predicate evaluation. Is thrown when the predicate need to evaluate a property which
+ * is not present in the projection.
  */
-public class ReverseEdgeEmbedding extends RichMapFunction<EmbeddingRecord, EmbeddingRecord> {
-
-  @Override
-  public EmbeddingRecord map(EmbeddingRecord value) throws Exception {
-    return value.reverse();
+public class MissingPropertyException extends RuntimeException {
+  /**
+   * Creates a new exception object for the missing property.
+   *
+   * @param property the missing variable
+   */
+  public MissingPropertyException(String property) {
+    super("The property '" + property + "' is missing in the projection");
   }
+
 }

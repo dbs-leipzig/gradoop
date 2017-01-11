@@ -17,18 +17,16 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.compareables;
 
+import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
+import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.PropertySelector;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -39,34 +37,30 @@ public class PropertySelectorComparableTest {
       selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
-    entry.getProperties().get().set("age", PropertyValue.create(42));
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
-    PropertyValue reference = PropertyValue.create(42);
+    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "age", 0);
 
-    Map<String, EmbeddingEntry> values = new HashMap<>();
-    values.put("a", entry);
-
-    assertEquals(reference, wrapper.evaluate(values));
-    assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(values));
+    assertEquals(PropertyValue.create(42), wrapper.evaluate(embedding, metaData));
+    assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
   }
 
-  @Test
-  public void testReturnNullPropertyValueIfPropertyIsMissing() {
+  @Test(expected = MissingPropertyException.class)
+  public void testThrowErrorIfPropertyIsMissing() {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
 
-    // property is missing
-    Map<String, EmbeddingEntry> values = new HashMap<>();
-    values.put("a", entry);
-    assertTrue(wrapper.evaluate(values).isNull());
+    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "birth", 0);
 
-    // entry is not a PropertyEntry
-    entry = new IdEntry(GradoopId.get());
-    values.put("a", entry);
-    assertTrue(wrapper.evaluate(values).isNull());
+    wrapper.evaluate(embedding, metaData);
   }
 
   @Test(expected= MissingElementException.class)
@@ -74,11 +68,13 @@ public class PropertySelectorComparableTest {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingEntry entry = new ProjectionEntry(GradoopId.get());
+    EmbeddingRecord embedding = new EmbeddingRecord();
+    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
-    Map<String, EmbeddingEntry> values = new HashMap<>();
-    values.put("b", entry);
+    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    metaData.updateColumnMapping("b", 0);
+    metaData.updatePropertyMapping("b", "age", 0);
 
-    wrapper.evaluate(values);
+    wrapper.evaluate(embedding, metaData);
   }
 }

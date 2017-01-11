@@ -17,17 +17,15 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join;
 
-import com.google.common.collect.Maps;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Joins two embeddings at given columns and checks for vertex/edge isomorphism/homomorphism.
@@ -45,11 +43,11 @@ public class JoinEmbeddings implements PhysicalOperator {
   /**
    * Left side embeddings
    */
-  private final DataSet<Embedding> left;
+  private final DataSet<EmbeddingRecord> left;
   /**
    * Right side embeddings
    */
-  private final DataSet<Embedding> right;
+  private final DataSet<EmbeddingRecord> right;
   /**
    * Left side join columns
    */
@@ -75,10 +73,6 @@ public class JoinEmbeddings implements PhysicalOperator {
    */
   private final List<Integer> distinctEdgeColumnsRight;
   /**
-   * Columns to adopt from the right side to the left side.
-   */
-  private final Map<Integer, Integer> adoptColumns;
-  /**
    * Flink join Hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
@@ -91,7 +85,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param leftJoinColumn join column left side
    * @param rightJoinColumn join column right side
    */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
     int leftJoinColumn, int rightJoinColumn) {
     this(left, right,
       Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn));
@@ -105,7 +99,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param leftJoinColumns specifies the join columns of the left side
    * @param rightJoinColumns specifies the join columns of the right side
    */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns) {
     this(left, right,
       leftJoinColumns, rightJoinColumns,
@@ -118,43 +112,6 @@ public class JoinEmbeddings implements PhysicalOperator {
    *
    * @param left embeddings of the left side of the join
    * @param right embeddings of the right side of the join
-   * @param leftJoinColumn specifies the join column of the left side
-   * @param rightJoinColumn specifies the join column of the right side
-   * @param adoptColumns columns that are adopted from the right side to the left side
-   */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
-    int leftJoinColumn, int rightJoinColumn,
-    Map<Integer, Integer> adoptColumns) {
-    this(left, right,
-      Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn),
-      Collections.emptyList(), Collections.emptyList(),
-      Collections.emptyList(), Collections.emptyList(),
-      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
-   * Instantiates a new join operator.
-   *
-   * @param left embeddings of the left side of the join
-   * @param right embeddings of the right side of the join
-   * @param leftJoinColumns specifies the join columns of the left side
-   * @param rightJoinColumns specifies the join columns of the right side
-   * @param adoptColumns columns that are adopted from the right side to the left side
-   */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
-    List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
-    Map<Integer, Integer> adoptColumns) {
-    this(left, right, leftJoinColumns, rightJoinColumns,
-      Collections.emptyList(), Collections.emptyList(),
-      Collections.emptyList(), Collections.emptyList(),
-      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
-   * Instantiates a new join operator.
-   *
-   * @param left embeddings of the left side of the join
-   * @param right embeddings of the right side of the join
    * @param leftJoinColumns specifies the join columns of the left side
    * @param rightJoinColumns specifies the join columns of the right side
    * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
@@ -162,7 +119,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
    */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
     List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight) {
@@ -170,7 +127,7 @@ public class JoinEmbeddings implements PhysicalOperator {
       leftJoinColumns, rightJoinColumns,
       distinctVertexColumnsLeft, distinctVertexColumnsRight,
       distinctEdgeColumnsLeft, distinctEdgeColumnsRight,
-      Maps.newHashMapWithExpectedSize(0), JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   /**
@@ -184,20 +141,17 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
    * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
-   * @param adoptColumns columns that are adopted from the right side to the left side
    * @param joinHint join strategy
    */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
+  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
     List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight,
-    Map<Integer, Integer> adoptColumns,
     JoinOperatorBase.JoinHint joinHint) {
     this.left                       = left;
     this.right                      = right;
     this.leftJoinColumns            = leftJoinColumns;
     this.rightJoinColumns           = rightJoinColumns;
-    this.adoptColumns               = adoptColumns;
     this.distinctVertexColumnsLeft  = distinctVertexColumnsLeft;
     this.distinctVertexColumnsRight = distinctVertexColumnsRight;
     this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;
@@ -206,12 +160,12 @@ public class JoinEmbeddings implements PhysicalOperator {
   }
 
   @Override
-  public DataSet<Embedding> evaluate() {
+  public DataSet<EmbeddingRecord> evaluate() {
     return left.join(right, joinHint)
       .where(new ExtractJoinColumns(leftJoinColumns))
       .equalTo(new ExtractJoinColumns(rightJoinColumns))
       .with(new MergeEmbeddings(rightJoinColumns,
         distinctVertexColumnsLeft, distinctVertexColumnsRight,
-        distinctEdgeColumnsLeft, distinctEdgeColumnsRight, adoptColumns));
+        distinctEdgeColumnsLeft, distinctEdgeColumnsRight));
   }
 }
