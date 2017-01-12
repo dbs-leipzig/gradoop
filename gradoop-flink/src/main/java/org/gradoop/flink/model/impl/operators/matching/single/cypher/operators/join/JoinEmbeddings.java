@@ -24,7 +24,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
 
-
 import java.util.Collections;
 import java.util.List;
 

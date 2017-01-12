@@ -48,7 +48,6 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
    */
   private final EmbeddingRecordMetaData metaData;
 
-
   /**
    * New edge filter function
    * @param predicates predicates used for filtering

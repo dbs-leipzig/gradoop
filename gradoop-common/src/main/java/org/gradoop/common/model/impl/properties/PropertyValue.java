@@ -100,7 +100,6 @@ public class PropertyValue
    */
   public PropertyValue() { }
 
-
   private PropertyValue(byte[] rawBytes) {
     this.rawBytes = rawBytes;
   }

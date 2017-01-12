@@ -49,7 +49,6 @@ public class GraphElementToEmbeddingTest {
     assertEquals(PropertyValue.create("42"), embedding.getProperty(1));
   }
 
-
   @Test
   public void convertEdge() throws Exception {
     Properties properties = new Properties();

@@ -113,7 +113,6 @@ public class CNF extends PredicateCollection<CNFElement> {
     return subCNF;
   }
 
-
   @Override
   public Set<String> getVariables() {
     Set<String> variables = new HashSet<>();

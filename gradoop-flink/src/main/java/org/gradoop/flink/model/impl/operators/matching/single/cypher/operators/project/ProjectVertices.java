@@ -21,8 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions
-  .ProjectVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectVertex;
 
 import java.util.ArrayList;
 import java.util.List;

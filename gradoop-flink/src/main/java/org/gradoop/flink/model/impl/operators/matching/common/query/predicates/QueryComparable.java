@@ -66,7 +66,6 @@ public abstract class QueryComparable implements Serializable {
   public abstract PropertyValue evaluate(Embedding embedding,
     EmbeddingRecordMetaData metaData);
 
-
   /**
    * Returns a set of property keys referenced by this expression for a given variable
    * @param variable the variable

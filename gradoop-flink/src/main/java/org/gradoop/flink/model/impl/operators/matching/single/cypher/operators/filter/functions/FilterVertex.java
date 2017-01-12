@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Grap
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
