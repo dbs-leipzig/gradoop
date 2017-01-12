@@ -30,7 +30,7 @@ import java.util.Set;
  * It includes information about the mapping of variables to embedding entries
  * and where properties are stored in the embedding
  */
-public class EmbeddingRecordMetaData implements Serializable {
+public class EmbeddingMetaData implements Serializable {
   /**
    * Stores the mapping of variables to embedding entries
    */
@@ -43,18 +43,18 @@ public class EmbeddingRecordMetaData implements Serializable {
   private Map<Pair<String, String>, Integer> propertyMapping;
 
   /**
-   * Initialises an empty EmbeddingRecordMetaData object
+   * Initialises an empty EmbeddingMetaData object
    */
-  public EmbeddingRecordMetaData() {
+  public EmbeddingMetaData() {
     this(new HashMap<>(), new HashMap<>());
   }
 
   /**
-   * Initializes a new EmbeddingRecordMetaData object from the given mappings
+   * Initializes a new EmbeddingMetaData object from the given mappings
    * @param columnMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
    */
-  public EmbeddingRecordMetaData(Map<String, Integer> columnMapping,
+  public EmbeddingMetaData(Map<String, Integer> columnMapping,
     Map<Pair<String, String>, Integer> propertyMapping) {
     this.columnMapping = columnMapping;
     this.propertyMapping = propertyMapping;

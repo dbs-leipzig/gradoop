@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 /**
  * Filters a set of embedding by given predicates
@@ -33,14 +33,14 @@ public class FilterEmbedding extends RichFilterFunction<Embedding> {
   /**
    * Mapping of variables names to embedding column
    */
-  private final EmbeddingRecordMetaData metaData;
+  private final EmbeddingMetaData metaData;
 
   /**
    * New embedding filter function
    * @param predicates predicates used for filtering
    * @param metaData mapping of variable names to embedding column
    */
-  public FilterEmbedding(CNF predicates, EmbeddingRecordMetaData metaData) {
+  public FilterEmbedding(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
     this.metaData = metaData;
   }

@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,7 +49,7 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
   }
 
   @Override
-  public boolean evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
+  public boolean evaluate(Embedding embedding, EmbeddingMetaData metaData) {
     for (ComparisonExpression comparisonExpression : predicates) {
       if (comparisonExpression.evaluate(embedding, metaData)) {
         return true;

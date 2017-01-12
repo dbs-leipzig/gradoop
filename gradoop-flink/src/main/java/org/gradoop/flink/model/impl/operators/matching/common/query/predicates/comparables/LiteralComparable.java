@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.Literal;
 
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class LiteralComparable extends QueryComparable {
    * @return property value of literal value
    */
   @Override
-  public PropertyValue evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
     return PropertyValue.create(literal.getValue());
   }
 

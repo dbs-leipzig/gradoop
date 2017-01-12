@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
   /**
    * Meta data about the edge embedding
    */
-  private final EmbeddingRecordMetaData metaData;
+  private final EmbeddingMetaData metaData;
 
   /**
    * New edge filter function
@@ -60,7 +60,7 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
     this.propertyKeys = new ArrayList<>();
     propertyKeys.addAll(predicates.getPropertyKeys(variable));
 
-    metaData = new EmbeddingRecordMetaData();
+    metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping(variable, 0);
 
     int i = 0;

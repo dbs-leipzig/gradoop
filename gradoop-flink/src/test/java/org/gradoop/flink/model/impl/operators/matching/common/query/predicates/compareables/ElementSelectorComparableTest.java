@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
@@ -39,7 +39,7 @@ public class ElementSelectorComparableTest {
     embedding.add(GradoopId.get());
     PropertyValue reference = PropertyValue.create(embedding.getId(0));
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
 
     assertEquals(reference, wrapper.evaluate(embedding, metaData));
@@ -54,7 +54,7 @@ public class ElementSelectorComparableTest {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("b", 0);
 
     wrapper.evaluate(embedding, metaData);

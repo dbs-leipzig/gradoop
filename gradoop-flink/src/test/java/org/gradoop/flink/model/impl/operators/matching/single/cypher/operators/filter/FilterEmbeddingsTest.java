@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
       embedding
     );
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
     metaData.updateColumnMapping("b", 1);
     metaData.updatePropertyMapping("a", "age", 0);
@@ -74,7 +74,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
       embedding
     );
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
     metaData.updateColumnMapping("b", 1);
     metaData.updatePropertyMapping("a", "age", 0);
@@ -102,7 +102,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
       embedding
     );
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
     metaData.updateColumnMapping("b", 1);
     metaData.updatePropertyMapping("a", "age", 0);

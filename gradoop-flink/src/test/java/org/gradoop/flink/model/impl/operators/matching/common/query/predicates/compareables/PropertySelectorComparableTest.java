@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.M
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
@@ -40,7 +40,7 @@ public class PropertySelectorComparableTest {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
     metaData.updatePropertyMapping("a", "age", 0);
 
@@ -56,7 +56,7 @@ public class PropertySelectorComparableTest {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("a", 0);
     metaData.updatePropertyMapping("a", "birth", 0);
 
@@ -71,7 +71,7 @@ public class PropertySelectorComparableTest {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
-    EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping("b", 0);
     metaData.updatePropertyMapping("b", "age", 0);
 

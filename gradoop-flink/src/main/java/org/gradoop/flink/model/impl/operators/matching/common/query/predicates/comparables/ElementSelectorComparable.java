@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
 import java.util.HashSet;
@@ -54,7 +54,7 @@ public class ElementSelectorComparable extends QueryComparable {
    * @throws MissingElementException if element is not specified in values mapping
    */
   @Override
-  public PropertyValue evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
     int column = metaData.getColumn(elementSelector.getVariable());
 
     if (column == -1) {

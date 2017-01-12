@@ -21,7 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEmbedding;
 
 /**
@@ -40,7 +40,7 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * Maps variable names to embedding entries;
    */
-  private final EmbeddingRecordMetaData metaData;
+  private final EmbeddingMetaData metaData;
 
   /**
    * New embedding filter operator
@@ -49,7 +49,7 @@ public class FilterEmbeddings implements PhysicalOperator {
    * @param metaData Maps variable names to embedding entries
    */
   public FilterEmbeddings(DataSet<Embedding> input, CNF predicates,
-    EmbeddingRecordMetaData metaData) {
+    EmbeddingMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
     this.metaData = metaData;

@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.c
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 import org.s1ck.gdl.model.comparables.Literal;
@@ -64,7 +64,7 @@ public abstract class QueryComparable implements Serializable {
    * @return evaluation result
    */
   public abstract PropertyValue evaluate(Embedding embedding,
-    EmbeddingRecordMetaData metaData);
+    EmbeddingMetaData metaData);
 
   /**
    * Returns a set of property keys referenced by this expression for a given variable

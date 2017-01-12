@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
   /**
    * Meta data about the vertex embedding
    */
-  private final EmbeddingRecordMetaData metaData;
+  private final EmbeddingMetaData metaData;
 
   /**
    * New vertex filter function
@@ -58,7 +58,7 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
     this.propertyKeys = new ArrayList<>();
     propertyKeys.addAll(predicates.getPropertyKeys(variable));
 
-    metaData = new EmbeddingRecordMetaData();
+    metaData = new EmbeddingMetaData();
     metaData.updateColumnMapping(variable, 0);
 
     int i = 0;

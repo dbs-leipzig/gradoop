@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.io.Serializable;
 import java.util.List;
@@ -79,7 +79,7 @@ public abstract class PredicateCollection<P>  implements Serializable {
    * @param metaData the embedding meta data
    * @return evaluation result
    */
-  public abstract boolean evaluate(Embedding embedding, EmbeddingRecordMetaData metaData);
+  public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
 
   /**
    * Retrieves a set of all variables included in the predicate collection
