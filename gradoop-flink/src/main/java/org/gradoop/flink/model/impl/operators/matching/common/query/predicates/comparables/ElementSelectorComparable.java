@@ -65,7 +65,7 @@ public class ElementSelectorComparable extends QueryComparable {
   }
 
   @Override
-  public Set<String> getProperties(String variable) {
+  public Set<String> getPropertyKeys(String variable) {
     return new HashSet<>();
   }
 

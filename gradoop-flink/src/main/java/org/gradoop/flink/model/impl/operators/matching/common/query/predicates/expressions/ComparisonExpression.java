@@ -101,9 +101,9 @@ public class ComparisonExpression extends QueryPredicate {
    * @param variable the variable
    * @return set of referenced properties
    */
-  public Set<String> getProperties(String variable) {
-    Set<String> properties = getLhs().getProperties(variable);
-    properties.addAll(getRhs().getProperties(variable));
+  public Set<String> getPropertyKeys(String variable) {
+    Set<String> properties = getLhs().getPropertyKeys(variable);
+    properties.addAll(getRhs().getPropertyKeys(variable));
 
     return properties;
   }

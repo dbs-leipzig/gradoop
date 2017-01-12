@@ -20,10 +20,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
-  .EmbeddingRecord;
-
-import java.util.ArrayList;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 
 /**
  * Represents an intermediate result for the expand operator

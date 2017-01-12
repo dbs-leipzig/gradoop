@@ -82,8 +82,8 @@ public class MergeExpandEmbeddings
     }
 
     // the new candidate is invalid under vertex isomorphism
-    if (ArrayUtils.isEquals(extension.getRawId(0), extension.getRawId(2))
-      && !distinctVertices.isEmpty()) {
+    if (ArrayUtils.isEquals(extension.getRawId(0), extension.getRawId(2)) &&
+      !distinctVertices.isEmpty()) {
       return false;
     }
 
@@ -102,7 +102,7 @@ public class MergeExpandEmbeddings
     List<GradoopId> ref;
 
     // check for clashes with distinct vertices in the base
-    for(int i : distinctVertices) {
+    for (int i : distinctVertices) {
       ref = prev.getBase().getIdAsList(i);
       if ((ref.contains(tgt) && i != closingColumn) || ref.contains(src)) {
         return false;
@@ -111,10 +111,6 @@ public class MergeExpandEmbeddings
 
     // check for clashes with distinct edges in the base
     ref = prev.getBase().getIdsAsList(distinctEdges);
-    if (ref.contains(edge)) {
-      return false;
-    }
-
-    return true;
+    return !ref.contains(edge);
   }
 }

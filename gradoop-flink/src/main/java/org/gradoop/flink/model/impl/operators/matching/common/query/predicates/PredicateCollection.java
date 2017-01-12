@@ -88,11 +88,11 @@ public abstract class PredicateCollection<P>  implements Serializable {
   public abstract Set<String> getVariables();
 
   /**
-   * Retrieves a set of all properties referenced by the predicate for a given variable
+   * Retrieves a set of all property keys referenced by the predicate for a given variable
    * @param variable the variable
    * @return set of referenced properties
    */
-  public abstract Set<String> getProperties(String variable);
+  public abstract Set<String> getPropertyKeys(String variable);
 
   /**
    * Stores the name of the operator predicates are connected with

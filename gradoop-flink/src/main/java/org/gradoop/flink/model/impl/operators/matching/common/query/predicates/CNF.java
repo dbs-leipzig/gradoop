@@ -124,10 +124,10 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   @Override
-  public Set<String> getProperties(String variable) {
+  public Set<String> getPropertyKeys(String variable) {
     Set<String> properties = new HashSet<>();
     for (CNFElement cnfElement : predicates) {
-      properties.addAll(cnfElement.getProperties(variable));
+      properties.addAll(cnfElement.getPropertyKeys(variable));
     }
     return properties;
   }

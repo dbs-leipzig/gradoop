@@ -38,8 +38,14 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, EmbeddingRecord> {
    */
   private final CNF predicates;
 
+  /**
+   * Information about the property keys needed to transform the vertex into an embedding
+   */
   private final List<String> propertyKeys;
 
+  /**
+   * Meta data about the vertex embedding
+   */
   private final EmbeddingRecordMetaData metaData;
 
   /**
@@ -51,13 +57,13 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, EmbeddingRecord> {
 
     String variable = (String) predicates.getVariables().toArray()[0];
     this.propertyKeys = new ArrayList<>();
-    propertyKeys.addAll(predicates.getProperties(variable));
+    propertyKeys.addAll(predicates.getPropertyKeys(variable));
 
     metaData = new EmbeddingRecordMetaData();
-    metaData.updateColumnMapping(variable,0);
+    metaData.updateColumnMapping(variable, 0);
 
     int i = 0;
-    for(String propertyKey : propertyKeys) {
+    for (String propertyKey : propertyKeys) {
       metaData.updatePropertyMapping(variable, propertyKey, i++);
     }
   }

@@ -35,7 +35,8 @@ import java.util.List;
  * <ul>
  * <li>new entries of the right embedding are always appended to the left embedding</li>
  * <li>duplicate fields are removed, i.e., the join columns are stored once in the result</li>
- * <li>join columns are either kept or adopted from the right side</li>
+ * <li>all properties from the right side are appended to the proeprties of the left side,
+ *     <em>no</em> deduplication is performed</li>
  * </ul>
  */
 public class JoinEmbeddings implements PhysicalOperator {

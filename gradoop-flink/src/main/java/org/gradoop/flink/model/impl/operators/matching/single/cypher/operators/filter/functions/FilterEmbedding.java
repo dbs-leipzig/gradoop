@@ -42,7 +42,7 @@ public class FilterEmbedding extends RichFilterFunction<EmbeddingRecord> {
    * @param predicates predicates used for filtering
    * @param metaData mapping of variable names to embedding column
    */
-  public FilterEmbedding(CNF predicates,EmbeddingRecordMetaData metaData) {
+  public FilterEmbedding(CNF predicates, EmbeddingRecordMetaData metaData) {
     this.predicates = predicates;
     this.metaData = metaData;
   }

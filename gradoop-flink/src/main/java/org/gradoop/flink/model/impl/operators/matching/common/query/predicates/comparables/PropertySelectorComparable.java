@@ -66,7 +66,7 @@ public class PropertySelectorComparable extends QueryComparable {
     int propertyColumn =
       metaData.getPropertyIndex(propertySelector.getVariable(), propertySelector.getPropertyName());
 
-    if(propertyColumn >= 0) {
+    if (propertyColumn >= 0) {
       return embedding.getProperty(propertyColumn);
     } else {
       throw new MissingPropertyException(propertySelector.getPropertyName());
@@ -74,7 +74,7 @@ public class PropertySelectorComparable extends QueryComparable {
   }
 
   @Override
-  public Set<String> getProperties(String variable) {
+  public Set<String> getPropertyKeys(String variable) {
     return variable.equals(propertySelector.getVariable()) ?
       Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet<>();
   }

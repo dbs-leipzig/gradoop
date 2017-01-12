@@ -69,10 +69,10 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
   }
 
   @Override
-  public Set<String> getProperties(String variable) {
+  public Set<String> getPropertyKeys(String variable) {
     Set<String> properties = new HashSet<>();
     for (ComparisonExpression comparisonExpression : predicates) {
-      properties.addAll(comparisonExpression.getProperties(variable));
+      properties.addAll(comparisonExpression.getPropertyKeys(variable));
     }
     return properties;
   }

@@ -44,6 +44,6 @@ public class ProjectEdge extends RichMapFunction<Edge, EmbeddingRecord> {
 
   @Override
   public EmbeddingRecord map(Edge edge) {
-    return GraphElementToEmbedding.convert(edge,propertyKeys);
+    return GraphElementToEmbedding.convert(edge, propertyKeys);
   }
 }

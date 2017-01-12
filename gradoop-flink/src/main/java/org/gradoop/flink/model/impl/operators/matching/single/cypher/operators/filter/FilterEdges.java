@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 /**
  * Filters a List of edges by predicates
  * Edge -> Embedding(IdEntry(SrcID), IdEntry(Edge), IdEntry(TargetID))
+ * No properties will be adopted.
  */
 public class FilterEdges implements PhysicalOperator {
   /**

@@ -38,8 +38,14 @@ public class FilterEdge extends RichFlatMapFunction<Edge, EmbeddingRecord> {
    */
   private final CNF predicates;
 
+  /**
+   * Stores the properties keys needed to convert the edge into an embedding
+   */
   private final List<String> propertyKeys;
 
+  /**
+   * Meta data about the edge embedding
+   */
   private final EmbeddingRecordMetaData metaData;
 
 
@@ -53,13 +59,13 @@ public class FilterEdge extends RichFlatMapFunction<Edge, EmbeddingRecord> {
     String variable = (String) predicates.getVariables().toArray()[0];
 
     this.propertyKeys = new ArrayList<>();
-    propertyKeys.addAll(predicates.getProperties(variable));
+    propertyKeys.addAll(predicates.getPropertyKeys(variable));
 
     metaData = new EmbeddingRecordMetaData();
-    metaData.updateColumnMapping(variable,0);
+    metaData.updateColumnMapping(variable, 0);
 
     int i = 0;
-    for(String propertyKey : propertyKeys) {
+    for (String propertyKey : propertyKeys) {
       metaData.updatePropertyMapping(variable, propertyKey, i++);
     }
   }

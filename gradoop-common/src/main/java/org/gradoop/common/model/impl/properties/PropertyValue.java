@@ -17,6 +17,7 @@
 
 package org.gradoop.common.model.impl.properties;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -452,6 +453,7 @@ public class PropertyValue
     return rawBytes.length;
   }
 
+  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getRawBytes() {
     return this.rawBytes;
   }

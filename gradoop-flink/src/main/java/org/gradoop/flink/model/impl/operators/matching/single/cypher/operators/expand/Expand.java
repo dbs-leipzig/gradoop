@@ -35,8 +35,8 @@ import java.util.List;
 
 /**
  * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
- * The input embedding is appended by 2 Entries, the first one represents the path,
- * the second one the end vertex
+ * The input embedding is appended by 2 Entries, the first one represents the path (edge, vertex,
+ * edge, vertex, ..., edge), the second one the end vertex
  */
 
 public class Expand implements PhysicalOperator {
@@ -96,8 +96,8 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
-    int lowerBound, int upperBound, ExpandDirection direction,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
 
@@ -126,8 +126,8 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
-    int lowerBound, int upperBound, ExpandDirection direction,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
     this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,
@@ -147,8 +147,8 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges, int expandColumn,
-    int lowerBound, ExpandDirection direction,
+  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+    int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
     this(input, candidateEdges, expandColumn, lowerBound, Integer.MAX_VALUE, direction,

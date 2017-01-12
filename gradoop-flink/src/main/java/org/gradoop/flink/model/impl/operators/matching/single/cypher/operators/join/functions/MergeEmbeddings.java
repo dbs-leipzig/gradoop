@@ -79,12 +79,12 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
 
   @Override
   public void join(EmbeddingRecord left, EmbeddingRecord right, Collector<EmbeddingRecord> out)
-    throws Exception {
+      throws Exception {
 
     if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &&
       isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
       out.collect(new EmbeddingRecord(
-        mergeIdData(left,right), mergePropertyData(left,right), mergeIdListData(left,right)
+        mergeIdData(left, right), mergePropertyData(left, right), mergeIdListData(left, right)
       ));
     }
   }
@@ -134,20 +134,21 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    */
   private byte[] mergeIdData(EmbeddingRecord left, EmbeddingRecord right) {
     byte[] newIdData = new byte[
-        left.getIdData().length
-      + right.getIdData().length
-      - (joinColumnsRight.size() * (GradoopId.ID_SIZE + 1))
+        left.getIdData().length +
+      right.getIdData().length -
+      (joinColumnsRight.size() * (GradoopId.ID_SIZE + 1))
     ];
 
     int offset = left.getIdData().length;
     System.arraycopy(left.getIdData(), 0, newIdData, 0, offset);
 
-    for(int i=0; i<right.size(); i++) {
-      if(joinColumnsRight.contains(i)) {
+    for (int i = 0; i < right.size(); i++) {
+      if (joinColumnsRight.contains(i)) {
         continue;
       }
 
-      System.arraycopy(right.getRawIdEntry(i),0, newIdData, offset, EmbeddingRecord.ID_ENTRY_SIZE);
+      System.arraycopy(right.getRawIdEntry(i), 0, newIdData, offset, EmbeddingRecord
+        .ID_ENTRY_SIZE);
       offset += EmbeddingRecord.ID_ENTRY_SIZE;
     }
 

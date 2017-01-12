@@ -29,6 +29,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 /**
  * Filters a List of vertices by predicates
  * Vertex -> Embedding( IdEntry(Vertex) )
+ * No properties are adopted.
  */
 public class FilterVertices implements PhysicalOperator {
   /**

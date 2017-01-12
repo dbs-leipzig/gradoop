@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
@@ -32,9 +33,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Stores an embedding represented as byte array.
+ * This class represents an Embedding, an ordered List of Embedding Entries. Every entry is
+ * either a reference to a single Edge or Vertex, or a path (Edge, Vertex, Edge, Vertex, ..., Edge).
+ * The reference is stored via the elements ID. Additionally the embedding ca store an ordered
+ * list of PropertyValues.
  */
+@SuppressWarnings("SE_NO_SERIALVERSIONID")
 public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
+
+  /**
+   * Size of an entry in the IdData array
+   */
+  public static final transient int ID_ENTRY_SIZE = 1 + GradoopId.ID_SIZE;
 
   /**
    * Holds the idData of all id-able entries (IDListFlag, ID)
@@ -52,11 +62,6 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   private byte[] idListData;
 
   /**
-   * Size of an entry in the IdData array
-   */
-  public static transient int ID_ENTRY_SIZE = 1 + GradoopId.ID_SIZE;
-
-  /**
    * Creates am empty EmbeddingRecord
    */
   public EmbeddingRecord() {
@@ -69,6 +74,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    * @param propertyData Properties stored in internal byte array format
    * @param idListData IdLists stored in internal byte array format
    */
+  @SuppressWarnings("EI_EXPOSE_REP2")
   public EmbeddingRecord(byte[] idData, byte[] propertyData, byte[] idListData) {
     this.idData = idData;
     this.propertyData = propertyData;
@@ -80,7 +86,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   // ---------------------------------------------------------------------------------------------
 
   /**
-   * Appends a GradoopId representing a GraphElement to the embedding
+   * Appends a reference to an Vertex/Edge to the embedding
    * @param id the Id that will be appended
    */
   public void add(GradoopId id) {
@@ -88,8 +94,8 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Returns the Id of the entry stored at the specified column
-   * @param column the column the entry is stored at
+   * Returns the Id of the entry stored at the specified position
+   * @param column the position the entry is stored at
    * @return ID of the entry
    */
   public GradoopId getId(int column) {
@@ -97,9 +103,9 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Returns the ID of the entry stored at the specified column represented as byte array
-   * @param column the column the entry is stored at
-   * @return ID
+   * Returns the ID of the entry stored at the specified position represented as byte array
+   * @param column position the entry is stored at
+   * @return the entries ID
    */
   public byte[] getRawId(int column) {
     byte[] rawEntry = getRawIdEntry(column);
@@ -112,8 +118,8 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Returns the internal representation of the IdEntry stored at the specified column
-   * @param column the column the entry is stored at
+   * Returns the internal representation of the IdEntry stored at the specified position
+   * @param column the position the entry is stored at
    * @return Internal representation of the entry
    */
   public byte[] getRawIdEntry(int column) {
@@ -122,9 +128,9 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Returns the ID or ID-List stored at the specified column
+   * Returns the ID or ID-List stored at the specified position
    * @param column Index of the entry
-   * @return The ID or ID-List stored at the specified column
+   * @return The ID or ID-List stored at the specified position
    */
   public List<GradoopId> getIdAsList(int column) {
     int offset = getIdOffset(column);
@@ -132,17 +138,17 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Returns the IDs entries stored at the specified columns
-   * @param columns Indices of the entries
-   * @return IDs of the entries stored at the specified colummns
+   * Returns the IDs entries stored at the specified positions
+   * @param columns positions of the entries
+   * @return IDs of the entries stored at the specified positions
    */
   public List<GradoopId> getIdsAsList(List<Integer> columns) {
     int offset;
     List<GradoopId> ids = new ArrayList<>();
 
-    for(Integer column : columns) {
+    for (Integer column : columns) {
       offset = getIdOffset(column);
-      if(idData[offset] == 0) {
+      if (idData[offset] == 0) {
         ids.add(getId(column));
       } else {
         ids.addAll(getIdList(column));
@@ -153,16 +159,16 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   /**
-   * Adds an Id into the ID List
-   * This can either be an ID representing a GraphElement or a pointer to an IdList
-   * @param id the id that whill be added to the lost
-   * @param isIdList indicates if the id represents a GraphElement or points to an IdList
+   * Adds an entry to the embedding.
+   * This can either be an ID representing referencing a Vertex/Edge or a pointer to a path entry
+   * @param id the id that will be added to the embedding
+   * @param isIdList indicates if the id represents a GraphElement or points to a path entry
    */
   private void add(GradoopId id, boolean isIdList) {
     byte[] newIds = new byte[idData.length + 1 + GradoopId.ID_SIZE];
     System.arraycopy(idData, 0, newIds, 0, idData.length);
-    newIds[idData.length] = (byte)(isIdList?1:0);
-    System.arraycopy(id.toByteArray(), 0, newIds, idData.length + 1 , GradoopId.ID_SIZE);
+    newIds[idData.length] = (byte) (isIdList ? 1 : 0);
+    System.arraycopy(id.toByteArray(), 0, newIds, idData.length + 1, GradoopId.ID_SIZE);
 
     idData = newIds;
   }
@@ -174,7 +180,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    */
   private int getIdOffset(int column) {
     checkColumn(column);
-    return (column * ID_ENTRY_SIZE);
+    return column * ID_ENTRY_SIZE;
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -190,9 +196,9 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   public void add(GradoopId id, List<PropertyValue> properties) {
     add(id);
 
-    int newPropertiesSize = propertyData.length
-      + properties.stream().mapToInt(PropertyValue::getByteSize).sum()
-      + properties.size() * Integer.BYTES;
+    int newPropertiesSize = propertyData.length +
+      properties.stream().mapToInt(PropertyValue::getByteSize).sum() +
+      properties.size() * Integer.BYTES;
 
     byte[] newPropertyData = new byte[newPropertiesSize];
 
@@ -223,7 +229,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     offset += Integer.BYTES;
 
     return PropertyValue.fromRawBytes(
-      ArrayUtils.subarray(propertyData, offset, offset+ entryLength)
+      ArrayUtils.subarray(propertyData, offset, offset + entryLength)
     );
   }
 
@@ -252,14 +258,15 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     int offset = 0;
     int entryLength;
 
-    while(i < column && offset < propertyData.length) {
-      entryLength = Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));
+    while (i < column && offset < propertyData.length) {
+      entryLength =
+        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));
 
       offset += entryLength + Integer.BYTES;
       i++;
     }
 
-    if(offset >= propertyData.length) {
+    if (offset >= propertyData.length) {
       throw new IndexOutOfBoundsException("Cant find Property. " + i + " < " + column);
     }
 
@@ -276,18 +283,18 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    */
   public void add(List<GradoopId> ids) {
     GradoopId pointer = GradoopId.get();
-    add(pointer,true);
+    add(pointer, true);
 
-    byte[] newIdLists = new byte[idListData.length
-      + GradoopId.ID_SIZE + Integer.BYTES
-      + ids.size() * GradoopId.ID_SIZE];
+    byte[] newIdLists = new byte[idListData.length +
+      GradoopId.ID_SIZE + Integer.BYTES +
+      ids.size() * GradoopId.ID_SIZE];
 
     System.arraycopy(idListData, 0, newIdLists, 0, idListData.length);
     writeId(pointer, newIdLists, idListData.length);
     writeInt(ids.size(), newIdLists, idListData.length + GradoopId.ID_SIZE);
 
-    int offset = idListData.length + GradoopId.ID_SIZE+ Integer.BYTES;
-    for(GradoopId id: ids) {
+    int offset = idListData.length + GradoopId.ID_SIZE + Integer.BYTES;
+    for (GradoopId id: ids) {
       writeId(id, newIdLists, offset);
       offset += GradoopId.ID_SIZE;
     }
@@ -303,13 +310,14 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   public List<GradoopId> getIdList(int column) {
     int offset = getIdListOffset(column);
 
-    int listSize = Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));
+    int listSize =
+      Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));
 
     offset += Integer.BYTES;
 
     List<GradoopId> idList = new ArrayList<>(listSize);
 
-    for(int i=0; i< listSize; i++) {
+    for (int i = 0; i < listSize; i++) {
       idList.add(GradoopId.fromByteArray(
         ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE)
       ));
@@ -327,7 +335,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   private int getIdListOffset(int column) {
     int pointerOffset = getIdOffset(column);
 
-    if(idData[pointerOffset++] != 1) {
+    if (idData[pointerOffset++] != 1) {
       throw new UnsupportedOperationException("Entry is not an IDList");
     }
 
@@ -338,18 +346,19 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     int listSize;
     boolean found = false;
 
-    while(!found && offset < idListData.length) {
+    while (!found && offset < idListData.length) {
       comparePointer = ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE);
       offset += GradoopId.ID_SIZE;
       found = Arrays.equals(pointer, comparePointer);
 
-      if(!found) {
-        listSize = Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));
+      if (!found) {
+        listSize =
+          Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));
         offset += GradoopId.ID_SIZE * listSize + Integer.BYTES;
       }
     }
 
-    if(!found) {
+    if (!found) {
       throw new RuntimeException("Could not find IdList entry");
     }
 
@@ -372,6 +381,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    * Returns the internal representation of the stored ids
    * @return Internal representation of the list of ids
    */
+  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getIdData() {
     return this.idData;
   }
@@ -380,6 +390,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    * Returns the internal representation of the stored properties
    * @return Internal representation of the stored properties
    */
+  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getPropertyData() {
     return this.propertyData;
   }
@@ -388,6 +399,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    * Returns the internal representation of the stored IdLists
    * @return Internal representation of the stored IdLists
    */
+  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getIdListData() {
     return idListData;
   }
@@ -418,7 +430,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
    */
   public EmbeddingRecord project(List<Integer> propertyWhiteList) {
     byte[] newPropertyData = new byte[0];
-    for(int index : propertyWhiteList) {
+    for (int index : propertyWhiteList) {
       newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));
     }
 
@@ -433,10 +445,10 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   public EmbeddingRecord reverse() {
     byte[] newIdData = new byte[idData.length];
 
-    for(int i=size() - 1; i >=0; i--) {
+    for (int i = size() - 1; i >= 0; i--) {
       System.arraycopy(
         getRawIdEntry(i), 0,
-        newIdData,  (size() - 1 - i)*ID_ENTRY_SIZE,
+        newIdData,  (size() - 1 - i) * ID_ENTRY_SIZE,
         ID_ENTRY_SIZE
       );
     }
@@ -550,20 +562,33 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
 
   @Override
   public void read(DataInputView in) throws IOException {
+
     int sizeBuffer = in.readInt();
     byte[] ids = new byte[sizeBuffer];
-    in.read(ids);
+    if (sizeBuffer > 0) {
+      if (in.read(ids) != sizeBuffer) {
+        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+      }
+    }
 
     sizeBuffer = in.readInt();
-    byte[] propertyData= new byte[sizeBuffer];
-    in.read(propertyData);
+    byte[] newPropertyData =  new byte[sizeBuffer];
+    if (sizeBuffer > 0) {
+      if (in.read(newPropertyData) != sizeBuffer) {
+        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+      }
+    }
 
     sizeBuffer = in.readInt();
     byte[] idLists = new byte[sizeBuffer];
-    in.read(idLists);
+    if (sizeBuffer > 0) {
+      if (in.read(idLists) != sizeBuffer) {
+        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+      }
+    }
 
     this.idData = ids;
-    this.propertyData = propertyData;
+    this.propertyData = newPropertyData;
     this.idListData = idLists;
   }
 
