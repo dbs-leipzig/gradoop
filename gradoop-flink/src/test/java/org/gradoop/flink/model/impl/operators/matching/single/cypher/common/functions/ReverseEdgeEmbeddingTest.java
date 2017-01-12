@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,14 +30,14 @@ public class ReverseEdgeEmbeddingTest {
     GradoopId e = GradoopId.get();
     GradoopId b = GradoopId.get();
 
-    EmbeddingRecord edge = new EmbeddingRecord();
+    Embedding edge = new Embedding();
     edge.add(a);
     edge.add(e);
     edge.add(b);
 
     ReverseEdgeEmbedding op = new ReverseEdgeEmbedding();
 
-    EmbeddingRecord reversed = op.map(edge);
+    Embedding reversed = op.map(edge);
 
     assertEquals(b, reversed.getId(0));
     assertEquals(e, reversed.getId(1));

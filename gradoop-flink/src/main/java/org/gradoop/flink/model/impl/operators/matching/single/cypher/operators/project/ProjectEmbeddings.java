@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEmbedding;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class ProjectEmbeddings implements PhysicalOperator {
   /**
    * Input Embeddings
    */
-  private final DataSet<EmbeddingRecord> input;
+  private final DataSet<Embedding> input;
   /**
    * Indices of all properties that will be kept in the projection
    */
@@ -45,7 +45,7 @@ public class ProjectEmbeddings implements PhysicalOperator {
    * @param propertyWhiteList HashMap of property labels, keys are the columns of the entry,
    *                     values are property keys
    */
-  public ProjectEmbeddings(DataSet<EmbeddingRecord> input,
+  public ProjectEmbeddings(DataSet<Embedding> input,
     List<Integer> propertyWhiteList) {
 
     this.input = input;
@@ -53,7 +53,7 @@ public class ProjectEmbeddings implements PhysicalOperator {
   }
 
   @Override
-  public DataSet<EmbeddingRecord> evaluate() {
+  public DataSet<Embedding> evaluate() {
     return input.map(new ProjectEmbedding(propertyWhiteList));
   }
 }

@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class ProjectVerticesTest extends PhysicalOperatorTest {
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "baz");
 
     ProjectVertices operator = new ProjectVertices(edgeDataSet, extractedPropertyKeys);
-    DataSet<EmbeddingRecord> results = operator.evaluate();
+    DataSet<Embedding> results = operator.evaluate();
 
     assertEquals(2,results.count());
 

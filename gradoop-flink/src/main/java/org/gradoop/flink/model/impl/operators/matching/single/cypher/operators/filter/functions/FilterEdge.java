@@ -22,7 +22,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 
 
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Filters a set of edges by given predicates
  */
-public class FilterEdge extends RichFlatMapFunction<Edge, EmbeddingRecord> {
+public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
   /**
    * Predicates used for filtering
    */
@@ -71,8 +71,8 @@ public class FilterEdge extends RichFlatMapFunction<Edge, EmbeddingRecord> {
   }
 
   @Override
-  public void flatMap(Edge edge, Collector<EmbeddingRecord> out) throws Exception {
-    EmbeddingRecord embedding = GraphElementToEmbedding.convert(edge, propertyKeys);
+  public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
+    Embedding embedding = GraphElementToEmbedding.convert(edge, propertyKeys);
 
     if (predicates.evaluate(embedding, metaData)) {
       embedding.clearPropertyData();

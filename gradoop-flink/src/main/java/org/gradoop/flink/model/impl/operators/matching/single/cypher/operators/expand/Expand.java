@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
@@ -44,11 +44,11 @@ public class Expand implements PhysicalOperator {
   /**
    * Input Embeddings
    */
-  private final DataSet<EmbeddingRecord> input;
+  private final DataSet<Embedding> input;
   /**
    * Candidate edges
    */
-  private DataSet<EmbeddingRecord> candidateEdges;
+  private DataSet<Embedding> candidateEdges;
   /**
    * specifies the input column that will be expanded
    */
@@ -96,7 +96,7 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -126,7 +126,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -147,7 +147,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<EmbeddingRecord> input, DataSet<EmbeddingRecord> candidateEdges,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -161,7 +161,7 @@ public class Expand implements PhysicalOperator {
    * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
    */
   @Override
-  public DataSet<EmbeddingRecord> evaluate() {
+  public DataSet<Embedding> evaluate() {
     DataSet<ExpandEmbedding> initialWorkingSet = preProcess();
 
     DataSet<ExpandEmbedding> iterationResults = iterate(initialWorkingSet);
@@ -221,8 +221,8 @@ public class Expand implements PhysicalOperator {
    * @param iterationResults the results produced by the iteration
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
-  private DataSet<EmbeddingRecord> postProcess(DataSet<ExpandEmbedding> iterationResults) {
-    DataSet<EmbeddingRecord> results =
+  private DataSet<Embedding> postProcess(DataSet<ExpandEmbedding> iterationResults) {
+    DataSet<Embedding> results =
       iterationResults.flatMap(new PostProcessExpandEmbedding(lowerBound, closingColumn));
 
     if (lowerBound == 0) {

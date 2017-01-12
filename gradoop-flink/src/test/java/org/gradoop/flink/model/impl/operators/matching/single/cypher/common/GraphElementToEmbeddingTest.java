@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -40,7 +40,7 @@ public class GraphElementToEmbeddingTest {
     properties.set("baz", false);
     Vertex vertex = new VertexFactory().createVertex("TestVertex",  properties);
 
-    EmbeddingRecord embedding =
+    Embedding embedding =
       GraphElementToEmbedding.convert(vertex, Lists.newArrayList("foo","bar"));
 
     assertEquals(1, embedding.size());
@@ -60,7 +60,7 @@ public class GraphElementToEmbeddingTest {
       "TestVertex", GradoopId.get(), GradoopId.get(), properties
     );
 
-    EmbeddingRecord embedding =
+    Embedding embedding =
       GraphElementToEmbedding.convert(edge, Lists.newArrayList("foo","bar"));
 
     assertEquals(3, embedding.size());

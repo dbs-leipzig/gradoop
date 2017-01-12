@@ -17,16 +17,16 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 /**
  * Reverses an EdgeEmbedding, as it switches source and target
  * This is used for traversing incoming edges
  */
-public class ReverseEdgeEmbedding extends RichMapFunction<EmbeddingRecord, EmbeddingRecord> {
+public class ReverseEdgeEmbedding extends RichMapFunction<Embedding, Embedding> {
 
   @Override
-  public EmbeddingRecord map(EmbeddingRecord value) throws Exception {
+  public Embedding map(Embedding value) throws Exception {
     return value.reverse();
   }
 }

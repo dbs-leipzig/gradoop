@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * (id0,id1,...,idn),[0,2] -> "id0id2"
  */
-public class ExtractJoinColumns implements KeySelector<EmbeddingRecord, String> {
+public class ExtractJoinColumns implements KeySelector<Embedding, String> {
   /**
    * Columns to concatenate ids from
    */
@@ -50,7 +50,7 @@ public class ExtractJoinColumns implements KeySelector<EmbeddingRecord, String> 
   }
 
   @Override
-  public String getKey(EmbeddingRecord value) throws Exception {
+  public String getKey(Embedding value) throws Exception {
     sb.delete(0, sb.length());
     for (Integer column : columns) {
       sb.append(ArrayUtils.toString(value.getRawId(column)));

@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 
 import java.util.HashMap;
@@ -36,11 +36,11 @@ public class ValueJoin implements PhysicalOperator {
   /**
    * Embeddings of the left side
    */
-  private final DataSet<EmbeddingRecord> lhs;
+  private final DataSet<Embedding> lhs;
   /**
    * Embeddings of the right side
    */
-  private final DataSet<EmbeddingRecord> rhs;
+  private final DataSet<Embedding> rhs;
   /**
    * predicates used for the join
    */
@@ -58,7 +58,7 @@ public class ValueJoin implements PhysicalOperator {
    * @param joinCriteria join criteria
    * @param variableMapping Maps variable names to embedding entries
    */
-  public ValueJoin(DataSet<EmbeddingRecord> lhs, DataSet<EmbeddingRecord> rhs, CNF joinCriteria,
+  public ValueJoin(DataSet<Embedding> lhs, DataSet<Embedding> rhs, CNF joinCriteria,
     HashMap<String, Integer> variableMapping) {
     this.lhs = lhs;
     this.rhs = rhs;
@@ -67,7 +67,7 @@ public class ValueJoin implements PhysicalOperator {
   }
 
   @Override
-  public DataSet<EmbeddingRecord> evaluate() {
+  public DataSet<Embedding> evaluate() {
     return null;
   }
 }

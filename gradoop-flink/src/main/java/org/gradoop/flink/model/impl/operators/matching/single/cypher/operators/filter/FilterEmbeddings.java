@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
   .EmbeddingRecordMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions
@@ -34,7 +34,7 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * Candidate Embeddings
    */
-  private final DataSet<EmbeddingRecord> input;
+  private final DataSet<Embedding> input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -50,7 +50,7 @@ public class FilterEmbeddings implements PhysicalOperator {
    * @param predicates Predicates to used for filtering
    * @param metaData Maps variable names to embedding entries
    */
-  public FilterEmbeddings(DataSet<EmbeddingRecord> input, CNF predicates,
+  public FilterEmbeddings(DataSet<Embedding> input, CNF predicates,
     EmbeddingRecordMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
@@ -60,7 +60,7 @@ public class FilterEmbeddings implements PhysicalOperator {
   /**
    * {@inheritDoc}
    */
-  public DataSet<EmbeddingRecord> evaluate() {
+  public DataSet<Embedding> evaluate() {
     return input.filter(new FilterEmbedding(predicates, metaData));
   }
 }

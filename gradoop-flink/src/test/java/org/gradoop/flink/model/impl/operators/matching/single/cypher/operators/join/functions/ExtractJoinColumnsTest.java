@@ -2,8 +2,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.commons.lang.ArrayUtils;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
     GradoopId v0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    EmbeddingRecord embedding = createEmbedding(v0, v1);
+    Embedding embedding = createEmbedding(v0, v1);
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Collections.singletonList(0));
 
@@ -29,7 +29,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
     GradoopId v0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    EmbeddingRecord embedding = createEmbedding(v0, v1);
+    Embedding embedding = createEmbedding(v0, v1);
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(0, 1));
 
@@ -44,7 +44,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
     GradoopId v0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    EmbeddingRecord embedding = createEmbedding(v0, v1);
+    Embedding embedding = createEmbedding(v0, v1);
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(1, 0));
 

@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
@@ -56,7 +56,7 @@ public class PropertySelectorComparable extends QueryComparable {
    * @throws MissingPropertyException if property is not in projection
    */
   @Override
-  public PropertyValue evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
+  public PropertyValue evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
     int entryColumn = metaData.getColumn(propertySelector.getVariable());
 
     if (entryColumn == -1) {

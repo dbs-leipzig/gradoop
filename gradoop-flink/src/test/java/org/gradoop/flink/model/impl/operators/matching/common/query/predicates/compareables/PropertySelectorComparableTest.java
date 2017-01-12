@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.PropertySelector;
@@ -37,7 +37,7 @@ public class PropertySelectorComparableTest {
       selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
@@ -53,7 +53,7 @@ public class PropertySelectorComparableTest {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
 
     EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();
@@ -68,7 +68,7 @@ public class PropertySelectorComparableTest {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingRecordMetaData metaData = new EmbeddingRecordMetaData();

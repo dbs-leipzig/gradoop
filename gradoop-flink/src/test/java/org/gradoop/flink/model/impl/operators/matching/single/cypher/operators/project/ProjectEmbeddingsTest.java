@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -33,18 +33,18 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
   public void projectEmbedding() throws Exception{
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
     embedding.add(GradoopId.get(), getPropertyValues(Lists.newArrayList("m", "n", "o")));
 
-    DataSet<EmbeddingRecord> embeddings =
+    DataSet<Embedding> embeddings =
       getExecutionEnvironment().fromElements(embedding, embedding);
 
     List<Integer> extractedPropertyKeys = Lists.newArrayList(0,2);
     
     ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
-    DataSet<EmbeddingRecord> results = operator.evaluate();
+    DataSet<Embedding> results = operator.evaluate();
     assertEquals(2,results.count());
     
     assertEveryEmbedding(results, (e) -> {

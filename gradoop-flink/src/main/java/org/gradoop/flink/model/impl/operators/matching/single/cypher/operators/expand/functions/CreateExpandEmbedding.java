@@ -19,8 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
-  .EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.List;
  * Creates the initial expand embeddings
  */
 public class CreateExpandEmbedding
-  extends RichFlatJoinFunction<EmbeddingRecord, EmbeddingRecord, ExpandEmbedding> {
+  extends RichFlatJoinFunction<Embedding, Embedding, ExpandEmbedding> {
 
   /**
    * Holds the index of all base vertex columns that should be distinct
@@ -60,7 +59,7 @@ public class CreateExpandEmbedding
   }
 
   @Override
-  public void join(EmbeddingRecord input, EmbeddingRecord edge, Collector<ExpandEmbedding> out)
+  public void join(Embedding input, Embedding edge, Collector<ExpandEmbedding> out)
       throws Exception {
 
     if (checkDistinctiveness(input, edge)) {
@@ -75,7 +74,7 @@ public class CreateExpandEmbedding
    * @param edge edge along which we expand
    * @return true if distinct criteria hold for the expansion
    */
-  private boolean checkDistinctiveness(EmbeddingRecord input, EmbeddingRecord edge) {
+  private boolean checkDistinctiveness(Embedding input, Embedding edge) {
     GradoopId edgeId = edge.getId(1);
     GradoopId tgt = edge.getId(2);
 

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 /**
@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.e
  * </ol>
  */
 public class PostProcessExpandEmbedding
-  extends RichFlatMapFunction<ExpandEmbedding, EmbeddingRecord> {
+  extends RichFlatMapFunction<ExpandEmbedding, Embedding> {
 
   /**
    * Holds the minimum path size calculated from lower bound
@@ -54,7 +54,7 @@ public class PostProcessExpandEmbedding
   }
 
   @Override
-  public void flatMap(ExpandEmbedding value, Collector<EmbeddingRecord> out) throws Exception {
+  public void flatMap(ExpandEmbedding value, Collector<Embedding> out) throws Exception {
     if (value.pathSize() < minPathLength) {
       return;
     }

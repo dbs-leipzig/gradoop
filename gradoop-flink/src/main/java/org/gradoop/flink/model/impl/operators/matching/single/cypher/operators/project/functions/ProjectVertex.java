@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * Projects a Vertex by a set of properties.
  * Vertex -> Embedding(GraphElementEmbedding(Vertex))
  */
-public class ProjectVertex extends RichMapFunction<Vertex, EmbeddingRecord> {
+public class ProjectVertex extends RichMapFunction<Vertex, Embedding> {
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -43,7 +43,7 @@ public class ProjectVertex extends RichMapFunction<Vertex, EmbeddingRecord> {
   }
 
   @Override
-  public EmbeddingRecord map(Vertex vertex) {
+  public Embedding map(Vertex vertex) {
     return GraphElementToEmbedding.convert(vertex, propertyKeys);
   }
 }

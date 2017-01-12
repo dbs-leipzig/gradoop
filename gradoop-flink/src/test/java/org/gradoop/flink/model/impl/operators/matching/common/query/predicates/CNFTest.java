@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.junit.Test;
 
@@ -103,7 +103,7 @@ public class CNFTest {
     GradoopId a = GradoopId.get();
     GradoopId c = GradoopId.get();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(
       a,
       Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
@@ -131,7 +131,7 @@ public class CNFTest {
     QueryHandler query = new QueryHandler(queryString);
     CNF predicates = query.getPredicates();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(
       GradoopId.get(),
       Lists.newArrayList(PropertyValue.NULL_VALUE)

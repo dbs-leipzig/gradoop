@@ -19,13 +19,13 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 /**
  * Extracts a join key from an id stored in an embedding record
  * The id is referenced via its column index.
  */
-public class ExtractExpandColumn implements KeySelector<EmbeddingRecord, GradoopId> {
+public class ExtractExpandColumn implements KeySelector<Embedding, GradoopId> {
   /**
    * Column that holds the id which will be used as key
    */
@@ -41,7 +41,7 @@ public class ExtractExpandColumn implements KeySelector<EmbeddingRecord, Gradoop
   }
 
   @Override
-  public GradoopId getKey(EmbeddingRecord value) throws Exception {
+  public GradoopId getKey(Embedding value) throws Exception {
     return value.getId(column);
   }
 }

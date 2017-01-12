@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public class CNFElementTest {
     GradoopId c = GradoopId.get();
 
     //Should be true if a = b
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(
       a,
       Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
@@ -75,7 +75,7 @@ public class CNFElementTest {
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be true if a.name = "Alice"
-    embedding = new EmbeddingRecord();
+    embedding = new Embedding();
     embedding.add(
       a,
       Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
@@ -88,7 +88,7 @@ public class CNFElementTest {
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be true if a.age > c.age
-    embedding = new EmbeddingRecord();
+    embedding = new Embedding();
     embedding.add(
       a,
       Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
@@ -101,7 +101,7 @@ public class CNFElementTest {
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be false otherwise
-    embedding = new EmbeddingRecord();
+    embedding = new Embedding();
     embedding.add(
       a,
       Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))

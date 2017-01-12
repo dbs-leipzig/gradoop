@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class PostProcessExpandEmbeddingTest {
   private final GradoopId c = GradoopId.get();
 
   private ExpandEmbedding expandEmbedding() {
-    EmbeddingRecord base = new EmbeddingRecord();
+    Embedding base = new Embedding();
     base.add(a);
     base.add(b);
     base.add(c);
@@ -47,28 +47,28 @@ public class PostProcessExpandEmbeddingTest {
 
   @Test
   public void testReturnNothingForFalseCircles() throws Exception{
-    List<EmbeddingRecord> result = new ArrayList<>();
+    List<Embedding> result = new ArrayList<>();
     new PostProcessExpandEmbedding(0,2).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
   public void testDoTransformationForClosedCircles() throws Exception{
-    List<EmbeddingRecord> result = new ArrayList<>();
+    List<Embedding> result = new ArrayList<>();
     new PostProcessExpandEmbedding(0,0).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(1, result.size());
   }
 
   @Test
   public void testReturnNothingForShortsResults() throws Exception{
-    List<EmbeddingRecord> result = new ArrayList<>();
+    List<Embedding> result = new ArrayList<>();
     new PostProcessExpandEmbedding(3,-1).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
   public void testDoTransformationForResultsThatFitLowerBound() throws Exception{
-    List<EmbeddingRecord> result = new ArrayList<>();
+    List<Embedding> result = new ArrayList<>();
     new PostProcessExpandEmbedding(2,-1).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(1, result.size());
   }

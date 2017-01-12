@@ -21,13 +21,13 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class to convert vertices and edges into {@link EmbeddingRecord}
+ * Utility class to convert vertices and edges into {@link Embedding}
  */
 public class GraphElementToEmbedding {
 
@@ -39,8 +39,8 @@ public class GraphElementToEmbedding {
    * @param propertyKeys Keys of the properties that will be adopted into the embedding
    * @return Vertex Embedding
    */
-  public static EmbeddingRecord convert(Vertex vertex, List<String> propertyKeys) {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+  public static Embedding convert(Vertex vertex, List<String> propertyKeys) {
+    Embedding embedding = new Embedding();
     embedding.add(vertex.getId(), project(vertex, propertyKeys));
 
     return embedding;
@@ -54,8 +54,8 @@ public class GraphElementToEmbedding {
    * @param propertyKeys Keys of the properties that will be adopted into the embedding
    * @return Edge Embedding
    */
-  public static EmbeddingRecord convert(Edge edge, List<String> propertyKeys) {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+  public static Embedding convert(Edge edge, List<String> propertyKeys) {
+    Embedding embedding = new Embedding();
     embedding.add(edge.getSourceId());
     embedding.add(edge.getId(), project(edge, propertyKeys));
     embedding.add(edge.getTargetId());

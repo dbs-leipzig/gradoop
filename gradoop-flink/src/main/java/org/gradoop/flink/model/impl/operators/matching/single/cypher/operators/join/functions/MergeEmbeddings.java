@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +33,7 @@ import java.util.Set;
  *
  * The constraints for merging are defined at {@link JoinEmbeddings}.
  */
-public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, EmbeddingRecord,
-  EmbeddingRecord> {
+public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, Embedding> {
   /**
    * Join columns from the right side.
    */
@@ -78,12 +77,12 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
   }
 
   @Override
-  public void join(EmbeddingRecord left, EmbeddingRecord right, Collector<EmbeddingRecord> out)
+  public void join(Embedding left, Embedding right, Collector<Embedding> out)
       throws Exception {
 
     if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &&
       isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
-      out.collect(new EmbeddingRecord(
+      out.collect(new Embedding(
         mergeIdData(left, right), mergePropertyData(left, right), mergeIdListData(left, right)
       ));
     }
@@ -99,7 +98,7 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    * @return true, if both embeddings contain unique id values for all specified columns
    */
   private boolean isDistinct(List<Integer> columnsLeft, List<Integer> columnsRight,
-    EmbeddingRecord left, EmbeddingRecord right) {
+    Embedding left, Embedding right) {
 
     Set<GradoopId> ids = new HashSet<>(left.size() + right.size());
     return isDistinct(ids, columnsLeft, left) && isDistinct(ids, columnsRight, right);
@@ -113,7 +112,7 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    * @param embedding embedding to check
    * @return true, if the embedding contains distinct Ids at the specified columns
    */
-  private boolean isDistinct(Set<GradoopId> ids, List<Integer> columns, EmbeddingRecord embedding) {
+  private boolean isDistinct(Set<GradoopId> ids, List<Integer> columns, Embedding embedding) {
     boolean isDistinct = true;
     for (Integer column : columns) {
       isDistinct = ids.addAll(embedding.getIdAsList(column));
@@ -132,7 +131,7 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    * @param right the right hand side embedding
    * @return the merged data represented as byte array
    */
-  private byte[] mergeIdData(EmbeddingRecord left, EmbeddingRecord right) {
+  private byte[] mergeIdData(Embedding left, Embedding right) {
     byte[] newIdData = new byte[
         left.getIdData().length +
       right.getIdData().length -
@@ -147,9 +146,9 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
         continue;
       }
 
-      System.arraycopy(right.getRawIdEntry(i), 0, newIdData, offset, EmbeddingRecord
+      System.arraycopy(right.getRawIdEntry(i), 0, newIdData, offset, Embedding
         .ID_ENTRY_SIZE);
-      offset += EmbeddingRecord.ID_ENTRY_SIZE;
+      offset += Embedding.ID_ENTRY_SIZE;
     }
 
     return newIdData;
@@ -163,7 +162,7 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    * @param right the right hand side embedding
    * @return the merged data represented as byte array
    */
-  private byte[] mergePropertyData(EmbeddingRecord left, EmbeddingRecord right) {
+  private byte[] mergePropertyData(Embedding left, Embedding right) {
     int leftLenght = left.getPropertyData().length;
     int rightLenght = right.getPropertyData().length;
 
@@ -183,7 +182,7 @@ public class MergeEmbeddings implements FlatJoinFunction<EmbeddingRecord, Embedd
    * @param right the right hand side embedding
    * @return the merged data represented as byte array
    */
-  private byte[] mergeIdListData(EmbeddingRecord left, EmbeddingRecord right) {
+  private byte[] mergeIdListData(Embedding left, Embedding right) {
     int leftLenght = left.getIdListData().length;
     int rightLenght = right.getIdListData().length;
 

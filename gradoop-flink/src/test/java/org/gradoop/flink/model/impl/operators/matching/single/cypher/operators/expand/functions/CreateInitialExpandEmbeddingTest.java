@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
@@ -107,7 +107,7 @@ public class CreateInitialExpandEmbeddingTest {
 
 
   /**
-   * Tests the join of the edge with an EmbeddingRecord
+   * Tests the join of the edge with an Embedding
    * (m, e0, n) x edge
    *
    * @param edge the edge the join is performed with
@@ -117,10 +117,10 @@ public class CreateInitialExpandEmbeddingTest {
    * @param isResult if true it is expected that the join yields exactly one result, 0 otherwise
    * @throws Exception
    */
-  private void testJoin(EmbeddingRecord edge, List<Integer> distinctVertices,
+  private void testJoin(Embedding edge, List<Integer> distinctVertices,
     List<Integer> distinctEdges, int closingColumn, boolean isResult) throws Exception {
 
-    EmbeddingRecord base = new EmbeddingRecord();
+    Embedding base = new Embedding();
     base.add(m);
     base.add(e0);
     base.add(n);
@@ -140,14 +140,14 @@ public class CreateInitialExpandEmbeddingTest {
   }
 
   /**
-   * Builds an EmbeddingRecord with the three entries resembling an edge
+   * Builds an Embedding with the three entries resembling an edge
    * @param src the edges source id
    * @param edgeId the edges id
    * @param tgt the edges target id
-   * @return EmbeddingRecord resembling the edge
+   * @return Embedding resembling the edge
    */
-  private EmbeddingRecord buildEdge(GradoopId src, GradoopId edgeId, GradoopId tgt) {
-    EmbeddingRecord edge = new EmbeddingRecord();
+  private Embedding buildEdge(GradoopId src, GradoopId edgeId, GradoopId tgt) {
+    Embedding edge = new Embedding();
     edge.add(src);
     edge.add(edgeId);
     edge.add(tgt);

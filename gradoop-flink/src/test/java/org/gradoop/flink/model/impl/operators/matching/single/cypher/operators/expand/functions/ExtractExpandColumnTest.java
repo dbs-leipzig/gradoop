@@ -17,7 +17,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +30,7 @@ public class ExtractExpandColumnTest {
     GradoopId b = GradoopId.get();
     GradoopId c = GradoopId.get();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a); 
     embedding.add(b); 
     embedding.add(c);

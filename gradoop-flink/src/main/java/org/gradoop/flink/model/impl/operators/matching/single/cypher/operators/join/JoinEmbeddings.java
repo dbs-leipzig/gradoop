@@ -19,10 +19,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +45,11 @@ public class JoinEmbeddings implements PhysicalOperator {
   /**
    * Left side embeddings
    */
-  private final DataSet<EmbeddingRecord> left;
+  private final DataSet<Embedding> left;
   /**
    * Right side embeddings
    */
-  private final DataSet<EmbeddingRecord> right;
+  private final DataSet<Embedding> right;
   /**
    * Left side join columns
    */
@@ -86,7 +87,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param leftJoinColumn join column left side
    * @param rightJoinColumn join column right side
    */
-  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
     int leftJoinColumn, int rightJoinColumn) {
     this(left, right,
       Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn));
@@ -100,7 +101,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param leftJoinColumns specifies the join columns of the left side
    * @param rightJoinColumns specifies the join columns of the right side
    */
-  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns) {
     this(left, right,
       leftJoinColumns, rightJoinColumns,
@@ -120,7 +121,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
    */
-  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
     List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight) {
@@ -144,7 +145,7 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
    * @param joinHint join strategy
    */
-  public JoinEmbeddings(DataSet<EmbeddingRecord> left, DataSet<EmbeddingRecord> right,
+  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
     List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight,
@@ -161,7 +162,7 @@ public class JoinEmbeddings implements PhysicalOperator {
   }
 
   @Override
-  public DataSet<EmbeddingRecord> evaluate() {
+  public DataSet<Embedding> evaluate() {
     return left.join(right, joinHint)
       .where(new ExtractJoinColumns(leftJoinColumns))
       .equalTo(new ExtractJoinColumns(rightJoinColumns))

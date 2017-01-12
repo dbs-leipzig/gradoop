@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 /**
  * Represents an intermediate result for the expand operator
@@ -30,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
  * The end node (f2) is the last element in expanded path (a node). It is stored separately
  * to enable using it as a join column
  */
-public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], GradoopId> {
+public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
 
   /**
    * Create a new ExpandIntermediateResult
@@ -44,7 +44,7 @@ public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], Gradoo
    * @param base the base part
    * @param path the path along we expanded
    */
-  public ExpandEmbedding(EmbeddingRecord base, GradoopId[] path) {
+  public ExpandEmbedding(Embedding base, GradoopId[] path) {
     super(base, ArrayUtils.subarray(path, 0, path.length - 1), path[path.length - 1]);
   }
 
@@ -52,7 +52,7 @@ public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], Gradoo
    * Returns the base part
    * @return the base part
    */
-  public EmbeddingRecord getBase() {
+  public Embedding getBase() {
     return f0;
   }
 
@@ -79,7 +79,7 @@ public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], Gradoo
    * @param edge the edge along which we expand
    * @return new expanded intermediate result
    */
-  public ExpandEmbedding grow(EmbeddingRecord edge) {
+  public ExpandEmbedding grow(Embedding edge) {
     return new ExpandEmbedding(
       f0,
       ArrayUtils.addAll(f1, f2, edge.getId(1), edge.getId(2))
@@ -100,8 +100,8 @@ public class ExpandEmbedding extends Tuple3<EmbeddingRecord, GradoopId[], Gradoo
    *
    * @return embedding representation of the expand intermediate result
    */
-  public EmbeddingRecord toEmbedding() {
-    EmbeddingRecord embedding = getBase().copy();
+  public Embedding toEmbedding() {
+    Embedding embedding = getBase().copy();
 
     embedding.add(Lists.newArrayList(f1));
     embedding.add(f2);

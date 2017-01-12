@@ -31,7 +31,7 @@ public enum MatchStrategy {
      */
     HOMOMORPHISM,
     /**
-     * Match cypher_old style: Homomorphism for vertices, isomorphism for edges
+     * Match cypher style: Homomorphism for vertices, isomorphism for edges
      */
     CYPHER
 }

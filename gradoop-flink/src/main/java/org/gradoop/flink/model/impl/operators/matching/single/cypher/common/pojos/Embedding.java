@@ -39,7 +39,7 @@ import java.util.List;
  * list of PropertyValues.
  */
 @SuppressWarnings("SE_NO_SERIALVERSIONID")
-public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
+public class Embedding implements Value, CopyableValue<Embedding> {
 
   /**
    * Size of an entry in the IdData array
@@ -62,20 +62,20 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   private byte[] idListData;
 
   /**
-   * Creates am empty EmbeddingRecord
+   * Creates am empty Embedding
    */
-  public EmbeddingRecord() {
+  public Embedding() {
     this(new byte[0], new byte[0], new byte[0]);
   }
 
   /**
-   * Creates am EmbeddingRecord with the given data
+   * Creates am Embedding with the given data
    * @param idData id data stored in a byte array
    * @param propertyData Properties stored in internal byte array format
    * @param idListData IdLists stored in internal byte array format
    */
   @SuppressWarnings("EI_EXPOSE_REP2")
-  public EmbeddingRecord(byte[] idData, byte[] propertyData, byte[] idListData) {
+  public Embedding(byte[] idData, byte[] propertyData, byte[] idListData) {
     this.idData = idData;
     this.propertyData = propertyData;
     this.idListData = idListData;
@@ -426,23 +426,23 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   /**
    * Projects the stored Properties. Only the white-listed properties will be kept
    * @param propertyWhiteList list of property indices
-   * @return EmbeddingRecord with the projected property list
+   * @return Embedding with the projected property list
    */
-  public EmbeddingRecord project(List<Integer> propertyWhiteList) {
+  public Embedding project(List<Integer> propertyWhiteList) {
     byte[] newPropertyData = new byte[0];
     for (int index : propertyWhiteList) {
       newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));
     }
 
-    return new EmbeddingRecord(idData, newPropertyData, idListData);
+    return new Embedding(idData, newPropertyData, idListData);
   }
 
   /**
    * Reverses the order of the entries stored in the embedding.
    * The order of the properties will stay untouched.
-   * @return  A new EmbeddingRecord with reversed entry order
+   * @return  A new Embedding with reversed entry order
    */
-  public EmbeddingRecord reverse() {
+  public Embedding reverse() {
     byte[] newIdData = new byte[idData.length];
 
     for (int i = size() - 1; i >= 0; i--) {
@@ -453,7 +453,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
       );
     }
 
-    return new EmbeddingRecord(newIdData, propertyData, idListData);
+    return new Embedding(newIdData, propertyData, idListData);
   }
 
 
@@ -515,7 +515,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   @Override
-  public void copyTo(EmbeddingRecord target) {
+  public void copyTo(Embedding target) {
     target.idData = new byte[idData.length];
     target.propertyData = new byte[propertyData.length];
     target.idListData = new byte[idListData.length];
@@ -526,8 +526,8 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
   }
 
   @Override
-  public EmbeddingRecord copy() {
-    EmbeddingRecord res = new EmbeddingRecord();
+  public Embedding copy() {
+    Embedding res = new Embedding();
     copyTo(res);
 
     return res;
@@ -567,7 +567,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     byte[] ids = new byte[sizeBuffer];
     if (sizeBuffer > 0) {
       if (in.read(ids) != sizeBuffer) {
-        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+        throw new RuntimeException("Deserialisation of Embedding failed");
       }
     }
 
@@ -575,7 +575,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     byte[] newPropertyData =  new byte[sizeBuffer];
     if (sizeBuffer > 0) {
       if (in.read(newPropertyData) != sizeBuffer) {
-        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+        throw new RuntimeException("Deserialisation of Embedding failed");
       }
     }
 
@@ -583,7 +583,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
     byte[] idLists = new byte[sizeBuffer];
     if (sizeBuffer > 0) {
       if (in.read(idLists) != sizeBuffer) {
-        throw new RuntimeException("Deserialisation of EmbeddingRecord failed");
+        throw new RuntimeException("Deserialisation of Embedding failed");
       }
     }
 
@@ -601,7 +601,7 @@ public class EmbeddingRecord implements Value, CopyableValue<EmbeddingRecord> {
       return false;
     }
 
-    EmbeddingRecord that = (EmbeddingRecord) o;
+    Embedding that = (Embedding) o;
 
     if (!Arrays.equals(idData, that.idData)) {
       return false;

@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
@@ -68,7 +68,7 @@ public class ComparisonExpression extends QueryPredicate {
    * @param metaData the embedding meta data
    * @return evaluation result
    */
-  public boolean evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
+  public boolean evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
     PropertyValue lhsValue = getLhs().evaluate(embedding, metaData);
     PropertyValue rhsValue = getRhs().evaluate(embedding, metaData);
 

@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingRecordMetaData;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   @Override
-  public boolean evaluate(EmbeddingRecord embedding, EmbeddingRecordMetaData metaData) {
+  public boolean evaluate(Embedding embedding, EmbeddingRecordMetaData metaData) {
     for (CNFElement element : predicates) {
       if (!element.evaluate(embedding, metaData)) {
         return false;

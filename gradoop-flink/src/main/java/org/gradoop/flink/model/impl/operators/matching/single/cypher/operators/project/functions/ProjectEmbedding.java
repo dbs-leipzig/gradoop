@@ -18,8 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos
-  .EmbeddingRecord;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
  * Projects an Embedding by a set of properties.
  * For each entry in the embedding a different property set can be specified
  */
-public class ProjectEmbedding extends RichMapFunction<EmbeddingRecord, EmbeddingRecord> {
+public class ProjectEmbedding extends RichMapFunction<Embedding, Embedding> {
   /**
    * Indices of the properties that will be kept in the projection
    */
@@ -42,7 +41,7 @@ public class ProjectEmbedding extends RichMapFunction<EmbeddingRecord, Embedding
   }
 
   @Override
-  public EmbeddingRecord map(EmbeddingRecord embedding) {
+  public Embedding map(Embedding embedding) {
     return embedding.project(propertyWhiteList);
   }
 }

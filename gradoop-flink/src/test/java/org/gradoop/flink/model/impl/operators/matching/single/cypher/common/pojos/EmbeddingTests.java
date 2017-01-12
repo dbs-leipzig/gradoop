@@ -27,12 +27,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class EmbeddingRecordTests {
+public class EmbeddingTests {
 
   @Test
   public void testAppendSingleId() {
     GradoopId id = GradoopId.get();
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(id);
 
     assertEquals(1, embedding.size());
@@ -42,7 +42,7 @@ public class EmbeddingRecordTests {
   @Test
   public void testAppendIdToExistingEmbedding() {
     GradoopId id = GradoopId.get();
-    EmbeddingRecord embedding = createEmbedding(4);
+    Embedding embedding = createEmbedding(4);
     embedding.add(id);
 
     assertEquals(5, embedding.size());
@@ -57,7 +57,7 @@ public class EmbeddingRecordTests {
       PropertyValue.create("String"), PropertyValue.create(42)
     );
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(id, properties);
 
     assertEquals(1, embedding.size());
@@ -73,7 +73,7 @@ public class EmbeddingRecordTests {
       PropertyValue.create("String"), PropertyValue.create(42)
     );
 
-    EmbeddingRecord embedding = createEmbedding(4);
+    Embedding embedding = createEmbedding(4);
     embedding.add(id, properties);
 
     assertEquals(5, embedding.size());
@@ -92,7 +92,7 @@ public class EmbeddingRecordTests {
       GradoopId.get()
     );
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(ids);
 
     assertEquals(1, embedding.size());
@@ -107,7 +107,7 @@ public class EmbeddingRecordTests {
       GradoopId.get()
     );
 
-    EmbeddingRecord embedding = createEmbedding(4);
+    Embedding embedding = createEmbedding(4);
     embedding.add(ids);
 
     assertEquals(5, embedding.size());
@@ -117,7 +117,7 @@ public class EmbeddingRecordTests {
   @Test
   public void testGetIdBytesByColumn() {
     GradoopId id = GradoopId.get();
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(id);
     assertArrayEquals(id.toByteArray(), embedding.getRawId(0));
   }
@@ -129,7 +129,7 @@ public class EmbeddingRecordTests {
       PropertyValue.create("String"), PropertyValue.create(42)
     );
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(id, properties);
 
     assertArrayEquals(id.toByteArray(), embedding.getRawId(0));
@@ -142,7 +142,7 @@ public class EmbeddingRecordTests {
       GradoopId.get(),
       GradoopId.get()
     );
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(ids);
 
     embedding.getRawId(0);
@@ -150,7 +150,7 @@ public class EmbeddingRecordTests {
 
   @Test(expected = IndexOutOfBoundsException.class)
   public void testGetRawIdThrowsOutOfBoundsExceptionIfColumnDoesNotExist() {
-    EmbeddingRecord embedding = createEmbedding(4);
+    Embedding embedding = createEmbedding(4);
     embedding.getRawId(4);
   }
 
@@ -160,7 +160,7 @@ public class EmbeddingRecordTests {
     GradoopId b = GradoopId.get();
     GradoopId c = GradoopId.get();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(b);
     embedding.add(c);
@@ -177,7 +177,7 @@ public class EmbeddingRecordTests {
       PropertyValue.create("String"), PropertyValue.create(42)
     );
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(id, properties);
 
     assertEquals(id, embedding.getId(0));
@@ -190,7 +190,7 @@ public class EmbeddingRecordTests {
       GradoopId.get(),
       GradoopId.get()
     );
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(ids);
 
     embedding.getId(0);
@@ -198,13 +198,13 @@ public class EmbeddingRecordTests {
 
   @Test(expected = IndexOutOfBoundsException.class)
   public void testGetIdThrowsOutOfBoundsExceptionIfColumnDoesNotExist() {
-    EmbeddingRecord embedding = createEmbedding(4);
+    Embedding embedding = createEmbedding(4);
     embedding.getRawId(4);
   }
 
   @Test
   public void testGetProperty() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
 
     List<PropertyValue> properties = Lists.newArrayList(
       PropertyValue.create("a"), PropertyValue.create(42)
@@ -224,7 +224,7 @@ public class EmbeddingRecordTests {
 
   @Test(expected = IndexOutOfBoundsException.class)
   public void testGetPropertyThrowsIndexOutOfBoundException() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
 
     embedding.getProperty(0);
@@ -232,7 +232,7 @@ public class EmbeddingRecordTests {
 
   @Test
   public void testGetIdList() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
 
     List<GradoopId> ids = Lists.newArrayList(
       GradoopId.get(),
@@ -246,7 +246,7 @@ public class EmbeddingRecordTests {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testGetListEntryThrowsUnsupportedOperationExceptionForIdEntries() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
 
     embedding.getIdList(0);
@@ -254,7 +254,7 @@ public class EmbeddingRecordTests {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testGetPropertyThrowsUnsupportedOperationExceptionForProjectionEntries() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     GradoopId id = GradoopId.get();
     List<PropertyValue> properties = Lists.newArrayList(
       PropertyValue.create("a"), PropertyValue.create(42)
@@ -269,7 +269,7 @@ public class EmbeddingRecordTests {
     GradoopId a = new GradoopId();
     GradoopId b = new GradoopId();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(b);
 
@@ -282,7 +282,7 @@ public class EmbeddingRecordTests {
     GradoopId a = new GradoopId();
     GradoopId b = new GradoopId();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(Lists.newArrayList(a,b));
     embedding.add(Lists.newArrayList(b,a));
@@ -298,7 +298,7 @@ public class EmbeddingRecordTests {
     GradoopId c = new GradoopId();
     GradoopId d = new GradoopId();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(b);
     embedding.add(c);
@@ -311,7 +311,7 @@ public class EmbeddingRecordTests {
 
   @Test
   public void testSize() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     assertEquals(0, embedding.size());
 
     embedding.add(GradoopId.get());
@@ -323,14 +323,14 @@ public class EmbeddingRecordTests {
 
   @Test
   public void testProject() {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     GradoopId id = GradoopId.get();
     List<PropertyValue> properties = Lists.newArrayList(
       PropertyValue.create("a"), PropertyValue.create(42), PropertyValue.create("foobar")
     );
     embedding.add(id, properties);
 
-    EmbeddingRecord projection = embedding.project(Lists.newArrayList(0,2));
+    Embedding projection = embedding.project(Lists.newArrayList(0,2));
     assertEquals(PropertyValue.create("a"), projection.getProperty(0));
     assertEquals(PropertyValue.create("foobar"), projection.getProperty(1));
   }
@@ -341,12 +341,12 @@ public class EmbeddingRecordTests {
     GradoopId b = GradoopId.get();
     GradoopId c = GradoopId.get();
 
-    EmbeddingRecord embedding = new EmbeddingRecord();
+    Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(b);
     embedding.add(c);
 
-    EmbeddingRecord reversed = embedding.reverse();
+    Embedding reversed = embedding.reverse();
 
     assertEquals(c, reversed.getId(0));
     assertEquals(b, reversed.getId(1));
@@ -354,8 +354,8 @@ public class EmbeddingRecordTests {
 
   }
 
-  private EmbeddingRecord createEmbedding(int size) {
-    EmbeddingRecord embedding = new EmbeddingRecord();
+  private Embedding createEmbedding(int size) {
+    Embedding embedding = new Embedding();
 
     for (long i = 0; i < size; i++) {
       embedding.add(GradoopId.get());
