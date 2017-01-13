@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
@@ -52,7 +53,7 @@ public class ExtractJoinColumns implements KeySelector<Embedding, String> {
   public String getKey(Embedding value) throws Exception {
     sb.delete(0, sb.length());
     for (Integer column : columns) {
-      sb.append(value.getEntry(column).getId().toString());
+      sb.append(ArrayUtils.toString(value.getRawId(column)));
     }
     return sb.toString();
   }
