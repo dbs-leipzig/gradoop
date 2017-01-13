@@ -37,6 +37,7 @@ public class FilterEmbedding extends RichFilterFunction<Embedding> {
 
   /**
    * New embedding filter function
+   *
    * @param predicates predicates used for filtering
    * @param metaData mapping of variable names to embedding column
    */
