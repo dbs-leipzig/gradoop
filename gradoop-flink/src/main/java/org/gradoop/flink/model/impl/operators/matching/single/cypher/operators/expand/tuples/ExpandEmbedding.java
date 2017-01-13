@@ -21,8 +21,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 
 /**
  * Represents an intermediate result for the expand operator
@@ -84,7 +82,7 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
   public ExpandEmbedding grow(Embedding edge) {
     return new ExpandEmbedding(
       f0,
-      ArrayUtils.addAll(f1, f2, edge.getEntry(1).getId(), edge.getEntry(2).getId())
+      ArrayUtils.addAll(f1, f2, edge.getId(1), edge.getId(2))
     );
   }
 
@@ -103,11 +101,10 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @return embedding representation of the expand intermediate result
    */
   public Embedding toEmbedding() {
-    Embedding embedding = new Embedding();
+    Embedding embedding = getBase().copy();
 
-    embedding.addEntries(f0.getEntries());
-    embedding.addEntry(new PathEntry(Lists.newArrayList(f1)));
-    embedding.addEntry(new IdEntry(f2));
+    embedding.add(Lists.newArrayList(f1));
+    embedding.add(f2);
 
     return embedding;
   }

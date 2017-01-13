@@ -18,16 +18,13 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -35,68 +32,26 @@ import static org.junit.Assert.assertEquals;
 public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
-  public void returnsEmbeddingWithOneProjection() throws Exception{
-    DataSet<Embedding> embeddings = createEmbeddings(2,
-      new IdEntry(GradoopId.get()),
-      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
-      new IdEntry(GradoopId.get())
-    );
+  public void projectEmbedding() throws Exception{
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get());
+    embedding.add(GradoopId.get(), getPropertyValues(Lists.newArrayList("m", "n", "o")));
 
-    HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();
-    extractedPropertyKeys.put(1, Lists.newArrayList("m", "o"));
+    DataSet<Embedding> embeddings =
+      getExecutionEnvironment().fromElements(embedding, embedding);
+
+    List<Integer> extractedPropertyKeys = Lists.newArrayList(0,2);
     
     ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
     DataSet<Embedding> results = operator.evaluate();
-
     assertEquals(2,results.count());
     
     assertEveryEmbedding(results, (e) -> {
-      assertEquals(3,                            e.size());
-      assertEquals(IdEntry.class,                e.getEntry(0).getClass());
-      assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
-      assertEquals(IdEntry.class,                e.getEntry(2).getClass());
-      assertEquals(
-        Sets.newHashSet(extractedPropertyKeys.get(1)),
-        e.getEntry(1).getProperties().get().getKeys()
-      );
+      assertEquals(2,                        e.size());
+      assertEquals(PropertyValue.create("m"), e.getProperty(0));
+      assertEquals(PropertyValue.create("o"), e.getProperty(1));
     });
   }
 
-  @Test
-  public void testProjectMultipleEntriesAtOnce() throws Exception{
-    DataSet<Embedding> embeddings = createEmbeddings(2,
-      new IdEntry(GradoopId.get()),
-      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("m", "n", "o"))),
-      new ProjectionEntry(GradoopId.get(), getProperties(Lists.newArrayList("a", "b", "c")))
-    );
-
-    HashMap<Integer, List<String>> extractedPropertyKeys = new HashMap<>();
-    extractedPropertyKeys.put(1, Lists.newArrayList("m", "o"));
-    extractedPropertyKeys.put(2, Lists.newArrayList("a", "d"));
-    
-    ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
-
-    DataSet<Embedding> results = operator.evaluate();
-
-    assertEquals(2,results.count());
-    
-    assertEveryEmbedding(results, (e) -> {
-      assertEquals(3,                            e.size());
-
-      assertEquals(IdEntry.class,                e.getEntry(0).getClass());
-      assertEquals(ProjectionEntry.class,        e.getEntry(1).getClass());
-      assertEquals(ProjectionEntry.class,        e.getEntry(2).getClass());
-
-      assertEquals(
-        Sets.newHashSet(extractedPropertyKeys.get(1))
-        , e.getEntry(1).getProperties().get().getKeys()
-      );
-
-      assertEquals(
-        Sets.newHashSet(extractedPropertyKeys.get(2)),
-        e.getEntry(2).getProperties().get().getKeys()
-      );
-    });
-  }
 }

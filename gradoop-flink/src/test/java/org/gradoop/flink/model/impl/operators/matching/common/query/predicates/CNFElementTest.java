@@ -17,14 +17,14 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
+import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,26 +50,67 @@ public class CNFElementTest {
     QueryHandler query = new QueryHandler(queryString);
     CNFElement cnfElement = query.getPredicates().getPredicates().get(0);
 
-    ProjectionEntry a = new ProjectionEntry(GradoopId.get());
-    a.addProperty(Property.create("name","Alfred"));
-    a.addProperty(Property.create("age",42));
-    ProjectionEntry c = new ProjectionEntry(GradoopId.get());
-    c.addProperty(Property.create("age",42));
-    HashMap<String, EmbeddingEntry> mapping = new HashMap<>();
-    mapping.put("a",a);
-    mapping.put("b",a);
-    mapping.put("c",c);
-    assertTrue(cnfElement.evaluate(mapping));
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updateColumnMapping("b", 1);
+    metaData.updateColumnMapping("c", 2);
+    metaData.updatePropertyMapping("a", "name", 0);
+    metaData.updatePropertyMapping("a", "age", 1);
+    metaData.updatePropertyMapping("c", "age", 2);
 
-    a.addProperty(Property.create("name","Alice"));
-    mapping.put("b",c);
-    assertTrue(cnfElement.evaluate(mapping));
+    GradoopId a = GradoopId.get();
+    GradoopId c = GradoopId.get();
 
-    a.addProperty(Property.create("name","Alfred"));
-    c.addProperty(Property.create("age",23));
-    assertTrue(cnfElement.evaluate(mapping));
+    //Should be true if a = b
+    Embedding embedding = new Embedding();
+    embedding.add(
+      a,
+      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+    );
+    embedding.add(a);
+    embedding.add(
+      c,
+      Lists.newArrayList(PropertyValue.create(42))
+    );
+    assertTrue(cnfElement.evaluate(embedding, metaData));
 
-    c.addProperty(Property.create("age",101));
-    assertFalse(cnfElement.evaluate(mapping));
+    //Should be true if a.name = "Alice"
+    embedding = new Embedding();
+    embedding.add(
+      a,
+      Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
+    );
+    embedding.add(GradoopId.get());
+    embedding.add(
+      c,
+      Lists.newArrayList(PropertyValue.create(42))
+    );
+    assertTrue(cnfElement.evaluate(embedding, metaData));
+
+    //Should be true if a.age > c.age
+    embedding = new Embedding();
+    embedding.add(
+      a,
+      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+    );
+    embedding.add(GradoopId.get());
+    embedding.add(
+      c,
+      Lists.newArrayList(PropertyValue.create(23))
+    );
+    assertTrue(cnfElement.evaluate(embedding, metaData));
+
+    //Should be false otherwise
+    embedding = new Embedding();
+    embedding.add(
+      a,
+      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+    );
+    embedding.add(GradoopId.get());
+    embedding.add(
+      c,
+      Lists.newArrayList(PropertyValue.create(42))
+    );
+    assertFalse(cnfElement.evaluate(embedding, metaData));
   }
 }

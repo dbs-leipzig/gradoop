@@ -25,8 +25,6 @@ import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
-import java.util.HashMap;
-
 import static org.junit.Assert.*;
 
 public class ComparisonExpressionTest {
@@ -134,10 +132,9 @@ public class ComparisonExpressionTest {
     assertFalse(compare(lhs, rhs, Comparator.LTE));
   }
 
-  private boolean compare(
-    Literal lhs, Literal rhs, Comparator comparator) {
+  private boolean compare(Literal lhs, Literal rhs, Comparator comparator) {
     return new ComparisonExpression(
       new Comparison(lhs,comparator,rhs)
-    ).evaluate(new HashMap<>());
+    ).evaluate(null, null);
   }
 }
