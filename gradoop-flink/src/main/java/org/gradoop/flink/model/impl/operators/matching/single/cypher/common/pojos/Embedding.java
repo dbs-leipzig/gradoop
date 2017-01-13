@@ -669,9 +669,10 @@ public class Embedding implements Value, CopyableValue<Embedding> {
           if (entry.size() == 1) {
             return entry.get(0).toString();
           } else {
-            return "[" + entry.stream().map(GradoopId::toString).collect(joining(", ")) + "]";
+            return entry.stream().map(GradoopId::toString).collect(joining(", ", "[", "]"));
           }
-        })
+        }
+      )
       .collect(joining(", "));
 
     String propertyString = getProperties()
@@ -680,9 +681,9 @@ public class Embedding implements Value, CopyableValue<Embedding> {
       .collect(joining(", "));
 
 
-    return "Embedding{\n" +
-      "\tentries: (" + idString + ")\n" +
-      "\tproperties: (" + propertyString + ")\n" +
+    return "Embedding{ " +
+      "entries: {" + idString + "},  " +
+      "properties: {" + propertyString + "} " +
       "}";
   }
 }
