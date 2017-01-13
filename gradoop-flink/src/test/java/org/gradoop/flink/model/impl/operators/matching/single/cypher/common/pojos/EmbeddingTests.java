@@ -384,7 +384,6 @@ public class EmbeddingTests {
       .create("Foobar")));
     embedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get(), GradoopId.get()));
 
-    System.out.println(embedding);
     assertNotNull(embedding.toString());
   }
 
