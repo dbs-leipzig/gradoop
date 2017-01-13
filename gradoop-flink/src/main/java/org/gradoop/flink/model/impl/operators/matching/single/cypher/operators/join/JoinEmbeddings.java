@@ -17,17 +17,15 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join;
 
-import com.google.common.collect.Maps;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Joins two embeddings at given columns and checks for vertex/edge isomorphism/homomorphism.
@@ -37,7 +35,8 @@ import java.util.Map;
  * <ul>
  * <li>new entries of the right embedding are always appended to the left embedding</li>
  * <li>duplicate fields are removed, i.e., the join columns are stored once in the result</li>
- * <li>join columns are either kept or adopted from the right side</li>
+ * <li>all properties from the right side are appended to the proeprties of the left side,
+ *     <em>no</em> deduplication is performed</li>
  * </ul>
  */
 public class JoinEmbeddings implements PhysicalOperator {
@@ -74,10 +73,6 @@ public class JoinEmbeddings implements PhysicalOperator {
    * Columns that represent edges in the right embedding which need to be distinct
    */
   private final List<Integer> distinctEdgeColumnsRight;
-  /**
-   * Columns to adopt from the right side to the left side.
-   */
-  private final Map<Integer, Integer> adoptColumns;
   /**
    * Flink join Hint
    */
@@ -118,43 +113,6 @@ public class JoinEmbeddings implements PhysicalOperator {
    *
    * @param left embeddings of the left side of the join
    * @param right embeddings of the right side of the join
-   * @param leftJoinColumn specifies the join column of the left side
-   * @param rightJoinColumn specifies the join column of the right side
-   * @param adoptColumns columns that are adopted from the right side to the left side
-   */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
-    int leftJoinColumn, int rightJoinColumn,
-    Map<Integer, Integer> adoptColumns) {
-    this(left, right,
-      Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn),
-      Collections.emptyList(), Collections.emptyList(),
-      Collections.emptyList(), Collections.emptyList(),
-      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
-   * Instantiates a new join operator.
-   *
-   * @param left embeddings of the left side of the join
-   * @param right embeddings of the right side of the join
-   * @param leftJoinColumns specifies the join columns of the left side
-   * @param rightJoinColumns specifies the join columns of the right side
-   * @param adoptColumns columns that are adopted from the right side to the left side
-   */
-  public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
-    List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
-    Map<Integer, Integer> adoptColumns) {
-    this(left, right, leftJoinColumns, rightJoinColumns,
-      Collections.emptyList(), Collections.emptyList(),
-      Collections.emptyList(), Collections.emptyList(),
-      adoptColumns, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
-   * Instantiates a new join operator.
-   *
-   * @param left embeddings of the left side of the join
-   * @param right embeddings of the right side of the join
    * @param leftJoinColumns specifies the join columns of the left side
    * @param rightJoinColumns specifies the join columns of the right side
    * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
@@ -170,7 +128,7 @@ public class JoinEmbeddings implements PhysicalOperator {
       leftJoinColumns, rightJoinColumns,
       distinctVertexColumnsLeft, distinctVertexColumnsRight,
       distinctEdgeColumnsLeft, distinctEdgeColumnsRight,
-      Maps.newHashMapWithExpectedSize(0), JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
   }
 
   /**
@@ -184,20 +142,17 @@ public class JoinEmbeddings implements PhysicalOperator {
    * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
    * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
-   * @param adoptColumns columns that are adopted from the right side to the left side
    * @param joinHint join strategy
    */
   public JoinEmbeddings(DataSet<Embedding> left, DataSet<Embedding> right,
     List<Integer> leftJoinColumns, List<Integer> rightJoinColumns,
     List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight,
-    Map<Integer, Integer> adoptColumns,
     JoinOperatorBase.JoinHint joinHint) {
     this.left                       = left;
     this.right                      = right;
     this.leftJoinColumns            = leftJoinColumns;
     this.rightJoinColumns           = rightJoinColumns;
-    this.adoptColumns               = adoptColumns;
     this.distinctVertexColumnsLeft  = distinctVertexColumnsLeft;
     this.distinctVertexColumnsRight = distinctVertexColumnsRight;
     this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;
@@ -212,6 +167,6 @@ public class JoinEmbeddings implements PhysicalOperator {
       .equalTo(new ExtractJoinColumns(rightJoinColumns))
       .with(new MergeEmbeddings(rightJoinColumns,
         distinctVertexColumnsLeft, distinctVertexColumnsRight,
-        distinctEdgeColumnsLeft, distinctEdgeColumnsRight, adoptColumns));
+        distinctEdgeColumnsLeft, distinctEdgeColumnsRight));
   }
 }

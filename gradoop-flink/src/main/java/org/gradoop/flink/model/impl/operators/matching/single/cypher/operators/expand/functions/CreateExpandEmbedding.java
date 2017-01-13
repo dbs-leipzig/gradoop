@@ -63,7 +63,7 @@ public class CreateExpandEmbedding
       throws Exception {
 
     if (checkDistinctiveness(input, edge)) {
-      GradoopId[] path = new GradoopId[]{edge.getEntry(1).getId(), edge.getEntry(2).getId()};
+      GradoopId[] path = new GradoopId[]{edge.getId(1), edge.getId(2)};
       out.collect(new ExpandEmbedding(input, path));
     }
   }
@@ -75,18 +75,17 @@ public class CreateExpandEmbedding
    * @return true if distinct criteria hold for the expansion
    */
   private boolean checkDistinctiveness(Embedding input, Embedding edge) {
-    GradoopId edgeId = edge.getEntry(1).getId();
-    GradoopId tgt = edge.getEntry(2).getId();
+    GradoopId edgeId = edge.getId(1);
+    GradoopId tgt = edge.getId(2);
 
     for (int i : distinctVertices) {
-      if (input.getEntry(i).getId().equals(tgt) && i != closingColumn) {
+      if (input.getIdAsList(i).contains(tgt) && i != closingColumn) {
         return false;
       }
     }
 
     for (int i : distinctEdges) {
-      GradoopId ref = input.getEntry(i).getId();
-      if (ref.equals(edgeId)) {
+      if (input.getIdAsList(i).contains(edgeId)) {
         return false;
       }
     }

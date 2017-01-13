@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
@@ -83,7 +82,6 @@ public class CreateInitialExpandEmbeddingTest {
     testJoin(buildEdge(n,e1,n), Lists.newArrayList(0,2), new ArrayList<>(), 2, true);
   }
 
-
   //EdgeIsomorphism
   @Test
   public void testEdgeIsomorphismWithoutDuplicates() throws Exception {
@@ -108,17 +106,26 @@ public class CreateInitialExpandEmbeddingTest {
   }
 
 
-  private void testJoin(Embedding edge, List<Integer> distinctVertices, List<Integer> distinctEdges,
-    int closingColumn, boolean isResult) throws Exception {
+  /**
+   * Tests the join of the edge with an Embedding
+   * (m, e0, n) x edge
+   *
+   * @param edge the edge the join is performed with
+   * @param distinctVertices distinct vertex columns of the base embedding
+   * @param distinctEdges distinct edge columns of the base embedding
+   * @param closingColumn closing column
+   * @param isResult if true it is expected that the join yields exactly one result, 0 otherwise
+   * @throws Exception
+   */
+  private void testJoin(Embedding edge, List<Integer> distinctVertices,
+    List<Integer> distinctEdges, int closingColumn, boolean isResult) throws Exception {
 
-    Embedding base = new Embedding(Lists.newArrayList(
-        new IdEntry(m),
-        new IdEntry(e0),
-        new IdEntry(n)
-    ));
+    Embedding base = new Embedding();
+    base.add(m);
+    base.add(e0);
+    base.add(n);
 
-    CreateExpandEmbedding op =
-      new CreateExpandEmbedding(distinctVertices, distinctEdges, closingColumn);
+    CreateExpandEmbedding op = new CreateExpandEmbedding(distinctVertices, distinctEdges, closingColumn);
 
     List<ExpandEmbedding> results = new ArrayList<>();
     op.join(base, edge, new ListCollector<>(results));
@@ -127,16 +134,24 @@ public class CreateInitialExpandEmbeddingTest {
 
     if (isResult) {
       assertEquals(base, results.get(0).getBase());
-      assertArrayEquals(new GradoopId[]{edge.getEntry(1).getId()}, results.get(0).getPath());
-      assertEquals(edge.getEntry(2).getId(), results.get(0).getEnd());
+      assertArrayEquals(new GradoopId[]{edge.getId(1)}, results.get(0).getPath());
+      assertEquals(edge.getId(2), results.get(0).getEnd());
     }
   }
 
-  private Embedding buildEdge(GradoopId src, GradoopId edge, GradoopId tgt) {
-    return new Embedding(Lists.newArrayList(
-      new IdEntry(src),
-      new IdEntry(edge),
-      new IdEntry(tgt)
-    ));
+  /**
+   * Builds an Embedding with the three entries resembling an edge
+   * @param src the edges source id
+   * @param edgeId the edges id
+   * @param tgt the edges target id
+   * @return Embedding resembling the edge
+   */
+  private Embedding buildEdge(GradoopId src, GradoopId edgeId, GradoopId tgt) {
+    Embedding edge = new Embedding();
+    edge.add(src);
+    edge.add(edgeId);
+    edge.add(tgt);
+
+    return edge;
   }
 }

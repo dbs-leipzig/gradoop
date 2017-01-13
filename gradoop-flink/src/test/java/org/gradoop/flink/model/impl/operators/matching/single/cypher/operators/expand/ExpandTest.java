@@ -20,8 +20,6 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
@@ -67,29 +65,28 @@ public class ExpandTest extends PhysicalOperatorTest {
 
     assertEveryEmbedding(result, (embedding -> {
       assertEquals(5,embedding.size());
-      assertEquals(PathEntry.class, embedding.getEntry(3).getClass());
-      assertEquals(IdEntry.class,     embedding.getEntry(4).getClass());
+      embedding.getIdList(3);
     }));
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 1
+      embedding -> (embedding.getIdList(3)).size() == 1
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 3
+      embedding -> (embedding.getIdList(3)).size() == 3
     );
 
     assertEmbeddingExists(
       result,
-      embedding -> ((PathEntry) embedding.getEntry(3)).getPath().size() == 5
+      embedding -> (embedding.getIdList(3)).size() == 5
     );
   }
 
   @Test
   public void testResultForOutExpansion() throws Exception {
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<Embedding> input = createEmbeddings(1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -109,7 +106,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<Embedding> input = createEmbeddings(1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,a),
@@ -129,7 +126,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<Embedding> input = createEmbeddings(1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -143,13 +140,13 @@ public class ExpandTest extends PhysicalOperatorTest {
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
+      assertEquals(3, embedding.getIdList(1).size());
     });
   }
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<Embedding> input = createEmbeddings(1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -162,13 +159,13 @@ public class ExpandTest extends PhysicalOperatorTest {
     ).evaluate();
 
     assertEveryEmbedding(result, (embedding) -> {
-      assertEquals(3, ((PathEntry) embedding.getEntry(1)).getPath().size());
+      assertEquals(3, embedding.getIdList(1).size());
     });
   }
 
   @Test
   public void testLowerBound0() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, new IdEntry(a));
+    DataSet<Embedding> input = createEmbeddings(1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b)
@@ -182,7 +179,7 @@ public class ExpandTest extends PhysicalOperatorTest {
     assertEquals(2, result.count());
 
     assertEmbeddingExists(result, (embedding) ->
-      embedding.size() == 1 &&  embedding.getEntry(0).getId().equals(a)
+      embedding.size() == 1 &&  embedding.getId(0).equals(a)
     );
   }
 
