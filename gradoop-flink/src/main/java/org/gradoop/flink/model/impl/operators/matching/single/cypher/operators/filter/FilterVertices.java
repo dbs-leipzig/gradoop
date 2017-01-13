@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterVertex;
@@ -38,20 +39,26 @@ public class FilterVertices implements PhysicalOperator {
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
+  /**
+   * Meta data describing the vertex used for filtering
+   */
+  private final EmbeddingMetaData metaData;
 
 
   /**
    * New vertex filter operator
    * @param input Candidate vertices
    * @param predicates Predicates used to filter vertices
+   * @param metaData Meta data describing the embedding used for filtering
    */
-  public FilterVertices(DataSet<Vertex> input, CNF predicates) {
+  public FilterVertices(DataSet<Vertex> input, CNF predicates, EmbeddingMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
+    this.metaData = metaData;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterVertex(predicates));
+    return input.flatMap(new FilterVertex(predicates, metaData));
   }
 }

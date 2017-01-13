@@ -21,6 +21,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEdge;
 
@@ -38,19 +39,25 @@ public class FilterEdges implements PhysicalOperator {
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
+  /**
+   * Meta data describing the embedding used for filtering
+   */
+  private final EmbeddingMetaData metaData;
 
   /**
    * New edge filter operator
    * @param input Candidate edges
    * @param predicates Predicates used to filter edges
+   * @param metaData Meta data describing the embedding used for filtering
    */
-  public FilterEdges(DataSet<Edge> input, CNF predicates) {
+  public FilterEdges(DataSet<Edge> input, CNF predicates, EmbeddingMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
+    this.metaData = metaData;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterEdge(predicates));
+    return input.flatMap(new FilterEdge(predicates, metaData));
   }
 }

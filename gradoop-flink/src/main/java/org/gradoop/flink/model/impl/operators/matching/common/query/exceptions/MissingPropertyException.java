@@ -18,17 +18,17 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.exceptions;
 
 /**
- * Used during predicate evaluation. Is thrown when the predicate need to evaluate a property which
+ * Used during predicate evaluation. Is thrown when the predicate needs to evaluate a property which
  * is not present in the projection.
  */
 public class MissingPropertyException extends RuntimeException {
   /**
    * Creates a new exception object for the missing property.
    *
-   * @param property the missing variable
+   * @param propertyKey the missing variable
    */
-  public MissingPropertyException(String property) {
-    super("The property '" + property + "' is missing in the projection");
+  public MissingPropertyException(String propertyKey) {
+    super("The property '" + propertyKey + "' is missing in the projection");
   }
 
 }

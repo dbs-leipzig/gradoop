@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -135,7 +136,7 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
     byte[] newIdData = new byte[
         left.getIdData().length +
       right.getIdData().length -
-      (joinColumnsRight.size() * (GradoopId.ID_SIZE + 1))
+      (joinColumnsRight.size() * (Embedding.ID_ENTRY_SIZE))
     ];
 
     int offset = left.getIdData().length;
@@ -146,8 +147,12 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
         continue;
       }
 
-      System.arraycopy(right.getRawIdEntry(i), 0, newIdData, offset, Embedding
-        .ID_ENTRY_SIZE);
+      System.arraycopy(
+        right.getRawIdEntry(i), 0,
+        newIdData, offset,
+        Embedding.ID_ENTRY_SIZE
+      );
+
       offset += Embedding.ID_ENTRY_SIZE;
     }
 
@@ -163,15 +168,7 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
    * @return the merged data represented as byte array
    */
   private byte[] mergePropertyData(Embedding left, Embedding right) {
-    int leftLenght = left.getPropertyData().length;
-    int rightLenght = right.getPropertyData().length;
-
-    byte[] newPropertyData = new byte[leftLenght + rightLenght];
-
-    System.arraycopy(left.getPropertyData(), 0, newPropertyData, 0, leftLenght);
-    System.arraycopy(right.getPropertyData(), 0, newPropertyData, leftLenght, rightLenght);
-
-    return newPropertyData;
+    return ArrayUtils.addAll(left.getPropertyData(), right.getPropertyData());
   }
 
   /**
@@ -183,14 +180,6 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
    * @return the merged data represented as byte array
    */
   private byte[] mergeIdListData(Embedding left, Embedding right) {
-    int leftLenght = left.getIdListData().length;
-    int rightLenght = right.getIdListData().length;
-
-    byte[] newIdListData = new byte[leftLenght + rightLenght];
-
-    System.arraycopy(left.getIdListData(), 0, newIdListData, 0, leftLenght);
-    System.arraycopy(right.getIdListData(), 0, newIdListData, leftLenght, rightLenght);
-
-    return newIdListData;
+    return ArrayUtils.addAll(left.getIdListData(), right.getIdListData());
   }
 }

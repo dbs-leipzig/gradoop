@@ -23,9 +23,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 public class EmbeddingTests {
 
@@ -362,6 +360,17 @@ public class EmbeddingTests {
     }
 
     return embedding;
+  }
+
+  @Test
+  public void testToString() {
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get());
+    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42), PropertyValue
+      .create("Foobar")));
+    embedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get(), GradoopId.get()));
+
+    assertNotNull(embedding.toString());
   }
 
 

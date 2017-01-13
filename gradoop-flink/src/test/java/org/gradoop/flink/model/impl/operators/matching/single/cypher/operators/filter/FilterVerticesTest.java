@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -45,7 +46,11 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterVertices filter = new FilterVertices(vertex, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterVertices filter = new FilterVertices(vertex, predicates, metaData);
 
     assertEquals(0, filter.evaluate().count());
   }
@@ -60,7 +65,11 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterVertices filter = new FilterVertices(vertex, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "__label__", 0);
+
+    FilterVertices filter = new FilterVertices(vertex, predicates, metaData);
     assertEquals(0, filter.evaluate().count());
   }
 
@@ -76,7 +85,11 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterVertices filter = new FilterVertices(vertex, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterVertices filter = new FilterVertices(vertex, predicates, metaData);
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -91,7 +104,11 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterVertices filter = new FilterVertices(vertex, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "__label__", 0);
+
+    FilterVertices filter = new FilterVertices(vertex, predicates, metaData);
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -108,7 +125,11 @@ public class FilterVerticesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterVertices filter = new FilterVertices(vertex, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterVertices filter = new FilterVertices(vertex, predicates, metaData);
 
     List<Embedding> result = filter.evaluate().collect();
 

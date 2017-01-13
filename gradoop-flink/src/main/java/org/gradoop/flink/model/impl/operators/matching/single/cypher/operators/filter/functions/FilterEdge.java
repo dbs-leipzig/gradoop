@@ -25,8 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Grap
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,29 +42,22 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
   private final List<String> propertyKeys;
 
   /**
-   * Meta data about the edge embedding
+   * Meta data describing the edge embedding used for filtering
    */
   private final EmbeddingMetaData metaData;
 
   /**
    * New edge filter function
    * @param predicates predicates used for filtering
+   * @param metaData Meta data describing the embedding used for filtering
    */
-  public FilterEdge(CNF predicates) {
+  public FilterEdge(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
+    this.metaData = metaData;
 
     String variable = (String) predicates.getVariables().toArray()[0];
 
-    this.propertyKeys = new ArrayList<>();
-    propertyKeys.addAll(predicates.getPropertyKeys(variable));
-
-    metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping(variable, 0);
-
-    int i = 0;
-    for (String propertyKey : propertyKeys) {
-      metaData.updatePropertyMapping(variable, propertyKey, i++);
-    }
+    this.propertyKeys = metaData.getPropertyKeys(variable);
   }
 
   @Override

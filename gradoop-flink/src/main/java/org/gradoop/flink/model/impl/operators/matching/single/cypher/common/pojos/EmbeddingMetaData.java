@@ -20,10 +20,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class stores meta data information about a set of embeddings
@@ -102,28 +103,29 @@ public class EmbeddingMetaData implements Serializable {
   }
 
   /**
-   * Returns a set of all variable that are contained in the embedding
-   * @return a set of all variable that are contained in the embedding
+   * Returns a list of all variable that are contained in the embedding
+   * The order of the variables is determined by their position within the embedding
+   * @return a list of all variable that are contained in the embedding
    */
-  public Set<String> getVariables() {
-    return columnMapping.keySet();
+  public List<String> getVariables() {
+    return columnMapping.entrySet().stream()
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(Map.Entry::getKey)
+      .collect(Collectors.toList());
   }
 
   /**
-   * Returns a set of all property keys that are contained in the embedding regarding the
+   * Returns a list of all property keys that are contained in the embedding regarding the
    * specified variable.
+   * The order of the keys is determined by the position of the property value in the embedding.
    * @param variable variable name
-   * @return a set of all property keys contained in the embedding
+   * @return a list of all property keys contained in the embedding
    */
-  public Set<String> getPropertyKeys(String variable) {
-    Set<String> properties = new HashSet<>();
-
-    for (Pair<String, String> variableAndProperty: propertyMapping.keySet()) {
-      if (variableAndProperty.getLeft().equals(variable)) {
-        properties.add(variableAndProperty.getRight());
-      }
-    }
-
-    return properties;
+  public List<String> getPropertyKeys(String variable) {
+    return propertyMapping.entrySet().stream()
+      .filter(entry -> entry.getKey().getLeft().equals(variable))
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getRight())
+      .collect(Collectors.toList());
   }
 }

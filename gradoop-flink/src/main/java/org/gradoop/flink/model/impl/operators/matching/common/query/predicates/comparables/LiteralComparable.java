@@ -58,7 +58,7 @@ public class LiteralComparable extends QueryComparable {
 
   @Override
   public Set<String> getPropertyKeys(String variable) {
-    return new HashSet<>();
+    return new HashSet<>(0);
   }
 
   @Override

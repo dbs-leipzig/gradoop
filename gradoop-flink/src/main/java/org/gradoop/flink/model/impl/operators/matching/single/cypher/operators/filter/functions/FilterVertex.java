@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Grap
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,30 +40,23 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
    * Information about the property keys needed to transform the vertex into an embedding
    */
   private final List<String> propertyKeys;
-
   /**
-   * Meta data about the vertex embedding
+   * Meta data describing the vertex embedding used for filtering
    */
   private final EmbeddingMetaData metaData;
+
 
   /**
    * New vertex filter function
    * @param predicates predicates used for filtering
+   * @param metaData Meta data describing the vertex embedding used for filtering
    */
-  public FilterVertex(CNF predicates) {
+  public FilterVertex(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
+    this.metaData = metaData;
 
     String variable = (String) predicates.getVariables().toArray()[0];
-    this.propertyKeys = new ArrayList<>();
-    propertyKeys.addAll(predicates.getPropertyKeys(variable));
-
-    metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping(variable, 0);
-
-    int i = 0;
-    for (String propertyKey : propertyKeys) {
-      metaData.updatePropertyMapping(variable, propertyKey, i++);
-    }
+    this.propertyKeys = metaData.getPropertyKeys(variable);
   }
 
   @Override

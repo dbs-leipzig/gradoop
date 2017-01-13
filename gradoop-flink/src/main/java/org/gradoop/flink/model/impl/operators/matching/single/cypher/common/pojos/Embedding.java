@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * This class represents an Embedding, an ordered List of Embedding Entries. Every entry is
  * either a reference to a single Edge or Vertex, or a path (Edge, Vertex, Edge, Vertex, ..., Edge).
@@ -47,6 +49,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   public static final transient int ID_ENTRY_SIZE = 1 + GradoopId.ID_SIZE;
 
   /**
+   * Indicates that an entry is an id list
+   */
+  public static final transient int ID_LIST_FLAG = 1;
+
+  /**
    * Holds the idData of all id-able entries (IDListFlag, ID)
    */
   private byte[] idData;
@@ -57,7 +64,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   private byte[] propertyData;
 
   /**
-   * Holds all id lists in the form (count, ID+)
+   * Holds all id lists in the form (pointer, count, ID+)
    */
   private byte[] idListData;
 
@@ -69,7 +76,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   }
 
   /**
-   * Creates am Embedding with the given data
+   * Creates an Embedding with the given data
    * @param idData id data stored in a byte array
    * @param propertyData Properties stored in internal byte array format
    * @param idListData IdLists stored in internal byte array format
@@ -110,11 +117,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   public byte[] getRawId(int column) {
     byte[] rawEntry = getRawIdEntry(column);
 
-    if (rawEntry[0] == 1) {
+    if (rawEntry[0] == ID_LIST_FLAG) {
       throw new UnsupportedOperationException("Can't return ID for ID List");
     }
 
-    return ArrayUtils.subarray(rawEntry, 1, 1 + GradoopId.ID_SIZE);
+    return ArrayUtils.subarray(rawEntry, 1, ID_ENTRY_SIZE);
   }
 
   /**
@@ -124,7 +131,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    */
   public byte[] getRawIdEntry(int column) {
     int offset = getIdOffset(column);
-    return ArrayUtils.subarray(idData, offset, offset + 1 + GradoopId.ID_SIZE);
+    return ArrayUtils.subarray(idData, offset, offset + ID_ENTRY_SIZE);
   }
 
   /**
@@ -134,7 +141,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    */
   public List<GradoopId> getIdAsList(int column) {
     int offset = getIdOffset(column);
-    return idData[offset] == 0 ? Lists.newArrayList(getId(column)) : getIdList(column);
+    return idData[offset] == ID_LIST_FLAG ? getIdList(column) : Lists.newArrayList(getId(column));
   }
 
   /**
@@ -148,10 +155,10 @@ public class Embedding implements Value, CopyableValue<Embedding> {
 
     for (Integer column : columns) {
       offset = getIdOffset(column);
-      if (idData[offset] == 0) {
-        ids.add(getId(column));
-      } else {
+      if (idData[offset] == ID_LIST_FLAG) {
         ids.addAll(getIdList(column));
+      } else {
+        ids.add(getId(column));
       }
     }
 
@@ -249,6 +256,30 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   }
 
   /**
+   * Returns a list of all property values stored in the embedding
+   * @return List of all property values stored in the embedding
+   */
+  public List<PropertyValue> getProperties() {
+    List<PropertyValue> properties = new ArrayList<>();
+    int offset = 0;
+    int entrySize;
+    while (offset < propertyData.length) {
+      entrySize =
+        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));
+
+      offset += Integer.BYTES;
+
+      properties.add(PropertyValue.fromRawBytes(
+        ArrayUtils.subarray(propertyData, offset, offset + entrySize)
+      ));
+
+      offset += entrySize;
+    }
+
+    return properties;
+  }
+
+  /**
    * Returns the offset of the property in the propertyData array
    * @param column the index of the property
    * @return Offset of the property in the propertyData array
@@ -267,7 +298,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     }
 
     if (offset >= propertyData.length) {
-      throw new IndexOutOfBoundsException("Cant find Property. " + i + " < " + column);
+      throw new IndexOutOfBoundsException("Cant find Property. " + (i - 1) + " < " + column);
     }
 
     return offset;
@@ -335,7 +366,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   private int getIdListOffset(int column) {
     int pointerOffset = getIdOffset(column);
 
-    if (idData[pointerOffset++] != 1) {
+    if (idData[pointerOffset++] != ID_LIST_FLAG) {
       throw new UnsupportedOperationException("Entry is not an IDList");
     }
 
@@ -374,7 +405,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * @return the number of entries in the embedding
    */
   public int size() {
-    return idData.length / GradoopId.ID_SIZE;
+    return idData.length / ID_ENTRY_SIZE;
   }
 
   /**
@@ -622,5 +653,36 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     result = 31 * result + Arrays.hashCode(propertyData);
     result = 31 * result + Arrays.hashCode(idListData);
     return result;
+  }
+
+  @Override
+  public String toString() {
+    List<List<GradoopId>> idCollection = new ArrayList<>();
+    for (int i = 0; i < size(); i++) {
+      idCollection.add(getIdAsList(i));
+    }
+
+    String idString = idCollection
+      .stream()
+      .map(entry ->
+        {
+          if (entry.size() == 1) {
+            return entry.get(0).toString();
+          } else {
+            return "[" + entry.stream().map(GradoopId::toString).collect(joining(", ")) + "]";
+          }
+        })
+      .collect(joining(", "));
+
+    String propertyString = getProperties()
+      .stream()
+      .map(PropertyValue::toString)
+      .collect(joining(", "));
+
+
+    return "Embedding{\n" +
+      "\tentries: (" + idString + ")\n" +
+      "\tproperties: (" + propertyString + ")\n" +
+      "}";
   }
 }
