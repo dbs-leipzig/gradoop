@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.iterative;
+package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
 import org.gradoop.flink.algorithms.fsm.transactional.GSpanIterative;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
@@ -7,9 +7,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 /**
  * Creates an {@link GSpanIterative} instance for test cases
  */
-public class TransactionalGSpanIterativeTest extends IterativeFSMTestBase {
+public class BasicPatternsGSpanIterativeTest extends BasicPatternsTransactionalFSMTestBase {
 
-  public TransactionalGSpanIterativeTest(String testName, String dataGraph,
+  public BasicPatternsGSpanIterativeTest(String testName, String dataGraph,
     String expectedGraphVariables, String expectedCollection) {
     super(testName, dataGraph, expectedGraphVariables, expectedCollection);
   }

@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.iterative;
+package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
 import org.gradoop.flink.algorithms.fsm.transactional.ThinkLikeAnEmbeddingTFSM;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
@@ -7,9 +7,10 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 /**
  * Creates an {@link ThinkLikeAnEmbeddingTFSM} instance for test cases
  */
-public class TransactionalThinkLikeAnEmbeddingTest extends IterativeFSMTestBase {
+public class BasicPatternsThinkLikeAnEmbeddingTest
+  extends BasicPatternsTransactionalFSMTestBase {
 
-  public TransactionalThinkLikeAnEmbeddingTest(String testName, String dataGraph,
+  public BasicPatternsThinkLikeAnEmbeddingTest(String testName, String dataGraph,
     String expectedGraphVariables, String expectedCollection) {
     super(testName, dataGraph, expectedGraphVariables, expectedCollection);
   }

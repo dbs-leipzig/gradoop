@@ -1,9 +1,9 @@
-package org.gradoop.flink.algorithms.fsm;
+package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
 /**
  * Class to provide test data for fsm tests
  */
-public class TestData {
+public class BasicPatternsData {
 
   public static final String FSM_SINGLE_EDGE =
     "g1[(v1:A)-[e1:a]->(v2:A)]" +

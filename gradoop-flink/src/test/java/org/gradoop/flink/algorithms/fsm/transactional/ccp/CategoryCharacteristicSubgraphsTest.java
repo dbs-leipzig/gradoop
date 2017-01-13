@@ -1,4 +1,4 @@
-package org.gradoop.flink.algorithms.fsm.category;
+package org.gradoop.flink.algorithms.fsm.transactional.ccp;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -9,7 +9,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
@@ -25,7 +24,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 import static org.junit.Assert.assertEquals;
 
 public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
@@ -60,7 +58,7 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
       .apply(new ApplySubgraph(new LabelIsIn<>("A", "B"), null))
       .apply(new ApplyTransformation(
         (current, transformed) -> {
-          current.setProperty(CATEGORY_KEY, "B");
+          current.setProperty(CategoryCharacteristicSubgraphs.CATEGORY_KEY, "B");
           return current;
         },
         TransformationFunction.keep(),
@@ -71,7 +69,7 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
       .apply(new ApplySubgraph(new LabelIsIn<>("A", "C"), null))
       .apply(new ApplyTransformation(
         (current, transformed) -> {
-          current.setProperty(CATEGORY_KEY, "C");
+          current.setProperty(CategoryCharacteristicSubgraphs.CATEGORY_KEY, "C");
           return current;
         },
         TransformationFunction.keep(),
@@ -112,7 +110,7 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
 
       final String category = transaction
         .getGraphHead()
-        .getPropertyValue(CATEGORY_KEY)
+        .getPropertyValue(CategoryCharacteristicSubgraphs.CATEGORY_KEY)
         .toString();
 
       transaction.getVertices().stream()
