@@ -21,14 +21,15 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Wrapps a {@link ComparableExpression}
@@ -58,8 +59,17 @@ public abstract class QueryComparable implements Serializable {
   /**
    * Evaluates the expression with respect to the given variable mapping
    *
-   * @param values mapping of variables to EmbeddingEntries
-   * @return the property value
+   * @param embedding the embedding record holding the data
+   * @param metaData the embedding meta data
+   * @return evaluation result
    */
-  public abstract PropertyValue evaluate(Map<String, EmbeddingEntry> values);
+  public abstract PropertyValue evaluate(Embedding embedding,
+    EmbeddingMetaData metaData);
+
+  /**
+   * Returns a set of property keys referenced by this expression for a given variable
+   * @param variable the variable
+   * @return set of property keys
+   */
+  public abstract Set<String> getPropertyKeys(String variable);
 }

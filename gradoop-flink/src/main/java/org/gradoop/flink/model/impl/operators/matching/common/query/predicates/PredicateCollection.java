@@ -17,11 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -75,16 +75,24 @@ public abstract class PredicateCollection<P>  implements Serializable {
 
   /**
    *
-   * @param values Mapping of embedding entries to variables
+   * @param embedding the embedding record holding the data
+   * @param metaData the embedding meta data
    * @return evaluation result
    */
-  public abstract boolean evaluate(Map<String, EmbeddingEntry> values);
+  public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
 
   /**
    * Retrieves a set of all variables included in the predicate collection
    * @return set of variables
    */
   public abstract Set<String> getVariables();
+
+  /**
+   * Retrieves a set of all property keys referenced by the predicate for a given variable
+   * @param variable the variable
+   * @return set of referenced properties
+   */
+  public abstract Set<String> getPropertyKeys(String variable);
 
   /**
    * Stores the name of the operator predicates are connected with

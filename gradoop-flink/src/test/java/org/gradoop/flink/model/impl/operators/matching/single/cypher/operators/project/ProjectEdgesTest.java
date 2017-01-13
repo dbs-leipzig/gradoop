@@ -18,17 +18,13 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
-
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
+
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -38,51 +34,16 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
   @Test
   public void returnsEmbeddingWithIdProjectionId() throws Exception{
     DataSet<Edge> edgeDataSet = createEdgesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
-
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
-    ProjectEdges operator = new ProjectEdges(edgeDataSet, extractedPropertyKeys);
 
+    ProjectEdges operator = new ProjectEdges(edgeDataSet, extractedPropertyKeys);
     DataSet<Embedding> results = operator.evaluate();
 
     assertEquals(2,results.count());
     assertEveryEmbedding(results, (embedding) -> {
       assertEquals(3,embedding.size());
-
-      assertEquals(IdEntry.class,         embedding.getEntry(0).getClass());
-      assertEquals(ProjectionEntry.class, embedding.getEntry(1).getClass());
-      assertEquals(IdEntry.class,         embedding.getEntry(2).getClass());
-
-      assertEquals(
-        Sets.newHashSet(extractedPropertyKeys),
-        embedding.getEntry(1).getProperties().get().getKeys()
-      );
+      assertEquals(PropertyValue.create("foo"), embedding.getProperty(0));
+      assertEquals(PropertyValue.create("bar"), embedding.getProperty(1));
     });
-  }
-
-  @Test
-  public void returnsIdEntriesIfNoPropertiesAreSupplied() throws Exception{
-    Edge edge = new EdgeFactory().initEdge(GradoopId.get(), GradoopId.get(), GradoopId.get());
-
-    DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromElements(edge);
-
-    ProjectEdges operator = new ProjectEdges(edgeDataSet);
-
-    DataSet<Embedding> results = operator.evaluate();
-
-    assertEquals(1,results.count());
-    assertEveryEmbedding(results, (embedding) -> {
-      assertEquals(3,embedding.size());
-
-      assertEquals(IdEntry.class, embedding.getEntry(0).getClass());
-      assertEquals(edge.getSourceId(), embedding.getEntry(0).getId());
-
-      assertEquals(IdEntry.class, embedding.getEntry(1).getClass());
-      assertEquals(edge.getId(), embedding.getEntry(1).getId());
-
-      assertEquals(IdEntry.class, embedding.getEntry(2).getClass());
-      assertEquals(edge.getTargetId(), embedding.getEntry(2).getId());
-    });
-
-
   }
 }

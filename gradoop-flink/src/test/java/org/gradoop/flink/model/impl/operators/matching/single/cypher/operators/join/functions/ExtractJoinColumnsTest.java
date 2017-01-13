@@ -1,5 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
@@ -20,7 +21,7 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Collections.singletonList(0));
 
-    Assert.assertEquals(v0.toString(), udf.getKey(embedding));
+    Assert.assertEquals(ArrayUtils.toString(v0.toByteArray()), udf.getKey(embedding));
   }
 
   @Test
@@ -32,7 +33,10 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(0, 1));
 
-    Assert.assertEquals(v0.toString() + v1.toString(), udf.getKey(embedding));
+    Assert.assertEquals(
+      ArrayUtils.toString(v0.toByteArray()) + ArrayUtils.toString(v1.toByteArray()),
+      udf.getKey(embedding)
+    );
   }
 
   @Test
@@ -44,6 +48,8 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(1, 0));
 
-    Assert.assertEquals(v1.toString() + v0.toString(), udf.getKey(embedding));
-  }
+    Assert.assertEquals(
+      ArrayUtils.toString(v1.toByteArray()) + ArrayUtils.toString(v0.toByteArray()),
+      udf.getKey(embedding)
+    );  }
 }

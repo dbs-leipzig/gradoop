@@ -18,12 +18,12 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,19 +49,16 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
   }
 
   @Override
-  public boolean evaluate(Map<String, EmbeddingEntry> values) {
-    for (ComparisonExpression comparisonExpressionWrapper : predicates) {
-      if (comparisonExpressionWrapper.evaluate(values)) {
+  public boolean evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+    for (ComparisonExpression comparisonExpression : predicates) {
+      if (comparisonExpression.evaluate(embedding, metaData)) {
         return true;
       }
     }
     return false;
   }
 
-  /**
-   * Returns a set of variables referenced by the predicates
-   * @return set of variables
-   */
+
   @Override
   public Set<String> getVariables() {
     Set<String> variables = new HashSet<>();
@@ -69,6 +66,15 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
       variables.addAll(comparisonExpression.getVariables());
     }
     return variables;
+  }
+
+  @Override
+  public Set<String> getPropertyKeys(String variable) {
+    Set<String> properties = new HashSet<>();
+    for (ComparisonExpression comparisonExpression : predicates) {
+      properties.addAll(comparisonExpression.getPropertyKeys(variable));
+    }
+    return properties;
   }
 
   @Override
