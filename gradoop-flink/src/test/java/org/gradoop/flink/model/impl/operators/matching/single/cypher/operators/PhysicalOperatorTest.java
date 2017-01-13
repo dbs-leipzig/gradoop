@@ -25,20 +25,16 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.PathEntry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -54,13 +50,13 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     );
   }
 
-  protected void assertEmbeddingExists(DataSet<Embedding> dataSet, Predicate<Embedding> predicate)
-    throws Exception {
-
-    assertTrue(dataSet.collect().stream().anyMatch(predicate::test));
+  protected void assertEmbeddingExists(DataSet<Embedding> dataSet,
+    Predicate<Embedding> predicate) throws Exception {
+    assertTrue(dataSet.collect().stream().anyMatch(predicate));
   }
 
-  protected void assertEveryEmbedding(DataSet<Embedding> dataSet, Consumer<Embedding> consumer)
+  protected void assertEveryEmbedding(DataSet<Embedding> dataSet,
+    Consumer<Embedding> consumer)
     throws Exception {
 
     dataSet.collect().forEach(consumer);
@@ -70,23 +66,17 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     Embedding embedding = new Embedding();
 
     for (GradoopId id : ids) {
-      embedding.addEntry(new IdEntry(id));
+      embedding.add(id);
     }
 
     return embedding;
   }
 
-  protected DataSet<Embedding> createEmbeddings(int size, GradoopId... idEntries) {
-    return createEmbeddings(size, (EmbeddingEntry[]) Arrays.stream(idEntries).map(IdEntry::new).toArray());
-  }
-
-  protected DataSet<Embedding> createEmbeddings(Integer size, EmbeddingEntry... entries) {
+  protected DataSet<Embedding> createEmbeddings(int size, GradoopId... ids) {
     List<Embedding> embeddings = new ArrayList<>(size);
 
-    ArrayList<EmbeddingEntry> embeddingEntries = Lists.newArrayList(entries);
-
     for (int i = 0; i < size; i++) {
-      embeddings.add(new Embedding(embeddingEntries));
+      embeddings.add(createEmbedding(ids));
     }
 
     return getExecutionEnvironment().fromCollection(embeddings);
@@ -116,6 +106,16 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(edges);
   }
 
+  protected List<PropertyValue> getPropertyValues(List<String> propertyNames) {
+    List<PropertyValue> propertyValues = new ArrayList<>(propertyNames.size());
+
+    for(String property_name : propertyNames) {
+      propertyValues.add(PropertyValue.create(property_name));
+    }
+
+    return propertyValues;
+  }
+
   protected Properties getProperties(List<String> propertyNames) {
     Properties properties = new Properties();
 
@@ -131,11 +131,11 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
   }
 
   private List<GradoopId> embeddingToIdList(Embedding embedding) {
-    return embedding.getEntries().stream().flatMap(entry -> {
-      if(entry instanceof PathEntry) {
-        return ((PathEntry) entry).getPath().stream();
-      }
-      return Lists.newArrayList(entry.getId()).stream();
-    }).collect(Collectors.toList());
+    List<GradoopId> idList = new ArrayList<>();
+    for(int i = 0; i < embedding.size(); i++) {
+      idList.addAll(embedding.getIdAsList(i));
+    }
+
+    return idList;
   }
 }

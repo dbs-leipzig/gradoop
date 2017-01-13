@@ -59,7 +59,7 @@ public class PostProcessExpandEmbedding
       return;
     }
 
-    if (closingColumn >= 0 && !value.getBase().getEntry(closingColumn).contains(value.getEnd())) {
+    if (closingColumn >= 0 && !value.getBase().getId(closingColumn).equals(value.getEnd())) {
       return;
     }
 

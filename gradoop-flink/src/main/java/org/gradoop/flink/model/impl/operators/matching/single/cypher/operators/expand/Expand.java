@@ -21,22 +21,22 @@ import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.PostProcessExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ExtractColumn;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractExpandColumn;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.PostProcessExpandEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
 
 /**
  * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
- * The input embedding is appended by 2 Entries, the first one represents the path,
- * the second one the end vertex
+ * The input embedding is appended by 2 Entries, the first one represents the path (edge, vertex,
+ * edge, vertex, ..., edge), the second one the end vertex
  */
 
 public class Expand implements PhysicalOperator {
@@ -96,8 +96,8 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
-    int lowerBound, int upperBound, ExpandDirection direction,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
 
@@ -126,8 +126,8 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
-    int lowerBound, int upperBound, ExpandDirection direction,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
     this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,
@@ -147,8 +147,8 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges, int expandColumn,
-    int lowerBound, ExpandDirection direction,
+  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+    int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
     this(input, candidateEdges, expandColumn, lowerBound, Integer.MAX_VALUE, direction,
@@ -181,8 +181,8 @@ public class Expand implements PhysicalOperator {
     }
 
     return input.join(candidateEdges, joinHint)
-      .where(new ExtractColumn(expandColumn))
-      .equalTo(new ExtractColumn(0))
+      .where(new ExtractExpandColumn(expandColumn))
+      .equalTo(new ExtractExpandColumn(0))
       .with(new CreateExpandEmbedding(
         distinctVertexColumns,
         distinctEdgeColumns,
@@ -204,10 +204,11 @@ public class Expand implements PhysicalOperator {
       .filter(new FilterPreviousExpandEmbedding())
       .join(candidateEdges, joinHint)
         .where(2)
-        .equalTo(new ExtractColumn(0))
+        .equalTo(new ExtractExpandColumn(0))
         .with(new MergeExpandEmbeddings(
           distinctVertexColumns,
-          distinctEdgeColumns, closingColumn
+          distinctEdgeColumns,
+          closingColumn
         ));
 
     DataSet<ExpandEmbedding> solutionSet = nextWorkingSet.union(iteration);

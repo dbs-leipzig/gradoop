@@ -17,14 +17,17 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
-import org.gradoop.common.model.impl.properties.Properties;
+import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
+import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Wraps a {@link PropertySelector}
@@ -46,22 +49,34 @@ public class PropertySelectorComparable extends QueryComparable {
   /**
    * Returns the specified property as property value
    *
-   * @param values mapping of variables to embedding entries
+   * @param embedding the embedding holding the data
+   * @param metaData meta data describing the embedding
    * @return the property value
    * @throws MissingElementException if element is not in mapping
+   * @throws MissingPropertyException if property is not in projection
    */
   @Override
-  public PropertyValue evaluate(Map<String, EmbeddingEntry> values) {
-    EmbeddingEntry entry = values.get(propertySelector.getVariable());
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+    int entryColumn = metaData.getColumn(propertySelector.getVariable());
 
-    if (entry == null) {
+    if (entryColumn == -1) {
       throw new MissingElementException(propertySelector.getVariable());
     }
 
-    PropertyValue value =  entry.getProperties().orElse(new Properties())
-      .get(propertySelector.getPropertyName());
+    int propertyColumn =
+      metaData.getPropertyIndex(propertySelector.getVariable(), propertySelector.getPropertyName());
 
-    return value == null ? PropertyValue.NULL_VALUE : value;
+    if (propertyColumn >= 0) {
+      return embedding.getProperty(propertyColumn);
+    } else {
+      throw new MissingPropertyException(propertySelector.getPropertyName());
+    }
+  }
+
+  @Override
+  public Set<String> getPropertyKeys(String variable) {
+    return variable.equals(propertySelector.getVariable()) ?
+      Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet<>();
   }
 
   @Override

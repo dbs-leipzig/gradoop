@@ -17,15 +17,15 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
+import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -100,23 +100,30 @@ public class CNFTest {
     QueryHandler query = new QueryHandler(queryString);
     CNF cnf = query.getPredicates();
 
-    ProjectionEntry a = new ProjectionEntry(GradoopId.get());
-    a.addProperty(Property.create("name","Alice"));
-    a.addProperty(Property.create("age",42));
+    GradoopId a = GradoopId.get();
+    GradoopId c = GradoopId.get();
 
-    ProjectionEntry c = new ProjectionEntry(GradoopId.get());
-    c.addProperty(Property.create("age",23));
+    Embedding embedding = new Embedding();
+    embedding.add(
+      a,
+      Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
+    );
 
-    HashMap<String, EmbeddingEntry> mapping = new HashMap<>();
-    mapping.put("a",a);
-    mapping.put("b",a);
-    mapping.put("c",c);
+    embedding.add(a);
+    embedding.add(
+      c,
+      Lists.newArrayList(PropertyValue.create(23))
+    );
 
-    assertTrue(cnf.evaluate(mapping));
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a",0);
+    metaData.updateColumnMapping("b",1);
+    metaData.updateColumnMapping("c",2);
+    metaData.updatePropertyMapping("a", "name", 0);
+    metaData.updatePropertyMapping("a", "age", 1);
+    metaData.updatePropertyMapping("c", "age", 2);
 
-    c.addProperty(Property.create("age",101));
-
-    assertFalse(cnf.evaluate(mapping));
+    assertTrue(cnf.evaluate(embedding, metaData));
   }
 
   @Test public void testEvaluationWithMissingProperty() {
@@ -124,12 +131,16 @@ public class CNFTest {
     QueryHandler query = new QueryHandler(queryString);
     CNF predicates = query.getPredicates();
 
-    ProjectionEntry a = new ProjectionEntry(GradoopId.get());
-    a.addProperty(Property.create("name", "Alice"));
+    Embedding embedding = new Embedding();
+    embedding.add(
+      GradoopId.get(),
+      Lists.newArrayList(PropertyValue.NULL_VALUE)
+    );
 
-    HashMap<String, EmbeddingEntry> mapping = new HashMap<>();
-    mapping.put("a",a);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a",0);
+    metaData.updatePropertyMapping("a", "age", 0);
 
-    assertFalse(predicates.evaluate(mapping));
+    assertFalse(predicates.evaluate(embedding, metaData));
   }
 }

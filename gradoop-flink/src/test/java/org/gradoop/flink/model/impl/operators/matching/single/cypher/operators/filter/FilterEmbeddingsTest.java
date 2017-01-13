@@ -20,17 +20,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.ProjectionEntry;
-
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,26 +37,24 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testFilterEmbeddings() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    Properties propertiesA = Properties.create();
-    propertiesA.set("age", 23);
+    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(23));
+    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(42));
 
-    Properties propertiesB = Properties.create();
-    propertiesB.set("age", 42);
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get(), propertiesA);
+    embedding.add(GradoopId.get(), propertiesB);
 
-    DataSet<Embedding> embedding = getExecutionEnvironment().fromCollection(
-      Lists.newArrayList(
-        new Embedding(Lists.newArrayList(
-          new ProjectionEntry(GradoopId.get(), propertiesA),
-          new ProjectionEntry(GradoopId.get(), propertiesB)
-        ))
-      )
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
+      embedding
     );
 
-    Map<String,Integer> columnMapping = new HashMap<>();
-    columnMapping.put("a",0);
-    columnMapping.put("b",1);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updateColumnMapping("b", 1);
+    metaData.updatePropertyMapping("a", "age", 0);
+    metaData.updatePropertyMapping("b", "age", 1);
 
-    FilterEmbeddings filter = new FilterEmbeddings(embedding, predicates, columnMapping);
+    FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
 
     assertEquals(0, filter.evaluate().count());
   }
@@ -68,26 +63,25 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testKeepEdges() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    Properties propertiesA = Properties.create();
-    propertiesA.set("age", 42);
+    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(42));
+    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(23));
 
-    Properties propertiesB = Properties.create();
-    propertiesB.set("age", 23);
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get(), propertiesA);
+    embedding.add(GradoopId.get(), propertiesB);
 
-    DataSet<Embedding> embedding = getExecutionEnvironment().fromCollection(
-      Lists.newArrayList(
-        new Embedding(Lists.newArrayList(
-          new ProjectionEntry(GradoopId.get(), propertiesA),
-          new ProjectionEntry(GradoopId.get(), propertiesB)
-        ))
-      )
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
+      embedding
     );
 
-    Map<String,Integer> columnMapping = new HashMap<>();
-    columnMapping.put("a",0);
-    columnMapping.put("b",1);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updateColumnMapping("b", 1);
+    metaData.updatePropertyMapping("a", "age", 0);
+    metaData.updatePropertyMapping("b", "age", 1);
 
-    FilterEmbeddings filter = new FilterEmbeddings(embedding, predicates, columnMapping);
+    FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
+
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -96,29 +90,25 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testDontAlterEmbedding() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    Properties propertiesA = Properties.create();
-    propertiesA.set("age", 42);
+    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(42));
+    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(23));
 
-    Properties propertiesB = Properties.create();
-    propertiesB.set("age", 23);
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get(), propertiesA);
+    embedding.add(GradoopId.get());
+    embedding.add(GradoopId.get(), propertiesB);
 
-    Embedding embedding = new Embedding(
-      Lists.newArrayList(
-        new ProjectionEntry(GradoopId.get(), propertiesA),
-        new IdEntry(GradoopId.get()),
-        new ProjectionEntry(GradoopId.get(), propertiesB)
-      )
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
+      embedding
     );
 
-    DataSet<Embedding> embeddingDataSet = getExecutionEnvironment().fromCollection(
-      Lists.newArrayList(embedding)
-    );
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 0);
+    metaData.updateColumnMapping("b", 1);
+    metaData.updatePropertyMapping("a", "age", 0);
+    metaData.updatePropertyMapping("b", "age", 1);
 
-    Map<String,Integer> columnMapping = new HashMap<>();
-    columnMapping.put("a",0);
-    columnMapping.put("b",2);
-
-    FilterEmbeddings filter = new FilterEmbeddings(embeddingDataSet, predicates, columnMapping);
+    FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
 
     assertEquals(embedding, filter.evaluate().collect().get(0));
   }
