@@ -19,11 +19,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEmbedding;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Projects an Embedding by a set of properties.
@@ -36,25 +35,25 @@ public class ProjectEmbeddings implements PhysicalOperator {
    */
   private final DataSet<Embedding> input;
   /**
-   * Names of the properties that will be kept in the projection
+   * Indices of all properties that will be kept in the projection
    */
-  private final Map<Integer, List<String>> propertyKeyMapping;
+  private final List<Integer> propertyWhiteList;
 
   /**
    * Creates a new embedding projection operator
    * @param input Embeddings that should be projected
-   * @param propertyKeyMapping HashMap of property labels, keys are the columns of the entry,
+   * @param propertyWhiteList HashMap of property labels, keys are the columns of the entry,
    *                     values are property keys
    */
   public ProjectEmbeddings(DataSet<Embedding> input,
-    Map<Integer, List<String>> propertyKeyMapping) {
+    List<Integer> propertyWhiteList) {
 
     this.input = input;
-    this.propertyKeyMapping = propertyKeyMapping;
+    this.propertyWhiteList = propertyWhiteList;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectEmbedding(propertyKeyMapping));
+    return input.map(new ProjectEmbedding(propertyWhiteList));
   }
 }

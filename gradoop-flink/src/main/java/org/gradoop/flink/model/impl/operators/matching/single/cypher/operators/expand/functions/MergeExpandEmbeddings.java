@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -80,14 +81,15 @@ public class MergeExpandEmbeddings
       return true;
     }
 
-    // the new edge is valid under vertex isomorphism
-    if (extension.getEntry(0).equals(extension.getEntry(2)) && !distinctVertices.isEmpty()) {
+    // the new candidate is invalid under vertex isomorphism
+    if (ArrayUtils.isEquals(extension.getRawId(0), extension.getRawId(2)) &&
+      !distinctVertices.isEmpty()) {
       return false;
     }
 
-    GradoopId src = extension.getEntry(0).getId();
-    GradoopId edge = extension.getEntry(1).getId();
-    GradoopId tgt = extension.getEntry(2).getId();
+    GradoopId src = extension.getId(0);
+    GradoopId edge = extension.getId(1);
+    GradoopId tgt = extension.getId(2);
 
     // check if there are any clashes in the path
     for (GradoopId ref : prev.getPath()) {
@@ -97,22 +99,18 @@ public class MergeExpandEmbeddings
       }
     }
 
+    List<GradoopId> ref;
+
     // check for clashes with distinct vertices in the base
     for (int i : distinctVertices) {
-      GradoopId ref = prev.getBase().getEntry(i).getId();
-      if ((ref.equals(tgt) && i != closingColumn) || ref.equals(src)) {
+      ref = prev.getBase().getIdAsList(i);
+      if ((ref.contains(tgt) && i != closingColumn) || ref.contains(src)) {
         return false;
       }
     }
 
     // check for clashes with distinct edges in the base
-    for (int i : distinctEdges) {
-      GradoopId ref = prev.getBase().getEntry(i).getId();
-      if (ref.equals(edge)) {
-        return false;
-      }
-    }
-
-    return true;
+    ref = prev.getBase().getIdsAsList(distinctEdges);
+    return !ref.contains(edge);
   }
 }

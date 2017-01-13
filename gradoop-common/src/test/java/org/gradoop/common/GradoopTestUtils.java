@@ -20,6 +20,11 @@ package org.gradoop.common;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.flink.types.Value;
 import org.apache.hadoop.io.Writable;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
@@ -287,6 +292,27 @@ public class GradoopTestUtils {
     DataInputStream dataIn = new DataInputStream(inputStream);
     out.readFields(dataIn);
 
+    return out;
+  }
+
+  public static <T extends Value> T writeAndReadValue(Class<T> clazz, T in) throws Exception {
+    // write to byte[]
+    java.io.ByteArrayOutputStream outStream = new java.io.ByteArrayOutputStream();
+    DataOutputView dataOutputView = new DataOutputViewStreamWrapper(outStream);
+    in.write(dataOutputView);
+
+    T out;
+    try {
+      out = clazz.newInstance();
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IOException("Cannot initialize the class: " + clazz);
+    }
+
+    // read from byte[]
+    ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+    DataInputView dataInputView = new DataInputViewStreamWrapper(inStream);
+    out.read(dataInputView);
     return out;
   }
 

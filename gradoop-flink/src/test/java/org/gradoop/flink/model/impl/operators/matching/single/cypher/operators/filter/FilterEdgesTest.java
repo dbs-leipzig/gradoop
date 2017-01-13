@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -47,7 +47,11 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterEdges filter = new FilterEdges(edge, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 1);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterEdges filter = new FilterEdges(edge, predicates, metaData);
 
     assertEquals(0, filter.evaluate().count());
   }
@@ -62,7 +66,11 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterEdges filter = new FilterEdges(edge, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 1);
+    metaData.updatePropertyMapping("a", "__label__", 0);
+
+    FilterEdges filter = new FilterEdges(edge, predicates, metaData);
 
     assertEquals(0, filter.evaluate().count());
   }
@@ -79,7 +87,11 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterEdges filter = new FilterEdges(edge, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 1);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterEdges filter = new FilterEdges(edge, predicates, metaData);
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -94,7 +106,11 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
       )
     );
 
-    FilterEdges filter = new FilterEdges(edge, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 1);
+    metaData.updatePropertyMapping("a", "__label__", 0);
+
+    FilterEdges filter = new FilterEdges(edge, predicates, metaData);
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -112,16 +128,16 @@ public class FilterEdgesTest extends PhysicalOperatorTest {
       Lists.newArrayList(edge)
     );
 
-    FilterEdges filter = new FilterEdges(edgeDataSet, predicates);
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.updateColumnMapping("a", 1);
+    metaData.updatePropertyMapping("a", "name", 0);
+
+    FilterEdges filter = new FilterEdges(edgeDataSet, predicates, metaData);
 
     List<Embedding> result = filter.evaluate().collect();
 
-    assertEquals(IdEntry.class, result.get(0).getEntry(0).getClass());
-    assertEquals(IdEntry.class, result.get(0).getEntry(1).getClass());
-    assertEquals(IdEntry.class, result.get(0).getEntry(2).getClass());
-
-    assertEquals(edge.getSourceId(), result.get(0).getEntry(0).getId());
-    assertEquals(edge.getId(),       result.get(0).getEntry(1).getId());
-    assertEquals(edge.getTargetId(), result.get(0).getEntry(2).getId());
+    assertEquals(edge.getSourceId(), result.get(0).getId(0));
+    assertEquals(edge.getId(),       result.get(0).getId(1));
+    assertEquals(edge.getTargetId(), result.get(0).getId(2));
   }
 }

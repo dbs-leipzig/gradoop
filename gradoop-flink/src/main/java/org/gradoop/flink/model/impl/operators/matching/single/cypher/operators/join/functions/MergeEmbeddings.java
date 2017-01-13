@@ -17,16 +17,15 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,10 +55,6 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
    * Edge columns of the right embedding that need to have distinct id values.
    */
   private final List<Integer> distinctEdgeColumnsRight;
-  /**
-   * Join columns that are adopted from the right side to the left side.
-   */
-  private final Map<Integer, Integer> adoptColumns;
 
   /**
    * Creates a new UDF instance.
@@ -69,16 +64,13 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
    * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
    * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
    * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
-   * @param adoptColumns columns that are adopted from the right side to the left side
    */
   public MergeEmbeddings(List<Integer> joinColumnsRight,
     List<Integer> distinctVertexColumnsLeft,
     List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft,
-    List<Integer> distinctEdgeColumnsRight,
-    Map<Integer, Integer> adoptColumns) {
+    List<Integer> distinctEdgeColumnsRight) {
     this.joinColumnsRight           = joinColumnsRight;
-    this.adoptColumns               = adoptColumns;
     this.distinctVertexColumnsLeft  = distinctVertexColumnsLeft;
     this.distinctVertexColumnsRight = distinctVertexColumnsRight;
     this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;
@@ -86,25 +78,14 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
   }
 
   @Override
-  public void join(Embedding left, Embedding right, Collector<Embedding> out) throws Exception {
-    // 1 check distinct columns
+  public void join(Embedding left, Embedding right, Collector<Embedding> out)
+      throws Exception {
+
     if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &&
       isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
-
-      // 2 adopt columns from the right side
-      for (Map.Entry<Integer, Integer> adoptColumn : adoptColumns.entrySet()) {
-        left.setEntry(adoptColumn.getValue(), right.getEntry(adoptColumn.getKey()));
-      }
-
-      // 3 append new elements from the right side
-      List<EmbeddingEntry> rightEntries = right.getEntries();
-      for (int i = 0; i < rightEntries.size(); i++) {
-        if (!joinColumnsRight.contains(i)) {
-          left.addEntry(right.getEntry(i));
-        }
-      }
-      // 4 collect merged embedding
-      out.collect(left);
+      out.collect(new Embedding(
+        mergeIdData(left, right), mergePropertyData(left, right), mergeIdListData(left, right)
+      ));
     }
   }
 
@@ -135,11 +116,70 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
   private boolean isDistinct(Set<GradoopId> ids, List<Integer> columns, Embedding embedding) {
     boolean isDistinct = true;
     for (Integer column : columns) {
-      isDistinct = ids.add(embedding.getEntry(column).getId());
+      isDistinct = ids.addAll(embedding.getIdAsList(column));
       if (!isDistinct) {
         break;
       }
     }
     return isDistinct;
+  }
+
+  /**
+   * Merges the idData columns of left and right
+   * All entries of left are kept as well as all right entries which aren't join columns
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergeIdData(Embedding left, Embedding right) {
+    byte[] newIdData = new byte[
+        left.getIdData().length +
+      right.getIdData().length -
+      (joinColumnsRight.size() * (Embedding.ID_ENTRY_SIZE))
+    ];
+
+    int offset = left.getIdData().length;
+    System.arraycopy(left.getIdData(), 0, newIdData, 0, offset);
+
+    for (int i = 0; i < right.size(); i++) {
+      if (joinColumnsRight.contains(i)) {
+        continue;
+      }
+
+      System.arraycopy(
+        right.getRawIdEntry(i), 0,
+        newIdData, offset,
+        Embedding.ID_ENTRY_SIZE
+      );
+
+      offset += Embedding.ID_ENTRY_SIZE;
+    }
+
+    return newIdData;
+  }
+
+  /**
+   * Merges the propertyData columns of the left and right embeddings
+   * All entries from both sides are kept.
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergePropertyData(Embedding left, Embedding right) {
+    return ArrayUtils.addAll(left.getPropertyData(), right.getPropertyData());
+  }
+
+  /**
+   * Merges the idListData columns of the left and right embeddings
+   * All entries from both sides are kept.
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergeIdListData(Embedding left, Embedding right) {
+    return ArrayUtils.addAll(left.getIdListData(), right.getIdListData());
   }
 }

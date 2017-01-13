@@ -17,16 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.IdEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Projector;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Projects a Vertex by a set of properties.
@@ -36,23 +32,18 @@ public class ProjectVertex extends RichMapFunction<Vertex, Embedding> {
   /**
    * Names of the properties that will be kept in the projection
    */
-  private final Map<Integer, List<String>> propertyKeyMapping;
+  private final List<String> propertyKeys;
 
   /**
    * Creates a new vertex projection function
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
   public ProjectVertex(List<String> propertyKeys) {
-    this.propertyKeyMapping = new HashMap<>();
-    propertyKeyMapping.put(0, propertyKeys);
+    this.propertyKeys = propertyKeys;
   }
 
   @Override
   public Embedding map(Vertex vertex) {
-    if (propertyKeyMapping.get(0).isEmpty()) {
-      return new Embedding(Lists.newArrayList(new IdEntry(vertex.getId())));
-    } else {
-      return Projector.project(Embedding.fromVertex(vertex), propertyKeyMapping);
-    }
+    return GraphElementToEmbedding.convert(vertex, propertyKeys);
   }
 }

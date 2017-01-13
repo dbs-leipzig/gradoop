@@ -17,6 +17,7 @@
 
 package org.gradoop.common.model.impl.properties;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -98,6 +99,10 @@ public class PropertyValue
    * Default constructor.
    */
   public PropertyValue() { }
+
+  private PropertyValue(byte[] rawBytes) {
+    this.rawBytes = rawBytes;
+  }
 
   /**
    * Creates a new property value from the given value.
@@ -441,6 +446,19 @@ public class PropertyValue
       String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
       BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
       GradoopId.class   : null;
+  }
+
+  public int getByteSize() {
+    return rawBytes.length;
+  }
+
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public byte[] getRawBytes() {
+    return this.rawBytes;
+  }
+
+  public static PropertyValue fromRawBytes(byte[] rawBytes) {
+    return new PropertyValue(rawBytes);
   }
 
   @Override
