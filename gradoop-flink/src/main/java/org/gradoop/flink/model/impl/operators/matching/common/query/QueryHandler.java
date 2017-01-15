@@ -109,12 +109,17 @@ public class QueryHandler {
   }
 
   /**
-   * Returns all predicates in Conjunctive Normal Form
+   * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
+   * predicated defined in the query, a CNF containing zero predicates is returned.
    *
    * @return predicates
    */
   public CNF getPredicates() {
-    return QueryPredicate.createFrom(gdlHandler.getPredicates()).asCNF();
+    if (gdlHandler.getPredicates().isPresent()) {
+      return QueryPredicate.createFrom(gdlHandler.getPredicates().get()).asCNF();
+    } else {
+      return new CNF();
+    }
   }
 
   /**
