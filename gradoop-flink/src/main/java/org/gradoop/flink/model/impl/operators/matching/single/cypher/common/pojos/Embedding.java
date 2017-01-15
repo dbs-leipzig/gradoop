@@ -441,20 +441,6 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   // ---------------------------------------------------------------------------------------------
 
   /**
-   * Clears all Properties stored in the embedding
-   */
-  public void clearPropertyData() {
-    propertyData = new byte[0];
-  }
-
-  /**
-   * Clears all IDLists stored in the embedding
-   */
-  public void clearIdListData() {
-    idListData = new byte[0];
-  }
-
-  /**
    * Projects the stored Properties. Only the white-listed properties will be kept
    * @param propertyWhiteList list of property indices
    * @return Embedding with the projected property list

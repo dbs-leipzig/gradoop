@@ -40,7 +40,7 @@ public class ElementSelectorComparableTest {
     PropertyValue reference = PropertyValue.create(embedding.getId(0));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
+    metaData.setEntryColumn("a", 0);
 
     assertEquals(reference, wrapper.evaluate(embedding, metaData));
     assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
@@ -55,7 +55,7 @@ public class ElementSelectorComparableTest {
     embedding.add(GradoopId.get());
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("b", 0);
+    metaData.setEntryColumn("b", 0);
 
     wrapper.evaluate(embedding, metaData);
   }

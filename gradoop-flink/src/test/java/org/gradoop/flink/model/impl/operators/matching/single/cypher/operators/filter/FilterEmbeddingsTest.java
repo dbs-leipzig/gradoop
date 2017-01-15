@@ -44,15 +44,13 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     embedding.add(GradoopId.get(), propertiesA);
     embedding.add(GradoopId.get(), propertiesB);
 
-    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
-      embedding
-    );
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updateColumnMapping("b", 1);
-    metaData.updatePropertyMapping("a", "age", 0);
-    metaData.updatePropertyMapping("b", "age", 1);
+    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("b", 1);
+    metaData.setPropertyColumn("a", "age", 0);
+    metaData.setPropertyColumn("b", "age", 1);
 
     FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
 
@@ -60,7 +58,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   }
 
   @Test
-  public void testKeepEdges() throws Exception{
+  public void testKeepEmbeddings() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
     List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(42));
@@ -70,18 +68,15 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     embedding.add(GradoopId.get(), propertiesA);
     embedding.add(GradoopId.get(), propertiesB);
 
-    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
-      embedding
-    );
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updateColumnMapping("b", 1);
-    metaData.updatePropertyMapping("a", "age", 0);
-    metaData.updatePropertyMapping("b", "age", 1);
+    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("b", 1);
+    metaData.setPropertyColumn("a", "age", 0);
+    metaData.setPropertyColumn("b", "age", 1);
 
     FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
-
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -98,15 +93,13 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     embedding.add(GradoopId.get());
     embedding.add(GradoopId.get(), propertiesB);
 
-    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(
-      embedding
-    );
+    DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updateColumnMapping("b", 1);
-    metaData.updatePropertyMapping("a", "age", 0);
-    metaData.updatePropertyMapping("b", "age", 1);
+    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("b", 1);
+    metaData.setPropertyColumn("a", "age", 0);
+    metaData.setPropertyColumn("b", "age", 1);
 
     FilterEmbeddings filter = new FilterEmbeddings(embeddings, predicates, metaData);
 
