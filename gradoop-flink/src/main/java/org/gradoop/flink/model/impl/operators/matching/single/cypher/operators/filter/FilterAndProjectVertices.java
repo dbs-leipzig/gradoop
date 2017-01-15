@@ -59,7 +59,7 @@ public class FilterAndProjectVertices implements PhysicalOperator {
    *
    * @param input Candidate vertices
    * @param predicates Predicates used to filter vertices
-   * @param metaData Meta data describing the embedding used for filtering
+   * @param metaData Meta data describing the projected (output) embedding
    */
   public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates,
     EmbeddingMetaData metaData) {

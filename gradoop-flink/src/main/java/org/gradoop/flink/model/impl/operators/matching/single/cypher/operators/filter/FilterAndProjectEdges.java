@@ -62,7 +62,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    *
    * @param input Candidate edges
    * @param predicates Predicates used to filter edges
-   * @param metaData Meta data describing the embedding used for filtering
+   * @param metaData Meta data describing the projected (output) embedding
    */
   public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates, EmbeddingMetaData metaData) {
     this.input = input;
