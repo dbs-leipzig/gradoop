@@ -55,7 +55,7 @@ public class ElementSelectorComparable extends QueryComparable {
    */
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    int column = metaData.getColumn(elementSelector.getVariable());
+    int column = metaData.getEntryColumn(elementSelector.getVariable());
 
     if (column == -1) {
       throw new MissingElementException(elementSelector.getVariable());
