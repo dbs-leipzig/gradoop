@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
 import java.util.List;
@@ -44,6 +44,6 @@ public class ProjectEdge extends RichMapFunction<Edge, Embedding> {
 
   @Override
   public Embedding map(Edge edge) {
-    return GraphElementToEmbedding.convert(edge, propertyKeys);
+    return EmbeddingFactory.fromEdge(edge, propertyKeys);
   }
 }
