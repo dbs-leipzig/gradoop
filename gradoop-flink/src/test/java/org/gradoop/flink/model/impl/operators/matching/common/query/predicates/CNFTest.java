@@ -116,12 +116,12 @@ public class CNFTest {
     );
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a",0);
-    metaData.updateColumnMapping("b",1);
-    metaData.updateColumnMapping("c",2);
-    metaData.updatePropertyMapping("a", "name", 0);
-    metaData.updatePropertyMapping("a", "age", 1);
-    metaData.updatePropertyMapping("c", "age", 2);
+    metaData.setEntryColumn("a",0);
+    metaData.setEntryColumn("b",1);
+    metaData.setEntryColumn("c",2);
+    metaData.setPropertyColumn("a", "name", 0);
+    metaData.setPropertyColumn("a", "age", 1);
+    metaData.setPropertyColumn("c", "age", 2);
 
     assertTrue(cnf.evaluate(embedding, metaData));
   }
@@ -138,8 +138,8 @@ public class CNFTest {
     );
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a",0);
-    metaData.updatePropertyMapping("a", "age", 0);
+    metaData.setEntryColumn("a",0);
+    metaData.setPropertyColumn("a", "age", 0);
 
     assertFalse(predicates.evaluate(embedding, metaData));
   }

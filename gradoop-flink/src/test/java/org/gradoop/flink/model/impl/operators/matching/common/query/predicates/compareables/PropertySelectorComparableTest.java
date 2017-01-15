@@ -41,8 +41,8 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updatePropertyMapping("a", "age", 0);
+    metaData.setEntryColumn("a", 0);
+    metaData.setPropertyColumn("a", "age", 0);
 
     assertEquals(PropertyValue.create(42), wrapper.evaluate(embedding, metaData));
     assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
@@ -57,8 +57,8 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updatePropertyMapping("a", "birth", 0);
+    metaData.setEntryColumn("a", 0);
+    metaData.setPropertyColumn("a", "birth", 0);
 
     wrapper.evaluate(embedding, metaData);
   }
@@ -72,8 +72,8 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("b", 0);
-    metaData.updatePropertyMapping("b", "age", 0);
+    metaData.setEntryColumn("b", 0);
+    metaData.setPropertyColumn("b", "age", 0);
 
     wrapper.evaluate(embedding, metaData);
   }

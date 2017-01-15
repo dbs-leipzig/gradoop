@@ -27,19 +27,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This class stores meta data information about a set of embeddings
- * It includes information about the mapping of variables to embedding entries
- * and where properties are stored in the embedding
+ * This class stores meta data information about a data set of {@link Embedding} objects.
+ *
+ * An {@link Embedding} stores identifiers (single or path) and properties associated with query
+ * elements.
+ *
+ * The meta data contains a mapping between query variables and the column index storing the
+ * associated element/path identifier. Furthermore, the meta data object contains a mapping between
+ * property values associated to property keys at query elements.
  */
 public class EmbeddingMetaData implements Serializable {
   /**
-   * Stores the mapping of variables to embedding entries
+   * Stores the mapping of query variables to embedding entries
    */
   private Map<String, Integer> columnMapping;
-
   /**
-   * Stores where the coresponding PropertyValue of a Variable-PropertyKey-Pair is stored within the
-   * embedding
+   * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
+   * the embedding
    */
   private Map<Pair<String, String>, Integer> propertyMapping;
 
@@ -52,6 +56,7 @@ public class EmbeddingMetaData implements Serializable {
 
   /**
    * Initializes a new EmbeddingMetaData object from the given mappings
+   *
    * @param columnMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
    */
@@ -63,48 +68,53 @@ public class EmbeddingMetaData implements Serializable {
 
   /**
    * Inserts or updates a column mapping entry
+   *
    * @param variable referenced variable
    * @param column corresponding embedding entry index
    */
-  public void updateColumnMapping(String variable, int column) {
+  public void setEntryColumn(String variable, int column) {
     columnMapping.put(variable, column);
   }
 
   /**
    * Returns the position of the embedding entry corresponding to the given variable.
    * Returns -1 if the variable is not present within the embedding
+   *
    * @param variable variable name
    * @return the position of the corresponding embedding entry
    */
-  public int getColumn(String variable) {
+  public int getEntryColumn(String variable) {
     return columnMapping.getOrDefault(variable, -1);
   }
 
   /**
    * Inserts or updates the mapping of a Variable-PropertyKey pair to the position of the
    * corresponding PropertyValue within the embeddings propertyData array
+   *
    * @param variable variable name
    * @param propertyKey property key
    * @param index position of the property value within the propertyData array
    */
-  public void updatePropertyMapping(String variable, String propertyKey, int index) {
+  public void setPropertyColumn(String variable, String propertyKey, int index) {
     propertyMapping.put(Pair.of(variable, propertyKey), index);
   }
 
   /**
    * Returns the position of the PropertyValue corresponding to the Variable-PropertyKey-Pair.
    * Returns -1 if the property is not present within the embedding.
+   *
    * @param variable variable name
    * @param propertyKey property key
    * @return the position of the corresponding property value
    */
-  public int getPropertyIndex(String variable, String propertyKey) {
+  public int getPropertyColumn(String variable, String propertyKey) {
     return propertyMapping.getOrDefault(Pair.of(variable, propertyKey), -1);
   }
 
   /**
    * Returns a list of all variable that are contained in the embedding
    * The order of the variables is determined by their position within the embedding
+   *
    * @return a list of all variable that are contained in the embedding
    */
   public List<String> getVariables() {
@@ -118,6 +128,7 @@ public class EmbeddingMetaData implements Serializable {
    * Returns a list of all property keys that are contained in the embedding regarding the
    * specified variable.
    * The order of the keys is determined by the position of the property value in the embedding.
+   *
    * @param variable variable name
    * @return a list of all property keys contained in the embedding
    */

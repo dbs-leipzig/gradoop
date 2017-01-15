@@ -21,23 +21,23 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.List;
 
 /**
- * Filters a set of vertices by given predicates
+ * Applies a given predicate on a {@link Vertex} and projects specified property values to the
+ * output embedding.
  */
-public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
+public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embedding> {
   /**
    * Predicates used for filtering
    */
   private final CNF predicates;
-
   /**
-   * Information about the property keys needed to transform the vertex into an embedding
+   * Property keys used for value projection
    */
   private final List<String> propertyKeys;
   /**
@@ -45,27 +45,25 @@ public class FilterVertex extends RichFlatMapFunction<Vertex, Embedding> {
    */
   private final EmbeddingMetaData metaData;
 
-
   /**
    * New vertex filter function
+   *
    * @param predicates predicates used for filtering
-   * @param metaData Meta data describing the vertex embedding used for filtering
+   * @param metaData meta data describing the output embedding
    */
-  public FilterVertex(CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectVertex(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
     this.metaData = metaData;
 
-    String variable = (String) predicates.getVariables().toArray()[0];
+    String variable = predicates.getVariables().iterator().next();
     this.propertyKeys = metaData.getPropertyKeys(variable);
   }
 
   @Override
   public void flatMap(Vertex vertex, Collector<Embedding> out) throws Exception {
-    Embedding embedding = GraphElementToEmbedding.convert(vertex, propertyKeys);
+    Embedding embedding = EmbeddingFactory.fromVertex(vertex, propertyKeys);
 
     if (predicates.evaluate(embedding, metaData)) {
-      embedding.clearPropertyData();
-      embedding.clearIdListData();
       out.collect(embedding);
     }
   }

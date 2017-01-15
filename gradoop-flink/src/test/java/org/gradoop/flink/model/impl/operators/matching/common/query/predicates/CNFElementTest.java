@@ -51,12 +51,12 @@ public class CNFElementTest {
     CNFElement cnfElement = query.getPredicates().getPredicates().get(0);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.updateColumnMapping("a", 0);
-    metaData.updateColumnMapping("b", 1);
-    metaData.updateColumnMapping("c", 2);
-    metaData.updatePropertyMapping("a", "name", 0);
-    metaData.updatePropertyMapping("a", "age", 1);
-    metaData.updatePropertyMapping("c", "age", 2);
+    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("c", 2);
+    metaData.setPropertyColumn("a", "name", 0);
+    metaData.setPropertyColumn("a", "age", 1);
+    metaData.setPropertyColumn("c", "age", 2);
 
     GradoopId a = GradoopId.get();
     GradoopId c = GradoopId.get();

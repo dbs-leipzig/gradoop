@@ -57,14 +57,14 @@ public class PropertySelectorComparable extends QueryComparable {
    */
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    int entryColumn = metaData.getColumn(propertySelector.getVariable());
+    int entryColumn = metaData.getEntryColumn(propertySelector.getVariable());
 
     if (entryColumn == -1) {
       throw new MissingElementException(propertySelector.getVariable());
     }
 
-    int propertyColumn =
-      metaData.getPropertyIndex(propertySelector.getVariable(), propertySelector.getPropertyName());
+    int propertyColumn = metaData
+      .getPropertyColumn(propertySelector.getVariable(), propertySelector.getPropertyName());
 
     if (propertyColumn >= 0) {
       return embedding.getProperty(propertyColumn);
@@ -76,7 +76,7 @@ public class PropertySelectorComparable extends QueryComparable {
   @Override
   public Set<String> getPropertyKeys(String variable) {
     return variable.equals(propertySelector.getVariable()) ?
-      Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet<>();
+      Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet<>(0);
   }
 
   @Override
@@ -90,9 +90,9 @@ public class PropertySelectorComparable extends QueryComparable {
 
     PropertySelectorComparable that = (PropertySelectorComparable) o;
 
-    return propertySelector != null ? propertySelector.equals(that.propertySelector) :
+    return propertySelector != null ?
+      propertySelector.equals(that.propertySelector) :
       that.propertySelector == null;
-
   }
 
   @Override
