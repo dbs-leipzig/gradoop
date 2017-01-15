@@ -21,8 +21,6 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -39,75 +37,73 @@ import static org.junit.Assert.assertTrue;
 public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
   @Test
-  public void testFilterEdges() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+  public void testFilterWithNoPredicates() throws Exception {
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->()");
 
+    EdgeFactory edgeFactory = new EdgeFactory();
     Properties properties = Properties.create();
     properties.set("name", "Anton");
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(
-      new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties));
+    Edge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+
+    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", 1);
-    metaData.setPropertyColumn("a", "name", 0);
 
-    FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
+    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
 
-    assertEquals(0, filter.evaluate().count());
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+  }
+
+  @Test
+  public void testFilterEdgesByProperties() throws Exception {
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
+
+    EdgeFactory edgeFactory = new EdgeFactory();
+    Properties properties = Properties.create();
+    properties.set("since", 2014);
+    Edge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+
+    properties = Properties.create();
+    properties.set("since", 2013);
+    Edge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+
+    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
+
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("a", 1);
+    metaData.setPropertyColumn("a", "since", 0);
+
+    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
+
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertTrue(result.get(0).getProperty(0).equals(e1.getPropertyValue("since")));
   }
 
   @Test
   public void testFilterEdgesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(
-      new EdgeFactory().createEdge("hates", GradoopId.get(), GradoopId.get()));
+    EdgeFactory edgeFactory = new EdgeFactory();
+    Edge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
+    Edge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
+    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", 1);
     metaData.setPropertyColumn("a", "__label__", 0);
 
-    FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
+    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
 
-    assertEquals(0, filter.evaluate().count());
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(e1.getLabel())));
   }
 
   @Test
-  public void testKeepEdges() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
-
-    Properties properties = Properties.create();
-    properties.set("name", "Alice");
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(
-      new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties));
-
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 1);
-    metaData.setPropertyColumn("a", "name", 0);
-
-    FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
-
-    assertEquals(1, filter.evaluate().count());
-  }
-
-  @Test
-  public void testKeepEdgesByLabel() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
-
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(
-      new EdgeFactory().createEdge("likes", GradoopId.get(), GradoopId.get()));
-
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 1);
-    metaData.setPropertyColumn("a", "__label__", 0);
-
-    FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
-
-    assertEquals(1, filter.evaluate().count());
-  }
-
-  @Test
-  public void testReturnEmbeddingWithThreeIdEntries() throws Exception {
+  public void testResultingEntryList() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
