@@ -21,16 +21,17 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.GraphElementToEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.List;
 
 /**
- * Filters a set of edges by given predicates
+ * Applies a given predicate on a {@link Edge} and projects specified property values to the
+ * output embedding.
  */
-public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
+public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
   /**
    * Predicates used for filtering
    */
@@ -48,25 +49,23 @@ public class FilterEdge extends RichFlatMapFunction<Edge, Embedding> {
 
   /**
    * New edge filter function
+   *
    * @param predicates predicates used for filtering
-   * @param metaData Meta data describing the embedding used for filtering
+   * @param metaData meta data describing the output embedding
    */
-  public FilterEdge(CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectEdge(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
     this.metaData = metaData;
 
-    String variable = (String) predicates.getVariables().toArray()[0];
-
+    String variable = predicates.getVariables().iterator().next();
     this.propertyKeys = metaData.getPropertyKeys(variable);
   }
 
   @Override
   public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    Embedding embedding = GraphElementToEmbedding.convert(edge, propertyKeys);
+    Embedding embedding = EmbeddingFactory.fromEdge(edge, propertyKeys);
 
     if (predicates.evaluate(embedding, metaData)) {
-      embedding.clearPropertyData();
-      embedding.clearIdListData();
       out.collect(embedding);
     }
   }

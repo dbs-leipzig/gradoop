@@ -23,14 +23,27 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEdge;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectEdge;
 
 /**
- * Filters a List of edges by predicates
- * Edge -> Embedding(IdEntry(SrcID), IdEntry(Edge), IdEntry(TargetID))
- * No properties will be adopted.
+ * Filters a set of EPGM {@link Edge} objects based on a specified predicate. Additionally, the
+ * operator projects all property values to the output {@link Embedding} that are specified in the
+ * given {@link EmbeddingMetaData}.
+ *
+ * Edge -> Embedding(
+ *  [IdEntry(SourceId),IdEntry(EdgeId),IdEntry(TargetId)],
+ *  [PropertyEntry(v1),PropertyEntry(v2)]
+ * )
+ *
+ * Example:
+ *
+ * Given an Edge(0, 1, 2, "friendOf", {since:2017, weight:23}), a predicate "weight = 23" and a
+ * mapping between property keys and column indices {weight:0,isValid:1} the operator creates
+ * an {@link Embedding}:
+ *
+ * ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(23),PropertyEntry(NULL)])
  */
-public class FilterEdges implements PhysicalOperator {
+public class FilterAndProjectEdges implements PhysicalOperator {
   /**
    * Input graph elements
    */
@@ -46,11 +59,12 @@ public class FilterEdges implements PhysicalOperator {
 
   /**
    * New edge filter operator
+   *
    * @param input Candidate edges
    * @param predicates Predicates used to filter edges
-   * @param metaData Meta data describing the embedding used for filtering
+   * @param metaData Meta data describing the projected (output) embedding
    */
-  public FilterEdges(DataSet<Edge> input, CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates, EmbeddingMetaData metaData) {
     this.input = input;
     this.predicates = predicates;
     this.metaData = metaData;
@@ -58,6 +72,6 @@ public class FilterEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterEdge(predicates, metaData));
+    return input.flatMap(new FilterAndProjectEdge(predicates, metaData));
   }
 }
