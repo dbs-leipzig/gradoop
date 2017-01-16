@@ -121,6 +121,7 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
     float minPrice = config.getProductMinPrice();
     float maxPrice = config.getProductMaxPrice();
 
+    // generate price between min and max value
     return  BigDecimal.valueOf(minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice)))
       .setScale(2, BigDecimal.ROUND_HALF_UP);
   }

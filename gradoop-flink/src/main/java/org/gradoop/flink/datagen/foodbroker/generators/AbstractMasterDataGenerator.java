@@ -111,6 +111,7 @@ public abstract class AbstractMasterDataGenerator
   List<String> getStringValuesFromFile(String fileName) {
     List<String> values = null;
     String adjectivesPath = null;
+    // get path relevant to the config file
     Path parentDirectory = Paths.get(foodBrokerConfig.getPath()).getParent();
     if (parentDirectory != null) {
       adjectivesPath = parentDirectory.toString() + "/" + fileName;

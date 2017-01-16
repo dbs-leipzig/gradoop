@@ -63,8 +63,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Generates a GraphCollection containing a foodbrokerage and a complaint
- * handling process.
+ * Generates a GraphCollection containing a foodbrokerage and a complaint handling process.
  */
 public class FoodBroker implements GraphCollectionGenerator {
   /**
@@ -170,9 +169,7 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(productsQualityDataMap, Constants.PRODUCT_QUALITY_MAP_BC)
       .withBroadcastSet(productsPriceDataMap, Constants.PRODUCT_PRICE_MAP_BC);
 
-    long complaintSeed = 0;
-
-    complaintSeed = foodBrokerConfig.getCaseCount();
+    long complaintSeed = foodBrokerConfig.getCaseCount();
 
     // Phase 2.2: Run Complaint Handling
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple = brokerage
@@ -213,11 +210,12 @@ public class FoodBroker implements GraphCollectionGenerator {
       .map(new GraphIdsTupleFromEdge())
       .reduceGroup(new GraphIdsMapFromTuple());
 
-    // get get new, in complaint handling generated, master data
+    // get the new master data which was generated in complaint handling
     DataSet<Vertex> complaintHandlingMasterData = complaintHandlingTuple
       .map(new Value1Of2<GraphTransaction, Set<Vertex>>())
       .flatMap(new UserClients());
 
+    // combine all master data and set their graph ids
     DataSet<Vertex> masterData = customers
       .union(vendors)
       .union(logistics)
@@ -249,6 +247,7 @@ public class FoodBroker implements GraphCollectionGenerator {
     employees = new EmployeeGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
     products = new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
+    // reduce all master data objects to their id and their quality value
     customerDataMap = customers
       .map(new MasterDataQualityMapper())
       .reduceGroup(new MasterDataMapFromTuple<Float>());

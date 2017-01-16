@@ -37,6 +37,7 @@ public class MasterDataMapFromTuple<T>
   public void reduce(Iterable<Tuple2<GradoopId, T>> iterable,
     Collector<Map<GradoopId, T>> collector) throws Exception {
     Map<GradoopId, T> map = Maps.newHashMap();
+    // fill map with all tuple pairs
     for (Tuple2<GradoopId, T> tuple : iterable) {
       map.put(tuple.f0, tuple.f1);
     }

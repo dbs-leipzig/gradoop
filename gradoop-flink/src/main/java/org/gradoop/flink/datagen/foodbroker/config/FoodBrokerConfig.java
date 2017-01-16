@@ -385,6 +385,7 @@ public class FoodBrokerConfig implements Serializable {
     Float value = startValue;
 
     for (float quality : influencingMasterDataQuality) {
+      // check quality value of the masterdata and adjust the result value
       if (quality >= getQualityGood()) {
         if (higherIsBetter) {
           value += influence;
@@ -421,6 +422,7 @@ public class FoodBrokerConfig implements Serializable {
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, 0.0f);
 
+    // load the min and max values for the node and key combination
     try {
       min = getTransactionalNodes().getJSONObject(node).getInt(key + "Min");
       max = getTransactionalNodes().getJSONObject(node).getInt(key + "Max");
@@ -428,11 +430,14 @@ public class FoodBrokerConfig implements Serializable {
       e.printStackTrace();
     }
 
+    // generate a random value to start with
     startValue = 1 + random.nextInt((max - min) + 1) + min;
 
+    // get the result value depending on the start value
     value = getValue(
       influencingMasterDataQuality, higherIsBetter, influence, startValue.floatValue()).intValue();
 
+    // keep result in boundaries
     if (value < min) {
       value = min;
     } else if (value > max) {
@@ -458,13 +463,16 @@ public class FoodBrokerConfig implements Serializable {
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
 
+    // load the value to start with
     try {
       baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
     } catch (JSONException e) {
       e.printStackTrace();
     }
+    // get the result value based on the loaded one
     value = getValue(influencingMasterDataQuality, higherIsBetter, influence, baseValue);
 
+    // round and return the value
     return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
   }
 
@@ -485,13 +493,16 @@ public class FoodBrokerConfig implements Serializable {
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
 
+    // load the value to start with
     try {
       baseValue = (float) getTransactionalNodes().getJSONObject(node).getDouble(key);
     } catch (JSONException e) {
       e.printStackTrace();
     }
+    // get the result value based on the loaded one
     value = getValue(influencingMasterDataQuality, higherIsBetter, influence, baseValue);
 
+    // return if the value is greater or equal to a random one
     return (float) Math.random() <= value;
   }
 
@@ -507,8 +518,10 @@ public class FoodBrokerConfig implements Serializable {
    */
   public long delayDelayConfiguration(long date, List<Float> influencingMasterDataQuality,
     String node, String key) {
+    // get the delay from range
     int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key, false);
 
+    // calculate time with delay
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(date);
     calendar.add(Calendar.DATE, delay);

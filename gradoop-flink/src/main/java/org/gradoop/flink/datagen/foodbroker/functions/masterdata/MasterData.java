@@ -35,7 +35,7 @@ public class MasterData {
   private static String createBusinessIdentifier(MasterDataSeed seed, String acronym) {
     String idString = String.valueOf(seed.getNumber());
     long count = 8 - idString.length();
-
+    // set preceding zeros
     for (int i = 1; i <= count; i++) {
       idString = "0" + idString;
     }
@@ -53,8 +53,7 @@ public class MasterData {
     String bid = createBusinessIdentifier(seed, acronym);
     Properties properties = new Properties();
 
-    properties.set(Constants.SUPERTYPE_KEY,
-      Constants.SUPERCLASS_VALUE_MASTER);
+    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_MASTER);
     properties.set(Constants.QUALITY, seed.getQuality());
     properties.set(Constants.SOURCEID_KEY, Constants.ERP_ACRONYM + "_" + bid);
 

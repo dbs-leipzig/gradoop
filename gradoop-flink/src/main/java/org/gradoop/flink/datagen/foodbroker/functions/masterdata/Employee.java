@@ -132,6 +132,7 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
     String gender;
     String name;
 
+    // separate between male and female and load the corresponding names
     if (seed.getNumber() % 2 == 0) {
       gender = "f";
       name = firstNamesFemale.get(random.nextInt(firstNameCountFemale)) +

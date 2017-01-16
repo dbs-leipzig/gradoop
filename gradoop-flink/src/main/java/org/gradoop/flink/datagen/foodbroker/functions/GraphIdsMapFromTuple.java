@@ -27,7 +27,8 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import java.util.Map;
 
 /**
- * Creates a map from a gradoop id to all graph ids the corresponding graph element is part of.
+ * Creates a map from a gradoop id to all graph ids in which the corresponding graph element is part
+ * of.
  */
 public class GraphIdsMapFromTuple implements
   GroupReduceFunction<Tuple2<GradoopId, GradoopIdSet>, Map<GradoopId, GradoopIdSet>> {
@@ -38,7 +39,9 @@ public class GraphIdsMapFromTuple implements
     throws Exception {
     Map<GradoopId, GradoopIdSet> map = Maps.newHashMap();
     GradoopIdSet graphIds;
+    // fill map with element and the graph ids
     for (Tuple2<GradoopId, GradoopIdSet> tuple : iterable) {
+      // if the element is already part of one graph
       if (map.containsKey(tuple.f0)) {
         graphIds = map.get(tuple.f0);
         graphIds.addAll(tuple.f1);
