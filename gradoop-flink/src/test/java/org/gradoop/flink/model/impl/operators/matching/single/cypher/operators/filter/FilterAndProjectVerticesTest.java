@@ -37,8 +37,8 @@ import static org.junit.Assert.assertTrue;
 public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
   @Test
-  public void testFilterVerticesByProperty() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
+  public void testFilterWithNoPredicates() throws Exception {
+    CNF predicates = predicateFromQuery("MATCH (a)");
 
     Properties properties = Properties.create();
     properties.set("name", "Anton");
@@ -47,36 +47,25 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", 0);
-    metaData.setPropertyColumn("a", "name", 0);
 
     FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices, predicates, metaData);
 
-    assertEquals(0, filter.evaluate().count());
+    assertEquals(1, filter.evaluate().count());
   }
 
   @Test
-  public void testFilterVerticesByLabel() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH (a:Person)");
-
-    DataSet<Vertex> vertices = getExecutionEnvironment()
-      .fromElements(new VertexFactory().createVertex("Robot"));
-
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setPropertyColumn("a", "__label__", 0);
-
-    FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices, predicates, metaData);
-    assertEquals(0, filter.evaluate().count());
-  }
-
-  @Test
-  public void testKeepVertices() throws Exception {
+  public void testFilterVerticesByProperties() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
+    VertexFactory vertexFactory = new VertexFactory();
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    DataSet<Vertex> vertices = getExecutionEnvironment()
-      .fromElements(new VertexFactory().createVertex("Person", properties));
+    Vertex v1 = vertexFactory.createVertex("Person", properties);
+    properties = Properties.create();
+    properties.set("name", "Bob");
+    Vertex v2 = vertexFactory.createVertex("Person", properties);
+
+    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", 0);
@@ -85,22 +74,29 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
 
     assertEquals(1, result.size());
+    assertTrue(result.get(0).getId(0).equals(v1.getId()));
+    assertTrue(result.get(0).getProperty(0).equals(v1.getPropertyValue("name")));
   }
 
   @Test
-  public void testKeepVerticesByLabel() throws Exception {
+  public void testFilterVerticesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a:Person)");
 
-    DataSet<Vertex> vertices = getExecutionEnvironment()
-      .fromElements(new VertexFactory().createVertex("Person"));
+
+    VertexFactory vertexFactory = new VertexFactory();
+    Vertex v1 = vertexFactory.createVertex("Person");
+    Vertex v2 = vertexFactory.createVertex("Forum");
+    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", 0);
     metaData.setPropertyColumn("a", "__label__", 0);
 
-    FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices, predicates, metaData);
+    List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
 
-    assertEquals(1, filter.evaluate().count());
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getId(0).equals(v1.getId()));
+    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(v1.getLabel())));
   }
 
   @Test
