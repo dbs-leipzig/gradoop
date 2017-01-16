@@ -23,10 +23,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Label;
@@ -36,14 +33,15 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class FoodBrokerTest extends GradoopFlinkTestBase {
+
   @Test
   public void testGenerate() throws Exception {
-
     GraphCollection cases = generateCollection();
 
-    GradoopFlinkTestUtils.printGraphCollection(cases);
+    assertNotNull(cases);
   }
 
   @Test
@@ -97,7 +95,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     GraphCollection cases = generateCollection();
     int casesCount = 10;
     double actual = 0;
-    //max 1:SalesQuotatio, 20:SalesQuotationLines, 1:SalesOrder,
+    // max 1:SalesQuotation, 20:SalesQuotationLines, 1:SalesOrder,
     // 20:SalesOrderLines, 20:PurchOrders, 20:PurchOrderLines,
     // 20:DeliveryNotes, 20:PurchInvoices, 1:SalesInvoice = 63
     double max = 63 * casesCount;
