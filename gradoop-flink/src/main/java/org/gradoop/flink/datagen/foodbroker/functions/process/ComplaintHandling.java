@@ -25,7 +25,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -122,7 +122,7 @@ public class ComplaintHandling
 
     //create new graph head
     graphHead = graphHeadFactory.createGraphHead();
-    graphIds = new GradoopIdSet();
+    graphIds = new GradoopIdList();
     graphIds.add(graphHead.getId());
     graphTransaction = new GraphTransaction();
     //the complaint handling process

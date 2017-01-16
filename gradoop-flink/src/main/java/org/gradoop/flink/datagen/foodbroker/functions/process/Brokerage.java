@@ -23,7 +23,7 @@ import org.apache.flink.api.common.functions.MapPartitionFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -87,7 +87,7 @@ public class Brokerage
       vertexMap = Maps.newHashMap();
       edgeMap = Maps.newHashMap();
       graphHead = graphHeadFactory.createGraphHead();
-      graphIds = new GradoopIdSet();
+      graphIds = new GradoopIdList();
       graphIds.add(graphHead.getId());
       graphTransaction = new GraphTransaction();
 

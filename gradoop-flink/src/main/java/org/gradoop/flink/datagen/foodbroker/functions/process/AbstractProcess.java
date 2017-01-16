@@ -23,7 +23,7 @@ import org.apache.flink.api.common.functions.AbstractRichFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
@@ -82,7 +82,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Graph ids, one seperate id for each case.
    */
-  protected GradoopIdSet graphIds;
+  protected GradoopIdList graphIds;
   /**
    * Map to quickly receive the target id of an edge.
    * Note that a object may have multiple outgoing edges with the same label.

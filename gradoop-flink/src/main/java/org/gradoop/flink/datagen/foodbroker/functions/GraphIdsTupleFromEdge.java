@@ -20,19 +20,19 @@ package org.gradoop.flink.datagen.foodbroker.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Creates a tuple containing the gradoop id of an edges target and the edges graph ids.
  */
 public class GraphIdsTupleFromEdge implements
-  MapFunction<Edge, Tuple2<GradoopId, GradoopIdSet>> {
+  MapFunction<Edge, Tuple2<GradoopId, GradoopIdList>> {
 
   @Override
-  public Tuple2<GradoopId, GradoopIdSet> map(Edge edge) throws Exception {
+  public Tuple2<GradoopId, GradoopIdList> map(Edge edge) throws Exception {
     return
-      new Tuple2<GradoopId, GradoopIdSet>(
+      new Tuple2<GradoopId, GradoopIdList>(
         edge.getTargetId(), edge.getGraphIds());
   }
 }

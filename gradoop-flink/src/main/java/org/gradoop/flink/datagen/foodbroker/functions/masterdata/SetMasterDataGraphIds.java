@@ -20,7 +20,7 @@ package org.gradoop.flink.datagen.foodbroker.functions.masterdata;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.foodbroker.config.Constants;
 
@@ -34,13 +34,13 @@ public class SetMasterDataGraphIds extends RichMapFunction<Vertex, Vertex> {
    * Hashmap from a gradoop id to a gradoop id set, which contains all graph ids the key id is
    * part of.
    */
-  private Map<GradoopId, GradoopIdSet> map;
+  private Map<GradoopId, GradoopIdList> map;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     map = getRuntimeContext()
-      .<Map<GradoopId, GradoopIdSet>>getBroadcastVariable(Constants.GRAPH_IDS_BC).get(0);
+      .<Map<GradoopId, GradoopIdList>>getBroadcastVariable(Constants.GRAPH_IDS_BC).get(0);
   }
 
   @Override

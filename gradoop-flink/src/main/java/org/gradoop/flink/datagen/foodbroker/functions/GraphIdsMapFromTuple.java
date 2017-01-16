@@ -22,7 +22,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 import java.util.Map;
 
@@ -31,16 +31,16 @@ import java.util.Map;
  * of.
  */
 public class GraphIdsMapFromTuple implements
-  GroupReduceFunction<Tuple2<GradoopId, GradoopIdSet>, Map<GradoopId, GradoopIdSet>> {
+  GroupReduceFunction<Tuple2<GradoopId, GradoopIdList>, Map<GradoopId, GradoopIdList>> {
 
   @Override
-  public void reduce(Iterable<Tuple2<GradoopId, GradoopIdSet>> iterable,
-    Collector<Map<GradoopId, GradoopIdSet>> collector)
+  public void reduce(Iterable<Tuple2<GradoopId, GradoopIdList>> iterable,
+    Collector<Map<GradoopId, GradoopIdList>> collector)
     throws Exception {
-    Map<GradoopId, GradoopIdSet> map = Maps.newHashMap();
-    GradoopIdSet graphIds;
+    Map<GradoopId, GradoopIdList> map = Maps.newHashMap();
+    GradoopIdList graphIds;
     // fill map with element and the graph ids
-    for (Tuple2<GradoopId, GradoopIdSet> tuple : iterable) {
+    for (Tuple2<GradoopId, GradoopIdList> tuple : iterable) {
       // if the element is already part of one graph
       if (map.containsKey(tuple.f0)) {
         graphIds = map.get(tuple.f0);
