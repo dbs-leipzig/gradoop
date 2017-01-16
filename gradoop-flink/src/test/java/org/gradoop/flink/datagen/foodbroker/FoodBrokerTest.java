@@ -147,25 +147,4 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     }
   }
 
-  @Test
-  public void toJson() throws Exception {
-
-    GraphCollection cases = generateCollection();
-
-    String graphsPath =
-      FoodBrokerTest.class.getResource("/foodbroker").getFile() +
-        "/graphs.json";
-    String nodesPath =
-      FoodBrokerTest.class.getResource("/foodbroker").getFile() + "/nodes.json";
-    String edgesPath =
-      FoodBrokerTest.class.getResource("/foodbroker").getFile() + "/edges.json";
-
-    DataSink dataSink = new JSONDataSink(graphsPath, nodesPath, edgesPath, getConfig());
-
-    dataSink.write(cases);
-
-    config.getExecutionEnvironment().execute();
-//    cases.writeTo(new JSONDataSink(graphsPath, nodesPath, edgesPath, getConfig()));
-
-  }
 }
