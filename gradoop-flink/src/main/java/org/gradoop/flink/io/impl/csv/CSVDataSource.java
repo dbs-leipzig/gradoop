@@ -26,6 +26,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
@@ -51,6 +52,8 @@ import org.gradoop.flink.io.impl.csv.pojos.Domain;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.xml.sax.SAXException;
@@ -167,33 +170,32 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .withBroadcastSet(vertexIds, CSVConstants.BROADCAST_ID_MAP);
 
     //get all graph keys from vertex properties
-    DataSet<String> vertexGraphKeys = vertices
+    DataSet<Tuple2<Vertex, String>> vertexGraphKeys = vertices
         .flatMap(new ElementToElementGraphKey<Vertex>());
 
     //get all graph keys from edge properties
-    DataSet<String>
-      edgeGraphKeys = edges
+    DataSet<Tuple2<Edge, String>> edgeGraphKeys = edges
       .flatMap(new ElementToElementGraphKey<Edge>());
 
-
+    //map each graphhead to its key from xml file
     DataSet<Tuple2<String, GraphHead>> keyGraphHead = graphHeads
-      .map(new MapFunction<GraphHead, Tuple2<String, GraphHead>>() {
-        @Override
-        public Tuple2<String, GraphHead> map(GraphHead graphHead) throws Exception {
-          return new Tuple2<String, GraphHead>(graphHead.getPropertyValue("key").getString(), graphHead);
-        }
-      });
+      .map((MapFunction<GraphHead, Tuple2<String, GraphHead>>) graphHead
+        -> new Tuple2<String, GraphHead>(
+          graphHead.getPropertyValue("key").getString(), graphHead));
 
+    //take all distinct graph keys which were read from or created for a vertex those are not yet
+    //mapped to an existing graphhead
     keyGraphHead = keyGraphHead
       .union(vertexGraphKeys
+          .map(new Value1Of2<Vertex, String>())
+        .union(edgeGraphKeys
+          .map(new Value1Of2<Edge, String>()))
         .distinct()
-        .map(new MapFunction<String, Tuple2<String, GraphHead>>() {
-          @Override
-          public Tuple2<String, GraphHead> map(String s) throws Exception {
-            return new Tuple2<String, GraphHead>(s, null);
-          }
-        }));
-    //distinct with validation that only existing graphhead is used, if there is one
+        .map((MapFunction<String, Tuple2<String, GraphHead>>) s
+          -> new Tuple2<String, GraphHead>(s, null)));
+
+    //distinct(groupbBy+reduceGroup) with validation that only existing graphhead is used, if
+    //there is one
     keyGraphHead = keyGraphHead
       .groupBy(0)
       .reduceGroup(new GroupReduceFunction<Tuple2<String, GraphHead>, Tuple2<String, GraphHead>>() {
@@ -202,11 +204,13 @@ public class CSVDataSource extends CSVBase implements DataSource {
           Collector<Tuple2<String, GraphHead>> collector) throws Exception {
           Tuple2<String, GraphHead> result;
           result = iterable.iterator().next();
+          //if possible select the key which already has a mapped graphhead
           for (Tuple2<String, GraphHead> tuple : iterable) {
             if (tuple.f1 != null){
               result = tuple;
             }
           }
+          //if the graph key does not have a mapped graphhead, one is created
           if (result.f1 == null){
             GraphHead graphHead = graphHeadFactory.createGraphHead();
             graphHead.setProperty(CSVConstants.PROPERTY_KEY_KEY, result.f0);
@@ -216,19 +220,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
         }
       });
 
-
-    //create graph heads for vertices without any
-    graphHeads = graphHeads
-      .union(vertexGraphKeys
-        .groupBy(1)
-        .reduceGroup(
-          new ElementGraphKeyToGraphHead<Vertex>(
-            graphHeadFactory)))
-      .union(edgeGraphKeys
-          .groupBy(1)
-          .reduceGroup(
-            new ElementGraphKeyToGraphHead<Edge>(
-              graphHeadFactory)));
+    graphHeads = keyGraphHead.map(new Value1Of2<String, GraphHead>());
 
     //set all graph heads
     vertices = vertexGraphKeys
