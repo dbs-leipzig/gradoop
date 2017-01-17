@@ -48,7 +48,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
 
@@ -72,7 +74,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
     metaData.setPropertyColumn("a", "since", 0);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
@@ -92,7 +96,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
     metaData.setPropertyColumn("a", "__label__", 0);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
@@ -113,7 +119,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
     metaData.setPropertyColumn("a", "name", 0);
 
     FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
@@ -136,7 +144,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
     metaData.setPropertyColumn("a", "name", 0);
 
     Embedding result = new FilterAndProjectEdges(edges, predicates, metaData)
@@ -156,7 +166,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("_v1", 0);
     metaData.setEntryColumn("a", 1);
+    metaData.setEntryColumn("_v2", 2);
     metaData.setPropertyColumn("a", "__label__", 0);
     metaData.setPropertyColumn("a", "name", 1);
     metaData.setPropertyColumn("a", "since", 2);

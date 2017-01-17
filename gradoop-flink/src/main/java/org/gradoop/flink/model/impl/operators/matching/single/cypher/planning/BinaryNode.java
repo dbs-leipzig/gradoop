@@ -14,20 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.common;
+
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
 
 /**
- * Used to select the strategy used by the matching algorithms
+ * A binary node takes two data sets containing embeddings as input which are used to compute
+ * a new data set of embeddings based on the specific node implementation.
  */
-public enum MatchStrategy {
-    /**
-     * If this strategy is used vertices and edges can only be
-     * mapped to one vertices/edges in the query graph
-     */
-    ISOMORPHISM,
-    /**
-     * If this strategy is used vertices and edges can be
-     * mapped to multiple vertices/edges in the query graph
-     */
-    HOMOMORPHISM
+public interface BinaryNode extends PlanNode {
+
+  /**
+   * Returns the left input node.
+   *
+   * @return left input node
+   */
+  PlanNode getLeftChild();
+
+  /**
+   * Returns the right input node.
+   *
+   * @return right input node
+   */
+  PlanNode getRightChild();
 }

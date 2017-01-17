@@ -40,7 +40,7 @@ public class EmbeddingMetaData implements Serializable {
   /**
    * Stores the mapping of query variables to embedding entries
    */
-  private Map<String, Integer> columnMapping;
+  private Map<String, Integer> entryMapping;
   /**
    * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
    * the embedding
@@ -57,13 +57,31 @@ public class EmbeddingMetaData implements Serializable {
   /**
    * Initializes a new EmbeddingMetaData object from the given mappings
    *
-   * @param columnMapping maps variables to embedding entries
+   * @param entryMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
    */
-  public EmbeddingMetaData(Map<String, Integer> columnMapping,
+  public EmbeddingMetaData(Map<String, Integer> entryMapping,
     Map<Pair<String, String>, Integer> propertyMapping) {
-    this.columnMapping = columnMapping;
+    this.entryMapping = entryMapping;
     this.propertyMapping = propertyMapping;
+  }
+
+  /**
+   * Returns the number of entries mapped in this meta data.
+   *
+   * @return number of mapped entries
+   */
+  public int getEntryCount() {
+    return entryMapping.size();
+  }
+
+  /**
+   * Returns the number of property values mapped in this meta data.
+   *
+   * @return number of mapped property values
+   */
+  public int getPropertyCount() {
+    return propertyMapping.size();
   }
 
   /**
@@ -73,7 +91,7 @@ public class EmbeddingMetaData implements Serializable {
    * @param column corresponding embedding entry index
    */
   public void setEntryColumn(String variable, int column) {
-    columnMapping.put(variable, column);
+    entryMapping.put(variable, column);
   }
 
   /**
@@ -84,7 +102,7 @@ public class EmbeddingMetaData implements Serializable {
    * @return the position of the corresponding embedding entry
    */
   public int getEntryColumn(String variable) {
-    return columnMapping.getOrDefault(variable, -1);
+    return entryMapping.getOrDefault(variable, -1);
   }
 
   /**
@@ -118,7 +136,7 @@ public class EmbeddingMetaData implements Serializable {
    * @return a list of all variable that are contained in the embedding
    */
   public List<String> getVariables() {
-    return columnMapping.entrySet().stream()
+    return entryMapping.entrySet().stream()
       .sorted(Comparator.comparingInt(Map.Entry::getValue))
       .map(Map.Entry::getKey)
       .collect(Collectors.toList());
@@ -138,5 +156,25 @@ public class EmbeddingMetaData implements Serializable {
       .sorted(Comparator.comparingInt(Map.Entry::getValue))
       .map(entry -> entry.getKey().getRight())
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EmbeddingMetaData metaData = (EmbeddingMetaData) o;
+
+    return entryMapping.equals(metaData.entryMapping) &&
+      propertyMapping.equals(metaData.propertyMapping);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * entryMapping.hashCode() + propertyMapping.hashCode();
   }
 }
