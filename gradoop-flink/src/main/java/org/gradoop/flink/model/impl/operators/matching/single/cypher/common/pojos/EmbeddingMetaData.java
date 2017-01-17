@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -113,32 +114,45 @@ public class EmbeddingMetaData implements Serializable {
    * Returns the position of the embedding entry corresponding to the given variable.
    * The method checks if the variable is mapped to a vertex or an edge entry.
    *
-   * Returns -1 if the variable is not present within the embedding
-   *
    * @param variable variable name
    * @return the position of the corresponding embedding entry
+   * @throws NoSuchElementException if there is no column mapped to the specified variable
    */
   public int getEntryColumn(String variable) {
     Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
 
     if (!entryMapping.containsKey(key)) {
       key = Pair.of(variable, EntryType.EDGE);
+      if(!entryMapping.containsKey(key)) {
+        throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+      }
     }
-    return entryMapping.getOrDefault(key, -1);
+    return entryMapping.get(key);
   }
 
   /**
-   * Returns the entry type of the given variable. The method assumes that the given variable is
-   * contained in the mapping and refers to either a vertex or an edge.
+   * Returns the entry type of the given variable.
    *
    * @param variable query variable
    * @return Entry type of the referred entry
+   * @throws NoSuchElementException if there is no column mapped to the specified variable
    */
   public EntryType getEntryType(String variable) {
     Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
+    EntryType result;
 
-    return entryMapping.containsKey(key) ? EntryType.VERTEX : EntryType.EDGE;
+    if (!entryMapping.containsKey(key)) {
+      key = Pair.of(variable, EntryType.EDGE);
+      if (!entryMapping.containsKey(key)) {
+        throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+      }
+      result = EntryType.EDGE;
+    } else {
+      result = EntryType.VERTEX;
+    }
+    return result;
   }
+
   /**
    * Inserts or updates the mapping of a Variable-PropertyKey pair to the position of the
    * corresponding PropertyValue within the embeddings propertyData array
@@ -153,14 +167,19 @@ public class EmbeddingMetaData implements Serializable {
 
   /**
    * Returns the position of the PropertyValue corresponding to the Variable-PropertyKey-Pair.
-   * Returns -1 if the property is not present within the embedding.
    *
    * @param variable variable name
    * @param propertyKey property key
    * @return the position of the corresponding property value
+   * @throws NoSuchElementException if there is no column mapped to the given variable and key
    */
   public int getPropertyColumn(String variable, String propertyKey) {
-    return propertyMapping.getOrDefault(Pair.of(variable, propertyKey), -1);
+    Integer column = propertyMapping.get(Pair.of(variable, propertyKey));
+    if (column == null) {
+      throw new NoSuchElementException(
+        String.format("no value for property %s.%s", variable, propertyKey));
+    }
+    return column;
   }
 
   /**

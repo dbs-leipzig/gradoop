@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,7 +38,6 @@ public class EmbeddingMetaDataTest {
     assertThat(metaData.getEntryColumn("a"), is(0));
     assertThat(metaData.getEntryColumn("b"), is(1));
     assertThat(metaData.getEntryColumn("c"), is(2));
-    assertThat(metaData.getEntryColumn("d"), is(-1));
     assertThat(metaData.getEntryType("a"), is(EntryType.VERTEX));
     assertThat(metaData.getEntryType("b"), is(EntryType.VERTEX));
     assertThat(metaData.getEntryType("c"), is(EntryType.EDGE));
@@ -46,7 +46,6 @@ public class EmbeddingMetaDataTest {
     assertThat(metaData.getPropertyColumn("a", "age"), is(0));
     assertThat(metaData.getPropertyColumn("b", "age"), is(1));
     assertThat(metaData.getPropertyColumn("c", "since"), is(2));
-    assertThat(metaData.getPropertyColumn("c", "age"), is(-1));
   }
 
   @Test
@@ -83,9 +82,14 @@ public class EmbeddingMetaDataTest {
   @Test
   public void testGetEntryColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    assertThat(metaData.getEntryColumn("a"), is(-1));
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     assertThat(metaData.getEntryColumn("a"), is(0));
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetEntryColumnForMissingVariable() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.getEntryColumn("a");
   }
 
   @Test
@@ -95,6 +99,12 @@ public class EmbeddingMetaDataTest {
     metaData.setEntryColumn("b", EntryType.EDGE, 1);
     assertThat(metaData.getEntryType("a"), is(EntryType.VERTEX));
     assertThat(metaData.getEntryType("b"), is(EntryType.EDGE));
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetEntryTypeForMissingVariable() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.getEntryType("a");
   }
 
   @Test
@@ -107,9 +117,14 @@ public class EmbeddingMetaDataTest {
   @Test
   public void testGetPropertyColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    assertThat(metaData.getPropertyColumn("a", "age"), is(-1));
     metaData.setPropertyColumn("a", "age", 0);
     assertThat(metaData.getPropertyColumn("a", "age"), is(0));
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetPropertyColumnForMissingVariable() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.getPropertyColumn("a", "age");
   }
 
   @Test
