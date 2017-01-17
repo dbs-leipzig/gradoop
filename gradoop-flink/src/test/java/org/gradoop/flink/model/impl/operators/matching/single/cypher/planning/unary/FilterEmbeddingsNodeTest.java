@@ -9,6 +9,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.MockPlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
   @Test
   public void testMetaDataInitialization() throws Exception {
     EmbeddingMetaData mockMeta = new EmbeddingMetaData();
-    mockMeta.setEntryColumn("a", 0);
+    mockMeta.setEntryColumn("a", EntryType.VERTEX, 0);
     mockMeta.setPropertyColumn("a", "age", 0);
     PlanNode mockNode = new MockPlanNode(null, mockMeta);
 
@@ -45,8 +46,8 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
     GradoopId vertexCId = GradoopId.get();
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
     metaData.setPropertyColumn("a", "age", 0);
     metaData.setPropertyColumn("b", "age", 1);
 

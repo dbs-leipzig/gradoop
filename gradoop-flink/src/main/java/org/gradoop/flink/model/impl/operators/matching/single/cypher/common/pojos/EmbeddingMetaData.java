@@ -37,10 +37,25 @@ import java.util.stream.Collectors;
  * property values associated to property keys at query elements.
  */
 public class EmbeddingMetaData implements Serializable {
+
+  /**
+   * Describes the type of an embedding entry
+   */
+  public enum EntryType {
+    /**
+     * Vertex
+     */
+    VERTEX,
+    /**
+     * Edge
+     */
+    EDGE
+  }
+
   /**
    * Stores the mapping of query variables to embedding entries
    */
-  private Map<String, Integer> entryMapping;
+  private Map<Pair<String, EntryType>, Integer> entryMapping;
   /**
    * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
    * the embedding
@@ -60,7 +75,7 @@ public class EmbeddingMetaData implements Serializable {
    * @param entryMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
    */
-  public EmbeddingMetaData(Map<String, Integer> entryMapping,
+  public EmbeddingMetaData(Map<Pair<String, EntryType>, Integer> entryMapping,
     Map<Pair<String, String>, Integer> propertyMapping) {
     this.entryMapping = entryMapping;
     this.propertyMapping = propertyMapping;
@@ -90,21 +105,40 @@ public class EmbeddingMetaData implements Serializable {
    * @param variable referenced variable
    * @param column corresponding embedding entry index
    */
-  public void setEntryColumn(String variable, int column) {
-    entryMapping.put(variable, column);
+  public void setEntryColumn(String variable, EntryType entryType, int column) {
+    entryMapping.put(Pair.of(variable, entryType), column);
   }
 
   /**
    * Returns the position of the embedding entry corresponding to the given variable.
+   * The method checks if the variable is mapped to a vertex or an edge entry.
+   *
    * Returns -1 if the variable is not present within the embedding
    *
    * @param variable variable name
    * @return the position of the corresponding embedding entry
    */
   public int getEntryColumn(String variable) {
-    return entryMapping.getOrDefault(variable, -1);
+    Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
+
+    if (!entryMapping.containsKey(key)) {
+      key = Pair.of(variable, EntryType.EDGE);
+    }
+    return entryMapping.getOrDefault(key, -1);
   }
 
+  /**
+   * Returns the entry type of the given variable. The method assumes that the given variable is
+   * contained in the mapping and refers to either a vertex or an edge.
+   *
+   * @param variable query variable
+   * @return Entry type of the referred entry
+   */
+  public EntryType getEntryType(String variable) {
+    Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
+
+    return entryMapping.containsKey(key) ? EntryType.VERTEX : EntryType.EDGE;
+  }
   /**
    * Inserts or updates the mapping of a Variable-PropertyKey pair to the position of the
    * corresponding PropertyValue within the embeddings propertyData array
@@ -130,15 +164,43 @@ public class EmbeddingMetaData implements Serializable {
   }
 
   /**
-   * Returns a list of all variable that are contained in the embedding
-   * The order of the variables is determined by their position within the embedding
+   * Returns a list of all variable that are contained in the embedding.
+   * The order of the variables is determined by their position within the embedding.
    *
-   * @return a list of all variable that are contained in the embedding
+   * @return a list of all variables
    */
   public List<String> getVariables() {
     return entryMapping.entrySet().stream()
       .sorted(Comparator.comparingInt(Map.Entry::getValue))
-      .map(Map.Entry::getKey)
+      .map(entry -> entry.getKey().getLeft())
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns a list of variables that are contained in the embedding and referring to vertices. The
+   * order of the variables is determined by their position within the embedding.
+   *
+   * @return a list of all vertex variables
+   */
+  public List<String> getVertexVariables() {
+    return entryMapping.entrySet().stream()
+      .filter(entry -> entry.getKey().getRight() == EntryType.VERTEX)
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getLeft())
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns a list of variables that are contained in the embedding and referring to edges. The
+   * order of the variables is determined by their position within the embedding.
+   *
+   * @return a list of all edge variables
+   */
+  public List<String> getEdgeVariables() {
+    return entryMapping.entrySet().stream()
+      .filter(entry -> entry.getKey().getRight() == EntryType.EDGE)
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getLeft())
       .collect(Collectors.toList());
   }
 

@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -46,7 +47,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
       .fromElements(new VertexFactory().createVertex("Person", properties));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
 
     FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices, predicates, metaData);
 
@@ -68,7 +69,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "name", 0);
 
     List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
@@ -89,7 +90,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "__label__", 0);
 
     List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
@@ -109,7 +110,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(person);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "name", 0);
     metaData.setPropertyColumn("a", "__label__", 1);
 
@@ -131,7 +132,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSource<Vertex> vertices = getExecutionEnvironment().fromElements(person);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "__label__", 0);
     metaData.setPropertyColumn("a", "name", 1);
     metaData.setPropertyColumn("a", "age", 2);

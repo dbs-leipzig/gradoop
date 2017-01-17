@@ -7,6 +7,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.MockPlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.hamcrest.core.Is;
@@ -26,8 +27,8 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
   @Test
   public void testMetaDataInitialization() throws Exception {
     EmbeddingMetaData inputMetaData = new EmbeddingMetaData();
-    inputMetaData.setEntryColumn("a", 0);
-    inputMetaData.setEntryColumn("b", 1);
+    inputMetaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    inputMetaData.setEntryColumn("b", EntryType.VERTEX, 1);
     inputMetaData.setPropertyColumn("a", "age", 0);
     inputMetaData.setPropertyColumn("b","name", 1);
 
@@ -50,8 +51,8 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
     GradoopId vertexBId = GradoopId.get();
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
     metaData.setPropertyColumn("a", "age", 0);
     metaData.setPropertyColumn("b", "age", 1);
 

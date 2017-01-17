@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf.FilterAndProjectEdgesNode;
@@ -42,7 +43,7 @@ public class EmbeddingMetaDataFactory {
     String vertexVariable, List<String> propertyKeys) {
 
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
-    embeddingMetaData.setEntryColumn(vertexVariable, 0);
+    embeddingMetaData.setEntryColumn(vertexVariable, EntryType.VERTEX, 0);
     embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, propertyKeys);
 
     return embeddingMetaData;
@@ -61,9 +62,9 @@ public class EmbeddingMetaDataFactory {
     String sourceVariable, String edgeVariable, String targetVariable, List<String> propertyKeys) {
 
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
-    embeddingMetaData.setEntryColumn(sourceVariable, 0);
-    embeddingMetaData.setEntryColumn(edgeVariable, 1);
-    embeddingMetaData.setEntryColumn(targetVariable, 2);
+    embeddingMetaData.setEntryColumn(sourceVariable, EntryType.VERTEX, 0);
+    embeddingMetaData.setEntryColumn(edgeVariable, EntryType.EDGE, 1);
+    embeddingMetaData.setEntryColumn(targetVariable, EntryType.VERTEX, 2);
 
     embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, propertyKeys);
 
@@ -95,7 +96,7 @@ public class EmbeddingMetaDataFactory {
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
 
     inputMetaData.getVariables()
-      .forEach(var -> embeddingMetaData.setEntryColumn(var, inputMetaData.getEntryColumn(var)));
+      .forEach(var -> embeddingMetaData.setEntryColumn(var, inputMetaData.getEntryType(var), inputMetaData.getEntryColumn(var)));
 
     IntStream.range(0, propertyKeys.size())
       .forEach(i -> embeddingMetaData.setPropertyColumn(propertyKeys.get(i).getLeft(), propertyKeys.get(i).getRight(), i));
@@ -113,7 +114,7 @@ public class EmbeddingMetaDataFactory {
     // append the non-join entries from the right to the left side
     for (String var : rightInputMetaData.getVariables()) {
       if (!joinVariablesRight.contains(var)) {
-        leftInputMetaData.setEntryColumn(var, leftEntryCount++);
+        leftInputMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), leftEntryCount++);
       }
     }
 

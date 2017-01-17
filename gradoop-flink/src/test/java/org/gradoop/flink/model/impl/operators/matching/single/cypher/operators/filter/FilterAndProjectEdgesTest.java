@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -48,9 +49,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
 
@@ -74,9 +75,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "since", 0);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
@@ -96,9 +97,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "__label__", 0);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
@@ -119,9 +120,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "name", 0);
 
     FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
@@ -144,9 +145,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "name", 0);
 
     Embedding result = new FilterAndProjectEdges(edges, predicates, metaData)
@@ -166,9 +167,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", 0);
-    metaData.setEntryColumn("a", 1);
-    metaData.setEntryColumn("_v2", 2);
+    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("a", EntryType.EDGE, 1);
+    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "__label__", 0);
     metaData.setPropertyColumn("a", "name", 1);
     metaData.setPropertyColumn("a", "since", 2);

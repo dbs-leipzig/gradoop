@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -47,8 +48,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
     metaData.setPropertyColumn("a", "age", 0);
     metaData.setPropertyColumn("b", "age", 1);
 
@@ -71,8 +72,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
     metaData.setPropertyColumn("a", "age", 0);
     metaData.setPropertyColumn("b", "age", 1);
 
@@ -96,8 +97,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings = getExecutionEnvironment().fromElements(embedding);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
     metaData.setPropertyColumn("a", "age", 0);
     metaData.setPropertyColumn("b", "age", 1);
 

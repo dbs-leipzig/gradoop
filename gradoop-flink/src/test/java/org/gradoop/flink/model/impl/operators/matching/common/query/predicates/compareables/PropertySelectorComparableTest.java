@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.M
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
@@ -41,7 +42,7 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "age", 0);
 
     assertEquals(PropertyValue.create(42), wrapper.evaluate(embedding, metaData));
@@ -57,7 +58,7 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("a", "birth", 0);
 
     wrapper.evaluate(embedding, metaData);
@@ -72,7 +73,7 @@ public class PropertySelectorComparableTest {
     embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("b", 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 0);
     metaData.setPropertyColumn("b", "age", 0);
 
     wrapper.evaluate(embedding, metaData);
