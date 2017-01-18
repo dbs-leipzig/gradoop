@@ -42,13 +42,12 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testRead() throws Exception {
+  public void testFirstRead() throws Exception {
 
     // paths to input files
     String csvFiles = CSVDataSourceTest.class.getResource("/data/csv/").getPath();
 
-    String metaXmlFile =
-      CSVDataSourceTest.class.getResource("/data/csv/test2.xml").getFile();
+    String metaXmlFile = CSVDataSourceTest.class.getResource("/data/csv/test1.xml").getFile();
 
     // create datasource
     DataSource dataSource = new CSVDataSource(metaXmlFile, csvFiles,config);
@@ -56,12 +55,10 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
     // get collection
     GraphCollection collection = dataSource.getGraphCollection();
 
-
     Collection<GraphHead> graphHeads = Lists.newArrayList();
     Collection<Vertex> vertices = Lists.newArrayList();
     Collection<Edge> edges = Lists.newArrayList();
 
-    System.out.println("collection = " + collection.getGraphHeads().count());
     collection.getGraphHeads()
       .output(new LocalCollectionOutputFormat<>(graphHeads));
     collection.getVertices()
@@ -71,24 +68,47 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    for (Iterator<GraphHead> iterator = graphHeads.iterator(); iterator.hasNext(); ) {
-      GraphHead next =  iterator.next();
-      System.out.println("next = " + next.getPropertyValue("key").getString() + "   -    " +next);
-    }
-//
-//    for (Iterator<Vertex> iterator = vertices.iterator(); iterator.hasNext(); ) {
-//      Vertex next =  iterator.next();
-//      System.out.println("VERTEX = " + next.getPropertyValue("graphs").getString());
-//    }
+    assertEquals("Wrong graph count", 3, graphHeads.size());
+    assertEquals("Wrong vertex count", 11, vertices.size());
+    assertEquals("Wrong edge count", 20, edges.size());
+  }
 
-//    for (Iterator<Edge> iterator = edges.iterator(); iterator.hasNext(); ) {
-//      Edge next =  iterator.next();
-//      System.out.println("EDGE = " + next.getPropertyValue("key").getString());
-//    }
+  /**
+   * Test method for
+   *
+   * {@link CSVDataSource#getLogicalGraph()} ()}
+   * @throws Exception
+   */
+  @Test
+  public void testSecondRead() throws Exception {
+
+    // paths to input files
+    String csvFiles = CSVDataSourceTest.class.getResource("/data/csv/").getPath();
+
+    String metaXmlFile = CSVDataSourceTest.class.getResource("/data/csv/test2.xml").getFile();
+
+    // create datasource
+    DataSource dataSource = new CSVDataSource(metaXmlFile, csvFiles,config);
+
+    // get collection
+    GraphCollection collection = dataSource.getGraphCollection();
+
+    Collection<GraphHead> graphHeads = Lists.newArrayList();
+    Collection<Vertex> vertices = Lists.newArrayList();
+    Collection<Edge> edges = Lists.newArrayList();
+
+    collection.getGraphHeads()
+      .output(new LocalCollectionOutputFormat<>(graphHeads));
+    collection.getVertices()
+      .output(new LocalCollectionOutputFormat<>(vertices));
+    collection.getEdges()
+      .output(new LocalCollectionOutputFormat<>(edges));
+
+    getExecutionEnvironment().execute();
+
     assertEquals("Wrong graph count", 9, graphHeads.size());
-//    assertEquals("Wrong vertex count", 11, vertices.size());
-//    assertEquals("Wrong edge count", 24, edges.size());
-
+    assertEquals("Wrong vertex count", 25, vertices.size());
+    assertEquals("Wrong edge count", 29, edges.size());
   }
 
 }
