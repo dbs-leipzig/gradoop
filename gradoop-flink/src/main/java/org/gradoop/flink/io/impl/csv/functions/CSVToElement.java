@@ -409,11 +409,11 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     return tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
       CSVConstants.ESCAPE_SEPARATOR_KEY) + CSVConstants.SEPARATOR_KEY +
       tuple.getDomainName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY)
-      + CSVConstants.SEPARATOR_KEY +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) +
+      CSVConstants.SEPARATOR_KEY +
       tuple.getClassName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY)
-      + CSVConstants.SEPARATOR_ID_START +
+        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) +
+      CSVConstants.SEPARATOR_ID_START +
       tuple.getId().replaceAll(
         CSVConstants.SEPARATOR_ID_START, CSVConstants.ESCAPE_SEPARATOR_ID_START);
   }
