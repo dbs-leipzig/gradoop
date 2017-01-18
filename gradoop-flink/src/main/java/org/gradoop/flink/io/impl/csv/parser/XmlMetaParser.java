@@ -63,12 +63,9 @@ public class XmlMetaParser {
     Datasource source;
     try {
       source = (Datasource) unmarshaller.unmarshal(fileInputStream);
-
     } finally {
       fileInputStream.close();
-
     }
-
     return source;
   }
 

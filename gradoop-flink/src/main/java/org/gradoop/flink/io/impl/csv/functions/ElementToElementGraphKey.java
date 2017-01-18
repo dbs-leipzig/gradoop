@@ -32,12 +32,10 @@ public class ElementToElementGraphKey<T extends EPGMGraphElement>
   implements FlatMapFunction<T, Tuple2<T, String>> {
 
   @Override
-  public void flatMap(T element, Collector<Tuple2<T, String>> collector)
-      throws Exception {
+  public void flatMap(T element, Collector<Tuple2<T, String>> collector) throws Exception {
     String graphs = element.getPropertyValue(CSVConstants.PROPERTY_KEY_GRAPHS).getString();
     for (String graph : graphs.split(CSVConstants.SEPARATOR_GRAPHS)) {
-      graph = graph.replaceAll(CSVConstants.ESCAPE_SEPARATOR_GRAPHS,
-        CSVConstants.SEPARATOR_GRAPHS);
+      graph = graph.replaceAll(CSVConstants.ESCAPE_SEPARATOR_GRAPHS, CSVConstants.SEPARATOR_GRAPHS);
       collector.collect(new Tuple2<T, String>(element, graph));
     }
   }

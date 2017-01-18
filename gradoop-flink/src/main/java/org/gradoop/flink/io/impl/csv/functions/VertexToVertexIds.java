@@ -26,8 +26,7 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 /**
  * Creates a tuple containing the string representation of a vertex' key and its id.
  */
-public class VertexToVertexIds implements
-  MapFunction<Vertex, Tuple2<String, GradoopId>> {
+public class VertexToVertexIds implements MapFunction<Vertex, Tuple2<String, GradoopId>> {
 
   @Override
   public Tuple2<String, GradoopId> map(Vertex vertex) throws Exception {

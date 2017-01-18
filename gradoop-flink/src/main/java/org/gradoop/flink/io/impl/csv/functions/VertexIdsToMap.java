@@ -28,8 +28,8 @@ import java.util.Map;
 /**
  * Creates a map from the string representation of a vertex' key to its id.
  */
-public class VertexIdsToMap implements GroupReduceFunction<Tuple2<String,
-  GradoopId>, Map<String, GradoopId>> {
+public class VertexIdsToMap
+  implements GroupReduceFunction<Tuple2<String, GradoopId>, Map<String, GradoopId>> {
 
   @Override
   public void reduce(Iterable<Tuple2<String, GradoopId>> iterable,

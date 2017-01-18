@@ -85,8 +85,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
    * @param csvDir csv directory
    * @param config Gradoop Flink configuration
    */
-  public CSVDataSource(String metaXmlPath, String csvDir,
-    GradoopFlinkConfig config) {
+  public CSVDataSource(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
     super(metaXmlPath, csvDir, config);
 
     graphHeadFactory = config.getGraphHeadFactory();
@@ -207,8 +206,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .reduceGroup(new SetElementGraphIds<Edge>())
       .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
 
-    return GraphCollection.fromDataSets(
-      graphHeads, vertices, edges, getConfig());
+    return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
   }
 
   @Override

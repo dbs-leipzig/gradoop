@@ -24,6 +24,7 @@ import javax.xml.bind.ValidationEventHandler;
  * Handles XML validation events
  */
 public class XmlValidationEventHandler implements ValidationEventHandler {
+
   @Override
   public boolean handleEvent(ValidationEvent event) {
     System.err.println(event.getLinkedException());

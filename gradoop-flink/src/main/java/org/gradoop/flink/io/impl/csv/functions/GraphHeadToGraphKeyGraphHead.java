@@ -25,8 +25,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
  * Maps the graph head to a tuple of graph key and graphhead. The key is taken from the heads key
  * property.
  */
-public class GraphHeadToGraphKeyGraphHead implements
-  MapFunction<GraphHead, Tuple2<String, GraphHead>> {
+public class GraphHeadToGraphKeyGraphHead
+  implements MapFunction<GraphHead, Tuple2<String, GraphHead>> {
 
   @Override
   public Tuple2<String, GraphHead> map(GraphHead graphHead) throws Exception {

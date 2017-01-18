@@ -116,7 +116,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @return GraphHead
    */
   private org.gradoop.common.model.impl.pojo.GraphHead createGraphHead(CsvExtension csv,
-  String[] fields) {
+    String[] fields) {
     String label = "";
     if (csv.getGraphhead().getLabel() != null) {
       label = createLabel(csv.getGraphhead().getLabel(), fields);
@@ -350,8 +350,8 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param separator separates each entry for the string
    * @return String of all separated entries
    */
-  private String getEntriesFromStaticOrRef(List<Serializable> objects, String[]
-    fields, String separator) {
+  private String getEntriesFromStaticOrRef(List<Serializable> objects, String[] fields,
+    String separator) {
     String contentString = "";
     String fieldContent;
     boolean notFirst = false;
@@ -373,7 +373,6 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         default:
           break;
         }
-
         if (notFirst && hasSeparator) {
           contentString += separator;
         } else {
@@ -406,16 +405,20 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @return string representation of the key
    */
   private String createKey(ReferenceTuple tuple) {
-    return tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
-      CSVConstants.ESCAPE_SEPARATOR_KEY) + CSVConstants.SEPARATOR_KEY +
-      tuple.getDomainName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) +
-      CSVConstants.SEPARATOR_KEY +
-      tuple.getClassName().replaceAll(
-        CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY) +
-      CSVConstants.SEPARATOR_ID_START +
-      tuple.getId().replaceAll(
-        CSVConstants.SEPARATOR_ID_START, CSVConstants.ESCAPE_SEPARATOR_ID_START);
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
+      CSVConstants.ESCAPE_SEPARATOR_KEY));
+    sb.append(CSVConstants.SEPARATOR_KEY);
+    sb.append(tuple.getDomainName().replaceAll(
+      CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY));
+    sb.append(CSVConstants.SEPARATOR_KEY);
+    sb.append(tuple.getClassName().replaceAll(
+      CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY));
+    sb.append(CSVConstants.SEPARATOR_ID_START);
+    sb.append(tuple.getId().replaceAll(
+      CSVConstants.SEPARATOR_ID_START, CSVConstants.ESCAPE_SEPARATOR_ID_START));
+    return sb.toString();
   }
 
   /**
