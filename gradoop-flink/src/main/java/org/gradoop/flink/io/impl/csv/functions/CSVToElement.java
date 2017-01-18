@@ -93,7 +93,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     //create the vertex
     if (csv.getVertex() != null) {
       EPGMElement vertex = createVertex(csv, fields);
-      //if the vertex also defines an outgoing edge is is also collected
+      //if the vertex also defines an outgoing edge it is also collected
       if (csv.getVertex().getEdges() != null) {
         for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
           collector.collect(createEdge(csv, fields, vertexEdge, vertex.getPropertyValue(
