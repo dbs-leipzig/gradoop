@@ -13,15 +13,14 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.Mo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.gradoop.common.GradoopTestUtils.call;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEmbedding;
-
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,8 +88,8 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v2"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(getColumns(node, "getJoinColumnsLeft"), is(asList(2)));
-    assertThat(getColumns(node, "getJoinColumnsRight"), is(asList(0)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getJoinColumnsLeft"), is(asList(2)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getJoinColumnsRight"), is(asList(0)));
   }
 
   @Test
@@ -116,10 +115,10 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(asList(0, 2)));
-    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -146,17 +145,10 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
-    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(asList()));
-    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(asList()));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(asList()));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(asList()));
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<Integer> getColumns(JoinEmbeddingsNode node, String methodName) throws Exception {
-    Method m = JoinEmbeddingsNode.class.getDeclaredMethod(methodName);
-    m.setAccessible(true);
-    return (List<Integer>) m.invoke(node);
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList()));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList()));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList()));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList()));
   }
 
   @Test

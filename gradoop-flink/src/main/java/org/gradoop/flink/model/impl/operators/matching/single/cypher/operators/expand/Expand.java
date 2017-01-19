@@ -118,7 +118,7 @@ public class Expand implements PhysicalOperator {
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
@@ -140,7 +140,7 @@ public class Expand implements PhysicalOperator {
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
    * @param distinctVertexColumns indices of distinct vertex columns

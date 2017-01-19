@@ -23,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary.JoinEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf.FilterAndProjectVerticesNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary.ExpandEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.unary.ProjectEmbeddingsNode;
 
 import java.util.Comparator;
@@ -36,7 +37,7 @@ public class EmbeddingMetaDataFactory {
    *
    * @param vertexVariable variable of the vertex
    * @param propertyKeys properties needed for filtering and projection
-   * @return EmbeddingMetaData describing the output of the node
+   * @return meta data describing the output of the corresponding plan node
    */
   public static EmbeddingMetaData forFilterAndProjectVertices(
     String vertexVariable, List<String> propertyKeys) {
@@ -55,7 +56,7 @@ public class EmbeddingMetaDataFactory {
    * @param edgeVariable variable of the edge
    * @param targetVariable variable of the target vertex
    * @param propertyKeys properties needed for filtering and projection
-   * @return EmbeddingMetaData describing the output of the node
+   * @return meta data describing the output of the corresponding plan node
    */
   public static EmbeddingMetaData forFilterAndProjectEdges(
     String sourceVariable, String edgeVariable, String targetVariable, List<String> propertyKeys) {
@@ -74,7 +75,7 @@ public class EmbeddingMetaDataFactory {
    * Creates the resulting {@link EmbeddingMetaData} for {@link FilterEmbedding}.
    *
    * @param inputMetaData embedding meta data of the input embedding
-   * @return EmbeddingMetaData describing the output of the node
+   * @return meta data describing the output of the corresponding plan node
    */
   public static EmbeddingMetaData forFilterEmbeddings(EmbeddingMetaData inputMetaData) {
     return new EmbeddingMetaData(inputMetaData);
@@ -85,20 +86,21 @@ public class EmbeddingMetaDataFactory {
    *
    * @param inputMetaData embedding meta data of the input embedding
    * @param propertyKeys properties to project
-   * @return EmbeddingMetaData describing the output of the node
+   * @return meta data describing the output of the corresponding plan node
    */
   public static EmbeddingMetaData forProjectEmbeddings(EmbeddingMetaData inputMetaData,
     List<Pair<String, String>> propertyKeys) {
 
-    propertyKeys.sort(Comparator.comparingInt(key -> inputMetaData.getPropertyColumn(key.getLeft(), key.getRight())));
+    propertyKeys.sort(Comparator.comparingInt(key ->
+      inputMetaData.getPropertyColumn(key.getLeft(), key.getRight())));
 
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
 
-    inputMetaData.getVariables()
-      .forEach(var -> embeddingMetaData.setEntryColumn(var, inputMetaData.getEntryType(var), inputMetaData.getEntryColumn(var)));
+    inputMetaData.getVariables().forEach(var -> embeddingMetaData.setEntryColumn(
+      var, inputMetaData.getEntryType(var), inputMetaData.getEntryColumn(var)));
 
-    IntStream.range(0, propertyKeys.size())
-      .forEach(i -> embeddingMetaData.setPropertyColumn(propertyKeys.get(i).getLeft(), propertyKeys.get(i).getRight(), i));
+    IntStream.range(0, propertyKeys.size()).forEach(i -> embeddingMetaData.setPropertyColumn(
+      propertyKeys.get(i).getLeft(), propertyKeys.get(i).getRight(), i));
 
     return embeddingMetaData;
   }
@@ -109,31 +111,52 @@ public class EmbeddingMetaDataFactory {
    * @param leftInputMetaData meta data for the left join input
    * @param rightInputMetaData meta data for the right join input
    * @param joinVariables variables to join embeddings on
-   * @return EmbeddingMetaData describing the output of the node
+   * @return meta data describing the output of the corresponding plan node
    */
-  public static EmbeddingMetaData forJoinEmbeddings(EmbeddingMetaData leftInputMetaData, EmbeddingMetaData rightInputMetaData,
-    List<String> joinVariables) {
+  public static EmbeddingMetaData forJoinEmbeddings(EmbeddingMetaData leftInputMetaData,
+    EmbeddingMetaData rightInputMetaData, List<String> joinVariables) {
 
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData(leftInputMetaData);
 
-    int leftEntryCount = leftInputMetaData.getEntryCount();
+    int entryCount = leftInputMetaData.getEntryCount();
 
     // append the non-join entry mappings from the right to the left side
     for (String var : rightInputMetaData.getVariables()) {
       if (!joinVariables.contains(var)) {
-        embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), leftEntryCount++);
+        embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);
       }
     }
 
     // append all property mappings from the right to the left side
-    int leftPropertyCount = leftInputMetaData.getPropertyCount();
+    int propertyCount = leftInputMetaData.getPropertyCount();
     for (String var : rightInputMetaData.getVariables()) {
       for (String key : rightInputMetaData.getPropertyKeys(var)) {
-        embeddingMetaData.setPropertyColumn(var, key, leftPropertyCount++);
+        embeddingMetaData.setPropertyColumn(var, key, propertyCount++);
       }
     }
     return embeddingMetaData;
   }
+
+  /**
+   * Creates the resulting {@link EmbeddingMetaData} for {@link ExpandEmbeddingsNode}.
+   *
+   * @param inputMetaData meta data associated with the expand input
+   * @param pathVariable variable to expand embeddings from
+   * @return meta data describing the output of the corresponding plan node
+   */
+  public static EmbeddingMetaData forExpandEmbeddings(EmbeddingMetaData inputMetaData,
+    String pathVariable, String endVariable) {
+    EmbeddingMetaData embedding = new EmbeddingMetaData(inputMetaData);
+
+    embedding.setEntryColumn(pathVariable, EntryType.PATH, inputMetaData.getEntryCount());
+
+    if (!inputMetaData.containsEntryColumn(endVariable)) {
+      embedding.setEntryColumn(endVariable, EntryType.VERTEX, inputMetaData.getEntryCount() + 1);
+    }
+
+    return embedding;
+  }
+
 
   /**
    * Sets the property columns in the specified meta data object according to the specified variable

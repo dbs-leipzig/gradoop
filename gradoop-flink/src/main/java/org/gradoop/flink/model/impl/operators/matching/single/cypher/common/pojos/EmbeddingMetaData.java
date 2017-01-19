@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,6 @@ import java.util.stream.Collectors;
  * property values associated to property keys at query elements.
  */
 public class EmbeddingMetaData implements Serializable {
-
   /**
    * Describes the type of an embedding entry
    */
@@ -50,7 +50,11 @@ public class EmbeddingMetaData implements Serializable {
     /**
      * Edge
      */
-    EDGE
+    EDGE,
+    /**
+     * Path
+     */
+    PATH
   }
 
   /**
@@ -140,10 +144,25 @@ public class EmbeddingMetaData implements Serializable {
     if (!entryMapping.containsKey(key)) {
       key = Pair.of(variable, EntryType.EDGE);
       if(!entryMapping.containsKey(key)) {
-        throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+        key = Pair.of(variable, EntryType.PATH);
+        if (!entryMapping.containsKey(key)) {
+          throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+        }
       }
     }
     return entryMapping.get(key);
+  }
+
+  /**
+   * Checks if the specified variable is mapped to a column in the embedding.
+   *
+   * @param variable query variable
+   * @return true, iff the variable is mapped to a column
+   */
+  public boolean containsEntryColumn(String variable) {
+    return entryMapping.containsKey(Pair.of(variable, EntryType.VERTEX)) ||
+      entryMapping.containsKey(Pair.of(variable, EntryType.EDGE)) ||
+      entryMapping.containsKey(Pair.of(variable, EntryType.PATH));
   }
 
   /**
@@ -155,18 +174,10 @@ public class EmbeddingMetaData implements Serializable {
    */
   public EntryType getEntryType(String variable) {
     Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
-    EntryType result;
 
-    if (!entryMapping.containsKey(key)) {
-      key = Pair.of(variable, EntryType.EDGE);
-      if (!entryMapping.containsKey(key)) {
-        throw new NoSuchElementException(String.format("no entry for variable %s", variable));
-      }
-      result = EntryType.EDGE;
-    } else {
-      result = EntryType.VERTEX;
-    }
-    return result;
+    return Arrays.stream(EntryType.values())
+      .filter(entryType -> entryMapping.containsKey(Pair.of(variable, entryType)))
+      .collect(Collectors.toList()).get(0);
   }
 
   /**

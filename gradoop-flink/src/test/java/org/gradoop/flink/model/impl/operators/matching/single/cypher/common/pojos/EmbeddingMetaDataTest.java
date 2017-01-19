@@ -107,6 +107,18 @@ public class EmbeddingMetaDataTest {
     assertThat(metaData.getEntryColumn("a"), is(0));
   }
 
+  @Test
+  public void testContainsEntryColumn() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.EDGE, 1);
+    metaData.setEntryColumn("c", EntryType.PATH, 2);
+    assertTrue(metaData.containsEntryColumn("a"));
+    assertTrue(metaData.containsEntryColumn("b"));
+    assertTrue(metaData.containsEntryColumn("c"));
+    assertFalse(metaData.containsEntryColumn("d"));
+  }
+
   @Test(expected = NoSuchElementException.class)
   public void testGetEntryColumnForMissingVariable() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
@@ -118,8 +130,10 @@ public class EmbeddingMetaDataTest {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setEntryColumn("b", EntryType.EDGE, 1);
+    metaData.setEntryColumn("c", EntryType.PATH, 2);
     assertThat(metaData.getEntryType("a"), is(EntryType.VERTEX));
     assertThat(metaData.getEntryType("b"), is(EntryType.EDGE));
+    assertThat(metaData.getEntryType("c"), is(EntryType.PATH));
   }
 
   @Test(expected = NoSuchElementException.class)
