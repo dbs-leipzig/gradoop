@@ -39,7 +39,7 @@ import java.util.List;
  * edge, vertex, ..., edge), the second one the end vertex
  */
 
-public class Expand implements PhysicalOperator {
+public class ExpandEmbeddings implements PhysicalOperator {
 
   /**
    * Input Embeddings
@@ -96,7 +96,7 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -126,7 +126,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -147,7 +147,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 

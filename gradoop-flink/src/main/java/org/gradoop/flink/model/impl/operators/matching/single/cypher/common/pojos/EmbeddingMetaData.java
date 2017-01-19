@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -139,18 +140,7 @@ public class EmbeddingMetaData implements Serializable {
    * @throws NoSuchElementException if there is no column mapped to the specified variable
    */
   public int getEntryColumn(String variable) {
-    Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
-
-    if (!entryMapping.containsKey(key)) {
-      key = Pair.of(variable, EntryType.EDGE);
-      if(!entryMapping.containsKey(key)) {
-        key = Pair.of(variable, EntryType.PATH);
-        if (!entryMapping.containsKey(key)) {
-          throw new NoSuchElementException(String.format("no entry for variable %s", variable));
-        }
-      }
-    }
-    return entryMapping.get(key);
+    return entryMapping.get(Pair.of(variable, getEntryType(variable)));
   }
 
   /**
@@ -160,9 +150,8 @@ public class EmbeddingMetaData implements Serializable {
    * @return true, iff the variable is mapped to a column
    */
   public boolean containsEntryColumn(String variable) {
-    return entryMapping.containsKey(Pair.of(variable, EntryType.VERTEX)) ||
-      entryMapping.containsKey(Pair.of(variable, EntryType.EDGE)) ||
-      entryMapping.containsKey(Pair.of(variable, EntryType.PATH));
+    return Arrays.stream(EntryType.values())
+      .anyMatch(entryType -> entryMapping.containsKey(Pair.of(variable, entryType)));
   }
 
   /**
@@ -173,11 +162,14 @@ public class EmbeddingMetaData implements Serializable {
    * @throws NoSuchElementException if there is no column mapped to the specified variable
    */
   public EntryType getEntryType(String variable) {
-    Pair<String, EntryType> key = Pair.of(variable, EntryType.VERTEX);
-
-    return Arrays.stream(EntryType.values())
+    Optional<EntryType> result = Arrays.stream(EntryType.values())
       .filter(entryType -> entryMapping.containsKey(Pair.of(variable, entryType)))
-      .collect(Collectors.toList()).get(0);
+      .findFirst();
+
+    if (!result.isPresent()) {
+      throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+    }
+    return result.get();
   }
 
   /**

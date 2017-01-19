@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Expa
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.Expand;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Binary node that wraps an {@link Expand} operator.
+ * Binary node that wraps an {@link ExpandEmbeddings} operator.
  */
 public class ExpandEmbeddingsNode implements BinaryNode {
   /**
@@ -122,7 +122,7 @@ public class ExpandEmbeddingsNode implements BinaryNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new Expand(leftChild.execute(), rightChild.execute(),
+    return new ExpandEmbeddings(leftChild.execute(), rightChild.execute(),
       expandColumn, lowerBound, upperBound, expandDirection,
       getDistinctVertexColumns(leftChild.getEmbeddingMetaData()),
       getDistinctEdgeColumns(leftChild.getEmbeddingMetaData()),
