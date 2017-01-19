@@ -17,6 +17,8 @@
 
 package org.gradoop.common.model.impl.properties;
 
+import com.google.common.primitives.Ints;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -28,7 +30,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a single property value in the EPGM.
@@ -85,6 +91,15 @@ public class PropertyValue
    */
   private static final transient byte TYPE_GRADOOP_ID   = 0x08;
   /**
+   * {@code <property-type>} for {@link java.util.HashMap}
+   */
+  private static final transient byte TYPE_MAP          = 0x09;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_LIST         = 0x0a;
+
+  /**
    * Value offset in byte
    */
   private static final transient byte OFFSET            = 0x01;
@@ -109,6 +124,15 @@ public class PropertyValue
    */
   private PropertyValue(Object value) {
     setObject(value);
+  }
+
+  /**
+   * Creates a new property value from the given byte array.
+   *
+   * @param bytes byte array
+   */
+  private PropertyValue(byte[] bytes) {
+    rawBytes = bytes;
   }
 
   /**
@@ -202,6 +226,22 @@ public class PropertyValue
   public boolean isGradoopId() {
     return rawBytes[0] == TYPE_GRADOOP_ID;
   }
+  /**
+   * True, if the wrapped value is of type {@code Map}.
+   *
+   * @return true, if {@code Map} value
+   */
+  public boolean isMap() {
+    return rawBytes[0] == TYPE_MAP;
+  }
+  /**
+   * True, if the wrapped value is of type {@code List}.
+   *
+   * @return true, if {@code List} value
+   */
+  public boolean isList() {
+    return rawBytes[0] == TYPE_LIST;
+  }
 
   //----------------------------------------------------------------------------
   // Getter
@@ -221,7 +261,9 @@ public class PropertyValue
               isString() ? getString() :
                 isBigDecimal() ? getBigDecimal() :
                   isGradoopId() ? getGradoopId() :
-                    null;
+                    isMap() ? getMap() :
+                      isList() ? getList() :
+                        null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -301,13 +343,70 @@ public class PropertyValue
     return decimal;
   }
   /**
-   * Returns the wrapped value as {@code GradoopId.
+   * Returns the wrapped value as {@code GradoopId}.
    *
    * @return {@code GradoopId} value
    */
   public GradoopId getGradoopId() {
     return GradoopId.fromByteArray(
       Arrays.copyOfRange(rawBytes, OFFSET, GradoopId.ID_SIZE + OFFSET));
+  }
+
+  /**
+   * Returns the wrapped Map as {@code Map<PropertyValue, PropertyValue>}.
+   *
+   * @return {@code Map<PropertyValue, PropertyValue>} value
+   */
+  public Map<PropertyValue, PropertyValue> getMap() {
+    int offset = 1;
+    int size;
+    PropertyValue key;
+    PropertyValue value;
+
+    Map<PropertyValue, PropertyValue> map = new HashMap<>();
+
+    while (offset < rawBytes.length) {
+      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
+      offset += Integer.BYTES;
+
+      key = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
+      offset += size;
+
+      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
+      offset += Integer.BYTES;
+
+      value = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
+      offset += size;
+
+      map.put(key, value);
+    }
+
+    return map;
+  }
+
+  /**
+   * Returns the wrapped List as {@code List<PropertyValue>}.
+   *
+   * @return {@code List<PropertyValue>} value
+   */
+  public List<PropertyValue> getList() {
+    int offset = 1;
+    int size;
+    PropertyValue entry;
+
+    List<PropertyValue> list = new ArrayList<>();
+
+    while (offset < rawBytes.length) {
+      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
+      offset += Integer.BYTES;
+
+      entry = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
+      offset += size;
+
+      list.add(entry);
+    }
+
+    return list;
   }
 
   //----------------------------------------------------------------------------
@@ -339,6 +438,10 @@ public class PropertyValue
       setBigDecimal((BigDecimal) value);
     } else if (value instanceof GradoopId) {
       setGradoopId((GradoopId) value);
+    } else if (value instanceof Map) {
+      setMap((HashMap) value);
+    } else if (value instanceof List) {
+      setList((List) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -427,6 +530,87 @@ public class PropertyValue
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 
+  /**
+   * Sets the wrapped value as {@code Map} value.
+   *
+   * @param map value
+   */
+  public void setMap(Map<PropertyValue, PropertyValue> map) {
+    int size =
+      map.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
+      map.keySet().size() * Integer.BYTES +
+      map.values().stream().mapToInt(PropertyValue::byteSize).sum() +
+      map.values().size() * Integer.BYTES +
+      1;
+
+    rawBytes = new byte[size];
+    rawBytes[0] = TYPE_MAP;
+
+    int offset = 1;
+
+    for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
+      System.arraycopy(
+        Ints.toByteArray(entry.getKey().byteSize()), 0,
+        rawBytes, offset,
+        Integer.BYTES
+      );
+      offset += Integer.BYTES;
+
+      System.arraycopy(
+        entry.getKey().rawBytes, 0,
+        rawBytes, offset,
+        entry.getKey().byteSize()
+      );
+      offset += entry.getKey().byteSize();
+
+      System.arraycopy(
+        Ints.toByteArray(entry.getValue().byteSize()), 0,
+        rawBytes, offset,
+        Integer.BYTES
+      );
+      offset += Integer.BYTES;
+
+      System.arraycopy(
+        entry.getValue().rawBytes, 0,
+        rawBytes, offset,
+        entry.getValue().byteSize()
+      );
+      offset += entry.getValue().byteSize();
+    }
+  }
+
+  /**
+   * Sets the wrapped value as {@code List} value.
+   *
+   * @param list value
+   */
+  public void setList(List<PropertyValue> list) {
+    int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
+      list.size() * Integer.BYTES +
+      1;
+
+    rawBytes = new byte[size];
+    rawBytes[0] = TYPE_LIST;
+
+    int offset = 1;
+
+    for (PropertyValue entry : list) {
+      System.arraycopy(
+        Ints.toByteArray(entry.byteSize()), 0,
+        rawBytes, offset,
+        Integer.BYTES
+      );
+      offset += Integer.BYTES;
+
+      System.arraycopy(
+        entry.rawBytes, 0,
+        rawBytes, offset,
+        entry.byteSize()
+      );
+      offset += entry.byteSize();
+    }
+  }
+
   //----------------------------------------------------------------------------
   // Util
   //----------------------------------------------------------------------------
@@ -440,7 +624,9 @@ public class PropertyValue
       Double.class      : rawBytes[0] == TYPE_STRING      ?
       String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
       BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
-      GradoopId.class   : null;
+      GradoopId.class   : rawBytes[0] == TYPE_MAP         ?
+      Map.class         : rawBytes[0] == TYPE_LIST        ?
+      List.class        : null;
   }
 
   @Override
@@ -482,12 +668,24 @@ public class PropertyValue
       result = this.getBigDecimal().compareTo(o.getBigDecimal());
     } else if (this.isGradoopId() && o.isGradoopId()) {
       result = this.getGradoopId().compareTo(o.getGradoopId());
+    } else if (this.isMap() && o.isMap()) {
+      result = this.getMap().equals(o.getMap()) ? 0 : 1;
+    } else if (this.isList() && o.isList()) {
+      result = this.getList().equals(o.getList()) ? 0 : 1;
     } else {
       throw new IllegalArgumentException(String.format(
         "Incompatible types: %s, %s", this.getClass(), o.getClass()));
     }
 
     return result;
+  }
+
+  /**
+   * Returns the byte size of the properties internal representation
+   * @return byte size
+   */
+  public int byteSize() {
+    return rawBytes.length;
   }
 
   /**
@@ -512,7 +710,8 @@ public class PropertyValue
     // type
     dataOutput.writeByte(rawBytes[0]);
     // dynamic type?
-    if (rawBytes[0] == TYPE_STRING || rawBytes[0] == TYPE_BIG_DECIMAL) {
+    if (rawBytes[0] == TYPE_STRING || rawBytes[0] == TYPE_BIG_DECIMAL ||
+      rawBytes[0] == TYPE_MAP || rawBytes[0] == TYPE_LIST) {
       // write length
       dataOutput.writeShort(rawBytes.length - OFFSET);
     }
@@ -526,7 +725,8 @@ public class PropertyValue
     // type
     byte type = dataInput.readByte();
     // dynamic type?
-    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL) {
+    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL ||
+      type == TYPE_MAP || type == TYPE_LIST) {
       // read length
       length = dataInput.readShort();
     } else if (type == TYPE_NULL) {
