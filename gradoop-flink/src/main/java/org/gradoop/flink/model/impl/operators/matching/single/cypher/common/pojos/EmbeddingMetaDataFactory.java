@@ -18,13 +18,12 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary.JoinEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf.FilterAndProjectVerticesNode;
-
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.unary.ProjectEmbeddingsNode;
 
 import java.util.Comparator;
 import java.util.List;
@@ -78,11 +77,11 @@ public class EmbeddingMetaDataFactory {
    * @return EmbeddingMetaData describing the output of the node
    */
   public static EmbeddingMetaData forFilterEmbeddings(EmbeddingMetaData inputMetaData) {
-    return inputMetaData;
+    return new EmbeddingMetaData(inputMetaData);
   }
 
   /**
-   * Creates the resulting {@link EmbeddingMetaData} for {@link ProjectEmbeddings}.
+   * Creates the resulting {@link EmbeddingMetaData} for {@link ProjectEmbeddingsNode}.
    *
    * @param inputMetaData embedding meta data of the input embedding
    * @param propertyKeys properties to project
@@ -104,22 +103,36 @@ public class EmbeddingMetaDataFactory {
     return embeddingMetaData;
   }
 
-  public static EmbeddingMetaData forJoinEmbeddings(EmbeddingMetaData leftInputMetaData,
-    EmbeddingMetaData rightInputMetaData,
-    List<String> joinVariablesLeft, List<String> joinVariablesRight,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+  /**
+   * Creates the resulting {@link EmbeddingMetaData} for {@link JoinEmbeddingsNode}.
+   *
+   * @param leftInputMetaData meta data for the left join input
+   * @param rightInputMetaData meta data for the right join input
+   * @param joinVariables variables to join embeddings on
+   * @return EmbeddingMetaData describing the output of the node
+   */
+  public static EmbeddingMetaData forJoinEmbeddings(EmbeddingMetaData leftInputMetaData, EmbeddingMetaData rightInputMetaData,
+    List<String> joinVariables) {
+
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData(leftInputMetaData);
 
     int leftEntryCount = leftInputMetaData.getEntryCount();
 
-    // append the non-join entries from the right to the left side
+    // append the non-join entry mappings from the right to the left side
     for (String var : rightInputMetaData.getVariables()) {
-      if (!joinVariablesRight.contains(var)) {
-        leftInputMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), leftEntryCount++);
+      if (!joinVariables.contains(var)) {
+        embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), leftEntryCount++);
       }
     }
 
-
-    return leftInputMetaData;
+    // append all property mappings from the right to the left side
+    int leftPropertyCount = leftInputMetaData.getPropertyCount();
+    for (String var : rightInputMetaData.getVariables()) {
+      for (String key : rightInputMetaData.getPropertyKeys(var)) {
+        embeddingMetaData.setPropertyColumn(var, key, leftPropertyCount++);
+      }
+    }
+    return embeddingMetaData;
   }
 
   /**

@@ -49,6 +49,27 @@ public class EmbeddingMetaDataTest {
   }
 
   @Test
+  public void testFromEmbeddingMetaData() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
+    metaData.setPropertyColumn("a", "age", 0);
+
+    EmbeddingMetaData copy = new EmbeddingMetaData(metaData);
+    assertThat(copy.getEntryColumn("a"), is(0));
+    assertThat(copy.getEntryColumn("b"), is(1));
+    assertThat(copy.getPropertyColumn("a", "age"), is(0));
+
+    copy.setEntryColumn("c", EntryType.VERTEX, 2);
+    assertThat(copy.getEntryCount(), is(3));
+    assertThat(metaData.getEntryCount(), is(2));
+
+    copy.setEntryColumn("a", EntryType.VERTEX, 3);
+    assertThat(copy.getEntryColumn("a"), is(3));
+    assertThat(metaData.getEntryColumn("a"), is(0));
+  }
+
+  @Test
   public void testGetEntryCount() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     assertThat(metaData.getEntryCount(), is(0));

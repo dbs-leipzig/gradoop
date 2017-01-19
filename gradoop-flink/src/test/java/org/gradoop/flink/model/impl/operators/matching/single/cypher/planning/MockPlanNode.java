@@ -9,9 +9,13 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.es
  * Mock node that can be used as input node in testing other plan nodes.
  */
 public class MockPlanNode implements PlanNode {
-
+  /**
+   * Data set to be returned by the node
+   */
   private final DataSet<Embedding> mockOutput;
-
+  /**
+   * Meta data to be returned by the node
+   */
   private final EmbeddingMetaData mockMetaData;
 
   /**

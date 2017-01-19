@@ -83,6 +83,22 @@ public class EmbeddingMetaData implements Serializable {
   }
 
   /**
+   * Initializes a new EmbeddingMetaData object using copies of the provided meta data.
+   *
+   * @param metaData meta data to be copied
+   */
+  public EmbeddingMetaData(EmbeddingMetaData metaData) {
+    this.entryMapping = new HashMap<>(metaData.getEntryCount());
+    this.propertyMapping = new HashMap<>(metaData.getPropertyCount());
+
+    metaData.getVariables().forEach(var -> {
+      this.entryMapping.put(Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
+      metaData.getPropertyKeys(var).forEach(key ->
+        this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+    });
+  }
+
+  /**
    * Returns the number of entries mapped in this meta data.
    *
    * @return number of mapped entries
@@ -257,5 +273,21 @@ public class EmbeddingMetaData implements Serializable {
   @Override
   public int hashCode() {
     return 31 * entryMapping.hashCode() + propertyMapping.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    List<Map.Entry<Pair<String, EntryType>, Integer>> sortedEntries = entryMapping.entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .collect(Collectors.toList());
+
+    List<Map.Entry<Pair<String, String>, Integer>> sortiedProperties = propertyMapping.entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .collect(Collectors.toList());
+
+    return String.format("EmbeddingMetaData{entryMapping=%s, propertyMapping=%s}",
+      sortedEntries, sortiedProperties);
   }
 }
