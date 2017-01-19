@@ -668,10 +668,9 @@ public class PropertyValue
       result = this.getBigDecimal().compareTo(o.getBigDecimal());
     } else if (this.isGradoopId() && o.isGradoopId()) {
       result = this.getGradoopId().compareTo(o.getGradoopId());
-    } else if (this.isMap() && o.isMap()) {
-      result = this.getMap().equals(o.getMap()) ? 0 : 1;
-    } else if (this.isList() && o.isList()) {
-      result = this.getList().equals(o.getList()) ? 0 : 1;
+    } else if (this.isMap() || o.isMap() || this.isList() || o.isList()) {
+      throw new UnsupportedOperationException(String.format(
+        "Method compareTo() is not supported for %s, %s", this.getClass(), o.getClass()));
     } else {
       throw new IllegalArgumentException(String.format(
         "Incompatible types: %s, %s", this.getClass(), o.getClass()));

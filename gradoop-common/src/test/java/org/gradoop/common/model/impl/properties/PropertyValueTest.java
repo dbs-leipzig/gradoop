@@ -574,6 +574,18 @@ public class PropertyValueTest {
     create(10).compareTo(create(10L));
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithMap() {
+    create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
+  }
+
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithList() {
+    create(LIST_VAL_A).compareTo(create(LIST_VAL_A));
+  }
+
+
   @Test
   public void testWriteAndReadFields() throws IOException {
     PropertyValue p = create(NULL_VAL_0);
