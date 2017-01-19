@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.*;
 import static org.junit.Assert.assertEquals;
 
 public class ExpandTest extends PhysicalOperatorTest {
@@ -86,7 +87,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForOutExpansion() throws Exception {
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -106,7 +107,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,a),
@@ -126,7 +127,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -146,7 +147,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -165,7 +166,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBound0() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b)

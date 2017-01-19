@@ -1,5 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -13,11 +14,15 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.Pl
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEmbedding;
+
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -44,7 +49,7 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     MockPlanNode rightMockNode = new MockPlanNode(null, rightInputMetaData);
 
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftMockNode, rightMockNode,
-      Collections.singletonList("v2"),
+      singletonList("v2"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
@@ -77,16 +82,15 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     rightInputMetaData.setEntryColumn("e2", EntryType.EDGE, 1);
     rightInputMetaData.setEntryColumn("v3", EntryType.VERTEX, 2);
 
-
     PlanNode leftChild = new MockPlanNode(null, leftInputMetaData);
     PlanNode rightChild = new MockPlanNode(null, rightInputMetaData);
 
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftChild, rightChild,
-      Collections.singletonList("v2"),
+      singletonList("v2"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(getColumns(node, "getJoinColumnsLeft"), is(Arrays.asList(2)));
-    assertThat(getColumns(node, "getJoinColumnsRight"), is(Arrays.asList(0)));
+    assertThat(getColumns(node, "getJoinColumnsLeft"), is(asList(2)));
+    assertThat(getColumns(node, "getJoinColumnsRight"), is(asList(0)));
   }
 
   @Test
@@ -105,18 +109,17 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     rightInputMetaData.setEntryColumn("e4", EntryType.EDGE, 3);
     rightInputMetaData.setEntryColumn("v5", EntryType.VERTEX, 4);
 
-
     PlanNode leftChild = new MockPlanNode(null, leftInputMetaData);
     PlanNode rightChild = new MockPlanNode(null, rightInputMetaData);
 
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftChild, rightChild,
-      Collections.singletonList("v3"),
+      singletonList("v3"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(Arrays.asList(0, 2)));
-    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(Arrays.asList(2, 4)));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(Arrays.asList(1, 3)));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(Arrays.asList(1, 3)));
+    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(asList(0, 2)));
+    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
+    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
+    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -136,18 +139,17 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     rightInputMetaData.setEntryColumn("e4", EntryType.EDGE, 3);
     rightInputMetaData.setEntryColumn("v5", EntryType.VERTEX, 4);
 
-
     PlanNode leftChild = new MockPlanNode(null, leftInputMetaData);
     PlanNode rightChild = new MockPlanNode(null, rightInputMetaData);
 
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftChild, rightChild,
-      Collections.singletonList("v3"),
+      singletonList("v3"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
-    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(Arrays.asList()));
-    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(Arrays.asList()));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(Arrays.asList()));
-    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(Arrays.asList()));
+    assertThat(getColumns(node, "getDistinctVertexColumnsLeft"), is(asList()));
+    assertThat(getColumns(node, "getDistinctVertexColumnsRight"), is(asList()));
+    assertThat(getColumns(node, "getDistinctEdgeColumnsLeft"), is(asList()));
+    assertThat(getColumns(node, "getDistinctEdgeColumnsRight"), is(asList()));
   }
 
   @SuppressWarnings("unchecked")
@@ -179,10 +181,8 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     leftInputMetaData.setEntryColumn("v1", EntryType.VERTEX, 0);
     leftInputMetaData.setPropertyColumn("v1", "age", 0);
 
-    Embedding embedding1 = new Embedding();
-    embedding1.add(a, Collections.singletonList(PropertyValue.create(42)));
-    Embedding embedding2 = new Embedding();
-    embedding2.add(b, Collections.singletonList(PropertyValue.create(23)));
+    Embedding embedding1 = createEmbedding(singletonList(Pair.of(a, singletonList(42))));
+    Embedding embedding2 = createEmbedding(singletonList(Pair.of(b, singletonList(23))));
 
     DataSet<Embedding> leftEmbeddings = getExecutionEnvironment()
       .fromElements(embedding1, embedding2);
@@ -202,14 +202,16 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     rightInputMetaData.setEntryColumn("v2", EntryType.VERTEX, 2);
     rightInputMetaData.setPropertyColumn("v2", "age", 0);
 
-    Embedding embedding3 = new Embedding();
-    embedding3.add(a);
-    embedding3.add(c);
-    embedding3.add(e, Collections.singletonList(PropertyValue.create(84)));
-    Embedding embedding4 = new Embedding();
-    embedding4.add(b);
-    embedding4.add(d);
-    embedding4.add(f, Collections.singletonList(PropertyValue.create(77)));
+    Embedding embedding3 = createEmbedding(asList(
+      Pair.of(a, emptyList()),
+      Pair.of(c, emptyList()),
+      Pair.of(e, singletonList(84))
+    ));
+    Embedding embedding4 = createEmbedding(asList(
+      Pair.of(b, emptyList()),
+      Pair.of(d, emptyList()),
+      Pair.of(f, singletonList(77))
+    ));
 
     DataSet<Embedding> rightEmbeddings = getExecutionEnvironment()
       .fromElements(embedding3, embedding4);
@@ -218,18 +220,14 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     MockPlanNode rightChild = new MockPlanNode(rightEmbeddings, rightInputMetaData);
 
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftChild, rightChild,
-      Collections.singletonList("v1"), MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+      singletonList("v1"), MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     List<Embedding> result = node.execute().collect();
     result.sort(Comparator.comparing(o -> o.getProperty(0))); // sort by property value in column 0
 
     assertThat(result.size(), is(2));
-    assertEmbedding(result.get(0), Arrays.asList(b, d, f), Arrays.asList(PropertyValue.create(23), PropertyValue.create(77)));
-    assertEmbedding(result.get(1), Arrays.asList(a, c, e), Arrays.asList(PropertyValue.create(42), PropertyValue.create(84)));
-  }
 
-  private void assertEmbedding(Embedding e, List<GradoopId> expectedEntries, List<PropertyValue> expectedProperties) {
-    expectedEntries.forEach(entry -> assertThat(e.getId(expectedEntries.indexOf(entry)), is(entry)));
-    expectedProperties.forEach(value -> assertThat(e.getProperty(expectedProperties.indexOf(value)), is(value)));
+    assertEmbedding(result.get(0), asList(b, d, f), asList(PropertyValue.create(23), PropertyValue.create(77)));
+    assertEmbedding(result.get(1), asList(a, c, e), asList(PropertyValue.create(42), PropertyValue.create(84)));
   }
 }
