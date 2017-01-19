@@ -15,11 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation;
-
 /**
- * Placeholder for future cost estimation in
- * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode}
+ * Contains leaf plan node implementations.
  */
-public interface Estimator {
-}
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
+

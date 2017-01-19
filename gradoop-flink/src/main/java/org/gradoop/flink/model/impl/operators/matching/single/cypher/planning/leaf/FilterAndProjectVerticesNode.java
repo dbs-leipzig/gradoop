@@ -17,64 +17,67 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectVertices;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.LeafNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectVertices} operator.
  */
-public class FilterAndProjectVerticesNode implements LeafNode {
+public class FilterAndProjectVerticesNode extends LeafNode {
   /**
    * Input data set
    */
   private DataSet<Vertex> vertices;
   /**
+   * Query variable of the vertex
+   */
+  private final String vertexVariable;
+  /**
    * Filter predicate that is applied on the input data set
    */
   private CNF filterPredicate;
   /**
-   * Meta data describing the output of that node
+   * Property keys used for projection
    */
-  private EmbeddingMetaData embeddingMetaData;
+  private final List<String> projectionKeys;
 
   /**
    * Creates a new node.
    *
    * @param vertices input vertices
-   * @param variable query variable of the vertex
+   * @param vertexVariable query variable of the vertex
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
    */
-  public FilterAndProjectVerticesNode(DataSet<Vertex> vertices, String variable,
+  public FilterAndProjectVerticesNode(DataSet<Vertex> vertices, String vertexVariable,
     CNF filterPredicate, Set<String> projectionKeys) {
     this.vertices = vertices;
+    this.vertexVariable = vertexVariable;
     this.filterPredicate = filterPredicate;
-    this.embeddingMetaData = EmbeddingMetaDataFactory
-      .forFilterAndProjectVertices(variable, Lists.newArrayList(projectionKeys));
+    this.projectionKeys = projectionKeys.stream().collect(Collectors.toList());
   }
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectVertices(vertices, filterPredicate, embeddingMetaData).evaluate();
+    return new FilterAndProjectVertices(vertices, filterPredicate, getEmbeddingMetaData())
+      .evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
+    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
+    embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, projectionKeys);
 
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
     return embeddingMetaData;
   }
 }

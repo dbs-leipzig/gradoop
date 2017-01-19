@@ -17,35 +17,46 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.LeafNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectEdges} operator.
  */
-public class FilterAndProjectEdgesNode implements LeafNode {
+public class FilterAndProjectEdgesNode extends LeafNode {
   /**
    * Input data set
    */
   private DataSet<Edge> edges;
   /**
+   * Query variable of the source vertex
+   */
+  private final String sourceVariable;
+  /**
+   * Query variable of the edge
+   */
+  private final String edgeVariable;
+  /**
+   * Query variable of the target vertex
+   */
+  private final String targetVariable;
+  /**
    * Filter predicate that is applied on the input data set
    */
   private CNF filterPredicate;
   /**
-   * Meta data describing the output of that node
+   * Property keys used for projection
    */
-  private EmbeddingMetaData embeddingMetaData;
+  private final List<String> projectionKeys;
 
   /**
    * Creates a new node.
@@ -61,23 +72,27 @@ public class FilterAndProjectEdgesNode implements LeafNode {
     String sourceVariable, String edgeVariable, String targetVariable,
     CNF filterPredicate, Set<String> projectionKeys) {
     this.edges = edges;
+    this.sourceVariable = sourceVariable;
+    this.edgeVariable = edgeVariable;
+    this.targetVariable = targetVariable;
     this.filterPredicate = filterPredicate;
-    this.embeddingMetaData = EmbeddingMetaDataFactory.forFilterAndProjectEdges(
-      sourceVariable, edgeVariable, targetVariable, Lists.newArrayList(projectionKeys));
+    this.projectionKeys = projectionKeys.stream().collect(Collectors.toList());
   }
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectEdges(edges, filterPredicate, embeddingMetaData).evaluate();
+    return new FilterAndProjectEdges(edges, filterPredicate, getEmbeddingMetaData()).evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
+  public EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
+    embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
+    embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
+    embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
 
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
+    embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);
+
     return embeddingMetaData;
   }
 }

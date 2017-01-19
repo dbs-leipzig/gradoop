@@ -123,8 +123,6 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     GradoopId e = GradoopId.get();
     GradoopId f = GradoopId.get();
     GradoopId g = GradoopId.get();
-    GradoopId h = GradoopId.get();
-    GradoopId i = GradoopId.get();
 
     /*
      * ---------
@@ -143,11 +141,11 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
      * -------------------------
      * |  v1   | e1    | v2    |
      * -------------------------
-     * | id(a) | id(c) | id(e) | -> Embedding 2
+     * | id(a) | id(b) | id(c) | -> Embedding 2
      * -------------------------
-     * | id(e) | id(f) | id(g) | -> Embedding 3
+     * | id(c) | id(d) | id(e) | -> Embedding 3
      * -------------------------
-     * | id(g) | id(h) | id(i) | -> Embedding 4
+     * | id(e) | id(f) | id(g) | -> Embedding 4
      * -------------------------
      */
     EmbeddingMetaData rightInputMetaData = new EmbeddingMetaData();
@@ -155,9 +153,9 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     rightInputMetaData.setEntryColumn("e1", EntryType.EDGE, 1);
     rightInputMetaData.setEntryColumn("v2", EntryType.VERTEX, 2);
 
-    Embedding embedding2 = createEmbedding(a, c, e);
-    Embedding embedding3 = createEmbedding(e, f, g);
-    Embedding embedding4 = createEmbedding(g, h, i);
+    Embedding embedding2 = createEmbedding(a, b, c);
+    Embedding embedding3 = createEmbedding(c, d, e);
+    Embedding embedding4 = createEmbedding(e, f, g);
     DataSet<Embedding> rightEmbeddings = getExecutionEnvironment()
       .fromElements(embedding2, embedding3, embedding4);
 
@@ -173,7 +171,7 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
      * ---------------------------------------------------
      * |  v1   | e1                              | v2    |
      * ---------------------------------------------------
-     * | id(a) | [id(c),id(e),id(f),id(g),id(h)] | id(i) | -> Result
+     * | id(a) | [id(b),id(c),id(d),id(e),id(f)] | id(g) | -> Result
      * ---------------------------------------------------
      */
     List<Embedding> result = node.execute().collect();
@@ -181,11 +179,11 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     Embedding embedding = result.get(0);
     assertThat(embedding.getId(0), is(a));
     assertThat(embedding.getIdList(1).size(), is(5));
-    assertThat(embedding.getIdList(1).get(0), is(c));
-    assertThat(embedding.getIdList(1).get(1), is(e));
-    assertThat(embedding.getIdList(1).get(2), is(f));
-    assertThat(embedding.getIdList(1).get(3), is(g));
-    assertThat(embedding.getIdList(1).get(4), is(h));
-    assertThat(embedding.getId(2), is(i));
+    assertThat(embedding.getIdList(1).get(0), is(b));
+    assertThat(embedding.getIdList(1).get(1), is(c));
+    assertThat(embedding.getIdList(1).get(2), is(d));
+    assertThat(embedding.getIdList(1).get(3), is(e));
+    assertThat(embedding.getIdList(1).get(4), is(f));
+    assertThat(embedding.getId(2), is(g));
   }
 }

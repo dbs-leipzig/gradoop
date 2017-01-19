@@ -21,11 +21,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,15 +32,7 @@ import java.util.stream.Collectors;
 /**
  * Binary node that wraps a {@link JoinEmbeddings} operator.
  */
-public class JoinEmbeddingsNode implements BinaryNode {
-  /**
-   * Left input plan node
-   */
-  private final PlanNode leftChild;
-  /**
-   * Right inout plan node
-   */
-  private final PlanNode rightChild;
+public class JoinEmbeddingsNode extends BinaryNode {
   /**
    * Query variables on which left and right child are joined
    */
@@ -55,10 +45,6 @@ public class JoinEmbeddingsNode implements BinaryNode {
    * Morphism type for edges
    */
   private final MatchStrategy edgeStrategy;
-  /**
-   * Meta data describing the output of that node
-   */
-  private final EmbeddingMetaData embeddingMetaData;
 
   /**
    * Creates a new node.
@@ -72,41 +58,42 @@ public class JoinEmbeddingsNode implements BinaryNode {
   public JoinEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
     List<String> joinVariables,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
-    this.leftChild = leftChild;
-    this.rightChild = rightChild;
+    super(leftChild, rightChild);
     this.joinVariables = joinVariables;
     this.vertexStrategy = vertexStrategy;
     this.edgeStrategy = edgeStrategy;
-
-    this.embeddingMetaData = EmbeddingMetaDataFactory.forJoinEmbeddings(
-      leftChild.getEmbeddingMetaData(), rightChild.getEmbeddingMetaData(), joinVariables);
-  }
-
-  @Override
-  public PlanNode getLeftChild() {
-    return leftChild;
-  }
-
-  @Override
-  public PlanNode getRightChild() {
-    return rightChild;
   }
 
   @Override
   public DataSet<Embedding> execute() {
-    return new JoinEmbeddings(leftChild.execute(), rightChild.execute(),
+    return new JoinEmbeddings(getLeftChild().execute(), getRightChild().execute(),
       getJoinColumnsLeft(), getJoinColumnsRight(),
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
       getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight()).evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData leftInputMetaData = getLeftChild().getEmbeddingMetaData();
+    EmbeddingMetaData rightInputMetaData = getRightChild().getEmbeddingMetaData();
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData(leftInputMetaData);
 
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
+    int entryCount = leftInputMetaData.getEntryCount();
+
+    // append the non-join entry mappings from the right to the left side
+    for (String var : rightInputMetaData.getVariables()) {
+      if (!joinVariables.contains(var)) {
+        embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);
+      }
+    }
+
+    // append all property mappings from the right to the left side
+    int propertyCount = leftInputMetaData.getPropertyCount();
+    for (String var : rightInputMetaData.getVariables()) {
+      for (String key : rightInputMetaData.getPropertyKeys(var)) {
+        embeddingMetaData.setPropertyColumn(var, key, propertyCount++);
+      }
+    }
     return embeddingMetaData;
   }
 
@@ -117,7 +104,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    */
   private List<Integer> getJoinColumnsLeft() {
     return joinVariables.stream()
-      .map(var -> leftChild.getEmbeddingMetaData().getEntryColumn(var))
+      .map(var -> getLeftChild().getEmbeddingMetaData().getEntryColumn(var))
       .collect(Collectors.toList());
   }
 
@@ -128,7 +115,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    */
   private List<Integer> getJoinColumnsRight() {
     return joinVariables.stream()
-      .map(var -> rightChild.getEmbeddingMetaData().getEntryColumn(var))
+      .map(var -> getRightChild().getEmbeddingMetaData().getEntryColumn(var))
       .collect(Collectors.toList());
   }
 
@@ -139,7 +126,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    * @return distinct vertex columns of the left embedding
    */
   private List<Integer> getDistinctVertexColumnsLeft() {
-    return getDistinctVertexColumns(leftChild.getEmbeddingMetaData());
+    return getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData());
   }
 
   /**
@@ -149,7 +136,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    * @return distinct vertex columns of the right embedding
    */
   private List<Integer> getDistinctVertexColumnsRight() {
-    return getDistinctVertexColumns(rightChild.getEmbeddingMetaData());
+    return getDistinctVertexColumns(getRightChild().getEmbeddingMetaData());
   }
 
   /**
@@ -175,7 +162,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    * @return distinct edge columns of the left embedding
    */
   private List<Integer> getDistinctEdgeColumnsLeft() {
-    return getDistinctEdgeColumns(leftChild.getEmbeddingMetaData());
+    return getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData());
   }
 
   /**
@@ -185,7 +172,7 @@ public class JoinEmbeddingsNode implements BinaryNode {
    * @return distinct edge columns of the right embedding
    */
   private List<Integer> getDistinctEdgeColumnsRight() {
-    return getDistinctEdgeColumns(rightChild.getEmbeddingMetaData());
+    return getDistinctEdgeColumns(getRightChild().getEmbeddingMetaData());
   }
 
   /**

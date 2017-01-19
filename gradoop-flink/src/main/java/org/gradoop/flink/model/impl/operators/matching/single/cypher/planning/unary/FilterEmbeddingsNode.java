@@ -21,29 +21,18 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.UnaryNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
 /**
  * Unary nodes that wraps a {@link FilterEmbeddings} operator.
  */
-public class FilterEmbeddingsNode implements UnaryNode {
-  /**
-   * Input plan node
-   */
-  private PlanNode childNode;
+public class FilterEmbeddingsNode extends UnaryNode {
   /**
    * Filter predicate that is applied on the embedding
    */
   private CNF filterPredicate;
-  /**
-   * Meta data describing the output of that node
-   */
-  private EmbeddingMetaData embeddingMetaData;
-
   /**
    * Creates a new node.
    *
@@ -51,29 +40,19 @@ public class FilterEmbeddingsNode implements UnaryNode {
    * @param filterPredicate filter predicate to be applied on embeddings
    */
   public FilterEmbeddingsNode(PlanNode childNode, CNF filterPredicate) {
-    this.childNode = childNode;
+    super(childNode);
     this.filterPredicate = filterPredicate;
-    this.embeddingMetaData = EmbeddingMetaDataFactory
-      .forFilterEmbeddings(childNode.getEmbeddingMetaData());
   }
 
-  @Override
-  public PlanNode getChild() {
-    return childNode;
-  }
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterEmbeddings(childNode.execute(), filterPredicate, embeddingMetaData).evaluate();
+    return new FilterEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData())
+      .evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
-
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
-    return embeddingMetaData;
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    return new EmbeddingMetaData(getChildNode().getEmbeddingMetaData());
   }
 }

@@ -21,67 +21,66 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.UnaryNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Unary node that wraps a {@link ProjectEmbeddings} operator.
  */
-public class ProjectEmbeddingsNode implements UnaryNode {
-  /**
-   * Input plan node
-   */
-  private final PlanNode childNode;
-  /**
-   * Meta data describing the output of that node
-   */
-  private final EmbeddingMetaData embeddingMetaData;
+public class ProjectEmbeddingsNode extends UnaryNode {
   /**
    * Property columns that are taken over to the output embedding
    */
   private final List<Integer> whiteListColumns;
+  /**
+   * Property keys used for projection
+   */
+  private final List<Pair<String, String>> projectionKeys;
 
   /**
    * Creates new node.
    *
    * @param childNode input plan node
-   * @param projectedKeys property keys whose associated values are projected to the output
+   * @param projectionKeys property keys whose associated values are projected to the output
    */
-  public ProjectEmbeddingsNode(PlanNode childNode, List<Pair<String, String>> projectedKeys) {
-    this.childNode = childNode;
+  public ProjectEmbeddingsNode(PlanNode childNode, List<Pair<String, String>> projectionKeys) {
+    super(childNode);
+    this.projectionKeys = projectionKeys;
     EmbeddingMetaData childMetaData = childNode.getEmbeddingMetaData();
-    // compute output meta data
-    this.embeddingMetaData = EmbeddingMetaDataFactory
-      .forProjectEmbeddings(childMetaData, projectedKeys);
+
     // compute columns of projected properties
-    whiteListColumns = projectedKeys.stream()
+    whiteListColumns = projectionKeys.stream()
       .map(pair -> childMetaData.getPropertyColumn(pair.getLeft(), pair.getRight()))
       .collect(Collectors.toList());
   }
 
   @Override
-  public PlanNode getChild() {
-    return childNode;
-  }
-
-  @Override
   public DataSet<Embedding> execute() {
-    return new ProjectEmbeddings(childNode.execute(), whiteListColumns).evaluate();
+    return new ProjectEmbeddings(getChildNode().execute(), whiteListColumns).evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    final EmbeddingMetaData childMetaData = getChildNode().getEmbeddingMetaData();
 
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
+    projectionKeys.sort(Comparator.comparingInt(key ->
+      childMetaData.getPropertyColumn(key.getLeft(), key.getRight())));
+
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
+
+    childMetaData.getVariables().forEach(var -> embeddingMetaData.setEntryColumn(
+      var, childMetaData.getEntryType(var), childMetaData.getEntryColumn(var)));
+
+    IntStream.range(0, projectionKeys.size()).forEach(i ->
+      embeddingMetaData.setPropertyColumn(
+        projectionKeys.get(i).getLeft(), projectionKeys.get(i).getRight(), i));
+
     return embeddingMetaData;
   }
 }

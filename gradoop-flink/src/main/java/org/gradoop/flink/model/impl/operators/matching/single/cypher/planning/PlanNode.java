@@ -20,32 +20,39 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
 /**
  * Represents a single node in a {@link QueryPlan}
  */
-public interface PlanNode {
+public abstract class PlanNode {
+  /**
+   * Describes the output of that node.
+   */
+  private EmbeddingMetaData embeddingMetaData;
 
   /**
-   * Recursively executed this node and returns the resulting {@link Embedding} data set.
+   * Recursively executes this node and returns the resulting {@link Embedding} data set.
    *
    * @return embeddings
    */
-  DataSet<Embedding> execute();
+  public abstract DataSet<Embedding> execute();
 
   /**
-   * Recursively computes the estimated output cardinality of the data set produced by
-   * {@link PlanNode#execute()}.
+   * Returns the meta data describing the embeddings produced by this node.
    *
-   * @return estimated cardinality
+   * @return meta data describing the output
    */
-  Estimator getEstimator();
+  public EmbeddingMetaData getEmbeddingMetaData() {
+    if (this.embeddingMetaData == null) {
+      this.embeddingMetaData = computeEmbeddingMetaData();
+    }
+    return embeddingMetaData;
+  }
 
   /**
-   * Returns the updates meta data to the embeddings produced by this node.
+   * Computes the meta data returned by the specific node.
    *
-   * @return
+   * @return meta data
    */
-  EmbeddingMetaData getEmbeddingMetaData();
+  protected abstract EmbeddingMetaData computeEmbeddingMetaData();
 }

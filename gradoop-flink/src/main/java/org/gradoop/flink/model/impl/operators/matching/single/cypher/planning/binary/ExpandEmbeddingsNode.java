@@ -23,11 +23,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaDataFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,19 +34,19 @@ import java.util.stream.Collectors;
 /**
  * Binary node that wraps an {@link ExpandEmbeddings} operator.
  */
-public class ExpandEmbeddingsNode implements BinaryNode {
-  /**
-   * Left input plan node
-   */
-  private final PlanNode leftChild;
-  /**
-   * Right inout plan node
-   */
-  private final PlanNode rightChild;
+public class ExpandEmbeddingsNode extends BinaryNode {
   /**
    * Column to expand the embedding from.
    */
   private final int expandColumn;
+  /**
+   * Query variable of the variable length path
+   */
+  private final String pathVariable;
+  /**
+   * Query variable of the final vertex in the path
+   */
+  private final String endVariable;
   /**
    * Minimum number of path expansion steps
    */
@@ -73,10 +71,6 @@ public class ExpandEmbeddingsNode implements BinaryNode {
    * Morphism type for edges
    */
   private final MatchStrategy edgeStrategy;
-  /**
-   * Meta data describing the output of that node
-   */
-  private final EmbeddingMetaData metaData;
 
   /**
    * Creates a new node.
@@ -96,8 +90,9 @@ public class ExpandEmbeddingsNode implements BinaryNode {
     String startVariable, String pathVariable, String endVariable,
     int lowerBound, int upperBound, ExpandDirection expandDirection,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
-    this.leftChild = leftChild;
-    this.rightChild = rightChild;
+    super(leftChild, rightChild);
+    this.pathVariable = pathVariable;
+    this.endVariable = endVariable;
     this.lowerBound = lowerBound;
     this.upperBound = upperBound;
     this.expandDirection = expandDirection;
@@ -106,36 +101,29 @@ public class ExpandEmbeddingsNode implements BinaryNode {
     this.expandColumn = leftChild.getEmbeddingMetaData().getEntryColumn(startVariable);
     this.closingColumn = leftChild.getEmbeddingMetaData().containsEntryColumn(endVariable) ?
       leftChild.getEmbeddingMetaData().getEntryColumn(endVariable) : -1;
-    this.metaData = EmbeddingMetaDataFactory.forExpandEmbeddings(leftChild.getEmbeddingMetaData(),
-      pathVariable, endVariable);
-  }
-
-  @Override
-  public PlanNode getLeftChild() {
-    return leftChild;
-  }
-
-  @Override
-  public PlanNode getRightChild() {
-    return rightChild;
   }
 
   @Override
   public DataSet<Embedding> execute() {
-    return new ExpandEmbeddings(leftChild.execute(), rightChild.execute(),
+    return new ExpandEmbeddings(getLeftChild().execute(), getRightChild().execute(),
       expandColumn, lowerBound, upperBound, expandDirection,
-      getDistinctVertexColumns(leftChild.getEmbeddingMetaData()),
-      getDistinctEdgeColumns(leftChild.getEmbeddingMetaData()),
+      getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData()),
+      getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData()),
       closingColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES).evaluate();
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
-  }
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData inputMetaData = getLeftChild().getEmbeddingMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData(inputMetaData);
 
-  @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
+    metaData.setEntryColumn(pathVariable, EmbeddingMetaData.EntryType.PATH,
+      inputMetaData.getEntryCount());
+
+    if (!inputMetaData.containsEntryColumn(endVariable)) {
+      metaData.setEntryColumn(endVariable, EmbeddingMetaData.EntryType.VERTEX,
+        inputMetaData.getEntryCount() + 1);
+    }
     return metaData;
   }
 

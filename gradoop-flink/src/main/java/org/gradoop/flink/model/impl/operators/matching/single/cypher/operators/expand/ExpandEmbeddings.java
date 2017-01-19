@@ -157,7 +157,8 @@ public class ExpandEmbeddings implements PhysicalOperator {
   }
 
   /**
-   * Runs a traversel over the given edgeCandidates withing the given bounds
+   * Runs a traversal over the given edgeCandidates withing the given bounds
+   *
    * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
    */
   @Override
@@ -171,6 +172,7 @@ public class ExpandEmbeddings implements PhysicalOperator {
 
   /**
    * creates the initial working set from the edge candidates
+   *
    * @return initial working set with the expand embeddings
    */
   private DataSet<ExpandEmbedding> preProcess() {
@@ -192,6 +194,7 @@ public class ExpandEmbeddings implements PhysicalOperator {
 
   /**
    * Runs the iterative traversal
+   *
    * @param initialWorkingSet the initial edges which are used as starting points for the traversal
    * @return set of paths produced by the iteration (length 1..upperBound)
    */
@@ -218,6 +221,7 @@ public class ExpandEmbeddings implements PhysicalOperator {
 
   /**
    * Produces the final operator results from the iteration results
+   *
    * @param iterationResults the results produced by the iteration
    * @return iteration results filtered by upper and lower bound and combined with input data
    */

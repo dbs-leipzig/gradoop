@@ -41,7 +41,7 @@ public class QueryPlan {
   /**
    * Returns the root node of the query plan
    *
-   * @return
+   * @return root node of the query plan
    */
   public PlanNode getRoot() {
     return root;

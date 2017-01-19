@@ -97,10 +97,12 @@ public class EmbeddingMetaData implements Serializable {
     this.propertyMapping = new HashMap<>(metaData.getPropertyCount());
 
     metaData.getVariables().forEach(var -> {
-      this.entryMapping.put(Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
-      metaData.getPropertyKeys(var).forEach(key ->
-        this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
-    });
+        this.entryMapping.put(
+          Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
+        metaData.getPropertyKeys(var).forEach(key ->
+          this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+      }
+    );
   }
 
   /**
@@ -125,6 +127,7 @@ public class EmbeddingMetaData implements Serializable {
    * Inserts or updates a column mapping entry
    *
    * @param variable referenced variable
+   * @param entryType entry type
    * @param column corresponding embedding entry index
    */
   public void setEntryColumn(String variable, EntryType entryType, int column) {

@@ -3,12 +3,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
 
 /**
  * Mock node that can be used as input node in testing other plan nodes.
  */
-public class MockPlanNode implements PlanNode {
+public class MockPlanNode extends PlanNode {
   /**
    * Data set to be returned by the node
    */
@@ -35,12 +34,12 @@ public class MockPlanNode implements PlanNode {
   }
 
   @Override
-  public Estimator getEstimator() {
-    return null;
+  public EmbeddingMetaData getEmbeddingMetaData() {
+    return mockMetaData;
   }
 
   @Override
-  public EmbeddingMetaData getEmbeddingMetaData() {
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
     return mockMetaData;
   }
 }
