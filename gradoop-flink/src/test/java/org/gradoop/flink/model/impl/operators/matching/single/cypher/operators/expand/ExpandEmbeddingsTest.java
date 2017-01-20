@@ -26,9 +26,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.*;
 import static org.junit.Assert.assertEquals;
 
-public class ExpandTest extends PhysicalOperatorTest {
+public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
   //define some vertices
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();
@@ -56,7 +57,7 @@ public class ExpandTest extends PhysicalOperatorTest {
     );
 
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input, candidateEdges, 2, 1, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -86,7 +87,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForOutExpansion() throws Exception {
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -94,7 +95,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -106,7 +107,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testResultForInExpansion() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(b,e1,a),
@@ -114,7 +115,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(d,e3,c)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.IN, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -126,7 +127,7 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testUpperBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
@@ -134,7 +135,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -146,14 +147,14 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBoundRequirement() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b),
       createEmbedding(b,e2,c)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -165,13 +166,13 @@ public class ExpandTest extends PhysicalOperatorTest {
 
   @Test
   public void testLowerBound0() throws Exception{
-    DataSet<Embedding> input = createEmbeddings(1, a);
+    DataSet<Embedding> input = createEmbeddings(getExecutionEnvironment(), 1, a);
 
     DataSet<Embedding> candidateEdges = getExecutionEnvironment().fromElements(
       createEmbedding(a,e1,b)
     );
 
-    DataSet<Embedding> result = new Expand(
+    DataSet<Embedding> result = new ExpandEmbeddings(
       input,candidateEdges, 0, 0, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
@@ -194,7 +195,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    Expand op = new Expand(
+    ExpandEmbeddings op = new ExpandEmbeddings(
       input, candidateEdges,
       2, 2, 3,
       ExpandDirection.OUT,
@@ -218,7 +219,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    Expand op = new Expand(
+    ExpandEmbeddings op = new ExpandEmbeddings(
       input, candidateEdges,
       2, 1, 2,
       ExpandDirection.OUT,
@@ -243,7 +244,7 @@ public class ExpandTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    Expand op = new Expand(
+    ExpandEmbeddings op = new ExpandEmbeddings(
       input, candidateEdges,
       2, 1, 2,
       ExpandDirection.OUT,

@@ -56,7 +56,7 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
   public FilterAndProjectEdge(CNF predicates, EmbeddingMetaData metaData) {
     this.predicates = predicates;
     this.metaData = metaData;
-    this.propertyKeys = metaData.getPropertyKeys(metaData.getVariables().get(0));
+    this.propertyKeys = metaData.getPropertyKeys(metaData.getVariables().get(1));
   }
 
   @Override

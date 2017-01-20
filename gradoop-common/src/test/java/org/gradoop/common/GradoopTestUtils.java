@@ -43,6 +43,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -346,27 +347,41 @@ public class GradoopTestUtils {
     return out;
   }
 
-  public static <T> boolean equalContent(Collection<T> col1, Collection<T> col2) {
+  /**
+   * Uses reflection to call a private method with no arguments.
+   *
+   * @param clazz class which has the method
+   * @param object instance of the class
+   * @param methodName method name
+   * @param <T1> return type of method
+   * @param <T2> type of the calling class
+   * @return method result
+   * @throws Exception in case anything goes wrong
+   */
+  @SuppressWarnings("unchecked")
+  public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName)
+    throws Exception {
+    return call(clazz, object, methodName, null, null);
+  }
 
-    boolean equal = col1.size() == col2.size();
-
-    if (equal) {
-      for (T val : col1) {
-        equal = col2.contains(val);
-        if (!equal) {
-          break;
-        }
-      }
-      if (equal) {
-        for (T val : col2) {
-          equal = col1.contains(val);
-          if (!equal) {
-            break;
-          }
-        }
-      }
-    }
-
-    return equal;
+  /**
+   * Uses reflection to call a private method with arguments.
+   *
+   * @param clazz class which has the method
+   * @param object instance of the class
+   * @param methodName method name
+   * @param args method arguments
+   * @param <T1> return type of method
+   * @param <T2> type of the calling class
+   * @return method result
+   * @throws Exception in case anything goes wrong
+   */
+  @SuppressWarnings("unchecked")
+  public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName, Class<?>[] parameterTypes, Object[] args)
+    throws Exception {
+    Method m = parameterTypes != null ?
+      clazz.getDeclaredMethod(methodName, parameterTypes) : clazz.getDeclaredMethod(methodName);
+    m.setAccessible(true);
+    return (T1) (args != null ?  m.invoke(object, args) : m.invoke(object));
   }
 }

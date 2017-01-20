@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
@@ -51,16 +50,10 @@ public class ElementSelectorComparable extends QueryComparable {
    * @param embedding the embedding holding the data
    * @param metaData meta data describing the embedding
    * @return property value of element id
-   * @throws MissingElementException if element is not specified in values mapping
    */
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
     int column = metaData.getEntryColumn(elementSelector.getVariable());
-
-    if (column == -1) {
-      throw new MissingElementException(elementSelector.getVariable());
-    }
-
     return PropertyValue.create(embedding.getId(column));
   }
 

@@ -20,10 +20,13 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,9 +41,27 @@ import java.util.stream.Collectors;
  */
 public class EmbeddingMetaData implements Serializable {
   /**
+   * Describes the type of an embedding entry
+   */
+  public enum EntryType {
+    /**
+     * Vertex
+     */
+    VERTEX,
+    /**
+     * Edge
+     */
+    EDGE,
+    /**
+     * Path
+     */
+    PATH
+  }
+
+  /**
    * Stores the mapping of query variables to embedding entries
    */
-  private Map<String, Integer> columnMapping;
+  private Map<Pair<String, EntryType>, Integer> entryMapping;
   /**
    * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
    * the embedding
@@ -57,34 +78,101 @@ public class EmbeddingMetaData implements Serializable {
   /**
    * Initializes a new EmbeddingMetaData object from the given mappings
    *
-   * @param columnMapping maps variables to embedding entries
+   * @param entryMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
    */
-  public EmbeddingMetaData(Map<String, Integer> columnMapping,
+  public EmbeddingMetaData(Map<Pair<String, EntryType>, Integer> entryMapping,
     Map<Pair<String, String>, Integer> propertyMapping) {
-    this.columnMapping = columnMapping;
+    this.entryMapping = entryMapping;
     this.propertyMapping = propertyMapping;
+  }
+
+  /**
+   * Initializes a new EmbeddingMetaData object using copies of the provided meta data.
+   *
+   * @param metaData meta data to be copied
+   */
+  public EmbeddingMetaData(EmbeddingMetaData metaData) {
+    this.entryMapping = new HashMap<>(metaData.getEntryCount());
+    this.propertyMapping = new HashMap<>(metaData.getPropertyCount());
+
+    metaData.getVariables().forEach(var -> {
+        this.entryMapping.put(
+          Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
+        metaData.getPropertyKeys(var).forEach(key ->
+          this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+      }
+    );
+  }
+
+  /**
+   * Returns the number of entries mapped in this meta data.
+   *
+   * @return number of mapped entries
+   */
+  public int getEntryCount() {
+    return entryMapping.size();
+  }
+
+  /**
+   * Returns the number of property values mapped in this meta data.
+   *
+   * @return number of mapped property values
+   */
+  public int getPropertyCount() {
+    return propertyMapping.size();
   }
 
   /**
    * Inserts or updates a column mapping entry
    *
    * @param variable referenced variable
+   * @param entryType entry type
    * @param column corresponding embedding entry index
    */
-  public void setEntryColumn(String variable, int column) {
-    columnMapping.put(variable, column);
+  public void setEntryColumn(String variable, EntryType entryType, int column) {
+    entryMapping.put(Pair.of(variable, entryType), column);
   }
 
   /**
    * Returns the position of the embedding entry corresponding to the given variable.
-   * Returns -1 if the variable is not present within the embedding
+   * The method checks if the variable is mapped to a vertex or an edge entry.
    *
    * @param variable variable name
    * @return the position of the corresponding embedding entry
+   * @throws NoSuchElementException if there is no column mapped to the specified variable
    */
   public int getEntryColumn(String variable) {
-    return columnMapping.getOrDefault(variable, -1);
+    return entryMapping.get(Pair.of(variable, getEntryType(variable)));
+  }
+
+  /**
+   * Checks if the specified variable is mapped to a column in the embedding.
+   *
+   * @param variable query variable
+   * @return true, iff the variable is mapped to a column
+   */
+  public boolean containsEntryColumn(String variable) {
+    return Arrays.stream(EntryType.values())
+      .anyMatch(entryType -> entryMapping.containsKey(Pair.of(variable, entryType)));
+  }
+
+  /**
+   * Returns the entry type of the given variable.
+   *
+   * @param variable query variable
+   * @return Entry type of the referred entry
+   * @throws NoSuchElementException if there is no column mapped to the specified variable
+   */
+  public EntryType getEntryType(String variable) {
+    Optional<EntryType> result = Arrays.stream(EntryType.values())
+      .filter(entryType -> entryMapping.containsKey(Pair.of(variable, entryType)))
+      .findFirst();
+
+    if (!result.isPresent()) {
+      throw new NoSuchElementException(String.format("no entry for variable %s", variable));
+    }
+    return result.get();
   }
 
   /**
@@ -101,26 +189,59 @@ public class EmbeddingMetaData implements Serializable {
 
   /**
    * Returns the position of the PropertyValue corresponding to the Variable-PropertyKey-Pair.
-   * Returns -1 if the property is not present within the embedding.
    *
    * @param variable variable name
    * @param propertyKey property key
    * @return the position of the corresponding property value
+   * @throws NoSuchElementException if there is no column mapped to the given variable and key
    */
   public int getPropertyColumn(String variable, String propertyKey) {
-    return propertyMapping.getOrDefault(Pair.of(variable, propertyKey), -1);
+    Integer column = propertyMapping.get(Pair.of(variable, propertyKey));
+    if (column == null) {
+      throw new NoSuchElementException(
+        String.format("no value for property %s.%s", variable, propertyKey));
+    }
+    return column;
   }
 
   /**
-   * Returns a list of all variable that are contained in the embedding
-   * The order of the variables is determined by their position within the embedding
+   * Returns a list of all variable that are contained in the embedding.
+   * The order of the variables is determined by their position within the embedding.
    *
-   * @return a list of all variable that are contained in the embedding
+   * @return a list of all variables
    */
   public List<String> getVariables() {
-    return columnMapping.entrySet().stream()
+    return entryMapping.entrySet().stream()
       .sorted(Comparator.comparingInt(Map.Entry::getValue))
-      .map(Map.Entry::getKey)
+      .map(entry -> entry.getKey().getLeft())
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns a list of variables that are contained in the embedding and referring to vertices. The
+   * order of the variables is determined by their position within the embedding.
+   *
+   * @return a list of all vertex variables
+   */
+  public List<String> getVertexVariables() {
+    return entryMapping.entrySet().stream()
+      .filter(entry -> entry.getKey().getRight() == EntryType.VERTEX)
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getLeft())
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns a list of variables that are contained in the embedding and referring to edges. The
+   * order of the variables is determined by their position within the embedding.
+   *
+   * @return a list of all edge variables
+   */
+  public List<String> getEdgeVariables() {
+    return entryMapping.entrySet().stream()
+      .filter(entry -> entry.getKey().getRight() == EntryType.EDGE)
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getLeft())
       .collect(Collectors.toList());
   }
 
@@ -138,5 +259,41 @@ public class EmbeddingMetaData implements Serializable {
       .sorted(Comparator.comparingInt(Map.Entry::getValue))
       .map(entry -> entry.getKey().getRight())
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EmbeddingMetaData metaData = (EmbeddingMetaData) o;
+
+    return entryMapping.equals(metaData.entryMapping) &&
+      propertyMapping.equals(metaData.propertyMapping);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * entryMapping.hashCode() + propertyMapping.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    List<Map.Entry<Pair<String, EntryType>, Integer>> sortedEntries = entryMapping.entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .collect(Collectors.toList());
+
+    List<Map.Entry<Pair<String, String>, Integer>> sortiedProperties = propertyMapping.entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .collect(Collectors.toList());
+
+    return String.format("EmbeddingMetaData{entryMapping=%s, propertyMapping=%s}",
+      sortedEntries, sortiedProperties);
   }
 }
