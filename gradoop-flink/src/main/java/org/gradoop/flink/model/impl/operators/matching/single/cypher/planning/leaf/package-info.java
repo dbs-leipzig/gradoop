@@ -15,20 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.common.query.exceptions;
-
 /**
- * Used during predicate evaluation. Is thrown when the predicate need to evaluate a variable which
- * is not present in the input map.
+ * Contains leaf plan node implementations.
  */
-public class MissingElementException extends RuntimeException {
-  /**
-   * Creates a new exception object for the missing variable.
-   *
-   * @param variable the missing variable
-   */
-  public MissingElementException(String variable) {
-    super("There is no element bound to '" + variable + "'");
-  }
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
 
-}

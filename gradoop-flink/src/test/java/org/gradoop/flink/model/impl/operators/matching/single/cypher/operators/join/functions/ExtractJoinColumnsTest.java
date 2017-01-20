@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
+
 public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
   @Test
