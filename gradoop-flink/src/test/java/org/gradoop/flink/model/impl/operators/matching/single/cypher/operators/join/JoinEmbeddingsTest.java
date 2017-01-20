@@ -2,6 +2,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -15,6 +16,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbeddings;
 
 @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
 public class JoinEmbeddingsTest extends PhysicalOperatorTest {
@@ -39,11 +43,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     GradoopId e0 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [Id(v0)]
-    DataSet<Embedding> left = createEmbeddings(1,v0);
+    DataSet<Embedding> left = createEmbeddings(env, 1,v0);
 
     // [Id(v0),Id(e0),Id(v1)]
-    DataSet<Embedding> right = createEmbeddings(1, v0, e0, v1);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v0, e0, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
@@ -75,11 +81,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e1 = GradoopId.get();
     GradoopId e2 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1, v0, e0, v1, e1, v2);
+    DataSet<Embedding> left = createEmbeddings(env, 1, v0, e0, v1, e1, v2);
 
     // [Id(v1),Id(e2),Id(v3)]
-    DataSet<Embedding> right = createEmbeddings(1, v1, e2 ,v3);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v1, e2 ,v3);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right, 2, 0);
@@ -113,12 +121,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e2 = GradoopId.get();
     GradoopId e3 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
 
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1, v0, e0, v1, e1, v2);
+    DataSet<Embedding> left = createEmbeddings(env, 1, v0, e0, v1, e1, v2);
 
     // [Id(v3),Id(e2),Id(v1),Id(e3),Id(v4)]
-    DataSet<Embedding> right = createEmbeddings(1, v3, e2, v1, e3, v4);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v3, e2, v1, e3, v4);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right, 2, 2);
@@ -146,11 +155,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId e1 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [Id(v0),Id(e0),Id(v1)]
-    DataSet<Embedding> left = createEmbeddings(1, v0, e0, v1);
+    DataSet<Embedding> left = createEmbeddings(env, 1, v0, e0, v1);
 
     // [Id(v0),Id(e1),Id(v1)]
-    DataSet<Embedding> right = createEmbeddings(1, v0, e1, v1);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v0, e1, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
@@ -184,12 +195,14 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e2 = GradoopId.get();
     GradoopId e3 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
-    DataSet<Embedding> left = createEmbeddings(1,
+    DataSet<Embedding> left = createEmbeddings(env, 1,
       v0, e0, v1, e1, v2);
 
     // [Id(v0),Id(e2),Id(v3),Id(e3),Id(v2)]
-    DataSet<Embedding> right = createEmbeddings(1,
+    DataSet<Embedding> right = createEmbeddings(env, 1,
       v0, e2, v3, e3, v2);
 
     // join operator
@@ -228,11 +241,13 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e4 = GradoopId.get();
     GradoopId e5 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3)]
-    DataSet<Embedding> left = createEmbeddings(1, v0, e0, v1, e1, v2, e2, v3);
+    DataSet<Embedding> left = createEmbeddings(env, 1, v0, e0, v1, e1, v2, e2, v3);
 
     // [Id(v4),Id(e3),Id(v1),Id(e4),Id(v2),Id(e5),Id(v5)]
-    DataSet<Embedding> right = createEmbeddings(1, v4, e3, v1, e4, v2, e5, v5);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v4, e3, v1, e4, v2, e5, v5);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,
@@ -258,6 +273,8 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
 
     Embedding embedding = new Embedding();
@@ -265,7 +282,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> left = getExecutionEnvironment().fromElements(embedding);
 
     // [v0, e0, v1]
-    DataSet<Embedding> right = createEmbeddings(1, v0, e0, v1);
+    DataSet<Embedding> right = createEmbeddings(env, 1, v0, e0, v1);
 
     // join operator
     PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
@@ -284,8 +301,10 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId v0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
+    ExecutionEnvironment env = getExecutionEnvironment();
+
     // [(Id(v0)]
-    DataSet<Embedding> left = createEmbeddings(1, v0);
+    DataSet<Embedding> left = createEmbeddings(env, 1, v0);
 
     List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
     Embedding embedding = new Embedding();

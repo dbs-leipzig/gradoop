@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -51,9 +52,9 @@ public class CNFElementTest {
     CNFElement cnfElement = query.getPredicates().getPredicates().get(0);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", 0);
-    metaData.setEntryColumn("b", 1);
-    metaData.setEntryColumn("c", 2);
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
+    metaData.setEntryColumn("c", EntryType.VERTEX, 2);
     metaData.setPropertyColumn("a", "name", 0);
     metaData.setPropertyColumn("a", "age", 1);
     metaData.setPropertyColumn("c", "age", 2);

@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains exceptions thrown in the matching process
+ * Contains binary plan node implementations.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.query.exceptions;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary;
+
