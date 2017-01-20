@@ -15,6 +15,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.junit.Test;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
@@ -81,26 +82,22 @@ public class ElementsFromEmbeddingTest {
       .findFirst()
       .get();
 
-    assertTrue(graphHead.hasProperty(GraphHead.VERTEX_VARIABLE_MAPPING_KEY));
-    assertTrue(graphHead.hasProperty(GraphHead.EDGE_VARIABLE_MAPPING_KEY));
+    assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
 
-    Map<PropertyValue, PropertyValue> vertexVariableMapping
-      = graphHead.getPropertyValue(GraphHead.VERTEX_VARIABLE_MAPPING_KEY).getMap();
+    Map<PropertyValue, PropertyValue> variableMapping
+      = graphHead.getPropertyValue(PatternMatching.VARIABLE_MAPPING_KEY).getMap();
 
     for (Vertex queryVertex : query.getVertices()) {
       assertEquals(
-        vertexVariableMapping.get(PropertyValue.create(queryVertex.getVariable())),
-        PropertyValue.create(vertexMapping[toIntExact(queryVertex.getId())])
+        variableMapping.get(PropertyValue.create(queryVertex.getVariable())),
+        PropertyValue.create(vertexMapping[(int) queryVertex.getId()])
       );
     }
 
-    Map<PropertyValue, PropertyValue> edgeVariableMapping
-      = graphHead.getPropertyValue(GraphHead.EDGE_VARIABLE_MAPPING_KEY).getMap();
-
     for (Edge queryEdge : query.getEdges()) {
       assertEquals(
-        edgeVariableMapping.get(PropertyValue.create(queryEdge.getVariable())),
-        PropertyValue.create(edgeMapping[toIntExact(queryEdge.getId())])
+        variableMapping.get(PropertyValue.create(queryEdge.getVariable())),
+        PropertyValue.create(edgeMapping[(int) queryEdge.getId()])
       );
     }
   }

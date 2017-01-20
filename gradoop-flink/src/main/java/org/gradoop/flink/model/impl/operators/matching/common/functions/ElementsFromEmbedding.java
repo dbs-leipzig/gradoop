@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,13 +64,18 @@ public class ElementsFromEmbedding
    * Constructs EPGM edges
    */
   private final EdgeFactory edgeFactory;
-
+  /**
+   * Maps query vertex ids to variables
+   */
   private final Map<Long, String> queryVertexMapping;
-
+  /**
+   * Maps query edge ids to variables
+   */
   private final Map<Long, String> queryEdgeMapping;
-
-  private Map<PropertyValue, PropertyValue> reuseVertexVariableMapping;
-  private Map<PropertyValue, PropertyValue> reuseEdgeVariableMapping;
+  /**
+   * Reuse map for storing the variable mapping
+   */
+  private Map<PropertyValue, PropertyValue> reuseVariableMapping;
   /**
    * Constructor
    *
@@ -77,6 +83,7 @@ public class ElementsFromEmbedding
    * @param graphHeadFactory  EPGM graph head factory
    * @param vertexFactory     EPGM vertex factory
    * @param edgeFactory       EPGM edge factory
+   * @param query             query handler
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
     GraphHeadFactory graphHeadFactory,
@@ -105,29 +112,27 @@ public class ElementsFromEmbedding
 
   @Override
   public void open(Configuration conf) {
-    this.reuseVertexVariableMapping = new HashMap<>();
-    this.reuseEdgeVariableMapping = new HashMap<>();
+    this.reuseVariableMapping = new HashMap<>();
   }
 
   @Override
   public void flatMap(Tuple1<Embedding<GradoopId>> embedding, Collector<Element> out)
-    throws Exception {
+      throws Exception {
 
     GradoopId[] vertexMapping = embedding.f0.getVertexMapping();
     GradoopId[] edgeMapping = embedding.f0.getEdgeMapping();
 
-    reuseVertexVariableMapping.clear();
-    reuseEdgeVariableMapping.clear();
+    reuseVariableMapping.clear();
 
     for (int i = 0; i < vertexMapping.length; i++) {
-      reuseVertexVariableMapping.put(
+      reuseVariableMapping.put(
         PropertyValue.create(queryVertexMapping.get((long) i)),
         PropertyValue.create(vertexMapping[i])
       );
     }
 
     for (int i = 0; i < edgeMapping.length; i++) {
-      reuseEdgeVariableMapping.put(
+      reuseVariableMapping.put(
         PropertyValue.create(queryEdgeMapping.get((long) i)),
         PropertyValue.create(edgeMapping[i])
       );
@@ -135,8 +140,7 @@ public class ElementsFromEmbedding
 
     // create graph head for this embedding
     GraphHead graphHead = graphHeadFactory.createGraphHead();
-    graphHead.setProperty(GraphHead.VERTEX_VARIABLE_MAPPING_KEY, reuseVertexVariableMapping);
-    graphHead.setProperty(GraphHead.EDGE_VARIABLE_MAPPING_KEY, reuseEdgeVariableMapping);
+    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);
     out.collect(graphHead);
 
     // collect vertices (and assign to graph head)

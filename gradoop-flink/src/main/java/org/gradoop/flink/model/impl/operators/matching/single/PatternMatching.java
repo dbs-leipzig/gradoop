@@ -40,6 +40,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
  */
 public abstract class PatternMatching implements
   UnaryGraphToCollectionOperator {
+
+  /**
+   * The property key used to stored the variable mappings inside the GraphHead properties
+   */
+  public static final transient String VARIABLE_MAPPING_KEY = "__vertex_variable_mapping";
+
   /**
    * GDL based query string
    */

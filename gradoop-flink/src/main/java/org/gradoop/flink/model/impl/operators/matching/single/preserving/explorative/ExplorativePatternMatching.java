@@ -140,6 +140,7 @@ public class ExplorativePatternMatching
     GradoopFlinkConfig config = graph.getConfig();
     GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
     VertexFactory vertexFactory = config.getVertexFactory();
+    String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<Vertex> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<>(getQuery()));
@@ -152,7 +153,7 @@ public class ExplorativePatternMatching
     }
 
     DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<>(graphHeadFactory))
+      .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable))
       .returns(new TupleTypeInfo<>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));

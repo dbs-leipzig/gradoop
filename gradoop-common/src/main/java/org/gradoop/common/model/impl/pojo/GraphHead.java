@@ -25,8 +25,6 @@ import org.gradoop.common.model.impl.properties.Properties;
  * POJO Implementation of an EPGM graph head.
  */
 public class GraphHead extends Element implements EPGMGraphHead {
-  public static transient final String VERTEX_VARIABLE_MAPPING_KEY = "__vertex_variable_mapping";
-  public static transient final String EDGE_VARIABLE_MAPPING_KEY = "__edge_variable_mapping";
 
   /**
    * Default constructor.
