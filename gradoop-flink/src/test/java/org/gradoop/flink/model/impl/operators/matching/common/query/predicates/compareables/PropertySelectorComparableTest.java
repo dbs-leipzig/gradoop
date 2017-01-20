@@ -20,14 +20,14 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingPropertyException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.PropertySelector;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
@@ -49,7 +49,7 @@ public class PropertySelectorComparableTest {
     assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
   }
 
-  @Test(expected = MissingPropertyException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfPropertyIsMissing() {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
@@ -64,7 +64,7 @@ public class PropertySelectorComparableTest {
     wrapper.evaluate(embedding, metaData);
   }
 
-  @Test(expected= MissingElementException.class)
+  @Test(expected= NoSuchElementException.class)
   public void testThrowErrorIfElementNotPresent() {
     PropertySelector selector = new PropertySelector("a","age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);

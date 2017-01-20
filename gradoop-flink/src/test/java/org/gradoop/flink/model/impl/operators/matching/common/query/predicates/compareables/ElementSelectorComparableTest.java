@@ -19,13 +19,14 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.exceptions.MissingElementException;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.ElementSelector;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -47,7 +48,7 @@ public class ElementSelectorComparableTest {
     assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
   }
 
-  @Test(expected= MissingElementException.class)
+  @Test(expected= NoSuchElementException.class)
   public void testThrowErrorIfElementNotPresent() {
     ElementSelector selector = new ElementSelector("a");
     ElementSelectorComparable wrapper = new ElementSelectorComparable(selector);
