@@ -95,4 +95,15 @@ public class FilterAndProjectEdgesNode extends LeafNode {
 
     return embeddingMetaData;
   }
+
+  @Override
+  public String toString() {
+    return String.format("FilterAndProjectEdgesNode{" +
+        "sourceVariable='%s', " +
+        "edgeVariable='%s', " +
+        "targetVariable='%s', " +
+        "filterPredicate=%s, " +
+        "projectionKeys=%s}",
+      sourceVariable, edgeVariable, targetVariable, filterPredicate, projectionKeys);
+  }
 }

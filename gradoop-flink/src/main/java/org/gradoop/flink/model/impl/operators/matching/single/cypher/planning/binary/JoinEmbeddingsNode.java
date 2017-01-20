@@ -189,4 +189,13 @@ public class JoinEmbeddingsNode extends BinaryNode {
         .map(metaData::getEntryColumn)
         .collect(Collectors.toList()) : Collections.emptyList();
   }
+
+  @Override
+  public String toString() {
+    return String.format("JoinEmbeddingsNode{" +
+      "joinVariables=%s, " +
+      "vertexMorphismType=%s, " +
+      "edgeMorphismType=%s}",
+      joinVariables, vertexStrategy, edgeStrategy);
+  }
 }

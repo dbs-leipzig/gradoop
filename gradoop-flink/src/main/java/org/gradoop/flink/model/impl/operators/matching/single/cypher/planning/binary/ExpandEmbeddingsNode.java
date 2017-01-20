@@ -40,11 +40,15 @@ public class ExpandEmbeddingsNode extends BinaryNode {
    */
   private final int expandColumn;
   /**
+   * Query variable of the first vertex in the path
+   */
+  private final String startVariable;
+  /**
    * Query variable of the variable length path
    */
   private final String pathVariable;
   /**
-   * Query variable of the final vertex in the path
+   * Query variable of the last vertex in the path
    */
   private final String endVariable;
   /**
@@ -92,6 +96,7 @@ public class ExpandEmbeddingsNode extends BinaryNode {
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
     super(leftChild, rightChild);
     this.pathVariable = pathVariable;
+    this.startVariable = startVariable;
     this.endVariable = endVariable;
     this.lowerBound = lowerBound;
     this.upperBound = upperBound;
@@ -154,5 +159,20 @@ public class ExpandEmbeddingsNode extends BinaryNode {
       metaData.getEdgeVariables().stream()
         .map(metaData::getEntryColumn)
         .collect(Collectors.toList()) : Collections.emptyList();
+  }
+
+  @Override
+  public String toString() {
+    return String.format("ExpandEmbeddingsNode={" +
+        "startVariable='%s', " +
+        "pathVariable='%s', " +
+        "endVariable='%s', " +
+        "lowerBound=%d, " +
+        "upperBound=%d, " +
+        "expandDirection=%s, " +
+        "vertexMorphismType=%s, " +
+        "edgeMorphismType=%s}",
+      startVariable, pathVariable, edgeStrategy, lowerBound, upperBound, expandDirection,
+      vertexStrategy, edgeStrategy);
   }
 }

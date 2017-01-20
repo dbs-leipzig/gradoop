@@ -42,4 +42,9 @@ public class MockPlanNode extends PlanNode {
   protected EmbeddingMetaData computeEmbeddingMetaData() {
     return mockMetaData;
   }
+
+  @Override
+  public String toString() {
+    return "MockPlanNode{" + "mockMetaData=" + mockMetaData + '}';
+  }
 }

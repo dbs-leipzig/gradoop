@@ -9,6 +9,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.MockPlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.QueryPlan;
 import org.junit.Test;
 
 import java.util.List;

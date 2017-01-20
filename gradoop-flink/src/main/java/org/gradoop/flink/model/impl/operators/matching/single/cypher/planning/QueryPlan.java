@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
@@ -28,6 +29,10 @@ public class QueryPlan {
    * Root entry point for the query plan.
    */
   private final PlanNode root;
+  /**
+   * Used for indentation when creating a string representation of the plan
+   */
+  private static final String PAD_STRING = "|.";
 
   /**
    * Creates a new query plan
@@ -54,5 +59,30 @@ public class QueryPlan {
    */
   public DataSet<Embedding> execute() {
     return root.execute();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    printPlanNode(root, 0, sb);
+    return sb.toString();
+  }
+
+  /**
+   * Recursively prints the sub tree of the given node in pre-order.
+   *
+   * @param node root plan node
+   * @param level level of the whole query tree
+   * @param sb string builder to append
+   */
+  private void printPlanNode(PlanNode node, int level, StringBuilder sb) {
+    sb.append(String.format("%s|-%s%n", StringUtils.leftPad("", level * 2, PAD_STRING), node));
+    level++;
+    if (node instanceof UnaryNode) {
+      printPlanNode(((UnaryNode) node).getChildNode(), level, sb);
+    } else if (node instanceof BinaryNode) {
+      printPlanNode(((BinaryNode) node).getLeftChild(), level, sb);
+      printPlanNode(((BinaryNode) node).getRightChild(), level, sb);
+    }
   }
 }

@@ -83,4 +83,9 @@ public class ProjectEmbeddingsNode extends UnaryNode {
 
     return embeddingMetaData;
   }
+
+  @Override
+  public String toString() {
+    return String.format("ProjectEmbeddingsNode{projectionKeys=%s", projectionKeys);
+  }
 }

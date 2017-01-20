@@ -55,4 +55,9 @@ public class FilterEmbeddingsNode extends UnaryNode {
   protected EmbeddingMetaData computeEmbeddingMetaData() {
     return new EmbeddingMetaData(getChildNode().getEmbeddingMetaData());
   }
+
+  @Override
+  public String toString() {
+    return String.format("FilterEmbeddingsNode{filterPredicate=%s", filterPredicate);
+  }
 }

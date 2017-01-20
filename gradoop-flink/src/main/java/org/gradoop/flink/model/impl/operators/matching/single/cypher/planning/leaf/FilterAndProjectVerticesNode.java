@@ -80,4 +80,13 @@ public class FilterAndProjectVerticesNode extends LeafNode {
 
     return embeddingMetaData;
   }
+
+  @Override
+  public String toString() {
+    return String.format("FilterAndProjectVerticesNode{" +
+        "vertexVariable=%s, " +
+        "filterPredicate=%s, " +
+        "projectionKeys=%s}",
+      vertexVariable, filterPredicate, projectionKeys);
+  }
 }
