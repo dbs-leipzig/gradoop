@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEveryEmbedding;
 import static org.junit.Assert.assertEquals;
 
 public class ProjectEmbeddingsTest extends PhysicalOperatorTest {

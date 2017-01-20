@@ -23,13 +23,13 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEmbedding;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Projects an Embedding by a set of properties.
  * For each entry in the embedding a different property set can be specified
  */
 public class ProjectEmbeddings implements PhysicalOperator {
-
   /**
    * Input Embeddings
    */
@@ -42,14 +42,11 @@ public class ProjectEmbeddings implements PhysicalOperator {
   /**
    * Creates a new embedding projection operator
    * @param input Embeddings that should be projected
-   * @param propertyWhiteList HashMap of property labels, keys are the columns of the entry,
-   *                     values are property keys
+   * @param propertyWhiteList property columns in the embedding that are taken over to the output
    */
-  public ProjectEmbeddings(DataSet<Embedding> input,
-    List<Integer> propertyWhiteList) {
-
+  public ProjectEmbeddings(DataSet<Embedding> input, List<Integer> propertyWhiteList) {
     this.input = input;
-    this.propertyWhiteList = propertyWhiteList;
+    this.propertyWhiteList = propertyWhiteList.stream().sorted().collect(Collectors.toList());
   }
 
   @Override

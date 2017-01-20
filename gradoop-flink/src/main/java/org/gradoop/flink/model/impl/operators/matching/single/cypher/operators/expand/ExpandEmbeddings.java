@@ -39,7 +39,7 @@ import java.util.List;
  * edge, vertex, ..., edge), the second one the end vertex
  */
 
-public class Expand implements PhysicalOperator {
+public class ExpandEmbeddings implements PhysicalOperator {
 
   /**
    * Input Embeddings
@@ -96,7 +96,7 @@ public class Expand implements PhysicalOperator {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -118,7 +118,7 @@ public class Expand implements PhysicalOperator {
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
@@ -126,7 +126,7 @@ public class Expand implements PhysicalOperator {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -140,14 +140,14 @@ public class Expand implements PhysicalOperator {
    *
    * @param input the embedding which should be expanded
    * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the colum that represents the vertex from which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param direction direction of the expansion {@see ExpandDirection}
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public Expand(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -157,7 +157,8 @@ public class Expand implements PhysicalOperator {
   }
 
   /**
-   * Runs a traversel over the given edgeCandidates withing the given bounds
+   * Runs a traversal over the given edgeCandidates withing the given bounds
+   *
    * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
    */
   @Override
@@ -171,6 +172,7 @@ public class Expand implements PhysicalOperator {
 
   /**
    * creates the initial working set from the edge candidates
+   *
    * @return initial working set with the expand embeddings
    */
   private DataSet<ExpandEmbedding> preProcess() {
@@ -192,6 +194,7 @@ public class Expand implements PhysicalOperator {
 
   /**
    * Runs the iterative traversal
+   *
    * @param initialWorkingSet the initial edges which are used as starting points for the traversal
    * @return set of paths produced by the iteration (length 1..upperBound)
    */
@@ -218,6 +221,7 @@ public class Expand implements PhysicalOperator {
 
   /**
    * Produces the final operator results from the iteration results
+   *
    * @param iterationResults the results produced by the iteration
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
