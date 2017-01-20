@@ -26,13 +26,13 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
  */
 public class QueryPlan {
   /**
-   * Root entry point for the query plan.
-   */
-  private final PlanNode root;
-  /**
    * Used for indentation when creating a string representation of the plan
    */
   private static final String PAD_STRING = "|.";
+  /**
+   * Root entry point for the query plan.
+   */
+  private final PlanNode root;
 
   /**
    * Creates a new query plan
