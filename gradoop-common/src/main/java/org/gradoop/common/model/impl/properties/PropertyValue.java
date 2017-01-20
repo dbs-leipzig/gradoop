@@ -369,7 +369,9 @@ public class PropertyValue
     DataInputStream inputStream = new DataInputStream(byteStream);
 
     try {
-      inputStream.skipBytes(OFFSET);
+      if (inputStream.skipBytes(OFFSET) != OFFSET) {
+        throw new RuntimeException("Malformed entry in PropertyValue List");
+      }
       while (inputStream.available() > 0) {
         key = new PropertyValue();
         key.readFields(inputStream);
@@ -400,7 +402,9 @@ public class PropertyValue
     DataInputStream inputStream = new DataInputStream(byteStream);
 
     try {
-      inputStream.skipBytes(OFFSET);
+      if (inputStream.skipBytes(OFFSET) != OFFSET) {
+        throw new RuntimeException("Malformed entry in PropertyValue List");
+      }
       while (inputStream.available() > 0) {
         entry = new PropertyValue();
         entry.readFields(inputStream);
@@ -444,7 +448,7 @@ public class PropertyValue
     } else if (value instanceof GradoopId) {
       setGradoopId((GradoopId) value);
     } else if (value instanceof Map) {
-      setMap((HashMap) value);
+      setMap((Map) value);
     } else if (value instanceof List) {
       setList((List) value);
     } else {
