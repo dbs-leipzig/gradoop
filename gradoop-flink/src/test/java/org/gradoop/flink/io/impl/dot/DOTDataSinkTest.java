@@ -32,7 +32,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
 
-    final String dotFile = tmpDir + "/test.dot";
+    final String dotFile = tmpDir + "/check.dot";
 
     // create data sink
     DataSink dataSink = new DOTDataSink(dotFile, false);

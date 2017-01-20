@@ -2,391 +2,443 @@ package org.gradoop.flink.model.impl.operators.fusion;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.TestUtils;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-/**
- * Created by Giacomo Bergami on 19/01/17.
- */
-public class FusionTest  extends GradoopFlinkTestBase {
+public class FusionTest extends GradoopFlinkTestBase {
+	@Test
+	public void empty_empty_to_empty() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("empty:G[]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("empty");
+		LogicalGraph right = loader.getLogicalGraphByVariable("empty");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("empty")));
+	}
 
-    StringBuilder databaseBuilder = new StringBuilder();
-    private LogicalGraph empty, oneVertex;
-    private LogicalGraph aVertex;
-    private LogicalGraph aAbGraph;
-    private LogicalGraph aBbGraph;
-    private LogicalGraph abGraph;
-    private LogicalGraph aAbCdGraph;
-    private LogicalGraph abCdGraph;
-    private LogicalGraph abdGraph;
-    private LogicalGraph semicomplex;
-    private LogicalGraph looplessPattern;
-    private LogicalGraph loopPattern;
-    private LogicalGraph firstmatch;
-    private LogicalGraph secondmatch;
-    private LogicalGraph tricky;
+	@Test
+	public void empty_single_to_empty() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("empty:G[]"+
+			"single:G["+
+			"()"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("empty");
+		LogicalGraph right = loader.getLogicalGraphByVariable("single");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("empty")));
+	}
 
-    private static void addTo(StringBuilder sb, Object o) {
-        sb.append(o.toString()).append('\n');
-    }
-    private static TestUtils.VertexBuilder<?> simpleVertex(String var, String type) {
-        TestUtils.VertexBuilder<?> a = new TestUtils.VertexBuilder<>();
-        TestUtils.VertexBuilder.generateWithValueAndType(null,a,var,type).propList().put(var+"value",var+"type").plEnd();
-        return a;
-    }
+	@Test
+	public void single_empty_to_single() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("single:G["+
+			"()"+
+			"]"+
+			"empty:G[]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("single");
+		LogicalGraph right = loader.getLogicalGraphByVariable("empty");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("single")));
+	}
 
-    private void check(LogicalGraph left, LogicalGraph right, LogicalGraph toCheck, Fusion f) throws Exception {
-        LogicalGraph result = f.execute(left, right);
-        collectAndAssertTrue(result.equalsByElementData(toCheck));
-    }
+	@Test
+	public void single_aVertex_to_single() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"single:G["+
+			"()"+
+			"]"+
+			"aVertex:G["+
+			"(a)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("single");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aVertex");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("single")));
+	}
 
-    //generally speaking, \Forall x. empty with to-be-fused x returns x
-    @Test
-    public void empty_3() throws Exception {
-        Fusion f = null;
-        check(empty,empty,empty,f);
-    }
+	@Test
+	public void single_single_to_single() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("single:G["+
+			"()"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("single");
+		LogicalGraph right = loader.getLogicalGraphByVariable("single");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("single")));
+	}
 
-    @Test
-    public void empty_single_Empty() throws Exception {
-        Fusion f = null;
-        check(empty,oneVertex,empty,f);
-    }
+	@Test
+	public void aVertex_aVertex_to_aVertex() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"aVertex:G["+
+			"(a)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aVertex");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aVertex");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aVertex")));
+	}
 
-    @Test
-    public void single_empty_Single() throws Exception {
-        Fusion f = null;
-        check(oneVertex,empty,oneVertex,f);
-    }
+	@Test
+	public void aVertex_empty_to_aVertex() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"aVertex:G["+
+			"(a)"+
+			"]"+
+			"empty:G[]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aVertex");
+		LogicalGraph right = loader.getLogicalGraphByVariable("empty");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aVertex")));
+	}
 
-    @Test
-    public void oneVertex_aVertex_oneVertex() throws Exception {
-        Fusion f = null;
-        check(oneVertex,aVertex,oneVertex,f);
-    }
+	@Test
+	public void aVertex_single_to_aVertex() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"aVertex:G["+
+			"(a)"+
+			"]"+
+			"single:G["+
+			"()"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aVertex");
+		LogicalGraph right = loader.getLogicalGraphByVariable("single");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aVertex")));
+	}
 
-    @Test
-    public void single_3() throws Exception {
-        Fusion f = null;
-        check(oneVertex,oneVertex,oneVertex,f);
-    }
+	@Test
+	public void aAbGraph_aVertex_to_aAbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"aVertex:G["+
+			"(a)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aVertex");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aAbGraph")));
+	}
 
-    @Test
-    public void aVertex_3() throws Exception {
-        Fusion f = null;
-        check(aVertex,aVertex,aVertex,f);
-    }
+	@Test
+	public void aAbGraph_empty_to_aAbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"empty:G[]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("empty");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aAbGraph")));
+	}
 
-    @Test
-    public void aVertex_empty_aVertex() throws Exception {
-        Fusion f = null;
-        check(aVertex,empty,aVertex,f);
-    }
+	@Test
+	public void aAbGraph_single_to_aAbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"single:G["+
+			"()"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("single");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aAbGraph")));
+	}
 
-    @Test
-    public void aVertex_oneVertex_aVertex() throws Exception {
-        Fusion f = null;
-        check(aVertex,oneVertex,aVertex,f);
-    }
+	@Test
+	public void aAbGraph_aAbGraph_to_abGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(ab:G {atype : \"avalue\",btype : \"bvalue\"})"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"abGraph:G["+
+			"(ab)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aAbGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("abGraph")));
+	}
 
-    @Test
-    public void otherTest1() throws Exception {
-        Fusion f = null;
-        check( aAbGraph , aVertex , aAbGraph,f);
-    }
+	@Test
+	public void aAbGraph_aBbGraph_to_aAbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aBbGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aAbGraph")));
+	}
 
-    @Test
-    public void otherTest2() throws Exception {
-        Fusion f = null;
-        check( aAbGraph , empty , aAbGraph,f);
-    }
+	@Test
+	public void aBbGraph_aVertex_to_aBbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]"+
+			"aVertex:G["+
+			"(a)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aBbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aVertex");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aBbGraph")));
+	}
 
-    @Test
-    public void otherTest3() throws Exception {
-        Fusion f = null;
-        check( aAbGraph , oneVertex , aAbGraph,f);
-    }
+	@Test
+	public void aBbGraph_empty_to_aBbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]"+
+			"empty:G[]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aBbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("empty");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aBbGraph")));
+	}
 
-    @Test
-    public void otherTest4() throws Exception {
-        Fusion f = null;
-        check( aAbGraph , aAbGraph , abGraph,f);
-    }
+	@Test
+	public void aBbGraph_single_to_aBbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]"+
+			"single:G["+
+			"()"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aBbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("single");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aBbGraph")));
+	}
 
-    @Test
-    public void otherTest5() throws Exception {
-        Fusion f = null;
-        check( aAbGraph , aBbGraph , aAbGraph,f);
-    }
+	@Test
+	public void aBbGraph_aAbGraph_to_aBbGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aBbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aAbGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("aBbGraph")));
+	}
 
-    @Test
-    public void otherTest6() throws Exception {
-        Fusion f = null;
-        check( aBbGraph , aVertex , aBbGraph,f);
-    }
+	@Test
+	public void aBbGraph_aBbGraph_to_abGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(ab:G {atype : \"avalue\",btype : \"bvalue\"})"+
+			"aBbGraph:G["+
+			"(a)-[:BetaEdge]->(b)"+
+			""+
+			"]"+
+			"abGraph:G["+
+			"(ab)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aBbGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aBbGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("abGraph")));
+	}
 
-    @Test
-    public void otherTest7() throws Exception {
-        Fusion f = null;
-        check( aBbGraph , empty , aBbGraph,f);
-    }
+	@Test
+	public void aAbCdGraph_aAbCdGraph_to_abdGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(c:C {ctype : \"cvalue\"})"+
+			"(ab:G {ctype : \"cvalue\",atype : \"avalue\",btype : \"bvalue\"})"+
+			"aAbCdGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(b)-[:GammaEdge]->(c)"+
+			""+
+			"]"+
+			"abdGraph:G["+
+			"(abc)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbCdGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aAbCdGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("abdGraph")));
+	}
 
-    @Test
-    public void otherTest8() throws Exception {
-        Fusion f = null;
-        check( aBbGraph , oneVertex , aBbGraph,f);
-    }
+	@Test
+	public void aAbCdGraph_aAbGraph_to_abCdGraph() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(c:C {ctype : \"cvalue\"})"+
+			"(ab:G {atype : \"avalue\",btype : \"bvalue\"})"+
+			"aAbCdGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(b)-[:GammaEdge]->(c)"+
+			""+
+			"]"+
+			"aAbGraph:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			""+
+			"]"+
+			"abCdGraph:G["+
+			"(ab)-[:GammaEdge]->(c)"+
+			""+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("aAbCdGraph");
+		LogicalGraph right = loader.getLogicalGraphByVariable("aAbGraph");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("abCdGraph")));
+	}
 
-    @Test
-    public void otherTest9() throws Exception {
-        Fusion f = null;
-        check( aBbGraph , aAbGraph , aBbGraph,f);
-    }
+	@Test
+	public void semicomplex_loopPattern_to_secondmatch() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(d:D {dtype : \"dvalue\"})"+
+			"(c:C {ctype : \"cvalue\"})"+
+			"(e:E {etype : \"evalue\"})"+
+			"(abd:G {ctype : \"cvalue\",atype : \"avalue\",btype : \"bvalue\",dtype : \"dvalue\"})"+
+			"semicomplex:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(b)-[:loop]->(b)"+
+			"(b)-->(c)"+
+			"(c)-->(e)"+
+			"(c)-[:BetaEdge]->(d)"+
+			"(d)-->(e)"+
+			""+
+			"]"+
+			"loopPattern:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(b)-[:loop]->(b)"+
+			"(d)"+
+			"]"+
+			"secondmatch:G["+
+			"(abd)-->(c)"+
+			"(abd)-->(e)"+
+			"(c)-[:BetaEdge]->(abd)"+
+			"(c)-->(d)"+
+			"(c)-->(e)"+
+			""+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("semicomplex");
+		LogicalGraph right = loader.getLogicalGraphByVariable("loopPattern");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("secondmatch")));
+	}
 
-    @Test
-    public void otherTest10() throws Exception {
-        Fusion f = null;
-        check( aBbGraph , aBbGraph , abGraph,f);
-    }
+	@Test
+	public void tricky_looplessPattern_to_firstmatch() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(c:C {ctype : \"cvalue\"})"+
+			"(d:D {dtype : \"dvalue\"})"+
+			"(e:E {etype : \"evalue\"})"+
+			"(abd:G {ctype : \"cvalue\",atype : \"avalue\",btype : \"bvalue\",dtype : \"dvalue\"})"+
+			"tricky:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(d)-[:loop]->(b)"+
+			"(b)-->(c)"+
+			"(c)-->(e)"+
+			"(c)-[:BetaEdge]->(d)"+
+			"(d)-->(e)"+
+			""+
+			"]"+
+			"looplessPattern:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(d)"+
+			"]"+
+			"firstmatch:G["+
+			"(abd)-->(c)"+
+			"(abd)-->(e)"+
+			"(abd)-[:loop]->(abd)"+
+			"(c)-[:BetaEdge]->(abd)"+
+			"(c)-->(d)"+
+			"(c)-->(e)"+
+			""+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("tricky");
+		LogicalGraph right = loader.getLogicalGraphByVariable("looplessPattern");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("firstmatch")));
+	}
 
-    @Test
-    public void otherTest11() throws Exception {
-        Fusion f = null;
-        check( aAbCdGraph , aAbCdGraph , abdGraph,f);
-    }
-
-    @Test
-    public void otherTest12() throws Exception {
-        Fusion f = null;
-        check( aAbCdGraph , aAbGraph , abCdGraph,f);
-    }
-    @Test
-    public void otherTest13() throws Exception {
-        Fusion f = null;
-        check( semicomplex , looplessPattern , firstmatch,f);
-    }
-
-    @Test
-    public void otherTest14() throws Exception {
-        Fusion f = null;
-        check( semicomplex , loopPattern , secondmatch,f);
-    }
-
-    @Test
-    public void otherTest15() throws Exception {
-        Fusion f = null;
-        check( tricky , looplessPattern , firstmatch,f);
-    }
-
-    @Test
-    public void otherTest16() throws Exception {
-        Fusion f = null;
-        check( tricky , loopPattern , tricky,f);
-    }
-
-    public FusionTest() {
-        super();
-        getTestGraphLoader();
-    }
-
-    private FlinkAsciiGraphLoader loader;
-    private FlinkAsciiGraphLoader getTestGraphLoader() {
-        if (loader==null) {
-            declareVariables();
-
-            //empty
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("empty", "G").t());
-
-            //single
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("single", "G").t()
-                    .pat().from().t().done());
-
-            //aVertex
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("aVertex","G").t()
-                    .pat()
-                    .fromVariable("a").t()
-                    .done());
-
-            //aAbGraph
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("aAbGraph","G").t()
-                    .pat()
-                    .fromVariable("a").t()
-                    .edgeVariableKey("α","AlphaEdge").t()
-                    .toVariable("b").t()
-                    .done());
-
-            //aBbGraph
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("aBbGraph","G").t()
-                    .pat()
-                    .fromVariable("a").t()
-                    .edgeVariableKey("β","BetaEdge").t()
-                    .toVariable("b").t()
-                    .done());
-
-            // abVertex
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("abVertex","G").t()
-                    .pat()
-                    .fromVariable("ab").t()
-                    .done());
-
-            // aAbCdGraph
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("aAbCdGraph","G").t()
-                    .pat()
-                    .fromVariable("a").t()
-                    .edgeVariableKey("α","AlphaEdge").t()
-                    .toVariable("b").t()
-                    .done()
-
-                    .pat()
-                    .fromVariable("b").t()
-                    .edgeVariableKey("γ","GammaEdge").t()
-                    .toVariable("c").t()
-                    .done());
-
-            // abCdGraph
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("abCdGraph","G").t()
-                    .pat()
-                    .fromVariable("ab").t()
-                    .edgeVariableKey("γ","GammaEdge").t()
-                    .toVariable("c").t()
-                    .done());
-
-            // abdGraph
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("abdGraph","G").t()
-                    .pat()
-                    .fromVariable("abc").t()
-                    .done());
-
-            // semicomplex
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("semicomplex","G").t()
-                    .pat()
-                    .fromVariable("a").t().edgeVariableKey("α","AlphaEdge").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("b").t().edgeVariableKey("hook","loop").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("b").t().toVariable("c").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("e").t()
-                    .done().pat()
-                    .fromVariable("c").t().edgeVariableKey("β","BetaEdge").t().toVariable("d").t()
-                    .done().pat()
-                    .fromVariable("d").t().toVariable("e").t()
-                    .done());
-
-            // looplessPattern
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("looplessPattern","G").t()
-                    .pat()
-                    .fromVariable("a").t().edgeVariableKey("α","AlphaEdge").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("d").t()
-                    .done());
-
-            // loopPattern
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("loopPattern","G").t()
-                    .pat()
-                    .fromVariable("a").t().edgeVariableKey("α","AlphaEdge").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("b").t().edgeVariableKey("hook","loop").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("d").t()
-                    .done());
-
-            // firstmatch
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("firstmatch","G").t()
-                    .pat()
-                    .fromVariable("abd").t().toVariable("c").t()
-                    .done().pat()
-                    .fromVariable("abd").t().toVariable("e").t()
-                    .done().pat()
-                    .fromVariable("abd").t().edgeVariableKey("hook","loop").t().toVariable("abd").t()
-                    .done().pat()
-                    .fromVariable("c").t().edgeVariableKey("β","BetaEdge").t().toVariable("abd").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("e").t()
-                    .done());
-
-            // secondmatch
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("secondmatch","G").t()
-                    .pat()
-                    .fromVariable("abd").t().toVariable("c").t()
-                    .done().pat()
-                    .fromVariable("abd").t().toVariable("e").t()
-                    .done().pat()
-                    .fromVariable("c").t().edgeVariableKey("β","BetaEdge").t().toVariable("abd").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("e").t()
-                    .done());
-
-            // tricky
-            addTo(databaseBuilder, TestUtils.GraphWithinDatabase.labelType("tricky","G").t()
-                    .pat()
-                    .fromVariable("a").t().edgeVariableKey("α","AlphaEdge").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("d").t().edgeVariableKey("hook","loop").t().toVariable("b").t()
-                    .done().pat()
-                    .fromVariable("b").t().toVariable("c").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("e").t()
-                    .done().pat()
-                    .fromVariable("c").t().edgeVariableKey("β","BetaEdge").t().toVariable("d").t()
-                    .done().pat()
-                    .fromVariable("d").t().toVariable("e").t()
-                    .done());
-
-            compileAndInitialize();
-        }
-        return loader;
-    }
-
-    /////
-    private void declareVariables() {
-        //Declaring vertices
-        TestUtils.VertexBuilder<?> a = simpleVertex("a","A");
-        TestUtils.VertexBuilder<?> b = simpleVertex("b","B");
-        TestUtils.VertexBuilder<?> c = simpleVertex("c","C");
-        TestUtils.VertexBuilder<?> d = simpleVertex("d","D");
-        TestUtils.VertexBuilder<?> e = simpleVertex("e","E");
-        TestUtils.VertexBuilder<?> ab = new TestUtils.VertexBuilder<>();
-        TestUtils.VertexBuilder.generateWithValueAndType(null,ab,"ab","A+B")
-                .propList().put("avalue","atype").put("bvalue","btype").plEnd();
-        TestUtils.VertexBuilder<?> abc = new TestUtils.VertexBuilder<>();
-        TestUtils.VertexBuilder.generateWithValueAndType(null,abc,"ab","A+B")
-                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").plEnd();
-        TestUtils.VertexBuilder<?> abd = new TestUtils.VertexBuilder<>();
-        TestUtils.VertexBuilder.generateWithValueAndType(null,abd,"abd","A+B+D")
-                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").put("dvalue","dtype").plEnd();
-        addTo(databaseBuilder,a);
-        addTo(databaseBuilder,b);
-        addTo(databaseBuilder,c);
-        addTo(databaseBuilder,d);
-        addTo(databaseBuilder,e);
-        addTo(databaseBuilder,ab);
-        addTo(databaseBuilder,abc);
-        addTo(databaseBuilder,abd);
-    }
-
-    private void compileAndInitialize() {
-        loader = getLoaderFromString(databaseBuilder.toString());
-        this.empty = loader.getLogicalGraphByVariable("empty");
-        this.oneVertex = loader.getLogicalGraphByVariable("single");
-        this.aVertex = loader.getLogicalGraphByVariable("aVertex");
-        this.aAbGraph = loader.getLogicalGraphByVariable("aAbGraph");
-        this.aBbGraph = loader.getLogicalGraphByVariable("aBbGraph");
-        this.abGraph = loader.getLogicalGraphByVariable("abGraph");
-        this.aAbCdGraph = loader.getLogicalGraphByVariable("aAbCdGraph");
-        this.abCdGraph = loader.getLogicalGraphByVariable("abCdGraph");
-        this.abdGraph = loader.getLogicalGraphByVariable("abdGraph");
-        this.semicomplex = loader.getLogicalGraphByVariable("semicomplex");
-        this.looplessPattern = loader.getLogicalGraphByVariable("looplessPattern");
-        this.loopPattern = loader.getLogicalGraphByVariable("loopPattern");
-        this.firstmatch = loader.getLogicalGraphByVariable("firstmatch");
-        this.secondmatch = loader.getLogicalGraphByVariable("secondmatch");
-        this.tricky = loader.getLogicalGraphByVariable("tricky");
-    }
-
+	@Test
+	public void tricky_loopPattern_to_tricky() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
+			"(b:B {btype : \"bvalue\"})"+
+			"(c:C {ctype : \"cvalue\"})"+
+			"(d:D {dtype : \"dvalue\"})"+
+			"(e:E {etype : \"evalue\"})"+
+			"tricky:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(d)-[:loop]->(b)"+
+			"(b)-->(c)"+
+			"(c)-->(e)"+
+			"(c)-[:BetaEdge]->(d)"+
+			"(d)-->(e)"+
+			""+
+			"]"+
+			"loopPattern:G["+
+			"(a)-[:AlphaEdge]->(b)"+
+			"(b)-[:loop]->(b)"+
+			"(d)"+
+			"]");
+		LogicalGraph left = loader.getLogicalGraphByVariable("tricky");
+		LogicalGraph right = loader.getLogicalGraphByVariable("loopPattern");
+		Fusion f = null;
+		LogicalGraph output = f.execute(left,right);
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("tricky")));
+	}
 }

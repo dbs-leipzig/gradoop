@@ -1,15 +1,19 @@
-package org.gradoop.flink.model.impl.operators;
+package org.gradoop.flink.model.impl.operators.utils;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Created by Giacomo Bergami on 19/01/17.
  */
-public class TestUtils {
+public class GDLBuilder {
 
-    public static class GraphWithinDatabase {
+    public static class GraphWithinDatabase implements IWithDependencies {
         StringBuilder sb = null;
+        private Set<String> dependencies = new HashSet<>();
         protected TupleBuilder<GraphWithinDatabase> tp;
 
         private GraphWithinDatabase() {
@@ -38,21 +42,34 @@ public class TestUtils {
             return tp.toString()+(sb==null ? "[]" : "[\n"+sb.toString()+"\n]");
         }
 
-        GraphWithinDatabase addClosedPattern(PatternBuilder patternBuilder) {
+        GraphWithinDatabase addClosedPattern(Collection<String> references, PatternBuilder patternBuilder) {
             if (sb==null)
                 sb = new StringBuilder();
+            dependencies.addAll(references);
             sb.append(patternBuilder);
             return this;
         }
+
+        @Override
+        public Set<String> getDependencies() {
+            return dependencies;
+        }
     }
 
-    public static class VertexBuilder<P> extends TupleBuilder<P> {
+    public static class VertexBuilder<P> extends TupleBuilder<P> implements IWithDependencies {
         public VertexBuilder() {
             super();
         }
         @Override
         public String toString() {
             return "("+super.toString()+")";
+        }
+
+        @Override
+        public Set<String> getDependencies() {
+            Set<String> elem = new HashSet<>();
+            if (getVariableName()!=null) elem.add(variableName);
+            return elem;
         }
     }
 
@@ -124,7 +141,14 @@ public class TestUtils {
         }
 
         public GraphWithinDatabase done() {
-            return elem.addClosedPattern(this);
+            Set<String> references = new HashSet<>();
+            if (src!=null && src.getVariableName()!=null && src.getVariableName().length()>0)
+                references.add(src.getVariableName());
+            if (dst!=null && dst.getVariableName()!=null && dst.getVariableName().length()>0)
+                references.add(dst.getVariableName());
+            if (e!=null && e.getVariableName()!=null && e.getVariableName().length()>0)
+                references.add(e.getVariableName());
+            return elem.addClosedPattern(references,this);
         }
 
         @Override
@@ -153,6 +177,10 @@ public class TestUtils {
         String typeName;
         PropList<P> propbuilder;
         P parent;
+
+        public String getVariableName() {
+            return variableName;
+        }
 
         TupleBuilder() {}
 
@@ -223,7 +251,7 @@ public class TestUtils {
             this.finale = finale;
         }
 
-        public PropList<P> put(String key, String value) {
+        public PropList<P> put(String value,String key) {
             attrTo.put(key,value);
             return this;
         }
@@ -236,7 +264,7 @@ public class TestUtils {
         @Override
         public String toString() {
             return attrTo.entrySet().stream()
-                    .map(x -> x.getKey() + " : " + x.getValue())
+                    .map(x -> (x.getKey() + " : " + (x.getValue().equals("NULL") ? "NULL" : "\""+x.getValue() + "\"")))
             .collect(Collectors.joining(",", " {", "}"));
         }
 
