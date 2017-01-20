@@ -547,9 +547,7 @@ public class PropertyValue
   public void setMap(Map<PropertyValue, PropertyValue> map) {
     int size =
       map.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
-      map.keySet().size() * Integer.BYTES +
       map.values().stream().mapToInt(PropertyValue::byteSize).sum() +
-      map.values().size() * Integer.BYTES +
       OFFSET;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
@@ -575,7 +573,6 @@ public class PropertyValue
    */
   public void setList(List<PropertyValue> list) {
     int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
-      list.size() * Integer.BYTES +
       OFFSET;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);

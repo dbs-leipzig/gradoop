@@ -616,6 +616,7 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(MAP_VAL_9);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(LIST_VAL_A);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
