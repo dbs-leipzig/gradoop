@@ -25,8 +25,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.common.util.GConstants;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -358,27 +362,27 @@ public class PropertyValue
    * @return {@code Map<PropertyValue, PropertyValue>} value
    */
   public Map<PropertyValue, PropertyValue> getMap() {
-    int offset = 1;
-    int size;
     PropertyValue key;
     PropertyValue value;
 
     Map<PropertyValue, PropertyValue> map = new HashMap<>();
 
-    while (offset < rawBytes.length) {
-      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
-      offset += Integer.BYTES;
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
+    DataInputStream inputStream = new DataInputStream(byteStream);
 
-      key = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
-      offset += size;
+    try {
+      inputStream.skipBytes(OFFSET);
+      while (inputStream.available() > 0) {
+        key = new PropertyValue();
+        key.readFields(inputStream);
 
-      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
-      offset += Integer.BYTES;
+        value = new PropertyValue();
+        value.readFields(inputStream);
 
-      value = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
-      offset += size;
-
-      map.put(key, value);
+        map.put(key, value);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading PropertyValue");
     }
 
     return map;
@@ -390,20 +394,23 @@ public class PropertyValue
    * @return {@code List<PropertyValue>} value
    */
   public List<PropertyValue> getList() {
-    int offset = 1;
-    int size;
     PropertyValue entry;
 
     List<PropertyValue> list = new ArrayList<>();
 
-    while (offset < rawBytes.length) {
-      size = Ints.fromByteArray(ArrayUtils.subarray(rawBytes, offset, offset + Integer.BYTES));
-      offset += Integer.BYTES;
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
+    DataInputStream inputStream = new DataInputStream(byteStream);
 
-      entry = new PropertyValue(ArrayUtils.subarray(rawBytes, offset, offset + size));
-      offset += size;
+    try {
+      inputStream.skipBytes(OFFSET);
+      while (inputStream.available() > 0) {
+        entry = new PropertyValue();
+        entry.readFields(inputStream);
 
-      list.add(entry);
+        list.add(entry);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading PropertyValue");
     }
 
     return list;
@@ -541,42 +548,22 @@ public class PropertyValue
       map.keySet().size() * Integer.BYTES +
       map.values().stream().mapToInt(PropertyValue::byteSize).sum() +
       map.values().size() * Integer.BYTES +
-      1;
+      OFFSET;
 
-    rawBytes = new byte[size];
-    rawBytes[0] = TYPE_MAP;
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+    DataOutputStream outputStream = new DataOutputStream(byteStream);
 
-    int offset = 1;
-
-    for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
-      System.arraycopy(
-        Ints.toByteArray(entry.getKey().byteSize()), 0,
-        rawBytes, offset,
-        Integer.BYTES
-      );
-      offset += Integer.BYTES;
-
-      System.arraycopy(
-        entry.getKey().rawBytes, 0,
-        rawBytes, offset,
-        entry.getKey().byteSize()
-      );
-      offset += entry.getKey().byteSize();
-
-      System.arraycopy(
-        Ints.toByteArray(entry.getValue().byteSize()), 0,
-        rawBytes, offset,
-        Integer.BYTES
-      );
-      offset += Integer.BYTES;
-
-      System.arraycopy(
-        entry.getValue().rawBytes, 0,
-        rawBytes, offset,
-        entry.getValue().byteSize()
-      );
-      offset += entry.getValue().byteSize();
+    try {
+      outputStream.write(TYPE_MAP);
+      for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
+        entry.getKey().write(outputStream);
+        entry.getValue().write(outputStream);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error writing PropertyValue");
     }
+
+    this.rawBytes = byteStream.toByteArray();
   }
 
   /**
@@ -587,28 +574,21 @@ public class PropertyValue
   public void setList(List<PropertyValue> list) {
     int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
       list.size() * Integer.BYTES +
-      1;
+      OFFSET;
 
-    rawBytes = new byte[size];
-    rawBytes[0] = TYPE_LIST;
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+    DataOutputStream outputStream = new DataOutputStream(byteStream);
 
-    int offset = 1;
-
-    for (PropertyValue entry : list) {
-      System.arraycopy(
-        Ints.toByteArray(entry.byteSize()), 0,
-        rawBytes, offset,
-        Integer.BYTES
-      );
-      offset += Integer.BYTES;
-
-      System.arraycopy(
-        entry.rawBytes, 0,
-        rawBytes, offset,
-        entry.byteSize()
-      );
-      offset += entry.byteSize();
+    try {
+      outputStream.write(TYPE_LIST);
+      for (PropertyValue entry : list) {
+        entry.write(outputStream);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error writing PropertyValue");
     }
+
+    this.rawBytes = byteStream.toByteArray();
   }
 
   //----------------------------------------------------------------------------
