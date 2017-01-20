@@ -40,48 +40,6 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
-  protected void assertEmbeddingExists(DataSet<Embedding> dataSet, GradoopId... path)
-    throws Exception {
-    List<GradoopId> pathList = Lists.newArrayList(path);
-    assertTrue(
-      dataSet.collect()
-        .stream()
-        .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding)))
-    );
-  }
-
-  protected void assertEmbeddingExists(DataSet<Embedding> dataSet,
-    Predicate<Embedding> predicate) throws Exception {
-    assertTrue(dataSet.collect().stream().anyMatch(predicate));
-  }
-
-  protected void assertEveryEmbedding(DataSet<Embedding> dataSet,
-    Consumer<Embedding> consumer)
-    throws Exception {
-
-    dataSet.collect().forEach(consumer);
-  }
-
-  protected Embedding createEmbedding(GradoopId... ids) {
-    Embedding embedding = new Embedding();
-
-    for (GradoopId id : ids) {
-      embedding.add(id);
-    }
-
-    return embedding;
-  }
-
-  protected DataSet<Embedding> createEmbeddings(int size, GradoopId... ids) {
-    List<Embedding> embeddings = new ArrayList<>(size);
-
-    for (int i = 0; i < size; i++) {
-      embeddings.add(createEmbedding(ids));
-    }
-
-    return getExecutionEnvironment().fromCollection(embeddings);
-  }
-
   protected DataSet<Vertex> createVerticesWithProperties(List<String> propertyNames) {
     Properties properties = getProperties(propertyNames);
     VertexFactory vertexFactory = new VertexFactory();
@@ -128,14 +86,5 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   protected CNF predicateFromQuery(String query) {
     return new QueryHandler(query).getPredicates();
-  }
-
-  private List<GradoopId> embeddingToIdList(Embedding embedding) {
-    List<GradoopId> idList = new ArrayList<>();
-    for(int i = 0; i < embedding.size(); i++) {
-      idList.addAll(embedding.getIdAsList(i));
-    }
-
-    return idList;
   }
 }

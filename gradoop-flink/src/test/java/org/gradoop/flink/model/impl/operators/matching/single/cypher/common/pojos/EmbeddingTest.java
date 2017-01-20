@@ -39,7 +39,7 @@ import static org.gradoop.common.GradoopTestUtils.writeAndReadValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class EmbeddingTests {
+public class EmbeddingTest {
 
   @Test
   public void testAppendSingleId() {
