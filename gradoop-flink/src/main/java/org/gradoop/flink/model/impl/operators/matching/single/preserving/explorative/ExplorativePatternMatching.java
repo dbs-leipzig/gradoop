@@ -52,18 +52,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .SetPairBulkTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .SetPairForLoopTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .SetPairTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TraverserStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TripleForLoopTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TripleTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
