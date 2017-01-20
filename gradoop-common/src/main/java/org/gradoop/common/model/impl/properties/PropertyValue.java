@@ -17,8 +17,6 @@
 
 package org.gradoop.common.model.impl.properties;
 
-import com.google.common.primitives.Ints;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
