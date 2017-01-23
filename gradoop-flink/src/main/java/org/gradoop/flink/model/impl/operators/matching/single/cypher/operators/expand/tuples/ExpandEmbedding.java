@@ -44,8 +44,9 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @param base the base part
    * @param path the path along we expanded
    */
-  public ExpandEmbedding(Embedding base, GradoopId[] path) {
+  public ExpandEmbedding(Embedding base, GradoopId... path) {
     super(base, ArrayUtils.subarray(path, 0, path.length - 1), path[path.length - 1]);
+
   }
 
   /**

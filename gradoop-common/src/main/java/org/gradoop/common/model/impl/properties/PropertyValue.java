@@ -117,10 +117,6 @@ public class PropertyValue
    */
   public PropertyValue() { }
 
-  private PropertyValue(byte[] rawBytes) {
-    this.rawBytes = rawBytes;
-  }
-
   /**
    * Creates a new property value from the given value.
    *
