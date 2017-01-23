@@ -18,30 +18,35 @@
 package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import com.google.common.collect.Maps;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
-import org.gradoop.flink.model.impl.operators.matching.common.query
-  .TraversalCode;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Extracts {@link Element} instances from an {@link Embedding}.
  */
 public class ElementsFromEmbedding
-  implements FlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
+  extends RichFlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -59,7 +64,18 @@ public class ElementsFromEmbedding
    * Constructs EPGM edges
    */
   private final EdgeFactory edgeFactory;
-
+  /**
+   * Maps query vertex ids to variables
+   */
+  private final Map<Long, String> queryVertexMapping;
+  /**
+   * Maps query edge ids to variables
+   */
+  private final Map<Long, String> queryEdgeMapping;
+  /**
+   * Reuse map for storing the variable mapping
+   */
+  private Map<PropertyValue, PropertyValue> reuseVariableMapping;
   /**
    * Constructor
    *
@@ -67,14 +83,24 @@ public class ElementsFromEmbedding
    * @param graphHeadFactory  EPGM graph head factory
    * @param vertexFactory     EPGM vertex factory
    * @param edgeFactory       EPGM edge factory
+   * @param query             query handler
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
     GraphHeadFactory graphHeadFactory,
     VertexFactory vertexFactory,
-    EdgeFactory edgeFactory) {
+    EdgeFactory edgeFactory,
+    QueryHandler query) {
     this.graphHeadFactory = graphHeadFactory;
     this.vertexFactory = vertexFactory;
     this.edgeFactory = edgeFactory;
+
+    this.queryVertexMapping = query.getVertices()
+      .stream()
+      .collect(Collectors.toMap(v -> v.getId(), v -> v.getVariable()));
+
+    this.queryEdgeMapping = query.getEdges()
+      .stream()
+      .collect(Collectors.toMap(e -> e.getId(), e -> e.getVariable()));
 
     List<Step> steps = traversalCode.getSteps();
     edgeToStep = Maps.newHashMapWithExpectedSize(steps.size());
@@ -85,15 +111,20 @@ public class ElementsFromEmbedding
   }
 
   @Override
+  public void open(Configuration conf) {
+    this.reuseVariableMapping = new HashMap<>();
+  }
+
+  @Override
   public void flatMap(Tuple1<Embedding<GradoopId>> embedding, Collector<Element> out)
-    throws Exception {
+      throws Exception {
 
     GradoopId[] vertexMapping = embedding.f0.getVertexMapping();
     GradoopId[] edgeMapping = embedding.f0.getEdgeMapping();
 
+
     // create graph head for this embedding
     GraphHead graphHead = graphHeadFactory.createGraphHead();
-    out.collect(graphHead);
 
     // collect vertices (and assign to graph head)
     for (int i = 0; i < vertexMapping.length; i++) {
@@ -102,6 +133,11 @@ public class ElementsFromEmbedding
         v.addGraphId(graphHead.getId());
         out.collect(v);
       }
+
+      reuseVariableMapping.put(
+        PropertyValue.create(queryVertexMapping.get((long) i)),
+        PropertyValue.create(vertexMapping[i])
+      );
     }
 
     // collect edges (and assign to graph head)
@@ -117,7 +153,15 @@ public class ElementsFromEmbedding
         e.addGraphId(graphHead.getId());
         out.collect(e);
       }
+
+      reuseVariableMapping.put(
+        PropertyValue.create(queryEdgeMapping.get((long) i)),
+        PropertyValue.create(edgeMapping[i])
+      );
     }
+
+    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);
+    out.collect(graphHead);
   }
 
   /**
