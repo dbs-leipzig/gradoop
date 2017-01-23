@@ -122,26 +122,9 @@ public class ElementsFromEmbedding
     GradoopId[] vertexMapping = embedding.f0.getVertexMapping();
     GradoopId[] edgeMapping = embedding.f0.getEdgeMapping();
 
-    reuseVariableMapping.clear();
-
-    for (int i = 0; i < vertexMapping.length; i++) {
-      reuseVariableMapping.put(
-        PropertyValue.create(queryVertexMapping.get((long) i)),
-        PropertyValue.create(vertexMapping[i])
-      );
-    }
-
-    for (int i = 0; i < edgeMapping.length; i++) {
-      reuseVariableMapping.put(
-        PropertyValue.create(queryEdgeMapping.get((long) i)),
-        PropertyValue.create(edgeMapping[i])
-      );
-    }
 
     // create graph head for this embedding
     GraphHead graphHead = graphHeadFactory.createGraphHead();
-    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);
-    out.collect(graphHead);
 
     // collect vertices (and assign to graph head)
     for (int i = 0; i < vertexMapping.length; i++) {
@@ -150,6 +133,11 @@ public class ElementsFromEmbedding
         v.addGraphId(graphHead.getId());
         out.collect(v);
       }
+
+      reuseVariableMapping.put(
+        PropertyValue.create(queryVertexMapping.get((long) i)),
+        PropertyValue.create(vertexMapping[i])
+      );
     }
 
     // collect edges (and assign to graph head)
@@ -165,7 +153,15 @@ public class ElementsFromEmbedding
         e.addGraphId(graphHead.getId());
         out.collect(e);
       }
+
+      reuseVariableMapping.put(
+        PropertyValue.create(queryEdgeMapping.get((long) i)),
+        PropertyValue.create(edgeMapping[i])
+      );
     }
+
+    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);
+    out.collect(graphHead);
   }
 
   /**
