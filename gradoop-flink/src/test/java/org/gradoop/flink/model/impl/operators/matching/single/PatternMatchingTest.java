@@ -1,19 +1,12 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * Base class for Pattern Matching Tests.
@@ -21,15 +14,15 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(Parameterized.class)
 public abstract class  PatternMatchingTest extends GradoopFlinkTestBase {
 
-  private final String testName;
+  protected final String testName;
 
-  private final String dataGraph;
+  protected final String dataGraph;
 
-  private final String queryGraph;
+  protected final String queryGraph;
 
-  private final String[] expectedGraphVariables;
+  protected final String[] expectedGraphVariables;
 
-  private final String expectedCollection;
+  protected final String expectedCollection;
 
   public PatternMatchingTest(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
@@ -74,26 +67,5 @@ public abstract class  PatternMatchingTest extends GradoopFlinkTestBase {
         .getGraphCollectionByVariables(expectedGraphVariables)));
   }
 
-  @Test
-  public void testVariableMappingExists() throws Exception {
-    PatternMatching implementation = getImplementation(queryGraph, false);
-    assumeTrue(!(implementation instanceof DualSimulation));
 
-    FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
-
-    // initialize with data graph
-    LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
-
-    // append the expected result
-    loader.appendToDatabaseFromString(expectedCollection);
-
-    // execute and validate
-    List<GraphHead> graphHeads = implementation.execute(db).
-      getGraphHeads().collect();
-
-    for(GraphHead graphHead : graphHeads) {
-      assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
-    }
-
-  }
 }
