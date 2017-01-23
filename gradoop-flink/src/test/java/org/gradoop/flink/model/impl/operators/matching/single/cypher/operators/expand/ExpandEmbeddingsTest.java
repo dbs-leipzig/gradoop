@@ -19,8 +19,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -180,7 +180,8 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
     assertEquals(2, result.count());
 
     assertEmbeddingExists(result, (embedding) ->
-      embedding.size() == 1 &&  embedding.getId(0).equals(a)
+      embedding.getId(0).equals(embedding.getId(2)) &&
+      embedding.getIdList(1).size() == 0
     );
   }
 
