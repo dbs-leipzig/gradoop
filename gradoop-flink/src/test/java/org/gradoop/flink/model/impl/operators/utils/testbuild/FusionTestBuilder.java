@@ -185,8 +185,6 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .done().pat()
                     .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("looplessPattern")).t()
                     .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
-                    .done().pat()
                     .fromVariable("c").t().toVariable("e").t()
                     .done());
             /////////////////
@@ -205,8 +203,6 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable(belongToGraph("loopPattern")).t().toVariable("e").t()
                     .done().pat()
                     .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("loopPattern")).t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
                     .done().pat()
                     .fromVariable("c").t().toVariable("e").t()
                     .done());
@@ -234,8 +230,6 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable(belongToGraph("looplessPattern")).t().edgeKey("loop").t().toVariable(belongToGraph("looplessPattern")).t()
                     .done().pat()
                     .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("looplessPattern")).t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
                     .done().pat()
                     .fromVariable("c").t().toVariable("e").t()
                     .done());

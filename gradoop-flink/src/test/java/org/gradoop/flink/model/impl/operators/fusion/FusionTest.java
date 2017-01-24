@@ -374,7 +374,6 @@ public class FusionTest extends GradoopFlinkTestBase {
 			"(looplessPatternV)-->(e)"+
 			"(looplessPatternV)-[:loop]->(looplessPatternV)"+
 			"(c)-[:BetaEdge]->(looplessPatternV)"+
-			"(c)-->(d)"+
 			"(c)-->(e)"+
 			""+
 			"]");
@@ -411,7 +410,6 @@ public class FusionTest extends GradoopFlinkTestBase {
 			"(loopPatternV)-->(c)"+
 			"(loopPatternV)-->(e)"+
 			"(c)-[:BetaEdge]->(loopPatternV)"+
-			"(c)-->(d)"+
 			"(c)-->(e)"+
 			""+
 			"]");
@@ -448,7 +446,6 @@ public class FusionTest extends GradoopFlinkTestBase {
 			"(looplessPatternV)-->(e)"+
 			"(looplessPatternV)-[:loop]->(looplessPatternV)"+
 			"(c)-[:BetaEdge]->(looplessPatternV)"+
-			"(c)-->(d)"+
 			"(c)-->(e)"+
 			""+
 			"]");
