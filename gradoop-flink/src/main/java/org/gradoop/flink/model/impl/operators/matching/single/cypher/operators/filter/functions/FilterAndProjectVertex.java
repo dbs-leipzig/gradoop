@@ -39,30 +39,43 @@ public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embeddin
   /**
    * Property keys used for value projection
    */
-  private final List<String> propertyKeys;
+  private final List<String> projectionPropertyKeys;
   /**
    * Meta data describing the vertex embedding used for filtering
    */
-  private final EmbeddingMetaData metaData;
+  private final EmbeddingMetaData filterMetaData;
+  /**
+   * PropertyKeys of the embedding used for filtering
+   */
+  private final List<String> filterPropertyKeys;
 
   /**
    * New vertex filter function
    *
+   * @param vertexVariable Variable assigned to the vertex
    * @param predicates predicates used for filtering
-   * @param metaData meta data describing the output embedding
+   * @param projectionPropertyKeys property keys that will be used for projection
    */
-  public FilterAndProjectVertex(CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectVertex(String vertexVariable, CNF predicates, List<String>
+    projectionPropertyKeys) {
     this.predicates = predicates;
-    this.metaData = metaData;
-    this.propertyKeys = metaData.getPropertyKeys(metaData.getVariables().get(0));
+    this.projectionPropertyKeys = projectionPropertyKeys;
+
+    this.filterMetaData = new EmbeddingMetaData();
+    this.filterMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
+    int i = 0;
+    for (String propertyKey : predicates.getPropertyKeys(vertexVariable)) {
+      this.filterMetaData.setPropertyColumn(vertexVariable, propertyKey, i++);
+    }
+
+    this.filterPropertyKeys = filterMetaData.getPropertyKeys(vertexVariable);
   }
 
   @Override
   public void flatMap(Vertex vertex, Collector<Embedding> out) throws Exception {
-    Embedding embedding = EmbeddingFactory.fromVertex(vertex, propertyKeys);
-
-    if (predicates.evaluate(embedding, metaData)) {
-      out.collect(embedding);
+    if (predicates.evaluate(EmbeddingFactory.fromVertex(vertex, filterPropertyKeys),
+      filterMetaData)) {
+      out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));
     }
   }
 }
