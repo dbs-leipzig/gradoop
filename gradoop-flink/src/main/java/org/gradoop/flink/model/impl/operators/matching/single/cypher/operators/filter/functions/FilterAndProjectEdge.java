@@ -36,35 +36,45 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
    * Predicates used for filtering
    */
   private final CNF predicates;
-
   /**
-   * Stores the properties keys needed to convert the edge into an embedding
+   * Property Keys used for the projection
    */
-  private final List<String> propertyKeys;
-
+  private final List<String> projectionPropertyKeys;
   /**
-   * Meta data describing the edge embedding used for filtering
+   * Meta data describing the vertex embedding used for filtering
    */
-  private final EmbeddingMetaData metaData;
+  private final EmbeddingMetaData filterMetaData;
+  /**
+   * PropertyKeys of the embedding used for filtering
+   */
+  private final List<String> filterPropertyKeys;
 
   /**
    * New edge filter function
    *
+   * @param edgeVariable variable assigned to the edge
    * @param predicates predicates used for filtering
-   * @param metaData meta data describing the output embedding
+   * @param projectionPropertyKeys property keys that will be used for projection
    */
-  public FilterAndProjectEdge(CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectEdge(String edgeVariable, CNF predicates,
+    List<String> projectionPropertyKeys) {
     this.predicates = predicates;
-    this.metaData = metaData;
-    this.propertyKeys = metaData.getPropertyKeys(metaData.getVariables().get(1));
+    this.projectionPropertyKeys = projectionPropertyKeys;
+
+    this.filterMetaData = new EmbeddingMetaData();
+    this.filterMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
+    int i = 0;
+    for (String propertyKey : predicates.getPropertyKeys(edgeVariable)) {
+      this.filterMetaData.setPropertyColumn(edgeVariable, propertyKey, i++);
+    }
+
+    this.filterPropertyKeys = filterMetaData.getPropertyKeys(edgeVariable);
   }
 
   @Override
   public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    Embedding embedding = EmbeddingFactory.fromEdge(edge, propertyKeys);
-
-    if (predicates.evaluate(embedding, metaData)) {
-      out.collect(embedding);
+    if (predicates.evaluate(EmbeddingFactory.fromEdge(edge, filterPropertyKeys), filterMetaData)) {
+      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys));
     }
   }
 }
