@@ -76,7 +76,7 @@ public class FusionTestBuilder extends AbstractTestBuilder {
 
             //a aggregated aAbGraph
             addTo("aggAbGraph", returnAggGraph("aggAbGraph","aAbGraph")
-                    .fromVariable("aGraph").t()
+                    .fromVariable(belongToGraph("aGraph")).t()
                     .edgeKey("AlphaEdge").t()
                     .toVariable("b").t()
                     .done());

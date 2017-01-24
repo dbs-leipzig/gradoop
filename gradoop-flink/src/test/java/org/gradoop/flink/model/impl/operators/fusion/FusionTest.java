@@ -121,15 +121,16 @@ public class FusionTest extends GradoopFlinkTestBase {
 	public void aAbGraph_aGraph_to_aggAbGraph() throws Exception {
 		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
 			"(b:B {btype : \"bvalue\"})"+
-			"aGraph:G {aGraph : \"graph\"}["+
-			"(a)"+
-			"]"+
+			"(aGraphV:G {aGraph : \"graph\"})"+
 			"aAbGraph:G {aAbGraph : \"graph\"}["+
 			"(a)-[:AlphaEdge]->(b)"+
 			""+
 			"]"+
+			"aGraph:G {aGraph : \"graph\"}["+
+			"(a)"+
+			"]"+
 			"aggAbGraph:G {aAbGraph : \"graph\"}["+
-			"(aGraph)-[:AlphaEdge]->(b)"+
+			"(aGraphV)-[:AlphaEdge]->(b)"+
 			""+
 			"]");
 		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
