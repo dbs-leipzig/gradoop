@@ -21,14 +21,15 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectEdge;
+
+import java.util.List;
 
 /**
  * Filters a set of EPGM {@link Edge} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
- * given {@link EmbeddingMetaData}.
+ * given {@code projectionPropertyKeys}.
  *
  * Edge -> Embedding(
  *  [IdEntry(SourceId),IdEntry(EdgeId),IdEntry(TargetId)],
@@ -37,11 +38,11 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
  *
  * Example:
  *
- * Given an Edge(0, 1, 2, "friendOf", {since:2017, weight:23}), a predicate "weight = 23" and a
- * mapping between property keys and column indices {weight:0,isValid:1} the operator creates
+ * Given an Edge(0, 1, 2, "friendOf", {since:2017, weight:23}), a predicate "weight = 23" and
+ * list of projection property keys [since,isValid] the operator creates
  * an {@link Embedding}:
  *
- * ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(23),PropertyEntry(NULL)])
+ * ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(2017),PropertyEntry(NULL)])
  */
 public class FilterAndProjectEdges implements PhysicalOperator {
   /**
@@ -49,29 +50,37 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    */
   private final DataSet<Edge> input;
   /**
+   * Variable assigned to the edge
+   */
+  private final String edgeVariable;
+  /**
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
   /**
-   * Meta data describing the embedding used for filtering
+   * Property keys used for projection
    */
-  private final EmbeddingMetaData metaData;
+  private final List<String> projectionPropertyKeys;
 
   /**
    * New edge filter operator
    *
    * @param input Candidate edges
+   * @param edgeVariable edgeVariable assigned to the Edge
    * @param predicates Predicates used to filter edges
-   * @param metaData Meta data describing the projected (output) embedding
+   * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates, EmbeddingMetaData metaData) {
+  public FilterAndProjectEdges(DataSet<Edge> input, String edgeVariable, CNF predicates,
+    List<String> projectionPropertyKeys) {
     this.input = input;
+    this.edgeVariable = edgeVariable;
     this.predicates = predicates;
-    this.metaData = metaData;
+    this.projectionPropertyKeys = projectionPropertyKeys;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterAndProjectEdge(predicates, metaData));
+    return input.flatMap(new FilterAndProjectEdge(edgeVariable, predicates,
+      projectionPropertyKeys));
   }
 }
