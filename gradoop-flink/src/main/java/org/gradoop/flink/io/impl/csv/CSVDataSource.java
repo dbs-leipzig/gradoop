@@ -42,6 +42,7 @@ import org.gradoop.flink.io.impl.csv.functions.VertexToVertexIds;
 import org.gradoop.flink.io.impl.csv.functions.GraphKeyToGraphKeyNullGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.DistinctGraphKeysWithHead;
 import org.gradoop.flink.io.impl.csv.functions.SetElementGraphIds;
+import org.gradoop.flink.io.impl.csv.functions.GraphHeadKeyMap;
 import org.gradoop.flink.io.impl.csv.parser.XmlMetaParser;
 import org.gradoop.flink.io.impl.csv.pojos.CsvExtension;
 import org.gradoop.flink.io.impl.csv.pojos.Datasource;
@@ -192,19 +193,22 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .groupBy(0)
       .reduceGroup(new DistinctGraphKeysWithHead(graphHeadFactory));
 
+    //all graphheads
     graphHeads = keyGraphHead.map(new Value1Of2<String, GraphHead>());
+    //contains one map from graph key to gradoop id
+    DataSet<Map<String, GradoopId>> graphHeadMap = graphHeads.reduceGroup(new GraphHeadKeyMap());
 
     //set all graph heads
     vertices = vertexGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<Vertex>())
-      .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
+      .withBroadcastSet(graphHeadMap, CSVConstants.BROADCAST_GRAPHHEADS);
 
     //set all graph heads
     edges = edgeGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<Edge>())
-      .withBroadcastSet(graphHeads, CSVConstants.BROADCAST_GRAPHHEADS);
+      .withBroadcastSet(graphHeadMap, CSVConstants.BROADCAST_GRAPHHEADS);
 
     return GraphCollection.fromDataSets(graphHeads, vertices, edges, getConfig());
   }
