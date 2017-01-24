@@ -1,17 +1,13 @@
 package org.gradoop.flink.model.impl.operators.utils.testbuild;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.fusion.Fusion;
 import org.gradoop.flink.model.impl.operators.utils.GDLBuilder;
 import org.gradoop.flink.model.impl.operators.utils.IWithDependencies;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -24,18 +20,43 @@ import java.util.stream.Collectors;
 public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
 
     HashMap<String,IWithDependencies> toAssociate;
+    private final String packageString;
 
     protected void addTo(String varname, IWithDependencies o) {
+        if (toAssociate.containsKey(varname)) {
+            throw new RuntimeException("Error: "+varname+" already exisists");
+        }
         toAssociate.put(varname,o);
+        if (o instanceof GDLBuilder.GraphWithinDatabase) {
+            GDLBuilder.GraphWithinDatabase g = (GDLBuilder.GraphWithinDatabase)o;
+            if (g.hasElementPropertyValues()) {
+                GDLBuilder.VertexBuilder<?> ab = new GDLBuilder.VertexBuilder<>();
+                GDLBuilder.VertexBuilder.generateWithVariableAndType(null,ab,belongToGraph(varname),"G")
+                        .propList().put("graph",varname).plEnd();
+                addTo(belongToGraph(varname),ab);
+            }
+        }
     }
+
+    public static String belongToGraph(String element) {
+        return element+"V";
+    }
+
+    protected void addToGraphAttribute(String variable, String type) {
+        GDLBuilder.VertexBuilder<?> aGV = new GDLBuilder.VertexBuilder<>();
+        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,aGV,belongToGraph(variable),type).t();
+        addTo(belongToGraph(variable),aGV);
+    }
+
     public static GDLBuilder.VertexBuilder<?> simpleVertex(String var, String type) {
         GDLBuilder.VertexBuilder<?> a = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithValueAndType(null,a,var,type).propList().put(var+"value",var+"type").plEnd();
+        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,a,var,type).propList().put(var+"value",var+"type").plEnd();
         return a;
     }
 
-    public AbstractTestBuilder() {
+    public AbstractTestBuilder(String packageString) {
         super();
+        this.packageString = "package " + packageString+";";
         toAssociate = new HashMap<>();
     }
 
@@ -53,7 +74,7 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
 
     public void generateToFile(File f, String binaryClassName, String testPatterns) {
         try(  PrintWriter out = new PrintWriter( f )  ){
-            out.println("import org.gradoop.flink.model.GradoopFlinkTestBase;\n" +
+            out.println(packageString+"\n\nimport org.gradoop.flink.model.GradoopFlinkTestBase;\n" +
                     "import org.gradoop.flink.model.impl.LogicalGraph;\n" +
                     "import org.gradoop.flink.util.FlinkAsciiGraphLoader;\n" +
                     "import org.junit.Test;\n\n" +
@@ -69,6 +90,7 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
                                 .flatMap(y->y.getValue().getDependencies().stream())
                                 .map(this::javify)
                                 .forEach(toJavify::add);
+                        System.err.println("Processing pattern: "+x[0]+" "+x[1]+" "+x[2]);
                         toJavify.add(javify(x[0]));
                         toJavify.add(javify(x[1]));
                         toJavify.add(javify(x[2]));
@@ -88,6 +110,7 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
 
     public void check() {
         getTestGraphLoader();
+        System.out.println("Current keys are: " + toAssociate.keySet().stream().collect(Collectors.joining(",")));
         loader = getLoaderFromString(toAssociate.values().stream().map(Object::toString).collect(Collectors.joining("\n")));
     }
 

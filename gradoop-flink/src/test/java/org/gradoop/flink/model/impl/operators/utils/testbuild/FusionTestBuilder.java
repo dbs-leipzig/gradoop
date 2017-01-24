@@ -11,9 +11,40 @@ import java.io.IOException;
  */
 public class FusionTestBuilder extends AbstractTestBuilder {
 
+
+
     public FusionTestBuilder() {
-        super();
+        super("org.gradoop.flink.model.impl.operators.fusion");
     }
+
+    public static <P> GDLBuilder.PatternBuilder returnStartGraph(String name) {
+        return GDLBuilder.GraphWithinDatabase.labelType(name,"G")
+                .propList()
+                .put("graph",name).plEnd()
+                .pat();
+    }
+
+    public static GDLBuilder.PatternBuilder returnAggGraph(String name, String oldName) {
+        return GDLBuilder.GraphWithinDatabase.labelType(name,"G")
+                .propList()
+                .put("graph",oldName).plEnd()
+                .pat();
+    }
+
+
+    public void addSelfieGraphOf(String newName, String oldName) {
+        addTo(newName, GDLBuilder.GraphWithinDatabase.labelType(newName,"G")
+                .propList()
+                .put("graph",oldName).plEnd()
+                .pat()
+                .fromVariable(belongToGraph(oldName)).t()
+                .done());
+    }
+
+    public void returnStartGraphAndAdd(String element) {
+        returnStartGraph(element);
+    }
+
 
     protected FlinkAsciiGraphLoader getTestGraphLoader() {
         if (loader==null) {
@@ -23,36 +54,84 @@ public class FusionTestBuilder extends AbstractTestBuilder {
             addTo("empty", GDLBuilder.GraphWithinDatabase.labelType("empty", "G").t());
 
             //single
-            addTo("single", GDLBuilder.GraphWithinDatabase.labelType("single", "G").t()
-                    .pat().from().t().done());
+            addTo("single", returnStartGraph("single")
+                    .from().t().done());
 
             //aVertex
-            addTo("aVertex", GDLBuilder.GraphWithinDatabase.labelType("aVertex","G").t()
-                    .pat()
+            addTo("aGraph", returnStartGraph("aGraph")
                     .fromVariable("a").t()
                     .done());
 
+            //aGraphLabels
+            addSelfieGraphOf("aGraphLabels","aGraph");
+            //////////////////
+
+            /////////////////
             //aAbGraph
-            addTo("aAbGraph", GDLBuilder.GraphWithinDatabase.labelType("aAbGraph","G").t()
-                    .pat()
+            addTo("aAbGraph", returnStartGraph("aAbGraph")
                     .fromVariable("a").t()
                     .edgeKey("AlphaEdge").t()
                     .toVariable("b").t()
                     .done());
 
-            //aBbGraph
-            addTo("aBbGraph", GDLBuilder.GraphWithinDatabase.labelType("aBbGraph","G").t()
+            //a aggregated aAbGraph
+            addTo("aggAbGraph", returnAggGraph("aggAbGraph","aAbGraph")
+                    .fromVariable("aGraph").t()
+                    .edgeKey("AlphaEdge").t()
+                    .toVariable("b").t()
+                    .done());
+
+            //Whole aggregated aAbGraph
+            addSelfieGraphOf("wholeaAbGraph","aAbGraph");
+            /*addTo("wholeaAbGraph", GDLBuilder.GraphWithinDatabase.labelType("wholeaAbGraph","G")
+                    .propList()
+                        .put("graph","aAbGraph").plEnd()
                     .pat()
+                    .fromVariable("aAbGraph").t()
+                    .done());*/
+            //////////////////
+
+            //////////////////
+            //aBbGraph
+            addTo("aBbGraph", returnStartGraph("aBbGraph")
                     .fromVariable("a").t()
                     .edgeKey("BetaEdge").t()
                     .toVariable("b").t()
                     .done());
 
             // abVertex
-            addTo("abGraph", GDLBuilder.GraphWithinDatabase.labelType("abGraph","G").t()
+            addSelfieGraphOf("abGraph","aBbGraph");
+            //////////////////
+
+            // aAbCdGraph
+            addTo("aAbCdGraph",returnStartGraph("aAbCdGraph")
+                    .fromVariable("a").t()
+                    .edgeKey("AlphaEdge").t()
+                    .toVariable("b").t()
+                    .done()
+
                     .pat()
-                    .fromVariable("ab").t()
+                    .fromVariable("b").t()
+                    .edgeKey("GammaEdge").t()
+                    .toVariable("c").t()
                     .done());
+
+
+            addSelfieGraphOf("abdGraph","aAbCdGraph");
+
+
+
+            addTo("abCdGraph", returnAggGraph("abCdGraph","aAbCdGraph")
+                    .fromVariable(belongToGraph("aAbGraph")).t()
+                    .edgeKey("GammaEdge").t()
+                    .toVariable("c").t()
+                    .done());
+
+
+
+
+            /*
+
 
             // aAbCdGraph
             addTo("aAbCdGraph", GDLBuilder.GraphWithinDatabase.labelType("aAbCdGraph","G").t()
@@ -74,17 +153,10 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable("ab").t()
                     .edgeKey("GammaEdge").t()
                     .toVariable("c").t()
-                    .done());
+                    .done());*/
 
-            // abdGraph
-            addTo("abdGraph", GDLBuilder.GraphWithinDatabase.labelType("abdGraph","G").t()
-                    .pat()
-                    .fromVariable("abc").t()
-                    .done());
 
-            // semicomplex
-            addTo("semicomplex", GDLBuilder.GraphWithinDatabase.labelType("semicomplex","G").t()
-                    .pat()
+            addTo("semicomplex",returnStartGraph("semicomplex")
                     .fromVariable("a").t().edgeKey("AlphaEdge").t().toVariable("b").t()
                     .done().pat()
                     .fromVariable("b").t().edgeKey("loop").t().toVariable("b").t()
@@ -98,17 +170,28 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable("d").t().toVariable("e").t()
                     .done());
 
-            // looplessPattern
-            addTo("looplessPattern", GDLBuilder.GraphWithinDatabase.labelType("looplessPattern","G").t()
-                    .pat()
+            addTo("looplessPattern",returnStartGraph("looplessPattern")
                     .fromVariable("a").t().edgeKey("AlphaEdge").t().toVariable("b").t()
                     .done().pat()
                     .fromVariable("d").t()
                     .done());
 
-            // loopPattern
-            addTo("loopPattern", GDLBuilder.GraphWithinDatabase.labelType("loopPattern","G").t()
-                    .pat()
+            addTo("firstmatch",returnAggGraph("firstmatch","semicomplex")
+                    .fromVariable(belongToGraph("looplessPattern")).t().toVariable("c").t()
+                    .done().pat()
+                    .fromVariable(belongToGraph("looplessPattern")).t().toVariable("e").t()
+                    .done().pat()
+                    .fromVariable(belongToGraph("looplessPattern")).t().edgeKey("loop").t().toVariable(belongToGraph("looplessPattern")).t()
+                    .done().pat()
+                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("looplessPattern")).t()
+                    .done().pat()
+                    .fromVariable("c").t().toVariable("d").t()
+                    .done().pat()
+                    .fromVariable("c").t().toVariable("e").t()
+                    .done());
+            /////////////////
+
+            addTo("loopPattern",returnStartGraph("loopPattern")
                     .fromVariable("a").t().edgeKey("AlphaEdge").t().toVariable("b").t()
                     .done().pat()
                     .fromVariable("b").t().edgeKey("loop").t().toVariable("b").t()
@@ -116,35 +199,49 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable("d").t()
                     .done());
 
-            // firstmatch
-            addTo("firstmatch", GDLBuilder.GraphWithinDatabase.labelType("firstmatch","G").t()
-                    .pat()
-                    .fromVariable("abd").t().toVariable("c").t()
+            addTo("secondmatch",returnAggGraph("secondmatch","semicomplex")
+                    .fromVariable(belongToGraph("loopPattern")).t().toVariable("c").t()
                     .done().pat()
-                    .fromVariable("abd").t().toVariable("e").t()
+                    .fromVariable(belongToGraph("loopPattern")).t().toVariable("e").t()
                     .done().pat()
-                    .fromVariable("abd").t().edgeKey("loop").t().toVariable("abd").t()
+                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("loopPattern")).t()
                     .done().pat()
-                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable("abd").t()
+                    .fromVariable("c").t().toVariable("d").t()
+                    .done().pat()
+                    .fromVariable("c").t().toVariable("e").t()
+                    .done());
+            /////////////////
+
+            addTo("tricky",returnStartGraph("tricky")
+                    .fromVariable("a").t().edgeKey("AlphaEdge").t().toVariable("b").t()
+                    .done().pat()
+                    .fromVariable("d").t().edgeKey("loop").t().toVariable("b").t()
+                    .done().pat()
+                    .fromVariable("b").t().toVariable("c").t()
+                    .done().pat()
+                    .fromVariable("c").t().toVariable("e").t()
+                    .done().pat()
+                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable("d").t()
+                    .done().pat()
+                    .fromVariable("d").t().toVariable("e").t()
+                    .done());
+
+            addTo("thirdmatch",returnAggGraph("thirdmatch","tricky")
+                    .fromVariable(belongToGraph("looplessPattern")).t().toVariable("c").t()
+                    .done().pat()
+                    .fromVariable(belongToGraph("looplessPattern")).t().toVariable("e").t()
+                    .done().pat()
+                    .fromVariable(belongToGraph("looplessPattern")).t().edgeKey("loop").t().toVariable(belongToGraph("looplessPattern")).t()
+                    .done().pat()
+                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable(belongToGraph("looplessPattern")).t()
                     .done().pat()
                     .fromVariable("c").t().toVariable("d").t()
                     .done().pat()
                     .fromVariable("c").t().toVariable("e").t()
                     .done());
 
-            // secondmatch
-            addTo("secondmatch", GDLBuilder.GraphWithinDatabase.labelType("secondmatch","G").t()
-                    .pat()
-                    .fromVariable("abd").t().toVariable("c").t()
-                    .done().pat()
-                    .fromVariable("abd").t().toVariable("e").t()
-                    .done().pat()
-                    .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable("abd").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("d").t()
-                    .done().pat()
-                    .fromVariable("c").t().toVariable("e").t()
-                    .done());
+
+            /*
 
             // tricky
             addTo("tricky", GDLBuilder.GraphWithinDatabase.labelType("tricky","G").t()
@@ -160,11 +257,13 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .fromVariable("c").t().edgeKey("BetaEdge").t().toVariable("d").t()
                     .done().pat()
                     .fromVariable("d").t().toVariable("e").t()
-                    .done());
+                    .done());*/
 
         }
         return loader;
     }
+
+
 
     /////
     private void declareVariables() {
@@ -174,51 +273,57 @@ public class FusionTestBuilder extends AbstractTestBuilder {
         GDLBuilder.VertexBuilder<?> c = simpleVertex("c","C");
         GDLBuilder.VertexBuilder<?> d = simpleVertex("d","D");
         GDLBuilder.VertexBuilder<?> e = simpleVertex("e","E");
-        GDLBuilder.VertexBuilder<?> ab = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithValueAndType(null,ab,"ab","G")
+
+        /*GDLBuilder.VertexBuilder<?> ab = new GDLBuilder.VertexBuilder<>();
+        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,ab,"ab","G")
                 .propList().put("avalue","atype").put("bvalue","btype").plEnd();
         GDLBuilder.VertexBuilder<?> abc = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithValueAndType(null,abc,"ab","G")
+        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,abc,"ab","G")
                 .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").plEnd();
         GDLBuilder.VertexBuilder<?> abd = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithValueAndType(null,abd,"abd","G")
-                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").put("dvalue","dtype").plEnd();
+        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,abd,"abd","G")
+                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").put("dvalue","dtype").plEnd();*/
+        //addToGraphAttribute("aGraph","graph");
+        //addToGraphAttribute("aAbGraph","graph");
+
         addTo("a",a);
         addTo("b",b);
         addTo("c",c);
         addTo("d",d);
         addTo("e",e);
-        addTo("ab",ab);
-        addTo("abc",abc);
-        addTo("abd",abd);
+        //addTo("ab",ab);
+        //addTo("abc",abc);
+        //addTo("abd",abd);
+
     }
 
     public static void main(String args[]) throws IOException {
         FusionTestBuilder ft = new FusionTestBuilder();
         ft.check();
-        ft.generateToFile(new File("./src/test/java/org/gradoop/flink/model/impl/operators/fusion/FusionTest.java"),"Fusion","empty empty empty\n" +
-                "empty single empty\n" +
-                "single empty single\n" +
-                "single aVertex single\n" +
-                "single single single\n" +
-                "aVertex aVertex aVertex\n" +
-                "aVertex empty aVertex\n" +
-                "aVertex single aVertex\n" +
-                "aAbGraph aVertex aAbGraph\n" +
-                "aAbGraph empty aAbGraph\n" +
-                "aAbGraph single aAbGraph\n" +
-                "aAbGraph aAbGraph abGraph\n" +
-                "aAbGraph aBbGraph aAbGraph\n" +
-                "aBbGraph aVertex aBbGraph\n" +
-                "aBbGraph empty aBbGraph\n" +
-                "aBbGraph single aBbGraph\n" +
-                "aBbGraph aAbGraph aBbGraph\n" +
-                "aBbGraph aBbGraph abGraph\n" +
-                "aAbCdGraph aAbCdGraph abdGraph\n" +
-                "aAbCdGraph aAbGraph abCdGraph semicomplex looplessPattern firstmatch\n" +
-                "semicomplex loopPattern secondmatch\n" +
-                "tricky looplessPattern firstmatch\n" +
-                "tricky loopPattern tricky");
+        ft.generateToFile(new File("./src/test/java/org/gradoop/flink/model/impl/operators/fusion/FusionTest.java"),"Fusion","empty empty empty" +
+                "\nempty single empty" +
+                "\nsingle empty single" +
+                "\nsingle aGraph single" +
+                "\nsingle single single" +
+                "\naGraph aGraph aGraphLabels" +
+                "\naGraph empty aGraph" +
+                "\naGraph single aGraph" +
+                "\naAbGraph aGraph aggAbGraph" +
+                "\naAbGraph empty aAbGraph" +
+                "\naAbGraph single aAbGraph" +
+                "\naAbGraph aAbGraph wholeaAbGraph" +
+                "\naAbGraph aBbGraph aAbGraph" +
+                "\naBbGraph aGraph aBbGraph" +
+                "\naBbGraph empty aBbGraph" +
+                "\naBbGraph single aBbGraph" +
+                "\naBbGraph aAbGraph aBbGraph" +
+                "\naBbGraph aBbGraph abGraph" +
+                "\naAbCdGraph aAbCdGraph abdGraph" +
+                "\naAbCdGraph aAbGraph abCdGraph" +
+                "\nsemicomplex looplessPattern firstmatch" +
+                "\nsemicomplex loopPattern secondmatch" +
+                "\ntricky looplessPattern thirdmatch" +
+                "\ntricky loopPattern tricky");
 
     }
 

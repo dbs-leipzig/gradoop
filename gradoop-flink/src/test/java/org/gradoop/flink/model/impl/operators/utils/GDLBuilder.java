@@ -15,6 +15,7 @@ public class GDLBuilder {
         StringBuilder sb = null;
         private Set<String> dependencies = new HashSet<>();
         protected TupleBuilder<GraphWithinDatabase> tp;
+        Object parent;
 
         private GraphWithinDatabase() {
             tp = new TupleBuilder<>();
@@ -30,8 +31,9 @@ public class GDLBuilder {
         }
         public static TupleBuilder<GraphWithinDatabase> labelType(String name, String type) {
             GraphWithinDatabase g = new GraphWithinDatabase();
-            return TupleBuilder.generateWithValueAndType(g,g.tp,name,type);
+            return TupleBuilder.generateWithVariableAndType(g,g.tp,name,type);
         }
+
 
         public PatternBuilder pat() {
             return new PatternBuilder(this);
@@ -40,6 +42,10 @@ public class GDLBuilder {
         @Override
         public String toString() {
             return tp.toString()+(sb==null ? "[]" : "[\n"+sb.toString()+"\n]");
+        }
+
+        public boolean hasElementPropertyValues() {
+            return tp!=null && tp.propbuilder!=null && !tp.propbuilder.isEmpty();
         }
 
         GraphWithinDatabase addClosedPattern(Collection<String> references, PatternBuilder patternBuilder) {
@@ -106,7 +112,7 @@ public class GDLBuilder {
             return src;
         }
         public VertexBuilder<PatternBuilder> fromVariableKey(String v, String k) {
-            src = TupleBuilder.generateWithValueAndType(this,new VertexBuilder<>(),v,k);
+            src = TupleBuilder.generateWithVariableAndType(this,new VertexBuilder<>(),v,k);
             return src;
         }
 
@@ -123,7 +129,7 @@ public class GDLBuilder {
             return dst;
         }
         public VertexBuilder<PatternBuilder> toVariableKey(String v, String k) {
-            dst =  TupleBuilder.generateWithValueAndType(this,new VertexBuilder<>(),v,k);
+            dst =  TupleBuilder.generateWithVariableAndType(this,new VertexBuilder<>(),v,k);
             return dst;
         }
 
@@ -136,7 +142,7 @@ public class GDLBuilder {
             return e;
         }
         public EdgeBuilder<PatternBuilder> edgeVariableKey(String v, String k) {
-            e =  TupleBuilder.generateWithValueAndType(this,new EdgeBuilder<>(),v,k);
+            e =  TupleBuilder.generateWithVariableAndType(this,new EdgeBuilder<>(),v,k);
             return e;
         }
 
@@ -182,7 +188,12 @@ public class GDLBuilder {
             return variableName;
         }
 
-        TupleBuilder() {}
+        TupleBuilder() {
+            variableName = null;
+            typeName = null;
+            parent = null;
+            propbuilder = null;
+        }
 
         public static <K extends TupleBuilder,P> K generateEmpty(P parent, K tb) {
             tb.variableName = "";
@@ -208,7 +219,7 @@ public class GDLBuilder {
             return tb;
         }
 
-        public static <K extends TupleBuilder,P> K generateWithValueAndType(P parent, K tb, String v, String k) {
+        public static <K extends TupleBuilder,P> K generateWithVariableAndType(P parent, K tb, String v, String k) {
             tb.variableName = v;
             tb.typeName = ":"+k;
             tb.propbuilder = null;
@@ -231,7 +242,8 @@ public class GDLBuilder {
         }
 
         public PropList<P> propList() {
-            this.propbuilder = new PropList<>(this);
+            if (this.propbuilder==null)
+                this.propbuilder = new PropList<>(this);
             return this.propbuilder;
         }
 
