@@ -40,13 +40,7 @@ public class CSVTypeFilter implements FilterFunction<EPGMElement> {
 
   @Override
   public boolean filter(EPGMElement element) throws Exception {
-    if (type.isInstance(element)) {
-      return true;
-    } else if (type.isInstance(element)) {
-      return true;
-    } else if (type.isInstance(element)) {
-      return true;
-    }
-    return false;
+    //returns true if element is of the specified type
+    return type.isInstance(element);
   }
 }

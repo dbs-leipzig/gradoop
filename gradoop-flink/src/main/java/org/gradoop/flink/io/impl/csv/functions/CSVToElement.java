@@ -81,7 +81,6 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   @Override
   public void flatMap(Tuple2<CsvExtension, String> tuple, Collector<EPGMElement> collector)
     throws Exception {
-
     CsvExtension csv = tuple.f0;
     String content = tuple.f1;
     //the single values of each line
@@ -93,9 +92,10 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     //create the vertex
     if (csv.getVertex() != null) {
       EPGMElement vertex = createVertex(csv, fields);
-      //if the vertex also defines an outgoing edge it is also collected
+      //if the vertex also defines outgoing edges they are collected too
       if (csv.getVertex().getEdges() != null) {
         for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
+          //creates and collects an edge with the current vertex as source
           collector.collect(createEdge(csv, fields, vertexEdge, vertex.getPropertyValue(
               CSVConstants.PROPERTY_KEY_KEY).getString()));
         }
@@ -118,11 +118,19 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private org.gradoop.common.model.impl.pojo.GraphHead createGraphHead(CsvExtension csv,
     String[] fields) {
     String label = "";
+    List<Property> propertiesCsv = null;
+    //if the label is set in the meta file it is read from csv line
     if (csv.getGraphhead().getLabel() != null) {
       label = createLabel(csv.getGraphhead().getLabel(), fields);
     }
+    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    // primary key)
     Key key = csv.getGraphhead().getKey();
-    List<Property> propertiesCsv = csv.getGraphhead().getProperties().getProperty();
+    if (csv.getGraphhead().getProperties() != null) {
+      //meta information about the properties
+      propertiesCsv = csv.getGraphhead().getProperties().getProperty();
+    }
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
   }
@@ -138,19 +146,25 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields) {
     String label = "";
     List<Property> propertiesCsv = null;
+    //if the label is set in the meta file it is read from csv line
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
+    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    //primary key)
     Key key = csv.getVertex().getKey();
     if (csv.getVertex().getProperties() != null) {
+      //meta information about the properties
       propertiesCsv = csv.getVertex().getProperties().getProperty();
     }
-    String className = csv.getVertex().getKey().getClazz();
+    //class name (e.g. tablename)
+    String className = key.getClazz();
+    //meta information about the graphs the vertex is contained in
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
     //List containing the keys of graphs the vertex is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
@@ -177,56 +191,63 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param csv contains meta information
    * @param fields contains the data
    * @param edge vertex edge defined inside the vertex field of the csv
-   * @param sourceKey the concatenated key of the source vertex
+   * @param fullKey the concatenated key of the source vertex
    * @return Edge
    */
   private org.gradoop.common.model.impl.pojo.Edge createEdge(CsvExtension csv,
-    String[] fields, Vertexedge edge, String sourceKey) {
+    String[] fields, Vertexedge edge, String fullKey) {
     String label = "";
     List<Property> propertiesCsv = null;
     //in this case it is a normal edge and none initialized by a vertex
     if (edge == null) {
       edge = csv.getEdge();
     }
+    //if the label is set in the meta file it is read from csv line
     if (edge.getLabel() != null) {
       label = createLabel(edge.getLabel(), fields);
     }
+    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    //primary key)
     Key key = edge.getKey();
     if (edge.getProperties() != null) {
+      //meta information about the properties
       propertiesCsv = edge.getProperties().getProperty();
     }
+    //class name (e.g. tablename)
     String className = edge.getKey().getClazz();
+    //meta information about the graphs the vertex is contained in
     List<Graph> graphs = edge.getGraphs().getGraph();
     //List containing the keys of graphs the edge is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(CSVConstants.PROPERTY_KEY_GRAPHS, graphList);
-
+    //tuple used to create the source and the target key
     ReferenceTuple referenceTuple;
-    // normal edge, so information can be read by the csv-edge meta information
-    if (sourceKey.equals("")) {
+    // normal edge, so information about the source can be read by the csv-edge meta information
+    if (fullKey.equals("")) {
       //relevant key information for the source
       referenceTuple = createKeyTuple(csv.getEdge().getSource(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
-      sourceKey = createKey(referenceTuple);
+      fullKey = createKey(referenceTuple);
     }
+    //write the source key content as edge property
+    properties.set(CSVConstants.PROPERTY_KEY_SOURCE, fullKey);
     //relevant key information for the target
     referenceTuple = createKeyTuple(edge.getTarget(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
-    String targetKey = createKey(referenceTuple);
-
-    properties.set(CSVConstants.PROPERTY_KEY_SOURCE, sourceKey);
-    properties.set(CSVConstants.PROPERTY_KEY_TARGET, targetKey);
+    fullKey = createKey(referenceTuple);
+    //write the target key content as edge property
+    properties.set(CSVConstants.PROPERTY_KEY_TARGET, fullKey);
 
     return edgeFactory.createEdge(label, GradoopId.get(), GradoopId.get(), properties);
   }
 
   /**
-   * Creates a key which is defined through all parameter below.
+   * Creates a key which is defined by all needed parameters.
    *
-   * @param graphs graphlist
+   * @param graphs list of graphs
    * @param datasourceName name of the datasource
    * @param domainName name of the domain
    * @param className name of the class
@@ -238,6 +259,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     StringBuilder sb = new StringBuilder();
     boolean notFirst = false;
     for (Graph graph : graphs) {
+      //set the separator in front of each graphs key except the first
       if (!notFirst) {
         notFirst = true;
       } else {
@@ -251,7 +273,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   }
 
   /**
-   * Creates a Tuple which contains the datasource name, the domain name, the class name and the id.
+   * Creates a tuple which contains the datasource name, the domain name, the class name and the id.
    *
    * @param staticOrReference contains the id information
    * @param fields contains the data
@@ -276,7 +298,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       tuple.setId(tuple.getId() + fields[ref.getColumnId().intValue()]);
       refSet = true;
     }
-    //extends id by any external reference
+    //extends id by all external reference
     for (Reference reference : staticOrReference.getReference()) {
       if (reference.getDatasourceName() != null) {
         tuple.setDatasourceName(reference.getDatasourceName());
@@ -316,11 +338,14 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     //contains only object, but information extraction depends on their class
     boolean refSet = false;
     for (Object object : objectReferences.getStaticOrRefOrReference()) {
+      //static predefined id
       if (Static.class.isInstance(object)) {
         tuple.setId(((Static) object).getName());
+        //checks for internal references
       } else  if (Ref.class.isInstance(object)) {
         tuple.setId(tuple.getId() + fields[((Ref) object).getColumnId().intValue()]);
         refSet = true;
+        //checks for external references
       } else if (Reference.class.isInstance(object)) {
         Reference reference = (Reference) object;
         if (reference.getDatasourceName() != null) {
@@ -361,11 +386,13 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         contentString = ((Static) object).getName();
       } else if (Ref.class.isInstance(object)) {
         fieldContent = fields[((Ref) object).getColumnId().intValue()];
+        //used to either replace all label separators in case a labels content is needed
         switch (separator) {
         case CSVConstants.SEPARATOR_LABEL:
           fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_LABEL,
             CSVConstants.ESCAPE_SEPARATOR_LABEL);
           break;
+        //or replace all id separators in case an ids content is needed
         case CSVConstants.SEPARATOR_ID:
           fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_ID,
             CSVConstants.ESCAPE_SEPARATOR_ID);
@@ -373,6 +400,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         default:
           break;
         }
+        //add separator in front of each added content except the first one
         if (notFirst && hasSeparator) {
           contentString += separator;
         } else {
@@ -406,16 +434,19 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private String createKey(ReferenceTuple tuple) {
     StringBuilder sb = new StringBuilder();
-
+    //datasource name
     sb.append(tuple.getDatasourceName().replaceAll(CSVConstants.SEPARATOR_KEY,
       CSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(CSVConstants.SEPARATOR_KEY);
+    //domain name
     sb.append(tuple.getDomainName().replaceAll(
       CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(CSVConstants.SEPARATOR_KEY);
+    //class name
     sb.append(tuple.getClassName().replaceAll(
       CSVConstants.SEPARATOR_KEY, CSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(CSVConstants.SEPARATOR_ID_START);
+    //ids
     sb.append(tuple.getId().replaceAll(
       CSVConstants.SEPARATOR_ID_START, CSVConstants.ESCAPE_SEPARATOR_ID_START));
     return sb.toString();
@@ -433,25 +464,25 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private Properties createProperties(CsvExtension csv, List<Property> properties,
     Key key, String[] fields) {
     Properties list = Properties.create();
+    //add a property which contains the key defined by datasource name,...
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
         getEntriesFromStaticOrRef(key.getContent(), fields, CSVConstants.SEPARATOR_ID)));
-
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
-
     list.set(CSVConstants.PROPERTY_KEY_KEY, value);
 
     //load all properties and set their type according to the type specified in the meta information
     if (properties != null && !properties.isEmpty()) {
       for (Property p : properties) {
+        //gradoop property and not the one defined by the xsd
         org.gradoop.common.model.impl.properties.Property prop
           = new org.gradoop.common.model.impl.properties.Property();
 
         prop.setKey(p.getName());
         value = new PropertyValue();
         String type = csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
-
+        //set the properties dependent on their type specified in the xsd
         switch (type) {
         case "String":
           value.setString(fields[p.getColumnId()]);
@@ -471,6 +502,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         case "Boolean":
           value.setBoolean(Boolean.parseBoolean(fields[p.getColumnId()]));
           break;
+        // by default the value is stored as string
         default:
           value.setString(fields[p.getColumnId()]);
           break;

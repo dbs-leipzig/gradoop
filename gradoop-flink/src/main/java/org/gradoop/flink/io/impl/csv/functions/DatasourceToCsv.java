@@ -30,6 +30,7 @@ public class DatasourceToCsv implements FlatMapFunction<Datasource, CsvExtension
 
   @Override
   public void flatMap(Datasource datasource, Collector<CsvExtension> collector) throws Exception {
+    //add the datasource name and the domain name to each csv
     for (Domain domain : datasource.getDomain()) {
       for (CsvExtension csv : domain.getCsv()) {
         csv.setDatasourceName(datasource.getName());

@@ -52,9 +52,12 @@ public class SetElementGraphIds<T extends EPGMGraphElement>
   public void reduce(Iterable<Tuple2<T, String>> iterable, Collector<T> collector)
     throws Exception {
     Iterator<Tuple2<T, String>> iterator = iterable.iterator();
+    //every tuple contains the same element
     Tuple2<T, String> tuple = iterator.next();
     T element = tuple.f0;
+    //add the first graph id
     element.addGraphId(keyIdMap.get(tuple.f1));
+    //add all other graph ids, if existing
     while (iterator.hasNext()) {
       tuple = iterator.next();
       element.addGraphId(keyIdMap.get(tuple.f1));
