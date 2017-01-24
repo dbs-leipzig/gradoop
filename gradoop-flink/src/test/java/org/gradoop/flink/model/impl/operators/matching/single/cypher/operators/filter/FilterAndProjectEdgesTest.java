@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -30,6 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -48,12 +50,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
+    List<Embedding> result = new FilterAndProjectEdges(edges, "a", predicates, new ArrayList<>())
+      .evaluate()
+      .collect();
 
     assertEquals(1, result.size());
     assertTrue(result.get(0).getId(1).equals(e1.getId()));
@@ -74,17 +73,12 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-    metaData.setPropertyColumn("a", "since", 0);
-
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
+    List<Embedding> result = new FilterAndProjectEdges(edges, "a", predicates, new ArrayList<>())
+      .evaluate()
+      .collect();
 
     assertEquals(1, result.size());
     assertTrue(result.get(0).getId(1).equals(e1.getId()));
-    assertTrue(result.get(0).getProperty(0).equals(e1.getPropertyValue("since")));
   }
 
   @Test
@@ -96,17 +90,12 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     Edge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-    metaData.setPropertyColumn("a", "__label__", 0);
-
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, metaData).evaluate().collect();
+    List<Embedding> result = new FilterAndProjectEdges(edges, "a", predicates, new ArrayList<>())
+      .evaluate()
+      .collect();
 
     assertEquals(1, result.size());
     assertTrue(result.get(0).getId(1).equals(e1.getId()));
-    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(e1.getLabel())));
   }
 
   @Test
@@ -119,15 +108,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-    metaData.setPropertyColumn("a", "name", 0);
-
-    FilterAndProjectEdges filter = new FilterAndProjectEdges(edges, predicates, metaData);
-
-    List<Embedding> result = filter.evaluate().collect();
+    List<Embedding> result = new FilterAndProjectEdges(edges, "a", predicates, new ArrayList<>())
+      .evaluate()
+      .collect();
 
     assertEquals(edge.getSourceId(), result.get(0).getId(0));
     assertEquals(edge.getId(),       result.get(0).getId(1));
@@ -144,13 +127,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-    metaData.setPropertyColumn("a", "name", 0);
+    List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    Embedding result = new FilterAndProjectEdges(edges, predicates, metaData)
+    Embedding result = new FilterAndProjectEdges(edges, "a", predicates, projectionPropertyKeys)
       .evaluate().collect().get(0);
 
     assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
@@ -166,19 +145,12 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("_v1", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("a", EntryType.EDGE, 1);
-    metaData.setEntryColumn("_v2", EntryType.VERTEX, 2);
-    metaData.setPropertyColumn("a", "__label__", 0);
-    metaData.setPropertyColumn("a", "name", 1);
-    metaData.setPropertyColumn("a", "since", 2);
+    List<String> projectionPropertyKeys = Lists.newArrayList("name","since");
 
-    Embedding result = new FilterAndProjectEdges(edges, predicates, metaData)
+    Embedding result = new FilterAndProjectEdges(edges, "a", predicates, projectionPropertyKeys)
       .evaluate().collect().get(0);
 
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Label")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(2).equals(PropertyValue.NULL_VALUE));
+    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
+    assertTrue(result.getProperty(1).equals(PropertyValue.NULL_VALUE));
   }
 }

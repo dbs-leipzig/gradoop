@@ -81,7 +81,8 @@ public class FilterAndProjectEdgesNode extends LeafNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectEdges(edges, filterPredicate, getEmbeddingMetaData()).evaluate();
+    return new FilterAndProjectEdges(edges, edgeVariable, filterPredicate, projectionKeys)
+      .evaluate();
   }
 
   @Override

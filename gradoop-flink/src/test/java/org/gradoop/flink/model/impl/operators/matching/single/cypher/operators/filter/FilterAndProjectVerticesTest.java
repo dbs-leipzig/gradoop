@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DataSource;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -30,6 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -46,10 +48,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment()
       .fromElements(new VertexFactory().createVertex("Person", properties));
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-
-    FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices, predicates, metaData);
+    FilterAndProjectVertices filter = new FilterAndProjectVertices(vertices,"a",
+      predicates, new ArrayList<>());
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -68,15 +68,14 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    metaData.setPropertyColumn("a", "name", 0);
 
-    List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
+    List<Embedding> result =
+      new FilterAndProjectVertices(vertices, "a", predicates, new ArrayList<>())
+        .evaluate()
+        .collect();
 
     assertEquals(1, result.size());
     assertTrue(result.get(0).getId(0).equals(v1.getId()));
-    assertTrue(result.get(0).getProperty(0).equals(v1.getPropertyValue("name")));
   }
 
   @Test
@@ -89,15 +88,13 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     Vertex v2 = vertexFactory.createVertex("Forum");
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    metaData.setPropertyColumn("a", "__label__", 0);
-
-    List<Embedding> result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect();
+    List<Embedding> result =
+      new FilterAndProjectVertices(vertices, "a", predicates, new ArrayList<>())
+      .evaluate()
+      .collect();
 
     assertEquals(1, result.size());
     assertTrue(result.get(0).getId(0).equals(v1.getId()));
-    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(v1.getLabel())));
   }
 
   @Test
@@ -109,17 +106,17 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     Vertex person = new VertexFactory().createVertex("Person", properties);
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(person);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    metaData.setPropertyColumn("a", "name", 0);
-    metaData.setPropertyColumn("a", "__label__", 1);
+    List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    Embedding result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect().get(0);
+    Embedding result =
+      new FilterAndProjectVertices(vertices, "a", predicates, projectionPropertyKeys)
+      .evaluate()
+      .collect()
+      .get(0);
 
     assertEquals(person.getId(), result.getId(0));
     assertTrue(result.getId(0).equals(person.getId()));
     assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.create("Person")));
   }
 
   @Test
@@ -131,17 +128,16 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     Vertex person = new VertexFactory().createVertex("Person", properties);
     DataSource<Vertex> vertices = getExecutionEnvironment().fromElements(person);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData();
-    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    metaData.setPropertyColumn("a", "__label__", 0);
-    metaData.setPropertyColumn("a", "name", 1);
-    metaData.setPropertyColumn("a", "age", 2);
+    List<String> projectionPropertyKeys = Lists.newArrayList("name","age");
 
-    Embedding result = new FilterAndProjectVertices(vertices, predicates, metaData).evaluate().collect().get(0);
+    Embedding result =
+      new FilterAndProjectVertices(vertices, "a", predicates, projectionPropertyKeys)
+      .evaluate()
+      .collect()
+      .get(0);
 
     assertEquals(person.getId(), result.getId(0));
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Person")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(2).equals(PropertyValue.NULL_VALUE));
+    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
+    assertTrue(result.getProperty(1).equals(PropertyValue.NULL_VALUE));
   }
 }
