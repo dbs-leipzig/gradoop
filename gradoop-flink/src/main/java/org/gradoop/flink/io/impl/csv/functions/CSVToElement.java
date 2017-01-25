@@ -295,7 +295,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       if (!ref.equals("")) {
         contentString.append(ref);
       //object is reference
-      } else if (Reference.class.isInstance(object)){
+      } else if (Reference.class.isInstance(object)) {
         Reference reference = (Reference) object;
         //set datasource and or domain if set in reference
         if (reference.getDatasourceName() != null) {
@@ -330,7 +330,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     for (Object object : objects) {
       //xsd type allows one static element and an optional ref element or no static element and one
       //ref element
-      contentString.append(getEntryFromStaticOrRef(object,fields,separator));
+      contentString.append(getEntryFromStaticOrRef(object, fields, separator));
       //add separator in front of each added content except the first one
       if (notFirst && hasSeparator) {
         contentString.append(separator);
