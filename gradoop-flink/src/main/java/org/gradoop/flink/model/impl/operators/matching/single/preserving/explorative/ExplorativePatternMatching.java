@@ -38,8 +38,6 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
@@ -49,25 +47,23 @@ import org.gradoop.flink.model.impl.operators.matching.common.functions.Matching
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TraverserStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
-
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
-
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .SetPairTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TripleTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
-import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint
+  .OPTIMIZER_CHOOSES;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
@@ -138,6 +134,7 @@ public class ExplorativePatternMatching
     GradoopFlinkConfig config = graph.getConfig();
     GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
     VertexFactory vertexFactory = config.getVertexFactory();
+    String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<Vertex> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<>(getQuery()));
@@ -150,7 +147,7 @@ public class ExplorativePatternMatching
     }
 
     DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<>(graphHeadFactory))
+      .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable))
       .returns(new TupleTypeInfo<>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
@@ -229,7 +226,9 @@ public class ExplorativePatternMatching
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory()));
+        graph.getConfig().getEdgeFactory(),
+        getQueryHandler()
+      ));
 
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :

@@ -180,8 +180,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       new HBaseVertexFactory<>();
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
-    // list is not supported by
-    final List<String> value = Lists.newArrayList();
+    // Set is not supported by
+    final Set<String> value = Sets.newHashSet();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";

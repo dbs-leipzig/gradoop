@@ -8,23 +8,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.gradoop.flink.model.impl.GradoopFlinkTestUtils.printGraphCollection;
-
 /**
  * Base class for Pattern Matching Tests.
  */
 @RunWith(Parameterized.class)
 public abstract class  PatternMatchingTest extends GradoopFlinkTestBase {
 
-  private final String testName;
+  protected final String testName;
 
-  private final String dataGraph;
+  protected final String dataGraph;
 
-  private final String queryGraph;
+  protected final String queryGraph;
 
-  private final String[] expectedGraphVariables;
+  protected final String[] expectedGraphVariables;
 
-  private final String expectedCollection;
+  protected final String expectedCollection;
 
   public PatternMatchingTest(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
@@ -68,4 +66,6 @@ public abstract class  PatternMatchingTest extends GradoopFlinkTestBase {
       .equalsByGraphElementData(loader
         .getGraphCollectionByVariables(expectedGraphVariables)));
   }
+
+
 }

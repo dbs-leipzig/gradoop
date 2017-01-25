@@ -1,5 +1,6 @@
 package org.gradoop.common.model.impl.properties;
 
+import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.junit.Rule;
@@ -9,6 +10,10 @@ import org.junit.rules.ExpectedException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
@@ -99,6 +104,14 @@ public class PropertyValueTest {
     p = create(GRADOOP_ID_VAL_8);
     assertTrue(p.isGradoopId());
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
+    //Map
+    p = create(MAP_VAL_9);
+    assertTrue(p.isMap());
+    assertEquals(MAP_VAL_9, p.getMap());
+    //List
+    p = create(LIST_VAL_A);
+    assertTrue(p.isList());
+    assertEquals(LIST_VAL_A, p.getList());
   }
 
   @Test
@@ -140,12 +153,20 @@ public class PropertyValueTest {
     p.setObject(GRADOOP_ID_VAL_8);
     assertTrue(p.isGradoopId());
     assertEquals(GRADOOP_ID_VAL_8, p.getObject());
+    // Map
+    p.setObject(MAP_VAL_9);
+    assertTrue(p.isMap());
+    assertEquals(MAP_VAL_9, p.getObject());
+    // List
+    p.setObject(LIST_VAL_A);
+    assertTrue(p.isList());
+    assertEquals(LIST_VAL_A, p.getObject());
   }
 
   @Test(expected = UnsupportedTypeException.class)
   public void testSetObjectWithUnsupportedType() {
     PropertyValue p = new PropertyValue();
-    p.setObject(new ArrayList<>());
+    p.setObject(new HashSet<>());
   }
 
   @Test
@@ -160,6 +181,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -174,6 +197,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -201,6 +226,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -228,6 +255,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -255,6 +284,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -282,6 +313,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -309,6 +342,8 @@ public class PropertyValueTest {
     assertTrue(p.isString());
     assertFalse(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -336,6 +371,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertTrue(p.isBigDecimal());
     assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -363,6 +400,8 @@ public class PropertyValueTest {
     assertFalse(p.isString());
     assertFalse(p.isBigDecimal());
     assertTrue(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
   }
 
   @Test
@@ -376,6 +415,64 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setGradoopId(GRADOOP_ID_VAL_8);
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
+  }
+
+  @Test
+  public void testIsMap() throws Exception {
+    PropertyValue p = PropertyValue.create(MAP_VAL_9);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertTrue(p.isMap());
+    assertFalse(p.isList());
+  }
+
+  @Test
+  public void testGetMap() throws Exception {
+    PropertyValue p = PropertyValue.create(MAP_VAL_9);
+    assertEquals(MAP_VAL_9, p.getMap());
+  }
+
+  @Test
+  public void testSetMap() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setMap(MAP_VAL_9);
+    assertEquals(MAP_VAL_9, p.getMap());
+  }
+
+  @Test
+  public void testIsList() throws Exception {
+    PropertyValue p = PropertyValue.create(LIST_VAL_A);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertTrue(p.isList());
+  }
+
+  @Test
+  public void testGetList() throws Exception {
+    PropertyValue p = PropertyValue.create(LIST_VAL_A);
+    assertEquals(LIST_VAL_A, p.getList());
+  }
+
+  @Test
+  public void testSetList() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setList(LIST_VAL_A);
+    assertEquals(LIST_VAL_A, p.getList());
   }
 
   @Test
@@ -403,6 +500,25 @@ public class PropertyValueTest {
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
       create(GradoopId.fromString("583ff8ffbd7d222690a9099a"))
     );
+
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
+    map1.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
+    map2.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
+    map3.put(PropertyValue.create("foo"), PropertyValue.create("baz"));
+    validateEqualsAndHashCode(create(map1), create(map2), create(map3));
+
+    List<PropertyValue> list1 = Lists.newArrayList(
+      PropertyValue.create("foo"), PropertyValue.create("bar")
+    );
+    List<PropertyValue> list2 = Lists.newArrayList(
+      PropertyValue.create("foo"), PropertyValue.create("bar")
+    );
+    List<PropertyValue> list3 = Lists.newArrayList(
+      PropertyValue.create("foo"), PropertyValue.create("baz")
+    );
+    validateEqualsAndHashCode(create(list1), create(list2), create(list3));
   }
 
   /**
@@ -458,6 +574,18 @@ public class PropertyValueTest {
     create(10).compareTo(create(10L));
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithMap() {
+    create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
+  }
+
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithList() {
+    create(LIST_VAL_A).compareTo(create(LIST_VAL_A));
+  }
+
+
   @Test
   public void testWriteAndReadFields() throws IOException {
     PropertyValue p = create(NULL_VAL_0);
@@ -485,6 +613,12 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(GRADOOP_ID_VAL_8);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(MAP_VAL_9);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(LIST_VAL_A);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
   /**
