@@ -22,9 +22,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.api.entities.EPGMElement;
 /**
- * EPGMGraphHead with properties => properties
+ * EPGMElement with properties => properties
  *
- * @param <L> EPGMGraphHead type having properties
+ * @param <L> EPGMElement type having properties
  */
 @FunctionAnnotation.ForwardedFields("properties->*")
 public class Properties<L extends EPGMElement>
