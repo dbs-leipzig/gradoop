@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains binary plan node implementations.
+ * Contains unary plan node implementations.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary;
 

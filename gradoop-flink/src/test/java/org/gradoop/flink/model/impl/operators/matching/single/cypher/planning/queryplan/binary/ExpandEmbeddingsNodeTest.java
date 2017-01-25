@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.binary;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -8,8 +8,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Expa
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.MockPlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
+
 import org.junit.Test;
 
 import java.util.List;

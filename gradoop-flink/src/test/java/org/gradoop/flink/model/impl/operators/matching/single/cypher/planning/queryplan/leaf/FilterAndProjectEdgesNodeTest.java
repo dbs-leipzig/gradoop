@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
