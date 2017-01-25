@@ -21,6 +21,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param <P> the stored predicate type
  */
-public abstract class PredicateCollection<P>  implements Serializable {
+public abstract class PredicateCollection<P> implements Iterable<P>, Serializable {
   /**
    * Holds the predicate collection
    */
@@ -74,6 +75,15 @@ public abstract class PredicateCollection<P>  implements Serializable {
   }
 
   /**
+   * Returns the number of predicates contained in this predicate collection.
+   *
+   * @return number of predicates
+   */
+  public int size() {
+    return predicates.size();
+  }
+
+  /**
    *
    * @param embedding the embedding record holding the data
    * @param metaData the embedding meta data
@@ -100,6 +110,11 @@ public abstract class PredicateCollection<P>  implements Serializable {
    * @return operator name
    */
   public abstract String operatorName();
+
+  @Override
+  public Iterator<P> iterator() {
+    return predicates.iterator();
+  }
 
   @Override
   public String toString() {
