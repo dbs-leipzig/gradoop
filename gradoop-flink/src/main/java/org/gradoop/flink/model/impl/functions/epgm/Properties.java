@@ -28,7 +28,8 @@ import org.gradoop.common.model.api.entities.EPGMElement;
  */
 @FunctionAnnotation.ForwardedFields("properties->*")
 public class Properties<L extends EPGMElement>
-  implements MapFunction<L, org.gradoop.common.model.impl.properties.Properties>, KeySelector<L, org.gradoop.common.model.impl.properties.Properties> {
+  implements MapFunction<L, org.gradoop.common.model.impl.properties.Properties>,
+             KeySelector<L, org.gradoop.common.model.impl.properties.Properties> {
 
   @Override
   public org.gradoop.common.model.impl.properties.Properties map(L l) throws Exception {
