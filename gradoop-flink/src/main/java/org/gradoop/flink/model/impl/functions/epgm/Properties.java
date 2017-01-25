@@ -26,7 +26,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
  *
  * @param <L> EPGMGraphHead type having properties
  */
-@FunctionAnnotation.ForwardedFields("label->*")
+@FunctionAnnotation.ForwardedFields("properties->*")
 public class Properties<L extends EPGMElement>
   implements MapFunction<L, org.gradoop.common.model.impl.properties.Properties>, KeySelector<L, org.gradoop.common.model.impl.properties.Properties> {
 
