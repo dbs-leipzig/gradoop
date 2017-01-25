@@ -253,7 +253,7 @@ public class QueryHandler {
    */
   public Collection<Vertex> getVerticesByLabel(String label) {
     if (labelToVertexCache == null) {
-      labelToVertexCache = initListCache(getVertices(), Vertex::getLabel, Function.identity());
+      labelToVertexCache = initSetCache(getVertices(), Vertex::getLabel, Function.identity());
     }
     return labelToVertexCache.get(label);
   }
@@ -267,7 +267,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesByLabel(String label) {
     if (labelToEdgeCache == null) {
-      labelToEdgeCache = initListCache(getEdges(), Edge::getLabel, Function.identity());
+      labelToEdgeCache = initSetCache(getEdges(), Edge::getLabel, Function.identity());
     }
     return labelToEdgeCache.get(label);
   }
@@ -299,7 +299,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesBySourceVertexId(Long vertexId) {
     if (sourceIdToEdgeCache == null) {
-      sourceIdToEdgeCache = initListCache(getEdges(), Edge::getSourceVertexId, Function.identity());
+      sourceIdToEdgeCache = initSetCache(getEdges(), Edge::getSourceVertexId, Function.identity());
     }
     return sourceIdToEdgeCache.get(vertexId);
   }
@@ -324,7 +324,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesByTargetVertexId(Long vertexId) {
     if (targetIdToEdgeCache == null) {
-      targetIdToEdgeCache = initListCache(getEdges(), Edge::getTargetVertexId, Function.identity());
+      targetIdToEdgeCache = initSetCache(getEdges(), Edge::getTargetVertexId, Function.identity());
     }
     return targetIdToEdgeCache.get(vertexId);
   }
@@ -523,7 +523,7 @@ public class QueryHandler {
    * @param <VT> the cache value type
    * @return cache KT -> Set<VT>
    */
-  private <EL, KT, VT> Map<KT, Set<VT>> initListCache(Collection<EL> elements,
+  private <EL, KT, VT> Map<KT, Set<VT>> initSetCache(Collection<EL> elements,
     Function<EL, KT> keySelector, Function<EL, VT> valueSelector) {
 
     return elements.stream()
