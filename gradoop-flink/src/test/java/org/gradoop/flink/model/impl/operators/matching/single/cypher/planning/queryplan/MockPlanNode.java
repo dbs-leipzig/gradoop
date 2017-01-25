@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;

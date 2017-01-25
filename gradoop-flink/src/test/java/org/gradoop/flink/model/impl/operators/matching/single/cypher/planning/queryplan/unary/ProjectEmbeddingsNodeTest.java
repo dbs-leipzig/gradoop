@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.unary;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
@@ -8,8 +8,8 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.MockPlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
