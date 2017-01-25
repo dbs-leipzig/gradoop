@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 
 import java.util.List;
 import java.util.Set;
