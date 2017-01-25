@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.DataSet;
