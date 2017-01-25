@@ -40,26 +40,30 @@ public class Fusion implements BinaryGraphToGraphOperator {
                         else {
                             // Do stuff here, they are both non empty.
 
-                            //Return the vertices that appear both in the left and the right graph
-                            l
+                            {
+                                //Return the vertices that appear both in the left and the right graph
+                                DataSet<Vertex> leftVertices = leftGraph.getVertices();
+                                leftVertices = FusionUtils.areElementsInGraph(leftVertices, rightGraph, true);
 
-                            DataSet<Vertex> leftVertices = leftGraph.getVertices();
-                            leftVertices = FusionUtils.areElementsInGraph(leftVertices,rightGraph,true);
+                                //If the number of vertices returned is the same as the one of the right graph
+                                if (leftVertices.count() != rightGraph.getVertices().count()) { // the two graphs are not the same
+                                    return FusionUtils.recreateGraph(leftGraph);
+                                }
 
-                            //If the number of vertices returned is the same as the one of the right graph
-                            if (leftVertices.count()!=rightGraph.getVertices().count()) { // the two graphs are not the same
-                                return FusionUtils.recreateGraph(leftGraph);
-                            }
-
-                            // Same thing I did for the edges I must do for the edges
-                            DataSet<Edge> leftEdges = leftGraph.getEdges();
-                            leftEdges = FusionUtils.areElementsInGraph(leftEdges,rightGraph,true);
-                            if (leftEdges.count()!=rightGraph.getEdges().count()) {
-                                return FusionUtils.recreateGraph(leftGraph);
+                                // Same thing I did for the edges I must do for the edges
+                                DataSet<Edge> leftEdges = leftGraph.getEdges();
+                                leftEdges = FusionUtils.areElementsInGraph(leftEdges, rightGraph, true);
+                                if (leftEdges.count() != rightGraph.getEdges().count()) {
+                                    return FusionUtils.recreateGraph(leftGraph);
+                                }
                             }
 
                             //At this point, I shall create the graph that has to be returned
                             LogicalGraph toret = null;
+                            {
+                                DataSet<Vertex> leftVertices = leftGraph.getVertices();
+                                leftVertices = FusionUtils.areElementsInGraph(leftVertices,rightGraph,false);
+                            }
 
                             return toret;
                         }
