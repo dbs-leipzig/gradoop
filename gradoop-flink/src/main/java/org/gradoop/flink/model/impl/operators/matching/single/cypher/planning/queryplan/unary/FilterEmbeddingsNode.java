@@ -15,15 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.unary;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.PlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.UnaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
 
 /**
  * Unary nodes that wraps a {@link FilterEmbeddings} operator.

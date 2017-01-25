@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains leaf plan node implementations.
+ * Contains all classes related to query plan representation.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.leaf;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 
