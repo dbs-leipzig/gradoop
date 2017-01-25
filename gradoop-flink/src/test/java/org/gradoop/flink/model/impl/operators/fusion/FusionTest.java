@@ -59,15 +59,19 @@ public class FusionTest extends GradoopFlinkTestBase {
 	}
 
 	@Test
-	public void single_single_to_single() throws Exception {
-		FlinkAsciiGraphLoader loader = getLoaderFromString("single:G {single : \"graph\"}["+
+	public void single_single_to_singleInside() throws Exception {
+		FlinkAsciiGraphLoader loader = getLoaderFromString("(singleV:G {single : \"graph\"})"+
+			"single:G {single : \"graph\"}["+
 			"()"+
+			"]"+
+			"singleInside:G {single : \"graph\"}["+
+			"(singleV)"+
 			"]");
 		LogicalGraph left = loader.getLogicalGraphByVariable("single");
 		LogicalGraph right = loader.getLogicalGraphByVariable("single");
 		Fusion f = null;
 		LogicalGraph output = f.execute(left,right);
-		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("single")));
+		collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable("singleInside")));
 	}
 
 	@Test

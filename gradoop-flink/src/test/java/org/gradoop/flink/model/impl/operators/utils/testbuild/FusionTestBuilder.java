@@ -57,6 +57,8 @@ public class FusionTestBuilder extends AbstractTestBuilder {
             addTo("single", returnStartGraph("single")
                     .from().t().done());
 
+            addSelfieGraphOf("singleInside","single");
+
             //aVertex
             addTo("aGraph", returnStartGraph("aGraph")
                     .fromVariable("a").t()
@@ -298,7 +300,7 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                 "\nempty single empty" +
                 "\nsingle empty single" +
                 "\nsingle aGraph single" +
-                "\nsingle single single" +
+                "\nsingle single singleInside" +
                 "\naGraph aGraph aGraphLabels" +
                 "\naGraph empty aGraph" +
                 "\naGraph single aGraph" +
