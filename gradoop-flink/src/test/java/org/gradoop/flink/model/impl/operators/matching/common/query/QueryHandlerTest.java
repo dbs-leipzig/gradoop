@@ -61,6 +61,18 @@ public class QueryHandlerTest {
   }
 
   @Test
+  public void testIsVertex() {
+    assertTrue(QUERY_HANDLER.isVertex("v1"));
+    assertFalse(QUERY_HANDLER.isVertex("e1"));
+  }
+
+  @Test
+  public void testIsedge() {
+    assertTrue(QUERY_HANDLER.isEdge("e1"));
+    assertFalse(QUERY_HANDLER.isEdge("v1"));
+  }
+
+  @Test
   public void testGetVertexById() throws Exception {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
     assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
@@ -70,6 +82,20 @@ public class QueryHandlerTest {
   public void testGetEdgeById() throws Exception {
     Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
     assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
+  }
+
+  @Test
+  public void testGetVertexByVariable() throws Exception {
+    Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
+    assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
+    assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
+  }
+
+  @Test
+  public void testGetEdgeByVariable() throws Exception {
+    Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
+    assertEquals(QUERY_HANDLER.getEdgeByVariable("e1"), expected);
+    assertNotEquals(QUERY_HANDLER.getEdgeByVariable("e2"), expected);
   }
 
   @Test
