@@ -201,14 +201,8 @@ public class FusionTest extends GradoopFlinkTestBase {
 	public void aAbGraph_aBbGraph_to_aAbGraph() throws Exception {
 		FlinkAsciiGraphLoader loader = getLoaderFromString("(a:A {atype : \"avalue\"})"+
 			"(b:B {btype : \"bvalue\"})"+
-			"aAbGraph:G {aAbGraph : \"graph\"}["+
-			"(a)-[:AlphaEdge]->(b)"+
-			""+
-			"]"+
-			"aBbGraph:G {aBbGraph : \"graph\"}["+
-			"(a)-[:BetaEdge]->(b)"+
-			""+
-			"]");
+			"aAbGraph:G {aAbGraph : \"graph\"}[(a)-[e:AlphaEdge]->(b)]"+
+			"aBbGraph:G {aBbGraph : \"graph\"}[(a)-[f:BetaEdge]->(b)]");
 		LogicalGraph left = loader.getLogicalGraphByVariable("aAbGraph");
 		LogicalGraph right = loader.getLogicalGraphByVariable("aBbGraph");
 		Fusion f = null;

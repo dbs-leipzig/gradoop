@@ -1,10 +1,18 @@
 package org.gradoop.flink.model.impl.operators.fusion;
 
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.MapOperator;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -18,59 +26,98 @@ public class Fusion implements BinaryGraphToGraphOperator {
 
     private static final GradoopFlinkConfig defaultConf = null;
 
+    private final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+
     @Override
     public LogicalGraph execute(final LogicalGraph leftGraph, final LogicalGraph rightGraph) {
         //Catching possible errors (null) and handling then as they were empty objects
-        if (leftGraph==null) {
-            return LogicalGraph.createEmptyGraph(rightGraph==null ? defaultConf : rightGraph.getConfig());
-        } else if (rightGraph==null) {
+        if (leftGraph == null) {
+            return LogicalGraph.createEmptyGraph(rightGraph == null ? defaultConf : rightGraph.getConfig());
+        } else if (rightGraph == null) {
             return FusionUtils.recreateGraph(leftGraph);
         } else {
-            rightGraph.isEmpty().first(1).map(isRightGraphEmpty -> {
-
-
+            //????
+            DataSet<LogicalGraph> l = rightGraph.isEmpty().first(1).map(isRightGraphEmpty -> {
                 if (isRightGraphEmpty) {
-                    return leftGraph;
+                    return FusionUtils.recreateGraph(leftGraph);
                 } else {
-                    return leftGraph.isEmpty().first(1).map(isLeftGraphEmpty -> {
-
-
+                    //????
+                    DataSet<LogicalGraph> lk = leftGraph.isEmpty().first(1).map(isLeftGraphEmpty -> {
                         if (isLeftGraphEmpty)
-                            return leftGraph;
+                            return FusionUtils.recreateGraph(leftGraph);
                         else {
-                            // Do stuff here, they are both non empty.
+                            DataSet<Vertex> leftVertices = leftGraph.getVertices();
 
-                            {
-                                //Return the vertices that appear both in the left and the right graph
-                                DataSet<Vertex> leftVertices = leftGraph.getVertices();
-                                leftVertices = FusionUtils.areElementsInGraph(leftVertices, rightGraph, true);
+                            //TbmV
+                            DataSet<Vertex> toBeReplaced = FusionUtils.areElementsInGraph(leftVertices, rightGraph, true);
+                            if (toBeReplaced.count()==0) {
+                                return FusionUtils.recreateGraph(leftGraph);
+                            } else {
 
-                                //If the number of vertices returned is the same as the one of the right graph
-                                if (leftVertices.count() != rightGraph.getVertices().count()) { // the two graphs are not the same
-                                    return FusionUtils.recreateGraph(leftGraph);
+                                DataSet<Vertex> toBeAdded;
+                                GradoopId vId = GradoopId.get();
+                                {
+                                    Vertex v = new Vertex();
+                                    v.setLabel(FusionUtils.getGraphLabel(rightGraph)); // ?????????
+                                    v.setProperties(FusionUtils.getGraphProperties(rightGraph));  // ?????????
+                                    v.setId(vId);
+                                    toBeAdded = env.fromElements(v);
                                 }
 
-                                // Same thing I did for the edges I must do for the edges
+                                DataSet<Vertex> finalVertices =
+                                        FusionUtils
+                                                .areElementsInGraph(leftVertices, rightGraph, false)
+                                                .union(toBeAdded);
+
+
                                 DataSet<Edge> leftEdges = leftGraph.getEdges();
-                                leftEdges = FusionUtils.areElementsInGraph(leftEdges, rightGraph, true);
-                                if (leftEdges.count() != rightGraph.getEdges().count()) {
-                                    return FusionUtils.recreateGraph(leftGraph);
-                                }
-                            }
+                                leftEdges = FusionUtils.areElementsInGraph(leftEdges, rightGraph, false);
 
-                            //At this point, I shall create the graph that has to be returned
-                            LogicalGraph toret = null;
-                            {
-                                DataSet<Vertex> leftVertices = leftGraph.getVertices();
-                                leftVertices = FusionUtils.areElementsInGraph(leftVertices,rightGraph,false);
-                            }
+                                // Everything in once, maybe more efficient
+                                DataSet<Edge> updatedEdges = leftEdges
+                                        .fullOuterJoin(leftVertices)
+                                        .where(Edge::getSourceId)
+                                        .equalTo(Element::getId)
+                                        .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
+                                            if (vertex == null) collector.collect(edge);
+                                            else {
+                                                Edge e = new Edge();
+                                                e.setId(GradoopId.get());
+                                                e.setSourceId(vId);
+                                                e.setTargetId(edge.getTargetId());
+                                                e.setProperties(edge.getProperties());
+                                                collector.collect(e);
+                                            }
+                                        })
+                                        .fullOuterJoin(leftVertices)
+                                        .where(Edge::getTargetId)
+                                        .equalTo(Element::getId)
+                                        .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
+                                            if (vertex == null) collector.collect(edge);
+                                            else {
+                                                Edge e = new Edge();
+                                                e.setId(GradoopId.get());
+                                                e.setTargetId(vId);
+                                                e.setSourceId(edge.getSourceId());
+                                                e.setProperties(edge.getProperties());
+                                                collector.collect(e);
+                                            }
+                                        });
 
-                            return toret;
+                                return LogicalGraph.fromDataSets(finalVertices, updatedEdges, leftGraph.getConfig());
+
+                            }
                         }
                     });
+                    return lk.collect().get(0);
                 }
             });
-            return null;
+            try {
+                return l.collect().get(0);
+            } catch (Exception e) {
+                return FusionUtils.recreateGraph(leftGraph);
+            }
         }
     }
+
 }
