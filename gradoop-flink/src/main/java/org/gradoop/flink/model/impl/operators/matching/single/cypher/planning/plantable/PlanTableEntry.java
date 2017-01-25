@@ -8,7 +8,13 @@ import java.util.Set;
 
 public class PlanTableEntry {
 
-  private PlanTableEntryType type;
+  public enum Type {
+    VERTEX,
+    EDGE,
+    PATH
+  }
+
+  private Type type;
 
   private final Set<String> evaluatedVars;
 
@@ -18,7 +24,7 @@ public class PlanTableEntry {
 
   private long estimatedCardinality;
 
-  public PlanTableEntry(PlanTableEntryType type, Set<String> evaluatedVars, QueryPlan queryPlan, Estimator estimator) {
+  public PlanTableEntry(Type type, Set<String> evaluatedVars, QueryPlan queryPlan, Estimator estimator) {
     this.type = type;
     this.evaluatedVars = evaluatedVars;
     this.queryPlan = queryPlan;
@@ -31,7 +37,7 @@ public class PlanTableEntry {
    *
    * @return plan table entry type
    */
-  public PlanTableEntryType getType() {
+  public Type getType() {
     return type;
   }
 

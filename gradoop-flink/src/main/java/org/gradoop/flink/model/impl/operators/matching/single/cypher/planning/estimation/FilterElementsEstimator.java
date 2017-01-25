@@ -6,11 +6,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.c
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.Optional;
 
 public class FilterElementsEstimator implements Estimator {
+
+  public enum ElementType {
+    VERTEX, EDGE
+  }
 
   private final GraphStatistics graphStatistics;
 
@@ -20,10 +23,10 @@ public class FilterElementsEstimator implements Estimator {
 
   private final CNF predicate;
 
-  public FilterElementsEstimator(GraphStatistics graphStatistics, String variable, EmbeddingMetaData.EntryType entryType, CNF predicate) {
+  public FilterElementsEstimator(GraphStatistics graphStatistics, String variable, ElementType elementType, CNF predicate) {
     this.graphStatistics = graphStatistics;
     this.variable = variable;
-    this.isVertex = entryType == EmbeddingMetaData.EntryType.VERTEX;
+    this.isVertex = elementType == ElementType.VERTEX;
     this.predicate = predicate;
   }
 
