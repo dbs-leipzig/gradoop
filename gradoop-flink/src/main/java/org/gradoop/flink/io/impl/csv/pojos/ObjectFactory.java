@@ -101,14 +101,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Objectreferences }
-     * 
-     */
-    public Objectreferences createObjectreferences() {
-        return new Objectreferences();
-    }
-
-    /**
      * Create an instance of {@link Graphs }
      * 
      */

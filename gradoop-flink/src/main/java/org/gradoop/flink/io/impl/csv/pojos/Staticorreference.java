@@ -13,177 +13,98 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for staticorreference complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>Java-Klasse für staticorreference complex type.
+ *
+ * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ *
  * <pre>
  * &lt;complexType name="staticorreference"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;choice&gt;
  *         &lt;sequence&gt;
- *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojos}static"/&gt;
- *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojos}ref" maxOccurs="unbounded" minOccurs="0"/&gt;
- *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojos}reference" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}static"/&gt;
+ *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}ref" minOccurs="0"/&gt;
  *         &lt;/sequence&gt;
  *         &lt;sequence&gt;
- *           &lt;choice maxOccurs="unbounded"&gt;
- *             &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojos}ref"/&gt;
- *             &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojos}reference"/&gt;
- *           &lt;/choice&gt;
+ *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}ref"/&gt;
+ *         &lt;/sequence&gt;
+ *         &lt;sequence&gt;
+ *           &lt;element ref="{http://www.gradoop.org/flink/io/impl/csv/pojo}reference"/&gt;
  *         &lt;/sequence&gt;
  *       &lt;/choice&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "staticorreference", propOrder = {
-    "_static",
-    "ref",
-    "reference",
-    "refOrReference"
+  "content"
 })
 @XmlSeeAlso({
-    Source.class,
-    Target.class
+  Source.class,
+  Target.class,
+  Graph.class
 })
-public class Staticorreference
-    implements Serializable
-{
+public class Staticorreference implements Serializable {
 
     private final static long serialVersionUID = 1L;
-    @XmlElement(name = "static")
-    protected Static _static;
-    protected List<Ref> ref;
-    protected List<Reference> reference;
-    @XmlElements({
-        @XmlElement(name = "ref", type = Ref.class),
-        @XmlElement(name = "reference", type = Reference.class)
+    @XmlElementRefs({
+      @XmlElementRef(name = "static", namespace = "http://www.gradoop.org/flink/io/impl/csv/pojo", type = Static.class, required = false),
+      @XmlElementRef(name = "ref", namespace = "http://www.gradoop.org/flink/io/impl/csv/pojo", type = Ref.class, required = false),
+      @XmlElementRef(name = "reference", namespace = "http://www.gradoop.org/flink/io/impl/csv/pojo", type = Reference.class, required = false)
     })
-    protected List<Serializable> refOrReference;
+    protected List<Serializable> content;
 
     /**
-     * Gets the value of the static property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Static }
-     *     
-     */
-    public Static getStatic() {
-        return _static;
-    }
-
-    /**
-     * Sets the value of the static property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Static }
-     *     
-     */
-    public void setStatic(Static value) {
-        this._static = value;
-    }
-
-    /**
-     * Gets the value of the ref property.
-     * 
+     * Ruft das restliche Contentmodell ab.
+     *
+     * <p>
+     * Sie rufen diese "catch-all"-Eigenschaft aus folgendem Grund ab:
+     * Der Feldname "Ref" wird von zwei verschiedenen Teilen eines Schemas verwendet. Siehe:
+     * Zeile 103 von file:/C:/Users/Stephan/Dropbox/Programming/IntelliJ/Pojo-Creator/src/main/resources/schemas/csv_format.xsd
+     * Zeile 100 von file:/C:/Users/Stephan/Dropbox/Programming/IntelliJ/Pojo-Creator/src/main/resources/schemas/csv_format.xsd
+     * <p>
+     * Um diese Eigenschaft zu entfernen, wenden Sie eine Eigenschaftenanpassung für eine
+     * der beiden folgenden Deklarationen an, um deren Namen zu ändern:
+     * Gets the value of the content property.
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the ref property.
-     * 
+     * This is why there is not a <CODE>set</CODE> method for the content property.
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getRef().add(newItem);
+     *    getContent().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Ref }
-     * 
-     * 
-     */
-    public List<Ref> getRef() {
-        if (ref == null) {
-            ref = new ArrayList<Ref>();
-        }
-        return this.ref;
-    }
-
-    /**
-     * Gets the value of the reference property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the reference property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getReference().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
+     * {@link Static }
      * {@link Reference }
-     * 
-     * 
-     */
-    public List<Reference> getReference() {
-        if (reference == null) {
-            reference = new ArrayList<Reference>();
-        }
-        return this.reference;
-    }
-
-    /**
-     * Gets the value of the refOrReference property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the refOrReference property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getRefOrReference().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
      * {@link Ref }
-     * {@link Reference }
-     * 
-     * 
+     *
+     *
      */
-    public List<Serializable> getRefOrReference() {
-        if (refOrReference == null) {
-            refOrReference = new ArrayList<Serializable>();
+    public List<Serializable> getContent() {
+        if (content == null) {
+            content = new ArrayList<Serializable>();
         }
-        return this.refOrReference;
+        return this.content;
     }
 
 }

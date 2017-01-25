@@ -34,10 +34,8 @@ import org.gradoop.flink.io.impl.csv.pojos.Key;
 import org.gradoop.flink.io.impl.csv.pojos.Ref;
 import org.gradoop.flink.io.impl.csv.pojos.Reference;
 import org.gradoop.flink.io.impl.csv.pojos.Static;
-import org.gradoop.flink.io.impl.csv.pojos.Staticorreference;
 import org.gradoop.flink.io.impl.csv.pojos.Vertexedge;
 import org.gradoop.flink.io.impl.csv.pojos.Label;
-import org.gradoop.flink.io.impl.csv.pojos.Objectreferences;
 import org.gradoop.flink.io.impl.csv.pojos.Property;
 import org.gradoop.flink.io.impl.csv.tuples.ReferenceTuple;
 
@@ -228,15 +226,16 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     // normal edge, so information about the source can be read by the csv-edge meta information
     if (fullKey.equals("")) {
       //relevant key information for the source
-      referenceTuple = createKeyTuple(csv.getEdge().getSource(), fields, csv.getDatasourceName(),
+      referenceTuple = createKeyTupleFromStaticOrRefOrReference(
+        csv.getEdge().getSource().getContent(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
       fullKey = createKey(referenceTuple);
     }
     //write the source key content as edge property
     properties.set(CSVConstants.PROPERTY_KEY_SOURCE, fullKey);
     //relevant key information for the target
-    referenceTuple = createKeyTuple(edge.getTarget(), fields, csv.getDatasourceName(),
-        csv.getDomainName(), className);
+    referenceTuple = createKeyTupleFromStaticOrRefOrReference(edge.getTarget().getContent(),
+      fields, csv.getDatasourceName(), csv.getDomainName(), className);
     fullKey = createKey(referenceTuple);
     //write the target key content as edge property
     properties.set(CSVConstants.PROPERTY_KEY_TARGET, fullKey);
@@ -266,108 +265,56 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         sb.append(CSVConstants.SEPARATOR_GRAPHS);
       }
       //adds a key of a graph to the 'list'
-      sb.append(createKey(createGraphTuple(graph, fields, datasourceName, domainName, className))
+      sb.append(createKey(createKeyTupleFromStaticOrRefOrReference(
+        graph.getContent(), fields, datasourceName, domainName, className))
         .replaceAll(CSVConstants.SEPARATOR_GRAPHS, CSVConstants.ESCAPE_SEPARATOR_GRAPHS));
     }
     return sb.toString();
   }
 
   /**
-   * Creates a tuple which contains the datasource name, the domain name, the class name and the id.
-   *
-   * @param staticOrReference contains the id information
-   * @param fields contains the data
-   * @param datasourceName name of the datasource
-   * @param domainName name of the domain
-   * @param className name of the class
-   * @return tuple containing all relevant information
-   */
-  private ReferenceTuple createKeyTuple(Staticorreference staticOrReference, String[] fields,
-    String datasourceName, String domainName, String className) {
-    ReferenceTuple tuple = new ReferenceTuple();
-    //hierarchy information
-    tuple.setDatasourceName(datasourceName);
-    tuple.setDomainName(domainName);
-    tuple.setClassName(className);
-    //start the id with the static name, if it is set
-    tuple.setId((staticOrReference.getStatic() != null) ?
-      staticOrReference.getStatic().getName() : "");
-    //extends id by all class internal references
-    boolean refSet = false;
-    for (Ref ref : staticOrReference.getRef()) {
-      tuple.setId(tuple.getId() + fields[ref.getColumnId().intValue()]);
-      refSet = true;
-    }
-    //extends id by all external reference
-    for (Reference reference : staticOrReference.getReference()) {
-      if (reference.getDatasourceName() != null) {
-        tuple.setDatasourceName(reference.getDatasourceName());
-      }
-      if (reference.getDomainName() != null) {
-        tuple.setDomainName(reference.getDomainName());
-      }
-      if (refSet) {
-        tuple.setClassName(tuple.getClassName() + reference.getKey().getClazz());
-      } else {
-        tuple.setClassName(reference.getKey().getClazz());
-      }
-      tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
-        fields, CSVConstants.SEPARATOR_ID));
-    }
-    return tuple;
-  }
-
-  /**
    * Creates a Tuple which contains the datasource name, the domain name, the class name and the id.
    *
-   * @param objectReferences contains objects with the id information
+   * @param objects contains the data
    * @param fields contains the data
    * @param datasourceName name of the datasource
    * @param domainName name of the domain
    * @param className name of the class
    * @return tuple containing all relevant information
    */
-  private ReferenceTuple createGraphTuple(Objectreferences objectReferences, String[] fields,
-    String datasourceName, String domainName, String className) {
-    ReferenceTuple tuple = new ReferenceTuple();
-    //hierarchy information
-    tuple.setDatasourceName(datasourceName);
-    tuple.setDomainName(domainName);
-    tuple.setClassName(className);
-    tuple.setId("");
-    //contains only object, but information extraction depends on their class
-    boolean refSet = false;
-    for (Object object : objectReferences.getStaticOrRefOrReference()) {
-      //static predefined id
-      if (Static.class.isInstance(object)) {
-        tuple.setId(((Static) object).getName());
-        //checks for internal references
-      } else  if (Ref.class.isInstance(object)) {
-        tuple.setId(tuple.getId() + fields[((Ref) object).getColumnId().intValue()]);
-        refSet = true;
-        //checks for external references
-      } else if (Reference.class.isInstance(object)) {
+  private ReferenceTuple createKeyTupleFromStaticOrRefOrReference(List<Serializable> objects,
+    String[] fields, String datasourceName, String domainName, String className) {
+    //this string contains the id
+    StringBuilder contentString = new StringBuilder();
+    String ref;
+    for (Object object : objects) {
+      //xsd type allows one static element and an optional ref element or no static element and one
+      //ref element or one reference element
+      ref = getEntryFromStaticOrRef(object, fields, CSVConstants.SEPARATOR_ID);
+      //object is static or ref
+      if (!ref.equals("")) {
+        contentString.append(ref);
+      //object is reference
+      } else if (Reference.class.isInstance(object)){
         Reference reference = (Reference) object;
+        //set datasource and or domain if set in reference
         if (reference.getDatasourceName() != null) {
-          tuple.setDatasourceName(reference.getDatasourceName());
+          datasourceName = reference.getDatasourceName();
         }
         if (reference.getDomainName() != null) {
-          tuple.setDomainName(reference.getDomainName());
+          domainName = reference.getDomainName();
         }
-        if (refSet) {
-          tuple.setClassName(tuple.getClassName() + reference.getKey().getClazz());
-        } else {
-          tuple.setClassName(reference.getKey().getClazz());
-        }
-        tuple.setId(tuple.getId() + this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
-            fields, CSVConstants.SEPARATOR_ID));
+        className = reference.getKey().getClazz();
+        //append the id from the csv line
+        contentString.append(this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
+          fields, CSVConstants.SEPARATOR_ID));
       }
     }
-    return tuple;
+    return new ReferenceTuple(datasourceName, domainName, className, contentString.toString());
   }
 
   /**
-   * Creates a string containing all entries form a Static of a Ref object which
+   * Creates a string containing all entries from a Static or a Ref object which
    * are separated by a given string.
    *
    * @param objects list of objects which are either from class Static or Ref
@@ -377,39 +324,57 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private String getEntriesFromStaticOrRef(List<Serializable> objects, String[] fields,
     String separator) {
-    String contentString = "";
-    String fieldContent;
+    StringBuilder contentString = new StringBuilder();
     boolean notFirst = false;
     boolean hasSeparator = !separator.equals("");
     for (Object object : objects) {
-      if (Static.class.isInstance(object)) {
-        contentString = ((Static) object).getName();
-      } else if (Ref.class.isInstance(object)) {
-        fieldContent = fields[((Ref) object).getColumnId().intValue()];
-        //used to either replace all label separators in case a labels content is needed
-        switch (separator) {
-        case CSVConstants.SEPARATOR_LABEL:
-          fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_LABEL,
-            CSVConstants.ESCAPE_SEPARATOR_LABEL);
-          break;
-        //or replace all id separators in case an ids content is needed
-        case CSVConstants.SEPARATOR_ID:
-          fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_ID,
-            CSVConstants.ESCAPE_SEPARATOR_ID);
-          break;
-        default:
-          break;
-        }
-        //add separator in front of each added content except the first one
-        if (notFirst && hasSeparator) {
-          contentString += separator;
-        } else {
-          notFirst = true;
-        }
-        contentString += fieldContent;
+      //xsd type allows one static element and an optional ref element or no static element and one
+      //ref element
+      contentString.append(getEntryFromStaticOrRef(object,fields,separator));
+      //add separator in front of each added content except the first one
+      if (notFirst && hasSeparator) {
+        contentString.append(separator);
+      } else {
+        notFirst = true;
       }
     }
-    return contentString;
+    return contentString.toString();
+  }
+
+  /**
+   * Creates a string containing one entry from a Static of a Ref object.
+   *
+   * @param object object which is either from class Static or Ref
+   * @param fields contains the data
+   * @param separator separates each entry for the string
+   * @return String of one entry
+   */
+  private String getEntryFromStaticOrRef(Object object, String[] fields, String separator) {
+    StringBuilder contentString = new StringBuilder();
+    String fieldContent;
+      //xsd type allows one static element and optional ref elements or no static element and at
+      //least one ref element
+    if (Static.class.isInstance(object)) {
+      contentString.append(((Static) object).getName());
+    } else if (Ref.class.isInstance(object)) {
+      fieldContent = fields[((Ref) object).getColumnId().intValue()];
+      //used to either replace all label separators in case a labels content is needed
+      switch (separator) {
+      case CSVConstants.SEPARATOR_LABEL:
+        fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_LABEL,
+          CSVConstants.ESCAPE_SEPARATOR_LABEL);
+        break;
+      //or replace all id separators in case an ids content is needed
+      case CSVConstants.SEPARATOR_ID:
+        fieldContent = fieldContent.replaceAll(CSVConstants.SEPARATOR_ID,
+          CSVConstants.ESCAPE_SEPARATOR_ID);
+        break;
+      default:
+        break;
+      }
+      contentString.append(fieldContent);
+    }
+    return contentString.toString();
   }
 
   /**

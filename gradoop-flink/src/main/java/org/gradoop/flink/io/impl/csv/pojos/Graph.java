@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
- *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojos}objectreferences"&gt;
+ *     &lt;extension base="{http://www.gradoop.org/flink/io/impl/csv/pojo}staticorreference"&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -35,10 +35,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "")
 @XmlRootElement(name = "graph")
 public class Graph
-    extends Objectreferences
-    implements Serializable
+    extends Staticorreference
 {
 
-    private final static long serialVersionUID = 1L;
 
 }
