@@ -54,6 +54,12 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
         return a;
     }
 
+    public static GDLBuilder.EdgeBuilder<?> simpleEdge(String var, String type) {
+        GDLBuilder.EdgeBuilder<?> a = new GDLBuilder.EdgeBuilder<>();
+        GDLBuilder.EdgeBuilder.generateWithVariableAndType(null,a,var,type).propList().put(var+"value",var+"type").plEnd();
+        return a;
+    }
+
     public AbstractTestBuilder(String packageString) {
         super();
         this.packageString = "package " + packageString+";";

@@ -62,13 +62,20 @@ public class GDLBuilder {
         }
     }
 
-    public static class VertexBuilder<P> extends TupleBuilder<P> implements IWithDependencies {
+    public static class VertexBuilder<P> extends TupleBuilderWithDependencies<P> {
         public VertexBuilder() {
             super();
         }
         @Override
         public String toString() {
             return "("+super.toString()+")";
+        }
+    }
+
+    public static class TupleBuilderWithDependencies<P> extends TupleBuilder<P> implements IWithDependencies {
+
+        public TupleBuilderWithDependencies() {
+            super();
         }
 
         @Override
@@ -77,10 +84,11 @@ public class GDLBuilder {
             if (getVariableName()!=null) elem.add(variableName);
             return elem;
         }
+
     }
 
-    public static class EdgeBuilder<P> extends TupleBuilder<P> {
-        EdgeBuilder() {
+    public static class EdgeBuilder<P> extends TupleBuilderWithDependencies<P> {
+        public EdgeBuilder() {
             super();
         }
         @Override
@@ -277,7 +285,7 @@ public class GDLBuilder {
         public String toString() {
             return attrTo.entrySet().stream()
                     .map(x -> (x.getKey() + " : " + (x.getValue().equals("NULL") ? "NULL" : "\""+x.getValue() + "\"")))
-            .collect(Collectors.joining(",", " {", "}"));
+                    .collect(Collectors.joining(",", " {", "}"));
         }
 
         public P plEnd() {
@@ -285,23 +293,5 @@ public class GDLBuilder {
         }
     }
 
-
-
-    public static void main(String args[]) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
 
 }
