@@ -76,14 +76,6 @@ public class QueryHandler {
    * Cache: vId -> Edges with Target Id == vId
    */
   private Map<Long, Set<Edge>> targetIdToEdgeCache;
-  /**
-   * Cache: variable -> Vertex with vertex.variable == variable
-   */
-  private Map<String, Vertex> variableToVertexCache;
-  /**
-   * Cache: variable -> Edge with edge.variable == variable
-   */
-  private Map<String, Edge> variableToEdgeCache;
 
   /**
    * Creates a new query handler.
