@@ -29,63 +29,66 @@ public class Fusion implements BinaryGraphToGraphOperator {
     private final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
     @Override
-    public LogicalGraph execute(final LogicalGraph leftGraph, final LogicalGraph rightGraph) {
+    public LogicalGraph execute(final LogicalGraph searchGraph, final LogicalGraph patternGraph) {
         //Catching possible errors (null) and handling then as they were empty objects
-        if (leftGraph == null) {
-            return LogicalGraph.createEmptyGraph(rightGraph == null ? defaultConf : rightGraph.getConfig());
-        } else if (rightGraph == null) {
-            return FusionUtils.recreateGraph(leftGraph);
+        if (searchGraph == null) {
+            return LogicalGraph.createEmptyGraph(patternGraph == null ? defaultConf : patternGraph.getConfig());
+        } else if (patternGraph == null) {
+            return FusionUtils.recreateGraph(searchGraph);
         } else {
+            /*
+                 If either the search graph or the pattern graphs are empty, then I have to return the
+                 search graph
+             */
             boolean exitCond = true;
             try {
-                exitCond = rightGraph.isEmpty().first(1).collect().get(0);
+                exitCond = patternGraph.isEmpty().first(1).collect().get(0);
             } catch (Exception ignored) {
             }
-            if (exitCond) return FusionUtils.recreateGraph(leftGraph);
-
+            if (exitCond) return FusionUtils.recreateGraph(searchGraph);
             exitCond = true;
             try {
-                exitCond = leftGraph.isEmpty().first(1).collect().get(0);
+                exitCond = searchGraph.isEmpty().first(1).collect().get(0);
             } catch (Exception ignore) {
             }
-            if (exitCond) return FusionUtils.recreateGraph(leftGraph);
+            if (exitCond) return FusionUtils.recreateGraph(searchGraph);
 
 
-            DataSet<Vertex> leftVertices = leftGraph.getVertices();
+            DataSet<Vertex> leftVertices = searchGraph.getVertices();
 
             //TbmV
-            DataSet<Vertex> toBeReplaced = FusionUtils.areElementsInGraph(leftVertices, rightGraph, true);
+            DataSet<Vertex> toBeReplaced = FusionUtils.areElementsInGraph(leftVertices, patternGraph, true);
             exitCond = true;
             try {
                 exitCond = toBeReplaced.count() == 0;
             } catch (Exception ignored) {
             }
-            if (exitCond) return FusionUtils.recreateGraph(leftGraph);
+            if (exitCond) return FusionUtils.recreateGraph(searchGraph);
 
             /// ERROR: Cannot perform a union between two DataSet belonging to different execution contexts
             DataSet<Vertex> finalVertices =
                     FusionUtils
-                            .areElementsInGraph(leftVertices, rightGraph, false);
-
+                            .areElementsInGraph(leftVertices, patternGraph, false);
+            //
 
             DataSet<Vertex> toBeAdded;
             GradoopId vId = GradoopId.get();
             {
                 Vertex v = new Vertex();
-                v.setLabel(FusionUtils.getGraphLabel(rightGraph));
-                v.setProperties(FusionUtils.getGraphProperties(rightGraph));
+                v.setLabel(FusionUtils.getGraphLabel(patternGraph));
+                v.setProperties(FusionUtils.getGraphProperties(patternGraph));
                 v.setId(vId);
                 toBeAdded = finalVertices.getExecutionEnvironment().fromElements(v);
             }
-            finalVertices = finalVertices.union(toBeAdded);
+            DataSet<Vertex> toBeReturned = finalVertices.union(toBeAdded);
+            System.err.println(FusionUtils.stringifyVerticesWithId(toBeReturned));
 
-
-            DataSet<Edge> leftEdges = leftGraph.getEdges();
-            leftEdges = FusionUtils.areElementsInGraph(leftEdges, rightGraph, false);
+            DataSet<Edge> leftEdges = searchGraph.getEdges();
+            leftEdges = FusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
 
             // Everything in once, maybe more efficient
             DataSet<Edge> updatedEdges = leftEdges
-                    .fullOuterJoin(leftVertices)
+                    .fullOuterJoin(toBeReplaced)
                     .where((Edge x) -> x.getSourceId())
                     .equalTo((Vertex y) -> y.getId())
                     .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
@@ -101,7 +104,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
                         }
                     })
                     .returns(Edge.class)
-                    .fullOuterJoin(leftVertices)
+                    .fullOuterJoin(toBeReplaced)
                     .where((Edge x) -> x.getTargetId())
                     .equalTo((Vertex y) -> y.getId())
                     .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
@@ -118,8 +121,9 @@ public class Fusion implements BinaryGraphToGraphOperator {
                     })
                     .returns(Edge.class);
 
+            System.err.println(FusionUtils.stringifyEdgesFromGraph(updatedEdges,toBeReturned));
 
-            return LogicalGraph.fromDataSets(leftGraph.getGraphHead(),finalVertices, updatedEdges, leftGraph.getConfig());
+            return LogicalGraph.fromDataSets(searchGraph.getGraphHead(),toBeReturned, updatedEdges, searchGraph.getConfig());
 
 
         }
