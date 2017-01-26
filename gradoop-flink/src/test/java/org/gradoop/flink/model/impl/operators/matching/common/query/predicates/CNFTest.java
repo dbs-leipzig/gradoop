@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -33,6 +34,16 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class CNFTest {
+
+  @Test
+  public void testCopyConstructor() {
+    CNF base = getPredicate("MATCH (a),(b) WHERE (a=b) AND (a = 0)");
+    CNF copy = new CNF(base);
+    copy.getPredicates().remove(0);
+
+    assertNotEquals(base,copy);
+  }
+
   @Test
   public void andConjunctionTest() {
     CNFElement or1 = new CNFElement();
@@ -95,6 +106,25 @@ public class CNFTest {
   }
 
   @Test
+  public void testRemoveCovered() {
+    CNF base = getPredicate(
+      "MATCH (a), (b), (c) WHERE (a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c)"
+    );
+
+    CNF expectedReturnValue = getPredicate(
+      "MATCH (a), (b), (c) WHERE (a = b) And (b > 5 OR a > 10)"
+    );
+
+    CNF expectedNewBase = getPredicate(
+      "MATCH (a), (b), (c) WHERE (c = false) AND (a = c)"
+    );
+
+
+    assertEquals(expectedReturnValue, base.removeCovered(Sets.newHashSet("a","b")));
+    assertEquals(expectedNewBase, base);
+  }
+
+  @Test
   public void testEvaluationForProperties() {
     String queryString = "MATCH (a), (b), (c)" +
       "WHERE a=b AND a.name = \"Alice\" AND a.age > c.age";
@@ -143,5 +173,10 @@ public class CNFTest {
     metaData.setPropertyColumn("a", "age", 0);
 
     assertFalse(predicates.evaluate(embedding, metaData));
+  }
+
+  private CNF getPredicate(String queryString) {
+    QueryHandler query = new QueryHandler(queryString);
+    return query.getPredicates();
   }
 }

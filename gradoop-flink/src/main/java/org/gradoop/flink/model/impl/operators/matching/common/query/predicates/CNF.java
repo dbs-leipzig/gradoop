@@ -23,7 +23,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a collection conjunct OrPredicates
@@ -44,6 +46,14 @@ public class CNF extends PredicateCollection<CNFElement> {
    */
   public CNF(List<CNFElement> predicates) {
     this.predicates = predicates;
+  }
+
+  /**
+   * Copy constructor for CNF
+   * @param copyValue CNF to copy
+   */
+  public CNF(CNF copyValue) {
+    this(new ArrayList<>(copyValue.getPredicates()));
   }
 
   /**
@@ -111,6 +121,28 @@ public class CNF extends PredicateCollection<CNFElement> {
       }
     }
     return subCNF;
+  }
+
+  /**
+   * Filters all disjunctions that could be evaluated with the given set of variables and removes
+   * them from the embedding. The filtered predicates will be returned in a new CNF
+   *
+   * Example:
+   * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
+   * myFilter.removeCovered(a,b) => CNF((a = b) And (b > 5 OR a > 10))
+   * and myFilter == CNF((c = false) AND (a = c))
+   *
+   * @param variables set of variables that must be included in the disjunction
+   * @return CNF containing only variables covered by the input list
+   */
+  public CNF removeCovered(Set<String> variables) {
+    Map<Boolean, List<CNFElement>> filtered = predicates
+      .stream()
+      .collect(Collectors.partitioningBy(p -> variables.containsAll(p.getVariables())));
+
+    this.predicates = filtered.get(false);
+
+    return new CNF(filtered.get(true));
   }
 
   @Override
