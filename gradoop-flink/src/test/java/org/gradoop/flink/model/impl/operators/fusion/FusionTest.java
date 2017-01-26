@@ -264,7 +264,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 			"pattern_fusewith_source:G {pattern : \"graph\"}[(u:G {source : \"graph\"})]");
 		LogicalGraph searchGraph = loader.getLogicalGraphByVariable("pattern");
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("source");
-		Fusion f = new Fusion();
+		Fusion f =new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
 		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("pattern_fusewith_source")));
 	}

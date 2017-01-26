@@ -316,7 +316,7 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                 "\nab_edgeWithBeta ab_edgeWithBeta fused_edgeWithBeta" +
                 "\nabcdGraph abcdGraph abdGraph" +
                 "\nabcdGraph ab_edgeWithAlpha ab_fusedGraph" +
-                "\nsemicomplex looplessPattern firstmatch" + 
+                "\nsemicomplex looplessPattern firstmatch" +
                 "\ntricky looplessPattern thirdmatch" +
                 "\nsource pattern source_fusewith_pattern"+
                 "\npattern source pattern_fusewith_source","searchGraph","patternGraph");
