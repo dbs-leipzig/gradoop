@@ -57,7 +57,7 @@ public class FusionUtils {
 
     public static Properties getGraphProperties(LogicalGraph g) {
         try {
-            Properties toret = g.getGraphHead().map(new TmpFusion<>()).collect().get(0);
+            Properties toret = g.getGraphHead().map(new org.gradoop.flink.model.impl.functions.epgm.Properties<>()).collect().get(0);
             return toret;
         } catch (Exception e) {
             throw new RuntimeException(e);
