@@ -90,19 +90,16 @@ public class CNFTest {
 
   @Test
   public void createExistingSubCnfTest() {
-    String queryString = "MATCH (a), (b), (c)" +
-      "WHERE a=b AND a.name = \"Alice\" AND c.name = \"Chris\"";
-    QueryHandler query = new QueryHandler(queryString);
-    CNF cnf = query.getPredicates();
+    CNF base = getPredicate(
+      "MATCH (a), (b), (c) WHERE a=b AND a.name = \"Alice\" AND c.name = \"Chris\""
+    );
 
-    Set<String> variables = new HashSet<>();
-    variables.add("a");
-    variables.add("b");
+    CNF expectedReturnValue = getPredicate(
+      "MATCH (a), (b), (c) WHERE a.name = \"Alice\" AND c.name = \"Chris\""
+    );
 
-    assertEquals("((a = b))",cnf.getSubCNF(variables).toString());
-
-    variables.add("c");
-    assertTrue(cnf.getSubCNF(variables).getPredicates().isEmpty());
+    assertEquals(expectedReturnValue, base.getSubCNF(Sets.newHashSet("a","c")));
+    assertEquals(new CNF(), base.getSubCNF(Sets.newHashSet("b")));
   }
 
   @Test
@@ -120,7 +117,7 @@ public class CNFTest {
     );
 
 
-    assertEquals(expectedReturnValue, base.removeCovered(Sets.newHashSet("a","b")));
+    assertEquals(expectedReturnValue, base.removeSubCNF(Sets.newHashSet("a","b")));
     assertEquals(expectedNewBase, base);
   }
 

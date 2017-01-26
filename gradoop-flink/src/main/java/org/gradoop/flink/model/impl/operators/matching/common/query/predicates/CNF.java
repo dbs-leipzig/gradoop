@@ -107,20 +107,23 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   /**
-   * Creates a new CNF containing only predicates concerning the specified variables
-   * @param variables list of variables
-   * @return sub cnf
+   * Filters all disjunctions that could be evaluated with the given set of variables and returns
+   * them in a new CNF
+   *
+   * Example:
+   * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
+   * myFilter.getSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))
+   *
+   * @param variables set of variables that must be included in the disjunction
+   * @return CNF containing only variables covered by the input list
    */
   public CNF getSubCNF(Set<String> variables) {
-    CNF subCNF = new CNF();
+    List<CNFElement> filtered = predicates
+      .stream()
+      .filter(p -> variables.containsAll(p.getVariables()))
+      .collect(Collectors.toList());
 
-    for (CNFElement cnfElement : predicates) {
-      Set<String> elementVariables = cnfElement.getVariables();
-      if (elementVariables.containsAll(variables) && elementVariables.size() == variables.size()) {
-        subCNF.addPredicate(cnfElement);
-      }
-    }
-    return subCNF;
+    return new CNF(filtered);
   }
 
   /**
@@ -129,13 +132,13 @@ public class CNF extends PredicateCollection<CNFElement> {
    *
    * Example:
    * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
-   * myFilter.removeCovered(a,b) => CNF((a = b) And (b > 5 OR a > 10))
+   * myFilter.removeSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))
    * and myFilter == CNF((c = false) AND (a = c))
    *
    * @param variables set of variables that must be included in the disjunction
    * @return CNF containing only variables covered by the input list
    */
-  public CNF removeCovered(Set<String> variables) {
+  public CNF removeSubCNF(Set<String> variables) {
     Map<Boolean, List<CNFElement>> filtered = predicates
       .stream()
       .collect(Collectors.partitioningBy(p -> variables.containsAll(p.getVariables())));
