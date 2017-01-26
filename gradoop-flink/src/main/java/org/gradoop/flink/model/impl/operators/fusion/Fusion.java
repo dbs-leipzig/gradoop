@@ -138,7 +138,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
                     })
                     .returns(Edge.class);
 
-            System.err.println(FusionUtils.stringifyEdgesFromGraph(updatedEdges,toBeReturned));
+            //System.err.println(FusionUtils.stringifyEdgesFromGraph(updatedEdges,toBeReturned));
 
             return LogicalGraph.fromDataSets(searchGraph.getGraphHead(),toBeReturned, updatedEdges, searchGraph.getConfig());
 
