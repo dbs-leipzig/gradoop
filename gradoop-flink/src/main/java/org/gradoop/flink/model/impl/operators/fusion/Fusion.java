@@ -86,15 +86,17 @@ public class Fusion implements BinaryGraphToGraphOperator {
 
             DataSet<Vertex> toBeAdded;
             GradoopId vId = GradoopId.get();
+            GradoopId searchGraphId = FusionUtils.getGraphId2(searchGraph);
             {
                 Vertex v = new Vertex();
                 v.setLabel(FusionUtils.getGraphLabel(patternGraph));
                 v.setProperties(FusionUtils.getGraphProperties(patternGraph));
                 v.setId(vId);
+                v.addGraphId(searchGraphId);
                 toBeAdded = finalVertices.getExecutionEnvironment().fromElements(v);
             }
             DataSet<Vertex> toBeReturned = finalVertices.union(toBeAdded);
-            System.err.println(FusionUtils.stringifyVerticesWithId(toBeReturned));
+            //System.err.println(FusionUtils.stringifyVerticesWithId(toBeReturned));
 
             DataSet<Edge> leftEdges = searchGraph.getEdges();
             leftEdges = FusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
@@ -113,6 +115,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
                             e.setTargetId(edge.getTargetId());
                             e.setProperties(edge.getProperties());
                             e.setLabel(edge.getLabel());
+                            e.addGraphId(searchGraphId);
                             collector.collect(e);
                         }
                     })
@@ -129,6 +132,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
                             e.setSourceId(edge.getSourceId());
                             e.setProperties(edge.getProperties());
                             e.setLabel(edge.getLabel());
+                            e.addGraphId(searchGraphId);
                             collector.collect(e);
                         }
                     })

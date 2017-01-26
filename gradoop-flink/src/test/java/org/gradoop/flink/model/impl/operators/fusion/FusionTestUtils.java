@@ -42,28 +42,6 @@ import java.util.stream.Collectors;
  */
 public class FusionTestUtils {
 
-    /**
-     * Equality test that is not passed:
-     *
-
-     ab_edgeWithAlpha_ab_edgeWithBeta_to_ab_edgeWithBeta_loop()
-     =====
-
-     (G{ab_edgeWithBeta=graph:String})
-     -[AlphaEdge{alphatype=alphavalue:String}]->(G{ab_edgeWithBeta=graph:String})
-     <-[AlphaEdge{alphatype=alphavalue:String}]-(G{ab_edgeWithBeta=graph:String})
-
-     (G{ab_edgeWithBeta=graph:String})
-     -[AlphaEdge{alphatype=alphavalue:String}]->(G{ab_edgeWithBeta=graph:String})
-     (G{ab_edgeWithBeta=graph:String})
-     <-[AlphaEdge{alphatype=alphavalue:String}]-(G{ab_edgeWithBeta=graph:String})
-
-
-
-     *
-     *
-     */
-
     public static final CanonicalAdjacencyMatrixBuilder can = new CanonicalAdjacencyMatrixBuilder(
             new GraphHeadToEmptyString(), new VertexToDataString(), new EdgeToDataString(), true);
 

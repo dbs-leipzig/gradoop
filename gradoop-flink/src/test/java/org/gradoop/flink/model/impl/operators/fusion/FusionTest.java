@@ -33,7 +33,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("empty")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("empty")));
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("empty")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("empty")));
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("emptyVertex")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("emptyVertex")));
 	}
 
 	@Test
@@ -69,19 +69,19 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("graphWithA");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("emptyVertex")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("emptyVertex")));
 	}
 
 	@Test
 	public void emptyVertex_emptyVertex_to_singleInside() throws Exception {
 		FlinkAsciiGraphLoader loader = getLoaderFromString(
 "emptyVertex:G {emptyVertex : \"graph\"}[()]"+
-			"singleInside:G {emptyVertex : \"graph\"}[(:G {emptyVertex : \"graph\"})]");
+			"singleInside:G {emptyVertex : \"graph\"}[(u:G {emptyVertex : \"graph\"})]");
 		LogicalGraph searchGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("singleInside")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("singleInside")));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("graphWithA");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("aGraphLabels")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("aGraphLabels")));
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("graphWithA")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("graphWithA")));
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("graphWithA")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("graphWithA")));
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("graphWithA");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("aggregatedASource")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("aggregatedASource")));
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
 	}
 
 	@Test
@@ -154,7 +154,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("ab_edgeWithAlpha");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("fused_edgeWithAlpha")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("fused_edgeWithAlpha")));
 	}
 
 	@Test
@@ -179,7 +179,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("ab_edgeWithBeta");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop")));
 	}
 
 
@@ -192,7 +192,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
 	}
 
 	@Test
@@ -204,7 +204,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("emptyVertex");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
 	}
 
 	@Test
@@ -216,7 +216,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("ab_edgeWithBeta");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("fused_edgeWithBeta")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("fused_edgeWithBeta")));
 	}
 
 	@Test
@@ -228,7 +228,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("abcdGraph");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("abdGraph")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("abdGraph")));
 	}
 
 
@@ -243,7 +243,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("looplessPattern");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("firstmatch")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("firstmatch")));
 	}
 
 
@@ -257,7 +257,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("looplessPattern");
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("thirdmatch")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("thirdmatch")));
 	}
 
 	@Test
@@ -271,7 +271,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 		Fusion f = new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
 		System.out.println(FusionTestUtils.stringifyGraph2(loader.getLogicalGraphByVariable("source_fusewith_pattern")));
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("source_fusewith_pattern")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("source_fusewith_pattern")));
 	}
 
 	@Test
@@ -284,6 +284,6 @@ public class FusionTest extends GradoopFlinkTestBase {
 		LogicalGraph patternGraph = loader.getLogicalGraphByVariable("source");
 		Fusion f =new Fusion();
 		LogicalGraph output = f.execute(searchGraph,patternGraph);
-		Assert.assertTrue("no match provided", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("pattern_fusewith_source")));
+		collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("pattern_fusewith_source")));
 	}
 }
