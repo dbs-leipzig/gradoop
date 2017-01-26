@@ -8,6 +8,7 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -66,10 +67,10 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
         toAssociate = new HashMap<>();
     }
 
-    public  String javify(String toJava) {
+    public  String javify(String toJava, boolean withVariables) {
         try {
 
-            return "\""+toAssociate.get(toJava).toString().replaceAll("\"","\\\\\"").replaceAll("\n", "\"+\n\t\t\t\"")+"\"";
+            return "\""+toAssociate.get(toJava).compileWith(toAssociate,withVariables).replaceAll("\"","\\\\\"").replaceAll("\n", "\"+\n\t\t\t\"")+"\"";
         } catch (Exception e) {
             System.err.println(toJava);
             e.printStackTrace();
@@ -78,10 +79,11 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
         }
     }
 
-    public void generateToFile(File f, String binaryClassName, String testPatterns) {
+    public void generateToFile(File f, String binaryClassName, String testPatterns, String left, String right) {
         try(  PrintWriter out = new PrintWriter( f )  ){
             out.println(packageString+"\n\nimport org.gradoop.flink.model.GradoopFlinkTestBase;\n" +
                     "import org.gradoop.flink.model.impl.LogicalGraph;\n" +
+                    "import org.junit.Assert;\n" +
                     "import org.gradoop.flink.util.FlinkAsciiGraphLoader;\n" +
                     "import org.junit.Test;\n\n" +
                     "public class "+binaryClassName+"Test extends GradoopFlinkTestBase {\n" + Pattern.compile("\n", Pattern.LITERAL)
@@ -91,17 +93,28 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
                         String testName = x[0] + "_" + x[1] + "_to_" + x[2];
                         StringBuilder sb = new StringBuilder();
                         Set<String> toJavify = new LinkedHashSet<>();
-                        toAssociate.entrySet().stream()
+                        /*toAssociate.entrySet().stream()
                                 .filter(y -> y.getKey().equals(x[0]) || y.getKey().equals(x[1]) || y.getKey().equals(x[2]))
                                 .flatMap(y->y.getValue().getDependencies().stream())
                                 .map(this::javify)
-                                .forEach(toJavify::add);
+                                .forEach(toJavify::add);*/
                         System.err.println("Processing pattern: "+x[0]+" "+x[1]+" "+x[2]);
-                        toJavify.add(javify(x[0]));
-                        toJavify.add(javify(x[1]));
-                        toJavify.add(javify(x[2]));
-                        StringBuilder append = sb.append("\t@Test\n\tpublic void ").append(x[0]).append("_").append(x[1]).append("_to_").append(x[2]).append("() throws Exception {\n\t\t").append("FlinkAsciiGraphLoader loader = getLoaderFromString(").append(toJavify.stream().collect(Collectors.joining("+\n\t\t\t"))).append(");\n\t\t").append("LogicalGraph left = loader.getLogicalGraphByVariable(\"").append(x[0]).append("\");\n\t\t").append("LogicalGraph right = loader.getLogicalGraphByVariable(\"").append(x[1]).append("\");\n\t\t")
-                                .append(binaryClassName+" f = null;\n\t\t").append("LogicalGraph output = f.execute(left,right);\n\t\t").append("collectAndAssertTrue(output.equalsByElementData(loader.getLogicalGraphByVariable(\"").append(x[2]).append("\")));\n\t}");
+                        Set<String> visited = new HashSet<>();
+                        toJavify.add(javify(x[0],true));
+                        visited.add(x[0]);
+                        if (!visited.contains(x[1]))
+                        toJavify.add(javify(x[1],true));
+                        if (!visited.contains(x[2]))
+                        toJavify.add(javify(x[2],false));
+                        //Assert.assertTrue("they do not match", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop")));
+                        StringBuilder append = sb
+                                .append("\t@Test\n\tpublic void ").append(x[0]).append("_").append(x[1]).append("_to_").append(x[2]).append("() throws Exception {\n\t\t")
+                                    .append("FlinkAsciiGraphLoader loader = getLoaderFromString(\n").append(toJavify.stream().collect(Collectors.joining("+\n\t\t\t"))).append(");\n\t\t")
+                                    .append("LogicalGraph "+left+" = loader.getLogicalGraphByVariable(\"").append(x[0]).append("\");\n\t\t")
+                                    .append("LogicalGraph "+right+" = loader.getLogicalGraphByVariable(\"").append(x[1]).append("\");\n\t\t")
+                                    .append(binaryClassName+" f = new "+binaryClassName+"();\n\t\t")
+                                    .append("LogicalGraph output = f.execute("+left+","+right+");\n\t\t")
+                                    .append("Assert.assertTrue(\"no match provided\", FusionTestUtils.graphEquals(output,loader.getLogicalGraphByVariable(\"").append(x[2]).append("\")));\n\t}");
                         return sb.toString();
                     }).collect(Collectors.joining("\n\n"))+"\n}");
         } catch (Exception e) {
@@ -117,7 +130,7 @@ public abstract class AbstractTestBuilder extends GradoopFlinkTestBase {
     public void check() {
         getTestGraphLoader();
         System.out.println("Current keys are: " + toAssociate.keySet().stream().collect(Collectors.joining(",")));
-        loader = getLoaderFromString(toAssociate.values().stream().map(Object::toString).collect(Collectors.joining("\n")));
+        loader = getLoaderFromString(toAssociate.values().stream().filter(x -> x instanceof GDLBuilder.GraphWithinDatabase).map(x -> x.compileWith(toAssociate,true)).collect(Collectors.joining("\n")));
     }
 
 }

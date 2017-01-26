@@ -102,6 +102,12 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .toVariable("b").t()
                     .done());
 
+            addTo("ab_edgeWithBeta_loop", returnAggGraph("ab_edgeWithBeta_loop","ab_edgeWithAlpha")
+                    .fromVariable(belongToGraph("ab_edgeWithBeta")).t()
+                    .edgeVariable("alpha").t()
+                    .toVariable(belongToGraph("ab_edgeWithBeta")).t()
+                    .done());
+
             // abVertex
             addSelfieGraphOf("fused_edgeWithBeta","ab_edgeWithBeta");
             //////////////////
@@ -129,34 +135,6 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .edgeVariable("g").t()
                     .toVariable("c").t()
                     .done());
-
-
-
-
-            /*
-
-
-            // abcdGraph
-            addTo("abcdGraph", GDLBuilder.GraphWithinDatabase.labelType("abcdGraph","G").t()
-                    .pat()
-                    .fromVariable("a").t()
-                    .edgeVariable("alpha").t()
-                    .toVariable("b").t()
-                    .done()
-
-                    .pat()
-                    .fromVariable("b").t()
-                    .edgeKey("GammaEdge").t()
-                    .toVariable("c").t()
-                    .done());
-
-            // ab_fusedGraph
-            addTo("ab_fusedGraph", GDLBuilder.GraphWithinDatabase.labelType("ab_fusedGraph","G").t()
-                    .pat()
-                    .fromVariable("ab").t()
-                    .edgeKey("GammaEdge").t()
-                    .toVariable("c").t()
-                    .done());*/
 
 
             addTo("semicomplex",returnStartGraph("semicomplex")
@@ -238,6 +216,35 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                     .done());
 
 
+            addTo("source",returnStartGraph("source")
+                .fromVariable("a").t().edgeVariable("alpha").t().toVariable("b").t()
+                .done().pat()
+                .fromVariable("a").t().edgeVariable("beta").t().toVariable("b").t()
+                .done().pat()
+                .fromVariable("a").t().edgeVariable("l").t().toVariable("c").t()
+                .done().pat()
+                .fromVariable("c").t().edgeVariable("g").t().toVariable("d").t()
+                .done()
+            );
+
+            addTo("pattern",returnStartGraph("pattern")
+                    .fromVariable("a").t().edgeVariable("alpha").t().toVariable("b").t()
+                    .done()
+            );
+
+            addTo("source_fusewith_pattern",returnAggGraph("source_fusewith_pattern","source")
+                    .fromVariable(belongToGraph("pattern")).t().edgeVariable("beta").t().toVariable(belongToGraph("pattern")).t()
+                    .done().pat()
+                    .fromVariable(belongToGraph("pattern")).t().edgeVariable("l").t().toVariable("c").t()
+                    .done().pat()
+                    .fromVariable("c").t().edgeVariable("g").t().toVariable("d").t()
+                    .done()
+            );
+
+            addTo("pattern_fusewith_source",returnAggGraph("pattern_fusewith_source","pattern")
+                    .fromVariable(belongToGraph("source")).t().done()
+            );
+
             /*
 
             // tricky
@@ -286,27 +293,6 @@ public class FusionTestBuilder extends AbstractTestBuilder {
         addEdge("l","loop");
         addEdge("g","GammaEdge");
 
-        /*GDLBuilder.VertexBuilder<?> ab = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,ab,"ab","G")
-                .propList().put("avalue","atype").put("bvalue","btype").plEnd();
-        GDLBuilder.VertexBuilder<?> abc = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,abc,"ab","G")
-                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").plEnd();
-        GDLBuilder.VertexBuilder<?> abd = new GDLBuilder.VertexBuilder<>();
-        GDLBuilder.VertexBuilder.generateWithVariableAndType(null,abd,"abd","G")
-                .propList().put("avalue","atype").put("bvalue","btype").put("cvalue","ctype").put("dvalue","dtype").plEnd();*/
-        //addToGraphAttribute("graphWithA","graph");
-        //addToGraphAttribute("ab_edgeWithAlpha","graph");
-
-        //addTo("a",a);
-        //addTo("b",b);
-        //addTo("c",c);
-        //addTo("d",d);
-        //addTo("e",e);
-        //addTo("ab",ab);
-        //addTo("abc",abc);
-        //addTo("abd",abd);
-
     }
 
     public static void main(String args[]) throws IOException {
@@ -324,18 +310,19 @@ public class FusionTestBuilder extends AbstractTestBuilder {
                 "\nab_edgeWithAlpha empty ab_edgeWithAlpha" +
                 "\nab_edgeWithAlpha emptyVertex ab_edgeWithAlpha" +
                 "\nab_edgeWithAlpha ab_edgeWithAlpha fused_edgeWithAlpha" +
-                "\nab_edgeWithAlpha ab_edgeWithBeta ab_edgeWithAlpha" +
+                "\nab_edgeWithAlpha ab_edgeWithBeta ab_edgeWithBeta_loop" +
                 "\nab_edgeWithBeta graphWithA ab_edgeWithBeta" +
                 "\nab_edgeWithBeta empty ab_edgeWithBeta" +
                 "\nab_edgeWithBeta emptyVertex ab_edgeWithBeta" +
-                "\nab_edgeWithBeta ab_edgeWithAlpha ab_edgeWithBeta" +
                 "\nab_edgeWithBeta ab_edgeWithBeta fused_edgeWithBeta" +
                 "\nabcdGraph abcdGraph abdGraph" +
                 "\nabcdGraph ab_edgeWithAlpha ab_fusedGraph" +
                 "\nsemicomplex looplessPattern firstmatch" +
                 "\nsemicomplex loopPattern secondmatch" +
                 "\ntricky looplessPattern thirdmatch" +
-                "\ntricky loopPattern tricky");
+                "\ntricky loopPattern tricky"+
+                "\nsource pattern source_fusewith_pattern"+
+                "\npattern source pattern_fusewith_source","searchGraph","patternGraph");
 
     }
 

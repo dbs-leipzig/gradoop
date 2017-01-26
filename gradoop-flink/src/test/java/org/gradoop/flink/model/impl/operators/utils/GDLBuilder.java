@@ -1,9 +1,6 @@
 package org.gradoop.flink.model.impl.operators.utils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -12,7 +9,8 @@ import java.util.stream.Collectors;
 public class GDLBuilder {
 
     public static class GraphWithinDatabase implements IWithDependencies {
-        StringBuilder sb = null;
+        //StringBuilder sb = null;
+        ArrayList<PatternBuilder> sb = null;
         private Set<String> dependencies = new HashSet<>();
         protected TupleBuilder<GraphWithinDatabase> tp;
         Object parent;
@@ -41,7 +39,7 @@ public class GDLBuilder {
 
         @Override
         public String toString() {
-            return tp.toString()+(sb==null ? "[]" : "[\n"+sb.toString()+"\n]");
+            return tp.toString()+(sb==null ? "[]" : "["+sb.toString()+"]");
         }
 
         public boolean hasElementPropertyValues() {
@@ -50,15 +48,25 @@ public class GDLBuilder {
 
         GraphWithinDatabase addClosedPattern(Collection<String> references, PatternBuilder patternBuilder) {
             if (sb==null)
-                sb = new StringBuilder();
+                sb = new ArrayList<>();
             dependencies.addAll(references);
-            sb.append(patternBuilder);
+            sb.add(patternBuilder);
             return this;
         }
 
         @Override
         public Set<String> getDependencies() {
             return dependencies;
+        }
+
+        @Override
+        public String toString(boolean withVariableName) {
+             return tp.toString()+(sb==null ? "[]" : "["+sb.stream().map(x-> x.toString(withVariableName)).collect(Collectors.joining(" "))+"]");
+        }
+
+        @Override
+        public String compileWith(HashMap<String, IWithDependencies> infoToExpand, boolean withVariableName) {
+            return tp.toString()+(sb==null ? "[]" : "["+sb.stream().map(x->x.compile(infoToExpand,withVariableName)).collect(Collectors.joining(" "))+"]");
         }
     }
 
@@ -69,6 +77,11 @@ public class GDLBuilder {
         @Override
         public String toString() {
             return "("+super.toString()+")";
+        }
+
+        @Override
+        public String compileWith(HashMap<String, IWithDependencies> infoToExpand, boolean withVariableName) {
+            return "("+super.compileWith(infoToExpand,withVariableName)+")";
         }
     }
 
@@ -85,6 +98,16 @@ public class GDLBuilder {
             return elem;
         }
 
+        @Override
+        public String toString(boolean withVariableName) {
+            return super.toString(withVariableName);
+        }
+
+        @Override
+        public String compileWith(HashMap<String, IWithDependencies> infoToExpand,boolean withVariableName) {
+            return super.compile(infoToExpand,withVariableName);
+        }
+
     }
 
     public static class EdgeBuilder<P> extends TupleBuilderWithDependencies<P> {
@@ -94,6 +117,11 @@ public class GDLBuilder {
         @Override
         public String toString() {
             return "["+super.toString()+"]";
+        }
+
+        @Override
+        public String compileWith(HashMap<String, IWithDependencies> infoToExpand, boolean withVariableName) {
+             return "["+super.compileWith(infoToExpand,withVariableName)+"]";
         }
     }
 
@@ -179,7 +207,41 @@ public class GDLBuilder {
                     sb.append(e.toString());
                 }
                 sb.append("->");
-                return sb.append(dst.toString()).append('\n').toString();
+                return sb.append(dst.toString()).append(" ").toString();
+            }
+        }
+
+        public String toString(boolean b) {
+            if (src==null && dst==null) {
+                return "";
+            } else if (src==null || dst==null) {
+                return src != null ? src.toString(b) : dst.toString(b);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(src.toString(b));
+                sb.append('-');
+                if (e!=null) {
+                    sb.append(e.toString(b));
+                }
+                sb.append("->");
+                return sb.append(dst.toString(b)).append(" ").toString();
+            }
+        }
+
+        public String compile(HashMap<String,IWithDependencies> toAssociate, boolean withVariableName) {
+            if (src==null && dst==null) {
+                return "";
+            } else if (src==null || dst==null) {
+                return src != null ? src.compileWith(toAssociate,withVariableName).replace("((","(").replace("))",")") : dst.compileWith(toAssociate,withVariableName).replace("((","(").replace("))",")");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(src.compileWith(toAssociate,withVariableName).replace("((","(").replace("))",")"));
+                sb.append('-');
+                if (e!=null) {
+                    sb.append(e.compileWith(toAssociate,withVariableName).replace("[(","[").replace(")]","]"));
+                }
+                sb.append("->");
+                return sb.append(dst.compileWith(toAssociate,withVariableName).replace("((","(").replace("))",")")).append(" ").toString();
             }
         }
 
@@ -237,12 +299,24 @@ public class GDLBuilder {
 
         @Override
         public String toString() {
+            return toString(true);
+        }
+
+        public String toString(boolean withVariableName) {
             StringBuilder sb = new StringBuilder();
-            sb.append(variableName).append(typeName);
+            if (withVariableName)
+                sb.append(variableName);
+            sb.append(typeName);
             if (propbuilder!=null && (!propbuilder.isEmpty())) {
                 sb.append(propbuilder.toString());
             }
             return sb.toString();
+        }
+
+        public String compile(HashMap<String,IWithDependencies> toAssociate, boolean withVariableName) {
+            if ((propbuilder==null || propbuilder.isEmpty())&&(variableName.length()>0)) {
+                return toAssociate.get(variableName).toString(withVariableName);
+            } else return toString();
         }
 
         public P t() {

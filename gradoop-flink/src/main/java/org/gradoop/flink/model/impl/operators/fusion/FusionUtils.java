@@ -19,12 +19,12 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadca
 import org.gradoop.flink.model.impl.functions.tuple.ToIdWithLabel;
 
 /**
- * Created by vasistas on 25/01/17.
+ * Created by Giacomo Bergami on 25/01/17.
  */
 public class FusionUtils {
 
     public static LogicalGraph recreateGraph(LogicalGraph x) {
-        return LogicalGraph.fromDataSets(x.getVertices(),x.getEdges(),x.getConfig());
+        return LogicalGraph.fromDataSets(x.getGraphHead(),x.getVertices(),x.getEdges(),x.getConfig());
     }
 
     public static MapOperator<GraphHead, GradoopId> getGraphId(LogicalGraph g) {
@@ -48,7 +48,12 @@ public class FusionUtils {
     }
 
     public static Properties getGraphProperties(LogicalGraph g) {
-        throw new RuntimeException("rightGraph: the method has not been implemented yet");
+        try {
+            Properties toret = g.getGraphHead().map(new TmpFusion<>()).collect().get(0);
+            return toret;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
