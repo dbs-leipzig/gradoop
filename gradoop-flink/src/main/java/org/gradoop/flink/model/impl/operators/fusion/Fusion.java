@@ -65,11 +65,13 @@ public class Fusion implements BinaryGraphToGraphOperator {
             } catch (Exception ignore) {
             }
             if (exitCond) return FusionUtils.recreateGraph(searchGraph);
-
+            //////////////////////////////////////////
 
             DataSet<Vertex> leftVertices = searchGraph.getVertices();
 
-            //TbmV
+            /*
+             * Collecting the vertices that have to be removed and replaced by the aggregation's result
+             */
             DataSet<Vertex> toBeReplaced = FusionUtils.areElementsInGraph(leftVertices, patternGraph, true);
             exitCond = true;
             try {
@@ -77,13 +79,20 @@ public class Fusion implements BinaryGraphToGraphOperator {
             } catch (Exception ignored) {
             }
             if (exitCond) return FusionUtils.recreateGraph(searchGraph);
+            //////////////////////////////////////////
 
-            /// ERROR: Cannot perform a union between two DataSet belonging to different execution contexts
+            /*
+              But, even the vertices that belong only to the search graph, should be added
+             */
             DataSet<Vertex> finalVertices =
                     FusionUtils
                             .areElementsInGraph(leftVertices, patternGraph, false);
-            //
+            //////////////////////////////////////////
 
+
+            /*
+             * Then I create the graph that substitute the vertices within toBeReplaced
+             */
             DataSet<Vertex> toBeAdded;
             GradoopId vId = GradoopId.get();
             GradoopId searchGraphId = FusionUtils.getGraphId2(searchGraph);
@@ -96,12 +105,29 @@ public class Fusion implements BinaryGraphToGraphOperator {
                 toBeAdded = finalVertices.getExecutionEnvironment().fromElements(v);
             }
             DataSet<Vertex> toBeReturned = finalVertices.union(toBeAdded);
-            //System.err.println(FusionUtils.stringifyVerticesWithId(toBeReturned));
+            //////////////////////////////////////////
 
+
+            /*
+             * In the final graph, all the edges appearing only in the search graph should appear
+             */
             DataSet<Edge> leftEdges = searchGraph.getEdges();
             leftEdges = FusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
 
-            // Everything in once, maybe more efficient
+            /*
+             * Concerning the other edges, we have to eventually update them and to be linked with the new vertex
+             * The following expression could be formalized as follows:
+             *
+             * updatedEdges = map(E, x ->
+             *      e' <- onNextUpdateof(x).newfrom(x);
+             *      if (e'.src \in toBeReplaced) e'.src = vId
+             *      end if
+             *      if (e'.dst \in toBeReplaced) e'.dst = vId
+             *      end if
+             *      return e'
+             * )
+             *
+             */
             DataSet<Edge> updatedEdges = leftEdges
                     .fullOuterJoin(toBeReplaced)
                     .where((Edge x) -> x.getSourceId())
@@ -138,8 +164,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
                     })
                     .returns(Edge.class);
 
-            //System.err.println(FusionUtils.stringifyEdgesFromGraph(updatedEdges,toBeReturned));
-
+            // All's well what ends well… farewell!
             return LogicalGraph.fromDataSets(searchGraph.getGraphHead(),toBeReturned, updatedEdges, searchGraph.getConfig());
 
 
