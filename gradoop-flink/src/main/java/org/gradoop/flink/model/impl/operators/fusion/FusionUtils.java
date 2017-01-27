@@ -1,28 +1,25 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * This file is part of Gradoop.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.gradoop.flink.model.impl.operators.fusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.MapOperator;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -47,18 +44,18 @@ public class FusionUtils {
   }
 
   /**
-   * Given a graph, returns its ID through a DataSet collection
+   * Given g...
    * @param g   Graph where the id should be returned
-   * @return
+   * @return    returns its ID through a DataSet collection
    */
   public static DataSet<GradoopId> getGraphId(LogicalGraph g) {
     return g.getGraphHead().map(new Id<>());
   }
 
   /**
-   * Given a graph, returns its ID
+   * Given g...
    * @param g   Graph where from which the id should be returned
-   * @return
+   * @return    returns its ID
    */
   public static GradoopId getGraphId2(LogicalGraph g) {
     try {
@@ -74,7 +71,7 @@ public class FusionUtils {
    * @param g         Graph where to verify the containment operation
    * @param inGraph   If the value is true, then perform an intersection, otherwise a difference
    * @param <P>       e.g. either vertices or edges
-   * @return
+   * @return          The filtered collection
    */
   public static <P extends GraphElement> DataSet<P> areElementsInGraph(DataSet<P> collection,
     LogicalGraph g, boolean inGraph) {
@@ -82,33 +79,4 @@ public class FusionUtils {
       .withBroadcastSet(getGraphId(g), GraphContainmentFilterBroadcast.GRAPH_ID);
   }
 
-  /**
-   * Returns a label from a single graph
-   * @param g
-   * @return
-   */
-  public static String getGraphLabel(LogicalGraph g) {
-    try {
-      String toret = g.getGraphHead().map(new Label<>()).collect().get(0);
-      return toret;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Returns the properties belonging to a single graph
-   * @param g
-   * @return
-   */
-  public static Properties getGraphProperties(LogicalGraph g) {
-    try {
-      Properties toret =
-        g.getGraphHead().map(new org.gradoop.flink.model.impl.functions.epgm.Properties<>())
-          .collect().get(0);
-      return toret;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
 }
