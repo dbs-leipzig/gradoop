@@ -17,23 +17,18 @@
 
 package org.gradoop.flink.model.impl.operators.fusion;
 
-import org.apache.flink.api.common.functions.BroadcastVariableInitializer;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-
-import java.io.Serializable;
 
 /**
  * Created by Giacomo Bergami on 19/01/17.
@@ -152,34 +147,34 @@ public class Fusion implements BinaryGraphToGraphOperator {
         leftEdges.fullOuterJoin(toBeReplaced).where((Edge x) -> x.getSourceId())
           .equalTo((Vertex y) -> y.getId())
           .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
-            if (vertex == null) {
-              collector.collect(edge);
-            } else if (edge != null) {
-              Edge e = new Edge();
-              e.setId(GradoopId.get());
-              e.setSourceId(vId);
-              e.setTargetId(edge.getTargetId());
-              e.setProperties(edge.getProperties());
-              e.setLabel(edge.getLabel());
-              e.setGraphIds(edge.getGraphIds());
-              collector.collect(e);
-            }
-          }).returns(Edge.class).fullOuterJoin(toBeReplaced).where((Edge x) -> x.getTargetId())
+              if (vertex == null) {
+                collector.collect(edge);
+              } else if (edge != null) {
+                Edge e = new Edge();
+                e.setId(GradoopId.get());
+                e.setSourceId(vId);
+                e.setTargetId(edge.getTargetId());
+                e.setProperties(edge.getProperties());
+                e.setLabel(edge.getLabel());
+                e.setGraphIds(edge.getGraphIds());
+                collector.collect(e);
+              }
+            }).returns(Edge.class).fullOuterJoin(toBeReplaced).where((Edge x) -> x.getTargetId())
           .equalTo((Vertex y) -> y.getId())
           .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
-            if (vertex == null) {
-              collector.collect(edge);
-            } else if (edge != null) {
-              Edge e = new Edge();
-              e.setId(GradoopId.get());
-              e.setTargetId(vId);
-              e.setSourceId(edge.getSourceId());
-              e.setProperties(edge.getProperties());
-              e.setLabel(edge.getLabel());
-              e.setGraphIds(edge.getGraphIds());
-              collector.collect(e);
-            }
-          }).returns(Edge.class);
+              if (vertex == null) {
+                collector.collect(edge);
+              } else if (edge != null) {
+                Edge e = new Edge();
+                e.setId(GradoopId.get());
+                e.setTargetId(vId);
+                e.setSourceId(edge.getSourceId());
+                e.setProperties(edge.getProperties());
+                e.setLabel(edge.getLabel());
+                e.setGraphIds(edge.getGraphIds());
+                collector.collect(e);
+              }
+            }).returns(Edge.class);
 
       // All's well what ends well… farewell!
       return LogicalGraph.fromDataSets(searchGraph.getGraphHead(), toBeReturned, updatedEdges,

@@ -17,10 +17,21 @@
 
 package org.gradoop.flink.model.impl.operators.fusion;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -33,14 +44,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("empty")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -52,14 +59,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("empty")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -71,14 +74,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyVertex")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -91,14 +90,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyVertex")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -112,14 +107,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("singleInside")));
 
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -132,14 +123,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("aGraphLabels")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -151,14 +138,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("graphWithA")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -171,14 +154,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("graphWithA")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -198,14 +177,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("aggregatedASource")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -221,14 +196,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -244,14 +215,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -269,14 +236,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("fused_edgeWithAlpha")));
 
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -294,14 +257,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
 
@@ -316,14 +275,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -337,14 +292,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -359,14 +310,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("fused_edgeWithBeta")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -381,14 +328,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("abdGraph")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
 
@@ -417,14 +360,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("firstmatch")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
 
@@ -453,14 +392,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("thirdmatch")));
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -485,14 +420,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = loader.getLogicalGraphByVariable("source_fusewith_pattern");
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
   @Test
@@ -512,14 +443,10 @@ public class FusionTest extends GradoopFlinkTestBase {
     Fusion f = new Fusion();
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = loader.getLogicalGraphByVariable("pattern_fusewith_source");
-    GradoopId expectedId = FusionUtils.getGraphId2(expected), searchId =
-      FusionUtils.getGraphId2(searchGraph);
-
     collectAndAssertTrue(output.equalsByData(expected));
-    collectAndAssertTrue(
-      searchGraph.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(expectedId))
-        .equalsByElementIds(
-          expected.edgeInducedSubgraph((Edge e) -> e.getGraphIds().contains(searchId))));
+    collectAndAssertTrue(FusionUtils
+      .myInducedEdgeSubgraphForFusion(searchGraph,expected)
+      .equalsByElementIds(FusionUtils.myInducedEdgeSubgraphForFusion(expected,searchGraph)));
   }
 
 }
