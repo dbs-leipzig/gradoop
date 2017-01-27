@@ -128,7 +128,7 @@ public class CNF extends PredicateCollection<CNFElement> {
 
   /**
    * Filters all disjunctions that could be evaluated with the given set of variables and removes
-   * them from the embedding. The filtered predicates will be returned in a new CNF
+   * them from the CNF. The filtered predicates will be returned in a new CNF
    *
    * Example:
    * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
