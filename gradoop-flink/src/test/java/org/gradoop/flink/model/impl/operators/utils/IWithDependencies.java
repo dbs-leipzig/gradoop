@@ -27,8 +27,11 @@ import java.util.Set;
  */
 public interface IWithDependencies {
 
-    Set<String> getDependencies();
-    public String toString(boolean withVariableName);
-    public String compileWith(HashMap<String,IWithDependencies> infoToExpand, boolean withVariableName);
+  Set<String> getDependencies();
+
+  public String toString(boolean withVariableName);
+
+  public String compileWith(HashMap<String, IWithDependencies> infoToExpand,
+    boolean withVariableName);
 
 }
