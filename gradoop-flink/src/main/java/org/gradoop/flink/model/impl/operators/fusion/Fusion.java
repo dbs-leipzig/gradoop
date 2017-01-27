@@ -32,6 +32,10 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Created by Giacomo Bergami on 19/01/17.
  */
 public class Fusion implements BinaryGraphToGraphOperator {
+
+  /**
+   * @return The operator's name
+   */
   @Override
   public String getName() {
     return Fusion.class.getName();
@@ -39,8 +43,15 @@ public class Fusion implements BinaryGraphToGraphOperator {
 
   private static final GradoopFlinkConfig defaultConf = null;
 
-  private final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
+  /**
+   * Given a searchGraph and a patternGraph, returns the fused graph where pattern is replaced
+   * inside the search by a single vertex having both label and properties belonging to the
+   * pattern graph.
+   * @param searchGraph     Graph containing the actual data
+   * @param patternGraph    Graph containing the graph to be replaced within the search graph
+   * @return                A search graph containing vertices and edges logically belonging to the
+   *                        search graph
+   */
   @Override
   public LogicalGraph execute(final LogicalGraph searchGraph, final LogicalGraph patternGraph) {
     //Catching possible errors (null) and handling then as they were empty objects
