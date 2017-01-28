@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 
 import java.util.Collections;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * Binary node that wraps an {@link ExpandEmbeddings} operator.
  */
-public class ExpandEmbeddingsNode extends BinaryNode {
+public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
   /**
    * Column to expand the embedding from.
    */

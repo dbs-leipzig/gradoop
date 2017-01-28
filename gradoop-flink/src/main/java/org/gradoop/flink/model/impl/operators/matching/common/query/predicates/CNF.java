@@ -107,6 +107,23 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   /**
+   * Filters all disjunctions that could be evaluated with the given variable and returns
+   * them in a new CNF
+   *
+   * Example:
+   * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
+   * myFilter.getSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))
+   *
+   * @param variable variable that must be included in the disjunction
+   * @return CNF containing only the specified variable
+   */
+  public CNF getSubCNF(String variable) {
+    Set<String> variables = new HashSet<>(1);
+    variables.add(variable);
+    return getSubCNF(variables);
+  }
+
+  /**
    * Filters all disjunctions that could be evaluated with the given set of variables and returns
    * them in a new CNF
    *
