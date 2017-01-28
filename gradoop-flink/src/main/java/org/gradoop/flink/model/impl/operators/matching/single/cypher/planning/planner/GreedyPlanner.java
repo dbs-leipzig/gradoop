@@ -6,10 +6,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.Estimator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.FilterElementsEstimator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.FilterEmbeddingsEstimator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.JoinEmbeddingsEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
@@ -85,13 +81,10 @@ public class GreedyPlanner {
       String variable = vertex.getVariable();
       CNF predicate = queryHandler.getPredicates().getSubCNF(variable);
 
-      Estimator estimator = new FilterElementsEstimator(graphStatistics, variable,
-        FilterElementsEstimator.ElementType.VERTEX, predicate);
-
       FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(graph.getVertices(),
         vertex.getVariable(), predicate, queryHandler.getPredicates().getPropertyKeys(vertex.getVariable()));
 
-      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(variable), new QueryPlan(node), estimator));
+      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(variable), new QueryPlan(node)));
     }
     return planTable;
   }
@@ -103,13 +96,10 @@ public class GreedyPlanner {
       String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
       CNF predicate = queryHandler.getPredicates().getSubCNF(edgeVariable);
 
-      Estimator estimator = new FilterElementsEstimator(graphStatistics, edgeVariable,
-        FilterElementsEstimator.ElementType.EDGE, predicate);
-
       FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(graph.getEdges(),
         sourceVariable, edgeVariable, targetVariable,
         predicate, queryHandler.getPredicates().getPropertyKeys(edgeVariable));
-      planTable.add(new PlanTableEntry(EDGE, Sets.newHashSet(edgeVariable), new QueryPlan(node), estimator));
+      planTable.add(new PlanTableEntry(EDGE, Sets.newHashSet(edgeVariable), new QueryPlan(node)));
     }
     return planTable;
   }
@@ -149,20 +139,13 @@ public class GreedyPlanner {
   }
 
   private PlanTableEntry joinEntries(PlanTableEntry leftEntry, PlanTableEntry rightEntry, List<String> joinVariables) {
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(graphStatistics,
-      Sets.newHashSet(joinVariables),
-      leftEntry.getEstimatedCardinality(),
-      rightEntry.getEstimatedCardinality(),
-      leftEntry.getQueryPlan().getRoot().getEmbeddingMetaData(),
-      rightEntry.getQueryPlan().getRoot().getEmbeddingMetaData());
-
     JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
       rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
 
     HashSet<String> evaluatedVars = Sets.newHashSet(leftEntry.getProcessedVariables());
     evaluatedVars.addAll(rightEntry.getProcessedVariables());
 
-    return new PlanTableEntry(PATH, evaluatedVars, new QueryPlan(node), estimator);
+    return new PlanTableEntry(PATH, evaluatedVars, new QueryPlan(node));
   }
 
   //----------------------------------------------------------------------------------------------
@@ -176,11 +159,8 @@ public class GreedyPlanner {
       Set<String> variables = Sets.newHashSet(entry.getAttributedVariables());
       CNF subCNF = queryHandler.getPredicates().getSubCNF(variables);
       if (subCNF.size() > 0) {
-        Estimator estimator = new FilterEmbeddingsEstimator(graphStatistics, variables, subCNF,
-          entry.getEstimatedCardinality(), entry.getQueryPlan().getRoot().getEmbeddingMetaData());
-        FilterEmbeddingsNode
-          node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
-        newTable.add(new PlanTableEntry(PATH, Sets.newHashSet(entry.getProcessedVariables()), new QueryPlan(node), estimator));
+        FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
+        newTable.add(new PlanTableEntry(PATH, Sets.newHashSet(entry.getProcessedVariables()), new QueryPlan(node)));
       }
       newTable.add(entry);
     }

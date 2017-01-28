@@ -1,5 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -28,9 +30,7 @@ public class PlanTable implements Iterable<PlanTableEntry> {
   }
 
   public PlanTableEntry min() {
-    return planTableEntries.stream()
-      .sorted(Comparator.comparingLong(PlanTableEntry::getEstimatedCardinality))
-      .findFirst().get();
+   throw new NotImplementedException();
   }
 
   public int size() {
