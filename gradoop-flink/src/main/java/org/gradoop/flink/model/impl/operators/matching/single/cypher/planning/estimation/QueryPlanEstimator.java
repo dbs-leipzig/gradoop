@@ -27,7 +27,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
 
 /**
- * Estimates the cardinality of a given query plan based on statistics about the search graph.
+ * Estimates a given query plan by traversing its nodes and updating the state of specific
+ * estimator implementations (e.g. for join, filter, project).
  */
 public class QueryPlanEstimator {
   /**

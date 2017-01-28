@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
  * Keeps track of the leaf nodes in a query plan and computes a final selectivity factor resulting
  * from the applied predicates.
  */
-public class FilterEstimator extends Estimator {
+class FilterEstimator extends Estimator {
   /**
    * The non-filtered cardinality of the leaf node.
    */
@@ -45,7 +45,7 @@ public class FilterEstimator extends Estimator {
    * @param queryHandler query handler
    * @param graphStatistics graph statistics
    */
-  public FilterEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
+  FilterEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
     super(queryHandler, graphStatistics);
     this.selectivity = 1f;
   }
@@ -55,18 +55,16 @@ public class FilterEstimator extends Estimator {
    *
    * @param node leaf node
    */
-  public void visit(FilterNode node) {
+  void visit(FilterNode node) {
     if (node instanceof FilterAndProjectVerticesNode) {
       FilterAndProjectVerticesNode vertexNode = (FilterAndProjectVerticesNode) node;
       setCardinality(vertexNode.getEmbeddingMetaData().getVertexVariables().get(0), true);
       updateSelectivity(vertexNode.getFilterPredicate());
-    }
-    else if (node instanceof FilterAndProjectEdgesNode) {
+    } else if (node instanceof FilterAndProjectEdgesNode) {
       FilterAndProjectEdgesNode edgeNode = (FilterAndProjectEdgesNode) node;
       setCardinality(edgeNode.getEmbeddingMetaData().getEdgeVariables().get(0), false);
       updateSelectivity(edgeNode.getFilterPredicate());
-    }
-    else if (node instanceof FilterEmbeddingsNode) {
+    } else if (node instanceof FilterEmbeddingsNode) {
       updateSelectivity(((FilterEmbeddingsNode) node).getFilterPredicate());
     }
   }
@@ -76,7 +74,7 @@ public class FilterEstimator extends Estimator {
    *
    * @return estimated cardinality
    */
-  public long getCardinality() {
+  long getCardinality() {
     return cardinality;
   }
 
@@ -85,7 +83,7 @@ public class FilterEstimator extends Estimator {
    *
    * @return combined selectivity factor
    */
-  public double getSelectivity() {
+  double getSelectivity() {
     return selectivity;
   }
 

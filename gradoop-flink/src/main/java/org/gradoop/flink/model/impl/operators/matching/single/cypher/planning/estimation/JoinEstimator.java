@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * Keeps track of the joined leaf nodes in a query plan and computes a total estimated cardinality
  * for the plan.
  */
-public class JoinEstimator extends Estimator {
+class JoinEstimator extends Estimator {
   /**
    * Maps vertex and edge variables to their estimated cardinality
    */
@@ -52,7 +52,7 @@ public class JoinEstimator extends Estimator {
    * @param queryHandler query handler
    * @param graphStatistics graph statistics
    */
-  public JoinEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
+  JoinEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
     super(queryHandler, graphStatistics);
     this.cardinalities = new HashMap<>();
     this.distinctValues = new HashMap<>();
@@ -63,7 +63,7 @@ public class JoinEstimator extends Estimator {
    *
    * @param node join node
    */
-  public void visit(JoinNode node) {
+  void visit(JoinNode node) {
     if (node instanceof BinaryNode) {
       BinaryNode binaryNode = (BinaryNode) node;
       if (binaryNode.getLeftChild() instanceof LeafNode) {
@@ -80,7 +80,7 @@ public class JoinEstimator extends Estimator {
    *
    * @return estimated cardinality
    */
-  public long getCardinality() {
+  long getCardinality() {
     long numerator = cardinalities.values().stream().reduce((i, j) -> i * j).orElse(0L);
 
     long denominator = distinctValues.values().stream()
@@ -105,10 +105,10 @@ public class JoinEstimator extends Estimator {
       processVertex(variables.get(0));
     } else {
       String edgeVariable = variables.get(1);
-      String sourceVariable = queryHandler.getVertexById(
-        queryHandler.getEdgeByVariable(edgeVariable).getSourceVertexId()).getVariable();
-      String targetVariable = queryHandler.getVertexById(
-        queryHandler.getEdgeByVariable(edgeVariable).getTargetVertexId()).getVariable();
+      String sourceVariable = getQueryHandler().getVertexById(
+        getQueryHandler().getEdgeByVariable(edgeVariable).getSourceVertexId()).getVariable();
+      String targetVariable = getQueryHandler().getVertexById(
+        getQueryHandler().getEdgeByVariable(edgeVariable).getTargetVertexId()).getVariable();
       processEdge(sourceVariable, variables.get(1), targetVariable);
     }
   }
@@ -135,16 +135,18 @@ public class JoinEstimator extends Estimator {
   private void processEdge(String sourceVariable, String edgeVariable, String targetVariable) {
     String edgeLabel = getLabel(edgeVariable, false);
 
-    long distinctSourceCount = graphStatistics.getDistinctSourceVertexCountByEdgeLabel(edgeLabel);
+    long distinctSourceCount = getGraphStatistics()
+      .getDistinctSourceVertexCountByEdgeLabel(edgeLabel);
     if (distinctSourceCount == 0L) {
-      distinctSourceCount = graphStatistics.getDistinctSourceVertexCount();
+      distinctSourceCount = getGraphStatistics().getDistinctSourceVertexCount();
     }
-    long distinctTargetCount = graphStatistics.getDistinctTargetVertexCountByEdgeLabel(edgeLabel);
+    long distinctTargetCount = getGraphStatistics()
+      .getDistinctTargetVertexCountByEdgeLabel(edgeLabel);
     if (distinctTargetCount == 0L) {
-      distinctTargetCount = graphStatistics.getDistinctTargetVertexCount();
+      distinctTargetCount = getGraphStatistics().getDistinctTargetVertexCount();
     }
 
-    Edge queryEdge = queryHandler.getEdgeByVariable(edgeVariable);
+    Edge queryEdge = getQueryHandler().getEdgeByVariable(edgeVariable);
     if (queryEdge.getUpperBound() > 1) {
       // variable case: n-hop edge
       updateCardinality(edgeVariable, getPathCardinality(getCardinality(edgeLabel, false),
@@ -175,7 +177,7 @@ public class JoinEstimator extends Estimator {
     double totalCardinality = 0L;
     long probability = distinctSourceCount * distinctTargetCount;
 
-    for (int i = lowerBound; i <= upperBound ; i++) {
+    for (int i = lowerBound; i <= upperBound; i++) {
       totalCardinality += Math.pow(edgeCardinality, i) / Math.pow(probability, i - 1);
     }
 
