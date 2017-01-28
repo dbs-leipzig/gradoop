@@ -22,13 +22,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
 
 /**
  * Unary nodes that wraps a {@link FilterEmbeddings} operator.
  */
-public class FilterEmbeddingsNode extends UnaryNode {
+public class FilterEmbeddingsNode extends UnaryNode implements FilterNode {
   /**
    * Filter predicate that is applied on the embedding
    */

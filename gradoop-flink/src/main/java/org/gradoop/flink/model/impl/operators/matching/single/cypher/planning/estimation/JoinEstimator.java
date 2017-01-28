@@ -22,6 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.s1ck.gdl.model.Edge;
 
@@ -62,12 +63,15 @@ public class JoinEstimator extends Estimator {
    *
    * @param node join node
    */
-  public void visit(BinaryNode node) {
-    if (node.getLeftChild() instanceof LeafNode) {
-      process(node.getLeftChild().getEmbeddingMetaData());
-    }
-    if (node.getRightChild() instanceof LeafNode) {
-      process(node.getRightChild().getEmbeddingMetaData());
+  public void visit(JoinNode node) {
+    if (node instanceof BinaryNode) {
+      BinaryNode binaryNode = (BinaryNode) node;
+      if (binaryNode.getLeftChild() instanceof LeafNode) {
+        process(binaryNode.getLeftChild().getEmbeddingMetaData());
+      }
+      if (binaryNode.getRightChild() instanceof LeafNode) {
+        process(binaryNode.getRightChild().getEmbeddingMetaData());
+      }
     }
   }
 

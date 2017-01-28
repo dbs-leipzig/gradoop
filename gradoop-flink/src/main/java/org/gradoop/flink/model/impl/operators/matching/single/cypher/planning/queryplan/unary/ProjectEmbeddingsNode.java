@@ -23,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
 
 import java.util.Comparator;
@@ -33,7 +34,7 @@ import java.util.stream.IntStream;
 /**
  * Unary node that wraps a {@link ProjectEmbeddings} operator.
  */
-public class ProjectEmbeddingsNode extends UnaryNode {
+public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
   /**
    * Property columns that are taken over to the output embedding
    */

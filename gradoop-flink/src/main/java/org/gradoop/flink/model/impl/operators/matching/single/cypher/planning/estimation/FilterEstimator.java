@@ -20,8 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.e
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
@@ -56,17 +55,16 @@ public class FilterEstimator extends Estimator {
    *
    * @param node leaf node
    */
-  public void visit(PlanNode node) {
-    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
+  public void visit(FilterNode node) {
     if (node instanceof FilterAndProjectVerticesNode) {
-      String variable = embeddingMetaData.getVertexVariables().get(0);
-      setCardinality(variable, true);
-      updateSelectivity(((FilterAndProjectVerticesNode) node).getFilterPredicate());
+      FilterAndProjectVerticesNode vertexNode = (FilterAndProjectVerticesNode) node;
+      setCardinality(vertexNode.getEmbeddingMetaData().getVertexVariables().get(0), true);
+      updateSelectivity(vertexNode.getFilterPredicate());
     }
     else if (node instanceof FilterAndProjectEdgesNode) {
-      String variable = node.getEmbeddingMetaData().getEdgeVariables().get(0);
-      setCardinality(variable, false);
-      updateSelectivity(((FilterAndProjectEdgesNode) node).getFilterPredicate());
+      FilterAndProjectEdgesNode edgeNode = (FilterAndProjectEdgesNode) node;
+      setCardinality(edgeNode.getEmbeddingMetaData().getEdgeVariables().get(0), false);
+      updateSelectivity(edgeNode.getFilterPredicate());
     }
     else if (node instanceof FilterEmbeddingsNode) {
       updateSelectivity(((FilterEmbeddingsNode) node).getFilterPredicate());

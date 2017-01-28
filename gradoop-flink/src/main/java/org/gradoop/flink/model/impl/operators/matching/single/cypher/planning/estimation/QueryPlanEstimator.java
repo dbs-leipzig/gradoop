@@ -1,14 +1,30 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
 
 /**
  * Estimates the cardinality of a given query plan based on statistics about the search graph.
@@ -22,7 +38,6 @@ public class QueryPlanEstimator {
    * Estimates the cardinality of the joins in the given query plan.
    */
   private final JoinEstimator joinEstimator;
-
   /**
    * Estimates the cardinality and selectivity of the leaf nodes.
    */
@@ -60,11 +75,18 @@ public class QueryPlanEstimator {
     return Math.round(cardinality * selectivity);
   }
 
+  /**
+   * Visits the node if necessary and traverses the plan further if possible.
+   *
+   * @param node plan node
+   */
   private void traversePlan(PlanNode node) {
-    if (node instanceof BinaryNode) {
-      this.joinEstimator.visit((BinaryNode) node);
+    if (node instanceof JoinNode) {
+      this.joinEstimator.visit((JoinNode) node);
     }
-    this.filterEstimator.visit(node);
+    if (node instanceof FilterNode) {
+      this.filterEstimator.visit((FilterNode) node);
+    }
 
     if (node instanceof BinaryNode) {
       traversePlan(((BinaryNode) node).getLeftChild());
