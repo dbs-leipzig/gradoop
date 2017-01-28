@@ -32,17 +32,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Manages the join estimation of a query plan by keeping track of joined embeddings.
+ * Keeps track of the joined leaf nodes in a query plan and computes a total estimated cardinality
+ * for the plan.
  */
-public class JoinEmbeddingsEstimator {
-  /**
-   * Query handler to get information about query elements
-   */
-  private final QueryHandler queryHandler;
-  /**
-   * Statistics about the search graph
-   */
-  private final GraphStatistics graphStatistics;
+public class JoinEmbeddingsEstimator extends Estimator {
   /**
    * Maps vertex and edge variables to their estimated cardinality
    */
@@ -59,8 +52,7 @@ public class JoinEmbeddingsEstimator {
    * @param graphStatistics graph statistics
    */
   public JoinEmbeddingsEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
-    this.queryHandler = queryHandler;
-    this.graphStatistics = graphStatistics;
+    super(queryHandler, graphStatistics);
     this.cardinalities = new HashMap<>();
     this.distinctValues = new HashMap<>();
   }
@@ -184,33 +176,6 @@ public class JoinEmbeddingsEstimator {
     }
 
     return Math.round(totalCardinality);
-  }
-
-  /**
-   * Returns the label of the given variable.
-   *
-   * @param variable query variable
-   * @param isVertex true, iff the variable maps to a vertex
-   * @return label
-   */
-  private String getLabel(String variable, boolean isVertex) {
-    return isVertex ? queryHandler.getVertexByVariable(variable).getLabel() :
-      queryHandler.getEdgeByVariable(variable).getLabel();
-  }
-
-  /**
-   * Returns the cardinality of the specified label according to the provided statistics.
-   *
-   * @param label label
-   * @param isVertex true, iff label maps to a vertex
-   * @return number of elements with the given label
-   */
-  private long getCardinality(String label, boolean isVertex) {
-    long cardinality = isVertex ? graphStatistics.getVertexCountByLabel(label) :
-      graphStatistics.getEdgeCountByLabel(label);
-
-    return cardinality > 0 ? cardinality :
-      isVertex ? graphStatistics.getVertexCount() : graphStatistics.getEdgeCount();
   }
 
   /**

@@ -1,0 +1,113 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
+
+import org.s1ck.gdl.model.Element;
+
+/**
+ * Keeps track of the leaf nodes in a query plan and computes a final selectivity factor resulting
+ * from the applied predicates.
+ */
+public class FilterElementEstimator extends Estimator {
+  /**
+   * The non-filtered cardinality of the leaf node.
+   */
+  private long cardinality;
+  /**
+   * The resulting selectivity factor of all leaf predicates
+   */
+  private double selectivity;
+
+  /**
+   * Creates a new estimator.
+   *
+   * @param queryHandler query handler
+   * @param graphStatistics graph statistics
+   */
+  public FilterElementEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
+    super(queryHandler, graphStatistics);
+    this.selectivity = 1f;
+  }
+
+  /**
+   * Updates the selectivity factor according to the given leaf node.
+   *
+   * @param node leaf node
+   */
+  public void visit(LeafNode node) {
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    if (node instanceof FilterAndProjectVerticesNode) {
+      String variable = embeddingMetaData.getVertexVariables().get(0);
+      setCardinality(variable, true);
+      updateSelectivity(queryHandler.getVertexByVariable(variable),
+        ((FilterAndProjectVerticesNode) node).getFilterPredicate());
+    }
+    if (node instanceof FilterAndProjectEdgesNode) {
+      String variable = node.getEmbeddingMetaData().getEdgeVariables().get(0);
+      setCardinality(variable, false);
+      updateSelectivity(queryHandler.getEdgeByVariable(variable),
+        ((FilterAndProjectEdgesNode) node).getFilterPredicate());
+    }
+  }
+
+  /**
+   * Returns the non-filtered cardinality of the leaf node output.
+   *
+   * @return estimated cardinality
+   */
+  public long getCardinality() {
+    return cardinality;
+  }
+
+  /**
+   * Returns the combined selectivity of all leaf nodes.
+   *
+   * @return combined selectivity factor
+   */
+  public double getSelectivity() {
+    return selectivity;
+  }
+
+  /**
+   * Updates the cardinality of the leaf node output.
+   *
+   * @param variable query variable
+   * @param isVertex true, iff the variable maps to a vertex
+   */
+  private void setCardinality(String variable, boolean isVertex) {
+    cardinality = getCardinality(getLabel(variable, isVertex), isVertex);
+  }
+
+  /**
+   * Computes the selectivity for the given element.
+   * @param element query element
+   * @param predicate query predicate
+   * @param <EL> element type
+   */
+  private <EL extends Element> void updateSelectivity(EL element, CNF predicate) {
+    // TODO
+  }
+}

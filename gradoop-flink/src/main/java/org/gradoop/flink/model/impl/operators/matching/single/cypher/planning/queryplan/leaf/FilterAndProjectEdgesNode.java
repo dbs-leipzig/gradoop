@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,8 +86,26 @@ public class FilterAndProjectEdgesNode extends LeafNode {
       .evaluate();
   }
 
+  /**
+   * Returns a copy of the filter predicate attached to this node.
+   *
+   * @return filter predicate
+   */
+  public CNF getFilterPredicate() {
+    return new CNF(filterPredicate);
+  }
+
+  /**
+   * Returns a copy of the projection keys attached to this node.
+   *
+   * @return projection keys
+   */
+  public List<String> getProjectionKeys() {
+    return new ArrayList<>(projectionKeys);
+  }
+
   @Override
-  public EmbeddingMetaData computeEmbeddingMetaData() {
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
     embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
     embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);

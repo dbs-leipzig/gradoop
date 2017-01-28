@@ -3,6 +3,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.e
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
@@ -23,6 +24,11 @@ public class QueryPlanEstimator {
   private final JoinEmbeddingsEstimator joinEstimator;
 
   /**
+   * Estimates the cardinality and selectivity of the leaf nodes.
+   */
+  private final FilterElementEstimator filterElementEstimator;
+
+  /**
    * Creates a new plan estimator.
    *
    * @param queryPlan query plan
@@ -33,6 +39,7 @@ public class QueryPlanEstimator {
     GraphStatistics graphStatistics) {
     this.queryPlan = queryPlan;
     this.joinEstimator = new JoinEmbeddingsEstimator(queryHandler, graphStatistics);
+    this.filterElementEstimator = new FilterElementEstimator(queryHandler, graphStatistics);
   }
 
   /**
@@ -42,7 +49,15 @@ public class QueryPlanEstimator {
    */
   public long getCardinality() {
     traversePlan(queryPlan.getRoot());
-    return this.joinEstimator.getCardinality();
+
+    long cardinality = joinEstimator.getCardinality();
+    if (cardinality == 0) {
+      // plan contains only a leaf node
+      cardinality = filterElementEstimator.getCardinality();
+    }
+    double selectivity = filterElementEstimator.getSelectivity();
+
+    return Math.round(cardinality * selectivity);
   }
 
   private void traversePlan(PlanNode node) {
@@ -51,6 +66,9 @@ public class QueryPlanEstimator {
     }
     if (node instanceof ExpandEmbeddingsNode) {
       this.joinEstimator.visit((ExpandEmbeddingsNode) node);
+    }
+    if (node instanceof LeafNode) {
+      this.filterElementEstimator.visit((LeafNode) node);
     }
 
     if (node instanceof BinaryNode) {
