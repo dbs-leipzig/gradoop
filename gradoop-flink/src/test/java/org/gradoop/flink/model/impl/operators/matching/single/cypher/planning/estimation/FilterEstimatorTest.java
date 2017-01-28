@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class FilterElementEstimatorTest extends EstimatorTestBase {
+public class FilterEstimatorTest extends EstimatorTestBase {
 
   @Test
   public void testVertex() throws Exception {
@@ -19,7 +19,7 @@ public class FilterElementEstimatorTest extends EstimatorTestBase {
     FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(null,
       "n", queryHandler.getPredicates().getSubCNF("n"), Sets.newHashSet());
 
-    FilterElementEstimator elementEstimator = new FilterElementEstimator(queryHandler, STATS);
+    FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(11L));
@@ -34,7 +34,7 @@ public class FilterElementEstimatorTest extends EstimatorTestBase {
     FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(null,
       "n", queryHandler.getPredicates().getSubCNF("n"), Sets.newHashSet());
 
-    FilterElementEstimator elementEstimator = new FilterElementEstimator(queryHandler, STATS);
+    FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(3L));
@@ -50,7 +50,7 @@ public class FilterElementEstimatorTest extends EstimatorTestBase {
       "n", "e", "m",
       queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
 
-    FilterElementEstimator elementEstimator = new FilterElementEstimator(queryHandler, STATS);
+    FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(24L));
@@ -66,7 +66,7 @@ public class FilterElementEstimatorTest extends EstimatorTestBase {
       "n", "e", "m",
       queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
 
-    FilterElementEstimator elementEstimator = new FilterElementEstimator(queryHandler, STATS);
+    FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(10L));

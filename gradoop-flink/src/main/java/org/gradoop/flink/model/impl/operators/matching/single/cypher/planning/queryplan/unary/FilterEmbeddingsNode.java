@@ -44,11 +44,19 @@ public class FilterEmbeddingsNode extends UnaryNode {
     this.filterPredicate = filterPredicate;
   }
 
-
   @Override
   public DataSet<Embedding> execute() {
     return new FilterEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData())
       .evaluate();
+  }
+
+  /**
+   * Returns a copy of the filter predicate attached to this node.
+   *
+   * @return filter predicate
+   */
+  public CNF getFilterPredicate() {
+    return new CNF(filterPredicate);
   }
 
   @Override

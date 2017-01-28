@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * Keeps track of the joined leaf nodes in a query plan and computes a total estimated cardinality
  * for the plan.
  */
-public class JoinEmbeddingsEstimator extends Estimator {
+public class JoinEstimator extends Estimator {
   /**
    * Maps vertex and edge variables to their estimated cardinality
    */
@@ -51,7 +51,7 @@ public class JoinEmbeddingsEstimator extends Estimator {
    * @param queryHandler query handler
    * @param graphStatistics graph statistics
    */
-  public JoinEmbeddingsEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
+  public JoinEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
     super(queryHandler, graphStatistics);
     this.cardinalities = new HashMap<>();
     this.distinctValues = new HashMap<>();

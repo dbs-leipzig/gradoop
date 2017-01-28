@@ -21,17 +21,16 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
-
-import org.s1ck.gdl.model.Element;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
 
 /**
  * Keeps track of the leaf nodes in a query plan and computes a final selectivity factor resulting
  * from the applied predicates.
  */
-public class FilterElementEstimator extends Estimator {
+public class FilterEstimator extends Estimator {
   /**
    * The non-filtered cardinality of the leaf node.
    */
@@ -47,29 +46,30 @@ public class FilterElementEstimator extends Estimator {
    * @param queryHandler query handler
    * @param graphStatistics graph statistics
    */
-  public FilterElementEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
+  public FilterEstimator(QueryHandler queryHandler, GraphStatistics graphStatistics) {
     super(queryHandler, graphStatistics);
     this.selectivity = 1f;
   }
 
   /**
-   * Updates the selectivity factor according to the given leaf node.
+   * Updates the selectivity factor according to the given node.
    *
    * @param node leaf node
    */
-  public void visit(LeafNode node) {
+  public void visit(PlanNode node) {
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     if (node instanceof FilterAndProjectVerticesNode) {
       String variable = embeddingMetaData.getVertexVariables().get(0);
       setCardinality(variable, true);
-      updateSelectivity(queryHandler.getVertexByVariable(variable),
-        ((FilterAndProjectVerticesNode) node).getFilterPredicate());
+      updateSelectivity(((FilterAndProjectVerticesNode) node).getFilterPredicate());
     }
-    if (node instanceof FilterAndProjectEdgesNode) {
+    else if (node instanceof FilterAndProjectEdgesNode) {
       String variable = node.getEmbeddingMetaData().getEdgeVariables().get(0);
       setCardinality(variable, false);
-      updateSelectivity(queryHandler.getEdgeByVariable(variable),
-        ((FilterAndProjectEdgesNode) node).getFilterPredicate());
+      updateSelectivity(((FilterAndProjectEdgesNode) node).getFilterPredicate());
+    }
+    else if (node instanceof FilterEmbeddingsNode) {
+      updateSelectivity(((FilterEmbeddingsNode) node).getFilterPredicate());
     }
   }
 
@@ -102,12 +102,11 @@ public class FilterElementEstimator extends Estimator {
   }
 
   /**
-   * Computes the selectivity for the given element.
-   * @param element query element
-   * @param predicate query predicate
-   * @param <EL> element type
+   * Updates the selectivity based on the given predicates.
+   *
+   * @param predicates query predicates
    */
-  private <EL extends Element> void updateSelectivity(EL element, CNF predicate) {
+  private void updateSelectivity(CNF predicates) {
     // TODO
   }
 }

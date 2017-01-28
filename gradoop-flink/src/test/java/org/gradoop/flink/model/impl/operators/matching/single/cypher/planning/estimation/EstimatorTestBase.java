@@ -10,7 +10,7 @@ public abstract class EstimatorTestBase {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    String path = JoinEmbeddingsEstimatorTest.class
+    String path = JoinEstimatorTest.class
       .getResource("/data/json/sna/statistics").getPath();
     STATS = GraphStatisticsLocalFSReader.read(path);
   }

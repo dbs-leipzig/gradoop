@@ -21,12 +21,12 @@ public class QueryPlanEstimator {
   /**
    * Estimates the cardinality of the joins in the given query plan.
    */
-  private final JoinEmbeddingsEstimator joinEstimator;
+  private final JoinEstimator joinEstimator;
 
   /**
    * Estimates the cardinality and selectivity of the leaf nodes.
    */
-  private final FilterElementEstimator filterElementEstimator;
+  private final FilterEstimator filterEstimator;
 
   /**
    * Creates a new plan estimator.
@@ -38,8 +38,8 @@ public class QueryPlanEstimator {
   public QueryPlanEstimator(QueryPlan queryPlan, QueryHandler queryHandler,
     GraphStatistics graphStatistics) {
     this.queryPlan = queryPlan;
-    this.joinEstimator = new JoinEmbeddingsEstimator(queryHandler, graphStatistics);
-    this.filterElementEstimator = new FilterElementEstimator(queryHandler, graphStatistics);
+    this.joinEstimator = new JoinEstimator(queryHandler, graphStatistics);
+    this.filterEstimator = new FilterEstimator(queryHandler, graphStatistics);
   }
 
   /**
@@ -53,23 +53,18 @@ public class QueryPlanEstimator {
     long cardinality = joinEstimator.getCardinality();
     if (cardinality == 0) {
       // plan contains only a leaf node
-      cardinality = filterElementEstimator.getCardinality();
+      cardinality = filterEstimator.getCardinality();
     }
-    double selectivity = filterElementEstimator.getSelectivity();
+    double selectivity = filterEstimator.getSelectivity();
 
     return Math.round(cardinality * selectivity);
   }
 
   private void traversePlan(PlanNode node) {
-    if (node instanceof JoinEmbeddingsNode) {
-      this.joinEstimator.visit((JoinEmbeddingsNode) node);
+    if (node instanceof BinaryNode) {
+      this.joinEstimator.visit((BinaryNode) node);
     }
-    if (node instanceof ExpandEmbeddingsNode) {
-      this.joinEstimator.visit((ExpandEmbeddingsNode) node);
-    }
-    if (node instanceof LeafNode) {
-      this.filterElementEstimator.visit((LeafNode) node);
-    }
+    this.filterEstimator.visit(node);
 
     if (node instanceof BinaryNode) {
       traversePlan(((BinaryNode) node).getLeftChild());

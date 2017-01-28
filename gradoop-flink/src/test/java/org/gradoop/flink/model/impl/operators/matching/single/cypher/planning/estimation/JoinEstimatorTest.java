@@ -16,7 +16,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
+public class JoinEstimatorTest extends EstimatorTestBase {
 
   @Test
   public void testLabelFree() throws Exception {
@@ -37,7 +37,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
@@ -63,7 +63,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
@@ -89,7 +89,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
@@ -115,7 +115,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
@@ -141,7 +141,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
     // 24 1-edge paths + 10 2-edge paths
@@ -167,7 +167,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
@@ -202,7 +202,7 @@ public class JoinEmbeddingsEstimatorTest extends EstimatorTestBase {
     JoinEmbeddingsNode ne1me2oJoin = new JoinEmbeddingsNode(ne1me2Join, oNode, Lists.newArrayList("o"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    JoinEmbeddingsEstimator estimator = new JoinEmbeddingsEstimator(queryHandler, STATS);
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(ne1me2oJoin);
     estimator.visit(ne1me2Join);
     estimator.visit(ne1mJoin);
