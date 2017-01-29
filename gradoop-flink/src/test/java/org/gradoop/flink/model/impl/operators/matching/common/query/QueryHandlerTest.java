@@ -1,8 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.impl.operators.matching.common.query
-  .QueryHandler;
 import org.junit.Test;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.GDLHandler.Builder;
@@ -10,7 +8,6 @@ import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -209,13 +206,12 @@ public class QueryHandlerTest {
     assertTrue(elementsEqual(centerVertices, expected));
   }
 
-  private static <EL extends Element>
-  boolean elementsEqual(List<EL> list, List<EL> expected) {
+  private static <EL extends Element> boolean elementsEqual(List<EL> list, List<EL> expected) {
     boolean equal = list.size() == expected.size();
 
     if (equal) {
-      Collections.sort(list, new ElementComparator<>());
-      Collections.sort(expected, new ElementComparator<>());
+      list.sort(Comparator.comparingLong(Element::getId));
+      expected.sort(Comparator.comparingLong(Element::getId));
       for (int i = 0; i < list.size(); i++) {
         if (!list.get(i).equals(expected.get(i))) {
           equal = false;
@@ -224,13 +220,5 @@ public class QueryHandlerTest {
       }
     }
     return equal;
-  }
-
-  private static class ElementComparator<EL extends Element>
-    implements Comparator<EL> {
-    @Override
-    public int compare(EL o1, EL o2) {
-      return Long.compare(o1.getId(), o2.getId());
-    }
   }
 }
