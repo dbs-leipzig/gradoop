@@ -1,28 +1,42 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
 
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represents a query plan and additional meta data. Plan table entries are managed in a
+ * {@link PlanTable}.
+ */
 public class PlanTableEntry {
-
+  /**
+   * Type of an entry
+   */
   public enum Type {
     VERTEX,
     EDGE,
     PATH
   }
 
+  /**
+   * The type of this entry
+   */
   private Type type;
+  /**
+   * The variables that are already processed by the query plan.
+   */
+  private final Set<String> processedVars;
+  /**
+   * The estimator containing the query plan.
+   */
+  private QueryPlanEstimator estimator;
 
-  private final Set<String> evaluatedVars;
-
-  private QueryPlan queryPlan;
-
-  public PlanTableEntry(Type type, Set<String> evaluatedVars, QueryPlan queryPlan) {
+  public PlanTableEntry(Type type, Set<String> processedVars, QueryPlanEstimator estimator) {
     this.type = type;
-    this.evaluatedVars = evaluatedVars;
-    this.queryPlan = queryPlan;
+    this.processedVars = processedVars;
+    this.estimator = estimator;
   }
 
   /**
@@ -40,7 +54,7 @@ public class PlanTableEntry {
    * @return covered variables
    */
   public List<String> getAllVariables() {
-    return queryPlan.getRoot().getEmbeddingMetaData().getVariables();
+    return estimator.getQueryPlan().getRoot().getEmbeddingMetaData().getVariables();
   }
 
   /**
@@ -49,7 +63,7 @@ public class PlanTableEntry {
    * @return query variables with assigned properties
    */
   public List<String> getAttributedVariables() {
-    return queryPlan.getRoot().getEmbeddingMetaData().getVariablesWithProperties();
+    return estimator.getQueryPlan().getRoot().getEmbeddingMetaData().getVariablesWithProperties();
   }
 
   /**
@@ -58,36 +72,27 @@ public class PlanTableEntry {
    * @return processed vars
    */
   public Set<String> getProcessedVariables() {
-    return evaluatedVars;
+    return processedVars;
+  }
+
+  /**
+   * Returns the estimated cardinality of the query plan represented by this entry.
+   *
+   * @return estimated cardinality
+   */
+  public long getEstimatedCardinality() {
+    return estimator.getCardinality();
   }
 
   public QueryPlan getQueryPlan() {
-    return queryPlan;
+    return estimator.getQueryPlan();
   }
 
   @Override
   public String toString() {
-    return String.format("PlanTableEntry | type: %s | all-vars: %s | proc-vars: %s | attr-vars: %s | Plan :%n%s",
-      type, getAllVariables(), getProcessedVariables(), getAttributedVariables(), queryPlan);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    PlanTableEntry that = (PlanTableEntry) o;
-
-    return queryPlan.getRoot().getEmbeddingMetaData().getVertexVariables()
-      .equals(that.queryPlan.getRoot().getEmbeddingMetaData().getVertexVariables());
-  }
-
-  @Override
-  public int hashCode() {
-    return queryPlan.getRoot().getEmbeddingMetaData().getVertexVariables().hashCode();
+    return String.format("PlanTableEntry | type: %s | all-vars: %s | " +
+        "proc-vars: %s | attr-vars: %s | est-card: %d | Plan :%n%s",
+      type, getAllVariables(), getProcessedVariables(), getAttributedVariables(),
+      estimator.getCardinality(), estimator.getQueryPlan());
   }
 }

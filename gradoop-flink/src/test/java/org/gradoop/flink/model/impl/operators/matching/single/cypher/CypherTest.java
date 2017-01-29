@@ -6,7 +6,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.GreedyPlanner;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;

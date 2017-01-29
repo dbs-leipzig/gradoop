@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy;
 
 import com.google.common.collect.Sets;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -6,6 +6,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation
+  .QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
@@ -84,7 +86,8 @@ public class GreedyPlanner {
       FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(graph.getVertices(),
         vertex.getVariable(), predicate, queryHandler.getPredicates().getPropertyKeys(vertex.getVariable()));
 
-      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(variable), new QueryPlan(node)));
+      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(variable),
+        new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
     return planTable;
   }
@@ -99,7 +102,8 @@ public class GreedyPlanner {
       FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(graph.getEdges(),
         sourceVariable, edgeVariable, targetVariable,
         predicate, queryHandler.getPredicates().getPropertyKeys(edgeVariable));
-      planTable.add(new PlanTableEntry(EDGE, Sets.newHashSet(edgeVariable), new QueryPlan(node)));
+      planTable.add(new PlanTableEntry(EDGE, Sets.newHashSet(edgeVariable),
+        new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
     return planTable;
   }
@@ -145,7 +149,8 @@ public class GreedyPlanner {
     HashSet<String> evaluatedVars = Sets.newHashSet(leftEntry.getProcessedVariables());
     evaluatedVars.addAll(rightEntry.getProcessedVariables());
 
-    return new PlanTableEntry(PATH, evaluatedVars, new QueryPlan(node));
+    return new PlanTableEntry(PATH, evaluatedVars,
+      new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
   }
 
   //----------------------------------------------------------------------------------------------
@@ -160,7 +165,8 @@ public class GreedyPlanner {
       CNF subCNF = queryHandler.getPredicates().getSubCNF(variables);
       if (subCNF.size() > 0) {
         FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
-        newTable.add(new PlanTableEntry(PATH, Sets.newHashSet(entry.getProcessedVariables()), new QueryPlan(node)));
+        newTable.add(new PlanTableEntry(PATH, Sets.newHashSet(entry.getProcessedVariables()),
+          new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
       }
       newTable.add(entry);
     }
