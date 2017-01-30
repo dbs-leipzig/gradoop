@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
 
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -25,7 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
- * A data structure to manage multiple query plans. Each query plan is represented by a
+ * A data structure to manage multiple query plans. Each {@link QueryPlan} is represented by a
  * {@link PlanTableEntry}.
  */
 public class PlanTable implements Iterable<PlanTableEntry> {
@@ -61,18 +63,20 @@ public class PlanTable implements Iterable<PlanTableEntry> {
   }
 
   /**
-   * Removes all entries that are processed by the given {@link PlanTableEntry}.
+   * Removes all entries from the table whose query plans are covered by the query plan wrapped by
+   * the specified entry.
    *
    * @param planTableEntry entry
    */
-  public void removeProcessedBy(PlanTableEntry planTableEntry) {
+  public void removeCoveredBy(PlanTableEntry planTableEntry) {
     planTableEntries = planTableEntries.stream()
       .filter(e -> !planTableEntry.getProcessedVariables().containsAll(e.getProcessedVariables()))
       .collect(Collectors.toList());
   }
 
   /**
-   * Returns the plan entry that represents the query plan with the minimum cost in this table.
+   * Returns the entry that represents the query plan with the minimum among all plans stored in
+   * this table.
    *
    * @return query plan with minimum cost
    */

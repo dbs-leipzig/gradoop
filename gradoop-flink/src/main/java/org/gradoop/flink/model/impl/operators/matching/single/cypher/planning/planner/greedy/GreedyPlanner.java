@@ -34,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.ProjectEmbeddingsNode;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
 
@@ -84,21 +85,28 @@ public class GreedyPlanner {
     this.edgeStrategy = edgeStrategy;
   }
 
+  /**
+   * Computes the {@link PlanTableEntry} that wraps the {@link QueryPlan} with the minimum costs
+   * according to the greedy optimization algorithm.
+   *
+   * @return entry with minimum execution costs
+   */
   public PlanTableEntry plan() {
-    // create initial plan table covering all possible leaf nodes
     PlanTable planTable = initPlanTable();
-//    planTable.forEach(System.out::println);
+    planTable.forEach(System.out::println);
 
     int i = 0;
     while(planTable.size() > 1) {
-      PlanTable newPlans = evaluateJoinEmbeddings(planTable);
-      newPlans = evaluateFilterEmbeddings(newPlans);
+      PlanTable newPlans = evaluateJoins(planTable);
+      newPlans = evaluateFilter(newPlans);
+      newPlans = evaluateProjection(newPlans);
+      // get plan with minimum costs and remove all plans covered by this plan
       PlanTableEntry bestEntry = newPlans.min();
-      planTable.removeProcessedBy(bestEntry);
+      planTable.removeCoveredBy(bestEntry);
       planTable.add(bestEntry);
 
-//      System.out.println("iteration " + ++i);
-//      planTable.forEach(System.out::println);
+      System.out.println("iteration " + ++i);
+      planTable.forEach(System.out::println);
     }
 
     return planTable.get(0);
@@ -115,50 +123,83 @@ public class GreedyPlanner {
    */
   private PlanTable initPlanTable() {
     PlanTable planTable = new PlanTable();
-    planTable = initVertices(planTable);
-    planTable = initEdges(planTable);
+    planTable = createVertexPlans(planTable);
+    planTable = createEdgePlans(planTable);
     return planTable;
   }
 
-  private PlanTable initVertices(PlanTable planTable) {
+  //------------------------------------------------------------------------------------------------
+  // Leaf nodes (i.e. vertices and (variable length) edges)
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Creates an initial {@link PlanTableEntry} for each vertex in the query graph and adds it to the
+   * specified {@link PlanTable}. The entry wraps a query plan that filters vertices based on their
+   * predicates and projects properties that are required for further query planning.
+   *
+   * @param planTable plan table
+   * @return updated plan table with entries for vertices
+   */
+  private PlanTable createVertexPlans(PlanTable planTable) {
     for (Vertex vertex : queryHandler.getVertices()) {
 
-      String variable = vertex.getVariable();
-      CNF predicates = queryHandler.getPredicates();
+      String vertexVariable = vertex.getVariable();
+      CNF allPredicates = queryHandler.getPredicates();
+      // TODO: this might be moved the the FilterAndProject node in issue #510
+      CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
+      Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
       FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(graph.getVertices(),
-        vertex.getVariable(), predicates.removeSubCNF(variable), queryHandler.getPredicates().getPropertyKeys(vertex.getVariable()));
+        vertex.getVariable(), vertexPredicates, projectionKeys);
 
-      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(variable), predicates,
+      planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
         new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
     return planTable;
   }
 
-  private PlanTable initEdges(PlanTable planTable) {
+  /**
+   * Creates an initial {@link PlanTableEntry} for each edge in the query graph and adds it to the
+   * specified {@link PlanTable}. The entry wraps a {@link QueryPlan} that filters edges based on
+   * their predicates and projects properties that are required for further query planning.
+   *
+   * @param planTable plan table
+   * @return updated plan table with entries for edges
+   */
+  private PlanTable createEdgePlans(PlanTable planTable) {
     for (Edge edge : queryHandler.getEdges()) {
       String edgeVariable = edge.getVariable();
       String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
       String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
-      CNF predicates = queryHandler.getPredicates();
+
+      CNF allPredicates = queryHandler.getPredicates();
+      // TODO: this might be moved the the FilterAndProject node in issue #510
+      CNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
+      Set<String> projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
 
       FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(graph.getEdges(),
-        sourceVariable, edgeVariable, targetVariable, predicates.removeSubCNF(edgeVariable),
-        queryHandler.getPredicates().getPropertyKeys(edgeVariable));
+        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys);
 
       PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
 
-      planTable.add(new PlanTableEntry(type, Sets.newHashSet(edgeVariable), predicates,
+      planTable.add(new PlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
         new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
     return planTable;
   }
 
-  //----------------------------------------------------------------------------------------------
-  // Join evaluation
-  //----------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------
+  // Join and Expand
+  //------------------------------------------------------------------------------------------------
 
-  private PlanTable evaluateJoinEmbeddings(PlanTable currentTable) {
+  /**
+   * Evaluates which entries in the specified plan table can be joined. The joined entries
+   * are added to a new table which is returned.
+   *
+   * @param currentTable query plan table
+   * @return new table containing solely joined plans from the input table
+   */
+  private PlanTable evaluateJoins(PlanTable currentTable) {
     PlanTable newTable = new PlanTable();
 
     for (int i = 0; i < currentTable.size(); i++) {
@@ -167,15 +208,15 @@ public class GreedyPlanner {
         for (int j = 0; j < currentTable.size(); j++) {
           PlanTableEntry rightEntry = currentTable.get(j);
           if (i != j) {
-            List<String> overlap = getOverlap(leftEntry, rightEntry);
-            if (overlap.size() > 0) {
-              if (rightEntry.getType() == PATH && overlap.size() == 2) {
+            List<String> joinVariables = getOverlap(leftEntry, rightEntry);
+            if (joinVariables.size() > 0) {
+              if (rightEntry.getType() == PATH && joinVariables.size() == 2) {
                 // evaluate join with variable length path on source and target vertex
-                newTable.add(joinEntries(leftEntry, rightEntry, overlap.subList(0, 1)));
-                newTable.add(joinEntries(leftEntry, rightEntry, overlap.subList(1, 2)));
+                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(0, 1)));
+                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(1, 2)));
               } else {
                 // regular join or join with variable length path on source or target vertex
-                newTable.add(joinEntries(leftEntry, rightEntry, overlap));
+                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables));
               }
             }
           }
@@ -185,42 +226,81 @@ public class GreedyPlanner {
     return newTable;
   }
 
+  /**
+   * Checks if the given entry may be extended. This is only the case for entries that represents
+   * either a vertex or a partial match graph.
+   *
+   * @param entry plan table entry
+   * @return true, iff the specified entry may be extended
+   */
   private boolean mayExtend(PlanTableEntry entry) {
     return entry.getType() == VERTEX || entry.getType() == PARTIAL_GRAPH;
   }
 
-  private List<String> getOverlap(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
-    return leftEntry.getAllVariables().stream()
-      .filter(var -> rightEntry.getAllVariables().contains(var))
+  /**
+   * Computes the overlapping query variables of the specified entries.
+   *
+   * @param firstEntry first entry
+   * @param secondEntry second entry
+   * @return variables that are available in both input entries
+   */
+  private List<String> getOverlap(PlanTableEntry firstEntry, PlanTableEntry secondEntry) {
+    return firstEntry.getAllVariables().stream()
+      .filter(var -> secondEntry.getAllVariables().contains(var))
       .collect(Collectors.toList());
   }
 
-  private PlanTableEntry joinEntries(PlanTableEntry leftEntry, PlanTableEntry rightEntry, List<String> joinVariables) {
+  /**
+   * Joins the query plans represented by the specified plan table entries.
+   *
+   * The method considers if the right entry is a variable length path and in that case
+   * creates an {@link ExpandEmbeddingsNode}. In any other case, a regular
+   * {@link JoinEmbeddingsNode} is used to join the query plans.
+   *
+   * @param leftEntry left entry
+   * @param rightEntry right entry
+   * @param joinVariables join variables
+   * @return an entry that represents the join of both input entries
+   */
+  private PlanTableEntry joinEntries(PlanTableEntry leftEntry, PlanTableEntry rightEntry,
+    List<String> joinVariables) {
+
     PlanNode node;
     if (rightEntry.getType() == PATH) {
-      node = createExpandNode(leftEntry, rightEntry, joinVariables);
+      assert(joinVariables.size() == 1);
+      node = createExpandNode(leftEntry, rightEntry, joinVariables.get(0));
     } else {
       node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
         rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
     }
 
-    HashSet<String> evaluatedVars = Sets.newHashSet(leftEntry.getProcessedVariables());
-    evaluatedVars.addAll(rightEntry.getProcessedVariables());
-    CNF leftPredicate = new CNF(leftEntry.getPredicates());
+    // update processed variables
+    HashSet<String> processedVariables = Sets.newHashSet(leftEntry.getProcessedVariables());
+    processedVariables.addAll(rightEntry.getProcessedVariables());
+    // create resulting predicates
+    // TODO: this might be moved the the join/expand node in issue #510
+    CNF leftPredicates = new CNF(leftEntry.getPredicates());
     CNF rightPredicates = new CNF(rightEntry.getPredicates());
-    leftPredicate.removeSubCNF(rightEntry.getProcessedVariables());
+    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
-    CNF predicates = leftPredicate.and(rightPredicates);
+    CNF predicates = leftPredicates.and(rightPredicates);
 
-    return new PlanTableEntry(PARTIAL_GRAPH, evaluatedVars, predicates,
+    return new PlanTableEntry(PARTIAL_GRAPH, processedVariables, predicates,
       new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
   }
 
+  /**
+   * Creates an {@link ExpandEmbeddingsNode} from the specified arguments.
+   *
+   * @param leftEntry left entry
+   * @param rightEntry right entry
+   * @param startVariable vertex variable to expand from
+   *
+   * @return new expand node
+   */
   private ExpandEmbeddingsNode createExpandNode(PlanTableEntry leftEntry, PlanTableEntry rightEntry,
-    List<String> joinVariables) {
-    assert(joinVariables.size() == 1);
+    String startVariable) {
 
-    String startVariable = joinVariables.get(0);
     String pathVariable = rightEntry.getQueryPlan().getRoot()
       .getEmbeddingMetaData().getEdgeVariables().get(0);
 
@@ -241,11 +321,19 @@ public class GreedyPlanner {
       vertexStrategy, edgeStrategy);
   }
 
-  //----------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------
   // Filter embedding evaluation
-  //----------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------
 
-  private PlanTable evaluateFilterEmbeddings(PlanTable currentTable) {
+  /**
+   * The method checks if a filter can be applied on any of the entries in the specified table. If
+   * this is the case, a {@link FilterEmbeddingsNode} is added to the query plan represented by the
+   * affected entries.
+   *
+   * @param currentTable query plan table
+   * @return input table with possibly updated entries
+   */
+  private PlanTable evaluateFilter(PlanTable currentTable) {
     PlanTable newTable = new PlanTable();
 
     for (PlanTableEntry entry : currentTable) {
@@ -261,5 +349,21 @@ public class GreedyPlanner {
     }
 
     return newTable;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Filter embedding evaluation
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * The method checks if a filter can be applied on any of the entries in the specified table. If
+   * this is the case, a {@link ProjectEmbeddingsNode} is added to the query plan represented by the
+   * affected entries.
+   *
+   * @param currentTable query plan table
+   * @return input table with possibly updated entries
+   */
+  private PlanTable evaluateProjection(PlanTable currentTable) {
+    return currentTable;
   }
 }
