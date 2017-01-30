@@ -1,6 +1,9 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -14,6 +17,7 @@ import java.util.Map;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class StatisticsTest extends GradoopFlinkTestBase {
 
@@ -310,5 +314,86 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     assertThat(cache.get(Tuple2.of("Person","knows")), is(10L));
     assertThat(cache.get(Tuple2.of("Person","hasModerator")), is(2L));
     assertThat(cache.get(Tuple2.of("Person","hasMember")), is(4L));
+  }
+
+
+  @Test
+  public void testDistinctEdgePropertyValuesByLabelAndPropertyName() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    List<WithCount<Tuple2<String, String>>> result =
+      new DistinctEdgePropertyValuesByLabelAndPropertyName()
+        .execute(db)
+        .collect();
+
+    Map<Tuple, Long> cache = new HashMap<>(5);
+    result.forEach(e -> cache.put(e.getObject(), e.getCount()));
+
+    assertThat(result.size(), is(2));
+    assertThat(cache.get(Tuple2.of("knows","since")), is(3L));
+    assertThat(cache.get(Tuple2.of("hasModerator","since")), is(1L));
+  }
+
+  @Test
+  public void testDistinctVertexPropertyValuesByLabelAndPropertyName() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    List<WithCount<Tuple2<String, String>>> result =
+      new DistinctVertexPropertyValuesByLabelAndPropertyName()
+        .execute(db)
+        .collect();
+
+    Map<Tuple, Long> cache = new HashMap<>(5);
+    result.forEach(e -> cache.put(e.getObject(), e.getCount()));
+
+    assertThat(result.size(), is(8));
+
+    assertThat(cache.get(Tuple2.of("Person","name")), is(6L));
+    assertThat(cache.get(Tuple2.of("Person","gender")), is(2L));
+    assertThat(cache.get(Tuple2.of("Person","city")), is(3L));
+    assertThat(cache.get(Tuple2.of("Person","age")), is(4L));
+    assertThat(cache.get(Tuple2.of("Person","speaks")), is(1L));
+    assertThat(cache.get(Tuple2.of("Person","locIP")), is(1L));
+    assertThat(cache.get(Tuple2.of("Tag","name")), is(3L));
+    assertThat(cache.get(Tuple2.of("Forum","title")), is(2L));
+  }
+
+  @Test
+  public void testDistinctEdgePropertyValuesByPropertyName() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    List<WithCount<String>> result =
+      new DistinctEdgePropertyValuesByPropertyName()
+        .execute(db)
+        .collect();
+
+    Map<String, Long> cache = new HashMap<>(5);
+    result.forEach(e -> cache.put(e.getObject(), e.getCount()));
+
+    assertThat(result.size(), is(1));
+    assertThat(cache.get("since"), is(3L));
+  }
+
+  @Test
+  public void testDistinctVertexPropertyValuesByPropertyName() throws Exception {
+    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+
+    List<WithCount<String>> result =
+      new DistinctVertexPropertyValuesByPropertyName()
+        .execute(db)
+        .collect();
+
+    Map<String, Long> cache = new HashMap<>(5);
+    result.forEach(e -> cache.put(e.getObject(), e.getCount()));
+
+    assertThat(result.size(), is(7));
+
+    assertThat(cache.get("name"), is(9L));
+    assertThat(cache.get("gender"), is(2L));
+    assertThat(cache.get("city"), is(3L));
+    assertThat(cache.get("age"), is(4L));
+    assertThat(cache.get("speaks"), is(1L));
+    assertThat(cache.get("locIP"), is(1L));
+    assertThat(cache.get("title"), is(2L));
   }
 }

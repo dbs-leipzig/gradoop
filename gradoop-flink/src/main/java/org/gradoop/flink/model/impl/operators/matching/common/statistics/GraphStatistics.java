@@ -67,6 +67,22 @@ public class GraphStatistics {
    * have at least one incoming edge with the specified label.
    */
   private Map<String, Long> distinctTargetVertexCountByEdgeLabel;
+  /**
+   * Number of distinct edge property values of a given label - property name pair
+   */
+  private Map<String, Map<String, Long>> distinctEdgePropertyValuesByLabelAndPropertyName;
+  /**
+   * Number of distinct vertex property values of a given label - property name pair
+   */
+  private Map<String, Map<String, Long>> distinctVertexPropertyValuesByLabelAndPropertyName;
+  /**
+   * Number of distinct edge property values for property names
+   */
+  private Map<String, Long> distinctEdgePropertyValuesByPropertyName;
+  /**
+   * Number of distinct vertex property values for property names
+   */
+  private Map<String, Long> distinctVertexPropertyValuesByPropertyName;
 
   /**
    * Constructor.
@@ -81,6 +97,10 @@ public class GraphStatistics {
    * @param distinctTargetVertexCount number of distinct target vertices
    * @param distinctSourceVertexCountByEdgeLabel number of distinct source vertices by edge label
    * @param distinctTargetVertexCountByEdgeLabel number of distinct target vertices by edge label
+   * @param distinctEdgePropertyValuesByLabelAndPropertyName (label,property) -> distinct values
+   * @param distinctVertexPropertyValuesByLabelAndPropertyName (label,property) -> distinct values
+   * @param distinctEdgePropertyValuesByPropertyName (edge property) -> distinct values
+   * @param distinctVertexPropertyValuesByPropertyName (vertex property) -> distinct values
    */
   GraphStatistics(long vertexCount, long edgeCount, Map<String, Long> vertexCountByLabel,
     Map<String, Long> edgeCountByLabel,
@@ -88,7 +108,11 @@ public class GraphStatistics {
     Map<String, Map<String, Long>> edgeCountByTargetVertexAndEdgeLabel,
     long distinctSourceVertexCount, long distinctTargetVertexCount,
     Map<String, Long> distinctSourceVertexCountByEdgeLabel,
-    Map<String, Long> distinctTargetVertexCountByEdgeLabel) {
+    Map<String, Long> distinctTargetVertexCountByEdgeLabel,
+    Map<String, Map<String, Long>> distinctEdgePropertyValuesByLabelAndPropertyName,
+    Map<String, Map<String, Long>> distinctVertexPropertyValuesByLabelAndPropertyName,
+    Map<String, Long> distinctEdgePropertyValuesByPropertyName,
+    Map<String, Long> distinctVertexPropertyValuesByPropertyName) {
     this.vertexCount = vertexCount;
     this.edgeCount = edgeCount;
     this.vertexCountByLabel = vertexCountByLabel;
@@ -99,6 +123,12 @@ public class GraphStatistics {
     this.distinctTargetVertexCount = distinctTargetVertexCount;
     this.distinctSourceVertexCountByEdgeLabel = distinctSourceVertexCountByEdgeLabel;
     this.distinctTargetVertexCountByEdgeLabel = distinctTargetVertexCountByEdgeLabel;
+    this.distinctEdgePropertyValuesByLabelAndPropertyName =
+      distinctEdgePropertyValuesByLabelAndPropertyName;
+    this.distinctVertexPropertyValuesByLabelAndPropertyName =
+      distinctVertexPropertyValuesByLabelAndPropertyName;
+    this.distinctEdgePropertyValuesByPropertyName = distinctEdgePropertyValuesByPropertyName;
+    this.distinctVertexPropertyValuesByPropertyName = distinctVertexPropertyValuesByPropertyName;
   }
 
   /**
@@ -203,6 +233,58 @@ public class GraphStatistics {
     return distinctTargetVertexCountByEdgeLabel.getOrDefault(label, 0L);
   }
 
+  /**
+   * Returns the number of distinct property values for given edge label property name pair
+   * Eg (Person, name) -> 20
+   *
+   * @param label label
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctEdgePropertyValuesByLabelAndPropertyName(String label,
+    String propertyName) {
+    return distinctEdgePropertyValuesByLabelAndPropertyName.containsKey(label) ?
+      distinctEdgePropertyValuesByLabelAndPropertyName
+        .get(label).getOrDefault(propertyName, 0L) : 0;
+  }
+
+  /**
+   * Returns the number of distinct property values for given vertex label property name pair
+   * Eg (Person, name) -> 20
+   *
+   * @param label label
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctVertexPropertyValuesByLabelAndPropertyName(String label,
+    String propertyName) {
+    return distinctVertexPropertyValuesByLabelAndPropertyName.containsKey(label) ?
+      distinctVertexPropertyValuesByLabelAndPropertyName
+        .get(label).getOrDefault(propertyName, 0L) : 0;
+  }
+
+  /**
+   * Returns the number of distinct edge property values for given property name
+   * Eg (name) -> 20
+   *
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctEdgePropertyValuesByPropertyName(String propertyName) {
+    return distinctEdgePropertyValuesByPropertyName.getOrDefault(propertyName, 0L);
+  }
+
+  /**
+   * Returns the number of distinct vertex property values for given property name
+   * Eg (name) -> 20
+   *
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctVertexPropertyValuesByPropertyName(String propertyName) {
+    return distinctVertexPropertyValuesByPropertyName.getOrDefault(propertyName, 0L);
+  }
+
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("GraphStatistics{");
@@ -226,6 +308,14 @@ public class GraphStatistics {
       .append(distinctSourceVertexCountByEdgeLabel);
     sb.append(String.format(",%n distinctTargetVertexCountByEdgeLabel="))
       .append(distinctTargetVertexCountByEdgeLabel);
+    sb.append(String.format(",%n distinctEdgePropertyValuesByLabelAndPropertyName="))
+      .append(distinctEdgePropertyValuesByLabelAndPropertyName);
+    sb.append(String.format(",%n distinctVertexPropertyValuesByLabelAndPropertyName="))
+      .append(distinctVertexPropertyValuesByLabelAndPropertyName);
+    sb.append(String.format(",%n distinctEdgePropertyValuesByPropertyName="))
+      .append(distinctEdgePropertyValuesByPropertyName);
+    sb.append(String.format(",%n distinctVertexPropertyValuesByPropertyName="))
+      .append(distinctVertexPropertyValuesByPropertyName);
     sb.append(String.format("%n}"));
     return sb.toString();
   }
