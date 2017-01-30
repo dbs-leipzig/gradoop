@@ -1,11 +1,13 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -25,18 +27,24 @@ public class CypherTest extends GradoopFlinkTestBase {
       "WHERE t.name = \"Databases\"";
     String query2 = "MATCH (p1:Person)-[e:knows]->(p2:Person)<-[:hasMember]-(f:Forum)-[:hasMember]->(p3:Person) " +
       "WHERE p1.yob > e.since";
+    String query3 = "MATCH (p1:Person)-[:knows]->(p2:Person)-[:knows]->(p1)";
+    String query4 = "MATCH (p1:Person)-[:knows]->(p2:Person)-[:knows]->(p1)<-[:knows]-(p3:Person)-[:knows]->(p2)";
+    String query5 = "MATCH (p1:Person)-[e1:knows*1..2]->(p2:Person)<-[e2:hasMember]-(f:Forum)-[e3:hasModerator]->(p1)";
 
-    String query = query2;
+    String query = query5;
 
-    System.out.println("query = " + query);
+    System.out.printf("query = %s%n%n", query);
 
     QueryHandler queryHandler = new QueryHandler(query);
 
     GreedyPlanner planner = new GreedyPlanner(graph, queryHandler, graphStatistics,
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    PlanTableEntry plan = planner.plan();
+    PlanTableEntry planTableEntry = planner.plan();
 
-    System.out.println(plan);
+    System.out.println(planTableEntry);
+
+    DataSet<Embedding> result = planTableEntry.getQueryPlan().execute();
+    result.print();
   }
 }

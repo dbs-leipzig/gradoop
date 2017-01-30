@@ -23,10 +23,13 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
@@ -39,9 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.EDGE;
-import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.PATH;
-import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.VERTEX;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.*;
 
 public class GreedyPlanner {
   /**
@@ -86,8 +87,7 @@ public class GreedyPlanner {
   public PlanTableEntry plan() {
     // create initial plan table covering all possible leaf nodes
     PlanTable planTable = initPlanTable();
-
-    planTable.forEach(System.out::println);
+//    planTable.forEach(System.out::println);
 
     int i = 0;
     while(planTable.size() > 1) {
@@ -97,8 +97,8 @@ public class GreedyPlanner {
       planTable.removeProcessedBy(bestEntry);
       planTable.add(bestEntry);
 
-      System.out.println("iteration " + ++i);
-      planTable.forEach(System.out::println);
+//      System.out.println("iteration " + ++i);
+//      planTable.forEach(System.out::println);
     }
 
     return planTable.get(0);
@@ -146,7 +146,9 @@ public class GreedyPlanner {
         sourceVariable, edgeVariable, targetVariable, predicates.removeSubCNF(edgeVariable),
         queryHandler.getPredicates().getPropertyKeys(edgeVariable));
 
-      planTable.add(new PlanTableEntry(EDGE, Sets.newHashSet(edgeVariable), predicates,
+      PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
+
+      planTable.add(new PlanTableEntry(type, Sets.newHashSet(edgeVariable), predicates,
         new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
     return planTable;
@@ -167,7 +169,14 @@ public class GreedyPlanner {
           if (i != j) {
             List<String> overlap = getOverlap(leftEntry, rightEntry);
             if (overlap.size() > 0) {
-              newTable.add(joinEntries(leftEntry, rightEntry, overlap));
+              if (rightEntry.getType() == PATH && overlap.size() == 2) {
+                // evaluate join with variable length path on source and target vertex
+                newTable.add(joinEntries(leftEntry, rightEntry, overlap.subList(0, 1)));
+                newTable.add(joinEntries(leftEntry, rightEntry, overlap.subList(1, 2)));
+              } else {
+                // regular join or join with variable length path on source or target vertex
+                newTable.add(joinEntries(leftEntry, rightEntry, overlap));
+              }
             }
           }
         }
@@ -177,7 +186,7 @@ public class GreedyPlanner {
   }
 
   private boolean mayExtend(PlanTableEntry entry) {
-    return entry.getType() == VERTEX || entry.getType() == PATH;
+    return entry.getType() == VERTEX || entry.getType() == PARTIAL_GRAPH;
   }
 
   private List<String> getOverlap(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
@@ -187,17 +196,49 @@ public class GreedyPlanner {
   }
 
   private PlanTableEntry joinEntries(PlanTableEntry leftEntry, PlanTableEntry rightEntry, List<String> joinVariables) {
-    JoinEmbeddingsNode node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
-      rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
+    PlanNode node;
+    if (rightEntry.getType() == PATH) {
+      node = createExpandNode(leftEntry, rightEntry, joinVariables);
+    } else {
+      node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
+        rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
+    }
 
     HashSet<String> evaluatedVars = Sets.newHashSet(leftEntry.getProcessedVariables());
     evaluatedVars.addAll(rightEntry.getProcessedVariables());
-    leftEntry.getPredicates().removeSubCNF(rightEntry.getProcessedVariables());
-    rightEntry.getPredicates().removeSubCNF(leftEntry.getProcessedVariables());
-    CNF predicates = leftEntry.getPredicates().and(rightEntry.getPredicates());
+    CNF leftPredicate = new CNF(leftEntry.getPredicates());
+    CNF rightPredicates = new CNF(rightEntry.getPredicates());
+    leftPredicate.removeSubCNF(rightEntry.getProcessedVariables());
+    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+    CNF predicates = leftPredicate.and(rightPredicates);
 
-    return new PlanTableEntry(PATH, evaluatedVars, predicates,
+    return new PlanTableEntry(PARTIAL_GRAPH, evaluatedVars, predicates,
       new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
+  }
+
+  private ExpandEmbeddingsNode createExpandNode(PlanTableEntry leftEntry, PlanTableEntry rightEntry,
+    List<String> joinVariables) {
+    assert(joinVariables.size() == 1);
+
+    String startVariable = joinVariables.get(0);
+    String pathVariable = rightEntry.getQueryPlan().getRoot()
+      .getEmbeddingMetaData().getEdgeVariables().get(0);
+
+    Edge queryEdge = queryHandler.getEdgeByVariable(pathVariable);
+    Vertex sourceVertex = queryHandler.getVertexById(queryEdge.getSourceVertexId());
+    Vertex targetVertex = queryHandler.getVertexById(queryEdge.getTargetVertexId());
+
+    int lowerBound = queryEdge.getLowerBound();
+    int upperBound = queryEdge.getUpperBound();
+    ExpandDirection direction = sourceVertex.getVariable().equals(startVariable) ?
+      ExpandDirection.OUT : ExpandDirection.IN;
+    String endVariable = direction == ExpandDirection.OUT ?
+      targetVertex.getVariable() : sourceVertex.getVariable();
+
+    return new ExpandEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
+      rightEntry.getQueryPlan().getRoot(),
+      startVariable, pathVariable, endVariable, lowerBound, upperBound, direction,
+      vertexStrategy, edgeStrategy);
   }
 
   //----------------------------------------------------------------------------------------------
@@ -211,9 +252,9 @@ public class GreedyPlanner {
       Set<String> variables = Sets.newHashSet(entry.getAttributedVariables());
       CNF predicates = entry.getPredicates();
       CNF subCNF = predicates.removeSubCNF(variables);
-      if (predicates.size() > 0) {
+      if (subCNF.size() > 0) {
         FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
-        newTable.add(new PlanTableEntry(PATH, Sets.newHashSet(entry.getProcessedVariables()),
+        newTable.add(new PlanTableEntry(PARTIAL_GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
           predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
       }
       newTable.add(entry);
