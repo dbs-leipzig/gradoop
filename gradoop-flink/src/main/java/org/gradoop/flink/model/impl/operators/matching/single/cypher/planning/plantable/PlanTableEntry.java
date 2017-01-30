@@ -1,5 +1,6 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
@@ -23,19 +24,24 @@ public class PlanTableEntry {
   /**
    * The type of this entry
    */
-  private Type type;
+  private final Type type;
   /**
    * The variables that are already processed by the query plan.
    */
   private final Set<String> processedVars;
   /**
+   * Remaining predicates
+   */
+  private final CNF predicates;
+  /**
    * The estimator containing the query plan.
    */
   private QueryPlanEstimator estimator;
 
-  public PlanTableEntry(Type type, Set<String> processedVars, QueryPlanEstimator estimator) {
+  public PlanTableEntry(Type type, Set<String> processedVars, CNF predicates, QueryPlanEstimator estimator) {
     this.type = type;
     this.processedVars = processedVars;
+    this.predicates = predicates;
     this.estimator = estimator;
   }
 
@@ -46,6 +52,10 @@ public class PlanTableEntry {
    */
   public Type getType() {
     return type;
+  }
+
+  public CNF getPredicates() {
+    return predicates;
   }
 
   /**
@@ -91,8 +101,8 @@ public class PlanTableEntry {
   @Override
   public String toString() {
     return String.format("PlanTableEntry | type: %s | all-vars: %s | " +
-        "proc-vars: %s | attr-vars: %s | est-card: %d | Plan :%n%s",
+        "proc-vars: %s | attr-vars: %s | est-card: %d | prediates: %s | Plan :%n%s",
       type, getAllVariables(), getProcessedVariables(), getAttributedVariables(),
-      estimator.getCardinality(), estimator.getQueryPlan());
+      estimator.getCardinality(), predicates, estimator.getQueryPlan());
   }
 }

@@ -57,9 +57,8 @@ public class CNFTest {
 
     ArrayList<CNFElement> reference = new ArrayList<>();
     reference.add(or1);
-    reference.add(or2);
 
-    assertEquals(reference, and1.and(and2).getPredicates());
+    assertEquals(reference, and1.and(and2).and(and1).getPredicates());
   }
 
   @Test
