@@ -17,12 +17,14 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a query plan and additional meta data. Plan table entries are managed in a
@@ -46,9 +48,9 @@ public class PlanTableEntry {
      */
     PATH,
     /**
-     * A partial graph contains joined vertices, edges, paths or partial graphs.
+     * A graph contains joined vertices, edges, paths or graphs.
      */
-    PARTIAL_GRAPH
+    GRAPH
   }
 
   /**
@@ -113,6 +115,29 @@ public class PlanTableEntry {
    */
   public Set<String> getProcessedVariables() {
     return processedVars;
+  }
+
+  /**
+   * Returns all (variable,key) pairs attached to the query plan.
+   *
+   * @return (variable,key) pairs attached to the current plan
+   */
+  public Set<Pair<String, String>> getPropertyPairs() {
+    return getAttributedVariables().stream()
+      .flatMap(var -> getQueryPlan().getRoot().getEmbeddingMetaData().getPropertyKeys(var).stream()
+        .map(key -> Pair.of(var, key)))
+      .collect(Collectors.toSet());
+  }
+
+  /**
+   * Returns all (variable,key) pairs needed for further query processing.
+   *
+   * @return (variable,key) pairs needed for further processing
+   */
+  public Set<Pair<String, String>> getProjectionPairs() {
+    return predicates.getVariables().stream()
+      .flatMap(var -> predicates.getPropertyKeys(var).stream().map(key -> Pair.of(var, key)))
+      .collect(Collectors.toSet());
   }
 
   /**

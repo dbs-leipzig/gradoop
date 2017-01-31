@@ -33,7 +33,10 @@ public class CypherTest extends GradoopFlinkTestBase {
     String query6 = "MATCH (t:Tag)<-[:hasTag]-(f:Forum)-[:hasMember]->(p:Person) " +
       "WHERE (t.name = \"Databases\" OR p.name = \"Alice\") AND f.title = \"Graph Databases\"";
 
-    String query = query6;
+    String query7 = "MATCH (t:Tag)<-[:hasTag]-(f:Forum)-[:hasMember]->(p1:Person)-[:knows*1..3]->(p2:Person)<-[:hasMember]-(f) " +
+      "WHERE (t.name = \"Databases\" OR p1.name = \"Alice\") AND f.title = \"Graph Databases\" AND p1.age > p2.age";
+
+    String query = query7;
 
     System.out.printf("query = %s%n%n", query);
 
@@ -46,7 +49,8 @@ public class CypherTest extends GradoopFlinkTestBase {
 
     System.out.println(planTableEntry);
 
-//    DataSet<Embedding> result = planTableEntry.getQueryPlan().execute();
-//    result.print();
+    DataSet<Embedding> result = planTableEntry.getQueryPlan().execute();
+
+    result.print();
   }
 }

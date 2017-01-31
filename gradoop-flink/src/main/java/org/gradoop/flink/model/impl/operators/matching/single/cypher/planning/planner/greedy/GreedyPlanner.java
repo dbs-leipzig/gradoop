@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -93,9 +94,7 @@ public class GreedyPlanner {
    */
   public PlanTableEntry plan() {
     PlanTable planTable = initPlanTable();
-    planTable.forEach(System.out::println);
 
-    int i = 0;
     while(planTable.size() > 1) {
       PlanTable newPlans = evaluateJoins(planTable);
       newPlans = evaluateFilter(newPlans);
@@ -104,9 +103,6 @@ public class GreedyPlanner {
       PlanTableEntry bestEntry = newPlans.min();
       planTable.removeCoveredBy(bestEntry);
       planTable.add(bestEntry);
-
-      System.out.println("iteration " + ++i);
-      planTable.forEach(System.out::println);
     }
 
     return planTable.get(0);
@@ -234,7 +230,7 @@ public class GreedyPlanner {
    * @return true, iff the specified entry may be extended
    */
   private boolean mayExtend(PlanTableEntry entry) {
-    return entry.getType() == VERTEX || entry.getType() == PARTIAL_GRAPH;
+    return entry.getType() == VERTEX || entry.getType() == GRAPH;
   }
 
   /**
@@ -285,7 +281,7 @@ public class GreedyPlanner {
     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
     CNF predicates = leftPredicates.and(rightPredicates);
 
-    return new PlanTableEntry(PARTIAL_GRAPH, processedVariables, predicates,
+    return new PlanTableEntry(GRAPH, processedVariables, predicates,
       new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
   }
 
@@ -342,7 +338,7 @@ public class GreedyPlanner {
       CNF subCNF = predicates.removeSubCNF(variables);
       if (subCNF.size() > 0) {
         FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
-        newTable.add(new PlanTableEntry(PARTIAL_GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
+        newTable.add(new PlanTableEntry(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
           predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
       }
       newTable.add(entry);
@@ -364,6 +360,26 @@ public class GreedyPlanner {
    * @return input table with possibly updated entries
    */
   private PlanTable evaluateProjection(PlanTable currentTable) {
-    return currentTable;
+    PlanTable newTable = new PlanTable();
+
+    for (PlanTableEntry entry : currentTable) {
+      Set<Pair<String, String>> propertyPairs = entry.getPropertyPairs();
+      Set<Pair<String, String>> projectionPairs = entry.getProjectionPairs();
+
+      Set<Pair<String, String>> updatedPropertyPairs = propertyPairs.stream()
+        .filter(projectionPairs::contains)
+        .collect(Collectors.toSet());
+
+      if (updatedPropertyPairs.size() < propertyPairs.size()) {
+        ProjectEmbeddingsNode node = new ProjectEmbeddingsNode(entry.getQueryPlan().getRoot(),
+          updatedPropertyPairs.stream().collect(Collectors.toList()));
+        newTable.add(new PlanTableEntry(GRAPH,
+          Sets.newHashSet(entry.getProcessedVariables()), entry.getPredicates(),
+          new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+      } else {
+        newTable.add(entry);
+      }
+    }
+    return newTable;
   }
 }
