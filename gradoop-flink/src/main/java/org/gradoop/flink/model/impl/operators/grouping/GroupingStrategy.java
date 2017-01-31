@@ -27,5 +27,9 @@ public enum GroupingStrategy {
   /**
    * {@see GroupingGroupCombine}
    */
-  GROUP_COMBINE
+  GROUP_COMBINE,
+
+  VERTEX_CENTRIC,
+
+  EDGE_CENTRIC
 }

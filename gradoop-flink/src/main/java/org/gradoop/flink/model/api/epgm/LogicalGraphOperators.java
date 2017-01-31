@@ -31,6 +31,8 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+
+import org.gradoop.flink.model.impl.operators.grouping.CentricalGrouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
@@ -226,6 +228,17 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return logical graph with random nodes and their associated edges
    */
   LogicalGraph sampleRandomNodes(float sampleSize);
+
+  /**
+   * Creates a condensed version of the logical graph by grouping vertices or edges based on the
+   * specified property keys.
+   *
+   * @param centricalGrouping type of grouping: vertex centric or edge centric
+   *
+   * @return summary graph
+   * @see Grouping
+   */
+  LogicalGraph groupBy(CentricalGrouping centricalGrouping);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices based on the specified
