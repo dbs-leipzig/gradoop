@@ -21,39 +21,31 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class CentricalGrouping extends Grouping{
+public abstract class CentricalGrouping extends Grouping {
 
   private final GroupingStrategy groupingStrategy;
 
-  CentricalGrouping(List<String> primaryGroupingKeys, GroupingStrategy groupingStrategy) {
-    this(primaryGroupingKeys, null, groupingStrategy);
-  }
-
-  CentricalGrouping(List<String> primaryGroupingKeys, List<String> secondaryGroupingKeys,
-    GroupingStrategy groupingStrategy) {
-    this(primaryGroupingKeys, false, null, secondaryGroupingKeys, false, null, groupingStrategy);
-  }
-
-  /**
-   * Creates grouping operator instance.
-   *
-   * @param primaryGroupingKeys   property keys to group vertices
-   * @param useVertexLabels       group on vertex label true/false
-   * @param primaryAggregators    aggregate functions for grouped vertices
-   * @param secondaryGroupingKeys property keys to group edges
-   * @param useEdgeLabels         group on edge label true/false
-   * @param secondaryAggregators  aggregate functions for grouped edges
-   */
-  CentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators) {
-
-    this(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
-      useEdgeLabels, secondaryAggregators, GroupingStrategy.GROUP_REDUCE);
-  }
+//  CentricalGrouping(List<String> primaryGroupingKeys) {
+//    this(primaryGroupingKeys, GroupingStrategy.GROUP_REDUCE);
+//  }
+//
+//  CentricalGrouping(List<String> primaryGroupingKeys, GroupingStrategy groupingStrategy) {
+//    this(primaryGroupingKeys, new ArrayList<>(), groupingStrategy);
+//  }
+//
+//  CentricalGrouping(List<String> primaryGroupingKeys, List<String> secondaryGroupingKeys) {
+//    this(primaryGroupingKeys, secondaryGroupingKeys, GroupingStrategy.GROUP_REDUCE);
+//  }
+//
+//  CentricalGrouping(List<String> primaryGroupingKeys, List<String> secondaryGroupingKeys,
+//    GroupingStrategy groupingStrategy) {
+//    this(primaryGroupingKeys, false, new ArrayList<>(), secondaryGroupingKeys, false,
+//      new ArrayList<>(), groupingStrategy);
+//  }
 
   CentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
@@ -65,8 +57,28 @@ public abstract class CentricalGrouping extends Grouping{
     this.groupingStrategy = groupingStrategy;
   }
 
+  //overload build to allow non overloaded groupBy
 
-  public abstract Grouping build();
+  public Grouping build(List<String> vertexGroupingKeys) {
+    return build(vertexGroupingKeys, null);
+  }
+
+  public Grouping build(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
+    return build(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
+  }
+
+  public Grouping build(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy) {
+    return build(vertexGroupingKeys, false, vertexAggregateFunctions, edgeGroupingKeys, false,
+      edgeAggregateFunctions, groupingStrategy);
+  }
+
+  public abstract Grouping build(List<String> primaryGroupingKeys, boolean useVertexLabels,
+    List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
+    boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators,
+    GroupingStrategy groupingStrategy);
 
   protected abstract LogicalGraph groupReduce(LogicalGraph graph);
 

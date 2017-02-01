@@ -33,6 +33,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -285,7 +286,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Overridden by concrete implementations.
    *
-   * @param graph input graphe
+   * @param graph input graph
    * @return grouped output graph
    */
   protected abstract LogicalGraph groupInternal(LogicalGraph graph);
@@ -299,6 +300,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Grouping strategy
      */
     private GroupingStrategy strategy;
+
+    /**
+     * Centrical grouping strategy.
+     */
+    private GroupingStrategy centricalStrategy;
+
     /**
      * True, iff vertex labels shall be considered.
      */
@@ -366,6 +373,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder setStrategy(GroupingStrategy strategy) {
       Objects.requireNonNull(strategy);
       this.strategy = strategy;
+      return this;
+    }
+
+    /**
+     * Set the grouping strategy. See {@link GroupingStrategy}.
+     *
+     * @param centricalStrategy grouping strategy
+     * @return this builder
+     */
+    public GroupingBuilder setCentricalStrategy(GroupingStrategy centricalStrategy) {
+      Objects.requireNonNull(centricalStrategy);
+      this.centricalStrategy = centricalStrategy;
       return this;
     }
 
@@ -663,17 +682,32 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       Grouping groupingOperator;
 
-      switch (strategy) {
-      case GROUP_REDUCE:
-        groupingOperator = new GroupingGroupReduce(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
-        break;
-      case GROUP_COMBINE:
-        groupingOperator = new GroupingGroupCombine(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported strategy: " + strategy);
+      if (centricalStrategy != null) {
+        switch (centricalStrategy) {
+        case VERTEX_CENTRIC:
+          groupingOperator = new VertexCentricalGrouping(
+              useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          break;
+        case EDGE_CENTRIC:
+          groupingOperator = new EdgeCentricalGrouping(
+              useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          break;
+        default:
+          throw new IllegalArgumentException("Unsupported centrical strategy: " + centricalStrategy);
+        }
+      } else {
+        switch (strategy) {
+        case GROUP_REDUCE:
+          groupingOperator = new GroupingGroupReduce(
+            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          break;
+        case GROUP_COMBINE:
+          groupingOperator = new GroupingGroupCombine(
+            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          break;
+        default:
+          throw new IllegalArgumentException("Unsupported strategy: " + strategy);
+        }
       }
 
       return groupingOperator;

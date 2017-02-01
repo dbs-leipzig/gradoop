@@ -45,23 +45,7 @@ import java.util.Objects;
  *
  */
 public class VertexCentricalGrouping extends CentricalGrouping {
-  
-  public VertexCentricalGrouping(List<String> vertexGroupingKeys, GroupingStrategy 
-    groupingStrategy) {
-    super(vertexGroupingKeys, groupingStrategy);
-  }
 
-  public VertexCentricalGrouping(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys,
-    GroupingStrategy groupingStrategy) {
-    super(vertexGroupingKeys, edgeGroupingKeys, groupingStrategy);
-  }
-
-  public VertexCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators) {
-    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
-      useEdgeLabels, edgeAggregators);
-  }
 
   public VertexCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
@@ -86,6 +70,7 @@ public class VertexCentricalGrouping extends CentricalGrouping {
 
     builder.addVertexGroupingKeys(getVertexGroupingKeys());
     builder.setStrategy(getGroupingStrategy());
+    builder.setCentricalStrategy(GroupingStrategy.VERTEX_CENTRIC);
 
     if (getEdgeGroupingKeys() != null) {
       builder.addEdgeGroupingKeys(getEdgeGroupingKeys());

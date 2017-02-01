@@ -325,7 +325,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public LogicalGraph groupBy(CentricalGrouping centricalGrouping) {
-    return  callForGraph(centricalGrouping.build());
+    return callForGraph(centricalGrouping);
   }
 
   /**
