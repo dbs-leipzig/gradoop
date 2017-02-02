@@ -103,6 +103,8 @@ public class GreedyPlanner {
       PlanTableEntry bestEntry = newPlans.min();
       planTable.removeCoveredBy(bestEntry);
       planTable.add(bestEntry);
+
+      planTable.forEach(System.out::println);
     }
 
     return planTable.get(0);
@@ -333,7 +335,7 @@ public class GreedyPlanner {
     PlanTable newTable = new PlanTable();
 
     for (PlanTableEntry entry : currentTable) {
-      Set<String> variables = Sets.newHashSet(entry.getAttributedVariables());
+      Set<String> variables = Sets.newHashSet(entry.getProcessedVariables());
       CNF predicates = entry.getPredicates();
       CNF subCNF = predicates.removeSubCNF(variables);
       if (subCNF.size() > 0) {

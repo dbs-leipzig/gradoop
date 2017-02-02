@@ -36,14 +36,22 @@ public class CypherTest extends GradoopFlinkTestBase {
     String query7 = "MATCH (t:Tag)<-[:hasTag]-(f:Forum)-[:hasMember]->(p1:Person)-[:knows*1..3]->(p2:Person)<-[:hasMember]-(f) " +
       "WHERE (t.name = \"Databases\" OR p1.name = \"Alice\") AND f.title = \"Graph Databases\" AND p1.age > p2.age";
 
-    String query = query7;
+    String query8 = "MATCH (a:Blue)<-[:blue*1..2]-(b:Green),(b)-[:red]->(c:Red)," +
+      "(c)-[:red]->(b) WHERE a.foo > b.bar OR c.foo = 42";
+
+    String query9 = "MATCH (c1:Clan)<-[:leaderOf]-(o1:Orc)-[:hates]->(o2:Orc)-[:leaderOf]->(c2:Clan),\n" +
+      "      (o2)-[:knows*1..10]->(h:Hobbit {name: \"Frodo Baggins\"})\n" +
+      "WHERE NOT(c1 = c2 OR o1 = o2)";
+
+    String query = query9;
 
     System.out.printf("query = %s%n%n", query);
 
     QueryHandler queryHandler = new QueryHandler(query);
+    System.out.println(queryHandler.getPredicates());
 
     GreedyPlanner planner = new GreedyPlanner(graph, queryHandler, graphStatistics,
-      MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     PlanTableEntry planTableEntry = planner.plan();
 
@@ -51,6 +59,9 @@ public class CypherTest extends GradoopFlinkTestBase {
 
     DataSet<Embedding> result = planTableEntry.getQueryPlan().execute();
 
-    result.print();
+    result.writeAsText("results");
+//
+    System.out.println(result.getExecutionEnvironment().getExecutionPlan());
+
   }
 }
