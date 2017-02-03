@@ -25,6 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Label;
 import org.junit.Assert;
@@ -48,7 +49,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesQuotationLineCount() throws IOException, JSONException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
-      .filter(new Label<Vertex>("SalesQuotationLine"));
+      .filter(new ByLabel<Vertex>("SalesQuotationLine"));
     int min = 1;
     int max = 20;
     int casesCount = 10;
@@ -68,9 +69,9 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   public void testSalesOrderCount() throws IOException, JSONException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
-      .filter(new Label<Vertex>("SalesQuotation"));
+      .filter(new ByLabel<Vertex>("SalesQuotation"));
     DataSet<Vertex> salesOrders = cases.getVertices()
-      .filter(new Label<Vertex>("SalesOrder"));
+      .filter(new ByLabel<Vertex>("SalesOrder"));
 
     double actual = 0;
     double expected = 0;
