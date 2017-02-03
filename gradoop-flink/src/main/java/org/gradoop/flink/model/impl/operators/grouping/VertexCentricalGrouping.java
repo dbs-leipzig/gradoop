@@ -53,39 +53,10 @@ public class VertexCentricalGrouping extends CentricalGrouping {
     GroupingStrategy groupingStrategy) {
     super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
       useEdgeLabels, edgeAggregators, groupingStrategy);
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Grouping build() {
-
-    //TODO replace builder from grouping with internal approach
-    
     Objects.requireNonNull(getVertexGroupingKeys(), "missing vertex grouping key(s)");
     Objects.requireNonNull(getGroupingStrategy(), "missing vertex grouping strategy");
-
-    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
-
-    builder.addVertexGroupingKeys(getVertexGroupingKeys());
-    builder.setStrategy(getGroupingStrategy());
-    builder.setCentricalStrategy(GroupingStrategy.VERTEX_CENTRIC);
-
-    if (getEdgeGroupingKeys() != null) {
-      builder.addEdgeGroupingKeys(getEdgeGroupingKeys());
-    }
-    if (getVertexAggregators() != null) {
-      getVertexAggregators().forEach(builder::addVertexAggregator);
-    }
-    if (getEdgeAggregators() != null) {
-      getEdgeAggregators().forEach(builder::addEdgeAggregator);
-    }
-    return builder.build();
   }
-
-
-
 
   protected LogicalGraph groupReduce(LogicalGraph graph) {
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
