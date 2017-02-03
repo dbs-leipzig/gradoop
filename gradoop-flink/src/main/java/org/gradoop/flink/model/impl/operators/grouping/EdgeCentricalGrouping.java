@@ -27,37 +27,12 @@ import java.util.List;
  */
 public class EdgeCentricalGrouping extends CentricalGrouping{
 
-  public EdgeCentricalGrouping(List<String> primaryGroupingKeys,
-    GroupingStrategy groupingStrategy) {
-    super(primaryGroupingKeys, groupingStrategy);
-  }
-
-  public EdgeCentricalGrouping(List<String> primaryGroupingKeys, List<String> secondaryGroupingKeys,
-    GroupingStrategy groupingStrategy) {
-    super(primaryGroupingKeys, secondaryGroupingKeys, groupingStrategy);
-  }
-
-  public EdgeCentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators) {
-    super(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
-      useEdgeLabels, secondaryAggregators);
-  }
-
   public EdgeCentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
     boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators,
     GroupingStrategy groupingStrategy) {
     super(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
       useEdgeLabels, secondaryAggregators, groupingStrategy);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Grouping build() {
-    return null;
   }
 
   @Override
