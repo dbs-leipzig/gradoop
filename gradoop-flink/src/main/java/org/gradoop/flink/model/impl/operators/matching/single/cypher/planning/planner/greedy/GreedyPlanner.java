@@ -104,8 +104,11 @@ public class GreedyPlanner {
       planTable.removeCoveredBy(bestEntry);
       planTable.add(bestEntry);
 
-      planTable.forEach(System.out::println);
+//      planTable.forEach(System.out::println);
     }
+
+//    System.out.println("Best plan");
+//    System.out.println(planTable.get(0));
 
     return planTable.get(0);
   }
@@ -342,8 +345,9 @@ public class GreedyPlanner {
         FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
         newTable.add(new PlanTableEntry(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
           predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+      } else {
+        newTable.add(entry);
       }
-      newTable.add(entry);
     }
 
     return newTable;

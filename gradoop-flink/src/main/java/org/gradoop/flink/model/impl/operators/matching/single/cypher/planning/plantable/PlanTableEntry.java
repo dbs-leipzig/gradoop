@@ -69,6 +69,10 @@ public class PlanTableEntry {
    * The estimator containing the query plan.
    */
   private QueryPlanEstimator estimator;
+  /**
+   * Estimated cardinality of the query result as computed by the estimator.
+   */
+  private long estimatedCardinality = -1;
 
   public PlanTableEntry(Type type, Set<String> processedVars, CNF predicates, QueryPlanEstimator estimator) {
     this.type = type;
@@ -146,7 +150,10 @@ public class PlanTableEntry {
    * @return estimated cardinality
    */
   public long getEstimatedCardinality() {
-    return estimator.getCardinality();
+    if (estimatedCardinality == -1) {
+      estimatedCardinality = estimator.getCardinality();
+    }
+    return estimatedCardinality;
   }
 
   public QueryPlan getQueryPlan() {
