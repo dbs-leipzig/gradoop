@@ -21,50 +21,46 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.common.util.GConstants;
 
 /**
- * (edgeId, (sourceId, targetId)) => ImportEdge
+ * (vertexId, label) => ImportVertex
  *
  * Forwarded fields:
  *
- * f0:        edgeId
- * f1.f0->f1: sourceId
- * f1.f1->f2: targetId
+ * f0: vertexId
  *
  * @param <K> id type
  */
-@FunctionAnnotation.ForwardedFields("f0; f1.f0->f1; f1.f1->f2")
-public class CreateImportEdge<K extends Comparable<K>>
-  implements MapFunction<Tuple2<K, Tuple2<K, K>>, ImportEdge<K>> {
+@FunctionAnnotation.ForwardedFields("f0")
+public class CreateLabeledImportVertex<K extends Comparable<K>>
+  implements MapFunction<Tuple2<K, String>, ImportVertex<K>> {
   /**
-   * Reduce object instantiations
+   * reused ImportVertex
    */
-  private ImportEdge<K> reuseEdge;
+  private ImportVertex<K> reuseVertex;
+  /**
+   * PropertyKey of property value
+   */
+  private String propertyKey;
 
   /**
    * Constructor
+   *
+   * @param propertyKey used PropertyKey
    */
-  public CreateImportEdge() {
-    this.reuseEdge = new ImportEdge<>();
-    reuseEdge.setLabel(GConstants.DEFAULT_EDGE_LABEL);
+  public CreateLabeledImportVertex(String propertyKey) {
+    this.propertyKey = propertyKey;
+    this.reuseVertex = new ImportVertex<>();
+    reuseVertex.setLabel(GConstants.DEFAULT_VERTEX_LABEL);
+    reuseVertex.setProperties(Properties.createWithCapacity(1));
   }
 
-  /**
-   * Method to create ImportEdge
-   *
-   * @param idTuple     tuple that contains unique line id + source and
-   *                    target ids
-   * @return            initialized reuseEdge
-   * @throws Exception
-   */
   @Override
-  public ImportEdge<K> map(Tuple2<K, Tuple2<K, K>> idTuple) throws Exception {
-    reuseEdge.setId(idTuple.f0);
-    reuseEdge.setProperties(Properties.create());
-    reuseEdge.setSourceId(idTuple.f1.f0);
-    reuseEdge.setTargetId(idTuple.f1.f1);
-    return reuseEdge;
+  public ImportVertex<K> map(Tuple2<K, String> inputTuple) throws Exception {
+    reuseVertex.setId(inputTuple.f0);
+    reuseVertex.getProperties().set(propertyKey, inputTuple.f1);
+    return reuseVertex;
   }
 }
