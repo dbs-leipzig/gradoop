@@ -51,7 +51,7 @@ public class EdgeListExample implements ProgramDescription {
   /**
    * Default token separator if none is defined by the user.
    */
-  private static final String TOKEN_SEPARATOR = " ";
+  private static final String TOKEN_SEPARATOR = "\t";
 
   /**
    * Reads the edge list from the given file and transforms it into an

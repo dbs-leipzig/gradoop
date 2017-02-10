@@ -32,15 +32,16 @@ import org.gradoop.common.util.GConstants;
  * f0:        edgeId
  * f1.f0->f1: sourceId
  * f1.f1->f2: targetId
+ *
+ * @param <K> id type
  */
 @FunctionAnnotation.ForwardedFields("f0; f1.f0->f1; f1.f1->f2")
-public class CreateImportEdge
-  implements MapFunction<Tuple2<Long, Tuple2<Long, Long>>, ImportEdge<Long>> {
-
+public class CreateImportEdge<K extends Comparable<K>>
+  implements MapFunction<Tuple2<K, Tuple2<K, K>>, ImportEdge<K>> {
   /**
-   * reused ImportEdge
+   * Reduce object instantiations
    */
-  private ImportEdge<Long> reuseEdge;
+  private ImportEdge<K> reuseEdge;
 
   /**
    * Constructor
@@ -59,7 +60,7 @@ public class CreateImportEdge
    * @throws Exception
    */
   @Override
-  public ImportEdge<Long> map(Tuple2<Long, Tuple2<Long, Long>> idTuple)
+  public ImportEdge<K> map(Tuple2<K, Tuple2<K, K>> idTuple)
       throws Exception {
     reuseEdge.setId(idTuple.f0);
     reuseEdge.setProperties(Properties.create());

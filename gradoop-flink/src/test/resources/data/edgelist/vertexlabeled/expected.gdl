@@ -1,4 +1,4 @@
-result[
+expected[
 (a{lan:"EN"})-->(b{lan:"ZH"})
 (c{lan:"EN"})-->(d{lan:"JA"})
 (e{lan:"EN"})-->(f{lan:"SV"})
