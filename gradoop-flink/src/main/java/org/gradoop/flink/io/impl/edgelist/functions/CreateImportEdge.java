@@ -60,8 +60,7 @@ public class CreateImportEdge<K extends Comparable<K>>
    * @throws Exception
    */
   @Override
-  public ImportEdge<K> map(Tuple2<K, Tuple2<K, K>> idTuple)
-      throws Exception {
+  public ImportEdge<K> map(Tuple2<K, Tuple2<K, K>> idTuple) throws Exception {
     reuseEdge.setId(idTuple.f0);
     reuseEdge.setProperties(Properties.create());
     reuseEdge.setSourceId(idTuple.f1.f0);

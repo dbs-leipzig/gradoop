@@ -58,8 +58,7 @@ public class CreateLabeledImportVertex<K extends Comparable<K>>
   }
 
   @Override
-  public ImportVertex<K> map(Tuple2<K, String> inputTuple) throws
-    Exception {
+  public ImportVertex<K> map(Tuple2<K, String> inputTuple) throws Exception {
     reuseVertex.setId(inputTuple.f0);
     reuseVertex.getProperties().set(propertyKey, inputTuple.f1);
     return reuseVertex;
