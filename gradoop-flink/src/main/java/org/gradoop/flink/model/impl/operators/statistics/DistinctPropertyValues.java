@@ -20,32 +20,36 @@ package org.gradoop.flink.model.impl.operators.statistics;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.impl.operators.statistics.functions.CombinePropertyValueDistributionByLabel;
-import org.gradoop.flink.model.impl.operators.statistics.functions.ExtractPropertyValuesByLabel;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.functions.CombinePropertyValueDistribution;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
+import java.util.Set;
+
 /**
- * Base class for Statistic operators calculating the number of distinct property values for
- * label - property name pairs
+ * Base class for Statistic operators calculating the number of distinct property values grouped by
+ * a given key K
  *
  * @param <T> element type
+ * @param <K> grouping key
  */
-public abstract class DistinctPropertyValuesByLabelAndPropertyName<T extends GraphElement>
-  implements UnaryGraphToValueOperator<DataSet<WithCount<Tuple2<String, String>>>> {
+public abstract class DistinctPropertyValues<T extends GraphElement, K>
+  implements UnaryGraphToValueOperator<DataSet<WithCount<K>>> {
 
-  /**
-   * Calculates number of distinct property values for label - property name pairs of the given
-   * elements
-   *
-   * @param elements graph elements the statistics will be calculated for
-   * @return number of distinct property values for each label - property name pair
-   */
-  DataSet<WithCount<Tuple2<String, String>>> calculate(DataSet<T> elements) {
-    return elements
-      .flatMap(new ExtractPropertyValuesByLabel<>())
+
+  @Override
+  public DataSet<WithCount<K>> execute(LogicalGraph graph) {
+    return extractValuePairs(graph)
       .groupBy(0)
-      .combineGroup(new CombinePropertyValueDistributionByLabel());
+      .reduceGroup(new CombinePropertyValueDistribution<>());
   }
 
+  /**
+   * Extracts key value pairs from the given logical graph
+   * @param graph input graph
+   * @return key value pairs
+   */
+  protected abstract DataSet<Tuple2<K, Set<PropertyValue>>> extractValuePairs(LogicalGraph graph);
 }

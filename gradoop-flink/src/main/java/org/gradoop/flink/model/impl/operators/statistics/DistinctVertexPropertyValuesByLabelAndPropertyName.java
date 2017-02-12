@@ -20,17 +20,21 @@ package org.gradoop.flink.model.impl.operators.statistics;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.model.impl.operators.statistics.functions.ExtractPropertyValuesByLabel;
+
+import java.util.Set;
 
 /**
  * Computes the number of distinct vertex property values for label - property name pairs
  */
 public class DistinctVertexPropertyValuesByLabelAndPropertyName
-  extends DistinctPropertyValuesByLabelAndPropertyName<Vertex> {
+  extends DistinctPropertyValues<Vertex, Tuple2<String, String>> {
 
   @Override
-  public DataSet<WithCount<Tuple2<String, String>>> execute(LogicalGraph graph) {
-    return calculate(graph.getVertices());
+  protected DataSet<Tuple2<Tuple2<String, String>, Set<PropertyValue>>> extractValuePairs(
+    LogicalGraph graph) {
+    return graph.getVertices().flatMap(new ExtractPropertyValuesByLabel<>());
   }
 }
