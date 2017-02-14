@@ -34,6 +34,9 @@ import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.fusion.functions.FilterSubgraphEdges;
 
 /**
+ *
+ * Contains some utility functions for the fusion operator
+ *
  * Created by Giacomo Bergami on 25/01/17.
  */
 public class FusionUtils {
@@ -64,12 +67,12 @@ public class FusionUtils {
     LogicalGraph superGraph) {
 
     //return the edges from the superGraph that are contained
-    DataSet<Edge> filteredEdges =
-      containment.getGraphHead().first(1).map((GraphHead x) -> x.getId())
-        .cross(superGraph.getEdges())
-        .filter(new FilterSubgraphEdges())
-        .map(new Value1Of2<>())
-        .returns(Edge.class);
+    DataSet<Edge> filteredEdges = containment.getGraphHead()
+      .first(1)
+      .map((GraphHead x) -> x.getId())
+      .cross(superGraph.getEdges())
+      .filter(new FilterSubgraphEdges())
+      .map(new Value1Of2<>());
 
     DataSet<Vertex> tobeUnitedWith = filteredEdges
       .join(superGraph.getVertices())

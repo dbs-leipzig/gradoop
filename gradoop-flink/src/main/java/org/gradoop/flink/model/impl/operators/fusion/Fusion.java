@@ -61,7 +61,6 @@ public class Fusion implements BinaryGraphToGraphOperator {
     return Fusion.class.getName();
   }
 
-
   /**
    * Given a searchGraph and a patternGraph, returns the fused graph where pattern is replaced
    * inside the search by a single vertex having both label and properties belonging to the
