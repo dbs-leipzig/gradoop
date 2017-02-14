@@ -7,6 +7,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.operators.join.functions.OplusVertex;
 import org.gradoop.flink.model.impl.operators.join.operators.OptSerializable;
+import org.gradoop.flink.model.impl.operators.join.operators.OptSerializableGradoopId;
 import org.gradoop.flink.model.impl.operators.join.tuples.ResultingJoinVertex;
 
 import java.io.Serializable;
@@ -30,17 +31,17 @@ public class VertexJoinCondition extends
     Exception {
     if (first != null && second != null) {
       if (thetaVertexF.apply(new Tuple2<>(first,second))) {
-        out.collect(new ResultingJoinVertex(OptSerializable.value(first.getId()),
-          OptSerializable.value(second.getId()),
+        out.collect(new ResultingJoinVertex(OptSerializableGradoopId.value(first.getId()),
+          OptSerializableGradoopId.value(second.getId()),
           combineVertices.apply(new Tuple2<>(first,second))));
       }
     } else if (first == null) {
       out.collect(
-        new ResultingJoinVertex(OptSerializable.empty(), OptSerializable.value(second.getId()),
+        new ResultingJoinVertex(OptSerializableGradoopId.empty(), OptSerializableGradoopId.value(second.getId()),
           second));
     } else {
       out.collect(
-        new ResultingJoinVertex(OptSerializable.value(first.getId()), OptSerializable.empty(),
+        new ResultingJoinVertex(OptSerializableGradoopId.value(first.getId()), OptSerializableGradoopId.empty(),
           first));
     }
   }

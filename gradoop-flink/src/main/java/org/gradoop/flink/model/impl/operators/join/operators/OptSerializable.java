@@ -23,13 +23,18 @@ import java.util.Objects;
 /**
  * Created by Giacomo Bergami on 30/01/17.
  */
-public class OptSerializable<K extends Serializable> {
+public class OptSerializable<K extends Serializable> implements Serializable {
   public final boolean isThereElement;
   public final K elem;
 
   public OptSerializable(boolean isThereElement, K elem) {
     this.isThereElement = isThereElement;
     this.elem = isThereElement ? elem : null;
+  }
+
+  public OptSerializable(K elem) {
+    this.isThereElement = elem != null;
+    this.elem = elem;
   }
 
   public K get()  {
@@ -50,7 +55,7 @@ public class OptSerializable<K extends Serializable> {
 
   @Override
   public int hashCode() {
-    return elem!=null ? elem.hashCode() : 0;
+    return elem!=null ? (elem.hashCode() == 0 ? 1 : elem.hashCode()) : 0;
   }
 
   @Override

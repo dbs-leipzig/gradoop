@@ -21,7 +21,7 @@ public class JoinTest_FullDisjExample extends GradoopFlinkTestBase {
     = PredefinedEdgeSemantics.DISJUNCTIVE;
   private static final Function<Tuple2<String,String>,String> BASIC_LABEL_CONCATENATION
     = xy -> xy.f0 + xy.f1;
-  private static final GeneralEdgeSemantics CONJUNCTIVE_SEMANTICS =  GeneralEdgeSemantics
+  private static final GeneralEdgeSemantics DISJUNCTIVE_SEMANTICS =  GeneralEdgeSemantics
     .fromEdgePredefinedSemantics(x -> y -> true, DISJUNCTIVE_BASICS,BASIC_LABEL_CONCATENATION);
 
   /**
@@ -92,7 +92,7 @@ public class JoinTest_FullDisjExample extends GradoopFlinkTestBase {
       joinedDisjunctively);
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("research");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("citation");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_OUTER_JOIN, CONJUNCTIVE_SEMANTICS,
+    GraphThetaJoin f = new GraphThetaJoin(GRAPH_OUTER_JOIN, DISJUNCTIVE_SEMANTICS,
       leftHash, rightHash, thetaVertex, null, null, null);
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("result")));

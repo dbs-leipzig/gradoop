@@ -26,9 +26,11 @@ import org.apache.flink.api.common.functions.RichFlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.join.JoinType;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TypeInfoParser;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -43,9 +45,12 @@ import org.gradoop.flink.model.impl.operators.join.blocks
   .KeySelectorFromTupleProjetionWithGradoopId;
 import org.gradoop.flink.model.impl.operators.join.blocks.KeySelectorFromTupleProjetionWithTargetId;
 import org.gradoop.flink.model.impl.operators.join.blocks.VertexJoinCondition;
+import org.gradoop.flink.model.impl.operators.join.blocks.VertexPJoinCondition;
 import org.gradoop.flink.model.impl.operators.join.edgesemantics.GeneralEdgeSemantics;
 import org.gradoop.flink.model.impl.operators.join.functions.OplusHeads;
 import org.gradoop.flink.model.impl.operators.join.functions.OplusVertex;
+import org.gradoop.flink.model.impl.operators.join.operators.OptSerializable;
+import org.gradoop.flink.model.impl.operators.join.operators.OptSerializableGradoopId;
 import org.gradoop.flink.model.impl.operators.join.operators.PreFilter;
 import org.gradoop.flink.model.impl.operators.join.tuples.CombiningEdgeTuples;
 import org.gradoop.flink.model.impl.operators.join.tuples.ResultingJoinVertex;
@@ -63,9 +68,11 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
   private final PreFilter<Vertex, PV> leftPrefilter;
   private final PreFilter<Vertex, PV> rightPrefilter;
   private final JoinType vertexJoinType;
-  private KeySelector<Tuple2<Vertex, PV>, PV> projector;
+  private final CoJoinGraphHeads cojoingraphheads;
+  private final VertexPJoinCondition<PV> verexPJoinCond;
+  private KeySelectorFromRightProjection projector;
   private final RichFlatJoinFunction<Vertex, Vertex, ResultingJoinVertex> vertexJoinCond;
-  private MapFunction<Tuple2<Vertex, PV>, Vertex> mapper = null;
+  private MapFunction<Tuple2<Vertex,OptSerializableGradoopId>, Vertex> mapper = null;
   private final FunctionToKeySelector leftHash;
   private final FunctionToKeySelector rightHash;
   private final Function<Tuple2<Vertex,Vertex>,Boolean> thetaVertex;
@@ -160,6 +167,8 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
     this.leftHash = new FunctionToKeySelector(leftHash);
     this.rightHash = new FunctionToKeySelector(rightHash);
     this.vertexJoinCond = new VertexJoinCondition(this.thetaVertex,combineVertices);
+    this.verexPJoinCond = new VertexPJoinCondition<>(this.thetaVertex,combineVertices);
+    this.cojoingraphheads = new CoJoinGraphHeads(this.thetaGraph,combineHeads);
   }
 
 
@@ -182,8 +191,8 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
         .coGroup(secondGraph.getGraphHead())
         .where((GraphHead x) -> 0)
         .equalTo((GraphHead y) -> 0)
-        .with(new CoJoinGraphHeads(thetaGraph,combineHeads,gid))
-      ;
+        .with(cojoingraphheads.setGraphId(gid));
+
 
     joinVertices(firstGraph.getVertices(), secondGraph.getVertices());
 
@@ -237,8 +246,6 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
           @Override
           public CombiningEdgeTuples join(Tuple2<Vertex, Edge> first,
             Tuple2<GradoopId, Vertex> second) throws Exception {
-            //System.err.println(first.f0.getProperties().toString()+" -["+which+"]-> "+second
-            //  .f1.getProperties());
             return new CombiningEdgeTuples(first.f0, first.f1, second.f1);
           }
         }).returns(CombiningEdgeTuples.class);
@@ -247,7 +254,7 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
 
   private void joinVertices(DataSet<Vertex> vertices, DataSet<Vertex> vertices1) {
     DataSet<Vertex> left = vertices, right = vertices1;
-    DataSet<Tuple2<Vertex, PV>> leftP = null, rightP = null;
+    DataSet<Tuple2<Vertex,OptSerializableGradoopId>> leftP = null, rightP = null;
     boolean leftFilter = false, rightFilter = false;
 
     /*
@@ -267,25 +274,21 @@ public class GeneralJoinPlan<PV> implements BinaryGraphToGraphOperator {
        * When we have a demultiplex, then we join by the multiplex condition
        */
       if (projector == null) {
-        projector = new KeySelectorFromRightProjection<Vertex,PV>();
+        projector = new KeySelectorFromRightProjection();
       }
       lrVjoin =
-        JoinUtils.joinByType(leftP, rightP, vertexJoinType).where(projector).equalTo(projector)
-          .with(
-            new FlatJoinFunction<Tuple2<Vertex, PV>, Tuple2<Vertex, PV>, ResultingJoinVertex>() {
-              @Override
-              public void join(Tuple2<Vertex, PV> first, Tuple2<Vertex, PV> second,
-                Collector<ResultingJoinVertex> out) throws Exception {
-                vertexJoinCond.join(first.f0, second.f0, out);
-              }
-            }).returns(ResultingJoinVertex.class);
+        JoinUtils.joinByType(leftP, rightP, vertexJoinType)
+          .where(projector)
+          .equalTo(projector)
+          .with(verexPJoinCond)
+          .returns(ResultingJoinVertex.class);
 
     } else {
       /*
        * Otherwise, join the vertices with the usual join condition
        */
       if ((mapper == null) && (leftFilter || rightFilter)) {
-        mapper = (Tuple2<Vertex, PV> t) -> t.f0;
+        mapper = (Tuple2<Vertex,OptSerializableGradoopId> t) -> t.f0;
       }
       if (leftFilter) {
         left = leftP.map(mapper).distinct();

@@ -86,6 +86,22 @@ public class JoinUtils {
     }
   }
 
+  public static <K,J> JoinOperatorSetsBase<K, J> joinByVertexEdge(DataSet<K> left, DataSet<J>
+    right,
+    JoinType
+    joinType, boolean isCorrectOrder) {
+    switch (joinType) {
+    case INNER:
+      return left.join(right);
+    case LEFT_OUTER:
+      return isCorrectOrder ? left.leftOuterJoin(right) : left.join(right);
+    case RIGHT_OUTER:
+      return isCorrectOrder ? left.join(right) : left.leftOuterJoin(right);
+    default:
+      return left.fullOuterJoin(right);
+    }
+  }
+
   public static Function<Tuple2<String,String>,String> generateConcatenator(
     Function<Tuple2<String,String>,String> edgeLabelConcatenation) {
     return edgeLabelConcatenation==null ? new StandardStringConcatenation() : edgeLabelConcatenation;

@@ -29,6 +29,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.operators.join.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.functions.RelationalJoinPrefilter;
 import org.gradoop.flink.model.impl.operators.join.operators.PreFilter;
 
 /**
@@ -36,22 +37,10 @@ import org.gradoop.flink.model.impl.operators.join.operators.PreFilter;
  */
 public class GraphEdgeJoin extends GeneralJoinPlan<GradoopId> {
 
-  private static final Function<Boolean, Function<DataSet<Edge>, PreFilter<Vertex, GradoopId>>>
-    relationalJoinPrefilter =
-    (Boolean isLeft) -> (DataSet<Edge> e) -> (PreFilter<Vertex, GradoopId>) vertexDataSet ->
-      vertexDataSet
-      .join(e).where((Vertex v) -> v.getId())
-      .equalTo((Edge e1) -> isLeft ? e1.getSourceId() : e1.getTargetId())
-      .with(new JoinFunction<Vertex, Edge, Tuple2<Vertex, GradoopId>>() {
-        @Override
-        public Tuple2<Vertex, GradoopId> join(Vertex first, Edge second) throws Exception {
-          return new Tuple2<>(first, second.getId());
-        }
-      }).returns(TypeInfoParser.parse(
-        Tuple2.class.getName() + "<" + Vertex.class.getCanonicalName() + "," +
-          GradoopId.class.getCanonicalName() + ">"));
-  private final DataSet<Edge> relations;
-
+  public GraphEdgeJoin(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
+    DataSet<Edge> relations) {
+    this(vertexJoinType,edgeSemanticsImplementation,relations,null,null,null,null);
+  }
 
   public GraphEdgeJoin(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
     DataSet<Edge> relations, @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
@@ -59,10 +48,9 @@ public class GraphEdgeJoin extends GeneralJoinPlan<GradoopId> {
     @Nullable Function<Tuple2<String,String>,String> vertexLabelConcatenation,
     @Nullable Function<Tuple2<String,String>,String> graphLabelConcatenation) {
     super(vertexJoinType, edgeSemanticsImplementation,
-      relationalJoinPrefilter.apply(true).apply(relations),
-      relationalJoinPrefilter.apply(false).apply(relations), null, null, thetaVertex, thetaGraph,
+      new RelationalJoinPrefilter(true,relations, vertexJoinType),
+      new RelationalJoinPrefilter(false,relations, vertexJoinType), null, null, thetaVertex, thetaGraph,
       vertexLabelConcatenation, graphLabelConcatenation);
-    this.relations = relations;
   }
 
 }

@@ -20,7 +20,7 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
   Serializable {
   private final Function<Tuple2<GraphHead, GraphHead>, Boolean> thetaGraph;
   private final Oplus<GraphHead> combineHeads;
-  private final GradoopId gid;
+  private GradoopId gid;
 
   private static final GraphHead basic = new GraphHead();
 
@@ -29,6 +29,18 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
     this.thetaGraph = thetaGraph;
     this.combineHeads = combineHeads;
     this.gid = gid;
+  }
+
+  public CoJoinGraphHeads(Function<Tuple2<GraphHead, GraphHead>, Boolean> thetaGraph,
+    Oplus<GraphHead> combineHeads) {
+    this.thetaGraph = thetaGraph;
+    this.combineHeads = combineHeads;
+    this.gid = null;
+  }
+
+  public CoJoinGraphHeads setGraphId(GradoopId id) {
+    this.gid = id;
+    return this;
   }
 
   @Override

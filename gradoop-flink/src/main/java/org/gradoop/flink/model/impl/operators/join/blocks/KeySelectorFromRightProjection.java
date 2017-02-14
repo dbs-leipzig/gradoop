@@ -1,8 +1,14 @@
 package org.gradoop.flink.model.impl.operators.join.blocks;
 
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
+import org.gradoop.flink.model.impl.operators.join.operators.OptSerializable;
+import org.gradoop.flink.model.impl.operators.join.operators.OptSerializableGradoopId;
 
 import java.io.Serializable;
 
@@ -11,17 +17,15 @@ import java.io.Serializable;
  *
  * Created by Giacomo Bergami on 01/02/17.
  */
-public class KeySelectorFromRightProjection<K,V> implements KeySelector<Tuple2<K,V>,V>,
+public class KeySelectorFromRightProjection implements KeySelector<Tuple2<Vertex,
+  OptSerializableGradoopId>,Integer>,
   Serializable {
 
-  public final Project2To1<K, V> p;
-
   public KeySelectorFromRightProjection() {
-    p = new Project2To1<K, V>();
   }
 
   @Override
-  public V getKey(Tuple2<K, V> value) throws Exception {
-    return p.map(value).f0;
+  public Integer getKey(Tuple2<Vertex,OptSerializableGradoopId> value) throws Exception {
+    return value.f1.hashCode();
   }
 }
