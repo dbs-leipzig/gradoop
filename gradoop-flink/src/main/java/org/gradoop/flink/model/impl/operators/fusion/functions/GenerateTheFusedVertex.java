@@ -35,29 +35,31 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 @FunctionAnnotation.ForwardedFieldsSecond("label;properties")
 public class GenerateTheFusedVertex implements FlatJoinFunction<GraphHead, GraphHead, Vertex> {
 
-  public static final Vertex reusableVertex = new Vertex();
-  public GradoopId newVertexId;
+  /**
+   * Basic vertex reused each time. It'll be the fused vertex
+   */
+  private static final Vertex REUSABLE_VERTEX = new Vertex();
 
+  /**
+   * newly generated vertex id for the new vertex
+   */
+  private GradoopId newVertexId;
+
+  /**
+   * Given the new vertex Id, it generates the joiner generating the new vertex
+   * @param newVertexId   new vertex Id
+   */
   public GenerateTheFusedVertex(GradoopId newVertexId) {
     this.newVertexId = newVertexId;
-  }
-
-  public GenerateTheFusedVertex() {
-    this.newVertexId = null;
-  }
-
-  public GenerateTheFusedVertex updateVertexId(GradoopId id) {
-    this.newVertexId = id;
-    return this;
   }
 
   @Override
   public void join(GraphHead searchGraphHead, GraphHead patternGraphSeachHead,
     Collector<Vertex> out) throws Exception {
-    reusableVertex.setLabel(patternGraphSeachHead.getLabel());
-    reusableVertex.setProperties(patternGraphSeachHead.getProperties());
-    reusableVertex.setId(newVertexId);
-    reusableVertex.addGraphId(searchGraphHead.getId());
-    out.collect(reusableVertex);
+    REUSABLE_VERTEX.setLabel(patternGraphSeachHead.getLabel());
+    REUSABLE_VERTEX.setProperties(patternGraphSeachHead.getProperties());
+    REUSABLE_VERTEX.setId(newVertexId);
+    REUSABLE_VERTEX.addGraphId(searchGraphHead.getId());
+    out.collect(REUSABLE_VERTEX);
   }
 }
