@@ -69,7 +69,7 @@ public class FusionUtils {
     //return the edges from the superGraph that are contained
     DataSet<Edge> filteredEdges = containment.getGraphHead()
       .first(1)
-      .map((GraphHead x) -> x.getId())
+      .map(new Id<>())
       .cross(superGraph.getEdges())
       .filter(new FilterSubgraphEdges())
       .map(new Value1Of2<>());
