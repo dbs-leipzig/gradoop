@@ -28,19 +28,26 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.fusion.functions.GenerateTheFusedVertex;
+import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThoughToBeFusedVertices;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Created by Giacomo Bergami on 19/01/17.
+ *
+ * Fusion is a binary operator taking two graphs: a search graph (first parameter) and a
+ * pattern graph (second parameter) [This means that this is not a symmetric operator
+ * (F(a,b) != F(b,a))]. Such operator behaves in the following way:
+ *
+ * 2)
+ *
+ *
  */
 public class Fusion implements BinaryGraphToGraphOperator {
-
-
-  /**
-   * Default configuration to be used if there are some problems with the input graphs
-   */
-  private static final GradoopFlinkConfig DEFAULT_CONF =
-    GradoopFlinkConfig.createConfig(ExecutionEnvironment.getExecutionEnvironment());
 
   /**
    * @return The operator's name
@@ -63,125 +70,71 @@ public class Fusion implements BinaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(final LogicalGraph searchGraph, final LogicalGraph patternGraph) {
-    //Catching possible errors (null) and handling then as they were empty objects
-    if (searchGraph == null) {
-      return LogicalGraph
-        .createEmptyGraph(patternGraph == null ? DEFAULT_CONF : patternGraph.getConfig());
-    } else if (patternGraph == null) {
-      return FusionUtils.recreateGraph(searchGraph);
-    } else {
+      // I assume that both searchGraph and patternGraph are not
       DataSet<Vertex> leftVertices = searchGraph.getVertices();
 
-            /*
-             * Collecting the vertices that have to be removed and replaced by the aggregation's
-             * result
-             */
+      /*
+       * Collecting the vertices that have to be removed and replaced by the aggregation's
+       * result
+       */
       DataSet<Vertex> toBeReplaced =
         FusionUtils.areElementsInGraph(leftVertices, patternGraph, true);
 
       // But, even the vertices that belong only to the search graph, should be added
       DataSet<Vertex> finalVertices =
         FusionUtils.areElementsInGraph(leftVertices, patternGraph, false);
-      //////////////////////////////////////////
 
       final GradoopId vId = GradoopId.get();
-      //final Properties prop = FusionUtils.getGraphProperties(patternGraph);
-      //final String label = FusionUtils.getGraphLabel(patternGraph);
 
       // Then I create the graph that substitute the vertices within toBeReplaced
-      DataSet<Vertex> toBeAdded;
-
-      toBeAdded = searchGraph.getGraphHead().first(1).join(patternGraph.getGraphHead().first(1))
+      DataSet<Vertex> toBeAdded = searchGraph.getGraphHead()
+        .first(1)
+        .join(patternGraph.getGraphHead().first(1))
         .where((GraphHead g) -> 0).equalTo((GraphHead g) -> 0)
-        .with(new FlatJoinFunction<GraphHead, GraphHead, Vertex>() {
-          @Override
-          public void join(GraphHead searchGraphHead, GraphHead patternGraphSeachHead,
-            Collector<Vertex> out) throws Exception {
-            Vertex v = new Vertex();
-            v.setLabel(patternGraphSeachHead.getLabel());
-            v.setProperties(patternGraphSeachHead.getProperties());
-            v.setId(vId);
-            v.addGraphId(searchGraphHead.getId());
-            out.collect(v);
-          }
-        });
+        .with(new GenerateTheFusedVertex(vId));
 
       /*
        * The newly created vertex v has to be created iff. we have some actual vertices to be
        * replaced, and then if toBeReplaced contains at least one element
        */
-      DataSet<Vertex> addOnlyIfNecessary =
-        toBeReplaced.first(1).join(toBeAdded).where((Vertex x) -> 0).equalTo((Vertex x) -> 0)
-          .with(new JoinFunction<Vertex, Vertex, Vertex>() {
-            @Override
-            public Vertex join(Vertex first, Vertex second) throws Exception {
-              // If there is at least one element to be replaced, then return the vertex that has
-              // to be added. Otherwise, this function won't ever be called
-              return second;
-            }
-          });
+      DataSet<Vertex> addOnlyIfNecessary = toBeReplaced
+        .first(1)
+        .join(toBeAdded)
+        .where((Vertex x) -> 0).equalTo((Vertex x) -> 0)
+        .with(new RightSide<>());
 
       DataSet<Vertex> toBeReturned = finalVertices.union(addOnlyIfNecessary);
-      //////////////////////////////////////////
 
       //In the final graph, all the edges appearing only in the search graph should appear
       DataSet<Edge> leftEdges = searchGraph.getEdges();
       leftEdges = FusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
 
-            /*
-             * Concerning the other edges, we have to eventually update them and to be linked
-             * with the new vertex
-             * The following expression could be formalized as follows:
-             *
-             * updatedEdges = map(E, x ->
-             *      e' <- onNextUpdateof(x).newfrom(x);
-             *      if (e'.src \in toBeReplaced) e'.src = vId
-             *      end if
-             *      if (e'.dst \in toBeReplaced) e'.dst = vId
-             *      end if
-             *      return e'
-             * )
-             *
-             */
+      /*
+       * Concerning the other edges, we have to eventually update them and to be linked
+       * with the new vertex
+       * The following expression could be formalized as follows:
+       *
+       * updatedEdges = map(E, x ->
+       *      e' <- onNextUpdateof(x).newfrom(x);
+       *      if (e'.src \in toBeReplaced) e'.src = vId
+       *      end if
+       *      if (e'.dst \in toBeReplaced) e'.dst = vId
+       *      end if
+       *      return e'
+       * )
+       *
+       */
       DataSet<Edge> updatedEdges =
-        leftEdges.fullOuterJoin(toBeReplaced).where((Edge x) -> x.getSourceId())
-          .equalTo((Vertex y) -> y.getId())
-          .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
-              if (vertex == null) {
-                collector.collect(edge);
-              } else if (edge != null) {
-                Edge e = new Edge();
-                e.setId(GradoopId.get());
-                e.setSourceId(vId);
-                e.setTargetId(edge.getTargetId());
-                e.setProperties(edge.getProperties());
-                e.setLabel(edge.getLabel());
-                e.setGraphIds(edge.getGraphIds());
-                collector.collect(e);
-              }
-            }).returns(Edge.class).fullOuterJoin(toBeReplaced).where((Edge x) -> x.getTargetId())
-          .equalTo((Vertex y) -> y.getId())
-          .with((FlatJoinFunction<Edge, Vertex, Edge>) (edge, vertex, collector) -> {
-              if (vertex == null) {
-                collector.collect(edge);
-              } else if (edge != null) {
-                Edge e = new Edge();
-                e.setId(GradoopId.get());
-                e.setTargetId(vId);
-                e.setSourceId(edge.getSourceId());
-                e.setProperties(edge.getProperties());
-                e.setLabel(edge.getLabel());
-                e.setGraphIds(edge.getGraphIds());
-                collector.collect(e);
-              }
-            }).returns(Edge.class);
+        leftEdges.fullOuterJoin(toBeReplaced)
+          .where(new SourceId<>()).equalTo(new Id<>())
+          .with(new UpdateEdgesThoughToBeFusedVertices(vId,true))
+          .fullOuterJoin(toBeReplaced).where(new TargetId<>())
+          .equalTo(new Id<>())
+          .with(new UpdateEdgesThoughToBeFusedVertices(vId,false));
 
       // All's well what ends well… farewell!
       return LogicalGraph.fromDataSets(searchGraph.getGraphHead(), toBeReturned, updatedEdges,
         searchGraph.getConfig());
-
-
-    }
   }
 
 }

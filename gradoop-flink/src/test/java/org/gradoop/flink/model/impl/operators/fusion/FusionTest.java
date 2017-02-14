@@ -37,7 +37,7 @@ import org.junit.Test;
 
 public class FusionTest extends GradoopFlinkTestBase {
   @Test
-  public void empty_empty_to_empty() throws Exception {
+  public void emptyAndEmptyToEmpty() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("empty:G[]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("empty");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("empty");
@@ -51,7 +51,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void empty_emptyVertex_to_empty() throws Exception {
+  public void emptyAndEmptyvertexToEmpty() throws Exception {
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("empty:G[]" + "emptyVertex:G {emptyVertex : \"graph\"}[()]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("empty");
@@ -66,7 +66,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void emptyVertex_empty_to_emptyVertex() throws Exception {
+  public void emptyvertexAndEmptyToEmptyvertex() throws Exception {
     FlinkAsciiGraphLoader loader =
       getLoaderFromString("emptyVertex:G {emptyVertex : \"graph\"}[()]" + "empty:G[]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("emptyVertex");
@@ -81,7 +81,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void emptyVertex_graphWithA_to_emptyVertex() throws Exception {
+  public void emptyvertexAndGraphwithaToEmptyvertex() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "emptyVertex:G {emptyVertex : \"graph\"}[()]" +
         "graphWithA:G {graphWithA : \"graph\"}[(a:A {atype : \"avalue\"})]");
@@ -97,7 +97,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void emptyVertex_emptyVertex_to_singleInside() throws Exception {
+  public void emptyvertexAndEmptyvertexToSingleInside() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "emptyVertex:G {emptyVertex : \"graph\"}[()]" +
         "singleInside:G {emptyVertex : \"graph\"}[(u:G {emptyVertex : \"graph\"})]");
@@ -114,7 +114,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void graphWithA_graphWithA_to_aGraphLabels() throws Exception {
+  public void graphwithaAndGraphwithaToAgraphlabels() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "graphWithA:G {graphWithA : \"graph\"}[(a:A {atype : \"avalue\"})]" +
         "aGraphLabels:G {graphWithA : \"graph\"}[(:G {graphWithA : \"graph\"})]");
@@ -130,7 +130,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void graphWithA_empty_to_graphWithA() throws Exception {
+  public void graphwithaAndEmptyToGraphwitha() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "graphWithA:G {graphWithA : \"graph\"}[(a:A {atype : \"avalue\"})]" + "empty:G[]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("graphWithA");
@@ -145,7 +145,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void graphWithA_emptyVertex_to_graphWithA() throws Exception {
+  public void graphwithaAndEmptyvertexToGraphwitha() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "graphWithA:G {graphWithA : \"graph\"}[(a:A {atype : \"avalue\"})]" +
         "emptyVertex:G {emptyVertex : \"graph\"}[()]");
@@ -161,7 +161,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithAlpha_graphWithA_to_aggregatedASource() throws Exception {
+  public void abedgewithalphaAndGraphwithaToAggregatedasource() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
@@ -184,7 +184,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithAlpha_empty_to_ab_edgeWithAlpha() throws Exception {
+  public void abedgewithalphaAndEmptyToAbedgeWithAlpha() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
@@ -203,7 +203,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithAlpha_emptyVertex_to_ab_edgeWithAlpha() throws Exception {
+  public void abEdgeWithAlphaAndEmptyVerteToAbedgeWithAlpha() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
@@ -222,7 +222,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithAlpha_ab_edgeWithAlpha_to_fused_edgeWithAlpha() throws Exception {
+  public void abEdgeWithAlphaAndAbEdgeWithAlphaToFusededgeWithAlpha() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
@@ -243,7 +243,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithAlpha_ab_edgeWithBeta_to_ab_edgeWithBeta_loop() throws Exception {
+  public void abEdgeWithAlphaAndAbedgeWithBetaToAbedgeWithBetaLoop() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
@@ -265,7 +265,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 
 
   @Test
-  public void ab_edgeWithBeta_empty_to_ab_edgeWithBeta() throws Exception {
+  public void abEdgeWithBetaAndEmptyToAbedgeWithBeta() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithBeta:G {ab_edgeWithBeta : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
@@ -282,7 +282,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithBeta_emptyVertex_to_ab_edgeWithBeta() throws Exception {
+  public void abedgeWithBetaAndEmptyVertexToAbedgeWithBeta() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithBeta:G {ab_edgeWithBeta : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
@@ -299,7 +299,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void ab_edgeWithBeta_ab_edgeWithBeta_to_fused_edgeWithBeta() throws Exception {
+  public void abEdgeWithBetaAndAbedgeWithBetaToFusedEdgeWithBeta() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "ab_edgeWithBeta:G {ab_edgeWithBeta : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
@@ -317,7 +317,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void abcdGraph_abcdGraph_to_abdGraph() throws Exception {
+  public void abcdGraphAndAbcdGraphToAbdGraph() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("abcdGraph:G {abcdGraph : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
@@ -336,7 +336,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 
 
   @Test
-  public void semicomplex_looplessPattern_to_firstmatch() throws Exception {
+  public void semicomplexAndLooplessPatternToFirstmatch() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("semicomplex:G {semicomplex : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
@@ -368,7 +368,7 @@ public class FusionTest extends GradoopFlinkTestBase {
 
 
   @Test
-  public void tricky_looplessPattern_to_thirdmatch() throws Exception {
+  public void trickyLooplessAndPatternToThirdmatch() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("tricky:G {tricky : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
@@ -399,7 +399,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void source_pattern_to_source_fusewith_pattern() throws Exception {
+  public void sourceAndPatternToSourceFusewithPattern() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
@@ -427,7 +427,7 @@ public class FusionTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void pattern_source_to_pattern_fusewith_source() throws Exception {
+  public void patternAndSourceToPatternfusewithsource() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("pattern:G {pattern : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"}) " + "]" + "" + "source:G {source : \"graph\"}[" +

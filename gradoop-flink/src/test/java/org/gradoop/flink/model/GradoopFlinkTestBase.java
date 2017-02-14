@@ -80,7 +80,7 @@ public abstract class GradoopFlinkTestBase {
   }
 
   /**
-   * Returns the default configuration for the check
+   * Returns the default configuration for the test
    *
    * @return Gradoop Flink configuration
    */
@@ -93,7 +93,7 @@ public abstract class GradoopFlinkTestBase {
   //----------------------------------------------------------------------------
 
   /**
-   * Custom check cluster start routine,
+   * Custom test cluster start routine,
    * workaround to set TASK_MANAGER_MEMORY_SIZE.
    *
    * TODO: remove, when future issue is fixed
@@ -171,7 +171,7 @@ public abstract class GradoopFlinkTestBase {
   }
 
   /**
-   * Returns an uninitialized loader with the check config.
+   * Returns an uninitialized loader with the test config.
    *
    * @return uninitialized Flink Ascii graph loader
    */

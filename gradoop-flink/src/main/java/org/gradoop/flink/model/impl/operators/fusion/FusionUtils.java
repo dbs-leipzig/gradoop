@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.fusion;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.JoinOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TypeInfoParser;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -34,34 +35,14 @@ import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.fusion.functions.FilterSubgraphEdges;
 
 /**
  * Created by Giacomo Bergami on 25/01/17.
  */
 public class FusionUtils {
-
-  /**
-   * Recreate another graph which is a copy of the graph x provided as an input
-   *
-   * @param x Input graph
-   * @return Copy graph
-   */
-  public static LogicalGraph recreateGraph(LogicalGraph x) {
-    return LogicalGraph
-      .fromDataSets(x.getGraphHead(), x.getVertices(), x.getEdges(), x.getConfig());
-  }
-
-  /**
-   * Given g...
-   *
-   * @param g Graph where the id should be returned
-   * @return returns its ID through a DataSet collection
-   */
-  public static DataSet<GradoopId> getGraphId(LogicalGraph g) {
-    return g.getGraphHead().map(new Id<>());
-  }
-
   /**
    * Filters a collection form a graph dataset performing either an intersection or a difference
    *
@@ -73,8 +54,9 @@ public class FusionUtils {
    */
   public static <P extends GraphElement> DataSet<P> areElementsInGraph(DataSet<P> collection,
     LogicalGraph g, boolean inGraph) {
-    return collection.filter(inGraph ? new InGraphBroadcast<>() : new NotInGraphBroadcast<>())
-      .withBroadcastSet(getGraphId(g), GraphContainmentFilterBroadcast.GRAPH_ID);
+    return collection
+      .filter(inGraph ? new InGraphBroadcast<>() : new NotInGraphBroadcast<>())
+      .withBroadcastSet(g.getGraphHead().map(new Id<>()), GraphContainmentFilterBroadcast.GRAPH_ID);
   }
 
   /**
@@ -91,28 +73,21 @@ public class FusionUtils {
     DataSet<Edge> filteredEdges =
       containment.getGraphHead().first(1).map((GraphHead x) -> x.getId())
         .cross(superGraph.getEdges())
-        .with(new CrossFunction<GradoopId, Edge, Tuple2<GradoopId, Edge>>() {
-          @Override
-          public Tuple2<GradoopId, Edge> cross(GradoopId val1, Edge val2) throws Exception {
-            return new Tuple2<>(val1, val2);
-          }
-        }).returns(TypeInfoParser.parse(
-        "Tuple2<org.gradoop.common.model.impl.id" + ".GradoopId, org.gradoop.common.model" +
-          ".impl.pojo.Edge>")).filter(new FilterFunction<Tuple2<GradoopId, Edge>>() {
-            @Override
-            public boolean filter(Tuple2<GradoopId, Edge> value) throws Exception {
-              return value.f1.getGraphIds().contains(value.f0);
-            }
-          }).returns(TypeInfoParser.parse(
-        "Tuple2<org.gradoop.common.model.impl.id" + ".GradoopId, org.gradoop.common.model" +
-          ".impl.pojo.Edge>")).map((Tuple2<GradoopId, Edge> t) -> t.f1).returns(Edge.class);
+        .filter(new FilterSubgraphEdges())
+        .map(new Value1Of2<>())
+        .returns(Edge.class);
 
-    DataSet<Vertex> newVertices =
-      filteredEdges.join(superGraph.getVertices()).where(new SourceId<>()).equalTo(new Id<Vertex>())
-        .with(new RightSide<Edge, Vertex>()).union(
-        filteredEdges.join(superGraph.getVertices()).where(new TargetId<>())
-          .equalTo(new Id<Vertex>()).with(new RightSide<Edge, Vertex>()))
-        .distinct(new Id<Vertex>());
+    DataSet<Vertex> tobeUnitedWith = filteredEdges
+      .join(superGraph.getVertices())
+      .where(new TargetId<>()).equalTo(new Id<>())
+      .with(new RightSide<>());
+
+    DataSet<Vertex> newVertices = filteredEdges
+      .join(superGraph.getVertices())
+      .where(new SourceId<>()).equalTo(new Id<>())
+      .with(new RightSide<>())
+      .union(tobeUnitedWith)
+      .distinct(new Id<>());
 
     return LogicalGraph.fromDataSets(newVertices, filteredEdges, superGraph.getConfig());
   }
