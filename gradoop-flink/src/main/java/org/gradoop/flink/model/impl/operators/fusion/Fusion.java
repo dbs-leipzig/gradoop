@@ -41,10 +41,19 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  *
  * Fusion is a binary operator taking two graphs: a search graph (first parameter) and a
  * pattern graph (second parameter) [This means that this is not a symmetric operator
- * (F(a,b) != F(b,a))]. Such operator behaves in the following way:
+ * (F(a,b) != F(b,a))]. The general idea of this operator is that everything that appears
+ * in the pattern graph is fused into a single vertex into the search graph. A new logical graph
+ * is returned.
  *
- * 2)
- *
+ * 1) If any search graph is empty, an empty result will always be returned
+ * 2) If a pattern graph is empty, then the search graph will always be returned
+ * 3) The vertices of the pattern graph appearing in the first parameter are replaced by a
+ *    new vertex. The old edges of the search graph are updated in the final result so that
+ *    each vertex, either pointing to a to-be-fused vertex or starting from a to-be-fused vertex,
+ *    are respectively updated as either pointing or starting from the fused vertex.
+ * 4) Pattern graph's edges are also taken into account: any edge between to-be-fused vertices
+ *    appearing in the search graph that are not expressed in the pattern graph are
+ *    rendered as hooks over the fused vertex
  *
  */
 public class Fusion implements BinaryGraphToGraphOperator {
