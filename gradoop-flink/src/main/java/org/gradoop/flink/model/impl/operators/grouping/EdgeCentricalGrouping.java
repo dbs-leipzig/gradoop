@@ -17,26 +17,76 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperEdges;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertexAndEdge;
+import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperEdges;
+import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+
+
+import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
 import java.util.List;
 
 /**
  *
  */
-public class EdgeCentricalGrouping extends CentricalGrouping{
+public class EdgeCentricalGrouping extends CentricalGrouping {
+
+  private boolean sourceSpecificGrouping;
+
+  private boolean targetSpecificGrouping;
 
   public EdgeCentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
     boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators,
-    GroupingStrategy groupingStrategy) {
+    GroupingStrategy groupingStrategy, Boolean sourceSpecificGrouping,
+    Boolean targetSpecificGrouping) {
     super(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
       useEdgeLabels, secondaryAggregators, groupingStrategy);
+    this.sourceSpecificGrouping = sourceSpecificGrouping;
+    this.targetSpecificGrouping = targetSpecificGrouping;
   }
 
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
+
+    DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
+      // map edg to edge group item
+      .map(new BuildSuperEdgeGroupItem(getEdgeGroupingKeys(), useEdgeLabels(),
+        getEdgeAggregators()));
+
+    //group vertices by label / properties / both
+    // additionally: source specific / target specific / both
+    DataSet<SuperEdgeGroupItem> edgeGroupItems = groupSuperEdges(edgesForGrouping,
+      sourceSpecificGrouping, targetSpecificGrouping)
+      //apply aggregate function
+      .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), getEdgeAggregators(),
+        sourceSpecificGrouping, targetSpecificGrouping));
+
+    DataSet<SuperEdgeGroupItem> superEdgeGroupItems = edgeGroupItems
+      // filter group representative tuples
+      .filter(new FilterSuperEdges());
+
+    DataSet<VertexWithSuperVertexAndEdge> vertexWithSuper = superEdgeGroupItems
+      .flatMap(new BuildVertexWithSuperVertexAndEdge())
+      .distinct();
+
+
+    //TODO use vertexWithSuper to set the source and the target for each edge
+    DataSet<Edge> superEdges = superEdgeGroupItems
+      // build super edges
+      .map(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
+        config.getEdgeFactory()));
+
+
+
+
     return null;
   }
 

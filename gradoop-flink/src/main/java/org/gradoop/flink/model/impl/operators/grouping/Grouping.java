@@ -29,6 +29,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroup
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -82,6 +83,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
    */
   public static final String LABEL_SYMBOL = ":label";
+
+  public static final String SOURCE_SYMBOL = ":source";
+
+  public static final String TARGET_SYMBOL = ":target";
   /**
    * Used to verify if a grouping key is used for all vertices.
    */
@@ -245,6 +250,51 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
+   * Group edges by either vertex label, vertex property or both and additionally source specific,
+   * target specific or both.
+   *
+   * @param groupSuperEdges dataset containing edge representation for grouping
+   * @return unsorted edge grouping
+   */
+  protected UnsortedGrouping<SuperEdgeGroupItem> groupSuperEdges(
+    DataSet<SuperEdgeGroupItem> groupSuperEdges, Boolean sourceSpecific, Boolean targetSpecific) {
+    UnsortedGrouping<SuperEdgeGroupItem> edgeGrouping;
+
+    if (useVertexLabels() && useVertexProperties()) {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 3, 4, 5);
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 4, 5);
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(3, 4, 5);
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(4, 5);
+      }
+    } else if (useVertexLabels()) {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 3, 4);
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 4);
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(3, 4);
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(4);
+      }
+    } else {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 3, 5);
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(2, 5);
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(3, 5);
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(5);
+      }
+    }
+    return edgeGrouping;
+  }
+
+  /**
    * Build super edges by joining them with vertices and their super vertex.
    *
    * @param graph                     input graph
@@ -321,6 +371,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     private List<LabelGroup> vertexLabelGroups;
 
     /**
+     * True, iff edge's source shall be considered.
+     */
+    private boolean useEdgeSource;
+
+    /**
+     * True, iff edge's target shall be considered.
+     */
+    private boolean useEdgeTarget;
+
+    /**
      * Stores grouping keys for a specific edge label.
      */
     private List<LabelGroup> edgeLabelGroups;
@@ -351,6 +411,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder() {
       this.useVertexLabel           = false;
       this.useEdgeLabel             = false;
+      this.useEdgeSource          = false;
+      this.useEdgeTarget          = false;
       this.vertexLabelGroups        = Lists.newArrayList();
       this.edgeLabelGroups          = Lists.newArrayList();
       this.globalVertexAggregators  = Lists.newArrayList();
@@ -431,6 +493,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       Objects.requireNonNull(key);
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useEdgeLabel(true);
+      } else if (key.equals(Grouping.SOURCE_SYMBOL)) {
+        useEdgeSource(true);
+      } else if (key.equals(Grouping.TARGET_SYMBOL)) {
+        useEdgeTarget(true);
       } else {
         defaultEdgeLabelGroup.addPropertyKey(key);
       }
@@ -605,6 +671,28 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
+     * Define, if the edge's source shall be used for grouping edges.
+     *
+     * @param useEdgeSource true, iff edge's source shall be used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder useEdgeSource(boolean useEdgeSource) {
+      this.useEdgeSource = useEdgeSource;
+      return this;
+    }
+
+    /**
+     * Define, if the edge's target shall be used for grouping edges.
+     *
+     * @param useEdgeTarget true, iff edge's target shall be used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder useEdgeTarget(boolean useEdgeTarget) {
+      this.useEdgeTarget = useEdgeTarget;
+      return this;
+    }
+
+    /**
      * Add an aggregate function which is applied on all vertices represented by a single super
      * vertex which do not have a specific label group.
      *
@@ -695,11 +783,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
         switch (centricalStrategy) {
         case VERTEX_CENTRIC:
           groupingOperator = new VertexCentricalGrouping(
-              useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy);
           break;
         case EDGE_CENTRIC:
           groupingOperator = new EdgeCentricalGrouping(
-              useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy,
+            useEdgeSource, useEdgeTarget);
           break;
         default:
           throw new IllegalArgumentException("Unsupported centrical strategy: " + centricalStrategy);
