@@ -35,8 +35,8 @@ import java.util.List;
  * the edge id, edge label, edge source, edge target, edge group properties and edge aggregate
  * properties.
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
-@FunctionAnnotation.ReadFields("label;properties") //TODO check for updates (source,target)
+//@FunctionAnnotation.ForwardedFields("id->f0")
+//@FunctionAnnotation.ReadFields("label;properties") //TODO check for updates (source,target)
 public class BuildSuperEdgeGroupItem
   extends BuildBase
   implements MapFunction<Edge, SuperEdgeGroupItem> {
@@ -72,8 +72,8 @@ public class BuildSuperEdgeGroupItem
   @Override
   public SuperEdgeGroupItem map(Edge edge) throws Exception {
     reuseSuperEdgeGroupItem.setEdgeId(edge.getId());
-    reuseSuperEdgeGroupItem.addSourceId(edge.getSourceId());
-    reuseSuperEdgeGroupItem.addTargetId(edge.getTargetId());
+    reuseSuperEdgeGroupItem.setSourceId(edge.getSourceId());
+    reuseSuperEdgeGroupItem.setTargetId(edge.getTargetId());
     reuseSuperEdgeGroupItem.setGroupLabel(getLabel(edge));
     reuseSuperEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
     if (doAggregate()) {

@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.tuple.Tuple8;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -38,6 +39,11 @@ import java.util.Set;
 public class SuperEdgeGroupItem
   extends Tuple8<GradoopId, GradoopId, Set<GradoopId>, Set<GradoopId>, String, PropertyValueList,
     PropertyValueList, Boolean> {
+
+  public SuperEdgeGroupItem() {
+    f2 = Sets.newHashSet();
+    f3 = Sets.newHashSet();
+  }
 
   public GradoopId getEdgeId() {
     return f0;
@@ -71,6 +77,11 @@ public class SuperEdgeGroupItem
     f2.addAll(sourceVertexIds);
   }
 
+  public void setSourceId(GradoopId sourceVertexId) {
+    f2.clear();
+    f2.add(sourceVertexId);
+  }
+
   public Set<GradoopId> getTargetIds() {
     return f3;
   }
@@ -87,6 +98,10 @@ public class SuperEdgeGroupItem
     f3.addAll(targetVertexIds);
   }
 
+  public void setTargetId(GradoopId targetVertexId) {
+    f3.clear();
+    f3.add(targetVertexId);
+  }
 
   public String getGroupLabel() {
     return f4;
