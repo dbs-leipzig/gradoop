@@ -31,7 +31,7 @@ import java.util.Objects;
  * @param <K>   In order to serialize the object, the parameter type should belong to a serializable
  *              object
  */
-public class OptSerializable<K extends Serializable> implements Serializable {
+public class OptSerializable<K extends Serializable> implements Serializable, IOptSerializable {
   /**
    * Checks if the value is present or not.
    */

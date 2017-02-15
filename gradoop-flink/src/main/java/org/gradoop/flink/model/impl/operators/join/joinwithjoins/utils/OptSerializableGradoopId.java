@@ -46,7 +46,7 @@ public class OptSerializableGradoopId extends OptSerializable<GradoopId> impleme
    * @return        an instance of an optional value with a missing GradoopId value
    */
   public static  OptSerializableGradoopId empty() {
-    return new OptSerializableGradoopId(false, null);
+    return new OptSerializableGradoopId(false, GradoopId.NULL_VALUE);
   }
 
   /**
