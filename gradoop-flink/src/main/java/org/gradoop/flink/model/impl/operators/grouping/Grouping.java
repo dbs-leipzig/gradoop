@@ -28,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroup
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -256,11 +257,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param groupSuperEdges dataset containing edge representation for grouping
    * @return unsorted edge grouping
    */
-  protected UnsortedGrouping<SuperEdgeGroupItem> groupSuperEdges(
-    DataSet<SuperEdgeGroupItem> groupSuperEdges, Boolean sourceSpecific, Boolean targetSpecific) {
-    UnsortedGrouping<SuperEdgeGroupItem> edgeGrouping;
+  protected UnsortedGrouping<EdgeWithSuperEdgeGroupItem> groupSuperEdges(
+    DataSet<EdgeWithSuperEdgeGroupItem> groupSuperEdges, Boolean sourceSpecific, Boolean targetSpecific) {
+    UnsortedGrouping<EdgeWithSuperEdgeGroupItem> edgeGrouping;
 
-    if (useVertexLabels() && useVertexProperties()) {
+    if (useEdgeLabels() && useEdgeProperties()) {
       if (sourceSpecific && targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(2, 3, 4, 5);
       } else if (sourceSpecific) {
@@ -270,7 +271,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       } else {
         edgeGrouping = groupSuperEdges.groupBy(4, 5);
       }
-    } else if (useVertexLabels()) {
+    } else if (useEdgeLabels()) {
       if (sourceSpecific && targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(2, 3, 4);
       } else if (sourceSpecific) {
