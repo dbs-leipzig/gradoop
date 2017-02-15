@@ -35,6 +35,9 @@ public class KeySelectorFromRightProjection implements KeySelector<Tuple2<Vertex
   OptSerializableGradoopId>, Integer>,
   Serializable {
 
+  /**
+   * Default constructor
+   */
   public KeySelectorFromRightProjection() {  }
 
   @Override

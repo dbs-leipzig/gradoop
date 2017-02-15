@@ -27,9 +27,10 @@ import java.util.function.Function;
 
 /**
  * Defining a non-serializable function allowing to pre-evaluate the vertices if required.
+ * @param <K> Element that is filtered prior to the actual join phase
  *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public interface PreFilter<K extends EPGMElement, P> extends Function<DataSet<K>, DataSet<Tuple2<Vertex, OptSerializableGradoopId>>> {
+public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<Tuple2<Vertex, OptSerializableGradoopId>>> {
 
 }

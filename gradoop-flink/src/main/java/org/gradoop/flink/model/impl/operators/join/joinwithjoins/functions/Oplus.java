@@ -24,7 +24,6 @@ import org.gradoop.flink.model.api.functions.Function;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.function.Supplier;
 
 /**
  * Defining a generic class for chaining two elments into once
@@ -49,42 +48,25 @@ public abstract class  Oplus<K extends EPGMElement> implements Function<Tuple2<K
    */
   public abstract String concatenateLabels(String labelLeft, String labelRight);
 
-  public static <K extends EPGMElement> Oplus<K> generate(Supplier<K> supplier,
-    Function<Tuple2<String, String>, String>
-    labelConcatenation) {
-    return new Oplus<K>() {
-      @Override
-      public K supplyEmpty() {
-        return supplier.get();
-      }
-
-      @Override
-      public String concatenateLabels(String labelLeft, String labelRight) {
-        return labelConcatenation.apply(new Tuple2<>(labelLeft, labelRight));
-      }
-
-    };
-  }
-
   @Override
   public K apply(Tuple2<K, K> k) {
     final K left = k.f0;
     final K right = k.f1;
-   et = supplyEmpty();
-   toret.setId(GradoopId.get());
-   toret.setLabel(concatenateLabels(left.getLabel(), right.getLabel()));
-   et<String> ll = new HashSet<String>();
-   left.getProperties().getKeys().forEach(ll::add);
-   et<String> rr = new HashSet<String>();
-   right.getProperties().getKeys().forEach(rr::add);
-   ll.retainAll(rr);
-   for (String x : left.getProperties().getKeys()) {
-     toret.setProperty(x, left.getPropertyValue(x));
-   }
-   for (String x : right.getProperties().getKeys()) {
-     toret.setProperty(x, right.getPropertyValue(x));
-   }
-   return (toret);
+    K toret = supplyEmpty();
+    toret.setId(GradoopId.get());
+    toret.setLabel(concatenateLabels(left.getLabel(), right.getLabel()));
+    HashSet<String> ll = new HashSet<String>();
+    left.getProperties().getKeys().forEach(ll::add);
+    HashSet<String> rr = new HashSet<String>();
+    right.getProperties().getKeys().forEach(rr::add);
+    ll.retainAll(rr);
+    for (String x : left.getProperties().getKeys()) {
+      toret.setProperty(x, left.getPropertyValue(x));
+    }
+    for (String x : right.getProperties().getKeys()) {
+      toret.setProperty(x, right.getPropertyValue(x));
+    }
+    return toret;
   }
 
 }

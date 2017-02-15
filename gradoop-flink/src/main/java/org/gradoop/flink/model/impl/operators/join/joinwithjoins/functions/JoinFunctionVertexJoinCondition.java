@@ -28,15 +28,28 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
 import java.io.Serializable;
 
 /**
- * Implements the join operation for the vertices
+ * Implements the join operation for the vertices: check if two vertices from the two operands
+ * match, and merge them together in a single tuple.
  *
  * Created by Giacomo Bergami on 01/02/17.
  */
 public class JoinFunctionVertexJoinCondition extends
   RichFlatJoinFunction<Vertex, Vertex, UndovetailingOPlusVertex> implements Serializable {
+  /**
+   * Selection function over pair of opreands' vertices
+   */
   private final Function<Tuple2<Vertex, Vertex>, Boolean> thetaVertexF;
+
+  /**
+   * How to merge the vertices that passed the check
+   */
   private final OplusVertex combineVertices;
 
+  /**
+   * Implements the join operation for the vertices
+   * @param thetaVertexF      Selection function over pair of opreands' vertices
+   * @param combineVertices   How to merge the vertices that passed the check
+   */
   public JoinFunctionVertexJoinCondition(Function<Tuple2<Vertex, Vertex>, Boolean> thetaVertexF,
     OplusVertex combineVertices) {
     this.thetaVertexF = thetaVertexF;
@@ -54,12 +67,16 @@ public class JoinFunctionVertexJoinCondition extends
       }
     } else if (first == null) {
       out.collect(
-        new UndovetailingOPlusVertex(OptSerializableGradoopId.empty(), OptSerializableGradoopId.value(second.getId()),
-          second));
+        new UndovetailingOPlusVertex(OptSerializableGradoopId.empty(),
+                                     OptSerializableGradoopId.value(second.getId()),
+                                     second)
+      );
     } else {
       out.collect(
-        new UndovetailingOPlusVertex(OptSerializableGradoopId.value(first.getId()), OptSerializableGradoopId.empty(),
-          first));
+        new UndovetailingOPlusVertex(OptSerializableGradoopId.value(first.getId()),
+                                     OptSerializableGradoopId.empty(),
+                                     first)
+      );
     }
   }
 }

@@ -28,9 +28,22 @@ import java.io.Serializable;
  */
 public class UndovetailingOPlusVertex extends
   Tuple3<OptSerializableGradoopId, OptSerializableGradoopId, Vertex> implements Serializable {
-  public UndovetailingOPlusVertex(OptSerializableGradoopId empty, OptSerializableGradoopId value,
-    Vertex second) {
-    super(empty, value, second);
+
+  /**
+   * Default constructor
+   * @param left   Left operand vertex id corrisponding to the third parameter
+   * @param right  Right operand vertex id corrisponding to the third parameter
+   * @param mergedCorrespondingVertex  Newly created vertex from left and right
+   */
+  public UndovetailingOPlusVertex(OptSerializableGradoopId left, OptSerializableGradoopId right,
+    Vertex mergedCorrespondingVertex) {
+    super(left, right, mergedCorrespondingVertex);
   }
-  public UndovetailingOPlusVertex() {  }
+
+  /**
+   * Required element-free constructor, (otherwise Apache Flink curses…)
+   */
+  public UndovetailingOPlusVertex() {
+    super();
+  }
 }

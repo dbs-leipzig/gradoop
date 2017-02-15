@@ -44,8 +44,8 @@ public class JoinWithJoinsUtils {
    * @param <K>         Element type
    * @return            The outcome of the combination of the left and right elements
    */
-  public static <K> JoinOperatorSetsBase<K, K> joinByType(DataSet<K> left, DataSet<K> right, JoinType
-    joinType) {
+  public static <K> JoinOperatorSetsBase<K, K> joinByType(
+    DataSet<K> left, DataSet<K> right, JoinType  joinType) {
     switch (joinType) {
     case INNER:
       return left.join(right);
@@ -59,11 +59,13 @@ public class JoinWithJoinsUtils {
   }
 
   /**
+   * Joins an operand dataset with a disambiguation one
    *
-   * @param left            Left operand
-   * @param right           Right operand
+   * @param left            Operand
+   * @param right           Disambiguation dataset
    * @param joinType        Type of join to be used
-   * @param isCorrectOrder
+   * @param isCorrectOrder  Checks if the left is actually the left operand and not the right one.
+   *                        The right operand, in this case, is always the disambiguation dataset
    * @param <K>             Left element type
    * @param <J>             Right element type
    * @return                The outcome of the combination of the left and right elements
@@ -90,7 +92,9 @@ public class JoinWithJoinsUtils {
    */
   public static Function<Tuple2<String, String>, String> generateConcatenator(
     @Nullable Function<Tuple2<String, String>, String> edgeLabelConcatenation) {
-    return edgeLabelConcatenation == null ? new DefaultStringConcatenationFunction() : edgeLabelConcatenation;
+    return edgeLabelConcatenation == null ?
+      new DefaultStringConcatenationFunction() :
+      edgeLabelConcatenation;
   }
 
   /**
@@ -102,11 +106,11 @@ public class JoinWithJoinsUtils {
    * @return      The extended function
    */
   public static <K extends EPGMElement> Function<Tuple2<K, K>, Boolean> extendBasic
-    (@Nullable Function<K, Function<K, Boolean>> prop) {
+  (@Nullable Function<K, Function<K, Boolean>> prop) {
     return new Function<Tuple2<K, K>, Boolean>() {
 
-      Function<K, Function<K, Boolean>> local = prop == null ?
-        (e1 -> (e2 -> true)) : prop;
+      private Function<K, Function<K, Boolean>> local = prop == null ?
+        e1 -> e2 -> true : prop;
 
       @Override
       public Boolean apply(Tuple2<K, K> entity) {
@@ -118,8 +122,9 @@ public class JoinWithJoinsUtils {
         right.getProperties().getKeys().forEach(rr::add);
         ll.retainAll(rr);
         for (String x : ll) {
-          if (!left.getPropertyValue(x).equals(right.getPropertyValue(x)))
+          if (!left.getPropertyValue(x).equals(right.getPropertyValue(x))) {
             return false;
+          }
         }
         return local.apply(left).apply(right);
       }
@@ -133,24 +138,23 @@ public class JoinWithJoinsUtils {
    */
   public static  Function<Tuple2<Triple, Triple>, Boolean>
   extendBasic2
-    (@Nullable Function<Triple, Function<Triple, Boolean>> prop) {
+  (@Nullable Function<Triple, Function<Triple, Boolean>> prop) {
     return new Function<Tuple2<Triple, Triple>, Boolean>() {
       @Override
       public Boolean apply(final Tuple2<Triple, Triple> p) {
-
         Function<Triple, Function<Triple, Boolean>> local = prop == null ?
-          (e1 -> (e2 -> true)) : prop;
-
-            HashSet<String> ll = new HashSet<String>();
-            p.f0.f1.getProperties().getKeys().forEach(ll::add);
-            HashSet<String> rr = new HashSet<String>();
-            p.f1.f1.getProperties().getKeys().forEach(rr::add);
-            ll.retainAll(rr);
-            for (String x : ll) {
-              if (!p.f0.f1.getPropertyValue(x).equals(p.f1.f1.getPropertyValue(x)))
-                return false;
-            }
-            return local.apply(p.f0).apply(p.f1);
+          e1 -> e2 -> true : prop;
+        HashSet<String> ll = new HashSet<String>();
+        p.f0.f1.getProperties().getKeys().forEach(ll::add);
+        HashSet<String> rr = new HashSet<String>();
+        p.f1.f1.getProperties().getKeys().forEach(rr::add);
+        ll.retainAll(rr);
+        for (String x : ll) {
+          if (!p.f0.f1.getPropertyValue(x).equals(p.f1.f1.getPropertyValue(x))) {
+            return false;
+          }
+        }
+        return local.apply(p.f0).apply(p.f1);
       }
     };
   }

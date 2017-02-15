@@ -36,7 +36,7 @@ public class JoinFunctionFlatWithGradoopIds implements
   FlatJoinFunction<Tuple2<Vertex, OptSerializableGradoopId>,
     Tuple2<Vertex, OptSerializableGradoopId>, UndovetailingOPlusVertex>, Serializable {
 
-  /*
+  /**
    * Function used to check if the vertices match or not
    */
   private final Function<Tuple2<Vertex, Vertex>, Boolean> thetaVertexF;
@@ -66,11 +66,8 @@ public class JoinFunctionFlatWithGradoopIds implements
     Collector<UndovetailingOPlusVertex> out) throws Exception {
     // Inner join condition
     if (first != null && second != null && first.f1.isPresent() && second.f1.isPresent()) {
-      Vertex ff0 = first.getField(0), sf0 = second.getField(0);
-      if (ff0 == null)
-        throw new RuntimeException("ff0 is null");
-      else if (sf0 == null)
-        throw new RuntimeException("sf0 is null");
+      Vertex ff0 = first.getField(0);
+      Vertex sf0 = second.getField(0);
       if (thetaVertexF.apply(new Tuple2<>(ff0, sf0))) {
         out.collect(new UndovetailingOPlusVertex(OptSerializableGradoopId.value(ff0.getId()),
           OptSerializableGradoopId.value(sf0.getId()),

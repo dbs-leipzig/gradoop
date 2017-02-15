@@ -31,31 +31,53 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.*;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.CoJoinGraphHeads;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .JoinFunctionFlatWithGradoopIds;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .JoinFunctionVertexJoinCondition;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.KeySelectorFromFunction;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .KeySelectorFromRightProjection;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .KeySelectorTripleHashfunction;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .CrossFunctionAddUndovetailingToGraph;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.OplusHeads;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.OplusVertex;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.PreFilter;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.JoinWithJoinsUtils;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
-
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .CrossFunctionAddEpgmElementToGraphThroughGraphHead;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .JoinFunctionAssociateVertexWithEdge;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .KeySelectorFromTupleProjetionWithTargetId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .JoinFunctionCreateTriple;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .FilterFunctionIsThereElement;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .MapFunctionProjectUndovetailingToGraphOperand;
 /**
  *
  * General abstract class with everything required to implement every possible graph join definition
  * formally.
  *
  * Created by Giacomo Bergami on 30/01/17.
- *
- * @param <PV> value over which, eventually, perform the multi-key join
- *             (activated by the PreFilter parameters)
  */
-public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator {
+public class GeneralJoinWithJoinsPlan implements BinaryGraphToGraphOperator {
 
-  /*
+  /**
    * Returning the GradoopId belonging to one of the operands' vertices
    */
   private static final Value0Of2<GradoopId, Vertex> LEFT_FUNCTION_PROJECTION = new Value0Of2<>();
 
-  /*
+  /**
    * Hashing the triples (vertices from the to-be-returned graph and the edge from one of the two
    * operands) by ignoring the aforementioned edge and hashing by vertices' id
    */
@@ -68,36 +90,36 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
   private static final KeySelectorFromRightProjection PROJECTOR = new
     KeySelectorFromRightProjection();
 
-  /* A Inner/Left/Right/Full graph join depend on the
+  /** A Inner/Left/Right/Full graph join depend on the
    * Inner/Left/Right/Full join performed over the vertices
    */
   private final JoinType vertexJoinType;
 
-  /*This class casts all the information about the way to combine the edges
+  /** This class casts all the information about the way to combine the edges
    */
   private final GeneralEdgeSemantics edgeSemanticsImplementation;
 
-  /* Non-Serializable function for mapping a vertex DataSet
+  /** Non-Serializable function for mapping a vertex DataSet
    * from the left graph into a dataset where vertices
    * are extended with their joining key (ideal when
    * there could be multiple join keys for the same vertex)
    */
-  private final PreFilter<Vertex, PV> leftPrefilter;
+  private final PreFilter<Vertex> leftPrefilter;
 
-  /* Non-Serializable function for mapping a vertex DataSet
+  /** Non-Serializable function for mapping a vertex DataSet
    * from the right graph into a dataset where vertices
    * are extended with their joining key (ideal when
    * there could be multiple join keys for the same vertex)
    */
-  private final PreFilter<Vertex, PV>  rightPrefilter;
+  private final PreFilter<Vertex>  rightPrefilter;
 
-  /*
+  /**
    * The user-defined hash function for left vertices is wrapped, so that if no function is given,
    * then the vertices are automatically mapped to a zero-constant.
    */
   private final KeySelectorFromFunction leftHash;
 
-  /*
+  /**
    * The user-defined hash function for right vertices is wrapped, so that if no function is given,
    * then the vertices are automatically mapped to a zero-constant.
    */
@@ -120,7 +142,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
    */
   private final CoJoinGraphHeads cojoingraphheads;
 
-  /*
+  /**
    * Provides the operands' vertices from the previous match with the relation
    */
   private Value0Of2<Vertex, OptSerializableGradoopId> mapper;
@@ -203,7 +225,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
 
     JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
 
-    @Nullable PreFilter<Vertex, PV> leftPreFilter, @Nullable PreFilter<Vertex, PV> rightPreFilter,
+    @Nullable PreFilter<Vertex> leftPreFilter, @Nullable PreFilter<Vertex> rightPreFilter,
 
     @Nullable Function<Vertex, Long> leftHash, @Nullable Function<Vertex, Long> rightHash,
 
@@ -307,17 +329,24 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
     return LogicalGraph.fromDataSets(gh, vertices, edges, firstGraph.getConfig());
   }
 
+  /**
+   * Function clearing the previous state
+   */
   private void clear() {
     lrVjoin = null;
+    leftV = null;
+    rightV = null;
     mapper = null;
   }
 
   /**
+   * Joins the vertices using the operands' edges
    *
    * @param edges                 Edges appearing in one of the two operands
    * @param verticesToBeReturned  Association between the old vertex id from the graph operand and
-   *                              the
-   * @return
+   *                              the newly-created vertices
+   * @return                      the final triples combining the vertices from the to-be-returned
+   *                              graph and the edge from the original graph operand
    */
   private DataSet<Triple> joinEdgePerGraphViaTriples(DataSet<Edge> edges,
     DataSet<Tuple2<GradoopId, Vertex>> verticesToBeReturned) {
@@ -337,9 +366,12 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
    * @param rightGraphVertices  edges coming from the right operand
    */
   private void joinVertices(DataSet<Vertex> leftGraphVertices, DataSet<Vertex> rightGraphVertices) {
-    DataSet<Vertex> left = leftGraphVertices, right = rightGraphVertices;
-    DataSet<Tuple2<Vertex, OptSerializableGradoopId>> leftP = null, rightP = null;
-    boolean leftFilter = false, rightFilter = false;
+    DataSet<Vertex> left = leftGraphVertices;
+    DataSet<Vertex> right = rightGraphVertices;
+    DataSet<Tuple2<Vertex, OptSerializableGradoopId>> leftP = null;
+    DataSet<Tuple2<Vertex, OptSerializableGradoopId>> rightP = null;
+    boolean leftFilter = false;
+    boolean rightFilter = false;
 
     /*
      * Sometimes I could pre-filter the vertices and demultiplex them…

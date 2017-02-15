@@ -32,8 +32,16 @@ import java.io.Serializable;
 @FunctionAnnotation.ForwardedFields("sourceId->*; targetId->*")
 public class KeySelectorFromVertexSrcOrDest implements KeySelector<Edge, GradoopId>, Serializable {
 
-  public final boolean isLeft;
+  /**
+   * Defines for which opreand is the UDF used for
+   */
+  private final boolean isLeft;
 
+  /**
+   * Default initialization
+   * @param elem  If true, it corresponds to the left operand. Otherwise, it corresponds to the
+   *              right one
+   */
   public KeySelectorFromVertexSrcOrDest(boolean elem) {
     isLeft = elem;
   }

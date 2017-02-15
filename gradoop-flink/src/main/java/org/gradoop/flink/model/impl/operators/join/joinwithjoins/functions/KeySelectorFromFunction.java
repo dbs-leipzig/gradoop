@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
+import com.sun.istack.Nullable;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
@@ -30,14 +31,18 @@ import java.io.Serializable;
  */
 public class KeySelectorFromFunction implements KeySelector<Vertex, Long>, Serializable {
 
+  /**
+   * Function mapping each vertex into an arbitrary long value. If this function is null,
+   * then the function is the 0L constant function
+   */
   private final Function<Vertex, Long> function;
 
-  public KeySelectorFromFunction(Function<Vertex, Long> function) {
+  /**
+   * Defines a KeySelector from a user-given function
+   * @param function    User-defined function
+   */
+  public KeySelectorFromFunction(@Nullable Function<Vertex, Long> function) {
     this.function = function;
-  }
-
-  public KeySelectorFromFunction() {
-    this.function = null;
   }
 
   @Override

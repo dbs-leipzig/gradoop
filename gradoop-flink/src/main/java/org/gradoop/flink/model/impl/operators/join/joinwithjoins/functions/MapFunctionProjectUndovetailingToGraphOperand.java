@@ -18,18 +18,31 @@
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
 
 /**
- * Created by vasistas on 14/02/17.
+ * Projects the Tuple3 UndovetailingOPlusVertex either to <f0,f2> or to <f1,f2>.
+ * f0 and f1 are transformed, too
+ *
+ * Created by Giacomo Bergami on 14/02/17.
  */
+@FunctionAnnotation.ForwardedFields("f2->f1")
 public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunction<UndovetailingOPlusVertex, Tuple2<GradoopId, Vertex>> {
 
+  /**
+   * Defines for which opreand is the UDF used for
+   */
   private final boolean isLeft;
 
+  /**
+   * Default initialization
+   * @param isLeft  If true, it corresponds to the left operand. Otherwise, it corresponds to the
+   *              right one
+   */
   public MapFunctionProjectUndovetailingToGraphOperand(boolean isLeft) {
     this.isLeft = isLeft;
   }

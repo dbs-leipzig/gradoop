@@ -21,7 +21,6 @@ import com.sun.istack.Nullable;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -34,30 +33,52 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.PreFi
  *
  * Created by Giacomo Bergami on 31/01/17.
  */
-public class GraphEdgeJoinWithJoins extends GeneralJoinWithJoinsPlan<GradoopId> {
+public class GraphEdgeJoinWithJoins extends GeneralJoinWithJoinsPlan {
 
   /**
+   * Simples constructor.
    *
-   * @param vertexJoinType
-   * @param edgeSemanticsImplementation
+   * @param vertexJoinType                Expresses the type of graph join by defining the
+   *                                      way to join the vertices
+   * @param edgeSemanticsImplementation   General way to combine the edges
    * @param relations                     Set of edges used as predicate. Alongside with the
    *                                      vertexJoinType, it induces the definition of the
    *                                      prefiltering function
    */
-  public GraphEdgeJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
+  public GraphEdgeJoinWithJoins(
+    JoinType vertexJoinType,
+    GeneralEdgeSemantics edgeSemanticsImplementation,
     DataSet<Edge> relations) {
-    this(vertexJoinType, edgeSemanticsImplementation, relations, null, null, null, null);
+    this(vertexJoinType, edgeSemanticsImplementation, relations,
+      null, null, null, null);
   }
 
-  public GraphEdgeJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
-    DataSet<Edge> relations, @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
+  /**
+   * Most general definition, allowing even a filtering condition after matching all the elements
+   * that are related to each other
+   * @param vertexJoinType                Expresses the type of graph join by defining the
+   *                                      way to join the vertices
+   * @param edgeSemanticsImplementation   General way to combine the edges
+   * @param relations                     Set of edges used as predicate. Alongside with the
+   *                                      vertexJoinType, it induces the definition of the
+   *                                      prefiltering function
+   * @param thetaVertex                   Other function for post-filtering the matched vertices
+   * @param thetaGraph                    Condition over the graphs' tuples
+   * @param vertexLabelConcatenation      How to concatenate the vertices' labels together
+   * @param graphLabelConcatenation       How to concatenate the graph heads' labels together
+   */
+  public GraphEdgeJoinWithJoins(
+    JoinType vertexJoinType,
+    GeneralEdgeSemantics edgeSemanticsImplementation,
+    DataSet<Edge> relations,
+    @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
     @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph,
     @Nullable Function<Tuple2<String, String>, String> vertexLabelConcatenation,
     @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
     super(vertexJoinType, edgeSemanticsImplementation,
       new PreFilterRelationalJoin(true, relations, vertexJoinType),
-      new PreFilterRelationalJoin(false, relations, vertexJoinType), null, null, thetaVertex,
-      thetaGraph,
+      new PreFilterRelationalJoin(false, relations, vertexJoinType),
+      null, null, thetaVertex, thetaGraph,
       vertexLabelConcatenation, graphLabelConcatenation);
   }
 

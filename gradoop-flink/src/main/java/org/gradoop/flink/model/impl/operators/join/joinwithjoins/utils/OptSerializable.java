@@ -89,7 +89,7 @@ public class OptSerializable<K extends Serializable> implements Serializable {
         return true;
       } else if (o instanceof OptSerializable) {
         OptSerializable<K> tr = (OptSerializable<K>) o;
-        return tr != null && Objects.equals(tr.elem, elem) && isThereElement == tr.isThereElement;
+        return Objects.equals(tr.elem, elem) && isThereElement == tr.isThereElement;
       } else {
         return false;
       }

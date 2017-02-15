@@ -20,39 +20,97 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins;
 import com.sun.istack.Nullable;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.PredefinedEdgeSemantics;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.PredefinedEdgeSemantics;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 
 /**
+ * Joins two graphs by using predicates as the sole possible condition to
+ *
  * Created by Giacomo Bergami on 31/01/17.
  */
-public class GraphThetaJoinWithJoins extends GeneralJoinWithJoinsPlan<Edge> {
+public class GraphThetaJoinWithJoins extends GeneralJoinWithJoinsPlan {
 
-  public GraphThetaJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation) {
-    super(vertexJoinType, edgeSemanticsImplementation, null, null, null, null, null,
+  /**
+   * Performs the graph join using the default label concatenation functions and using
+   * all the predicates as true constants
+   * @param vertexJoinType                Defines the general graph join type providing the way
+   *                                      the vertices are joined together
+   * @param edgeSemanticsImplementation   Defines the most general semantic for combining the edges
+   */
+  public GraphThetaJoinWithJoins(JoinType vertexJoinType,
+    GeneralEdgeSemantics edgeSemanticsImplementation) {
+    super(vertexJoinType, edgeSemanticsImplementation, null, null,
+      null, null, null,
       null, null, null);
   }
 
-  public GraphThetaJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
-    @Nullable Function<Vertex, Long> leftHash, @Nullable Function<Vertex, Long> rightHash, @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
-    @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph, @Nullable Function<Tuple2<String, String>, String>
-    vertexLabelConcatenation,
+  /**
+   * Joining the two graphs using a custom-defined edge semantics
+   *
+   * @param vertexJoinType                Defines the general graph join type providing the way
+   *                                      the vertices are joined together
+   * @param edgeSemanticsImplementation   Defines the most general semantic for combining the edges
+   * @param leftHash                      Prior to the join phase, the left elements are coGrouped
+   *                                      by their hash value. This is applied to the elements
+   *                                      belonging to the left operand
+   * @param rightHash                     Prior to the join phase, the left elements are coGrouped
+   *                                      by their hash value. This is applied to the elements
+   *                                      belonging to the right opreand
+   * @param thetaVertex                   Binary function determining which vertices have to be
+   *                                      merged
+   * @param thetaGraph                    Binary function determining which graphs have to be
+   *                                      medged
+   * @param vertexLabelConcatenation      Function providing a concatenation for the vertex labels
+   * @param graphLabelConcatenation       Function providing a concatenation for the graph head
+   *                                      labels
+   */
+  public GraphThetaJoinWithJoins(JoinType vertexJoinType,
+    GeneralEdgeSemantics edgeSemanticsImplementation,
+    @Nullable Function<Vertex, Long> leftHash, @Nullable Function<Vertex, Long> rightHash,
+    @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
+    @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph,
+    @Nullable Function<Tuple2<String, String>, String> vertexLabelConcatenation,
     @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
     super(vertexJoinType, edgeSemanticsImplementation, null, null, leftHash, rightHash, thetaVertex,
       thetaGraph, vertexLabelConcatenation, graphLabelConcatenation);
   }
 
+  /**
+   * Joining the two graphs using a default edge semantics (conjunctive, disjunctive)
+   *
+   * @param vertexJoinType                Defines the general graph join type providing the way
+   *                                      the vertices are joined together
+   * @param thetaEdge                     Binary function determining which edges have to be
+   *                                      merged
+   * @param es                            Edge default semantics
+   * @param edgeLabelConcatenation        Function providing a concatenation for the edges
+   * @param leftHash                      Prior to the join phase, the left elements are coGrouped
+   *                                      by their hash value. This is applied to the elements
+   *                                      belonging to the left operand
+   * @param rightHash                     Prior to the join phase, the left elements are coGrouped
+   *                                      by their hash value. This is applied to the elements
+   *                                      belonging to the right opreand
+   * @param thetaVertex                   Binary function determining which vertices has to be
+   *                                      merged
+   * @param thetaGraph                    Binary function determining which graphs have to be
+   *                                      medged
+   * @param vertexLabelConcatenation      Function providing a concatenation for the vertex labels
+   * @param graphLabelConcatenation       Function providing a concatenation for the graph head
+   *                                      labels
+   */
   public GraphThetaJoinWithJoins(JoinType vertexJoinType,
     final Function<Triple, Function<Triple, Boolean>> thetaEdge,
     final PredefinedEdgeSemantics es,
-    Function<Tuple2<String, String>, String> edgeLabelConcatenation, @Nullable Function leftHash,
-    @Nullable Function rightHash, @Nullable Function thetaVertex, @Nullable Function thetaGraph,
-    @Nullable Function vertexLabelConcatenation, @Nullable Function graphLabelConcatenation) {
+    @Nullable Function<Tuple2<String, String>, String> edgeLabelConcatenation,
+    @Nullable Function<Vertex, Long> leftHash, @Nullable Function<Vertex, Long> rightHash,
+    @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
+    @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph,
+    @Nullable Function<Tuple2<String, String>, String> vertexLabelConcatenation,
+    @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
     super(vertexJoinType,
       GeneralEdgeSemantics.fromEdgePredefinedSemantics(thetaEdge, es, edgeLabelConcatenation), null,
       null, leftHash, rightHash, thetaVertex, thetaGraph, vertexLabelConcatenation,
