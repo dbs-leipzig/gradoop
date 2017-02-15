@@ -20,7 +20,6 @@ package org.gradoop.flink.model.impl.operators.fusion;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
