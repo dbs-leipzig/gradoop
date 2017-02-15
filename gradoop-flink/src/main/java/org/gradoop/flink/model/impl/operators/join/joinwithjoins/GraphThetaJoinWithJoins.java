@@ -40,9 +40,9 @@ public class GraphThetaJoinWithJoins extends GeneralJoinWithJoinsPlan<Edge> {
 
   public GraphThetaJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
     @Nullable Function<Vertex, Long> leftHash, @Nullable Function<Vertex, Long> rightHash, @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
-    @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph, @Nullable Function<Tuple2<String,String>,String>
+    @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph, @Nullable Function<Tuple2<String, String>, String>
     vertexLabelConcatenation,
-    @Nullable Function<Tuple2<String,String>,String> graphLabelConcatenation) {
+    @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
     super(vertexJoinType, edgeSemanticsImplementation, null, null, leftHash, rightHash, thetaVertex,
       thetaGraph, vertexLabelConcatenation, graphLabelConcatenation);
   }
@@ -50,7 +50,7 @@ public class GraphThetaJoinWithJoins extends GeneralJoinWithJoinsPlan<Edge> {
   public GraphThetaJoinWithJoins(JoinType vertexJoinType,
     final Function<Triple, Function<Triple, Boolean>> thetaEdge,
     final PredefinedEdgeSemantics es,
-    Function<Tuple2<String,String>,String> edgeLabelConcatenation, @Nullable Function leftHash,
+    Function<Tuple2<String, String>, String> edgeLabelConcatenation, @Nullable Function leftHash,
     @Nullable Function rightHash, @Nullable Function thetaVertex, @Nullable Function thetaGraph,
     @Nullable Function vertexLabelConcatenation, @Nullable Function graphLabelConcatenation) {
     super(vertexJoinType,

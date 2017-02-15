@@ -32,13 +32,13 @@ import java.io.Serializable;
  */
 @FunctionAnnotation.ReadFields("f1")
 public class KeySelectorFromRightProjection implements KeySelector<Tuple2<Vertex,
-  OptSerializableGradoopId>,Integer>,
+  OptSerializableGradoopId>, Integer>,
   Serializable {
 
-  public KeySelectorFromRightProjection() {}
+  public KeySelectorFromRightProjection() {  }
 
   @Override
-  public Integer getKey(Tuple2<Vertex,OptSerializableGradoopId> value) throws Exception {
+  public Integer getKey(Tuple2<Vertex, OptSerializableGradoopId> value) throws Exception {
     return value.f1.hashCode();
   }
 }

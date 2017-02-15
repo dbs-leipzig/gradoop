@@ -44,5 +44,5 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> implements Serializable
   /**
    * Required element-free constructor, (otherwise Apache Flink curses…)
    */
-  public Triple() {}
+  public Triple() {  }
 }

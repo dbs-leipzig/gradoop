@@ -30,6 +30,6 @@ import java.util.function.Function;
  *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public interface PreFilter<K extends EPGMElement,P> extends Function<DataSet<K>,DataSet<Tuple2<Vertex,OptSerializableGradoopId>>> {
+public interface PreFilter<K extends EPGMElement, P> extends Function<DataSet<K>, DataSet<Tuple2<Vertex, OptSerializableGradoopId>>> {
 
 }

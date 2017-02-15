@@ -16,7 +16,7 @@ public abstract class OplusSemiConcrete<K extends EPGMElement> extends Oplus<K> 
   /**
    * Label concatenation function
    */
-  public final Function<Tuple2<String,String>,String> transformation;
+  public final Function<Tuple2<String, String>, String> transformation;
 
   /**
    * Default constructor
@@ -34,7 +34,7 @@ public abstract class OplusSemiConcrete<K extends EPGMElement> extends Oplus<K> 
    */
   @Override
   public String concatenateLabels(String labelLeft, String labelRight) {
-    return transformation.apply(new Tuple2<>(labelLeft,labelRight));
+    return transformation.apply(new Tuple2<>(labelLeft, labelRight));
   }
 
 }

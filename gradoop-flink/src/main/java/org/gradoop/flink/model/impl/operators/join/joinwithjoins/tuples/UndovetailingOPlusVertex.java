@@ -30,7 +30,7 @@ public class UndovetailingOPlusVertex extends
   Tuple3<OptSerializableGradoopId, OptSerializableGradoopId, Vertex> implements Serializable {
   public UndovetailingOPlusVertex(OptSerializableGradoopId empty, OptSerializableGradoopId value,
     Vertex second) {
-    super(empty,value,second);
+    super(empty, value, second);
   }
-  public UndovetailingOPlusVertex() {}
+  public UndovetailingOPlusVertex() {  }
 }

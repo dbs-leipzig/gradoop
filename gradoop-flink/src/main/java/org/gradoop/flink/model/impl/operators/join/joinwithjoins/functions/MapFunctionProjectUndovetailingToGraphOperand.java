@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
 /**
  * Created by vasistas on 14/02/17.
  */
-public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunction<UndovetailingOPlusVertex,Tuple2<GradoopId, Vertex>> {
+public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunction<UndovetailingOPlusVertex, Tuple2<GradoopId, Vertex>> {
 
   private final boolean isLeft;
 

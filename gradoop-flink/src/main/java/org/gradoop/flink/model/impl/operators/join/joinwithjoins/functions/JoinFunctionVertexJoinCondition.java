@@ -34,7 +34,7 @@ import java.io.Serializable;
  */
 public class JoinFunctionVertexJoinCondition extends
   RichFlatJoinFunction<Vertex, Vertex, UndovetailingOPlusVertex> implements Serializable {
-  private final Function<Tuple2<Vertex,Vertex>,Boolean> thetaVertexF;
+  private final Function<Tuple2<Vertex, Vertex>, Boolean> thetaVertexF;
   private final OplusVertex combineVertices;
 
   public JoinFunctionVertexJoinCondition(Function<Tuple2<Vertex, Vertex>, Boolean> thetaVertexF,
@@ -47,10 +47,10 @@ public class JoinFunctionVertexJoinCondition extends
   public void join(Vertex first, Vertex second, Collector<UndovetailingOPlusVertex> out) throws
     Exception {
     if (first != null && second != null) {
-      if (thetaVertexF.apply(new Tuple2<>(first,second))) {
+      if (thetaVertexF.apply(new Tuple2<>(first, second))) {
         out.collect(new UndovetailingOPlusVertex(OptSerializableGradoopId.value(first.getId()),
           OptSerializableGradoopId.value(second.getId()),
-          combineVertices.apply(new Tuple2<>(first,second))));
+          combineVertices.apply(new Tuple2<>(first, second))));
       }
     } else if (first == null) {
       out.collect(

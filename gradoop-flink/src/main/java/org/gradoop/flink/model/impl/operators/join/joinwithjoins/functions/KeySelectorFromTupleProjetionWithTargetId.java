@@ -33,7 +33,7 @@ import java.io.Serializable;
  * Created by Giacomo Bergami on 01/02/17.
  */
 @FunctionAnnotation.ReadFields("f1")
-public class KeySelectorFromTupleProjetionWithTargetId implements KeySelector<Tuple2<Vertex, Edge>,GradoopId>, Serializable {
+public class KeySelectorFromTupleProjetionWithTargetId implements KeySelector<Tuple2<Vertex, Edge>, GradoopId>, Serializable {
   @Override
   public GradoopId getKey(Tuple2<Vertex, Edge> value) throws Exception {
     return value.f1.getTargetId();

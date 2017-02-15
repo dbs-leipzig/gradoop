@@ -40,8 +40,8 @@ public class PreFilterRelationalJoin implements PreFilter<Vertex, GradoopId>, Se
   }
 
   @Override
-  public DataSet<Tuple2<Vertex,OptSerializableGradoopId>> apply(DataSet<Vertex> vertexDataSet) {
-    return  JoinWithJoinsUtils.joinByVertexEdge(vertexDataSet,e,vertexJoinType,isLeft)
+  public DataSet<Tuple2<Vertex, OptSerializableGradoopId>> apply(DataSet<Vertex> vertexDataSet) {
+    return  JoinWithJoinsUtils.joinByVertexEdge(vertexDataSet, e, vertexJoinType, isLeft)
       .where(new Id<>())
       .equalTo(new KeySelectorFromVertexSrcOrDest(isLeft))
       .with(new JoinFunctionWithVertexAndGradoopIdFromEdge());

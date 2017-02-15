@@ -46,7 +46,7 @@ public class GraphEdgeJoinWithJoins extends GeneralJoinWithJoinsPlan<GradoopId> 
    */
   public GraphEdgeJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
     DataSet<Edge> relations) {
-    this(vertexJoinType,edgeSemanticsImplementation,relations,null,null,null,null);
+    this(vertexJoinType, edgeSemanticsImplementation, relations, null, null, null, null);
   }
 
   public GraphEdgeJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,

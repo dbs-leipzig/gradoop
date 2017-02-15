@@ -68,7 +68,7 @@ public class JoinWithJoinsUtils {
    * @param <J>             Right element type
    * @return                The outcome of the combination of the left and right elements
    */
-  public static <K,J> JoinOperatorSetsBase<K, J> joinByVertexEdge(DataSet<K> left,
+  public static <K, J> JoinOperatorSetsBase<K, J> joinByVertexEdge(DataSet<K> left,
     DataSet<J> right, JoinType joinType, boolean isCorrectOrder) {
     switch (joinType) {
     case INNER:
@@ -90,7 +90,7 @@ public class JoinWithJoinsUtils {
    */
   public static Function<Tuple2<String, String>, String> generateConcatenator(
     @Nullable Function<Tuple2<String, String>, String> edgeLabelConcatenation) {
-    return edgeLabelConcatenation==null ? new DefaultStringConcatenationFunction() : edgeLabelConcatenation;
+    return edgeLabelConcatenation == null ? new DefaultStringConcatenationFunction() : edgeLabelConcatenation;
   }
 
   /**

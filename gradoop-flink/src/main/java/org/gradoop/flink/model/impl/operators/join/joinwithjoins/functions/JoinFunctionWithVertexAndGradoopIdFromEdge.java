@@ -12,9 +12,9 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerial
  * Created by Giacomo Bergami on 15/02/17.
  */
 public class JoinFunctionWithVertexAndGradoopIdFromEdge implements
-  JoinFunction<Vertex, Edge, Tuple2<Vertex,OptSerializableGradoopId>> {
+  JoinFunction<Vertex, Edge, Tuple2<Vertex, OptSerializableGradoopId>> {
   @Override
-  public Tuple2<Vertex,OptSerializableGradoopId> join(Vertex first, Edge second) throws
+  public Tuple2<Vertex, OptSerializableGradoopId> join(Vertex first, Edge second) throws
     Exception {
     return new Tuple2<>(first, second == null ? OptSerializableGradoopId.empty() :
       OptSerializableGradoopId.value(second.getId()));

@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
  */
 @FunctionAnnotation.ReadFields("f0; f2")
 public class KeySelectorTripleHashfunction implements
-  KeySelector<Triple,Integer> {
+  KeySelector<Triple, Integer> {
   @Override
   public Integer getKey(Triple t) throws Exception {
     return t.f0.getId().hashCode() * 13 + t.f2.getId().hashCode();

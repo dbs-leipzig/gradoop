@@ -123,7 +123,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
   /*
    * Provides the operands' vertices from the previous match with the relation
    */
-  private Value0Of2<Vertex,OptSerializableGradoopId> mapper;
+  private Value0Of2<Vertex, OptSerializableGradoopId> mapper;
 
   /**
    * Part of the inernal state of the intermediate computation of the vertices (1 out of 3)
@@ -210,8 +210,8 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
     @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
     @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph,
 
-    @Nullable Function<Tuple2<String,String>,String> vertexLabelConcatenation,
-    @Nullable Function<Tuple2<String,String>,String> graphLabelConcatenation) {
+    @Nullable Function<Tuple2<String, String>, String> vertexLabelConcatenation,
+    @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
 
     /*
       Some functions are only defined logically, but used practially with wrappers. So intermediate
@@ -275,8 +275,8 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
      * and e is the edge in one in the two operands that will connect two vertices in
      * the final source.
      */
-    DataSet<Triple> leftE = joinEdgePerGraphViaTriples(firstGraph.getEdges(),leftV);
-    DataSet<Triple> rightE = joinEdgePerGraphViaTriples(secondGraph.getEdges(),rightV);
+    DataSet<Triple> leftE = joinEdgePerGraphViaTriples(firstGraph.getEdges(), leftV);
+    DataSet<Triple> rightE = joinEdgePerGraphViaTriples(secondGraph.getEdges(), rightV);
 
     /*
      * <code>edgeSemanticsImplementation</code>: the edges are joined according to the edge-join
@@ -338,7 +338,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
    */
   private void joinVertices(DataSet<Vertex> leftGraphVertices, DataSet<Vertex> rightGraphVertices) {
     DataSet<Vertex> left = leftGraphVertices, right = rightGraphVertices;
-    DataSet<Tuple2<Vertex,OptSerializableGradoopId>> leftP = null, rightP = null;
+    DataSet<Tuple2<Vertex, OptSerializableGradoopId>> leftP = null, rightP = null;
     boolean leftFilter = false, rightFilter = false;
 
     /*
