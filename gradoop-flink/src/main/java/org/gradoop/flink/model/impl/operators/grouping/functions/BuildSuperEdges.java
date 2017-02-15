@@ -17,16 +17,22 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
 import java.util.List;
 
@@ -38,7 +44,7 @@ import java.util.List;
 @FunctionAnnotation.ReadFields("f1;f4;f5;f6")
 public class BuildSuperEdges
   extends BuildBase
-  implements MapFunction<SuperEdgeGroupItem, Edge>, ResultTypeQueryable<Edge> {
+  implements CoGroupFunction<SuperEdgeGroupItem, VertexWithSuperVertexAndEdge, Edge>, ResultTypeQueryable<Edge> {
 
   /**
    * Edge edgeFactory.
@@ -61,24 +67,34 @@ public class BuildSuperEdges
     this.edgeFactory = edgeFactory;
   }
 
-  /**
-   * Creates a {@link Edge} object from the given {@link
-   * SuperEdgeGroupItem} and returns a new {@link Edge}.
-   *
-   * @param groupItem vertex group item
-   * @return vertex including new vertex data
-   * @throws Exception
-   */
+
   @Override
-  public Edge map(SuperEdgeGroupItem groupItem) throws
+  public void coGroup(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
+    Iterable<VertexWithSuperVertexAndEdge> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
     Exception {
-    Edge superEdge = edgeFactory.initEdge(groupItem.getSuperEdgeId(), null, null);
 
-    setLabel(superEdge, groupItem.getGroupLabel());
-    setGroupProperties(superEdge, groupItem.getGroupingValues());
-    setAggregateValues(superEdge, groupItem.getAggregateValues());
+    // only one Edge per id
+    SuperEdgeGroupItem superEdgeGroupItem = superEdgeGroupItems.iterator().next();
 
-    return superEdge;
+    GradoopId sourceId = null;
+    GradoopId targetId = null;
+
+    for (VertexWithSuperVertexAndEdge vertexWithSuperVertexAndEdge :
+      vertexWithSuperVertexAndEdges) {
+      if (vertexWithSuperVertexAndEdge.isSource()) {
+        sourceId = vertexWithSuperVertexAndEdge.getSuperVertexId();
+      } else {
+        targetId = vertexWithSuperVertexAndEdge.getSuperVertexId();
+      }
+    }
+
+    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getSuperEdgeId(), sourceId, targetId);
+
+    setLabel(superEdge, superEdgeGroupItem.getGroupLabel());
+    setGroupProperties(superEdge, superEdgeGroupItem.getGroupingValues());
+    setAggregateValues(superEdge, superEdgeGroupItem.getAggregateValues());
+
+    collector.collect(superEdge);
   }
 
   /**
