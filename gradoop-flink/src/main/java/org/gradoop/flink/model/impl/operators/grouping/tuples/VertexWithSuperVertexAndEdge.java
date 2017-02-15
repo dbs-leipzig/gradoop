@@ -17,32 +17,46 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 
-public class VertexWithSuperVertexAndEdge extends Tuple3<GradoopId, GradoopId, GradoopId> {
+/**
+ * f0: vertex id
+ * f1: group representative vertex id
+ * f2: connected group representative edge id
+ * f3: true if vertex is source of this edge
+ */
+public class VertexWithSuperVertexAndEdge extends Tuple4<GradoopId, GradoopId, GradoopId, Boolean> {
 
   public GradoopId getVertexId() {
     return f0;
-  }
-
-  public GradoopId getSuperVertexId() {
-    return f1;
-  }
-
-  public GradoopId getSuperEdgeId() {
-    return f2;
   }
 
   public void setVertexId(GradoopId vertexId) {
     f0 = vertexId;
   }
 
+  public GradoopId getSuperVertexId() {
+    return f1;
+  }
+
   public void setSuperVertexId(GradoopId superVertexId) {
     f1 = superVertexId;
   }
 
+  public GradoopId getSuperEdgeId() {
+    return f2;
+  }
+
   public void setSuperEdgeId(GradoopId superEdgeId) {
     f2 = superEdgeId;
+  }
+
+  public boolean isSource() {
+    return f3;
+  }
+
+  public void setSource(Boolean isSource) {
+    f3 = isSource;
   }
 }
