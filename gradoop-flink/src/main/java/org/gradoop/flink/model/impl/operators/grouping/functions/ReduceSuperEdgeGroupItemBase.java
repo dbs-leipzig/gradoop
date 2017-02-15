@@ -83,6 +83,7 @@ abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
     Set<GradoopId> targets)
       throws IOException {
     reuseSuperEdgeGroupItem.setEdgeId(superEdgeId);
+    reuseSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
     reuseSuperEdgeGroupItem.setGroupLabel(groupLabel);
     reuseSuperEdgeGroupItem.setGroupingValues(groupPropertyValues);
     reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues());
