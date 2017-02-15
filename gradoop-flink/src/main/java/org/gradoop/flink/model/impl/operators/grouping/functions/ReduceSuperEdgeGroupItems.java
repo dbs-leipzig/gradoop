@@ -22,6 +22,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -32,14 +33,14 @@ import java.util.Set;
 /**
    * Reduces a group of {@link SuperEdgeGroupItem} instances.
    */
-  @FunctionAnnotation.ForwardedFields(
-    "f0;" + // edge id
-      "f3;" + // label
-      "f4"    // properties
-  )
+ // @FunctionAnnotation.ForwardedFields(
+ //   "f0;" + // edge id
+ //     "f3;" + // label
+ //     "f4"    // properties
+ // )
   public class ReduceSuperEdgeGroupItems
     extends ReduceSuperEdgeGroupItemBase
-    implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {
+    implements GroupReduceFunction<EdgeWithSuperEdgeGroupItem, SuperEdgeGroupItem> {
 
     /**
      * Creates group reduce function.
@@ -54,21 +55,21 @@ import java.util.Set;
     }
 
     @Override
-    public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
+    public void reduce(Iterable<EdgeWithSuperEdgeGroupItem> superEdgeGroupItems,
       Collector<SuperEdgeGroupItem> collector) throws Exception {
 
       GradoopId superEdgeId               = null;
       String groupLabel                     = null;
       PropertyValueList groupPropertyValues = null;
 
-      SuperEdgeGroupItem reuseTuple = getReuseSuperEdgeGroupItem();
+//      SuperEdgeGroupItem reuseTuple = getReuseSuperEdgeGroupItem();
 
       boolean isFirst = true;
 
       Set<GradoopId> sources = Sets.newHashSet();
       Set<GradoopId> targets = Sets.newHashSet();
 
-      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
+      for (EdgeWithSuperEdgeGroupItem groupItem : superEdgeGroupItems) {
         // grouped by source and target
         if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
           if (isFirst) {
@@ -97,21 +98,21 @@ import java.util.Set;
           groupLabel          = groupItem.getGroupLabel();
           groupPropertyValues = groupItem.getGroupingValues();
 
-          if (useLabel()) {
-            reuseTuple.setGroupLabel(groupLabel);
-          }
-
-          reuseTuple.setGroupingValues(groupPropertyValues);
-          reuseTuple.setSuperEdgeId(superEdgeId);
-          reuseTuple.setAggregateValues(groupItem.getAggregateValues());
-          reuseTuple.setSuperEdge(groupItem.isSuperEdge());
+//          if (useLabel()) {
+//            reuseTuple.setGroupLabel(groupLabel);
+//          }
+//
+//          reuseTuple.setGroupingValues(groupPropertyValues);
+//          reuseTuple.setSuperEdgeId(superEdgeId);
+//          reuseTuple.setAggregateValues(groupItem.getAggregateValues());
+//          reuseTuple.setSuperEdge(groupItem.isSuperEdge());
 
           isFirst = false;
         }
-        reuseTuple.setEdgeId(groupItem.getEdgeId());
+//        reuseTuple.setEdgeId(groupItem.getEdgeId());
 
-        // collect updated edge item
-        collector.collect(reuseTuple);
+//        // collect updated edge item
+//        collector.collect(reuseTuple);
 
         if (doAggregate()) {
           aggregate(groupItem.getAggregateValues());
