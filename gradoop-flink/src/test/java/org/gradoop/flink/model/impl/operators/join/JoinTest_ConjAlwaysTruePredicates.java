@@ -5,8 +5,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.GeneralEdgeSemantics;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.PredefinedEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.GraphThetaJoinWithJoins;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.PredefinedEdgeSemantics;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("empty[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("empty");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("empty");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("empty")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -52,7 +53,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
       "emptyGG:GG[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyG");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyG");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyGG")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -70,7 +71,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {}[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -89,7 +90,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         " emptyWithLabel {emptyVertex : \"graph\"}[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("empty");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyVertex");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyWithLabel")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -106,7 +107,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "simpleVertex {emptyVertex : \"graph\"}[(:Vertex {with: \"2\" })]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("empty");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("simpleVertex");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("simpleVertex")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -125,7 +126,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {v: \"1\", a: \"2\", b: \"3\"}[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -143,7 +144,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {v: \"1\", a: \"2\", b: \"3\"}[(:V1V1 {a: \"1\", b: \"2\", c: \"3\"})]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -161,7 +162,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "-[:alphabeta]->(:V2V4 {a: \"9\", b:\"10\", c:\"11\"})]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -178,7 +179,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {v: \"1\", a: \"2\", b: \"3\"}[(:V1V3 {a: \"1\", b: \"2\", c: \"3\"}))]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -195,7 +196,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {v: \"1\", a: \"2\", b: \"3\"}[(:V2V4 {a: \"9\", b:\"10\", c:\"11\"})]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));
@@ -212,7 +213,7 @@ public class JoinTest_ConjAlwaysTruePredicates extends GradoopFlinkTestBase {
         "emptyR {v: \"1\", a: \"2\", b: \"3\"}[]");
     LogicalGraph leftOperand = loader.getLogicalGraphByVariable("emptyV1");
     LogicalGraph rightOperand = loader.getLogicalGraphByVariable("emptyV2");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS);
     LogicalGraph output = f.execute(leftOperand, rightOperand);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyR")));
     collectAndAssertTrue(output.equalsByData(expected));

@@ -11,8 +11,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.GeneralEdgeSemantics;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.PredefinedEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.GraphEdgeJoinWithJoins;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.PredefinedEdgeSemantics;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -118,7 +119,7 @@ public class JoinTest_FullDisjEdgesExample extends GradoopFlinkTestBase {
       joinedDisjunctively);
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("research");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("citation");
-    GraphEdgeJoin f = new GraphEdgeJoin(GRAPH_OUTER_JOIN, DISJUNCTIVE_SEMANTICS,
+    GraphEdgeJoinWithJoins f = new GraphEdgeJoinWithJoins(GRAPH_OUTER_JOIN, DISJUNCTIVE_SEMANTICS,
       getedgeWithProperties(searchGraph,patternGraph));
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("result")));

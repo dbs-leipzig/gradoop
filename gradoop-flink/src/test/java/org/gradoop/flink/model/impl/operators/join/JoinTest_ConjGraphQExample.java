@@ -1,15 +1,14 @@
 package org.gradoop.flink.model.impl.operators.join;
 
-import com.sun.istack.Nullable;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.GeneralEdgeSemantics;
-import org.gradoop.flink.model.impl.operators.join.edgesemantics.PredefinedEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.GraphThetaJoinWithJoins;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.PredefinedEdgeSemantics;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -78,7 +77,7 @@ public class JoinTest_ConjGraphQExample extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(researchGateGraph+" "+citationGraph+" "+joinedConjunctively);
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("research");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("citation");
-    GraphThetaJoin f = new GraphThetaJoin(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS,
+    GraphThetaJoinWithJoins f = new GraphThetaJoinWithJoins(GRAPH_INNER_JOIN, CONJUNCTIVE_SEMANTICS,
       leftHash, rightHash, thetaVertex, null, null, null);
     LogicalGraph output = f.execute(searchGraph, patternGraph);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("result")));
