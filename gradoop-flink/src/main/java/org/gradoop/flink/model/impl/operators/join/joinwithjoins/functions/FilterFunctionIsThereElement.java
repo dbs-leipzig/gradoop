@@ -30,14 +30,21 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
 @FunctionAnnotation.NonForwardedFields("f0; f1")
 public class FilterFunctionIsThereElement implements FilterFunction<UndovetailingOPlusVertex> {
 
-  public final boolean isLeft;
+  /**
+   * Defining on which operand we're working on
+   */
+  private final boolean isLeft;
 
+  /**
+   * Instantiating the class
+   * @param isLeft  the operand position (left or right)
+   */
   public FilterFunctionIsThereElement(boolean isLeft) {
     this.isLeft = isLeft;
   }
 
   @Override
   public boolean filter(UndovetailingOPlusVertex value) throws Exception {
-    return isLeft ? value.f0.isThereElement : value.f1.isThereElement;
+    return isLeft ? value.f0.isPresent() : value.f1.isPresent();
   }
 }

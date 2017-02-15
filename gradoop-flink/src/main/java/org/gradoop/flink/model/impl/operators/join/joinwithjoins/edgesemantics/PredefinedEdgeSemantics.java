@@ -23,6 +23,12 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics;
  * Created by Giacomo Bergami on 30/01/17.
  */
 public enum PredefinedEdgeSemantics {
+  /**
+   * Conjunctive semantics: both edges must appear in the respective graphs
+   */
   CONJUNCTIVE,
+  /**
+   * Disjunctive semantics: inherit all the edges from all the operands
+   */
   DISJUNCTIVE;
 }

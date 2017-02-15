@@ -61,14 +61,15 @@ public class JoinFunctionFlatWithGradoopIds implements
   }
 
   @Override
-  public void join(Tuple2<Vertex,OptSerializableGradoopId> first, Tuple2<Vertex, OptSerializableGradoopId> second, Collector<UndovetailingOPlusVertex> out) throws
-    Exception {
+  public void join(Tuple2<Vertex,OptSerializableGradoopId> first,
+    Tuple2<Vertex, OptSerializableGradoopId> second,
+    Collector<UndovetailingOPlusVertex> out) throws Exception {
     // Inner join condition
     if (first != null && second != null && first.f1.isPresent() && second.f1.isPresent()) {
       Vertex ff0 = first.getField(0), sf0 = second.getField(0);
-      if (ff0==null)
+      if (ff0 == null)
         throw new RuntimeException("ff0 is null");
-      else if (sf0 ==null)
+      else if (sf0 == null)
         throw new RuntimeException("sf0 is null");
       if (thetaVertexF.apply(new Tuple2<>(ff0,sf0))) {
         out.collect(new UndovetailingOPlusVertex(OptSerializableGradoopId.value(ff0.getId()),
@@ -82,8 +83,8 @@ public class JoinFunctionFlatWithGradoopIds implements
       if (first == null || !first.f1.isPresent()) {
         Vertex sf0 = second.getField(0);
         out.collect(
-          new UndovetailingOPlusVertex(OptSerializableGradoopId.empty(), OptSerializableGradoopId.value(sf0.getId()),
-            sf0));
+          new UndovetailingOPlusVertex(OptSerializableGradoopId.empty(),
+            OptSerializableGradoopId.value(sf0.getId()), sf0));
       }
       // outer join conditions:
       // * right or/and
@@ -91,8 +92,8 @@ public class JoinFunctionFlatWithGradoopIds implements
       if (second == null || !second.f1.isPresent()){
         Vertex ff0 = first.getField(0);
         out.collect(
-          new UndovetailingOPlusVertex(OptSerializableGradoopId.value(ff0.getId()), OptSerializableGradoopId.empty(),
-            ff0));
+          new UndovetailingOPlusVertex(OptSerializableGradoopId.value(ff0.getId()),
+            OptSerializableGradoopId.empty(), ff0));
       }
     }
   }

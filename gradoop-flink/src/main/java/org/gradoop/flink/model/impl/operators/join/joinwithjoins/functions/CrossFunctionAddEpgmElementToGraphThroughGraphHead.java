@@ -26,6 +26,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
  * This function adds the GraphElement to the given graph head (the resulting graph)
  *
  * Created by Giacomo Bergami on 14/02/17.
+ *
+ * @param <K> Graph element used in this scenario
  */
 @FunctionAnnotation.ReadFieldsSecond("id")
 public class CrossFunctionAddEpgmElementToGraphThroughGraphHead<K extends GraphElement> implements CrossFunction<K, GraphHead,

@@ -8,19 +8,25 @@ import org.gradoop.flink.model.api.functions.Function;
 import java.io.Serializable;
 
 /**
- * Created by vasistas on 01/02/17.
+ * Defining the way to combine the edges
+ *
+ * Created by Giacomo Bergami on 01/02/17.
  */
 public class OplusEdges extends OplusSemiConcrete<Edge> implements Serializable {
 
+  /**
+   * @{
+   * @param transformation
+   */
   public OplusEdges(Function<Tuple2<String, String>, String> transformation) {
     super(transformation);
   }
 
   @Override
   public Edge supplyEmpty() {
-    Edge v = new Edge();
-    v.setId(GradoopId.get());
-    return v;
+    Edge e = new Edge();
+    e.setId(GradoopId.get());
+    return e;
   }
 
 }

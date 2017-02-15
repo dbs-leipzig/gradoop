@@ -7,6 +7,8 @@ import org.gradoop.flink.model.api.functions.Function;
 import java.io.Serializable;
 
 /**
+ * Merging graph heads
+ *
  * Created by vasistas on 01/02/17.
  */
 public class OplusHeads extends OplusSemiConcrete<GraphHead> implements Serializable {

@@ -283,7 +283,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
      * function outlined by the semantic
      */
     DataSet<Edge> edges = JoinWithJoinsUtils.joinByType(leftE, rightE, edgeSemanticsImplementation
-      .edgeJoinType)
+      .getEdgeJoinType())
       /*
        * The co-grouping condition is that the two edges appearing in two distinct graph
        * operands must link the same two vertices in the final graph. An hashing function
@@ -294,7 +294,7 @@ public class GeneralJoinWithJoinsPlan<PV> implements BinaryGraphToGraphOperator 
        * How the final edge should be obtained from the pair of triples is defined by the edge
        * semantics
        */
-      .with(edgeSemanticsImplementation.joiner)
+      .with(edgeSemanticsImplementation.getJoiner())
       /*
        * Return such elements if and only if the graph has actually to appear
        */

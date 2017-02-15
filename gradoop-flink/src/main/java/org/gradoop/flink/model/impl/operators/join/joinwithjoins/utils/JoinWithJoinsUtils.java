@@ -17,61 +17,24 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
+import com.sun.istack.Nullable;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.operators.JoinOperator;
-import org.apache.flink.api.java.operators.join.JoinFunctionAssigner;
 import org.apache.flink.api.java.operators.join.JoinOperatorSetsBase;
 import org.apache.flink.api.java.operators.join.JoinType;
-import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.typeutils.TypeInfoParser;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.DefaultStringConcatenationFunction;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 
 import java.util.HashSet;
 
 /**
+ * Defining some utility functions for the actual join operator implemented with joins
+ *
  * Created by Giacomo Bergami on 30/01/17.
  */
 public class JoinWithJoinsUtils {
-
-  public static <K,V> KeySelector<Tuple2<K,V>,V> keySelectorFromRightProjection(Project2To1<K, V>
-    p) {
-    return new KeySelector<Tuple2<K,V>, V>() {
-      @Override
-      public V getKey(Tuple2<K,V> value) throws Exception {
-        return p.map(value).f0;
-      }
-    };
-  }
-
-  public static <K,V> KeySelector<K, V> functionToKeySelector(final Function<K,V> fkv) {
-    return new KeySelector<K, V>() {
-      @Override
-      public V getKey(K value) throws Exception {
-        return fkv.apply(value);
-      }
-    };
-  }
-
-
-  public static <K,V> MapFunction<K,V> functionToMapFunction(final Function<K,V> mop) {
-    return new MapFunction<K, V>() {
-      @Override
-      public V map(K value) throws Exception {
-        return mop.apply(value);
-      }
-    };
-  }
-
   /**
    * Given two datasets of the same “type” (<code>left</code> and <code>right</code>), join them
    * accordingly to the <code>jointype</code>
@@ -79,7 +42,7 @@ public class JoinWithJoinsUtils {
    * @param right       Right operand
    * @param joinType    Type of join to be used
    * @param <K>         Element type
-   * @return
+   * @return            The outcome of the combination of the left and right elements
    */
   public static <K> JoinOperatorSetsBase<K, K> joinByType(DataSet<K> left, DataSet<K> right, JoinType
     joinType) {
@@ -103,7 +66,7 @@ public class JoinWithJoinsUtils {
    * @param isCorrectOrder
    * @param <K>             Left element type
    * @param <J>             Right element type
-   * @return
+   * @return                The outcome of the combination of the left and right elements
    */
   public static <K,J> JoinOperatorSetsBase<K, J> joinByVertexEdge(DataSet<K> left,
     DataSet<J> right, JoinType joinType, boolean isCorrectOrder) {
@@ -119,45 +82,27 @@ public class JoinWithJoinsUtils {
     }
   }
 
-  public static Function<Tuple2<String,String>,String> generateConcatenator(
-    Function<Tuple2<String,String>,String> edgeLabelConcatenation) {
+  /**
+   * Generating the default string concatenator from an user-provided input
+   * @param edgeLabelConcatenation  The user defined function for concatenating edges
+   * @return                        If the input is null, the DefaultStringConcatenationFunction is
+   *                                returned, otherwise the user-defined function.
+   */
+  public static Function<Tuple2<String, String>, String> generateConcatenator(
+    @Nullable Function<Tuple2<String, String>, String> edgeLabelConcatenation) {
     return edgeLabelConcatenation==null ? new DefaultStringConcatenationFunction() : edgeLabelConcatenation;
   }
 
-  public static <T> DataSet<T> project(int pos, DataSet<? extends Tuple> dt) {
-    return dt.<Tuple1<T>>project(pos).map((Tuple1<T> tt)->tt.f0);
-  }
-
-  public static <L,R> JoinOperator<L, R, Tuple2<L, R>> joinAsCross(JoinFunctionAssigner<L,R>
-    join, Class<L> lClass, Class<R>
-    rClass) {
-    return join.with(new JoinFunction<L, R, Tuple2<L,R>>() {
-      @Override
-      public Tuple2<L, R> join(L first, R second) throws Exception {
-        return new Tuple2<L, R>(first,second);
-      }
-    }).returns(TypeInfoParser.parse(Tuple2.class.getCanonicalName()+"<"+lClass.getCanonicalName()+"," +
-      ""+rClass.getCanonicalName()+">"));
-  }
-
-  public static <L,R,M> JoinOperator<Tuple2<L, R>, M, Tuple3<L,R,M>> join2AsCross3
-    (JoinFunctionAssigner<Tuple2<L, R>, M>
-    join, Class<L> lClass, Class<R>
-    rClass, Class<M> mClass) {
-    return join.with(new JoinFunction<Tuple2<L, R>, M, Tuple3<L,R,M>>() {
-      @Override
-      public Tuple3<L, R,M> join(Tuple2<L,R> first, M second) throws Exception {
-        return new Tuple3<L, R, M>(first.f0,first.f1,second);
-      }
-    }).returns(TypeInfoParser.parse(Tuple3.class.getCanonicalName()+"<"+lClass.getCanonicalName
-      ()+"," +
-      ""+rClass.getCanonicalName()+","+mClass.getCanonicalName()+">"));
-  }
-
-  //CombiningEdgeTuples
-
-  public static <K extends EPGMElement> Function<Tuple2<K,K>, Boolean> extendBasic
-    (Function<K, Function<K, Boolean>> prop) {
+  /**
+   * Wrapping the user-defined function for EPGMElement comparison with some join equality testing.
+   * In the code this function is used for the vertices
+   *
+   * @param prop  If the element is null, the always true predicate is returned
+   * @param <K>   EPGMElement type
+   * @return      The extended function
+   */
+  public static <K extends EPGMElement> Function<Tuple2<K, K>, Boolean> extendBasic
+    (@Nullable Function<K, Function<K, Boolean>> prop) {
     return new Function<Tuple2<K, K>, Boolean>() {
 
       Function<K, Function<K, Boolean>> local = prop == null ?
@@ -181,12 +126,17 @@ public class JoinWithJoinsUtils {
     };
   }
 
-  public static  Function<Tuple2<Triple,Triple>, Boolean>
+  /**
+   * Wrapping the user-defined function for Triple comparison with some join equality testing.
+   * @param prop  If the element is null, the always true predicate is returned
+   * @return      The extended function
+   */
+  public static  Function<Tuple2<Triple, Triple>, Boolean>
   extendBasic2
-    (Function<Triple, Function<Triple, Boolean>> prop) {
-    return new Function<Tuple2<Triple,Triple>, Boolean>() {
+    (@Nullable Function<Triple, Function<Triple, Boolean>> prop) {
+    return new Function<Tuple2<Triple, Triple>, Boolean>() {
       @Override
-      public Boolean apply(final Tuple2<Triple,Triple> p) {
+      public Boolean apply(final Tuple2<Triple, Triple> p) {
 
         Function<Triple, Function<Triple, Boolean>> local = prop == null ?
           (e1 -> (e2 -> true)) : prop;
@@ -201,9 +151,7 @@ public class JoinWithJoinsUtils {
                 return false;
             }
             return local.apply(p.f0).apply(p.f1);
-
-
-      };
+      }
     };
   }
 

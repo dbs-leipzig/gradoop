@@ -21,52 +21,78 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * Defines an optional value that could be easily serialized. The problem is that Tuples in
+ * Apache flink could be hashed iff. there are no null values stored inside. So this is a
+ * wrap around, allowing an hashing function even when I have null values. Even by extending
+ * the tuple with a different behaviour doesn't work!
+ *
  * Created by Giacomo Bergami on 30/01/17.
+ *
+ * @param <K>   In order to serialize the object, the parameter type should belong to a serializable
+ *              object
  */
 public class OptSerializable<K extends Serializable> implements Serializable {
-  public final boolean isThereElement;
-  public final K elem;
+  /**
+   * Checks if the value is present or not.
+   */
+  private final boolean isThereElement;
+  /**
+   * The actual value (witness)
+   */
+  private final K elem;
 
-  public OptSerializable(boolean isThereElement, K elem) {
+  /**
+   * Default constructor
+   * @param isThereElement  If the element is present or not
+   * @param elem            If the element is not present, a null is replaced. Please note that, in
+   *                        some cases, null could be considered as valid values :O
+   */
+  OptSerializable(boolean isThereElement, K elem) {
     this.isThereElement = isThereElement;
     this.elem = isThereElement ? elem : null;
   }
 
-  public OptSerializable(K elem) {
-    this.isThereElement = elem != null;
-    this.elem = elem;
-  }
-
+  /** This getter…
+   * @return  the value
+   */
   public K get()  {
     return this.elem;
   }
 
+  /** This getter…
+   * @return if the element is present or not
+   */
   public boolean isPresent() {
     return isThereElement;
   }
 
-  public static <K extends Serializable> OptSerializable<K> empty() {
-    return new OptSerializable<K>(false,null);
-  }
-
-  public static <K extends Serializable> OptSerializable<K> value(K val) {
-    return new OptSerializable<K>(true,val);
-  }
-
+  /**
+   * Redefined hash function
+   * @return  hash value
+   */
   @Override
   public int hashCode() {
-    return elem!=null ? (elem.hashCode() == 0 ? 1 : elem.hashCode()) : 0;
+    return elem != null ? (elem.hashCode() == 0 ? 1 : elem.hashCode()) : 0;
   }
 
+  /**
+   * Overridden equality
+   * @param o Object to be compared with
+   * @return  The equality test result (value by value)
+   */
   @Override
   public boolean equals(Object o) {
-    if (o==null) return !isThereElement;
-    else {
-      if (o.equals(elem)) return true;
-      else if (o instanceof OptSerializable) {
+    if (o == null) {
+      return !isThereElement;
+    } else {
+      if (o.equals(elem)) {
+        return true;
+      } else if (o instanceof OptSerializable) {
         OptSerializable<K> tr = (OptSerializable<K>) o;
         return tr != null && Objects.equals(tr.elem, elem) && isThereElement == tr.isThereElement;
-      } else return false;
+      } else {
+        return false;
+      }
     }
   }
 

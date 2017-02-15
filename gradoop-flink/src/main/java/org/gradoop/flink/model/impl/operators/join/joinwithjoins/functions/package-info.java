@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
-
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.functions.Function;
-
 /**
- * This function defines a default way to concatenate two strings, that is simply append them
- *
- * Created by Giacomo Bergami on 01/02/17.
+ * Some useful "semantic" tuples
  */
-@FunctionAnnotation.NonForwardedFields("f0; f1")
-public class DefaultStringConcatenationFunction implements Function<Tuple2<String, String>,
-  String> {
-  @Override
-  public String apply(Tuple2<String, String> entity) {
-    return entity.f0 + entity.f1;
-  }
-}
+package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;

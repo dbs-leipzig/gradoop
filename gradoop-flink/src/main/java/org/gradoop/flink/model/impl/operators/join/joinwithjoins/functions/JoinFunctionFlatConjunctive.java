@@ -38,12 +38,18 @@ public class JoinFunctionFlatConjunctive implements
    * are the one in the resulting graph, so they provide the values coming from at least one graph
    * operand
    */
-  private final Function<Tuple2<Triple,Triple>,Boolean> finalThetaEdge;
+  private final Function<Tuple2<Triple, Triple>, Boolean> finalThetaEdge;
+
   /**
    * Utility function for combining the edges into one final result
    */
   private final OplusEdges combineEdges;
 
+  /**
+   * Default constructor
+   * @param finalThetaEdge    Function used to select the patterns
+   * @param combineEdges      Function used to merge the matching edges
+   */
   public JoinFunctionFlatConjunctive(
     Function<Tuple2<Triple, Triple>, Boolean> finalThetaEdge,
     OplusEdges combineEdges) {
@@ -54,11 +60,11 @@ public class JoinFunctionFlatConjunctive implements
   @Override
   public void join(Triple first, Triple second,
     Collector<Edge> out) throws Exception {
-    // Iff. the triples match with both source and destination, then I have to merge the edges into
-    // one single edge
+    // Iff. the triples match with both source and destination,
+    // then I have to merge the edges into one single edge
     if (first.f0.getId().equals(second.f0.getId()) && first.f2.getId().equals(second.f2.getId())) {
-      if (finalThetaEdge.apply(new Tuple2<>(first,second))) {
-        Edge prepared = combineEdges.apply(new Tuple2<>(first.f1,second.f1));
+      if (finalThetaEdge.apply(new Tuple2<>(first, second))) {
+        Edge prepared = combineEdges.apply(new Tuple2<>(first.f1, second.f1));
         prepared.setSourceId(first.f0.getId());
         prepared.setTargetId(first.f2.getId());
         out.collect(prepared);

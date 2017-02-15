@@ -27,12 +27,26 @@ import java.util.HashSet;
 import java.util.function.Supplier;
 
 /**
+ * Defining a generic class for chaining two elments into once
+ * @param <K>
+ *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public abstract class  Oplus<K extends EPGMElement> implements Function<Tuple2<K,K>,K>,
+public abstract class  Oplus<K extends EPGMElement> implements Function<Tuple2<K, K>, K>,
   Serializable {
 
+  /**
+   * Defines a provider…
+   * @return  a new instance of an element;
+   */
   public abstract K supplyEmpty();
+
+  /**
+   * How to combine two labels from two EPGMElements
+   * @param labelLeft   Left label
+   * @param labelRight  Right label
+   * @return            Concatenated label
+   */
   public abstract String concatenateLabels(String labelLeft, String labelRight);
 
   public static <K extends EPGMElement> Oplus<K> generate(Supplier<K> supplier,
@@ -72,6 +86,5 @@ public abstract class  Oplus<K extends EPGMElement> implements Function<Tuple2<K
         }
         return (toret);
   }
-
 
 }

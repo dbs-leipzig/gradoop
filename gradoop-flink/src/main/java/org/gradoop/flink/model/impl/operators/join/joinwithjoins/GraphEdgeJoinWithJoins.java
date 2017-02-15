@@ -52,11 +52,12 @@ public class GraphEdgeJoinWithJoins extends GeneralJoinWithJoinsPlan<GradoopId> 
   public GraphEdgeJoinWithJoins(JoinType vertexJoinType, GeneralEdgeSemantics edgeSemanticsImplementation,
     DataSet<Edge> relations, @Nullable Function<Vertex, Function<Vertex, Boolean>> thetaVertex,
     @Nullable Function<GraphHead, Function<GraphHead, Boolean>> thetaGraph,
-    @Nullable Function<Tuple2<String,String>,String> vertexLabelConcatenation,
-    @Nullable Function<Tuple2<String,String>,String> graphLabelConcatenation) {
+    @Nullable Function<Tuple2<String, String>, String> vertexLabelConcatenation,
+    @Nullable Function<Tuple2<String, String>, String> graphLabelConcatenation) {
     super(vertexJoinType, edgeSemanticsImplementation,
-      new PreFilterRelationalJoin(true,relations, vertexJoinType),
-      new PreFilterRelationalJoin(false,relations, vertexJoinType), null, null, thetaVertex, thetaGraph,
+      new PreFilterRelationalJoin(true, relations, vertexJoinType),
+      new PreFilterRelationalJoin(false, relations, vertexJoinType), null, null, thetaVertex,
+      thetaGraph,
       vertexLabelConcatenation, graphLabelConcatenation);
   }
 

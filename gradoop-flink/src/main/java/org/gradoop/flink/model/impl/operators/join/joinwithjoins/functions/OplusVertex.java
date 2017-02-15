@@ -8,7 +8,9 @@ import org.gradoop.flink.model.api.functions.Function;
 import java.io.Serializable;
 
 /**
- * Created by vasistas on 01/02/17.
+ * Merging vertices together
+ *
+ * Created by Giacomo Bergami on 01/02/17.
  */
 public class OplusVertex extends OplusSemiConcrete<Vertex> implements Serializable {
 

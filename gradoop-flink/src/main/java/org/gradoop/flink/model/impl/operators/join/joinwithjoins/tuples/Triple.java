@@ -24,11 +24,25 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import java.io.Serializable;
 
 /**
+ * Each triple represents an edge coming from one of the graph operands joining possibly two
+ * new edges coming from the to-be-returned graph.
+ *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public class Triple extends Tuple3<Vertex,Edge,Vertex> implements Serializable {
+public class Triple extends Tuple3<Vertex, Edge, Vertex> implements Serializable {
+  /**
+   * Default constructor
+   * @param f0      Source vertex belonging to the to-be-returned graph
+   * @param f1      Edge belonging to one of the operands, matching with the new source and
+   *                destination vertice
+   * @param f11     Destination vertex belonging to the to-be-returned graph
+   */
   public Triple(Vertex f0, Edge f1, Vertex f11) {
-    super(f0,f1,f11);
+    super(f0, f1, f11);
   }
+
+  /**
+   * Required element-free constructor, (otherwise Apache Flink curses…)
+   */
   public Triple() {}
 }

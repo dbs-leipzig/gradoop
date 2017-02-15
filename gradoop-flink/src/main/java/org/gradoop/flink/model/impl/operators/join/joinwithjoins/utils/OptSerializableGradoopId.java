@@ -20,41 +20,51 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
+ * The type resolutor (the one by string arguments) fails to check for types with parameters for
+ * non-default classes (e.g. tuples). So I extend the OptSerializable class in order to avoid
+ * such kind of possible problems
+ *
  * Created by Giacomo Bergami on 30/01/17.
  */
 public class OptSerializableGradoopId extends OptSerializable<GradoopId> implements
   Comparable<OptSerializableGradoopId> {
 
-  public OptSerializableGradoopId(boolean isThereElement, GradoopId elem) {
+  /**
+   * Default constructor
+   * @param isThereElement  If the element is present or not
+   * @param elem            If the element is not present, a null is replaced. Please note that, in
+   *                        some cases, null could be considered as valid values :O
+   */
+  private OptSerializableGradoopId(boolean isThereElement, GradoopId elem) {
     super(isThereElement, elem);
   }
 
-  public OptSerializableGradoopId(GradoopId elem) {
-    super(elem);
-  }
-
+  /**
+   * Creates an empty element. It'll be hashed to zero. All the other GradoopId with zero
+   * hash value are mapped to 1.
+   * All the other
+   * @return        an instance of an optional value with a missing GradoopId value
+   */
   public static  OptSerializableGradoopId empty() {
-    return new OptSerializableGradoopId(false,null);
+    return new OptSerializableGradoopId(false, null);
   }
 
+  /**
+   * Creates an instance of Optional element with a value. It'll be hashed to a non-zero value.
+   * @param val   The GradoopId element
+   * @return      an instance of an optional value containing <code>val</code>
+   */
   public static OptSerializableGradoopId value(GradoopId val) {
-    return new OptSerializableGradoopId(true,val);
+    return new OptSerializableGradoopId(true, val);
   }
 
   @Override
   public int compareTo(OptSerializableGradoopId o) {
-    if (o==null) return 1;
-    if (isPresent()) {
-      if (o.isPresent())
-        return 0;
-      else {
-        return get().compareTo(o.get());
-      }
-    } else {
-      if (o.isPresent())
-        return -1;
-      else
-        return 0;
-    }
+    return (o == null) ?
+      1 :
+      (isPresent() ?
+        (o.isPresent() ? 0 : get().compareTo(o.get())) :
+        (o.isPresent() ? -1 : 0)
+      );
   }
 }

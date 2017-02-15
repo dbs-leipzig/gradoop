@@ -34,6 +34,13 @@ import java.io.Serializable;
  */
 public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, GraphHead>,
   Serializable {
+
+  /**
+   * Basic graph head that could be returned when an empty graph should be returned (no matching
+   * graphs)
+   */
+  private static final GraphHead BASIC = new GraphHead();
+
   /**
    * Function describing if the two graph heads match or not.
    */
@@ -42,23 +49,17 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
    * Function for combining the matching graph heads together
    */
   private final Oplus<GraphHead> combineHeads;
-  /**
-   * Basic graph head that could be returned when an empty graph should be returned (no matching
-   * graphs)
-   */
-  private static final GraphHead basic = new GraphHead();
+
   /**
    * Graph id to which the GraphHead belongs to
    */
   private GradoopId gid;
 
-  public CoJoinGraphHeads(Function<Tuple2<GraphHead, GraphHead>, Boolean> thetaGraph,
-    Oplus<GraphHead> combineHeads, GradoopId gid) {
-    this.thetaGraph = thetaGraph;
-    this.combineHeads = combineHeads;
-    this.gid = gid;
-  }
-
+  /**
+   * Default constructor
+   * @param thetaGraph      Function for selecting graph heads
+   * @param combineHeads    Way to combine two graph heads
+   */
   public CoJoinGraphHeads(Function<Tuple2<GraphHead, GraphHead>, Boolean> thetaGraph,
     Oplus<GraphHead> combineHeads) {
     this.thetaGraph = thetaGraph;
@@ -66,6 +67,11 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
     this.gid = null;
   }
 
+  /**
+   * Setting the id of the graph that has to be returned
+   * @param id    The id of the graph that has to be returned
+   * @return      An updated instance of the same class
+   */
   public CoJoinGraphHeads setGraphId(GradoopId id) {
     this.gid = id;
     return this;
@@ -74,43 +80,48 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
   @Override
   public void coGroup(Iterable<GraphHead> first, Iterable<GraphHead> second,
     Collector<GraphHead> out) throws Exception {
-    boolean joinConditionIsSatisfied = false;
+    boolean isThereAtLeastOneHead = false;
     boolean hasNotBeenInserted = true;
     boolean isBasicInserted = true;
     int isLeft = 0;
-    GraphHead toInsert = basic;
+    GraphHead toInsert = BASIC;
+    // Checking if the left graph has a head
     for (GraphHead left : first) {
-      joinConditionIsSatisfied = true;
-      if (isLeft==0) {
-        isLeft = 1;
-        toInsert = left;
-      }
+      isThereAtLeastOneHead = true;
+      toInsert = left;
+      // Checking if the right graph has a head
       for (GraphHead right : second) {
-        if (thetaGraph.apply(new Tuple2<>(left,right))) {
-          if (isLeft==1) isLeft = 3;
+        if (thetaGraph.apply(new Tuple2<>(left, right))) {
           GraphHead gh1 = combineHeads.apply(new Tuple2<>(left, right));
           gh1.setId(gid);
           out.collect(gh1);
           hasNotBeenInserted = false;
+          break;
         } else {
-          joinConditionIsSatisfied = true;
+          isThereAtLeastOneHead = true;
           hasNotBeenInserted = true;
           isBasicInserted = true;
-          toInsert = basic;
+          toInsert = BASIC;
+          break;
         }
       }
     }
-    if (! joinConditionIsSatisfied) {
+    // The fact that the left grpah has no head, does not insure that the right graph has it
+    // or not.
+    if (! isThereAtLeastOneHead) {
+      // Checking if the right graph has the head
       for (GraphHead right : second) {
-        joinConditionIsSatisfied = true;
+        isThereAtLeastOneHead = true;
         isBasicInserted = false;
         toInsert = right;
         break;
       }
     }
-    if (joinConditionIsSatisfied && hasNotBeenInserted) {
-      if (isBasicInserted) // Generating a new Id only when strictly required
+    // Inserting the element if it has not been inserted yet
+    if (isThereAtLeastOneHead && hasNotBeenInserted) {
+      if (isBasicInserted) { // Generating a new Id only when strictly required
         toInsert.setId(GradoopId.get());
+      }
       out.collect(toInsert);
     }
   }

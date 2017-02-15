@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics;
 
+import com.sun.istack.Nullable;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -41,43 +42,87 @@ import java.io.Serializable;
  * Created by Giacomo Bergami on 30/01/17.
  */
 public class GeneralEdgeSemantics implements Serializable {
-  public final JoinType edgeJoinType;
-  public final FlatJoinFunction<Triple, Triple, Edge> joiner;
+  /**
+   * Defines how to combine the edges through joins
+   */
+  private final JoinType edgeJoinType;
 
+  /**
+   *  Combines the resulting triples into a final edge
+   */
+  private final FlatJoinFunction<Triple, Triple, Edge> joiner;
+
+  /**
+   * General constructor accepting the most generic parameters to perform a join between the edges
+   * @param edgeJoinType    how to combine the edges through joins
+   * @param joiner          Combines the resulting triples into a final edge
+   */
   public GeneralEdgeSemantics(JoinType edgeJoinType,
     FlatJoinFunction<Triple, Triple, Edge> joiner) {
     this.edgeJoinType = edgeJoinType;
     this.joiner = joiner;
   }
 
+  /**
+   * Using a PredefinedEdgeSemantics (eg. disjunctive, conjunctive) determines the parameters to
+   * instantiate the edge semantics.
+   * @param thetaEdge               Function for selecting the triples
+   * @param es                      Predefined edge semantics
+   * @param edgeLabelConcatenation  How to concatenate the labels from two edges
+   * @return                        The instantiation of the edge semantics
+   */
   public static GeneralEdgeSemantics fromEdgePredefinedSemantics(
     final Function<Triple, Function<Triple, Boolean>> thetaEdge,
     final PredefinedEdgeSemantics es,
-    Function<Tuple2<String,String>,String> edgeLabelConcatenation) {
-    OplusEdges combinateEdges = new OplusEdges(JoinWithJoinsUtils.generateConcatenator(edgeLabelConcatenation));
+    @Nullable Function<Tuple2<String, String>, String> edgeLabelConcatenation) {
+    OplusEdges combinateEdges =
+      new OplusEdges(JoinWithJoinsUtils.generateConcatenator(edgeLabelConcatenation));
     return fromEdgePredefinedSemantics(thetaEdge, es, combinateEdges);
   }
 
+  /**
+   * Using a PredefinedEdgeSemantics (eg. disjunctive, conjunctive) determines the parameters to
+   * instantiate the edge semantics.
+   * @param thetaEdge               Function for selecting the triples
+   * @param es                      Predefined edge semantics
+   * @param combineEdges            How to concatenate two edges
+   * @return                        The instantiation of the edge semantics
+   */
   private static GeneralEdgeSemantics fromEdgePredefinedSemantics(
     final Function<Triple, Function<Triple, Boolean>> thetaEdge,
     final PredefinedEdgeSemantics es, final OplusEdges combineEdges) {
     JoinType edgeJoinType = null;
     FlatJoinFunction<Triple, Triple, Edge> joiner = null;
-    final Function<Tuple2<Triple,Triple>,Boolean> finalThetaEdge =
+    final Function<Tuple2<Triple, Triple>, Boolean> finalThetaEdge =
       JoinWithJoinsUtils.extendBasic2(thetaEdge);
     switch (es) {
-    case CONJUNCTIVE: {
+    case CONJUNCTIVE:
       edgeJoinType = JoinType.INNER;
-      joiner = new JoinFunctionFlatConjunctive(finalThetaEdge,combineEdges);
-    }
-    break;
-    case DISJUNCTIVE: {
+      joiner = new JoinFunctionFlatConjunctive(finalThetaEdge, combineEdges);
+      break;
+    case DISJUNCTIVE:
       edgeJoinType = JoinType.FULL_OUTER;
-      joiner = new JoinFunctionFlatDisjunctive(finalThetaEdge,combineEdges);
-    }
-    break;
+      joiner = new JoinFunctionFlatDisjunctive(finalThetaEdge, combineEdges);
+      break;
+    default:
+      Object noop;
     }
     return new GeneralEdgeSemantics(edgeJoinType, joiner);
   }
 
+  /**
+   *
+   * @return  The join type used between the edges
+   */
+  public JoinType getEdgeJoinType() {
+    return edgeJoinType;
+  }
+
+  /**
+   *
+   * @return  The join function used to determine the way to combine triples to edges
+   */
+  public FlatJoinFunction<Triple, Triple, Edge> getJoiner() {
+    return joiner;
+  }
 }
