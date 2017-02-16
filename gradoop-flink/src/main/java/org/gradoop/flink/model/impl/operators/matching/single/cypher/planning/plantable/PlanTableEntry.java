@@ -74,7 +74,16 @@ public class PlanTableEntry {
    */
   private long estimatedCardinality = -1;
 
-  public PlanTableEntry(Type type, Set<String> processedVars, CNF predicates, QueryPlanEstimator estimator) {
+  /**
+   * Creates a new plan table entry.
+   *
+   * @param type the partial match type this entry represents
+   * @param processedVars processed query variables
+   * @param predicates predicates not covered by this plan
+   * @param estimator cardinality estimator
+   */
+  public PlanTableEntry(Type type, Set<String> processedVars, CNF predicates,
+    QueryPlanEstimator estimator) {
     this.type = type;
     this.processedVars = processedVars;
     this.predicates = predicates;
@@ -90,6 +99,11 @@ public class PlanTableEntry {
     return type;
   }
 
+  /**
+   * Returns the remaining predicates not covered by this plan entry.
+   *
+   * @return remaining predicates
+   */
   public CNF getPredicates() {
     return predicates;
   }

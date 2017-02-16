@@ -44,8 +44,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.*;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.EDGE;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.GRAPH;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.PATH;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.VERTEX;
 
+/**
+ * A greedy query planner that builds a query plan by iteratively picking the cheapest partial query
+ * plan and extending it.
+ */
 public class GreedyPlanner {
   /**
    * The search graph to be queried
@@ -95,7 +102,7 @@ public class GreedyPlanner {
   public PlanTableEntry plan() {
     PlanTable planTable = initPlanTable();
 
-    while(planTable.size() > 1) {
+    while (planTable.size() > 1) {
       PlanTable newPlans = evaluateJoins(planTable);
       newPlans = evaluateFilter(newPlans);
       newPlans = evaluateProjection(newPlans);
@@ -103,12 +110,7 @@ public class GreedyPlanner {
       PlanTableEntry bestEntry = newPlans.min();
       planTable.removeCoveredBy(bestEntry);
       planTable.add(bestEntry);
-
-//      planTable.forEach(System.out::println);
     }
-
-//    System.out.println("Best plan");
-//    System.out.println(planTable.get(0));
 
     return planTable.get(0);
   }
@@ -146,7 +148,7 @@ public class GreedyPlanner {
 
       String vertexVariable = vertex.getVariable();
       CNF allPredicates = queryHandler.getPredicates();
-      // TODO: this might be moved the the FilterAndProject node in issue #510
+      // TODO: this might be moved to the FilterAndProject node in issue #510
       CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
       Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
@@ -268,7 +270,7 @@ public class GreedyPlanner {
 
     PlanNode node;
     if (rightEntry.getType() == PATH) {
-      assert(joinVariables.size() == 1);
+      assert joinVariables.size() == 1;
       node = createExpandNode(leftEntry, rightEntry, joinVariables.get(0));
     } else {
       node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),
@@ -279,7 +281,7 @@ public class GreedyPlanner {
     HashSet<String> processedVariables = Sets.newHashSet(leftEntry.getProcessedVariables());
     processedVariables.addAll(rightEntry.getProcessedVariables());
     // create resulting predicates
-    // TODO: this might be moved the the join/expand node in issue #510
+    // TODO: this might be moved to the join/expand node in issue #510
     CNF leftPredicates = new CNF(leftEntry.getPredicates());
     CNF rightPredicates = new CNF(rightEntry.getPredicates());
     leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
@@ -342,7 +344,8 @@ public class GreedyPlanner {
       CNF predicates = entry.getPredicates();
       CNF subCNF = predicates.removeSubCNF(variables);
       if (subCNF.size() > 0) {
-        FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(), subCNF);
+        FilterEmbeddingsNode node = new FilterEmbeddingsNode(entry.getQueryPlan().getRoot(),
+          subCNF);
         newTable.add(new PlanTableEntry(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
           predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
       } else {
