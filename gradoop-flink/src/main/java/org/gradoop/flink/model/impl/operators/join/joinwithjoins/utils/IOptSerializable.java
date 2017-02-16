@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils;
 
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -6,17 +23,32 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Created by vasistas on 15/02/17.
+ * Due to efficiency's sake, we want to express an optional value as a Pair2
+ * containing a boolean and a value. Such value must never be null, otherwise
+ * the AF hashing function won't work. So, just replace the null value with
+ * a default value, and use the first field in order to point out that the
+ * element has no meaning
+ * @param <K> Serializable argument
+ *
+ * Created by Giacomo Bergami on 15/02/17.
  */
-public abstract class IOptSerializable<K extends Serializable> extends Tuple2<Boolean,K> implements
+public abstract class IOptSerializable<K extends Serializable> extends Tuple2<Boolean, K> implements
   Serializable {
 
+  /**
+   * Default constructor used by AF
+   */
   public IOptSerializable() {
 
   }
 
-  public IOptSerializable(Boolean isThereElement, K element) {
-    super(isThereElement,element);
+  /**
+   * Semantic constructor
+   * @param isThereElement    If the element is present or not
+   * @param element           The value that has to be stored
+   */
+  IOptSerializable(Boolean isThereElement, K element) {
+    super(isThereElement, element);
   }
 
   /** This getter…

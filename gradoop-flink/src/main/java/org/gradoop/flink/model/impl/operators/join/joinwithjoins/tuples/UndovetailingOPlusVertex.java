@@ -17,11 +17,9 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 
 import java.io.Serializable;
 
@@ -32,7 +30,7 @@ import java.io.Serializable;
  * Created by Giacomo Bergami on 30/01/17.
  */
 public class UndovetailingOPlusVertex extends
-  Tuple5<Boolean,GradoopId,Boolean,GradoopId, Vertex> implements Serializable {
+  Tuple5<Boolean, GradoopId, Boolean, GradoopId, Vertex> implements Serializable {
 
   /**
    * Default constructor
@@ -45,7 +43,7 @@ public class UndovetailingOPlusVertex extends
   public UndovetailingOPlusVertex(Boolean leftB, GradoopId leftId,
     Boolean rightB, GradoopId rightId,
     Vertex mergedCorrespondingVertex) {
-    super(leftB,leftId,rightB,rightId,mergedCorrespondingVertex);
+    super(leftB, leftId, rightB, rightId, mergedCorrespondingVertex);
   }
 
   /**

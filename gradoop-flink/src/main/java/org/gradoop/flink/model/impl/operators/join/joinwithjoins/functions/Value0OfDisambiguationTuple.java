@@ -17,18 +17,28 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
 
-import java.util.function.Function;
-
 /**
- * Defining a non-serializable function allowing to pre-evaluate the vertices if required.
- * @param <K> Element that is filtered prior to the actual join phase
- *
- * Created by Giacomo Bergami on 30/01/17.
+ * (f0,f1,f2) => Vertex
+ * From Value0Of3
  */
-public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<DisambiguationTupleWithVertexId>> {
+@FunctionAnnotation.ForwardedFields("f0->*")
+public class Value0OfDisambiguationTuple
+  implements
+  MapFunction<DisambiguationTupleWithVertexId, Vertex>, KeySelector<DisambiguationTupleWithVertexId, Vertex> {
 
+  @Override
+  public Vertex map(DisambiguationTupleWithVertexId triple) throws Exception {
+    return triple.f0;
+  }
+
+  @Override
+  public Vertex getKey(DisambiguationTupleWithVertexId triple) throws Exception {
+    return triple.f0;
+  }
 }

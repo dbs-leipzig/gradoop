@@ -46,6 +46,15 @@ public class JoinFunctionFlatConjunctive implements
   private final OplusEdges combineEdges;
 
   /**
+   * reusable field for triple matching
+   */
+  private final Tuple2<Triple, Triple> reusableTriplePair;
+  /**
+   * Reusable field for edge concatenation
+   */
+  private final Tuple2<Edge, Edge> reusableEdgePair;
+
+  /**
    * Default constructor
    * @param finalThetaEdge    Function used to select the patterns
    * @param combineEdges      Function used to merge the matching edges
@@ -55,6 +64,8 @@ public class JoinFunctionFlatConjunctive implements
     OplusEdges combineEdges) {
     this.finalThetaEdge = finalThetaEdge;
     this.combineEdges = combineEdges;
+    reusableTriplePair = new Tuple2<>();
+    reusableEdgePair = new Tuple2<>();
   }
 
   @Override
@@ -63,8 +74,12 @@ public class JoinFunctionFlatConjunctive implements
     // Iff. the triples match with both source and destination,
     // then I have to merge the edges into one single edge
     if (first.f0.getId().equals(second.f0.getId()) && first.f2.getId().equals(second.f2.getId())) {
-      if (finalThetaEdge.apply(new Tuple2<>(first, second))) {
-        Edge prepared = combineEdges.apply(new Tuple2<>(first.f1, second.f1));
+      reusableTriplePair.f0 = first;
+      reusableTriplePair.f1 = second;
+      if (finalThetaEdge.apply(reusableTriplePair)) {
+        reusableEdgePair.f0 = first.f1;
+        reusableEdgePair.f1 = second.f1;
+        Edge prepared = combineEdges.apply(reusableEdgePair);
         prepared.setSourceId(first.f0.getId());
         prepared.setTargetId(first.f2.getId());
         out.collect(prepared);

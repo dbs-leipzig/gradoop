@@ -20,12 +20,11 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
+import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
 
 import java.io.Serializable;
@@ -38,8 +37,12 @@ import java.io.Serializable;
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0;f2->f1")
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2;f2->f3")
 public class JoinFunctionFlatWithGradoopIds implements
-  FlatJoinFunction<Tuple3<Vertex, Boolean,GradoopId>,
-    Tuple3<Vertex, Boolean,GradoopId>, UndovetailingOPlusVertex>, Serializable {
+  FlatJoinFunction<DisambiguationTupleWithVertexId, DisambiguationTupleWithVertexId, UndovetailingOPlusVertex>, Serializable {
+
+  /**
+   * Tuple reusable for internal computations
+   */
+  private final Tuple2<Vertex, Vertex> reusableTuple;
 
   /**
    * Function used to check if the vertices match or not
@@ -50,6 +53,11 @@ public class JoinFunctionFlatWithGradoopIds implements
    * Function used to combine the vertices together
    */
   private final OplusVertex combineVertices;
+
+  /**
+   * Yet another reusable field for providing a result
+   */
+  private final UndovetailingOPlusVertex reusableU;
 
   /**
    * Provides the implementation of the join function between the vertices. The result is the merged
@@ -63,19 +71,27 @@ public class JoinFunctionFlatWithGradoopIds implements
     OplusVertex combineVertices) {
     this.thetaVertexF = thetaVertexF;
     this.combineVertices = combineVertices;
+    reusableTuple = new Tuple2<>();
+    reusableU = new UndovetailingOPlusVertex();
   }
 
   @Override
-  public void join(Tuple3<Vertex, Boolean,GradoopId> first,
-    Tuple3<Vertex, Boolean,GradoopId> second,
+  public void join(DisambiguationTupleWithVertexId first,
+    DisambiguationTupleWithVertexId second,
     Collector<UndovetailingOPlusVertex> out) throws Exception {
     // Inner join condition
     if (first != null && second != null && first.f1 && second.f1) {
       Vertex ff0 = first.getField(0);
       Vertex sf0 = second.getField(0);
-      if (thetaVertexF.apply(new Tuple2<>(ff0, sf0))) {
-        out.collect(new UndovetailingOPlusVertex(true,ff0.getId(),true,sf0.getId(),
-          combineVertices.apply(new Tuple2<>(ff0, sf0))));
+      reusableTuple.f0 = ff0;
+      reusableTuple.f1 = sf0;
+      if (thetaVertexF.apply(reusableTuple)) {
+        reusableU.f0 = true;
+        reusableU.f1 = ff0.getId();
+        reusableU.f2 = true;
+        reusableU.f3 = sf0.getId();
+        reusableU.f4 = combineVertices.apply(reusableTuple);
+        out.collect(reusableU);
       }
     } else {
       // outer join conditions:
@@ -83,18 +99,24 @@ public class JoinFunctionFlatWithGradoopIds implements
       // * full
       if (first == null || !first.f1) {
         Vertex sf0 = second.getField(0);
-        out.collect(
-          new UndovetailingOPlusVertex(false, GradoopId.NULL_VALUE,
-            true,sf0.getId(), sf0));
+        reusableU.f0 = false;
+        reusableU.f1 = GradoopId.NULL_VALUE;
+        reusableU.f2 = true;
+        reusableU.f3 = sf0.getId();
+        reusableU.f4 = sf0;
+        out.collect(reusableU);
       }
       // outer join conditions:
       // * right or/and
       // * full
       if (second == null || !second.f1) {
         Vertex ff0 = first.getField(0);
-        out.collect(
-          new UndovetailingOPlusVertex(true,ff0.getId(),
-            false, GradoopId.NULL_VALUE, ff0));
+        reusableU.f0 = true;
+        reusableU.f1 = ff0.getId();
+        reusableU.f2 = false;
+        reusableU.f3 = GradoopId.NULL_VALUE;
+        reusableU.f4 = ff0;
+        out.collect(reusableU);
       }
     }
   }

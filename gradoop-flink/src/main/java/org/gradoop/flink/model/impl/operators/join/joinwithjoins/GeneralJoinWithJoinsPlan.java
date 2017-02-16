@@ -21,7 +21,6 @@ import com.sun.istack.Nullable;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -32,8 +31,6 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
-import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.edgesemantics.GeneralEdgeSemantics;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.CoJoinGraphHeads;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
@@ -45,15 +42,22 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .KeySelectorFromRightProjection;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .KeySelectorTripleHashfunction;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.OplusHeads;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.PreFilter;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .Value0OfDisambiguationTuple;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .OplusVertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .CrossFunctionAddUndovetailingToGraph;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.OplusHeads;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.OplusVertex;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions.PreFilter;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.JoinWithJoinsUtils;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .FilterFunctionIsThereElement;
+import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.JoinWithJoinsUtils;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .MapFunctionProjectUndovetailingToGraphOperand;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .CrossFunctionAddEpgmElementToGraphThroughGraphHead;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
@@ -62,10 +66,6 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .KeySelectorFromTupleProjetionWithTargetId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .JoinFunctionCreateTriple;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
-  .FilterFunctionIsThereElement;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
-  .MapFunctionProjectUndovetailingToGraphOperand;
 /**
  *
  * General abstract class with everything required to implement every possible graph join definition
@@ -148,7 +148,7 @@ public class GeneralJoinWithJoinsPlan implements BinaryGraphToGraphOperator {
   /**
    * Provides the operands' vertices from the previous match with the relation
    */
-  private Value0Of3<Vertex,Boolean,GradoopId> mapper;
+  private Value0OfDisambiguationTuple mapper;
 
   /**
    * Part of the inernal state of the intermediate computation of the vertices (1 out of 3)
@@ -261,7 +261,7 @@ public class GeneralJoinWithJoinsPlan implements BinaryGraphToGraphOperator {
     this.vertexJoinCond = new JoinFunctionVertexJoinCondition(thetaVertex1, combineVertices);
     this.verexPJoinCond = new JoinFunctionFlatWithGradoopIds(thetaVertex1, combineVertices);
     this.cojoingraphheads = new CoJoinGraphHeads(thetaGraph1, combineHeads);
-    mapper = new Value0Of3<>();
+    mapper = new Value0OfDisambiguationTuple();
   }
 
   @Override
@@ -370,8 +370,8 @@ public class GeneralJoinWithJoinsPlan implements BinaryGraphToGraphOperator {
   private void joinVertices(DataSet<Vertex> leftGraphVertices, DataSet<Vertex> rightGraphVertices) {
     DataSet<Vertex> left = leftGraphVertices;
     DataSet<Vertex> right = rightGraphVertices;
-    DataSet<Tuple3<Vertex, Boolean, GradoopId>> leftP = null;
-    DataSet<Tuple3<Vertex, Boolean, GradoopId>> rightP = null;
+    DataSet<DisambiguationTupleWithVertexId> leftP = null;
+    DataSet<DisambiguationTupleWithVertexId> rightP = null;
     boolean leftFilter = false;
     boolean rightFilter = false;
 

@@ -40,16 +40,24 @@ public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunctio
   private final boolean isLeft;
 
   /**
+   * Reusable field
+   */
+  private final Tuple2<GradoopId, Vertex> reusable;
+
+  /**
    * Default initialization
    * @param isLeft  If true, it corresponds to the left operand. Otherwise, it corresponds to the
    *              right one
    */
   public MapFunctionProjectUndovetailingToGraphOperand(boolean isLeft) {
     this.isLeft = isLeft;
+    reusable = new Tuple2<>();
   }
 
   @Override
   public Tuple2<GradoopId, Vertex> map(UndovetailingOPlusVertex x) throws Exception {
-    return new Tuple2<>(isLeft ? x.f1 : x.f3, x.f4);
+    reusable.f0 = isLeft ? x.f1 : x.f3;
+    reusable.f1 = x.f4;
+    return reusable;
   }
 }

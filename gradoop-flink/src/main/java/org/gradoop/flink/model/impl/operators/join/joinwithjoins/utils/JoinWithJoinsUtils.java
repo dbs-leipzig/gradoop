@@ -59,32 +59,6 @@ public class JoinWithJoinsUtils {
   }
 
   /**
-   * Joins an operand dataset with a disambiguation one
-   *
-   * @param left            Operand
-   * @param right           Disambiguation dataset
-   * @param joinType        Type of join to be used
-   * @param isCorrectOrder  Checks if the left is actually the left operand and not the right one.
-   *                        The right operand, in this case, is always the disambiguation dataset
-   * @param <K>             Left element type
-   * @param <J>             Right element type
-   * @return                The outcome of the combination of the left and right elements
-   */
-  public static <K, J> JoinOperatorSetsBase<K, J> joinByVertexEdge(DataSet<K> left,
-    DataSet<J> right, JoinType joinType, boolean isCorrectOrder) {
-    switch (joinType) {
-    case INNER:
-      return left.join(right);
-    case LEFT_OUTER:
-      return isCorrectOrder ? left.leftOuterJoin(right) : left.join(right);
-    case RIGHT_OUTER:
-      return isCorrectOrder ? left.join(right) : left.leftOuterJoin(right);
-    default:
-      return left.fullOuterJoin(right);
-    }
-  }
-
-  /**
    * Generating the default string concatenator from an user-provided input
    * @param edgeLabelConcatenation  The user defined function for concatenating edges
    * @return                        If the input is null, the DefaultStringConcatenationFunction is

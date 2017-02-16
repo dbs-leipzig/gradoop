@@ -15,20 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
-
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
-
-import java.util.function.Function;
-
 /**
- * Defining a non-serializable function allowing to pre-evaluate the vertices if required.
- * @param <K> Element that is filtered prior to the actual join phase
- *
- * Created by Giacomo Bergami on 30/01/17.
+ * Some utility functions
  */
-public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<DisambiguationTupleWithVertexId>> {
-
-}
+package org.gradoop.flink.model.impl.operators.join.joinwithfusion;

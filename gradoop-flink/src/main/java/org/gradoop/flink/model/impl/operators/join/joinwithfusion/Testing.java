@@ -1,11 +1,25 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.join.joinwithfusion;
 
-import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
@@ -16,16 +30,22 @@ import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.join.JoinUtils;
+import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithfusion.containers.Subgraphs;
+import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.FilterVerticesAccordingToSemanticsAndMatching;
 import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.MergeGraphHeads;
-import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.MergeToBeFusedVertices;
-import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.DemultiplexEdge;
-import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.DemultiplexVertex;
+import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions
+  .UpdateEdgesThoughToBeFusedVertices;
+import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.VertexNotInSubgraph;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
+  .Value0OfDisambiguationTuple;
 
 /**
  * Created by vasistas on 15/02/17.
@@ -49,88 +69,93 @@ public class Testing {
       .withBroadcastSet(g.getGraphHead().map(new Id<>()), GraphContainmentFilterBroadcast.GRAPH_ID);
   }
 
+
+  public static DataSet<DisambiguationTupleWithVertexId> generateDisambiguation(DataSet<Vertex> left,
+    DataSet<Tuple2<GradoopId, Vertex>> demultiplexedVertices,JoinType vertexJoinType,
+    boolean isLeft) {
+    return JoinUtils.joinByVertexEdge(left,demultiplexedVertices,vertexJoinType,isLeft)
+      .where(new Id<>()).equalTo(new DemultiplexedEPGMToId<>())
+      .with(new FilterVerticesAccordingToSemanticsAndMatching());
+  }
+
   public static void main(String args[]) {
     GraphCollection patterns = null;
     LogicalGraph left = null;
     LogicalGraph right = null;
-    Function<Tuple2<String,String>,String> concatenateGraphHeads = null;
-    Function<Tuple2<Properties,Properties>,Properties> concatenateProperties = null;
+    LogicalGraph union = new Combination().execute(left,right);
+    Function<Tuple2<String, String>, String> concatenateGraphHeads = null;
+    Function<Tuple2<Properties, Properties>, Properties> concatenateProperties = null;
     JoinType vertexJoinType = null;
-
-    DataSet<Vertex> vertexUnion = left.getVertices()
-      .union(right.getVertices());
-
-    // getting all the possible graphs
-    DataSet<GraphHead> graphHeads = patterns.getGraphHeads();
-      //.map(new Id<>());
-
     // The resulting graph id
-    GradoopId fusedGraphId = GradoopId.get();
-    // The head belonging to the final graph
-    DataSet<GraphHead> fusedGraphHead = left.getGraphHead()
-      .first(1)
-      .join(right.getGraphHead().first(1))
-      .where((GraphHead x)->0).equalTo((GraphHead y)->0)
-      .with(new MergeGraphHeads(fusedGraphId,concatenateGraphHeads,concatenateProperties));
+    final GradoopId fusedGraphId = GradoopId.get();
+
 
     // ---------------
     // - Step 1
     // ---------------
-    // associate to each vertex its graphId <graphid,vertex>
-    DataSet<Tuple2<GradoopId, Vertex>> demultiplexedVertices = patterns.getVertices()
-      .flatMap(new DemultiplexVertex())
-      .join(graphHeads)
-      .where(new Value0Of2<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    // associate to each edge its graphId <graphid,edge>
-    DataSet<Tuple2<GradoopId, Edge>> demultiplexedEdges = patterns.getEdges()
-      .flatMap(new DemultiplexEdge())
-      .join(graphHeads)
-      .where(new Value0Of2<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
+    // Part of the work here could be reduced
+    Subgraphs sg = new Subgraphs(patterns,union,fusedGraphId);
 
     // ---------------
     // - Step 2
     // ---------------
-    // filter the demultiplexed vertices such that they appear in the union graph
-    DataSet<Tuple3<Vertex, Boolean, GradoopId>> toBefusedVertices = vertexUnion
-      .join(demultiplexedVertices)
-      .where(new Id<>()).equalTo(new EPGMElementIdInSecond<>())
-      .with(new FlatJoinFunction<Vertex, Tuple2<GradoopId, Vertex>, Tuple3<Vertex, Boolean, GradoopId>>() {
-        @Override
-        public void join(Vertex first, Tuple2<GradoopId, Vertex> second,
-          Collector<Tuple3<Vertex, Boolean, GradoopId>> out) throws Exception {
-          out.collect(new Tuple3<>());
-        }
-      });
+    // For each operand, we shall return the final vertices
+    DataSet<DisambiguationTupleWithVertexId> leftVerticesNotInPattern =
+      left.getVertices().filter(new NotInGraphBroadcast<>())
+        .withBroadcastSet(patterns.getGraphHeads().map(new Id<>()),
+          GraphContainmentFilterBroadcast.GRAPH_ID)
+        .map(new VertexNotInSubgraph());
+    DataSet<DisambiguationTupleWithVertexId> rightVerticesNotInPattern =
+      left.getVertices().filter(new NotInGraphBroadcast<>())
+        .withBroadcastSet(patterns.getGraphHeads().map(new Id<>()),
+          GraphContainmentFilterBroadcast.GRAPH_ID)
+        .map(new VertexNotInSubgraph());
 
-      //demultiplexedVertices
-      //.join(vertexUnion)
-      //.where(new EPGMElementIdInSecond<>()).equalTo(new Id<>())
-      //.with(new LeftSide<>());
+    // The head belonging to the final graph
+    DataSet<GraphHead> finalHead = left.getGraphHead()
+      .first(1)
+      .join(right.getGraphHead().first(1))
+      .where((GraphHead x)->0).equalTo((GraphHead y)->0)
+      .with(new MergeGraphHeads(fusedGraphId, concatenateGraphHeads, concatenateProperties));
 
-    // the patterns that are actually used are the ones that have a GradoopId in the
-    // toBefusedVertices set. Merge the filtered vertices as pointed out by the patterns
-    //DataSet<Tuple2<GradoopId, Vertex>> fusedVertices = toBefusedVertices
-      //.coGroup(graphHeads);
-      /*.where(new Value0Of2<>()).equalTo(new Id<>())
-      .with(new MergeToBeFusedVertices(fusedGraphId))*/;
+    // The set of vertices belonging to the final graph
+    DataSet<DisambiguationTupleWithVertexId> finalVertices = sg.getDisambiguatedUpperLevelView();
 
-      /*
-    DataSet<Vertex> toBeReturned = fusedVertices.map(new Value1Of2<>());
-    switch (vertexJoinType) {
-    case INNER:
-      break;
-    case LEFT_OUTER:
-      toBeReturned.union()
-      break;
-    case RIGHT_OUTER:
-      break;
-    case FULL_OUTER:
-      break;
-    }*/
+    // -----------------------------------------------------------------
+    // The final vertices that have to be used into the edge update fase
+    // -----------------------------------------------------------------
+    DataSet<DisambiguationTupleWithVertexId> upperLevelVerticesToPeek = patterns.getConfig().getExecutionEnvironment().fromElements();
+    if (vertexJoinType.equals(JoinType.FULL_OUTER)||
+        vertexJoinType.equals(JoinType.LEFT_OUTER)) {
+      upperLevelVerticesToPeek = finalVertices.union(leftVerticesNotInPattern);
+    }
+    if (vertexJoinType.equals(JoinType.FULL_OUTER)||
+      vertexJoinType.equals(JoinType.RIGHT_OUTER)) {
+      if (upperLevelVerticesToPeek == null) {
+        upperLevelVerticesToPeek = rightVerticesNotInPattern;
+      } else {
+        upperLevelVerticesToPeek = upperLevelVerticesToPeek.union(rightVerticesNotInPattern);
+      }
+    }
+    upperLevelVerticesToPeek.union(sg.getZoomOutViewAsVertex());
 
+    //
+
+    DataSet<Edge> finalEdges = patterns.getEdges()
+      // From all the patterns, extract only those vertices that appear in the union
+      .filter(new InGraphBroadcast<>())
+      .withBroadcastSet(union.getGraphHead().map(new Id<>()),GraphContainmentFilterBroadcast.GRAPH_ID)
+      .fullOuterJoin(finalVertices)
+      .where(new SourceId<>()).equalTo(new Id<>())
+      /// XXXX
+      .with(new UpdateEdgesThoughToBeFusedVertices(true))
+      .fullOuterJoin(finalVertices)
+      .where(new TargetId<>()).equalTo(new Id<>())
+      /// XXXX
+      .with(new UpdateEdgesThoughToBeFusedVertices(false));;
+
+    LogicalGraph toret = LogicalGraph
+      .fromDataSets(finalHead, finalVertices.map(new Value0OfDisambiguationTuple()), finalEdges, patterns.getConfig());
   }
   
 }

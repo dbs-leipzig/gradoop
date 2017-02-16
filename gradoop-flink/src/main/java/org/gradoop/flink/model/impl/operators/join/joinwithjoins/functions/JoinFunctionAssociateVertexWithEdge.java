@@ -33,9 +33,23 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 public class JoinFunctionAssociateVertexWithEdge implements
   JoinFunction<Tuple2<GradoopId, Vertex>, Edge, Tuple2<Vertex, Edge>> {
 
+  /**
+   * Reusable field
+   */
+  private final Tuple2<Vertex, Edge> reusable;
+
+  /**
+   * Default constructor
+   */
+  public JoinFunctionAssociateVertexWithEdge() {
+    reusable = new Tuple2<>();
+  }
+
   @Override
   public Tuple2<Vertex, Edge> join(Tuple2<GradoopId, Vertex> first, Edge second) throws
     Exception {
+    reusable.f0 = first.f1;
+    reusable.f1 = second;
     return new Tuple2<>(first.f1, second);
   }
 }

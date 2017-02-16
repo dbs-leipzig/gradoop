@@ -35,9 +35,25 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class JoinFunctionCreateTriple implements
   JoinFunction<Tuple2<Vertex, Edge>, Tuple2<GradoopId, Vertex>, Triple> {
+
+  /**
+   * reusable field
+   */
+  private final Triple reusable;
+
+  /**
+   * Default constructor
+   */
+  public JoinFunctionCreateTriple() {
+    reusable = new Triple();
+  }
+
   @Override
   public Triple join(Tuple2<Vertex, Edge> first,
     Tuple2<GradoopId, Vertex> second) throws Exception {
-    return new Triple(first.f0, first.f1, second.f1);
+    reusable.f0 = first.f0;
+    reusable.f1 = first.f1;
+    reusable.f2 = second.f1;
+    return reusable;
   }
 }

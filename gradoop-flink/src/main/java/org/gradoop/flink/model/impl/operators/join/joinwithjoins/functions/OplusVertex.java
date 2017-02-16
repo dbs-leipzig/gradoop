@@ -32,16 +32,22 @@ import java.io.Serializable;
 public class OplusVertex extends OplusSemiConcrete<Vertex> implements Serializable {
 
   /**
+   * reusable vertex while generating vertices
+   */
+  private final Vertex v;
+
+  /**
    * Default constructor
    * @param transformation    String concatenation function
    */
   public OplusVertex(Function<Tuple2<String, String>, String> transformation) {
     super(transformation);
+    v = new Vertex();
   }
 
   @Override
   public Vertex supplyEmpty() {
-    Vertex v = new Vertex();
+
     v.setId(GradoopId.get());
     return v;
   }

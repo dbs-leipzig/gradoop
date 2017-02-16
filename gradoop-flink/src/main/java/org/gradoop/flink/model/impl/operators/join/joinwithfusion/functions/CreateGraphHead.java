@@ -15,20 +15,29 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithfusion;
+package org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions;
 
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Returning the elemnet itself
- *
- * Created by vasistas on 15/02/17.
+ * Created by vasistas on 16/02/17.
  */
-@FunctionAnnotation.ForwardedFields("*->*")
-public class Self<K> implements
-  org.apache.flink.api.java.functions.KeySelector<K, K> {
+public class CreateGraphHead implements MapFunction<Vertex, GraphHead> {
+
+  private final GraphHead gh;
+
+  public CreateGraphHead(GradoopId gid) {
+    gh = new GraphHead();
+    gh.setId(gid);
+  }
+
   @Override
-  public K getKey(K value) throws Exception {
-    return value;
+  public GraphHead map(Vertex value) throws Exception {
+    gh.setProperties(value.getProperties());
+    gh.setLabel(value.getLabel());
+    return gh;
   }
 }

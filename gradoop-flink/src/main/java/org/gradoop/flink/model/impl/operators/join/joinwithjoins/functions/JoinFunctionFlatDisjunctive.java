@@ -34,6 +34,11 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 public class JoinFunctionFlatDisjunctive extends JoinFunctionFlatConjunctive {
 
   /**
+   * Some private edge to be updated
+   */
+  private final Edge e;
+
+  /**
    * Default constructor
    * @param finalThetaEdge    Function used to select which patterns are useful in the graphs
    * @param combineEdges      Function to combine edges that have to be merged
@@ -42,6 +47,7 @@ public class JoinFunctionFlatDisjunctive extends JoinFunctionFlatConjunctive {
     Function<Tuple2<Triple, Triple>, Boolean> finalThetaEdge,
     OplusEdges combineEdges) {
     super(finalThetaEdge, combineEdges);
+    e = new Edge();
   }
 
   /**
@@ -49,8 +55,7 @@ public class JoinFunctionFlatDisjunctive extends JoinFunctionFlatConjunctive {
    * @param triple  Triple containing the to-be-returned edge
    * @return        The new edge to-appear in the final graph join result
    */
-  private static Edge generateFromSingle(Triple triple) {
-    Edge e = new Edge(); // Even here, I cannot reuse the object, otherwise the semantics is wrong
+  private Edge generateFromSingle(Triple triple) {
     e.setSourceId(triple.f0.getId());
     e.setTargetId(triple.f2.getId());
     e.setProperties(triple.f1.getProperties());

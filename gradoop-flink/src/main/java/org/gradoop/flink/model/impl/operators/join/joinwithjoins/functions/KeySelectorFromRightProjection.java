@@ -17,14 +17,10 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
+import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
 
 import java.io.Serializable;
 
@@ -34,7 +30,7 @@ import java.io.Serializable;
  * Created by Giacomo Bergami on 01/02/17.
  */
 @FunctionAnnotation.ReadFields("f3->*")
-public class KeySelectorFromRightProjection implements KeySelector<Tuple3<Vertex, Boolean, GradoopId>, GradoopId>,
+public class KeySelectorFromRightProjection implements KeySelector<DisambiguationTupleWithVertexId, GradoopId>,
   Serializable {
 
   /**
@@ -43,7 +39,7 @@ public class KeySelectorFromRightProjection implements KeySelector<Tuple3<Vertex
   public KeySelectorFromRightProjection() {  }
 
   @Override
-  public GradoopId getKey(Tuple3<Vertex, Boolean, GradoopId> value) throws Exception {
+  public GradoopId getKey(DisambiguationTupleWithVertexId value) throws Exception {
     return value.f2;
   }
 }

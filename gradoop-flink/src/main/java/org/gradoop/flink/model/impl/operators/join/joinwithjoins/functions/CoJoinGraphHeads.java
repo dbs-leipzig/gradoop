@@ -22,7 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
 
 import java.io.Serializable;
@@ -50,6 +49,10 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
    * Function for combining the matching graph heads together
    */
   private final Oplus<GraphHead> combineHeads;
+
+  /**
+   * Reusable tuple for many times within the worker
+   */
   private final Tuple2<GraphHead, GraphHead> tuple2;
 
   /**
@@ -92,10 +95,12 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
     for (GraphHead left : first) {
       isThereAtLeastOneHead = true;
       toInsert = left;
+      tuple2.f0 = left;
       // Checking if the right graph has a head
       for (GraphHead right : second) {
-        if (thetaGraph.apply(new Tuple2<>(left, right))) {
-          GraphHead gh1 = combineHeads.apply(new Tuple2<>(left, right));
+        tuple2.f1 = right;
+        if (thetaGraph.apply(tuple2)) {
+          GraphHead gh1 = combineHeads.apply(tuple2);
           gh1.setId(gid);
           out.collect(gh1);
           hasNotBeenInserted = false;

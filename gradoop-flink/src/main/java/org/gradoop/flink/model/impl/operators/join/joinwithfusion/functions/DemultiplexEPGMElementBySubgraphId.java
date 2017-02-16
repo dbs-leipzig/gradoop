@@ -17,43 +17,38 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
- * This function collects the vertices that has to be fused into one
- * since they belong to the pattern having the same graphid
+ * Splits each EPGMElement e into a tuple <t,e> where t is a graphid to where e belongs
  * Created by vasistas on 15/02/17.
  */
-public class MergeToBeFusedVertices implements
-  CoGroupFunction<Tuple2<GradoopId, Vertex>, GraphHead, Tuple2<GradoopId, Vertex>> {
+public class DemultiplexEPGMElementBySubgraphId<K extends GraphElement> implements FlatMapFunction<K,
+  Tuple2<GradoopId,
+  K>> {
 
   /**
-   * Reusable field
+   * Reusable field used for speedup
    */
-  private final Vertex v;
+  private final Tuple2<GradoopId, K> reusable;
 
   /**
    * Default constructor
-   * @param gid   Graph id belonging to the final result
    */
-  public MergeToBeFusedVertices(GradoopId gid) {
-    this.v = new Vertex();
-    this.v.addGraphId(gid);
+  public DemultiplexEPGMElementBySubgraphId() {
+    reusable = new Tuple2<GradoopId, K>();
   }
 
   @Override
-  public void coGroup(Iterable<Tuple2<GradoopId, Vertex>> first, Iterable<GraphHead> second,
-    Collector<Tuple2<GradoopId, Vertex>> out) throws Exception {
-    for (GraphHead gh : second) {
-      v.setProperties(gh.getProperties());
-      v.setLabel(gh.getLabel());
-      out.collect(new Tuple2<>(gh.getId(), v));
-      break;
+  public void flatMap(K value, Collector<Tuple2<GradoopId, K>> out) throws Exception {
+    for (GradoopId id : value.getGraphIds()) {
+      reusable.f0 = id;
+      reusable.f1 = value;
+      out.collect(reusable);
     }
   }
 }

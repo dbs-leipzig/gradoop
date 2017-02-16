@@ -18,13 +18,11 @@
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
 
 import java.io.Serializable;
@@ -50,6 +48,16 @@ public class JoinFunctionVertexJoinCondition extends
   private final OplusVertex combineVertices;
 
   /**
+   * Reusable field for providing the final result
+   */
+  private final UndovetailingOPlusVertex reusableToBeCollected;
+
+  /**
+   * Reusable field for intermediate evaluation and computation
+   */
+  private final Tuple2<Vertex, Vertex> reusablePair;
+
+  /**
    * Implements the join operation for the vertices
    * @param thetaVertexF      Selection function over pair of opreands' vertices
    * @param combineVertices   How to merge the vertices that passed the check
@@ -58,29 +66,38 @@ public class JoinFunctionVertexJoinCondition extends
     OplusVertex combineVertices) {
     this.thetaVertexF = thetaVertexF;
     this.combineVertices = combineVertices;
+    reusableToBeCollected = new UndovetailingOPlusVertex();
+    reusablePair = new Tuple2<>();
   }
 
   @Override
   public void join(Vertex first, Vertex second, Collector<UndovetailingOPlusVertex> out) throws
     Exception {
     if (first != null && second != null) {
-      if (thetaVertexF.apply(new Tuple2<>(first, second))) {
-        out.collect(new UndovetailingOPlusVertex(true,first.getId(),
-          true,second.getId(),
-          combineVertices.apply(new Tuple2<>(first, second))));
+      reusablePair.f0 = first;
+      reusablePair.f1 = second;
+      if (thetaVertexF.apply(reusablePair)) {
+        reusableToBeCollected.f0 = true;
+        reusableToBeCollected.f1 = first.getId();
+        reusableToBeCollected.f2 = true;
+        reusableToBeCollected.f3 = second.getId();
+        reusableToBeCollected.f4 = combineVertices.apply(reusablePair);
+        out.collect(reusableToBeCollected);
       }
     } else if (first == null) {
-      out.collect(
-        new UndovetailingOPlusVertex(false, GradoopId.NULL_VALUE,
-                                     true,second.getId(),
-                                     second)
-      );
+      reusableToBeCollected.f0 = false;
+      reusableToBeCollected.f1 = GradoopId.NULL_VALUE;
+      reusableToBeCollected.f2 = true;
+      reusableToBeCollected.f3 = second.getId();
+      reusableToBeCollected.f4 = second;
+      out.collect(reusableToBeCollected);
     } else {
-      out.collect(
-        new UndovetailingOPlusVertex(true,first.getId(),
-                                     false, GradoopId.NULL_VALUE,
-                                     first)
-      );
+      reusableToBeCollected.f0 = true;
+      reusableToBeCollected.f1 = first.getId();
+      reusableToBeCollected.f2 = false;
+      reusableToBeCollected.f3 = GradoopId.NULL_VALUE;
+      reusableToBeCollected.f4 = first;
+      out.collect(reusableToBeCollected);
     }
   }
 }

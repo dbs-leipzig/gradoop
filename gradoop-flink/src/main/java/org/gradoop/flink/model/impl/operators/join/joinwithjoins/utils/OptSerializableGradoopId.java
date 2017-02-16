@@ -42,8 +42,11 @@ public class OptSerializableGradoopId extends IOptSerializable<GradoopId> implem
     super(isThereElement, elem);
   }
 
+  /**
+   * Constructor used by Apache Flink
+   */
   public OptSerializableGradoopId() {
-
+    super();
   }
 
   /**

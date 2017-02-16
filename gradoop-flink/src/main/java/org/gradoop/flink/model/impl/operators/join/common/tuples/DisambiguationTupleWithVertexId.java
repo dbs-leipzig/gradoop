@@ -15,40 +15,28 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
+package org.gradoop.flink.model.impl.operators.join.common.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.functions.Function;
-
-import java.io.Serializable;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Defining the way to combine the edges
+ * Tuple representing the fused vertex, and eventually its id (boolean)
+ * in the graph operand
  *
- * Created by Giacomo Bergami on 01/02/17.
+ * f0: fused vertex
+ * f1: if f2 appears in the graph operand
+ * f2: operand's vertex id matching with f0.
+ *
+ * Created by Giacomo Bergami on 16/02/17.
  */
-public class OplusEdges extends OplusSemiConcrete<Edge> implements Serializable {
-
-  /**
-   * Reusable edge field
-   */
-  private final Edge ee;
-
+public class DisambiguationTupleWithVertexId extends Tuple3<Vertex, Boolean, GradoopId> {
   /**
    * Default constructor
-   * @param transformation  Edge label concatenation function
    */
-  public OplusEdges(Function<Tuple2<String, String>, String> transformation) {
-    super(transformation);
-    ee = new Edge();
-  }
-
-  @Override
-  public Edge supplyEmpty() {
-    ee.setId(GradoopId.get());
-    return ee;
+  public DisambiguationTupleWithVertexId() {
+    super();
   }
 
 }

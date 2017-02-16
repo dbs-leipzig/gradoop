@@ -19,14 +19,11 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.JoinWithJoinsUtils;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
+import org.gradoop.flink.model.impl.operators.join.JoinUtils;
+import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
 
 /**
  * Given a set of vertex elements that have to be pre-filtered accordingly to the vertex join
@@ -66,8 +63,8 @@ public class PreFilterRelationalJoin implements PreFilter<Vertex> {
   }
 
   @Override
-  public DataSet<Tuple3<Vertex, Boolean, GradoopId>> apply(DataSet<Vertex> vertexDataSet) {
-    return  JoinWithJoinsUtils.joinByVertexEdge(vertexDataSet, e, vertexJoinType, isLeft)
+  public DataSet<DisambiguationTupleWithVertexId> apply(DataSet<Vertex> vertexDataSet) {
+    return  JoinUtils.joinByVertexEdge(vertexDataSet, e, vertexJoinType, isLeft)
       .where(new Id<>())
       .equalTo(new KeySelectorFromVertexSrcOrDest(isLeft))
       .with(new JoinFunctionWithVertexAndGradoopIdFromEdge());

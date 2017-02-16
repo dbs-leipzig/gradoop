@@ -15,20 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
-
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
-
-import java.util.function.Function;
+package org.gradoop.flink.model.impl.operators.join.common.tuples;
 
 /**
- * Defining a non-serializable function allowing to pre-evaluate the vertices if required.
- * @param <K> Element that is filtered prior to the actual join phase
+ * Tuple representing the fused vertex, and eventually its id (boolean)
+ * in the graph operand
  *
- * Created by Giacomo Bergami on 30/01/17.
+ * f0: fused vertex
+ * f1: if f2 appears in the graph operand
+ * f2: graph's id containing f0
+ *
+ * Created by Giacomo Bergami on 16/02/17.
  */
-public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<DisambiguationTupleWithVertexId>> {
+public class DisambiguationTupleWithGraphId extends DisambiguationTupleWithVertexId {
+  /**
+   * Default constructor
+   */
+  public DisambiguationTupleWithGraphId() {
+    super();
+  }
 
 }

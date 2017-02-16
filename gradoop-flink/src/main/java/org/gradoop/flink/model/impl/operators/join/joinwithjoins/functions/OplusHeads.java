@@ -31,16 +31,22 @@ import java.io.Serializable;
 public class OplusHeads extends OplusSemiConcrete<GraphHead> implements Serializable {
 
   /**
+   * Reusable field
+   */
+  private final GraphHead gh;
+
+  /**
    * Default constructor
    * @param transformation  Graph Heads labels' concatenation function
    */
   public OplusHeads(Function<Tuple2<String, String>, String> transformation) {
     super(transformation);
+    gh = new GraphHead();
   }
 
   @Override
   public GraphHead supplyEmpty() {
-    return new GraphHead();
+    return gh;
   }
 
 }
