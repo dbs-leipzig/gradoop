@@ -88,8 +88,8 @@ abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
     reuseSuperEdgeGroupItem.setGroupingValues(groupPropertyValues);
     reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues());
     reuseSuperEdgeGroupItem.setSuperEdge(true);
-    reuseSuperEdgeGroupItem.addSourceIds(sources);
-    reuseSuperEdgeGroupItem.addTargetIds(targets);
+    reuseSuperEdgeGroupItem.setSourceIds(sources);
+    reuseSuperEdgeGroupItem.setTargetIds(targets);
     return reuseSuperEdgeGroupItem;
   }
 }

@@ -77,6 +77,11 @@ public class SuperEdgeGroupItem
     f2.addAll(sourceVertexIds);
   }
 
+  public void setSourceIds(Set<GradoopId> sourceVertexIds) {
+    f2.clear();
+    f2.addAll(sourceVertexIds);
+  }
+
   public void setSourceId(GradoopId sourceVertexId) {
     f2.clear();
     f2.add(sourceVertexId);
@@ -95,6 +100,11 @@ public class SuperEdgeGroupItem
   }
 
   public void addTargetIds(Set<GradoopId> targetVertexIds) {
+    f3.addAll(targetVertexIds);
+  }
+
+  public void setTargetIds(Set<GradoopId> targetVertexIds) {
+    f3.clear();
     f3.addAll(targetVertexIds);
   }
 
