@@ -43,7 +43,7 @@ public class GraphStatisticsHDFSReader extends GraphStatisticsReader {
    * @throws IOException if an I/O error occurs opening the files
    */
   public static GraphStatistics read(String inputPath, Configuration configuration)
-    throws IOException {
+      throws IOException {
     FileSystem fs = FileSystem.get(configuration);
     Path root = new Path(inputPath);
     Charset charset = Charset.forName("UTF-8");
@@ -58,6 +58,10 @@ public class GraphStatisticsHDFSReader extends GraphStatisticsReader {
     long distinctTargetVertexCount;
     Map<String, Long> distinctSourceVertexCountByEdgeLabel;
     Map<String, Long> distinctTargetVertexCountByEdgeLabel;
+    Map<String, Map<String, Long>> distinctPropertyValuesByEdgeLabelAndPropertyName;
+    Map<String, Map<String, Long>> distinctPropertyValuesByVertexLabelAndPropertyName;
+    Map<String, Long> distinctEdgePropertyValuesByPropertyName;
+    Map<String, Long> distinctVertexPropertyValuesByPropertyName;
 
     Path p = new Path(root, GraphStatisticsReader.FILE_VERTEX_COUNT);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
@@ -109,9 +113,35 @@ public class GraphStatisticsHDFSReader extends GraphStatisticsReader {
       distinctTargetVertexCountByEdgeLabel = readKeyValueMap(br.lines());
     }
 
+    p = new Path(root,
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY);
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
+      distinctPropertyValuesByEdgeLabelAndPropertyName = readNestedKeyValueMap(br.lines());
+    }
+
+    p = new Path(root,
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY);
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
+      distinctPropertyValuesByVertexLabelAndPropertyName = readNestedKeyValueMap(br.lines());
+    }
+
+    p = new Path(root,
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY);
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
+      distinctEdgePropertyValuesByPropertyName = readKeyValueMap(br.lines());
+    }
+
+    p = new Path(root,
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY);
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
+      distinctVertexPropertyValuesByPropertyName = readKeyValueMap(br.lines());
+    }
+
     return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,
       edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
       distinctSourceVertexCount, distinctTargetVertexCount, distinctSourceVertexCountByEdgeLabel,
-      distinctTargetVertexCountByEdgeLabel);
+      distinctTargetVertexCountByEdgeLabel, distinctPropertyValuesByEdgeLabelAndPropertyName,
+      distinctPropertyValuesByVertexLabelAndPropertyName,
+      distinctEdgePropertyValuesByPropertyName, distinctVertexPropertyValuesByPropertyName);
   }
 }

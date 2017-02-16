@@ -24,6 +24,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertyValuesByLabelAndPropertyName;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexPropertyValuesByLabelAndPropertyName;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
@@ -120,6 +122,52 @@ public class BuildStatisticsFile extends AbstractRunner implements ProgramDescri
         withCount.getCount()))
       .returns(typeHint);
 
+    //----------------------------------------------------------------------------------------------
+    // Distinct Edge Property Values by label - property name pair
+    //----------------------------------------------------------------------------------------------
+    DataSet<Tuple2<String, Long>> distinctEdgePropertyValuesByLabelAndPropertyName =
+      new DistinctEdgePropertyValuesByLabelAndPropertyName()
+      .execute(graph)
+      .map(pair -> Tuple2.of(
+        String.format("edges.%s.%s.distinct.property.values",
+          pair.f0.f0, pair.f0.f1),
+        pair.f1))
+      .returns(typeHint);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct Vertex Property Values by label - property name pair
+    //----------------------------------------------------------------------------------------------
+    DataSet<Tuple2<String, Long>> distinctVertexPropertyValuesByLabelAndPropertyName =
+      new DistinctVertexPropertyValuesByLabelAndPropertyName()
+        .execute(graph)
+        .map(pair -> Tuple2.of(
+          String.format("vertex.%s.%s.distinct.property.values",
+            pair.f0.f0, pair.f0.f1),
+          pair.f1))
+        .returns(typeHint);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct Edge Property Values by property name
+    //----------------------------------------------------------------------------------------------
+    DataSet<Tuple2<String, Long>> distinctEdgePropertyValuesByLabel =
+      new DistinctEdgePropertyValuesByLabelAndPropertyName()
+        .execute(graph)
+        .map(pair -> Tuple2.of(
+          String.format("edges.distinct.property.values", pair.f0),
+          pair.f1))
+        .returns(typeHint);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct Vertex Property Values by property name
+    //----------------------------------------------------------------------------------------------
+    DataSet<Tuple2<String, Long>> distinctVertexPropertyValuesByLabel =
+      new DistinctVertexPropertyValuesByLabelAndPropertyName()
+        .execute(graph)
+        .map(pair -> Tuple2.of(
+          String.format("vertex.%s.distinct.property.values", pair.f0),
+          pair.f1))
+        .returns(typeHint);
+
     vertexCount
       .union(edgeCount)
       .union(vertexLabelDistribution)
@@ -128,6 +176,10 @@ public class BuildStatisticsFile extends AbstractRunner implements ProgramDescri
       .union(distinctTargetIds)
       .union(sourceVerticesByEdgeLabel)
       .union(targetVerticesByEdgeLabel)
+      .union(distinctEdgePropertyValuesByLabelAndPropertyName)
+      .union(distinctVertexPropertyValuesByLabelAndPropertyName)
+      .union(distinctEdgePropertyValuesByLabel)
+      .union(distinctVertexPropertyValuesByLabel)
       .sortPartition(0, Order.ASCENDING)
       .setParallelism(1)
       .writeAsCsv(outputFile, System.lineSeparator(), "=");

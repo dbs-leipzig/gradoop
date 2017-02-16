@@ -23,12 +23,15 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertyValuesByLabelAndPropertyName;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertyValuesByPropertyName;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexPropertyValuesByLabelAndPropertyName;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexPropertyValuesByPropertyName;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeLabelDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegreeDistribution;
@@ -178,6 +181,54 @@ public class Statistics extends AbstractRunner implements ProgramDescription {
       .returns(new TypeHint<Tuple3<String, String, Long>>() { })
       .writeAsCsv(
         outputDir + GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL,
+        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct edge PropertyValues by Label - PropertyName pairs
+    //----------------------------------------------------------------------------------------------
+    new DistinctEdgePropertyValuesByLabelAndPropertyName()
+      .execute(graph)
+      .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+      .returns(new TypeHint<Tuple3<String, String, Long>>() { })
+      .writeAsCsv(
+        outputDir +
+          GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY,
+        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct vertex PropertyValues by Label - PropertyName pairs
+    //----------------------------------------------------------------------------------------------
+    new DistinctVertexPropertyValuesByLabelAndPropertyName()
+      .execute(graph)
+      .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+      .returns(new TypeHint<Tuple3<String, String, Long>>() { })
+      .writeAsCsv(
+        outputDir +
+          GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY,
+        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct edge PropertyValues by PropertyName
+    //----------------------------------------------------------------------------------------------
+    new DistinctEdgePropertyValuesByPropertyName()
+      .execute(graph)
+      .writeAsCsv(
+        outputDir +
+          GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY,
+        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
+      .setParallelism(1);
+
+    //----------------------------------------------------------------------------------------------
+    // Distinct vertex PropertyValues by PropertyName
+    //----------------------------------------------------------------------------------------------
+    new DistinctVertexPropertyValuesByPropertyName()
+      .execute(graph)
+      .writeAsCsv(
+        outputDir +
+          GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY,
         System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
       .setParallelism(1);
 

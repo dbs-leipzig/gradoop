@@ -123,6 +123,54 @@ public abstract class GraphStatisticsReader {
     "distinct_target_vertex_count_by_edge_label";
 
   /**
+   * Each line contains the edge label a property name and the number of distinct property
+   * values for that pair, e.g.
+   *
+   * BOF
+   * knows,since,73
+   * connecting,isActive,2
+   * EOF
+   */
+  public static final String FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY =
+    "distinct_edge_property_values_by_label_and_property_name";
+
+  /**
+   * Each line contains the vertex label a property name and the number of distinct property
+   * values for that pair, e.g.
+   *
+   * BOF
+   * Person,age,100
+   * City,name,25
+   * EOF
+   */
+  public static final String FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY =
+    "distinct_vertex_property_values_by_label_and_property_name";
+
+  /**
+   * Each line contains the edge property name and the number of distinct property
+   * values for that value
+   *
+   * BOF
+   * since,73
+   * isActive,2
+   * EOF
+   */
+  public static final String FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY =
+    "distinct_edge_property_values_by_property_name";
+
+  /**
+   * Each line contains the vertex property name and the number of distinct property
+   * values for that value
+   *
+   * BOF
+   * age,100
+   * name,25
+   * EOF
+   */
+  public static final String FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY =
+    "distinct_vertex_property_values_by_property_name";
+
+  /**
    * Reads a single {@link Long} value from the specified file.
    *
    * @param lines stream of lines in the file
@@ -157,7 +205,7 @@ public abstract class GraphStatisticsReader {
    * @throws IOException if an I/O error occurs opening the file
    */
   static Map<String, Map<String, Long>> readNestedKeyValueMap(Stream<String> lines)
-    throws IOException {
+      throws IOException {
 
     final Map<String, Map<String, Long>> mapping = new HashMap<>();
 

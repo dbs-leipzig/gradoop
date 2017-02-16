@@ -102,4 +102,90 @@ public abstract class GraphStatisticsTest {
     // nonexistent edge label
     assertThat(TEST_STATISTICS.getDistinctTargetVertexCountByEdgeLabel("foo"), is(0L));
   }
+
+  @Test
+  public void testDistinctPropertyValuesByEdgeLabelAndPropertyName() throws Exception {
+    assertThat(
+      TEST_STATISTICS.getDistinctEdgePropertyValuesByLabelAndPropertyName("knows", "since"),
+      is(6L));
+    assertThat(
+      TEST_STATISTICS.getDistinctEdgePropertyValuesByLabelAndPropertyName("hasModerator", "since"),
+      is(3L));
+    // nonexistent edge label
+    assertThat(
+      TEST_STATISTICS.getDistinctEdgePropertyValuesByLabelAndPropertyName("foo", "bar"),
+      is(0L));
+  }
+
+  @Test
+  public void testDistinctPropertyValuesByVertexLabelAndPropertyName() throws Exception {
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "name"),
+      is(6L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "gender"),
+      is(2L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "city"),
+      is(3L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "age"),
+      is(4L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "speaks"),
+      is(1L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Person", "locIP"),
+      is(1L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Tag", "name"),
+      is(3L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("Forum", "title"),
+      is(2L));
+    // nonexistent edge label
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByLabelAndPropertyName("foo", "bar"),
+      is(0L));
+  }
+
+  @Test
+  public void testDistinctEdgePropertyValuesByPropertyName() throws Exception {
+    assertThat(TEST_STATISTICS.getDistinctEdgePropertyValuesByPropertyName("since"),
+      is(9L));
+    // nonexistent edge label
+    assertThat(
+      TEST_STATISTICS.getDistinctEdgePropertyValuesByPropertyName("bar"),
+      is(0L));
+  }
+
+  @Test
+  public void testDistinctVertexPropertyValuesByPropertyName() throws Exception {
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName( "name"),
+      is(9L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName("gender"),
+      is(2L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName("city"),
+      is(3L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName( "age"),
+      is(4L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName( "speaks"),
+      is(1L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName( "locIP"),
+      is(1L));
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName("title"),
+      is(2L));
+    // nonexistent edge label
+    assertThat(
+      TEST_STATISTICS.getDistinctVertexPropertyValuesByPropertyName("bar"),
+      is(0L));
+  }
+
 }

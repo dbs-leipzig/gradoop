@@ -79,10 +79,34 @@ public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {
       .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL));
     Map<String, Long> distTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
+    p = statisticsDir.resolve(Paths.get(
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY));
+    Map<String, Map<String, Long>> distinctPropertyValuesByEdgeLabelAndPropertyName =
+      readNestedKeyValueMap(Files.lines(p, charset));
+
+    p = statisticsDir.resolve(Paths.get(
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY));
+    Map<String, Map<String, Long>> distinctPropertyValuesByVertexLabelAndPropertyName =
+      readNestedKeyValueMap(Files.lines(p, charset));
+
+    p = statisticsDir.resolve(Paths.get(
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY));
+    Map<String, Long> distinctEdgePropertyValuesByPropertyName =
+      readKeyValueMap(Files.lines(p, charset));
+
+    p = statisticsDir.resolve(Paths.get(
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY));
+    Map<String, Long> distinctVertexPropertyValuesByPropertyName =
+      readKeyValueMap(Files.lines(p, charset));
+
     return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,
       edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
       distinctSourceVertexCount, distinctTargetVertexCount,
-      distSourceVertexCountByEdgeLabel, distTargetVertexCountByEdgeLabel);
+      distSourceVertexCountByEdgeLabel, distTargetVertexCountByEdgeLabel,
+      distinctPropertyValuesByEdgeLabelAndPropertyName,
+      distinctPropertyValuesByVertexLabelAndPropertyName,
+      distinctEdgePropertyValuesByPropertyName,
+      distinctVertexPropertyValuesByPropertyName);
   }
 
 }
