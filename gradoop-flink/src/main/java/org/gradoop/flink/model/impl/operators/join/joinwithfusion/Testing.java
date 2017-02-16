@@ -4,6 +4,7 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -19,6 +20,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentF
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.MergeGraphHeads;
 import org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions.MergeToBeFusedVertices;
@@ -92,19 +94,42 @@ public class Testing {
     // - Step 2
     // ---------------
     // filter the demultiplexed vertices such that they appear in the union graph
-    DataSet<Tuple2<GradoopId, Vertex>> toBefusedVertices = demultiplexedVertices
-      .join(vertexUnion)
-      .where(new EPGMElementIdInSecond<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
+    DataSet<Tuple3<Vertex, Boolean, GradoopId>> toBefusedVertices = vertexUnion
+      .join(demultiplexedVertices)
+      .where(new Id<>()).equalTo(new EPGMElementIdInSecond<>())
+      .with(new FlatJoinFunction<Vertex, Tuple2<GradoopId, Vertex>, Tuple3<Vertex, Boolean, GradoopId>>() {
+        @Override
+        public void join(Vertex first, Tuple2<GradoopId, Vertex> second,
+          Collector<Tuple3<Vertex, Boolean, GradoopId>> out) throws Exception {
+          out.collect(new Tuple3<>());
+        }
+      });
+
+      //demultiplexedVertices
+      //.join(vertexUnion)
+      //.where(new EPGMElementIdInSecond<>()).equalTo(new Id<>())
+      //.with(new LeftSide<>());
 
     // the patterns that are actually used are the ones that have a GradoopId in the
     // toBefusedVertices set. Merge the filtered vertices as pointed out by the patterns
-    DataSet<Tuple2<GradoopId, Vertex>> fusedVertices = toBefusedVertices
-      .coGroup(graphHeads)
-      .where(new Value0Of2<>()).equalTo(new Id<>())
-      .with(new MergeToBeFusedVertices(fusedGraphId));
+    //DataSet<Tuple2<GradoopId, Vertex>> fusedVertices = toBefusedVertices
+      //.coGroup(graphHeads);
+      /*.where(new Value0Of2<>()).equalTo(new Id<>())
+      .with(new MergeToBeFusedVertices(fusedGraphId))*/;
 
-
+      /*
+    DataSet<Vertex> toBeReturned = fusedVertices.map(new Value1Of2<>());
+    switch (vertexJoinType) {
+    case INNER:
+      break;
+    case LEFT_OUTER:
+      toBeReturned.union()
+      break;
+    case RIGHT_OUTER:
+      break;
+    case FULL_OUTER:
+      break;
+    }*/
 
   }
   

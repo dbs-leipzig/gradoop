@@ -22,6 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
 
 import java.io.Serializable;
@@ -49,6 +50,7 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
    * Function for combining the matching graph heads together
    */
   private final Oplus<GraphHead> combineHeads;
+  private final Tuple2<GraphHead, GraphHead> tuple2;
 
   /**
    * Graph id to which the GraphHead belongs to
@@ -65,6 +67,7 @@ public class CoJoinGraphHeads  implements CoGroupFunction<GraphHead, GraphHead, 
     this.thetaGraph = thetaGraph;
     this.combineHeads = combineHeads;
     this.gid = null;
+    this.tuple2 = new Tuple2<>();
   }
 
   /**

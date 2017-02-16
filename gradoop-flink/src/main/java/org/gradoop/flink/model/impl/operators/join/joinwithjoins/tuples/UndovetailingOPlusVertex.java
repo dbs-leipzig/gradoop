@@ -18,26 +18,34 @@
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 
 import java.io.Serializable;
 
 /**
+ * Utility semantic tuple associating each newly created vertex to the ids
+ * of the former graph operads
+ *
  * Created by Giacomo Bergami on 30/01/17.
  */
 public class UndovetailingOPlusVertex extends
-  Tuple3<OptSerializableGradoopId, OptSerializableGradoopId, Vertex> implements Serializable {
+  Tuple5<Boolean,GradoopId,Boolean,GradoopId, Vertex> implements Serializable {
 
   /**
    * Default constructor
-   * @param left   Left operand vertex id corrisponding to the third parameter
-   * @param right  Right operand vertex id corrisponding to the third parameter
+   * @param leftB                      If the left value is significant or not
+   * @param leftId                     The actual left id
+   * @param rightB                      If the right value is significant or not
+   * @param rightId                     The actual right id
    * @param mergedCorrespondingVertex  Newly created vertex from left and right
    */
-  public UndovetailingOPlusVertex(OptSerializableGradoopId left, OptSerializableGradoopId right,
+  public UndovetailingOPlusVertex(Boolean leftB, GradoopId leftId,
+    Boolean rightB, GradoopId rightId,
     Vertex mergedCorrespondingVertex) {
-    super(left, right, mergedCorrespondingVertex);
+    super(leftB,leftId,rightB,rightId,mergedCorrespondingVertex);
   }
 
   /**

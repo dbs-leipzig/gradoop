@@ -19,7 +19,9 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 
@@ -31,6 +33,6 @@ import java.util.function.Function;
  *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<Tuple2<Vertex, OptSerializableGradoopId>>> {
+public interface PreFilter<K extends EPGMElement> extends Function<DataSet<K>, DataSet<Tuple3<Vertex, Boolean, GradoopId>>> {
 
 }

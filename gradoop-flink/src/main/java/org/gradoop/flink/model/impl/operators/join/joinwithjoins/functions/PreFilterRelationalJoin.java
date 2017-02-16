@@ -20,6 +20,8 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.join.JoinType;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -64,7 +66,7 @@ public class PreFilterRelationalJoin implements PreFilter<Vertex> {
   }
 
   @Override
-  public DataSet<Tuple2<Vertex, OptSerializableGradoopId>> apply(DataSet<Vertex> vertexDataSet) {
+  public DataSet<Tuple3<Vertex, Boolean, GradoopId>> apply(DataSet<Vertex> vertexDataSet) {
     return  JoinWithJoinsUtils.joinByVertexEdge(vertexDataSet, e, vertexJoinType, isLeft)
       .where(new Id<>())
       .equalTo(new KeySelectorFromVertexSrcOrDest(isLeft))

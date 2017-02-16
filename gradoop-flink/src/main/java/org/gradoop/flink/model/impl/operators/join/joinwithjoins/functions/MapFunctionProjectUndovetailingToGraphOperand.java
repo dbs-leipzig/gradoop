@@ -30,7 +30,8 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
  *
  * Created by Giacomo Bergami on 14/02/17.
  */
-@FunctionAnnotation.ForwardedFields("f2->f1")
+@FunctionAnnotation.ForwardedFields("f4->f1")
+@FunctionAnnotation.ReadFields("f1;f3")
 public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunction<UndovetailingOPlusVertex, Tuple2<GradoopId, Vertex>> {
 
   /**
@@ -49,6 +50,6 @@ public class MapFunctionProjectUndovetailingToGraphOperand implements MapFunctio
 
   @Override
   public Tuple2<GradoopId, Vertex> map(UndovetailingOPlusVertex x) throws Exception {
-    return new Tuple2<GradoopId, Vertex>(isLeft ? x.f0.get() : x.f1.get(), x.f2);
+    return new Tuple2<>(isLeft ? x.f1 : x.f3, x.f4);
   }
 }

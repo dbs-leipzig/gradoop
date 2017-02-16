@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
 public class JoinFunctionAssociateVertexWithEdge implements
   JoinFunction<Tuple2<GradoopId, Vertex>, Edge, Tuple2<Vertex, Edge>> {
+
   @Override
   public Tuple2<Vertex, Edge> join(Tuple2<GradoopId, Vertex> first, Edge second) throws
     Exception {

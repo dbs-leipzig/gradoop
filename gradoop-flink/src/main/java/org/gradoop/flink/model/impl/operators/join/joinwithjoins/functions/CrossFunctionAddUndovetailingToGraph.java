@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
 public class CrossFunctionAddUndovetailingToGraph implements CrossFunction<UndovetailingOPlusVertex, GraphHead, Vertex> {
   @Override
   public Vertex cross(UndovetailingOPlusVertex val1, GraphHead val2) throws Exception {
-    Vertex toret = val1.f2;
+    Vertex toret = val1.f4;
     toret.addGraphId(val2.getId());
     return toret;
   }

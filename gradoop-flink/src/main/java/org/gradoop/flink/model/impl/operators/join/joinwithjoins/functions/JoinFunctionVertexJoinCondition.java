@@ -18,8 +18,10 @@
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
@@ -33,6 +35,8 @@ import java.io.Serializable;
  *
  * Created by Giacomo Bergami on 01/02/17.
  */
+//@FunctionAnnotation.ForwardedFieldsFirst("id->f1")
+//@FunctionAnnotation.ForwardedFieldsSecond("id->f3")
 public class JoinFunctionVertexJoinCondition extends
   RichFlatJoinFunction<Vertex, Vertex, UndovetailingOPlusVertex> implements Serializable {
   /**
@@ -61,20 +65,20 @@ public class JoinFunctionVertexJoinCondition extends
     Exception {
     if (first != null && second != null) {
       if (thetaVertexF.apply(new Tuple2<>(first, second))) {
-        out.collect(new UndovetailingOPlusVertex(OptSerializableGradoopId.value(first.getId()),
-          OptSerializableGradoopId.value(second.getId()),
+        out.collect(new UndovetailingOPlusVertex(true,first.getId(),
+          true,second.getId(),
           combineVertices.apply(new Tuple2<>(first, second))));
       }
     } else if (first == null) {
       out.collect(
-        new UndovetailingOPlusVertex(OptSerializableGradoopId.empty(),
-                                     OptSerializableGradoopId.value(second.getId()),
+        new UndovetailingOPlusVertex(false, GradoopId.NULL_VALUE,
+                                     true,second.getId(),
                                      second)
       );
     } else {
       out.collect(
-        new UndovetailingOPlusVertex(OptSerializableGradoopId.value(first.getId()),
-                                     OptSerializableGradoopId.empty(),
+        new UndovetailingOPlusVertex(true,first.getId(),
+                                     false, GradoopId.NULL_VALUE,
                                      first)
       );
     }

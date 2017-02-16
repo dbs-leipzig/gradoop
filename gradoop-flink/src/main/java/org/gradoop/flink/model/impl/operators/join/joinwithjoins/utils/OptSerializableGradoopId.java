@@ -19,15 +19,18 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 
+import java.io.Serializable;
+
 /**
  * The type resolutor (the one by string arguments) fails to check for types with parameters for
  * non-default classes (e.g. tuples). So I extend the OptSerializable class in order to avoid
- * such kind of possible problems
+ * such kind of possible problems. A default null GradoopId value is used instead, and the
+ * boolean value disambiguates.
  *
  * Created by Giacomo Bergami on 30/01/17.
  */
-public class OptSerializableGradoopId extends OptSerializable<GradoopId> implements
-  Comparable<OptSerializableGradoopId> {
+public class OptSerializableGradoopId extends IOptSerializable<GradoopId> implements
+  Comparable<OptSerializableGradoopId>, Serializable {
 
   /**
    * Default constructor
@@ -37,6 +40,10 @@ public class OptSerializableGradoopId extends OptSerializable<GradoopId> impleme
    */
   private OptSerializableGradoopId(boolean isThereElement, GradoopId elem) {
     super(isThereElement, elem);
+  }
+
+  public OptSerializableGradoopId() {
+
   }
 
   /**

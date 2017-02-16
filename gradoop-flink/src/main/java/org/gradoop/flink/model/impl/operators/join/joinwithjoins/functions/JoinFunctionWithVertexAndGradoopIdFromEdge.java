@@ -18,7 +18,10 @@
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
@@ -29,11 +32,14 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerial
  * Created by Giacomo Bergami on 15/02/17.
  */
 public class JoinFunctionWithVertexAndGradoopIdFromEdge implements
-  JoinFunction<Vertex, Edge, Tuple2<Vertex, OptSerializableGradoopId>> {
+  JoinFunction<Vertex, Edge, Tuple3<Vertex, Boolean, GradoopId>> {
   @Override
-  public Tuple2<Vertex, OptSerializableGradoopId> join(Vertex first, Edge second) throws
+  public Tuple3<Vertex, Boolean, GradoopId> join(Vertex first, Edge second) throws
     Exception {
-    return new Tuple2<>(first, second == null ? OptSerializableGradoopId.empty() :
-      OptSerializableGradoopId.value(second.getId()));
+    return new Tuple3<>(
+      first,
+      second != null,
+      second == null ? GradoopId.NULL_VALUE : second.getId()
+    );
   }
 }

@@ -17,9 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.OptSerializableGradoopId;
 
@@ -30,9 +33,8 @@ import java.io.Serializable;
  *
  * Created by Giacomo Bergami on 01/02/17.
  */
-@FunctionAnnotation.ReadFields("f1")
-public class KeySelectorFromRightProjection implements KeySelector<Tuple2<Vertex,
-  OptSerializableGradoopId>, Integer>,
+@FunctionAnnotation.ReadFields("f3->*")
+public class KeySelectorFromRightProjection implements KeySelector<Tuple3<Vertex, Boolean, GradoopId>, GradoopId>,
   Serializable {
 
   /**
@@ -41,7 +43,7 @@ public class KeySelectorFromRightProjection implements KeySelector<Tuple2<Vertex
   public KeySelectorFromRightProjection() {  }
 
   @Override
-  public Integer getKey(Tuple2<Vertex, OptSerializableGradoopId> value) throws Exception {
-    return value.f1.hashCode();
+  public GradoopId getKey(Tuple3<Vertex, Boolean, GradoopId> value) throws Exception {
+    return value.f2;
   }
 }

@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Undoveta
  *
  * Created by Giacomo Bergami on 14/02/17.
  */
-@FunctionAnnotation.NonForwardedFields("f0; f1")
+@FunctionAnnotation.NonForwardedFields("f0; f2")
 public class FilterFunctionIsThereElement implements FilterFunction<UndovetailingOPlusVertex> {
 
   /**
@@ -45,6 +45,6 @@ public class FilterFunctionIsThereElement implements FilterFunction<Undovetailin
 
   @Override
   public boolean filter(UndovetailingOPlusVertex value) throws Exception {
-    return isLeft ? value.f0.isPresent() : value.f1.isPresent();
+    return isLeft ? value.f0 : value.f2;
   }
 }

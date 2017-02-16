@@ -102,7 +102,6 @@ public class JoinTest_FullDisjEdgesExample extends GradoopFlinkTestBase {
             e.setSourceId(first.getId());
             e.setTargetId(second.getId());
             e.setLabel("relation");
-            System.err.println(first.toString()+"->"+second.toString());
             out.collect(e);
           }
         }
