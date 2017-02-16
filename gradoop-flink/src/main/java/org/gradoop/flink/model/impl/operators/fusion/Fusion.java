@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.fusion.functions.GenerateTheFusedVertex;
 import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThoughToBeFusedVertices;
@@ -90,23 +91,19 @@ public class Fusion implements BinaryGraphToGraphOperator {
     final GradoopId vId = GradoopId.get();
 
     // Then I create the graph that substitute the vertices within toBeReplaced
-    DataSet<Vertex> toBeAdded = searchGraph.getGraphHead()
+    DataSet<Vertex> toBeReturned = searchGraph.getGraphHead()
       .first(1)
-      .join(patternGraph.getGraphHead().first(1))
+      /*
+       * The newly created vertex v has to be created iff. we have some actual vertices to be
+       * replaced, and then if toBeReplaced contains at least one element
+       */
+      .join(patternGraph.getGraphHead())
       .where((GraphHead g) -> 0).equalTo((GraphHead g) -> 0)
-      .with(new GenerateTheFusedVertex(vId));
-
-    /*
-     * The newly created vertex v has to be created iff. we have some actual vertices to be
-     * replaced, and then if toBeReplaced contains at least one element
-     */
-    DataSet<Vertex> addOnlyIfNecessary = toBeReplaced
-      .first(1)
-      .join(toBeAdded)
-      .where((Vertex x) -> 0).equalTo((Vertex x) -> 0)
-      .with(new RightSide<>());
-
-    DataSet<Vertex> toBeReturned = finalVertices.union(addOnlyIfNecessary);
+      .with(new GenerateTheFusedVertex(vId))
+      .join(toBeReplaced.first(1))
+      .where((Vertex x)->0).equalTo((Vertex x)->0)
+      .with(new LeftSide<>())
+      .union(finalVertices);
 
     //In the final graph, all the edges appearing only in the search graph should appear
     DataSet<Edge> leftEdges = searchGraph.getEdges();
