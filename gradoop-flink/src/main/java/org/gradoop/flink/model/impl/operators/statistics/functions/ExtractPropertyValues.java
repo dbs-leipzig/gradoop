@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
@@ -33,12 +33,27 @@ import java.util.Set;
  * @param <T> graph element type
  */
 public class ExtractPropertyValues<T extends GraphElement>
-  extends RichFlatMapFunction<T, Tuple2<String, Set<PropertyValue>>> {
+  implements FlatMapFunction<T, Tuple2<String, Set<PropertyValue>>> {
+
+  /**
+   * Reuse Tuple
+   */
+  private final Tuple2<String, Set<PropertyValue>> reuseTuple;
+
+  /**
+   * Creates a new UDF
+   */
+  public ExtractPropertyValues() {
+    this.reuseTuple = new Tuple2<>();
+  }
 
   @Override
   public void flatMap(T value, Collector<Tuple2<String, Set<PropertyValue>>> out) throws Exception {
     for (Property property : value.getProperties()) {
-      out.collect(new Tuple2<>(property.getKey(), Sets.newHashSet(property.getValue())));
+      reuseTuple.f0 = property.getKey();
+      reuseTuple.f1 = Sets.newHashSet(property.getValue());
+
+      out.collect(reuseTuple);
     }
   }
 }
