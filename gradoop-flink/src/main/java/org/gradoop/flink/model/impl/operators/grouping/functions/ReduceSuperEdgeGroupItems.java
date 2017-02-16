@@ -58,13 +58,10 @@ import java.util.Set;
     public void reduce(Iterable<EdgeWithSuperEdgeGroupItem> superEdgeGroupItems,
       Collector<SuperEdgeGroupItem> collector) throws Exception {
 
-      GradoopId superEdgeId               = null;
+      GradoopId superEdgeId                 = null;
       String groupLabel                     = null;
       PropertyValueList groupPropertyValues = null;
-
-//      SuperEdgeGroupItem reuseTuple = getReuseSuperEdgeGroupItem();
-
-      boolean isFirst = true;
+      boolean isFirst                       = true;
 
       Set<GradoopId> sources = Sets.newHashSet();
       Set<GradoopId> targets = Sets.newHashSet();
@@ -98,28 +95,12 @@ import java.util.Set;
           groupLabel          = groupItem.getGroupLabel();
           groupPropertyValues = groupItem.getGroupingValues();
 
-//          if (useLabel()) {
-//            reuseTuple.setGroupLabel(groupLabel);
-//          }
-//
-//          reuseTuple.setGroupingValues(groupPropertyValues);
-//          reuseTuple.setSuperEdgeId(superEdgeId);
-//          reuseTuple.setAggregateValues(groupItem.getAggregateValues());
-//          reuseTuple.setSuperEdge(groupItem.isSuperEdge());
-
           isFirst = false;
         }
-//        reuseTuple.setEdgeId(groupItem.getEdgeId());
-
-//        // collect updated edge item
-//        collector.collect(reuseTuple);
-
         if (doAggregate()) {
           aggregate(groupItem.getAggregateValues());
         }
-
       }
-
       // collect single item representing the whole group
       collector.collect(createSuperEdgeTuple(
         superEdgeId,
