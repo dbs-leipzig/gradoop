@@ -222,26 +222,26 @@ public class QueryHandler {
   }
 
   /**
-   * Returns the Vertex assiciated with the given variable or {@code null} if the variable does
-   * not exist
+   * Returns the vertex associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
    *
-   * @param variable variable
+   * @param variable query vertex variable
    * @return vertex or {@code null}
    */
   public Vertex getVertexByVariable(String variable) {
-    return gdlHandler.getVertexCache().get(variable);
+    return gdlHandler.getVertexCache(true, true).get(variable);
   }
 
 
   /**
-   * Returns the Edge assiciated with the given variable or {@code null} if the variable does
-   * not exist
+   * Returns the Edge associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
    *
-   * @param variable variable
+   * @param variable query edge variable
    * @return edge or {@code null}
    */
   public Edge getEdgeByVariable(String variable) {
-    return gdlHandler.getEdgeCache().get(variable);
+    return gdlHandler.getEdgeCache(true, true).get(variable);
   }
 
   /**

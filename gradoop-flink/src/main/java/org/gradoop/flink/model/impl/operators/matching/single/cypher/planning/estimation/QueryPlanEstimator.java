@@ -59,6 +59,15 @@ public class QueryPlanEstimator {
   }
 
   /**
+   * Returns the estimated query plan.
+   *
+   * @return query plan
+   */
+  public QueryPlan getQueryPlan() {
+    return queryPlan;
+  }
+
+  /**
    * Traverses the query plan and computes the estimated cardinality according to the nodes.
    *
    * @return estimated cardinality of the specified plan

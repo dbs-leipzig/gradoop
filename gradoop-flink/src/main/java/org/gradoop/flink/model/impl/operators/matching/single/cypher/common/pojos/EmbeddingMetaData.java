@@ -218,6 +218,19 @@ public class EmbeddingMetaData implements Serializable {
   }
 
   /**
+   * Returns a list of all variables that are contained in the embedding and have at least one
+   * associated property column.
+   *
+   * @return a list of all variables with at least one property column
+   */
+  public List<String> getVariablesWithProperties() {
+    return propertyMapping.keySet().stream()
+      .map(Pair::getLeft)
+      .distinct()
+      .collect(Collectors.toList());
+  }
+
+  /**
    * Returns a list of variables that are contained in the embedding and referring to vertices. The
    * order of the variables is determined by their position within the embedding.
    *

@@ -45,6 +45,15 @@ public class LiteralComparable extends QueryComparable {
   }
 
   /**
+   * Returns the value of the literal.
+   *
+   * @return literal value
+   */
+  public Object getValue() {
+    return literal.getValue();
+  }
+
+  /**
    * Returns a property value that wraps the represented literal
    *
    * @param embedding the embedding holding the data

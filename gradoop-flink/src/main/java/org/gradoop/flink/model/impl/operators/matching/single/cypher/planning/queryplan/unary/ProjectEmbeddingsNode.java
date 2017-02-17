@@ -87,6 +87,6 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
 
   @Override
   public String toString() {
-    return String.format("ProjectEmbeddingsNode{projectionKeys=%s", projectionKeys);
+    return String.format("ProjectEmbeddingsNode{projectionKeys=%s}", projectionKeys);
   }
 }
