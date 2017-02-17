@@ -77,7 +77,7 @@ public class NotPredicate extends QueryPredicate {
       Predicate[] otherArguments = expression.getArguments();
       And and = new And(
         new Not(otherArguments[0]),
-        new Not(otherArguments[0])
+        new Not(otherArguments[1])
       );
 
       return QueryPredicate.createFrom(and).asCNF();
