@@ -17,10 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.functions.FlatJoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
@@ -88,7 +85,7 @@ public class BuildSuperEdges
       }
     }
 
-    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getSuperEdgeId(), sourceId, targetId);
+    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getEdgeId(), sourceId, targetId);
 
     setLabel(superEdge, superEdgeGroupItem.getGroupLabel());
     setGroupProperties(superEdge, superEdgeGroupItem.getGroupingValues());
