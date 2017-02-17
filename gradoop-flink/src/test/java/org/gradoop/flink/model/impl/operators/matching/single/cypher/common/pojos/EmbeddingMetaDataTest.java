@@ -173,6 +173,19 @@ public class EmbeddingMetaDataTest {
   }
 
   @Test
+  public void testGetVariablesWithProperties() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setEntryColumn("a", EntryType.VERTEX, 0);
+    metaData.setEntryColumn("b", EntryType.EDGE, 1);
+    metaData.setEntryColumn("c", EntryType.VERTEX, 2);
+    metaData.setPropertyColumn("a", "age", 0);
+    metaData.setPropertyColumn("a", "name", 1);
+    metaData.setPropertyColumn("c", "age", 2);
+
+    assertThat(metaData.getVariablesWithProperties(), is(Arrays.asList("a", "c")));
+  }
+
+  @Test
   public void testGetVertexVariables() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     List<String> inputVariables = Arrays.asList("a", "b", "c", "d");

@@ -173,7 +173,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
         "expandDirection=%s, " +
         "vertexMorphismType=%s, " +
         "edgeMorphismType=%s}",
-      startVariable, pathVariable, edgeStrategy, lowerBound, upperBound, expandDirection,
+      startVariable, pathVariable, endVariable, lowerBound, upperBound, expandDirection,
       vertexStrategy, edgeStrategy);
   }
 }

@@ -117,8 +117,34 @@ public class JoinEstimatorTest extends EstimatorTestBase {
 
     JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
+    assertThat(estimator.getCardinality(), is(10L));
     estimator.visit(nemJoin);
+    assertThat(estimator.getCardinality(), is(10L));
+  }
 
+  @Test
+  public void testWithLabelsUnbound() throws Exception {
+    String query = "MATCH (:Person)-[:knows]->(:Person)";
+
+    QueryHandler queryHandler = new QueryHandler(query);
+
+    LeafNode nNode = new FilterAndProjectVerticesNode(null, "__v0",
+      queryHandler.getPredicates().getSubCNF("__v0"), Sets.newHashSet());
+    LeafNode mNode = new FilterAndProjectVerticesNode(null, "__v1",
+      queryHandler.getPredicates().getSubCNF("__v1"), Sets.newHashSet());
+    LeafNode eNode = new FilterAndProjectEdgesNode(null,
+      "__v0", "__e0", "__v1",
+      queryHandler.getPredicates().getSubCNF("__e0"), Sets.newHashSet());
+
+    JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("__v0"),
+      MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+    JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("__v1"),
+      MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+
+    JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
+    estimator.visit(neJoin);
+    assertThat(estimator.getCardinality(), is(10L));
+    estimator.visit(nemJoin);
     assertThat(estimator.getCardinality(), is(10L));
   }
 

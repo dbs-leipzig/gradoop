@@ -67,6 +67,6 @@ public class FilterEmbeddingsNode extends UnaryNode implements FilterNode {
 
   @Override
   public String toString() {
-    return String.format("FilterEmbeddingsNode{filterPredicate=%s", filterPredicate);
+    return String.format("FilterEmbeddingsNode{filterPredicate=%s}", filterPredicate);
   }
 }

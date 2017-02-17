@@ -45,6 +45,24 @@ public class PropertySelectorComparable extends QueryComparable {
   }
 
   /**
+   * Returns the query variable of the property selector.
+   *
+   * @return query variable
+   */
+  public String getVariable() {
+    return this.propertySelector.getVariable();
+  }
+
+  /**
+   * Returns the property key of the property selector.
+   *
+   * @return property key
+   */
+  public String getPropertyKey() {
+    return this.propertySelector.getPropertyName();
+  }
+
+  /**
    * Returns the specified property as property value
    *
    * @param embedding the embedding holding the data

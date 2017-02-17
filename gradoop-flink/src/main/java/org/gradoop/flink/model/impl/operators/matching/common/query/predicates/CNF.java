@@ -42,6 +42,7 @@ public class CNF extends PredicateCollection<CNFElement> {
 
   /**
    * Creates a new conjunctive normal form with given predicate list
+   *
    * @param predicates predicates
    */
   public CNF(List<CNFElement> predicates) {
@@ -57,17 +58,20 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   /**
-   * Connect another cnf predicate via AND
+   * Connects another CNF via AND. Duplicate predicates are removed.
+   *
    * @param other a predicate in cnf
    * @return this
    */
   public CNF and(CNF other) {
-    addPredicates(other.getPredicates());
+    other.getPredicates().stream()
+      .filter(predicate -> !this.predicates.contains(predicate))
+      .forEach(this::addPredicate);
     return this;
   }
 
   /**
-   * Connect another predicate in cnf via OR
+   * Connects another CNF via OR.
    *
    * @param other a predicate in cnf
    * @return this
@@ -144,11 +148,29 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   /**
+   * Filters all disjunctions that could be evaluated with the given variable and removes
+   * them from the CNF. The filtered predicates will be returned in a new CNF
+   *
+   * Example:
+   * Given myFilter = CNF((a = 10) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))
+   * myFilter.removeSubCNF(a) => CNF(a = 10)
+   * and myFilter == CNF((b > 5 OR a > 10) AND (c = false) AND (a = c))
+   *
+   * @param variable variable that must be included in the disjunction
+   * @return CNF containing only variables covered by the input list
+   */
+  public CNF removeSubCNF(String variable) {
+    Set<String> variables = new HashSet<>(1);
+    variables.add(variable);
+    return removeSubCNF(variables);
+  }
+
+  /**
    * Filters all disjunctions that could be evaluated with the given set of variables and removes
    * them from the CNF. The filtered predicates will be returned in a new CNF
    *
    * Example:
-   * Given myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))
+   * Given myFilter = CNF((a = b) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))
    * myFilter.removeSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))
    * and myFilter == CNF((c = false) AND (a = c))
    *
