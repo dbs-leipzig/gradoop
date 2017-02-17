@@ -20,6 +20,8 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
@@ -44,18 +46,18 @@ public class BuildVertexWithSuperVertexAndEdge implements
     Set<GradoopId> targets = superEdgeGroupItem.getTargetIds();
 
     GradoopId superVertexId = GradoopId.get();
+
+    reuseTuple.setSuperVertexId(superVertexId);
+    reuseTuple.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
     for (GradoopId source : sources) {
       reuseTuple.setVertexId(source);
-      reuseTuple.setSuperVertexId(superVertexId);
-      reuseTuple.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
       reuseTuple.setSource(true);
       collector.collect(reuseTuple);
     }
     superVertexId = GradoopId.get();
+    reuseTuple.setSuperVertexId(superVertexId);
     for (GradoopId target : targets) {
       reuseTuple.setVertexId(target);
-      reuseTuple.setSuperVertexId(superVertexId);
-      reuseTuple.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
       reuseTuple.setSource(false);
       collector.collect(reuseTuple);
     }
