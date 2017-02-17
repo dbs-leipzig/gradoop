@@ -34,11 +34,11 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
   @Test
   public void testRead() throws Exception {
     String graphFile =
-      EdgeCentricGroupingTestBase.class.getResource("/data/json/sna/graphs.json").getFile();
+      EdgeCentricGroupingTestBase.class.getResource("/data/grouping/graphs.json").getFile();
     String vertexFile =
-      EdgeCentricGroupingTestBase.class.getResource("/data/json/sna/nodes.json").getFile();
+      EdgeCentricGroupingTestBase.class.getResource("/data/grouping/nodes.json").getFile();
     String edgeFile =
-      EdgeCentricGroupingTestBase.class.getResource("/data/json/sna/edges.json").getFile();
+      EdgeCentricGroupingTestBase.class.getResource("/data/grouping/edges.json").getFile();
 
     DataSource dataSource = new JSONDataSource(graphFile, vertexFile, edgeFile, config);
 
@@ -46,6 +46,8 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
 //      .addEdgeGroupingKey(Grouping.LABEL_SYMBOL)
       .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL, Grouping.TARGET_SYMBOL))
+//      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL))
+//      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL,Grouping.TARGET_SYMBOL))
       .addEdgeAggregator(new CountAggregator("count"))
       .setStrategy(getStrategy())
       .setCentricalStrategy(GroupingStrategy.EDGE_CENTRIC)
