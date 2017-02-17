@@ -109,6 +109,17 @@ public class QueryHandler {
   }
 
   /**
+   * Returns the query graph as a collection of triples.
+   *
+   * @return triples
+   */
+  public Collection<Triple> getTriples() {
+    return getEdges().stream()
+      .map(e -> new Triple(
+        getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))
+      .collect(Collectors.toList());
+  }
+  /**
    * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
    * predicated defined in the query, a CNF containing zero predicates is returned.
    *
