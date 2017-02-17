@@ -17,13 +17,21 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperEdges;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertexAndEdge;
-import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperEdges;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
@@ -31,9 +39,12 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -71,24 +82,51 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), getEdgeAggregators(),
         sourceSpecificGrouping, targetSpecificGrouping));
 
-    DataSet<VertexWithSuperVertexAndEdge> vertexWithSuper = superEdgeGroupItems
-      .flatMap(new BuildVertexWithSuperVertexAndEdge())
-      .distinct();
+    // TODO edgeitem -> set<GradoopId>+edgeid -> groupby set -> set,edgeid,superVid ->..
+    DataSet<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> vertexWithSuper = superEdgeGroupItems
+      //get all resulting (maybe concatenated) vertices
+      //vertexIds - superedgeId
+      .flatMap(new FlatMapFunction<SuperEdgeGroupItem, Tuple2<Set<GradoopId>, GradoopId>>() {
+        @Override
+        public void flatMap(SuperEdgeGroupItem superEdgeGroupItem,
+          Collector<Tuple2<Set<GradoopId>, GradoopId>> collector) throws Exception {
+          collector.collect(new Tuple2<Set<GradoopId>, GradoopId>(superEdgeGroupItem.getSourceIds(), superEdgeGroupItem.getEdgeId()));
+          collector.collect(new Tuple2<Set<GradoopId>, GradoopId>(superEdgeGroupItem.getTargetIds(), superEdgeGroupItem.getEdgeId()));
+        }
+      })
+      .groupBy(1)
+      //assign supervertex id
+      //vertexIds - superVId - edgeId
+      .reduceGroup(new GroupReduceFunction<Tuple2<Set<GradoopId>,GradoopId>,
+        Tuple3<Set<GradoopId>, GradoopId, GradoopId>>() {
+        @Override
+        public void reduce(Iterable<Tuple2<Set<GradoopId>, GradoopId>> iterable,
+          Collector<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> collector) throws Exception {
 
-    //TODO use vertexWithSuper to set the source and the target for each edge
+          Tuple2<Set<GradoopId>, GradoopId> supervertex = new Tuple2<Set<GradoopId>, GradoopId>
+            (iterable.iterator().next().f0, GradoopId.get());
+
+          Iterator<Tuple2<Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
+          while (iterator.hasNext()) {
+            collector.collect(new Tuple3<>(supervertex.f0, supervertex.f1, iterator.next().f1));
+          }
+
+        }
+      });
+
+
     DataSet<Edge> superEdges = superEdgeGroupItems
-      .coGroup(
-        vertexWithSuper
-          //.distinct(1))
-      )
+      .coGroup(vertexWithSuper)
       .where(0)
-      .equalTo(1)
+      .equalTo(2)
       // build super edges
       .with(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
         config.getEdgeFactory()));
 
+    //TODO replace with super vertices
+    DataSet<Vertex> superVertices = graph.getVertices();
 
-    return null;
+    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
   @Override

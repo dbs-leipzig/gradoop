@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
@@ -32,6 +33,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
@@ -41,7 +43,7 @@ import java.util.List;
 @FunctionAnnotation.ReadFields("f1;f4;f5;f6")
 public class BuildSuperEdges
   extends BuildBase
-  implements CoGroupFunction<SuperEdgeGroupItem, VertexWithSuperVertexAndEdge, Edge>, ResultTypeQueryable<Edge> {
+  implements CoGroupFunction<SuperEdgeGroupItem, Tuple3<Set<GradoopId>, GradoopId, GradoopId>, Edge>, ResultTypeQueryable<Edge> {
 
   /**
    * Edge edgeFactory.
@@ -67,7 +69,7 @@ public class BuildSuperEdges
 
   @Override
   public void coGroup(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
-    Iterable<VertexWithSuperVertexAndEdge> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
+    Iterable<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
     Exception {
 
     // only one Edge per id
@@ -76,12 +78,18 @@ public class BuildSuperEdges
     GradoopId sourceId = null;
     GradoopId targetId = null;
 
-    for (VertexWithSuperVertexAndEdge vertexWithSuperVertexAndEdge :
+    for (Tuple3<Set<GradoopId>, GradoopId, GradoopId> vertexWithSuperVertexAndEdge :
       vertexWithSuperVertexAndEdges) {
-      if (vertexWithSuperVertexAndEdge.isSource()) {
-        sourceId = vertexWithSuperVertexAndEdge.getSuperVertexId();
-      } else {
-        targetId = vertexWithSuperVertexAndEdge.getSuperVertexId();
+
+
+
+
+
+
+      if (vertexWithSuperVertexAndEdge.equals(superEdgeGroupItem.getSourceIds())) {
+        sourceId = vertexWithSuperVertexAndEdge.f1;
+      } else if (vertexWithSuperVertexAndEdge.equals(superEdgeGroupItem.getTargetIds())) {
+        targetId = vertexWithSuperVertexAndEdge.f1;
       }
     }
 
