@@ -75,15 +75,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .flatMap(new BuildVertexWithSuperVertexAndEdge())
       .distinct();
 
-    try {
-      edgesForGrouping.print();
-      superEdgeGroupItems.print();
-//      vertexWithSuper.print();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-
     //TODO use vertexWithSuper to set the source and the target for each edge
     DataSet<Edge> superEdges = superEdgeGroupItems
       .coGroup(
@@ -95,12 +86,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // build super edges
       .with(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
         config.getEdgeFactory()));
-
-    try {
-      superEdges.print();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
 
 
     return null;
