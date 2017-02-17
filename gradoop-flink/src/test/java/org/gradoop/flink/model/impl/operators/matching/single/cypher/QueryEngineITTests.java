@@ -20,7 +20,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Just a few tests that check for the correct cardinality.
  */
-public class BasicITTests extends GradoopFlinkTestBase {
+public class QueryEngineITTests extends GradoopFlinkTestBase {
 
   private LogicalGraph socialNetwork;
 
@@ -29,7 +29,7 @@ public class BasicITTests extends GradoopFlinkTestBase {
   @Before
   public void setUp() throws Exception {
     socialNetwork = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
-    String path = BasicITTests.class.getResource("/data/json/sna/statistics").getPath();
+    String path = QueryEngineITTests.class.getResource("/data/json/sna/statistics").getPath();
     socialNetworkStatistics = GraphStatisticsLocalFSReader.read(path);
   }
 

@@ -126,8 +126,8 @@ public class GreedyPlanner {
    */
   private PlanTable initPlanTable() {
     PlanTable planTable = new PlanTable();
-    planTable = createVertexPlans(planTable);
-    planTable = createEdgePlans(planTable);
+    createVertexPlans(planTable);
+    createEdgePlans(planTable);
     return planTable;
   }
 
@@ -141,9 +141,8 @@ public class GreedyPlanner {
    * predicates and projects properties that are required for further query planning.
    *
    * @param planTable plan table
-   * @return updated plan table with entries for vertices
    */
-  private PlanTable createVertexPlans(PlanTable planTable) {
+  private void createVertexPlans(PlanTable planTable) {
     for (Vertex vertex : queryHandler.getVertices()) {
 
       String vertexVariable = vertex.getVariable();
@@ -158,7 +157,6 @@ public class GreedyPlanner {
       planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
         new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
-    return planTable;
   }
 
   /**
@@ -167,9 +165,8 @@ public class GreedyPlanner {
    * their predicates and projects properties that are required for further query planning.
    *
    * @param planTable plan table
-   * @return updated plan table with entries for edges
    */
-  private PlanTable createEdgePlans(PlanTable planTable) {
+  private void createEdgePlans(PlanTable planTable) {
     for (Edge edge : queryHandler.getEdges()) {
       String edgeVariable = edge.getVariable();
       String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
@@ -188,7 +185,6 @@ public class GreedyPlanner {
       planTable.add(new PlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
         new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
     }
-    return planTable;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -248,9 +244,9 @@ public class GreedyPlanner {
    * @return variables that are available in both input entries
    */
   private List<String> getOverlap(PlanTableEntry firstEntry, PlanTableEntry secondEntry) {
-    return firstEntry.getAllVariables().stream()
-      .filter(var -> secondEntry.getAllVariables().contains(var))
-      .collect(Collectors.toList());
+    Set<String> overlap = firstEntry.getAllVariables();
+    overlap.retainAll(secondEntry.getAllVariables());
+    return overlap.stream().collect(Collectors.toList());
   }
 
   /**

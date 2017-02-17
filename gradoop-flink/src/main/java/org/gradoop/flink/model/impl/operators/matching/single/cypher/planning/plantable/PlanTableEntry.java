@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -113,8 +113,9 @@ public class PlanTableEntry {
    *
    * @return covered variables
    */
-  public List<String> getAllVariables() {
-    return estimator.getQueryPlan().getRoot().getEmbeddingMetaData().getVariables();
+  public Set<String> getAllVariables() {
+    return new HashSet<>(estimator.getQueryPlan().getRoot().getEmbeddingMetaData()
+      .getVariables());
   }
 
   /**
@@ -122,8 +123,9 @@ public class PlanTableEntry {
    *
    * @return query variables with assigned properties
    */
-  public List<String> getAttributedVariables() {
-    return estimator.getQueryPlan().getRoot().getEmbeddingMetaData().getVariablesWithProperties();
+  public Set<String> getAttributedVariables() {
+    return new HashSet<>(estimator.getQueryPlan().getRoot().getEmbeddingMetaData()
+      .getVariablesWithProperties());
   }
 
   /**
