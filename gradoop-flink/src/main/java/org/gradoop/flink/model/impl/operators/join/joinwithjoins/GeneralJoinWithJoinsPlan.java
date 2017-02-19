@@ -52,7 +52,7 @@ import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .CrossFunctionAddUndovetailingToGraph;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions
   .FilterFunctionIsThereElement;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.Triple;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.utils.JoinWithJoinsUtils;

@@ -15,29 +15,28 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions;
+package org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Created by vasistas on 16/02/17.
+ * Tuple representing the fused vertex, and eventually its id (boolean)
+ * in the graph operand
+ *
+ * f0: fused vertex
+ * f1: if f2 appears in the graph operand
+ * f2: operand's vertex id matching with f0.
+ *
+ * Created by Giacomo Bergami on 16/02/17.
  */
-public class CreateGraphHead implements MapFunction<Vertex, GraphHead> {
-
-  private final GraphHead gh;
-
-  public CreateGraphHead(GradoopId gid) {
-    gh = new GraphHead();
-    gh.setId(gid);
+public class DisambiguationTupleWithVertexId extends Tuple3<Vertex, Boolean, GradoopId> {
+  /**
+   * Default constructor
+   */
+  public DisambiguationTupleWithVertexId() {
+    super();
   }
 
-  @Override
-  public GraphHead map(Vertex value) throws Exception {
-    gh.setProperties(value.getProperties());
-    gh.setLabel(value.getLabel());
-    return gh;
-  }
 }

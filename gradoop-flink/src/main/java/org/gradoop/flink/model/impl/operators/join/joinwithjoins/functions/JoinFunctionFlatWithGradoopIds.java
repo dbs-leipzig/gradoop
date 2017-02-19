@@ -24,7 +24,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.UndovetailingOPlusVertex;
 
 import java.io.Serializable;

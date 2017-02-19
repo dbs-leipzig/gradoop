@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.join.JoinUtils;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 
 /**
  * Given a set of vertex elements that have to be pre-filtered accordingly to the vertex join

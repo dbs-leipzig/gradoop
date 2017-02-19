@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 
 /**
  * (f0,f1,f2) => Vertex

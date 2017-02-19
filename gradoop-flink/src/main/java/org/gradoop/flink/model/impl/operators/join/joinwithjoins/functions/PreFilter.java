@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 
 import java.util.function.Function;
 

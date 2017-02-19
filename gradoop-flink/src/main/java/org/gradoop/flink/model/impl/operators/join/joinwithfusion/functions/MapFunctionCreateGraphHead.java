@@ -1,18 +1,18 @@
-package org.gradoop.flink.model.impl.operators.join.joinwithfusion.containers;
+package org.gradoop.flink.model.impl.operators.join.joinwithfusion.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 
 /**
  * Created by vasistas on 16/02/17.
  */
-public class CreateGraphHead2 implements MapFunction<DisambiguationTupleWithVertexId,
+public class MapFunctionCreateGraphHead implements MapFunction<DisambiguationTupleWithVertexId,
   GraphHead> {
 
   private final GraphHead gh;
 
-  public CreateGraphHead2() {
+  public MapFunctionCreateGraphHead() {
     gh = new GraphHead();
   }
 

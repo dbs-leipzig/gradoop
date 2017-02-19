@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.join.joinwithjoins.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.join.common.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
 
 import java.io.Serializable;
 
