@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.representation.common;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -26,7 +26,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * This class represents a Triple.
  * A Triple represents an edge extended with information about the source and target vertex.
  */
-public class Triple extends Tuple3<Vertex,Edge, Vertex> {
+public class Triple extends Tuple3<Vertex, Edge, Vertex> {
+
+  /**
+   * Default Constructor
+   */
+  public Triple() {
+    super();
+  }
 
   /**
    * Creates a new Triple

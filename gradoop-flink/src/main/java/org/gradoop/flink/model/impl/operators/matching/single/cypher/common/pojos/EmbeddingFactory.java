@@ -21,7 +21,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.representation.common.Triple;
 
 import java.util.List;
 
@@ -69,8 +68,27 @@ public class EmbeddingFactory {
     return embedding;
   }
 
+  /**
+   * Converts an {@link Triple} into an {@link Embedding}.
+   *
+   * The resulting embedding has two or three entries containing the source vertex id, the edge id
+   * and the target vertex id. Furthermore, the embedding has one entry for each property value
+   * associated with the specified property keys (ordered by source properties, edge properties,
+   * target properties in list order). Note that missing property values are represented
+   * by a {@link PropertyValue#NULL_VALUE}.
+   *
+   * @param triple triple to create embedding from
+   * @param sourcePropertyKeys source properties that will be stored in the embedding
+   * @param edgePropertyKeys edge properties that will be stored in the embedding
+   * @param targetPropertyKeys target properties that will be stored in the embedding
+   * @param sourceVertexVariable variable of the source vertex
+   * @param targetVertexVariable variable of the target vertex
+   * @return Embedding
+   */
   public static Embedding fromTriple(Triple triple, List<String> sourcePropertyKeys, List<String>
-    edgePropertyKeys, List<String> targetPropertyKeys) {
+    edgePropertyKeys, List<String> targetPropertyKeys, String sourceVertexVariable,
+    String targetVertexVariable) {
+
     Embedding embedding = new Embedding();
     embedding.add(
       triple.getSourceVertex().getId(),
@@ -81,6 +99,10 @@ public class EmbeddingFactory {
       triple.getEdge().getId(),
       project(triple.getEdge(), edgePropertyKeys)
     );
+
+    if (sourceVertexVariable.equals(targetVertexVariable)) {
+      return embedding;
+    }
 
     embedding.add(
       triple.getTargetVertex().getId(),

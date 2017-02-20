@@ -18,11 +18,12 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectTriple;
-import org.gradoop.flink.representation.common.Triple;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Triple;
 
 import java.util.List;
 import java.util.Map;
@@ -38,14 +39,17 @@ import java.util.Map;
  * Example:
  *
  * Given a Triple
- * ( SourceVertex(0, "Person", {name:"Alice", age:23}),
- *   Edge(1, "knows", {}),
- *   TargetVertex(2, "Person", {name:"Bob", age:23})
- * ), a predicate "age = 23" and
- * projection property keys [name, location] the operator creates an
- * {@link Embedding}:
+ * (
+ *   p1: SourceVertex(0, "Person", {name:"Alice", age:23, location: "Sweden"}),
+ *   e1: Edge(1, "knows", {}),
+ *   p2: TargetVertex(2, "Person", {name:"Bob", age:23})
+ * ),
+ * a predicate "p1.name = "Alice" AND p1.age <= p2.age" and
+ * projection property keys {p1: [name, location], e1: [], p2: [name, location] the operator creates
+ * an {@link Embedding}:
  *
- * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ * ([IdEntry(0),IdEntry(1),IdEntry(2)],[PropertyEntry("Alice"),PropertyEntry("Sweden"),
+ * PropertyEntry("Bob"),PropertyEntry(NULL)])
  */
 public class FilterAndProjectTriples implements PhysicalOperator {
   /**
@@ -72,6 +76,10 @@ public class FilterAndProjectTriples implements PhysicalOperator {
    * Property keys used for projection
    */
   private final Map<String, List<String>> projectionPropertyKeys;
+  /**
+   * Match Strategy used for Vertices
+   */
+  private final MatchStrategy vertexMatchStrategy;
 
   /**
    * New vertex filter operator
@@ -82,15 +90,18 @@ public class FilterAndProjectTriples implements PhysicalOperator {
    * @param targetVariable Variable assigned to the vertex
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
+   * @param vertexMatchStrategy Vertex match strategy
    */
   public FilterAndProjectTriples(DataSet<Triple> input, String sourceVariable, String edgeVariable,
-    String targetVariable, CNF predicates, Map<String,List<String>> projectionPropertyKeys) {
+    String targetVariable, CNF predicates, Map<String, List<String>> projectionPropertyKeys,
+    MatchStrategy vertexMatchStrategy) {
     this.input = input;
     this.sourceVariable = sourceVariable;
-    this.edgeVariable = sourceVariable;
-    this.targetVariable = sourceVariable;
+    this.edgeVariable = edgeVariable;
+    this.targetVariable = targetVariable;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
+    this.vertexMatchStrategy = vertexMatchStrategy;
   }
 
   @Override
@@ -101,7 +112,8 @@ public class FilterAndProjectTriples implements PhysicalOperator {
         edgeVariable,
         targetVariable,
         predicates,
-        projectionPropertyKeys
+        projectionPropertyKeys,
+        vertexMatchStrategy
       )
     );
   }

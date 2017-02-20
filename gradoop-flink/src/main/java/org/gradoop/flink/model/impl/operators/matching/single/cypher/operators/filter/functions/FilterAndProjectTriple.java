@@ -19,11 +19,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.representation.common.Triple;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,14 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
    * Predicates used for filtering
    */
   private final CNF predicates;
+  /**
+   * variable of the source vertex
+   */
+  private final String sourceVariable;
+  /**
+   * variable of the target vertex
+   */
+  private final String targetVariable;
   /**
    * Property keys used for value projection of the source vertex
    */
@@ -66,6 +75,10 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
    * Target vertex propertyKeys of the embedding used for filtering
    */
   private final List<String> targetFilterPropertyKeys;
+  /**
+   * Vertex match strategy
+   */
+  private final MatchStrategy vertexMatchStrategy;
 
   /**
    * New FilterAndProjectTriples
@@ -74,11 +87,16 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
    * @param targetVariable target variable
    * @param predicates filter predicates
    * @param projectionPropertyKeys property keys used for projection
+   * @param vertexMatchStrategy vertex match strategy
    */
   public FilterAndProjectTriple(String sourceVariable, String edgeVariable, String targetVariable,
-    CNF predicates, Map<String, List<String>> projectionPropertyKeys) {
+    CNF predicates, Map<String, List<String>> projectionPropertyKeys,
+    MatchStrategy vertexMatchStrategy) {
 
     this.predicates = predicates;
+    this.sourceVariable = sourceVariable;
+    this.targetVariable = targetVariable;
+    this.vertexMatchStrategy = vertexMatchStrategy;
 
     this.sourceProjectionPropertyKeys =
       projectionPropertyKeys.getOrDefault(sourceVariable, new ArrayList<>());
@@ -96,13 +114,41 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
 
   @Override
   public void flatMap(Triple triple, Collector<Embedding> out) throws Exception {
-    if (predicates.evaluate(EmbeddingFactory.fromTriple(triple, sourceFilterPropertyKeys,
-      edgeFilterPropertyKeys, targetFilterPropertyKeys), filterMetaData)) {
 
-
-      out.collect(EmbeddingFactory.fromTriple(triple, sourceProjectionPropertyKeys,
-        edgeProjectionPropertyKeys, targetProjectionPropertyKeys));
+    if (sourceVariable.equals(targetVariable)) {
+      // Check if source and target are expected to be the same
+      if (!triple.getSourceVertex().getId().equals(triple.getTargetVertex().getId())) {
+        return;
+      }
+    } else if (vertexMatchStrategy.equals(MatchStrategy.ISOMORPHISM) &&
+      triple.getSourceVertex().getId().equals(triple.getTargetVertex().getId())) {
+      return;
     }
+
+    if (filter(triple)) {
+      out.collect(
+        EmbeddingFactory.fromTriple(
+          triple,
+          sourceProjectionPropertyKeys, edgeProjectionPropertyKeys, targetProjectionPropertyKeys,
+          sourceVariable, targetVariable
+        )
+      );
+    }
+  }
+
+  /**
+   * Checks if the the triple holds for the predicate
+   * @param triple triple to be filtered
+   * @return True if the triple holds for the predicate
+   */
+  private boolean filter(Triple triple) {
+    return predicates.evaluate(
+      EmbeddingFactory.fromTriple(triple,
+        sourceFilterPropertyKeys,  edgeFilterPropertyKeys, targetFilterPropertyKeys,
+        sourceVariable, targetVariable
+      ),
+      filterMetaData
+    );
   }
 
   /**
@@ -130,4 +176,5 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
 
     return metaData;
   }
+
 }
