@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.representation.common.Triple;
 
 import java.util.List;
 
@@ -64,6 +65,27 @@ public class EmbeddingFactory {
     Embedding embedding = new Embedding();
     embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());
     embedding.addPropertyValues(project(edge, propertyKeys));
+
+    return embedding;
+  }
+
+  public static Embedding fromTriple(Triple triple, List<String> sourcePropertyKeys, List<String>
+    edgePropertyKeys, List<String> targetPropertyKeys) {
+    Embedding embedding = new Embedding();
+    embedding.add(
+      triple.getSourceVertex().getId(),
+      project(triple.getSourceVertex(), sourcePropertyKeys)
+    );
+
+    embedding.add(
+      triple.getEdge().getId(),
+      project(triple.getEdge(), edgePropertyKeys)
+    );
+
+    embedding.add(
+      triple.getTargetVertex().getId(),
+      project(triple.getTargetVertex(), targetPropertyKeys)
+    );
 
     return embedding;
   }

@@ -27,10 +27,14 @@ import org.apache.flink.types.Value;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import static java.util.stream.Collectors.joining;
 
@@ -616,14 +620,33 @@ public class Embedding implements Value, CopyableValue<Embedding> {
 
   @Override
   public void write(DataOutputView out) throws IOException {
-    out.writeInt(idData.length);
-    out.write(idData);
+    byte[] buffer = compress(idData);
+    out.writeInt(buffer.length);
+    out.write(buffer);
 
-    out.writeInt(propertyData.length);
-    out.write(propertyData);
+    buffer = compress(propertyData);
+    out.writeInt(buffer.length);
+    out.write(buffer);
 
-    out.writeInt(idListData.length);
-    out.write(idListData);
+    buffer = compress(idListData);
+    out.writeInt(buffer.length);
+    out.write(buffer);
+  }
+
+  public byte[] compress(byte[] data) throws IOException {
+    Deflater deflater = new Deflater();
+    deflater.setInput(data);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+    deflater.finish();
+    byte[] buffer = new byte[1024];
+    while (!deflater.finished()) {
+      int count = deflater.deflate(buffer); // returns the generated code... index
+      outputStream.write(buffer, 0, count);
+    }
+    outputStream.close();
+
+    return outputStream.toByteArray();
   }
 
   @Override
@@ -653,9 +676,32 @@ public class Embedding implements Value, CopyableValue<Embedding> {
       }
     }
 
-    this.idData = ids;
-    this.propertyData = newPropertyData;
-    this.idListData = idLists;
+    this.idData = decompress(ids);
+    this.propertyData = decompress(newPropertyData);
+    this.idListData = decompress(idLists);
+  }
+
+  private byte[] decompress(byte[] input) throws IOException {
+    Inflater inflater = new Inflater();
+    inflater.setInput(input);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+
+    while (!inflater.finished()) {
+      int count = 0;
+
+      try {
+        count = inflater.inflate(buffer);
+      } catch (DataFormatException e) {
+        throw new RuntimeException("Deserialisation of Embedding failed");
+      }
+
+      outputStream.write(buffer, 0, count);
+    }
+
+    outputStream.close();
+    return outputStream.toByteArray();
   }
 
   @Override
