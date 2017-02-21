@@ -1,0 +1,27 @@
+// all vertices
+(alice:User {name: "Alice"})
+(bob:User {name: "Bob"})
+(dan:User {name: "Dan"})
+
+research:RG {}[
+   (alice)
+   (bob)
+   (dan)
+]
+
+a1:RG {}[
+   (alice)
+   (dan)
+]
+
+a2:RG {}[
+   (bob)
+]
+
+// logical graphs
+g0:fused {paper : "Graphs", author : "Alice"} [
+    (alice)
+]
+g1:fused {paper : "OWL", author : "Bob"} [
+     (bob)
+]

@@ -13,8 +13,11 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentFilterBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InBiGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -25,6 +28,11 @@ import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapFunctio
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapGraphHeadForNewGraph;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapVertexToPairWithGraphId;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapVerticesAsTuplesWithNullId;
+
+import static org.gradoop.flink.model.impl.functions.graphcontainment
+  .BiGraphContainmentFilterBroadcast.GRAPH_LEFT;
+import static org.gradoop.flink.model.impl.functions.graphcontainment
+  .BiGraphContainmentFilterBroadcast.GRAPH_RIGHT;
 
 /**
  * Given two graph operands and a graph collection of (solved)
@@ -45,6 +53,7 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
     GraphCollection hypervertices) {
     
     LogicalGraph gU = new Combination().execute(left,right);
+
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
     DataSet<GraphHead> gh = gU.getGraphHead()
@@ -55,8 +64,9 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
     DataSet<Tuple2<Vertex,GradoopId>> vWithGid = hypervertices.getVertices()
-      .filter(new InGraphBroadcast<>())
-      .withBroadcastSet(gU.getGraphHead().map(new Id<>()), GraphContainmentFilterBroadcast.GRAPH_ID)
+      .filter(new InBiGraphBroadcast<>())
+      .withBroadcastSet(left.getGraphHead().map(new Id<>()), GRAPH_LEFT)
+      .withBroadcastSet(right.getGraphHead().map(new Id<>()), GRAPH_RIGHT)
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
@@ -67,8 +77,8 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
 
     // PHASE 2: Recreating the vertices
     DataSet<Vertex> vi = gU.getVertices()
-      .filter(new NotInGraphBroadcast<>())
-      .withBroadcastSet(subgraphIds, GraphContainmentFilterBroadcast.GRAPH_ID);
+      .filter(new NotInGraphsBroadcast<>())
+      .withBroadcastSet(subgraphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<Vertex> vToRet = nuWithGid
       .map(new Value0Of2<>())
@@ -83,8 +93,8 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
     DataSet<Edge> edges = gU.getEdges()
-      .filter(new NotInGraphBroadcast<>())
-      .withBroadcastSet(subgraphIds, GraphContainmentFilterBroadcast.GRAPH_ID)
+      .filter(new NotInGraphsBroadcast<>())
+      .withBroadcastSet(subgraphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS)
       .leftOuterJoin(idJoin)
       .where(new SourceId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(true))

@@ -22,7 +22,7 @@ public class FlatJoinSourceEdgeReference implements
   @Override
   public void join(Edge first, Tuple2<Vertex, GradoopId> second, Collector<Edge> out) throws
     Exception {
-    if (second != null && second.f1.equals(GradoopId.NULL_VALUE)) {
+    if (second != null && !(second.f1.equals(GradoopId.NULL_VALUE))) {
       if (isItSourceDoingNow) {
         first.setSourceId(second.f1);
       } else {

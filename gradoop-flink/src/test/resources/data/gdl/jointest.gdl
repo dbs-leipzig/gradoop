@@ -1,0 +1,73 @@
+// all vertices
+(alice:User {name: "Alice"})
+(bob:User {name: "Bob"})
+(carl:User {name: "Carl"})
+(dan:User {name: "Dan"})
+(grieg:User {name: "Edward"})
+(graphs:Paper {title: "Graphs", fstAuth: "Alice"})    
+(join:Paper {title: "Join", fstAuth: "Alice"})    
+(owl:Paper {title: "OWL", fstAuth: "Bob"})    
+(proj:Paper {title: "Projection", fstAuth: "Carl"})    
+(mu:Paper {title: "muCalc", fstAuth: "Dan"})    
+(matita:Paper {title: "Matita", fstAuth: "Asperti"}) 
+(aGr:fused {paper: "Graphs", author: "Alice"})
+(aJoin:fused {paper: "Join", author: "Alice"})
+(bOwl:fused {paper: "OWL", author: "Bob"})
+(cProj:fused {paper: "Projection", author: "Carl"})
+(dMu:fused {paper: "muCalc", author: "Dan"})
+
+// left operand
+research:RG {}[
+   (alice)-[:follows]->(bob) 
+   (alice)-[:follows]->(carl) 
+   (bob)-[:follows]->(dan) 
+   (dan)-[:follows]->(carl) 
+   (grieg)-[:follows]->(alice) 
+]
+
+//right operand
+citation:CG {}[
+   (graphs)-[:cites]->(owl)    
+   (join)-[:cites]->(proj)    
+   (owl)-[:cites]->(proj)    
+   (proj)-[:cites]->(mu)    
+   (graphs)-[:cites]->(matita)    
+]
+
+result {}[
+   (grieg)-[:follows]->(aGr) 
+   (grieg)-[:follows]->(aJoin)
+
+   (aGr)-[:cites]->(matita)
+   (aGr)-[:follows]->(bOwl)
+   (aGr)-[:cites]->(bOwl)
+   (aGr)-[:follows]->(cProj)
+
+   (aJoin)-[:follows]->(bOwl)
+   (aJoin)-[:follows]->(cProj)
+   (aJoin)-[:cites]->(cProj)
+
+   (bOwl)-[:cites]->(cProj)
+   (bOwl)-[:follows]->(dMu)
+
+   (cProj)-[:cites]->(dMu)
+
+   (dMu)-[:follows]->(cProj)
+]
+
+// logical graphs
+g0:fused {paper : "Graphs", author : "Alice"} [
+    (alice)-->(graphs)
+]
+g1:fused {paper : "Join", author : "Alice"} [
+    (alice)-->(join)
+]
+g2:fused {paper : "OWL", author : "Bob"} [
+     (bob)-->(owl)
+]
+g3:fused {paper : "Projection", author : "Carl"} [
+     (carl)-->(proj)
+]
+g4:fused {paper : "muCalc", author : "Dan"} [
+     (dan)-->(mu)
+]
