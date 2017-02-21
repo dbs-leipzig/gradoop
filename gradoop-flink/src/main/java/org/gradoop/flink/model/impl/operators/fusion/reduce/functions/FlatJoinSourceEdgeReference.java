@@ -8,7 +8,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Created by vasistas on 17/02/17.
+ * Created by Giacomo Bergami on 17/02/17.
  */
 public class FlatJoinSourceEdgeReference implements
   FlatJoinFunction<Edge, Tuple2<Vertex, GradoopId>, Edge> {

@@ -50,11 +50,13 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
     DataSet<GraphHead> gh = gU.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
+    DataSet<GradoopId> subgraphIds = hypervertices.getGraphHeads().map(new Id<>());
+
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
     DataSet<Tuple2<Vertex,GradoopId>> vWithGid = hypervertices.getVertices()
       .filter(new InGraphBroadcast<>())
-      .withBroadcastSet(gU.getGraphHead(), GraphContainmentFilterBroadcast.GRAPH_ID)
+      .withBroadcastSet(gU.getGraphHead().map(new Id<>()), GraphContainmentFilterBroadcast.GRAPH_ID)
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
@@ -66,7 +68,7 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
     // PHASE 2: Recreating the vertices
     DataSet<Vertex> vi = gU.getVertices()
       .filter(new NotInGraphBroadcast<>())
-      .withBroadcastSet(hypervertices.getGraphHeads(), GraphContainmentFilterBroadcast.GRAPH_ID);
+      .withBroadcastSet(subgraphIds, GraphContainmentFilterBroadcast.GRAPH_ID);
 
     DataSet<Vertex> vToRet = nuWithGid
       .map(new Value0Of2<>())
@@ -82,11 +84,11 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
 
     DataSet<Edge> edges = gU.getEdges()
       .filter(new NotInGraphBroadcast<>())
-      .withBroadcastSet(hypervertices.getGraphHeads(), GraphContainmentFilterBroadcast.GRAPH_ID)
-      .fullOuterJoin(idJoin)
+      .withBroadcastSet(subgraphIds, GraphContainmentFilterBroadcast.GRAPH_ID)
+      .leftOuterJoin(idJoin)
       .where(new SourceId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(true))
-      .fullOuterJoin(idJoin)
+      .leftOuterJoin(idJoin)
       .where(new TargetId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(false))
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
