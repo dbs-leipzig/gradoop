@@ -38,7 +38,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.FilterSubgraphEdg
  *
  * Created by Giacomo Bergami on 25/01/17.
  */
-public class FusionUtils {
+public class VertexFusionUtils {
   /**
    * Filters a collection form a graph dataset performing either an intersection or a difference
    *

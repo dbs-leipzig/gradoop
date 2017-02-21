@@ -51,14 +51,14 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThough
  *    rendered as hooks over the fused vertex
  *
  */
-public class Fusion implements BinaryGraphToGraphOperator {
+public class VertexFusion implements BinaryGraphToGraphOperator {
 
   /**
    * @return The operator's name
    */
   @Override
   public String getName() {
-    return Fusion.class.getName();
+    return VertexFusion.class.getName();
   }
 
   /**
@@ -81,11 +81,11 @@ public class Fusion implements BinaryGraphToGraphOperator {
      * result
      */
     DataSet<Vertex> toBeReplaced =
-      FusionUtils.areElementsInGraph(leftVertices, patternGraph, true);
+      VertexFusionUtils.areElementsInGraph(leftVertices, patternGraph, true);
 
     // But, even the vertices that belong only to the search graph, should be added
     DataSet<Vertex> finalVertices =
-      FusionUtils.areElementsInGraph(leftVertices, patternGraph, false);
+      VertexFusionUtils.areElementsInGraph(leftVertices, patternGraph, false);
 
     final GradoopId vId = GradoopId.get();
 
@@ -106,7 +106,7 @@ public class Fusion implements BinaryGraphToGraphOperator {
 
     //In the final graph, all the edges appearing only in the search graph should appear
     DataSet<Edge> leftEdges = searchGraph.getEdges();
-    leftEdges = FusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
+    leftEdges = VertexFusionUtils.areElementsInGraph(leftEdges, patternGraph, false);
 
     /*
      * Concerning the other edges, we have to eventually update them and to be linked
