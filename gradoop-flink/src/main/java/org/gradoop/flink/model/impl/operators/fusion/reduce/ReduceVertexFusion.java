@@ -73,21 +73,21 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
       .union(vi)
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
+    // PHASE 3: Recreating the edges
     DataSet<Tuple2<Vertex,GradoopId>> idJoin = vWithGid
       .coGroup(nuWithGid)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new CoGroupAssociateOldVerticesWithNewIds())
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
-    // PHASE 3: Recreating the edges
     DataSet<Edge> edges = gU.getEdges()
       .filter(new NotInGraphBroadcast<>())
       .withBroadcastSet(hypervertices.getGraphHeads(), GraphContainmentFilterBroadcast.GRAPH_ID)
       .fullOuterJoin(idJoin)
-      .where(new SourceId<>()).equalTo(new Value0Of2<>())
+      .where(new SourceId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(true))
       .fullOuterJoin(idJoin)
-      .where(new TargetId<>()).equalTo(new Value0Of2<Vertex, GradoopId>())
+      .where(new TargetId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(false))
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 

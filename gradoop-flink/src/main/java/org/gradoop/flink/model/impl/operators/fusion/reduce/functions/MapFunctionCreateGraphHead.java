@@ -1,8 +1,9 @@
 package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;
 
+
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.operators.join.joinwithjoins.tuples.DisambiguationTupleWithVertexId;
+import org.gradoop.flink.model.impl.operators.fusion.reduce.tuples.DisambiguationTupleWithVertexId;
 
 /**
  * Created by vasistas on 16/02/17.
