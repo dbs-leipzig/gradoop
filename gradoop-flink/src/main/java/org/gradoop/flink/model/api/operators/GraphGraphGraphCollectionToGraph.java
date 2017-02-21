@@ -1,5 +1,6 @@
 package org.gradoop.flink.model.api.operators;
 
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 
 /**
@@ -9,5 +10,8 @@ import org.gradoop.flink.model.impl.LogicalGraph;
  *
  * Created by Giacomo Bergami on 21/02/17.
  */
-public interface GraphGraphGraphCollectionToGraph {
+public interface GraphGraphGraphCollectionToGraph extends Operator {
+
+  LogicalGraph execute(LogicalGraph left, LogicalGraph right, GraphCollection hypervertices);
+
 }
