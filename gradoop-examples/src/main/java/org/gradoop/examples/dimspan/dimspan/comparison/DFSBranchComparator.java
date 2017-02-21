@@ -15,26 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.dimspan.dimspan.config;
+package org.gradoop.examples.dimspan.dimspan.comparison;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Dictionary coding options
+ * Compare initial extensions of DFS codes.
  */
-public enum DictionaryType implements Comparable<DictionaryType> {
-  /**
-   * No label pruning and alphabetical order.
-   */
-  RANDOM,
-  /**
-   * Higher label frequency <=> lower label (original gSpan)
-   */
-  INVERSE_PROPORTIONAL,
-  /**
-   * Higher label frequency <=> higher label
-   */
-  PROPORTIONAL,
-  /**
-   * label pruning but no alphabetical order.
-   */
-  FREQUENT
+public interface DFSBranchComparator extends Comparator<int[]>, Serializable {
 }

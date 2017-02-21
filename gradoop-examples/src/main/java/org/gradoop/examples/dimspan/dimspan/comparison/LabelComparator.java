@@ -15,26 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.dimspan.dimspan.config;
+package org.gradoop.examples.dimspan.dimspan.comparison;
+
+import org.gradoop.flink.model.impl.tuples.WithCount;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Dictionary coding options
+ * Frequency-based label comparator.
  */
-public enum DictionaryType implements Comparable<DictionaryType> {
-  /**
-   * No label pruning and alphabetical order.
-   */
-  RANDOM,
-  /**
-   * Higher label frequency <=> lower label (original gSpan)
-   */
-  INVERSE_PROPORTIONAL,
-  /**
-   * Higher label frequency <=> higher label
-   */
-  PROPORTIONAL,
-  /**
-   * label pruning but no alphabetical order.
-   */
-  FREQUENT
+public interface LabelComparator extends Comparator<WithCount<String>>,Serializable {
 }

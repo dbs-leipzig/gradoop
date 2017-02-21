@@ -15,26 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.dimspan.dimspan.config;
+package org.gradoop.examples.dimspan.dimspan.functions;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.examples.dimspan.dimspan.representation.GraphUtilsBase;
 
 /**
- * Dictionary coding options
+ * (g, V, E) => true, if E not empty
  */
-public enum DictionaryType implements Comparable<DictionaryType> {
-  /**
-   * No label pruning and alphabetical order.
-   */
-  RANDOM,
-  /**
-   * Higher label frequency <=> lower label (original gSpan)
-   */
-  INVERSE_PROPORTIONAL,
-  /**
-   * Higher label frequency <=> higher label
-   */
-  PROPORTIONAL,
-  /**
-   * label pruning but no alphabetical order.
-   */
-  FREQUENT
+public class NotEmpty implements FilterFunction<int[]> {
+
+  @Override
+  public boolean filter(int[] graph) throws Exception {
+    return GraphUtilsBase.getEdgeCount(graph) > 0;
+  }
 }
