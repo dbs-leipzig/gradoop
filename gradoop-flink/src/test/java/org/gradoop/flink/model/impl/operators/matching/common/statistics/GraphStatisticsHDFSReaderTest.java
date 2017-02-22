@@ -29,7 +29,7 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
   }
 
   /**
-   * Stops the tests cluster after the test.
+   * Stops the test cluster after the test.
    *
    * @throws Exception
    */
