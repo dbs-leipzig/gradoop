@@ -1,12 +1,10 @@
 package org.gradoop.flink.algorithms.fsm.transactional.predgen;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +34,8 @@ public abstract class PredictableGeneratorFSMTestBase extends GradoopFlinkTestBa
     this.graphCount = Long.parseLong(graphCount);
   }
 
-  public abstract TransactionalFSMBase getImplementation(FSMConfig config);
+  public abstract UnaryCollectionToCollectionOperator getImplementation(
+    float minSupport, boolean directed);
 
   @Parameterized.Parameters(name = "{index} : {0}")
   public static Iterable data(){
@@ -82,21 +81,19 @@ public abstract class PredictableGeneratorFSMTestBase extends GradoopFlinkTestBa
 
   @Test
   public void withGeneratorTest() throws Exception {
-    FSMConfig config = new FSMConfig(threshold, directed);
-
     GraphTransactions transactions = new PredictableTransactionsGenerator(
       graphCount, 1, true, getConfig()).execute();
 
-    DataSet<GraphTransaction> frequentSubgraphs = getImplementation(config)
-      .execute(transactions)
-      .getTransactions();
+    GraphCollection frequentSubgraphs = getImplementation(threshold, directed)
+      .execute(GraphCollection.fromTransactions(transactions));
 
     if (directed){
       Assert.assertEquals(PredictableTransactionsGenerator
-        .containedDirectedFrequentSubgraphs(threshold), frequentSubgraphs.count());
+        .containedDirectedFrequentSubgraphs(threshold), frequentSubgraphs.getGraphHeads().count());
     } else {
       Assert.assertEquals(PredictableTransactionsGenerator
-        .containedUndirectedFrequentSubgraphs(threshold), frequentSubgraphs.count());
+        .containedUndirectedFrequentSubgraphs(threshold), frequentSubgraphs.getGraphHeads().count());
     }
   }
+
 }

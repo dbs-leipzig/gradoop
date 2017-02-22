@@ -36,7 +36,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
    *
    * @param fsmConfig externally configured DIMSpan configuration
    */
-  private TransactionalFSM(DIMSpanConfig fsmConfig) {
+  public TransactionalFSM(DIMSpanConfig fsmConfig) {
     dimSpan = new DIMSpan(fsmConfig);
   }
 

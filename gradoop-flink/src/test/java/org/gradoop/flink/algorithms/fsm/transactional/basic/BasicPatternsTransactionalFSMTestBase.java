@@ -2,6 +2,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlink
     this.expectedResultVariables = expectedResultVariables.split(",");
   }
 
-  public abstract TransactionalFSMBase getImplementation();
+  public abstract UnaryCollectionToCollectionOperator getImplementation();
 
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
