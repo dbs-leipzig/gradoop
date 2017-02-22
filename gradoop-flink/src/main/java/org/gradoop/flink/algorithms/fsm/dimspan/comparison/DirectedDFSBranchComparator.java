@@ -23,21 +23,23 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
  * Compare initial extensions of DFS codes in directed mode.
  */
 public class DirectedDFSBranchComparator implements DFSBranchComparator {
+  private DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
+
   @Override
   public int compare(int[] a, int[] b) {
-    int comparison = DFSCodeUtils.getFromLabel(a, 0) - DFSCodeUtils.getFromLabel(b, 0);
+    int comparison = dfsCodeUtils.getFromLabel(a, 0) - dfsCodeUtils.getFromLabel(b, 0);
 
     if (comparison == 0) {
-      boolean aIsLoop = DFSCodeUtils.isLoop(a, 0);
-      if (aIsLoop == DFSCodeUtils.isLoop(b, 0)) {
+      boolean aIsLoop = dfsCodeUtils.isLoop(a, 0);
+      if (aIsLoop == dfsCodeUtils.isLoop(b, 0)) {
 
-        boolean aIsOutgoing = DFSCodeUtils.isOutgoing(a, 0);
-        if (aIsOutgoing == DFSCodeUtils.isOutgoing(b, 0)) {
+        boolean aIsOutgoing = dfsCodeUtils.isOutgoing(a, 0);
+        if (aIsOutgoing == dfsCodeUtils.isOutgoing(b, 0)) {
 
-          comparison = DFSCodeUtils.getEdgeLabel(a, 0) - DFSCodeUtils.getEdgeLabel(b, 0);
+          comparison = dfsCodeUtils.getEdgeLabel(a, 0) - dfsCodeUtils.getEdgeLabel(b, 0);
 
           if (comparison == 0) {
-            comparison = DFSCodeUtils.getToLabel(a, 0) - DFSCodeUtils.getToLabel(b, 0);
+            comparison = dfsCodeUtils.getToLabel(a, 0) - dfsCodeUtils.getToLabel(b, 0);
           }
         } else {
           if (aIsOutgoing) {

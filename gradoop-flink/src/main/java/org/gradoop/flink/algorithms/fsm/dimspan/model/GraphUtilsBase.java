@@ -17,141 +17,87 @@
 
 package org.gradoop.flink.algorithms.fsm.dimspan.model;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 /**
- * Static util methods to interpret and manipulate int-array encoded graphs.
+ * Util base methods to interpret and manipulate multiplexed graphs or patterns.
  */
-public class GraphUtilsBase {
+public class GraphUtilsBase implements GraphUtils {
 
-  /**
-   * Number of indexes used to represent a single edge.
-   */
-  public static final int EDGE_LENGTH = 6;
-
-  /**
-   * Offset of 1-edge DFS code's from label.
-   */
-  protected static final int FROM_LABEL = 0;
-
-  /**
-   * Offset of 1-edge DFS code's direction indicator.
-   */
-  protected static final int DIRECTION = 1;
-
-  /**
-   * Offset of 1-edge DFS code's edge label.
-   */
-  protected static final int EDGE_LABEL = 2;
-
-  /**
-   * Offset of 1-edge DFS code's to label.
-   */
-  protected static final int TO_LABEL = 3;
-
-  /**
-   * Offset of 1-edge DFS code's from id.
-   */
-  protected static final int FROM_ID = 4;
-
-  /**
-   * Offset of 1-edge DFS code's to id.
-   */
-  protected static final int TO_ID = 5;
-
-  /**
-   * integer model of "outgoing"
-   */
-  protected static final int OUTGOING = 0;
-
-  /**
-   * integer model of "incoming"
-   */
-  protected static final int INCOMING = 1;
-
-  public static int[] getEdge(int fromId, int fromLabel, boolean outgoing, int edgeLabel, int toId,
-    int toLabel) {
+  @Override
+  public int[] multiplex(
+    int fromId, int fromLabel, boolean outgoing, int edgeLabel, int toId, int toLabel) {
 
     int[] edge = new int[EDGE_LENGTH];
 
     edge[FROM_ID] = fromId;
     edge[TO_ID] = toId;
-    edge[FROM_LABEL] = fromLabel;
-    edge[TO_LABEL] = toLabel;
     edge[DIRECTION] = outgoing ? OUTGOING : INCOMING;
     edge[EDGE_LABEL] = edgeLabel;
+    edge[FROM_LABEL] = fromLabel;
+    edge[TO_LABEL] = toLabel;
 
     return edge;
   }
 
-  public static int getFromId(int[] data, int id) {
-    return data[id * EDGE_LENGTH + FROM_ID];
-  }
-
-  public static int getToId(int[] data, int id) {
-    return data[id * EDGE_LENGTH + TO_ID];
-  }
-
-  public static int getFromLabel(int[] data, int id) {
-    return data[id * EDGE_LENGTH + FROM_LABEL];
-  }
-
-  public static int getEdgeLabel(int[] data, int id) {
-    return data[id * EDGE_LENGTH + EDGE_LABEL];
-  }
-
-  public static boolean isOutgoing(int[] data, int id) {
-    return data[id * EDGE_LENGTH + DIRECTION] == 0;
-  }
-
-  public static boolean isLoop(int[] data, int id) {
-    return getFromId(data, id) == getToId(data, id);
-  }
-
-
-
-  public static int getToLabel(int[] data, int id) {
-    return data[id * EDGE_LENGTH + TO_LABEL];
-  }
-
-  public static int getEdgeCount(int[] data) {
-    return data.length / EDGE_LENGTH;
-  }
-
-  public static int getVertexCount(int[] data) {
+  @Override
+  public int getVertexCount(int[] mux) {
     int maxId = 0;
 
-    for (int edgeId = 0; edgeId < getEdgeCount(data); edgeId++) {
-      maxId = Math.max(maxId, Math.max(getFromId(data, edgeId), getToId(data, edgeId)));
+    for (int edgeId = 0; edgeId < getEdgeCount(mux); edgeId++) {
+      maxId = Math.max(maxId, Math.max(getFromId(mux, edgeId), getToId(mux, edgeId)));
     }
 
     return maxId + 1;
   }
 
-  public static int[] getVertexLabels(int[] data) {
-    int[] vertexLabels = new int[getVertexCount(data)];
+  @Override
+  public int getEdgeCount(int[] mux) {
+    return mux.length / EDGE_LENGTH;
+  }
 
-    for (int edgeId = 0; edgeId < getEdgeCount(data); edgeId++) {
-      vertexLabels[getFromId(data, edgeId)] = getFromLabel(data, edgeId);
-      vertexLabels[getToId(data, edgeId)] = getToLabel(data, edgeId);
+  @Override
+  public int[] getVertexLabels(int[] mux) {
+    int[] vertexLabels = new int[getVertexCount(mux)];
+
+    for (int edgeId = 0; edgeId < getEdgeCount(mux); edgeId++) {
+      vertexLabels[getFromId(mux, edgeId)] = getFromLabel(mux, edgeId);
+      vertexLabels[getToId(mux, edgeId)] = getToLabel(mux, edgeId);
     }
 
     return vertexLabels;
   }
 
-  public int[] addEdge(int[] graph, int sourceId, int sourceLabel, int edgeLabel,
-    int targetId, int targetLabel) {
+  @Override
+  public int getFromId(int[] mux, int id) {
+    return mux[id * EDGE_LENGTH + FROM_ID];
+  }
 
-    int[] edge;
+  @Override
+  public int getToId(int[] mux, int id) {
+    return mux[id * EDGE_LENGTH + TO_ID];
+  }
 
-    if (sourceLabel <= targetLabel) {
-      edge = getEdge(sourceId, sourceLabel, true, edgeLabel, targetId, targetLabel);
-    } else {
-      edge = getEdge(targetId, targetLabel, false, edgeLabel, sourceId, sourceLabel);
-    }
+  @Override
+  public int getFromLabel(int[] mux, int id) {
+    return mux[id * EDGE_LENGTH + FROM_LABEL];
+  }
 
-    graph = ArrayUtils.addAll(graph, edge);
+  @Override
+  public int getEdgeLabel(int[] mux, int id) {
+    return mux[id * EDGE_LENGTH + EDGE_LABEL];
+  }
 
-    return graph;
+  @Override
+  public boolean isOutgoing(int[] mux, int edgeId) {
+    return mux[edgeId * EDGE_LENGTH + DIRECTION] == OUTGOING;
+  }
+
+  @Override
+  public int getToLabel(int[] mux, int id) {
+    return mux[id * EDGE_LENGTH + TO_LABEL];
+  }
+
+  @Override
+  public boolean isLoop(int[] mux, int edgeId) {
+    return getFromId(mux, edgeId) == getToId(mux, edgeId);
   }
 }

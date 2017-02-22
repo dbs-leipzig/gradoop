@@ -21,11 +21,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSCodeComparator;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SortedSearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedSearchGraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.SortedGraphUtils;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedGraphUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -44,12 +43,13 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
   /**
    * graph utils (provides methods to interpret int-array encoded graphs)
    */
-  private final GraphUtils graphUtils;
+  private final SearchGraphUtils graphUtils;
 
   /**
    * flag to enable branch constraint in pattern-growth (true=enabled)
    */
   private final boolean branchFilterEnabled;
+  private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
 
   /**
    * Constructor
@@ -57,8 +57,8 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
    */
   protected GSpanLogicBase(DIMSpanConfig fsmConfig) {
     // set graph utils depending on the branch constraint configuration
-    branchFilterEnabled = fsmConfig.isBranchFilterEnabled();
-    graphUtils = branchFilterEnabled ? new SortedGraphUtils(fsmConfig) : new UnsortedGraphUtils();
+    branchFilterEnabled = fsmConfig.isBranchConstraintEnabled();
+    graphUtils = branchFilterEnabled ? new SortedSearchGraphUtils(fsmConfig) : new UnsortedSearchGraphUtils();
   }
 
   // SINGLE EDGE PATTERNS
@@ -68,24 +68,24 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
     PatternEmbeddingsMap patternEmbeddings = PatternEmbeddingsMap.getEmptyOne();
 
     // create a 1-edge DFS code for every edge as well as all embeddings
-    for (int edgeId = 0; edgeId < GraphUtilsBase.getEdgeCount(graph); edgeId++) {
+    for (int edgeId = 0; edgeId < graphUtils.getEdgeCount(graph); edgeId++) {
 
-      int fromId = GraphUtilsBase.getFromId(graph, edgeId);
-      int fromLabel = GraphUtilsBase.getFromLabel(graph, edgeId);
-      int toId = GraphUtilsBase.getToId(graph, edgeId);
-      int toLabel = GraphUtilsBase.getToLabel(graph, edgeId);
+      int fromId = graphUtils.getFromId(graph, edgeId);
+      int fromLabel = graphUtils.getFromLabel(graph, edgeId);
+      int toId = graphUtils.getToId(graph, edgeId);
+      int toLabel = graphUtils.getToLabel(graph, edgeId);
 
       boolean loop = fromId == toId;
 
       int[] vertexIds = loop ? new int[] {fromId} : new int[] {fromId, toId};
       int[] edgeIds = new int[] {edgeId};
-      int edgeLabel = GraphUtilsBase.getEdgeLabel(graph, edgeId);
+      int edgeLabel = graphUtils.getEdgeLabel(graph, edgeId);
       int fromTime = 0;
       int toTime = loop ? 0 : 1;
       boolean outgoing = getSingleEdgePatternIsOutgoing(graph, edgeId, loop);
 
-      int[] pattern = GraphUtilsBase
-        .getEdge(fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
+      int[] pattern = graphUtils
+        .multiplex(fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);
 
       storeSingleEdgePatternEmbeddings(
         patternEmbeddings, pattern, vertexIds, edgeIds, fromLabel, toLabel, loop);
@@ -127,9 +127,9 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
     int[] rightmostPathTimes;
 
     // 1-edge pattern
-    if (GraphUtilsBase.getEdgeCount(pattern) == 1) {
+    if (graphUtils.getEdgeCount(pattern) == 1) {
       // loop
-      if (GraphUtilsBase.getFromId(pattern, 0) == GraphUtilsBase.getToId(pattern, 0)) {
+      if (graphUtils.getFromId(pattern, 0) == graphUtils.getToId(pattern, 0)) {
         rightmostPathTimes = new int[] {0};
       } else {
         rightmostPathTimes = new int[] {1, 0};
@@ -137,9 +137,9 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
     } else {
       rightmostPathTimes = new int[0];
 
-      for (int edgeTime = GraphUtilsBase.getEdgeCount(pattern) - 1; edgeTime >= 0; edgeTime--) {
-        int fromTime = GraphUtilsBase.getFromId(pattern, edgeTime);
-        int toTime = GraphUtilsBase.getToId(pattern, edgeTime);
+      for (int edgeTime = graphUtils.getEdgeCount(pattern) - 1; edgeTime >= 0; edgeTime--) {
+        int fromTime = graphUtils.getFromId(pattern, edgeTime);
+        int toTime = graphUtils.getToId(pattern, edgeTime);
         boolean firstStep = rightmostPathTimes.length == 0;
 
         // forwards
@@ -186,7 +186,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
         int[] parentPattern = frequentPatterns.get(frequentPatternIndex);
 
         if (branchFilterEnabled) {
-          int[] firstExtension = DFSCodeUtils.getFirstExtension(parentPattern);
+          int[] firstExtension = dfsCodeUtils.getBranch(parentPattern);
 
           if (!Objects.deepEquals(minExtension, firstExtension)) {
             minEdgeId = graphUtils
@@ -239,20 +239,20 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
       int[] parentVertexIds = parentEmbeddings[2*m];
       int[] parentEdgeIds = parentEmbeddings[2*m+1];
 
-      int forwardsTime = GraphUtilsBase.getVertexCount(parentPattern);
+      int forwardsTime = graphUtils.getVertexCount(parentPattern);
       int rightmostTime = rightmostPath[0];
 
       // FOR EACH EDGE
-      for (int edgeId = minEdgeId; edgeId < GraphUtilsBase.getEdgeCount(graph); edgeId++) {
+      for (int edgeId = minEdgeId; edgeId < graphUtils.getEdgeCount(graph); edgeId++) {
 
         // if not contained in parent embedding
         if (!ArrayUtils.contains(parentEdgeIds, edgeId)) {
 
           // determine times of incident vertices in parent embedding
-          int edgeFromId = GraphUtilsBase.getFromId(graph, edgeId);
+          int edgeFromId = graphUtils.getFromId(graph, edgeId);
           int fromTime = ArrayUtils.indexOf(parentVertexIds, edgeFromId);
 
-          int edgeToId = GraphUtilsBase.getToId(graph, edgeId);
+          int edgeToId = graphUtils.getToId(graph, edgeId);
           int toTime = ArrayUtils.indexOf(parentVertexIds, edgeToId);
 
           // CHECK FOR BACKWARDS GROWTH OPTIONS
@@ -260,13 +260,13 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
           // grow backwards from from
           if (fromTime == rightmostTime && toTime >= 0) {
 
-            int[] childPattern = DFSCodeUtils.grow(parentPattern,
+            int[] childPattern = dfsCodeUtils.addExtension(parentPattern,
               fromTime,
-              GraphUtilsBase.getFromLabel(graph, edgeId),
+              graphUtils.getFromLabel(graph, edgeId),
               getExtensionIsOutgoing(graph, edgeId, true),
-              GraphUtilsBase.getEdgeLabel(graph, edgeId),
+              graphUtils.getEdgeLabel(graph, edgeId),
               toTime,
-              GraphUtilsBase.getToLabel(graph, edgeId)
+              graphUtils.getToLabel(graph, edgeId)
             );
 
             int[] childVertexIds = parentVertexIds.clone();
@@ -276,13 +276,13 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
             // grow backwards from to
           } else if (toTime == rightmostTime && fromTime >= 0) {
 
-            int[] childPattern = DFSCodeUtils.grow(parentPattern,
+            int[] childPattern = dfsCodeUtils.addExtension(parentPattern,
               toTime,
-              GraphUtilsBase.getFromLabel(graph, edgeId),
+              graphUtils.getFromLabel(graph, edgeId),
               getExtensionIsOutgoing(graph, edgeId, false),
-              GraphUtilsBase.getEdgeLabel(graph, edgeId),
+              graphUtils.getEdgeLabel(graph, edgeId),
               fromTime,
-              GraphUtilsBase.getToLabel(graph, edgeId)
+              graphUtils.getToLabel(graph, edgeId)
             );
 
             int[] childVertexIds = parentVertexIds.clone();
@@ -298,13 +298,13 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
               // grow forwards from from
               if (fromTime == rightmostPathTime && toTime < 0) {
 
-                int[] childPattern = DFSCodeUtils.grow(parentPattern,
+                int[] childPattern = dfsCodeUtils.addExtension(parentPattern,
                   fromTime,
-                  GraphUtilsBase.getFromLabel(graph, edgeId),
+                  graphUtils.getFromLabel(graph, edgeId),
                   getExtensionIsOutgoing(graph, edgeId, true),
-                  GraphUtilsBase.getEdgeLabel(graph, edgeId),
+                  graphUtils.getEdgeLabel(graph, edgeId),
                   forwardsTime,
-                  GraphUtilsBase.getToLabel(graph, edgeId)
+                  graphUtils.getToLabel(graph, edgeId)
                 );
 
                 int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeToId);
@@ -315,13 +315,13 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
                 // forwards from to
               } else if (toTime == rightmostPathTime && fromTime < 0) {
 
-                int[] childPattern = DFSCodeUtils.grow(parentPattern,
+                int[] childPattern = dfsCodeUtils.addExtension(parentPattern,
                   toTime,
-                  GraphUtilsBase.getToLabel(graph, edgeId),
+                  graphUtils.getToLabel(graph, edgeId),
                   getExtensionIsOutgoing(graph, edgeId, false),
-                  GraphUtilsBase.getEdgeLabel(graph, edgeId),
+                  graphUtils.getEdgeLabel(graph, edgeId),
                   forwardsTime,
-                  GraphUtilsBase.getFromLabel(graph, edgeId)
+                  graphUtils.getFromLabel(graph, edgeId)
                 );
 
                 int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeFromId);
@@ -364,7 +364,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
     PatternEmbeddingsMap subEmbeddingsMap = getSingleEdgePatternEmbeddings(graph);
 
     // extend the ONE current k-edge minimal DFS code unit k=|E|
-    for (int k = 0; k < GraphUtilsBase.getEdgeCount(graph); k++) {
+    for (int k = 0; k < graphUtils.getEdgeCount(graph); k++) {
       int minPatternIndex = 0;
       int[] minPattern = subEmbeddingsMap.getPattern(minPatternIndex);
 
@@ -380,7 +380,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
       }
 
       // check if input pattern is still child of current minimum
-      minimal = DFSCodeUtils.isChildOf(minPattern, pattern);
+      minimal = dfsCodeUtils.isChildOf(minPattern, pattern);
 
       // brake  as soon as not minimal
       if (!minimal) {
@@ -413,24 +413,24 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
     int[] graph = new int[0];
 
-    for (int edgeTime = 0; edgeTime < GraphUtilsBase.getEdgeCount(pattern); edgeTime++) {
+    for (int edgeTime = 0; edgeTime < graphUtils.getEdgeCount(pattern); edgeTime++) {
 
       int sourceId;
       int sourceLabel;
-      int edgeLabel = GraphUtilsBase.getEdgeLabel(pattern, edgeTime);
+      int edgeLabel = graphUtils.getEdgeLabel(pattern, edgeTime);
       int targetId;
       int targetLabel;
 
-      if (GraphUtilsBase.isOutgoing(pattern, edgeTime)) {
-        sourceId = GraphUtilsBase.getFromId(pattern, edgeTime);
-        sourceLabel = GraphUtilsBase.getFromLabel(pattern, edgeTime);
-        targetId = GraphUtilsBase.getToId(pattern, edgeTime);
-        targetLabel = GraphUtilsBase.getToLabel(pattern, edgeTime);
+      if (graphUtils.isOutgoing(pattern, edgeTime)) {
+        sourceId = graphUtils.getFromId(pattern, edgeTime);
+        sourceLabel = graphUtils.getFromLabel(pattern, edgeTime);
+        targetId = graphUtils.getToId(pattern, edgeTime);
+        targetLabel = graphUtils.getToLabel(pattern, edgeTime);
       } else {
-        sourceId = GraphUtilsBase.getToId(pattern, edgeTime);
-        sourceLabel = GraphUtilsBase.getToLabel(pattern, edgeTime);
-        targetId = GraphUtilsBase.getFromId(pattern, edgeTime);
-        targetLabel = GraphUtilsBase.getFromLabel(pattern, edgeTime);
+        sourceId = graphUtils.getToId(pattern, edgeTime);
+        sourceLabel = graphUtils.getToLabel(pattern, edgeTime);
+        targetId = graphUtils.getFromId(pattern, edgeTime);
+        targetLabel = graphUtils.getFromLabel(pattern, edgeTime);
       }
 
       graph = graphUtils

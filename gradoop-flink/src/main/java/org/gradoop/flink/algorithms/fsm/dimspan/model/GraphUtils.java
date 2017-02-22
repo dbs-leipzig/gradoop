@@ -20,33 +20,161 @@ package org.gradoop.flink.algorithms.fsm.dimspan.model;
 import java.io.Serializable;
 
 /**
- * Util methods to interpret and manipulate int-array encoded graphs
+ * Util methods to interpret and manipulate int-array encoded patterns and graphs
  */
 public interface GraphUtils extends Serializable {
 
   /**
-   * Add an edge to a graph.
-   *
-   * @param graph edge multiplex
-   * @param sourceId new source id
-   * @param sourceLabel new source label
-   * @param edgeLabel new edge label
-   * @param targetId new target id
-   * @param targetLabel new target label
-   *
-   * @return updated edge multiplex
+   * Number of indexes used to represent a single edge.
    */
-  int[] addEdge(int[] graph, int sourceId, int sourceLabel, int edgeLabel, int targetId,
-    int targetLabel);
+  int EDGE_LENGTH = 6;
 
   /**
-   * Find the fist edge greater than or equal to a given 1-edge DFS code.
-   *
-   * @param graph edge multiplex
-   * @param dfsCode search DFS code
-   * @param searchFromEdgeId offset of edge that are already known to be smaller
-   *
-   * @return first edge id with min DFS code greater than or equal search DFS code
+   * Offset of 1-edge DFS code's from label.
    */
-  int getFirstGeqEdgeId(int[] graph, int[] dfsCode, int searchFromEdgeId);
+  int FROM_LABEL = 0;
+
+  /**
+   * Offset of 1-edge DFS code's direction indicator.
+   */
+  int DIRECTION = 1;
+
+  /**
+   * Offset of 1-edge DFS code's edge label.
+   */
+  int EDGE_LABEL = 2;
+
+  /**
+   * Offset of 1-edge DFS code's to label.
+   */
+  int TO_LABEL = 3;
+
+  /**
+   * Offset of 1-edge DFS code's from id.
+   */
+  int FROM_ID = 4;
+
+  /**
+   * Offset of 1-edge DFS code's to id.
+   */
+  int TO_ID = 5;
+
+  /**
+   * integer model of "outgoing"
+   */
+  int OUTGOING = 0;
+
+  /**
+   * integer model of "incoming"
+   */
+  int INCOMING = 1;
+
+  /**
+   * Creates an integer multiplex representing a single edge traversal.
+   *
+   * @param fromId traversal from id
+   * @param fromLabel traversal from label
+   * @param outgoing traversal oin or against direction (0=outgoing)
+   * @param edgeLabel label of the traversed edge
+   * @param toId traversal to id
+   * @param toLabel traversal to label
+   *
+   * @return integer multiplex representing the traversal
+   */
+  int[] multiplex(
+    int fromId, int fromLabel, boolean outgoing, int edgeLabel, int toId, int toLabel);
+
+  /**
+   * Calculates the vertex count for a given edge multiplex.
+   *
+   * @param mux edge multiplex
+   * @return vertex count
+   */
+  int getVertexCount(int[] mux);
+
+  /**
+   * Calculates the edge count for a given edge multiplex.
+   *
+   * @param mux edge multiplex
+   * @return edge count
+   */
+  int getEdgeCount(int[] mux);
+
+  /**
+   * Returns distinct vertex labels from a given edge multiplex.
+   *
+   * @param mux edge multiplex
+   * @return vertex labels
+   */
+  int[] getVertexLabels(int[] mux);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return from vertex id
+   */
+  int getFromId(int[] mux, int edgeId);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return from vertex label
+   */
+  int getFromLabel(int[] mux, int edgeId);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return true, if edge was traversed in direction
+   */
+  boolean isOutgoing(int[] mux, int edgeId);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return edge label
+   */
+  int getEdgeLabel(int[] mux, int edgeId);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return to vertex id
+   */
+  int getToId(int[] mux, int edgeId);
+
+  /**
+   * Getter.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return to vertex label
+   */
+  int getToLabel(int[] mux, int edgeId);
+
+  /**
+   * Convenience method to check if an edge/extension is a loop.
+   *
+   * @param mux edge multiplex
+   * @param edgeId edge id
+   *
+   * @return true, if edge/extension is a loop
+   */
+  boolean isLoop(int[] mux, int edgeId);
 }

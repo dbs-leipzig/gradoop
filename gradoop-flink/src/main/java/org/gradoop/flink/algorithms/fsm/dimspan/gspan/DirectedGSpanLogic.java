@@ -19,6 +19,7 @@ package org.gradoop.flink.algorithms.fsm.dimspan.gspan;
 
 
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 
@@ -27,6 +28,8 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
  */
 public class DirectedGSpanLogic extends GSpanLogicBase {
 
+
+  private final GraphUtils graphUtils = new GraphUtilsBase();
 
   /**
    * Constructor.
@@ -39,12 +42,12 @@ public class DirectedGSpanLogic extends GSpanLogicBase {
 
   @Override
   protected boolean getSingleEdgePatternIsOutgoing(int[] graph, int edgeId, boolean loop) {
-    return loop || GraphUtilsBase.isOutgoing(graph, edgeId);
+    return loop || graphUtils.isOutgoing(graph, edgeId);
   }
 
   @Override
   protected boolean getExtensionIsOutgoing(int[] graph, int edgeId, boolean fromFrom) {
-    return fromFrom == GraphUtilsBase.isOutgoing(graph, edgeId);
+    return fromFrom == graphUtils.isOutgoing(graph, edgeId);
   }
 
   @Override

@@ -26,7 +26,9 @@ import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DirectedDFSBranchComp
 import org.gradoop.flink.algorithms.fsm.dimspan.comparison.UndirectedDFSBranchComparator;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedSearchGraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
 
 import java.util.Arrays;
@@ -52,9 +54,10 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
    * comparator used for graph sorting
    */
   private final DFSBranchComparator branchComparator;
+  private final SearchGraphUtils graphUtils = new UnsortedSearchGraphUtils();
 
   public EncodeAndPruneEdges(DIMSpanConfig fsmConfig) {
-    sortGraph = fsmConfig.isBranchFilterEnabled();
+    sortGraph = fsmConfig.isBranchConstraintEnabled();
     branchComparator = fsmConfig.isDirected() ?
       new DirectedDFSBranchComparator() :
       new UndirectedDFSBranchComparator();
@@ -90,9 +93,9 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
         int targetLabel = inGraph.getTargetLabel(edgeId);
 
         int[] dfsCode = sourceLabel <= targetLabel ?
-          GraphUtilsBase.getEdge(
+          graphUtils.multiplex(
             sourceId, sourceLabel, true, edgeLabel, targetId, targetLabel) :
-          GraphUtilsBase.getEdge(
+          graphUtils.multiplex(
             targetId, targetLabel, false, edgeLabel, sourceId, sourceLabel);
 
         dfsCodes = ArrayUtils.add(dfsCodes, dfsCode);
@@ -105,12 +108,12 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
     }
 
     // multiplex 1-edge DFS codes
-    int[] outGraph = new int[dfsCodes.length * GraphUtilsBase.EDGE_LENGTH];
+    int[] outGraph = new int[dfsCodes.length * GraphUtils.EDGE_LENGTH];
 
     int i = 0;
     for (int[] dfsCode : dfsCodes) {
-      for (int j = 0; j< GraphUtilsBase.EDGE_LENGTH; j++) {
-        outGraph[i * GraphUtilsBase.EDGE_LENGTH + j] = dfsCode[j];
+      for (int j = 0; j< GraphUtils.EDGE_LENGTH; j++) {
+        outGraph[i * GraphUtils.EDGE_LENGTH + j] = dfsCode[j];
       }
       i++;
     }

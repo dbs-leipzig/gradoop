@@ -61,12 +61,12 @@ public class DIMSpanConfig implements Serializable {
   /**
    * Flag to set dataflow position of pattern validation.
    */
-  private DataflowStep patternValidationInStep = DataflowStep.COMBINE;
+  private DataflowStep patternVerificationInStep = DataflowStep.COMBINE;
 
   /**
    * Flag to enable branch constraint in pattern growth (true=enabled).
    */
-  private boolean branchFilterEnabled = true;
+  private boolean branchConstraintEnabled = true;
 
   /**
    * valued constructor
@@ -86,12 +86,12 @@ public class DIMSpanConfig implements Serializable {
     parameters.add((directed ? "directed" : "undirected") + " mode");
     parameters.add("dictionary type : " + dictionaryType.toString());
 
-    parameters.add(getParameterEnabled("branch constraint", branchFilterEnabled));
+    parameters.add(getParameterEnabled("branch constraint", branchConstraintEnabled));
     parameters.add(getParameterEnabled("graph compression", graphCompressionEnabled));
     parameters.add(
       getParameterEnabled("embedding compression", embeddingCompressionEnabled));
     parameters.add("pattern compression @ " + patternCompressionInStep.toString());
-    parameters.add("pattern validation @ " + patternValidationInStep.toString());
+    parameters.add("pattern validation @ " + patternVerificationInStep.toString());
 
     return StringUtils.join(parameters, "|");
   }
@@ -148,19 +148,19 @@ public class DIMSpanConfig implements Serializable {
     return patternCompressionInStep;
   }
 
-  public DataflowStep getPatternValidationInStep() {
-    return patternValidationInStep;
+  public DataflowStep getPatternVerificationInStep() {
+    return patternVerificationInStep;
   }
 
-  public void setPatternValidationInStep(DataflowStep patternValidationInStep) {
-    this.patternValidationInStep = patternValidationInStep;
+  public void setPatternVerificationInStep(DataflowStep patternVerificationInStep) {
+    this.patternVerificationInStep = patternVerificationInStep;
   }
 
-  public void setBranchFilterEnabled(boolean branchFilterEnabled) {
-    this.branchFilterEnabled = branchFilterEnabled;
+  public void setBranchConstraintEnabled(boolean branchConstraintEnabled) {
+    this.branchConstraintEnabled = branchConstraintEnabled;
   }
 
-  public boolean isBranchFilterEnabled() {
-    return branchFilterEnabled;
+  public boolean isBranchConstraintEnabled() {
+    return branchConstraintEnabled;
   }
 }

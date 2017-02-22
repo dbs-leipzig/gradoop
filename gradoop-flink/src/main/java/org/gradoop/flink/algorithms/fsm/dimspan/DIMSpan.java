@@ -302,7 +302,7 @@ public class DIMSpan {
       .groupBy(0)
       .combineGroup(sumPartition());
 
-    if (fsmConfig.getPatternValidationInStep() == DataflowStep.COMBINE) {
+    if (fsmConfig.getPatternVerificationInStep() == DataflowStep.COMBINE) {
       patterns = patterns
         .filter(new VerifyPattern(gSpan, fsmConfig));
     }
@@ -324,7 +324,7 @@ public class DIMSpan {
       .filter(new Frequent<>())
       .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);
 
-    if (fsmConfig.getPatternValidationInStep() == DataflowStep.FILTER) {
+    if (fsmConfig.getPatternVerificationInStep() == DataflowStep.FILTER) {
       patterns = patterns
         .filter(new VerifyPattern(gSpan, fsmConfig));
     }

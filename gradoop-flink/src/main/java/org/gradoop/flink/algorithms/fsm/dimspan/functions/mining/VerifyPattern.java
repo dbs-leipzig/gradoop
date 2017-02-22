@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -34,6 +35,7 @@ public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
    */
   private final GSpanLogic gSpan;
   private final boolean uncompress;
+  private GraphUtils graphUtils = new GraphUtilsBase();
 
   /**
    * Constructor.
@@ -44,7 +46,7 @@ public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
   public VerifyPattern(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
     this.gSpan = gSpan;
     uncompress = fsmConfig.getPatternCompressionInStep()
-      .compareTo(fsmConfig.getPatternValidationInStep()) < 0;
+      .compareTo(fsmConfig.getPatternVerificationInStep()) < 0;
   }
 
   @Override
@@ -57,7 +59,7 @@ public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
       pattern = Simple16Compressor.uncompress(pattern);
     }
 
-    if (GraphUtilsBase.getEdgeCount(pattern) > 1) {
+    if (graphUtils.getEdgeCount(pattern) > 1) {
       valid = gSpan.isMinimal(pattern);
     }
     return valid;

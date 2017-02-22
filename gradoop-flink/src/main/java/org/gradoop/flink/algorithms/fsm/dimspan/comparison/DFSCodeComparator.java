@@ -28,6 +28,8 @@ import java.util.Comparator;
  */
 public class DFSCodeComparator implements Comparator<int[]>, Serializable {
 
+  private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
+
   @Override
   public int compare(int[] a, int[] b) {
     int comparison;
@@ -46,8 +48,8 @@ public class DFSCodeComparator implements Comparator<int[]>, Serializable {
     } else {
       comparison = 0;
 
-      int thisSize = DFSCodeUtils.getEdgeCount(a);
-      int thatSize = DFSCodeUtils.getEdgeCount(b);
+      int thisSize = dfsCodeUtils.getEdgeCount(a);
+      int thatSize = dfsCodeUtils.getEdgeCount(b);
 
       boolean sameSize = thisSize == thatSize;
 
@@ -56,26 +58,26 @@ public class DFSCodeComparator implements Comparator<int[]>, Serializable {
       // compare extensions
       for (int edgeTime = 0; edgeTime < minSize; edgeTime++) {
 
-        int thisFromTime = DFSCodeUtils.getFromId(a, edgeTime);
-        int thatFromTime = DFSCodeUtils.getFromId(b, edgeTime);
+        int thisFromTime = dfsCodeUtils.getFromId(a, edgeTime);
+        int thatFromTime = dfsCodeUtils.getFromId(b, edgeTime);
 
-        int thisToTime = DFSCodeUtils.getToId(a, edgeTime);
-        int thatToTime = DFSCodeUtils.getToId(b, edgeTime);
+        int thisToTime = dfsCodeUtils.getToId(a, edgeTime);
+        int thatToTime = dfsCodeUtils.getToId(b, edgeTime);
 
         // no difference is times
         if (thisFromTime == thatFromTime && thisToTime == thatToTime) {
 
           // compare from Labels
-          int thisFromLabel = DFSCodeUtils.getFromLabel(a, edgeTime);
-          int thatFromLabel = DFSCodeUtils.getFromLabel(b, edgeTime);
+          int thisFromLabel = dfsCodeUtils.getFromLabel(a, edgeTime);
+          int thatFromLabel = dfsCodeUtils.getFromLabel(b, edgeTime);
 
           comparison = thisFromLabel - thatFromLabel;
 
           if (comparison == 0) {
 
             // compare direction
-            boolean thisIsOutgoing = DFSCodeUtils.isOutgoing(a, edgeTime);
-            boolean thatIsOutgoing = DFSCodeUtils.isOutgoing(b, edgeTime);
+            boolean thisIsOutgoing = dfsCodeUtils.isOutgoing(a, edgeTime);
+            boolean thatIsOutgoing = dfsCodeUtils.isOutgoing(b, edgeTime);
 
             if (thisIsOutgoing && !thatIsOutgoing) {
               comparison = -1;
@@ -84,16 +86,16 @@ public class DFSCodeComparator implements Comparator<int[]>, Serializable {
             } else {
 
               // compare edge Labels
-              int thisEdgeLabel = DFSCodeUtils.getEdgeLabel(a, edgeTime);
-              int thatEdgeLabel = DFSCodeUtils.getEdgeLabel(b, edgeTime);
+              int thisEdgeLabel = dfsCodeUtils.getEdgeLabel(a, edgeTime);
+              int thatEdgeLabel = dfsCodeUtils.getEdgeLabel(b, edgeTime);
 
               comparison = thisEdgeLabel - thatEdgeLabel;
 
               if (comparison == 0) {
 
                 // compare to Labels
-                int thisToLabel = DFSCodeUtils.getToLabel(a, edgeTime);
-                int thatToLabel = DFSCodeUtils.getToLabel(b, edgeTime);
+                int thisToLabel = dfsCodeUtils.getToLabel(a, edgeTime);
+                int thatToLabel = dfsCodeUtils.getToLabel(b, edgeTime);
 
                 comparison = thisToLabel - thatToLabel;
               }

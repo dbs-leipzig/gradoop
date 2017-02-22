@@ -15,21 +15,16 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
+package org.gradoop.flink.algorithms.fsm.dimspan.model;
 
 /**
- * (g, V, E) => true, if E not empty
+ * Util methods to interpret and manipulate unsorted int-array encoded graphs
  */
-public class NotEmpty implements FilterFunction<int[]> {
-
-  private final GraphUtils graphUtils = new GraphUtilsBase();
+public class UnsortedSearchGraphUtils extends SearchGraphUtilsBase implements SearchGraphUtils {
 
   @Override
-  public boolean filter(int[] graph) throws Exception {
-    return graphUtils.getEdgeCount(graph) > 0;
+  public int getFirstGeqEdgeId(int[] graphMux, int[] searchMux, int searchFromEdgeId) {
+    return 0;
   }
+
 }

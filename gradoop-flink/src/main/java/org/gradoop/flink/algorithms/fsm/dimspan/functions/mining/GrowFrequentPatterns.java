@@ -99,7 +99,7 @@ public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbedd
     uncompressFrequentPatterns = fsmConfig.getPatternCompressionInStep() != DataflowStep.WITHOUT;
 
     // cache validation flag
-    validatePatterns = fsmConfig.getPatternValidationInStep() == DataflowStep.MAP;
+    validatePatterns = fsmConfig.getPatternVerificationInStep() == DataflowStep.MAP;
   }
 
   @Override

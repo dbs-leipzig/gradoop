@@ -15,7 +15,7 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   private static final long GRAPH_COUNT = 10;
 
   @Test
-  public void setDictionaryType() throws Exception {
+  public void dictionaryType() throws Exception {
     for (DictionaryType type : DictionaryType.values()) {
       DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
       if (type != config.getDictionaryType()) {
@@ -26,21 +26,21 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void setEmbeddingCompressionEnabled() throws Exception {
+  public void embeddingCompression() throws Exception {
     DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
     config.setEmbeddingCompressionEnabled(! config.isEmbeddingCompressionEnabled());
     executeWith(config);
   }
 
   @Test
-  public void setGraphCompressionEnabled() throws Exception {
+  public void graphCompression() throws Exception {
     DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
     config.setGraphCompressionEnabled(! config.isGraphCompressionEnabled());
     executeWith(config);
   }
 
   @Test
-  public void getPatternCompressionInStep() throws Exception {
+  public void patternCompression() throws Exception {
     for (DataflowStep step : DataflowStep.values()) {
       DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
       if (step != config.getPatternCompressionInStep()) {
@@ -51,20 +51,20 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void setPatternValidationInStep() throws Exception {
+  public void patternVerification() throws Exception {
     for (DataflowStep step : DataflowStep.values()) {
       DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
-      if (step != config.getPatternValidationInStep() && step != DataflowStep.WITHOUT) {
-        config.setPatternValidationInStep(step);
+      if (step != config.getPatternVerificationInStep() && step != DataflowStep.WITHOUT) {
+        config.setPatternVerificationInStep(step);
         executeWith(config);
       }
     }
   }
 
   @Test
-  public void setBranchFilterEnabled() throws Exception {
+  public void branchConstraint() throws Exception {
     DIMSpanConfig config = new DIMSpanConfig(MIN_SUPPORT, true);
-    config.setBranchFilterEnabled(! config.isBranchFilterEnabled());
+    config.setBranchConstraintEnabled(! config.isBranchConstraintEnabled());
     executeWith(config);
   }
 

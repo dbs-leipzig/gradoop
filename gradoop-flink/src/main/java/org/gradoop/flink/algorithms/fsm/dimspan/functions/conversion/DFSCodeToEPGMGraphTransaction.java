@@ -9,6 +9,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
@@ -28,6 +29,7 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
    * frequent vertex labels
    */
   private String[] edgeDictionary;
+  private final GraphUtils graphUtils = new GraphUtilsBase();
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -49,7 +51,7 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
     GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
     // VERTICES
-    int[] vertexLabels = GraphUtilsBase.getVertexLabels(inGraph);
+    int[] vertexLabels = graphUtils.getVertexLabels(inGraph);
 
     GradoopId[] vertexIds = new GradoopId[vertexLabels.length];
 
@@ -69,18 +71,18 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
     // EDGES
     Set<Edge> edges = Sets.newHashSet();
 
-    for (int edgeId = 0; edgeId < GraphUtilsBase.getEdgeCount(inGraph); edgeId++) {
-      String label = edgeDictionary[GraphUtilsBase.getEdgeLabel(inGraph, edgeId)];
+    for (int edgeId = 0; edgeId < graphUtils.getEdgeCount(inGraph); edgeId++) {
+      String label = edgeDictionary[graphUtils.getEdgeLabel(inGraph, edgeId)];
 
       GradoopId sourceId;
       GradoopId targetId;
 
-      if (GraphUtilsBase.isOutgoing(inGraph, edgeId)) {
-        sourceId = vertexIds[GraphUtilsBase.getFromId(inGraph, edgeId)];
-        targetId = vertexIds[GraphUtilsBase.getToId(inGraph, edgeId)];
+      if (graphUtils.isOutgoing(inGraph, edgeId)) {
+        sourceId = vertexIds[graphUtils.getFromId(inGraph, edgeId)];
+        targetId = vertexIds[graphUtils.getToId(inGraph, edgeId)];
       } else {
-        sourceId = vertexIds[GraphUtilsBase.getToId(inGraph, edgeId)];
-        targetId = vertexIds[GraphUtilsBase.getFromId(inGraph, edgeId)];
+        sourceId = vertexIds[graphUtils.getToId(inGraph, edgeId)];
+        targetId = vertexIds[graphUtils.getFromId(inGraph, edgeId)];
       }
 
       edges.add(new Edge(GradoopId.get(), label, sourceId, targetId, null, graphIds));
