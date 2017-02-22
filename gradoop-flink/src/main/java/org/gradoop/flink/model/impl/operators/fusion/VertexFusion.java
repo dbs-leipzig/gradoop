@@ -20,7 +20,6 @@ package org.gradoop.flink.model.impl.operators.fusion;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -95,7 +94,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .cross(patternGraph.getGraphHead())
       .with(new CreateFusedVertex(vId))
       .cross(toBeReplaced.first(1))
-      .with(new LeftSide<>())
+      .with(new LeftSide<Vertex, Vertex>())
       .union(finalVertices);
 
     //In the final graph, all the edges appearing only in the search graph should appear
@@ -119,10 +118,10 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
      */
     DataSet<Edge> updatedEdges = leftEdges
       .fullOuterJoin(toBeReplaced)
-      .where(new SourceId<>()).equalTo(new Id<>())
+      .where(new SourceId<Edge>()).equalTo(new Id<Vertex>())
       .with(new UpdateEdgesThoughToBeFusedVertices(vId, true))
       .fullOuterJoin(toBeReplaced)
-      .where(new TargetId<>()).equalTo(new Id<>())
+      .where(new TargetId<Edge>()).equalTo(new Id<Vertex>())
       .with(new UpdateEdgesThoughToBeFusedVertices(vId, false));
 
     // All's well what ends well… farewell!
