@@ -20,11 +20,7 @@ package org.gradoop.examples.dimspan;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.examples.dimspan.dimspan.config.DIMSpanConfig;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 
 /**
  * A program to run DIMSpan standalone.
