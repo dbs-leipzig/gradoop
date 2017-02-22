@@ -81,10 +81,8 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = vWithGid
-      .coGroup(hypervertices.getGraphHeads())
-      .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new CoGroupGraphHeadToVertex());
+    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = hypervertices.getGraphHeads()
+      .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
     DataSet<Vertex> vi = gU.getVertices()

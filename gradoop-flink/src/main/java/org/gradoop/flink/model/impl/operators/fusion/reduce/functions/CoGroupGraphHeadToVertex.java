@@ -17,9 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -29,7 +28,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * to the merged vertices
  */
 public class CoGroupGraphHeadToVertex implements
-  CoGroupFunction<Tuple2<Vertex, GradoopId>, GraphHead, Tuple2<Vertex, GradoopId>> {
+  MapFunction<GraphHead, Tuple2<Vertex, GradoopId>> {
 
   /**
    * Reusable tuple to be returned as a result
@@ -45,18 +44,11 @@ public class CoGroupGraphHeadToVertex implements
   }
 
   @Override
-  public void coGroup(Iterable<Tuple2<Vertex, GradoopId>> first, Iterable<GraphHead> second,
-    Collector<Tuple2<Vertex, GradoopId>> out) throws Exception {
-    for (Tuple2<Vertex, GradoopId> x : first) {
-      for (GraphHead hid : second) {
-        reusable.f0.setId(GradoopId.get());
-        reusable.f0.setLabel(hid.getLabel());
-        reusable.f0.setProperties(hid.getProperties());
-        reusable.f1 = hid.getId();
-        out.collect(reusable);
-        break;
-      }
-      break;
-    }
+  public Tuple2<Vertex, GradoopId> map(GraphHead hid) throws Exception {
+    reusable.f0.setId(GradoopId.get());
+    reusable.f0.setLabel(hid.getLabel());
+    reusable.f0.setProperties(hid.getProperties());
+    reusable.f1 = hid.getId();
+    return reusable;
   }
 }
