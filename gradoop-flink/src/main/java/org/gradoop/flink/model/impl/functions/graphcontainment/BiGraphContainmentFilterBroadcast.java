@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
- * Superclass of single graph containment filters using broadcast variables.
+ * Superclass of a pair of graph containment using broadcast variables.
  *
  * @param <GE> graph element type
  */
@@ -40,11 +40,11 @@ public abstract class BiGraphContainmentFilterBroadcast
   public static final String GRAPH_RIGHT = "graphRIGHT";
 
   /**
-   * graph id
+   * left graph id
    */
   protected GradoopId graphIdL;
   /**
-   * graph id
+   * right graph id
    */
   protected GradoopId graphIdR;
 
