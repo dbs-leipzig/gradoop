@@ -86,5 +86,4 @@ public class VertexFusionUtils {
 
     return LogicalGraph.fromDataSets(newVertices, filteredEdges, superGraph.getConfig());
   }
-
 }

@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 
 public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
   /**
-   * Handles the tests cluster which is started for during unit testing.
+   * Handles the test cluster which is started for during unit testing.
    */
   private static HBaseTestingUtility utility;
 
