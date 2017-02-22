@@ -96,6 +96,14 @@ public class DIMSpanConfig implements Serializable {
     return StringUtils.join(parameters, "|");
   }
 
+  /**
+   * Convenience method for string formatting of enum parameters.
+   *
+   * @param parameter parameter name
+   * @param enabled parameter value
+   *
+   * @return string representation of the parameter and its value
+   */
   private String getParameterEnabled(String parameter, boolean enabled) {
     return parameter + " " + (enabled ? "enabled" : "disabled");
   }

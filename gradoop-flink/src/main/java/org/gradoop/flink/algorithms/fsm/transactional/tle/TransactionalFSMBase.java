@@ -30,7 +30,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterEdg
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterVerticesByLabel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.NotEmpty;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLabels;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;

@@ -15,18 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
-
 /**
- * (graph, pattern->embeddings) => true, if graph is empty
+ * Classes related to the gSpan logic applied within DIMSpan.
  */
-public class IsFrequentPatternCollector implements FilterFunction<GraphWithPatternEmbeddingsMap> {
-
-  @Override
-  public boolean filter(GraphWithPatternEmbeddingsMap graphWithMap) throws Exception {
-    return graphWithMap.isFrequentPatternCollector();
-  }
-}
+package org.gradoop.flink.algorithms.fsm.dimspan.gspan;

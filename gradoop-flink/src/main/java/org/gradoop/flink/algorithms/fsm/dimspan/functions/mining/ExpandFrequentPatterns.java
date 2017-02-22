@@ -31,8 +31,8 @@ public class ExpandFrequentPatterns
   public void flatMap(GraphWithPatternEmbeddingsMap graphWithPatternEmbeddingsMap,
     Collector<int[]> collector) throws Exception {
 
-    for (int i = 0; i < graphWithPatternEmbeddingsMap.getPatternEmbeddings().getPatternCount(); i++) {
-      collector.collect(graphWithPatternEmbeddingsMap.getPatternEmbeddings().getPattern(i));
+    for (int i = 0; i < graphWithPatternEmbeddingsMap.getMap().getPatternCount(); i++) {
+      collector.collect(graphWithPatternEmbeddingsMap.getMap().getPattern(i));
     }
   }
 }

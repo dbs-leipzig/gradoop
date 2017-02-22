@@ -54,8 +54,17 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
    * comparator used for graph sorting
    */
   private final DFSBranchComparator branchComparator;
+
+  /**
+   * util methods to interpret and manipulate int-array encoded graphs
+   */
   private final SearchGraphUtils graphUtils = new UnsortedSearchGraphUtils();
 
+  /**
+   * Constructor
+   *
+   * @param fsmConfig FSM configuration
+   */
   public EncodeAndPruneEdges(DIMSpanConfig fsmConfig) {
     sortGraph = fsmConfig.isBranchConstraintEnabled();
     branchComparator = fsmConfig.isDirected() ?
@@ -112,9 +121,7 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
 
     int i = 0;
     for (int[] dfsCode : dfsCodes) {
-      for (int j = 0; j< GraphUtils.EDGE_LENGTH; j++) {
-        outGraph[i * GraphUtils.EDGE_LENGTH + j] = dfsCode[j];
-      }
+      System.arraycopy(dfsCode, 0, outGraph, i * 6, GraphUtils.EDGE_LENGTH);
       i++;
     }
 

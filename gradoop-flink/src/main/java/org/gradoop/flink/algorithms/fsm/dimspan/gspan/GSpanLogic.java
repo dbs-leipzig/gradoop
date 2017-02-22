@@ -42,7 +42,10 @@ public interface GSpanLogic extends Serializable {
    * @param parentMap k-edge patter-embedding map
    * @param frequentPatterns k-edge frequent patterns
    * @param rightmostPaths k-edge rightmost paths
+   * @param uncompressEmbeddings flag, to enable embedding decompression (true=enabled)
    * @param compressedPatterns compressed k-edge frequent patterns for map lookup
+   *
+   * @return map of grown supported patterns
    */
   PatternEmbeddingsMap growPatterns(
     int[] graph,

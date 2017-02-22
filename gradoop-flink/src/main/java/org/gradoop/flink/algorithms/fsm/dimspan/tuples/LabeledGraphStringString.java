@@ -95,24 +95,31 @@ public class LabeledGraphStringString extends Tuple3<int[], String[], String[]> 
 
   // GETTERS AND SETTERS
 
+  /**
+   * Getter.
+   * @param id edge id
+   * @return target vertex id
+   */
   public int getSourceId(int id) {
     return getEdges()[id * EDGE_LENGTH + SOURCE_ID];
   }
 
-  public String getSourceLabel(int id) {
-    return getVertexLabels()[getSourceId(id)];
-  }
-
+  /**
+   * Getter.
+   * @param id edge id
+   * @return edge label
+   */
   public String getEdgeLabel(int id) {
     return this.f2[id];
   }
 
+  /**
+   * Getter.
+   * @param id edge id
+   * @return target vertex id
+   */
   public int getTargetId(int id) {
     return getEdges()[id * EDGE_LENGTH + TARGET_ID];
-  }
-
-  public String getTargetLabel(int id) {
-    return getVertexLabels()[getTargetId(id)];
   }
 
   public String[] getVertexLabels() {

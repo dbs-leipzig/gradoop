@@ -36,21 +36,34 @@ public class InitSingleEdgePatternEmbeddingsMap implements MapFunction<int[], Gr
    */
   private final GSpanLogic gSpan;
 
-  private final boolean graphCompressionEnabled;
-  private final boolean patternCompressionEnabled;
-  private final boolean embeddingCompressionEnabled;
+  /**
+   * flag to enable graph compression (true=enabled)
+   */
+  private final boolean compressGraphs;
+
+  /**
+   * flag to enable pattern compression (true=enabled)
+   */
+  private final boolean compressPatterns;
+
+  /**
+   * flag to enable embedding compression (true=enabled)
+   */
+  private final boolean compressEmbeddings;
 
   /**
    * Constructor.
    *
    * @param gSpan pattern generation logic
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    */
   public InitSingleEdgePatternEmbeddingsMap(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
     this.gSpan = gSpan;
-    graphCompressionEnabled = fsmConfig.isGraphCompressionEnabled();
-    embeddingCompressionEnabled = fsmConfig.isEmbeddingCompressionEnabled();
-    patternCompressionEnabled =
+
+    // set compression flags depending on configuration
+    compressGraphs = fsmConfig.isGraphCompressionEnabled();
+    compressEmbeddings = fsmConfig.isEmbeddingCompressionEnabled();
+    compressPatterns =
       fsmConfig.getPatternCompressionInStep() == DataflowStep.MAP;
   }
 
@@ -59,15 +72,15 @@ public class InitSingleEdgePatternEmbeddingsMap implements MapFunction<int[], Gr
 
     PatternEmbeddingsMap map = gSpan.getSingleEdgePatternEmbeddings(graph);
 
-    if (graphCompressionEnabled) {
+    if (compressGraphs) {
       graph = Simple16Compressor.compress(graph);
     }
 
-    if (patternCompressionEnabled) {
+    if (compressPatterns) {
       Simple16Compressor.compressPatterns(map);
     }
 
-    if (embeddingCompressionEnabled) {
+    if (compressEmbeddings) {
       Simple16Compressor.compressEmbeddings(map);
     }
 

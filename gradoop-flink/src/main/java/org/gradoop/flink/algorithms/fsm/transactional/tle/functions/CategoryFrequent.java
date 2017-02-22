@@ -21,7 +21,6 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CategoryCountableLabel;
-import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 
 import java.util.Map;
 

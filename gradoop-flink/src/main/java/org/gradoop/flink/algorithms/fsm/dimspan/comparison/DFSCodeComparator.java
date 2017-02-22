@@ -28,6 +28,9 @@ import java.util.Comparator;
  */
 public class DFSCodeComparator implements Comparator<int[]>, Serializable {
 
+  /**
+   * util methods to interpret int-array encoded patterns
+   */
   private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
 
   @Override

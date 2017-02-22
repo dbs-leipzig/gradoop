@@ -51,11 +51,11 @@ public class UndirectedGSpanLogic extends GSpanLogicBase {
   protected void storeSingleEdgePatternEmbeddings(PatternEmbeddingsMap patternEmbeddings,
     int[] pattern, int[] vertexIds, int[] edgeIds, int fromLabel, int toLabel, boolean loop) {
 
-    patternEmbeddings.store(pattern, vertexIds, edgeIds);
+    patternEmbeddings.put(pattern, vertexIds, edgeIds);
 
     // create a second embedding for 1-edge automorphism
     if (fromLabel == toLabel && !loop) {
-      patternEmbeddings.store(pattern, new int[] {vertexIds[1], vertexIds[0]}, edgeIds);
+      patternEmbeddings.put(pattern, new int[] {vertexIds[1], vertexIds[0]}, edgeIds);
     }
   }
 }

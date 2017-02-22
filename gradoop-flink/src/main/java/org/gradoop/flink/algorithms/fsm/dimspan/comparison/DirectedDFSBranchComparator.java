@@ -23,6 +23,10 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
  * Compare initial extensions of DFS codes in directed mode.
  */
 public class DirectedDFSBranchComparator implements DFSBranchComparator {
+
+  /**
+   * util methods to interpret int-array encoded patterns
+   */
   private DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
 
   @Override

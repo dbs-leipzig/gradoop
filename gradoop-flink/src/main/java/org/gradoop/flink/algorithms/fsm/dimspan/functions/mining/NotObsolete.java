@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbedding
  */
 public class NotObsolete implements FilterFunction<GraphWithPatternEmbeddingsMap> {
   @Override
-  public boolean filter(GraphWithPatternEmbeddingsMap graphWithPatternEmbeddingsMap) throws Exception {
-    return !graphWithPatternEmbeddingsMap.getPatternEmbeddings().isEmpty();
+  public boolean filter(GraphWithPatternEmbeddingsMap graphWithMap) throws Exception {
+    return !graphWithMap.getMap().isEmpty();
   }
 }

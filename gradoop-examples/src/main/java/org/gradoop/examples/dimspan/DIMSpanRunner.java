@@ -76,6 +76,7 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
 
     DIMSpanConfig fsmConfig = new DIMSpanConfig(minSupport, directed);
 
+    System.out.println(inputPath + outputPath + fsmConfig.toString());
   }
 
   /**

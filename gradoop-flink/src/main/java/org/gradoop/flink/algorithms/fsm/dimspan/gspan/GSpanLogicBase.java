@@ -48,7 +48,11 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
   /**
    * flag to enable branch constraint in pattern-growth (true=enabled)
    */
-  private final boolean branchFilterEnabled;
+  private final boolean branchConstraintEnabled;
+
+  /**
+   * util methods to interpret and manipulate int-array encoded DFS codes
+   */
   private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();
 
   /**
@@ -57,8 +61,10 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
    */
   protected GSpanLogicBase(DIMSpanConfig fsmConfig) {
     // set graph utils depending on the branch constraint configuration
-    branchFilterEnabled = fsmConfig.isBranchConstraintEnabled();
-    graphUtils = branchFilterEnabled ? new SortedSearchGraphUtils(fsmConfig) : new UnsortedSearchGraphUtils();
+    branchConstraintEnabled = fsmConfig.isBranchConstraintEnabled();
+    graphUtils = branchConstraintEnabled ?
+      new SortedSearchGraphUtils(fsmConfig) :
+      new UnsortedSearchGraphUtils();
   }
 
   // SINGLE EDGE PATTERNS
@@ -185,7 +191,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
       if (parentPatternIndex >= 0) {
         int[] parentPattern = frequentPatterns.get(frequentPatternIndex);
 
-        if (branchFilterEnabled) {
+        if (branchConstraintEnabled) {
           int[] firstExtension = dfsCodeUtils.getBranch(parentPattern);
 
           if (!Objects.deepEquals(minExtension, firstExtension)) {
@@ -234,10 +240,10 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
     // init partial map for current parent for fast insertion
     PatternEmbeddingsMap currentChildMap = PatternEmbeddingsMap.getEmptyOne();
 
-    for (int m = 0; m < parentEmbeddings.length / 2; m++ ) {
+    for (int m = 0; m < parentEmbeddings.length / 2; m++) {
 
-      int[] parentVertexIds = parentEmbeddings[2*m];
-      int[] parentEdgeIds = parentEmbeddings[2*m+1];
+      int[] parentVertexIds = parentEmbeddings[2 * m];
+      int[] parentEdgeIds = parentEmbeddings[2 * m + 1];
 
       int forwardsTime = graphUtils.getVertexCount(parentPattern);
       int rightmostTime = rightmostPath[0];
@@ -271,7 +277,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
             int[] childVertexIds = parentVertexIds.clone();
             int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);
-            currentChildMap.store(childPattern, childVertexIds, childEdgeIds);
+            currentChildMap.put(childPattern, childVertexIds, childEdgeIds);
 
             // grow backwards from to
           } else if (toTime == rightmostTime && fromTime >= 0) {
@@ -287,7 +293,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
             int[] childVertexIds = parentVertexIds.clone();
             int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);
-            currentChildMap.store(childPattern, childVertexIds, childEdgeIds);
+            currentChildMap.put(childPattern, childVertexIds, childEdgeIds);
 
             // CHECK FOR FORWARDS GROWTH OPTIONS
           } else {
@@ -309,7 +315,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
                 int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeToId);
                 int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);
-                currentChildMap.store(childPattern, childVertexIds, childEdgeIds);
+                currentChildMap.put(childPattern, childVertexIds, childEdgeIds);
                 break;
 
                 // forwards from to
@@ -326,7 +332,7 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
                 int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeFromId);
                 int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);
-                currentChildMap.store(childPattern, childVertexIds, childEdgeIds);
+                currentChildMap.put(childPattern, childVertexIds, childEdgeIds);
                 break;
 
               }

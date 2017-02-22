@@ -87,7 +87,8 @@ public class EncodeAndPruneVertices
           int sourceLabel = newVertexLabels[sourceId];
           int targetLabel = newVertexLabels[targetId];
 
-          outGraph.addEdge(sourceId, sourceLabel, inGraph.getEdgeLabel(edgeId), targetId, targetLabel);
+          outGraph
+            .addEdge(sourceId, sourceLabel, inGraph.getEdgeLabel(edgeId), targetId, targetLabel);
         }
       }
     }

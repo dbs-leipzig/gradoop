@@ -53,7 +53,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.gspan.UndirectedGSpanLogic;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -199,7 +199,7 @@ public class DIMSpan {
     // ITERATION BODY
 
     DataSet<WithCount<int[]>> reports = iterative
-      .flatMap(new ReportSupportedPatterns(fsmConfig));
+      .flatMap(new ReportSupportedPatterns());
 
     DataSet<int[]> frequentPatterns = getFrequentPatterns(reports);
 
@@ -217,6 +217,12 @@ public class DIMSpan {
       .flatMap(new ExpandFrequentPatterns());
   }
 
+  /**
+   * Triggers the postprocessing.
+   *
+   * @param encodedOutput frequent patterns represented by multiplexed int-arrays
+   * @return Gradoop graph transactions
+   */
   private DataSet<GraphTransaction> postProcess(DataSet<int[]> encodedOutput) {
     return encodedOutput
       .map(new DFSCodeToEPGMGraphTransaction())
@@ -237,7 +243,7 @@ public class DIMSpan {
     DataSet<WithCount<String>> vertexLabels = graphs
       .flatMap(new ReportVertexLabels());
 
-    vertexLabels = pruneLabels(vertexLabels);
+    vertexLabels = getFrequentLabels(vertexLabels);
 
     // DICTIONARY ENCODING
 
@@ -260,7 +266,7 @@ public class DIMSpan {
     DataSet<WithCount<String>> edgeLabels = graphs
       .flatMap(new ReportEdgeLabels());
 
-    edgeLabels = pruneLabels(edgeLabels);
+    edgeLabels = getFrequentLabels(edgeLabels);
 
     edgeDictionary = edgeLabels
       .reduceGroup(new CreateDictionary(comparator));
@@ -270,7 +276,14 @@ public class DIMSpan {
       .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY);
   }
 
-  private DataSet<WithCount<String>> pruneLabels(DataSet<WithCount<String>> labels) {
+  /**
+   * Determines frequent labels.
+   *
+   * @param labels dataset of labels
+   *
+   * @return dataset of frequent labels
+   */
+  private DataSet<WithCount<String>> getFrequentLabels(DataSet<WithCount<String>> labels) {
     // enabled
     if (fsmConfig.getDictionaryType() != DictionaryType.RANDOM) {
 

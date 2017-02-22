@@ -22,7 +22,7 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSingleEdgeEmbeddings;

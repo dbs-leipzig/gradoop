@@ -25,5 +25,5 @@ import java.util.Comparator;
 /**
  * Frequency-based label comparator.
  */
-public interface LabelComparator extends Comparator<WithCount<String>>,Serializable {
+public interface LabelComparator extends Comparator<WithCount<String>>, Serializable {
 }

@@ -28,7 +28,9 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
  */
 public class DirectedGSpanLogic extends GSpanLogicBase {
 
-
+  /**
+   * util methods to interpret and manipulate int-array encoded graphs
+   */
   private final GraphUtils graphUtils = new GraphUtilsBase();
 
   /**
@@ -54,7 +56,7 @@ public class DirectedGSpanLogic extends GSpanLogicBase {
   protected void storeSingleEdgePatternEmbeddings(PatternEmbeddingsMap patternEmbeddings,
     int[] pattern, int[] vertexIds, int[] edgeIds, int fromLabel, int toLabel, boolean loop) {
 
-    patternEmbeddings.store(pattern, vertexIds, edgeIds);
+    patternEmbeddings.put(pattern, vertexIds, edgeIds);
   }
 
 }

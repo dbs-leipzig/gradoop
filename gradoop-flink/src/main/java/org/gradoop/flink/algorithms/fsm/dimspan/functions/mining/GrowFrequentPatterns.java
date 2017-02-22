@@ -34,7 +34,8 @@ import java.util.List;
 /**
  * (graph, k-edge pattern -> embeddings) => (graph, k+1-edge pattern -> embeddings)
  */
-public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbeddingsMap, GraphWithPatternEmbeddingsMap> {
+public class GrowFrequentPatterns
+  extends RichMapFunction<GraphWithPatternEmbeddingsMap, GraphWithPatternEmbeddingsMap> {
 
   /**
    * compressed k-edge frequent patterns for fast embedding map lookup
@@ -145,7 +146,7 @@ public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbedd
     // union k-1 edge frequent patterns with k-edge ones
     if (pair.isFrequentPatternCollector()) {
       for (int[] pattern : frequentPatterns) {
-        pair.getPatternEmbeddings().collect(pattern);
+        pair.getMap().collect(pattern);
       }
     } else {
       int[] graph = pair.getGraph();
@@ -156,18 +157,18 @@ public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbedd
       }
 
       // execute pattern growth for all supported frequent patterns
-      PatternEmbeddingsMap childMap = gSpan.growPatterns(graph, pair.getPatternEmbeddings(),
+      PatternEmbeddingsMap childMap = gSpan.growPatterns(graph, pair.getMap(),
         frequentPatterns, rightmostPaths, compressEmbeddings, compressedFrequentPatterns);
 
       // drop non-minimal patterns if configured to be executed here
-      if (validatePatterns){
+      if (validatePatterns) {
         PatternEmbeddingsMap validatedMap = PatternEmbeddingsMap.getEmptyOne();
 
         for (int i = 0; i < childMap.getPatternCount(); i++) {
           int[] pattern = childMap.getPattern(i);
 
           if (gSpan.isMinimal(pattern)) {
-            int[] embeddingData = childMap.getEmbeddingData()[i];
+            int[] embeddingData = childMap.getValues()[i];
             validatedMap.put(pattern, embeddingData);
           }
         }
@@ -181,11 +182,11 @@ public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbedd
       // compress patterns and embedding, if configured
       // NOTE: graphs will remain compressed
       if (compressPatterns) {
-        Simple16Compressor.compressPatterns(pair.getPatternEmbeddings());
+        Simple16Compressor.compressPatterns(pair.getMap());
       }
 
       if (compressEmbeddings) {
-        Simple16Compressor.compressEmbeddings(pair.getPatternEmbeddings());
+        Simple16Compressor.compressEmbeddings(pair.getMap());
       }
     }
 

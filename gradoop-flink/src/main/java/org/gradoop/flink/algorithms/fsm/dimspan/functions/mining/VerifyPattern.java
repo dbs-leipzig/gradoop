@@ -34,14 +34,22 @@ public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
    * validation logic
    */
   private final GSpanLogic gSpan;
+
+  /**
+   * flag, to enable decompression before verification (true=enabled)
+   */
   private final boolean uncompress;
+
+  /**
+   * util methods ti interpret int-array encoded patterns
+   */
   private GraphUtils graphUtils = new GraphUtilsBase();
 
   /**
    * Constructor.
    *
    * @param gSpan validation logic
-   * @param fsmConfig
+   * @param fsmConfig FSM configuration
    */
   public VerifyPattern(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
     this.gSpan = gSpan;

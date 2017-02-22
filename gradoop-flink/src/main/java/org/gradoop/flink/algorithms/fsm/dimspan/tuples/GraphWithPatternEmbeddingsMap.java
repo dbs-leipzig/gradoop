@@ -58,7 +58,7 @@ public class GraphWithPatternEmbeddingsMap extends Tuple2<int[], PatternEmbeddin
     this.f0 = graph;
   }
 
-  public PatternEmbeddingsMap getPatternEmbeddings() {
+  public PatternEmbeddingsMap getMap() {
     return f1;
   }
 

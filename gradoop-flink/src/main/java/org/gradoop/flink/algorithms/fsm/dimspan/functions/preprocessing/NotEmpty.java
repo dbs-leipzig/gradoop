@@ -22,10 +22,13 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 
 /**
- * (g, V, E) => true, if E not empty
+ * (V, E) => true, if E not empty
  */
 public class NotEmpty implements FilterFunction<int[]> {
 
+  /**
+   * util methods to interpret int-array encoded graphs
+   */
   private final GraphUtils graphUtils = new GraphUtilsBase();
 
   @Override
