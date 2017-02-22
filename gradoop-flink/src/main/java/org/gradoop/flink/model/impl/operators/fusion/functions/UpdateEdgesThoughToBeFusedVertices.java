@@ -30,8 +30,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  *    should now point to the newly fused vertex
  * 3) Ignore the edges not matching with the vertices (pointless edges that should not occur and
  *    should be removed)
- *
- * Created by Giacomo Bergami on 14/02/17.
  */
 public class UpdateEdgesThoughToBeFusedVertices implements FlatJoinFunction<Edge, Vertex, Edge> {
   /**

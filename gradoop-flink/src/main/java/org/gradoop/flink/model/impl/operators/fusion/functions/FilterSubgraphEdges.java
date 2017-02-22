@@ -24,8 +24,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Checks whether the edge contains a given graphId, which means that belongs to a given graph
- *
- * Created by Giacomo Bergami on 14/02/17.
  */
 public class FilterSubgraphEdges implements FilterFunction<Tuple2<GradoopId, Edge>> {
   @Override

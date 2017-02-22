@@ -1126,15 +1126,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .setStrategy(getStrategy())
         .build()
         .execute(input);
-
-
+    
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
   public void testMinWithMissingValues() throws Exception {
-
     FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
         "(v0:Blue)" +
         "(v1:Blue)" +

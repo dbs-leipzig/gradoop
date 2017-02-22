@@ -28,12 +28,10 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.fusion.functions.GenerateTheFusedVertex;
+import org.gradoop.flink.model.impl.operators.fusion.functions.CreateFusedVertex;
 import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThoughToBeFusedVertices;
 
 /**
- * Created by Giacomo Bergami on 19/01/17.
- *
  * Fusion is a binary operator taking two graphs: a search graph (first parameter) and a
  * pattern graph (second parameter) [This means that this is not a symmetric operator
  * (F(a,b) != F(b,a))]. The general idea of this operator is that everything that appears
@@ -49,7 +47,6 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThough
  * 4) Pattern graph's edges are also taken into account: any edge between to-be-fused vertices
  *    appearing in the search graph that are not expressed in the pattern graph are
  *    rendered as hooks over the fused vertex
- *
  */
 public class VertexFusion implements BinaryGraphToGraphOperator {
 
@@ -73,7 +70,6 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(final LogicalGraph searchGraph, final LogicalGraph patternGraph) {
-    // I assume that both searchGraph and patternGraph are not
     DataSet<Vertex> leftVertices = searchGraph.getVertices();
 
     /*
@@ -96,11 +92,9 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
        * The newly created vertex v has to be created iff. we have some actual vertices to be
        * replaced, and then if toBeReplaced contains at least one element
        */
-      .join(patternGraph.getGraphHead())
-      .where((GraphHead g) -> 0).equalTo((GraphHead g) -> 0)
-      .with(new GenerateTheFusedVertex(vId))
-      .join(toBeReplaced.first(1))
-      .where((Vertex x)->0).equalTo((Vertex x)->0)
+      .cross(patternGraph.getGraphHead())
+      .with(new CreateFusedVertex(vId))
+      .cross(toBeReplaced.first(1))
       .with(new LeftSide<>())
       .union(finalVertices);
 
@@ -135,5 +129,4 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
     return LogicalGraph.fromDataSets(searchGraph.getGraphHead(), toBeReturned, updatedEdges,
         searchGraph.getConfig());
   }
-
 }

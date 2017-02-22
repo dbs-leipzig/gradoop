@@ -63,6 +63,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 | Overlap       | G             | Graph with vertices and edges that exist in both input graphs          | Yes  |
 | Exclusion     | G             | Graph with vertices and edges that exist only in the first graph       | Yes  |
 | Equality      | {true, false} | Compare graphs in terms of identity or equality of contained elements  | Yes  |
+| VertexFusion  | G             | The second graph is fused to a single vertex within the first graph    | Yes  |
 
 #### Unary graph collection operators (one collection as input):
 

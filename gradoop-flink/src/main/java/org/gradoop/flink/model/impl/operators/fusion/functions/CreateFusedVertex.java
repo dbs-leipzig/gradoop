@@ -17,9 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.fusion.functions;
 
-import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -29,11 +28,10 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * Creates the fused vertex from the collection of the graph head of the pattern graph element.
  * The new vertex is stored as an occurence of the searchGraph
  *
- * Created by Giacomo Bergami on 14/02/17.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id")
 @FunctionAnnotation.ForwardedFieldsSecond("label;properties")
-public class GenerateTheFusedVertex implements FlatJoinFunction<GraphHead, GraphHead, Vertex> {
+public class CreateFusedVertex implements CrossFunction<GraphHead, GraphHead, Vertex> {
 
   /**
    * Basic vertex reused each time. It'll be the fused vertex
@@ -49,17 +47,16 @@ public class GenerateTheFusedVertex implements FlatJoinFunction<GraphHead, Graph
    * Given the new vertex Id, it generates the joiner generating the new vertex
    * @param newVertexId   new vertex Id
    */
-  public GenerateTheFusedVertex(GradoopId newVertexId) {
+  public CreateFusedVertex(GradoopId newVertexId) {
     this.newVertexId = newVertexId;
   }
 
   @Override
-  public void join(GraphHead searchGraphHead, GraphHead patternGraphSeachHead,
-    Collector<Vertex> out) throws Exception {
+  public Vertex cross(GraphHead searchGraphHead, GraphHead patternGraphSeachHead) throws Exception {
     REUSABLE_VERTEX.setLabel(patternGraphSeachHead.getLabel());
     REUSABLE_VERTEX.setProperties(patternGraphSeachHead.getProperties());
     REUSABLE_VERTEX.setId(newVertexId);
     REUSABLE_VERTEX.addGraphId(searchGraphHead.getId());
-    out.collect(REUSABLE_VERTEX);
+    return REUSABLE_VERTEX;
   }
 }

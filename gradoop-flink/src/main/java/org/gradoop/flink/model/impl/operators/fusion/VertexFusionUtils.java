@@ -36,7 +36,6 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.FilterSubgraphEdg
  *
  * Contains some utility functions for the fusion operator
  *
- * Created by Giacomo Bergami on 25/01/17.
  */
 public class VertexFusionUtils {
   /**
