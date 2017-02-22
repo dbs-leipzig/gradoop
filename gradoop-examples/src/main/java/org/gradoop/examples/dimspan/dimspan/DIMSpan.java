@@ -21,23 +21,37 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.examples.dimspan.dimspan.comparison.AlphabeticalLabelComparator;
 import org.gradoop.examples.dimspan.dimspan.comparison.InverseProportionalLabelComparator;
 import org.gradoop.examples.dimspan.dimspan.comparison.LabelComparator;
 import org.gradoop.examples.dimspan.dimspan.comparison.ProportionalLabelComparator;
 import org.gradoop.examples.dimspan.dimspan.config.DIMSpanConfig;
 import org.gradoop.examples.dimspan.dimspan.config.DIMSpanConstants;
+import org.gradoop.examples.dimspan.dimspan.config.DataflowStep;
 import org.gradoop.examples.dimspan.dimspan.config.DictionaryType;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.CompressPattern;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.CreateCollector;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.ExpandResult;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.HasEmbeddings;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.InitSingleEdgeEmbeddings;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.IsCollector;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.PatternGrowth;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.Report;
+import org.gradoop.examples.dimspan.dimspan.functions.mining.Validate;
+import org.gradoop.examples.dimspan.dimspan.functions.postprocessing.DfsCodeToSetPair;
+import org.gradoop.examples.dimspan.dimspan.functions.postprocessing.SetPairToGraphTransaction;
 import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.ReportEdgeLabels;
 import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.EncodeAndPruneEdges;
 import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.EncodeAndPruneVertices;
-import org.gradoop.examples.dimspan.dimspan.functions.MinFrequency;
-import org.gradoop.examples.dimspan.dimspan.functions.NotEmpty;
+import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.MinFrequency;
+import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.NotEmpty;
 import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.CreateDictionary;
 import org.gradoop.examples.dimspan.dimspan.functions.preprocessing.ReportVertexLabels;
 import org.gradoop.examples.dimspan.dimspan.gspan.DirectedGSpanAlgorithm;
 import org.gradoop.examples.dimspan.dimspan.gspan.GSpanAlgorithm;
 import org.gradoop.examples.dimspan.dimspan.gspan.UndirectedGSpanAlgorithm;
+import org.gradoop.examples.dimspan.dimspan.tuples.GraphEmbeddingsPair;
 import org.gradoop.examples.dimspan.dimspan.tuples.LabeledGraphIntString;
 import org.gradoop.examples.dimspan.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
@@ -52,6 +66,11 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * subgraph mining algorithm as Gradoop operator
  */
 public class DIMSpan {
+
+  /**
+   * Maximum number of iterations if set of k-edge frequent patterns is not running empty before.
+   */
+  private static final int MAX_ITERATIONS = 100;
 
   /**
    * FSM configuration
@@ -174,7 +193,7 @@ public class DIMSpan {
     // ITERATION HEAD
 
     IterativeDataSet<GraphEmbeddingsPair> iterative = searchSpace
-      .iterate(fsmConfig.getMaxEdgeCount());
+      .iterate(MAX_ITERATIONS);
 
     // ITERATION BODY
 
@@ -268,8 +287,6 @@ public class DIMSpan {
 
     return labels;
   }
-
-
 
   /**
    * Identifies valid frequent patterns from a dataset of reported patterns.

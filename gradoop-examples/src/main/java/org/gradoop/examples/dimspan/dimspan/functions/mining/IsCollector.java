@@ -15,18 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.examples.dimspan.dimspan.functions;
+package org.gradoop.examples.dimspan.dimspan.functions.mining;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.examples.dimspan.dimspan.representation.GraphUtilsBase;
+import org.gradoop.examples.dimspan.dimspan.tuples.GraphEmbeddingsPair;
 
 /**
- * (g, V, E) => true, if E not empty
+ * (graph, pattern->embeddings) => true, if graph is empty
  */
-public class NotEmpty implements FilterFunction<int[]> {
+public class IsCollector implements FilterFunction<GraphEmbeddingsPair> {
 
   @Override
-  public boolean filter(int[] graph) throws Exception {
-    return GraphUtilsBase.getEdgeCount(graph) > 0;
+  public boolean filter(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
+    return graphEmbeddingsPair.isCollector();
   }
 }
