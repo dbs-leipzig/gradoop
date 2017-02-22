@@ -26,8 +26,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Maps vertices that are not associated to a graph id
  * to a null id.
- *
- * Created by Giacomo Bergami on 17/02/17.
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class MapVerticesAsTuplesWithNullId implements

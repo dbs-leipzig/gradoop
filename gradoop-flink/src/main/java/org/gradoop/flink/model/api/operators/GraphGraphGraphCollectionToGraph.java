@@ -25,8 +25,6 @@ import org.gradoop.flink.model.impl.operators.fusion.reduce.ReduceVertexFusion;
  * Creates a {@link LogicalGraph} based on two input graphs and a {@link org.gradoop.flink.model.impl.GraphCollection}
  *
  * @see ReduceVertexFusion
- *
- * Created by Giacomo Bergami on 21/02/17.
  */
 public interface GraphGraphGraphCollectionToGraph extends Operator {
 

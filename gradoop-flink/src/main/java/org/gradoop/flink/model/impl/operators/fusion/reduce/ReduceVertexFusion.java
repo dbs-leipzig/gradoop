@@ -58,7 +58,6 @@ import static org.gradoop.flink.model.impl.functions.graphcontainment.BiGraphCon
  * won't logically obtain the same result. This should be considered
  * as a mere generalization.
  *
- * Created by Giacomo Bergami on 21/02/17.
  */
 public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
   @Override

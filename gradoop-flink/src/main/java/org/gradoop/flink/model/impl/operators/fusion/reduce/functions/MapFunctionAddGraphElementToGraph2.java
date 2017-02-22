@@ -26,7 +26,6 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  * but a graph id
  * @param <K> element receiving the new graph id
  *
- * Created by Giacomo Bergami on 17/02/17.
  */
 public class MapFunctionAddGraphElementToGraph2<K extends GraphElement> implements MapFunction<K, K> {
 

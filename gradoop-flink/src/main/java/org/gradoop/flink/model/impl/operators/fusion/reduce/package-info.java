@@ -16,6 +16,6 @@
  */
 
 /**
- * Some utility functions
+ * Package implementing the reduce version of the fuse operator… NOT!
  */
 package org.gradoop.flink.model.impl.operators.fusion.reduce;

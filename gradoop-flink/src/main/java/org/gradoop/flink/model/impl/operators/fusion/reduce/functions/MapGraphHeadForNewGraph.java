@@ -23,8 +23,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * Creates a new head and sets a new graph id
- *
- * Created by Giacomo Bergami on 17/02/17.
  */
 public class MapGraphHeadForNewGraph implements MapFunction<GraphHead, GraphHead> {
 

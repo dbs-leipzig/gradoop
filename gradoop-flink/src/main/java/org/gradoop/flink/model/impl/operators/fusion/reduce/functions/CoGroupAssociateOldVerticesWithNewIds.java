@@ -30,7 +30,6 @@ import java.util.Collection;
 /**
  * Associates the old vertices with the new vertex fused ids.
  *
- * Created by Giacomo Bergami on 17/02/17.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0->f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")

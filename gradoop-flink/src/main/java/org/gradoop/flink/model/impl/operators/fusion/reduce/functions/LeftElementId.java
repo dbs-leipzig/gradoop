@@ -26,7 +26,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Left projection with id obtained.
  * @param <K> Element where the id is extracted
  *
- * Created by Giacomo Bergami on 21/02/17.
  */
 public class LeftElementId<K extends EPGMElement> implements KeySelector<Tuple2<K, GradoopId>,
   GradoopId> {

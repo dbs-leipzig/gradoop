@@ -26,8 +26,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Demultiplexes a vertex by associating its graphId
- *
- * Created by Giacomo Bergami on 17/02/17.
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class MapVertexToPairWithGraphId implements FlatMapFunction<Vertex, Tuple2<Vertex,   GradoopId>> {

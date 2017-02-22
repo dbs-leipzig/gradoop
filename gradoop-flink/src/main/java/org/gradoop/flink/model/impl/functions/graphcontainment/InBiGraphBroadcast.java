@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
- * True, if an element is contained by one of the two graphs provided through the 
+ * True, if an element is contained by one of the two graphs provided through the
  * BiGraphContainmentFilterBroadcast interface, that must follow the current filter function
  * through a broadcast join.
  *

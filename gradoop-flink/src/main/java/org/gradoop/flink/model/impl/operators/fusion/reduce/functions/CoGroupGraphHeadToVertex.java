@@ -27,8 +27,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Associate each graph id in teh hypervertices' heads
  * to the merged vertices
- *
- * Created by Giacomo Bergami on 17/02/17.
  */
 public class CoGroupGraphHeadToVertex implements
   CoGroupFunction<Tuple2<Vertex, GradoopId>, GraphHead, Tuple2<Vertex, GradoopId>> {

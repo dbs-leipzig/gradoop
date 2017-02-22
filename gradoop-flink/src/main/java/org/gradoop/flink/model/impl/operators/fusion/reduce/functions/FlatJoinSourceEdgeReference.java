@@ -27,8 +27,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Function updating the edges' sources or destination
  * for each newly created hypervertex
- *
- * Created by Giacomo Bergami on 17/02/17.
  */
 public class FlatJoinSourceEdgeReference implements
   FlatJoinFunction<Edge, Tuple2<Vertex, GradoopId>, Edge> {
