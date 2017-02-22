@@ -11,7 +11,7 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
 import java.util.Map;
 
 
-public class ToMinLabeledGraphStringString implements
+public class EPGMGraphTransactionToLabeledGraph implements
   MapFunction<GraphTransaction, LabeledGraphStringString> {
 
   @Override

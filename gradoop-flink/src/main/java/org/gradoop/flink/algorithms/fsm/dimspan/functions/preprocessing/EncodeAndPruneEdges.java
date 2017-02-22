@@ -66,7 +66,7 @@ public class EncodeAndPruneEdges extends RichMapFunction<LabeledGraphIntString, 
 
     // create inverse dictionary at broadcast reception
     String[] broadcast = getRuntimeContext()
-      .<String[]>getBroadcastVariable(DIMSpanConstants.FREQUENT_EDGE_LABELS).get(0);
+      .<String[]>getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);
 
     for (int i = 0; i < broadcast.length; i++) {
       edgeDictionary.put(broadcast[i], i);

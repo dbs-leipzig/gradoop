@@ -17,16 +17,22 @@
 
 package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphEmbeddingsPair;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 
 /**
- * (graph, pattern->embeddings) => true, if graph is empty
+ * (graph, pattern -> embedding) => pattern, ...
  */
-public class IsCollector implements FilterFunction<GraphEmbeddingsPair> {
+public class ExpandFrequentPatterns
+  implements FlatMapFunction<GraphWithPatternEmbeddingsMap, int[]> {
 
   @Override
-  public boolean filter(GraphEmbeddingsPair graphEmbeddingsPair) throws Exception {
-    return graphEmbeddingsPair.isCollector();
+  public void flatMap(GraphWithPatternEmbeddingsMap graphWithPatternEmbeddingsMap,
+    Collector<int[]> collector) throws Exception {
+
+    for (int i = 0; i < graphWithPatternEmbeddingsMap.getPatternEmbeddings().getPatternCount(); i++) {
+      collector.collect(graphWithPatternEmbeddingsMap.getPatternEmbeddings().getPattern(i));
+    }
   }
 }

@@ -23,7 +23,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.SortedGraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedGraphUtils;
 
@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Superclass of gSpan pattern growth and verification functionality.
  */
-public abstract class GSpanAlgorithmBase implements GSpanAlgorithm, Serializable {
+public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
   /**
    * Comparator used to verify minimum DFS codes.
@@ -55,7 +55,7 @@ public abstract class GSpanAlgorithmBase implements GSpanAlgorithm, Serializable
    * Constructor
    * @param fsmConfig FSM configuration
    */
-  protected GSpanAlgorithmBase(DIMSpanConfig fsmConfig) {
+  protected GSpanLogicBase(DIMSpanConfig fsmConfig) {
     // set graph utils depending on the branch constraint configuration
     branchFilterEnabled = fsmConfig.isBranchFilterEnabled();
     graphUtils = branchFilterEnabled ? new SortedGraphUtils(fsmConfig) : new UnsortedGraphUtils();

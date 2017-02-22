@@ -24,17 +24,17 @@ import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSCodeComparator;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanAlgorithm;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 
 import java.util.List;
 
 /**
  * (graph, k-edge pattern -> embeddings) => (graph, k+1-edge pattern -> embeddings)
  */
-public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmbeddingsPair> {
+public class GrowFrequentPatterns extends RichMapFunction<GraphWithPatternEmbeddingsMap, GraphWithPatternEmbeddingsMap> {
 
   /**
    * compressed k-edge frequent patterns for fast embedding map lookup
@@ -54,7 +54,7 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
   /**
    * pattern growth logic (directed or undirected mode)
    */
-  private final GSpanAlgorithm gSpan;
+  private final GSpanLogic gSpan;
 
   /**
    * flag to enable graph compression (true=enabled)
@@ -87,7 +87,7 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
    * @param gSpan pattern growth logic
    * @param fsmConfig FSM Configuration
    */
-  public PatternGrowth(GSpanAlgorithm gSpan, DIMSpanConfig fsmConfig) {
+  public GrowFrequentPatterns(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
 
     // set pattern growth logic for directed or undirected mode
     this.gSpan = gSpan;
@@ -140,10 +140,10 @@ public class PatternGrowth extends RichMapFunction<GraphEmbeddingsPair, GraphEmb
   }
 
   @Override
-  public GraphEmbeddingsPair map(GraphEmbeddingsPair pair) throws Exception {
+  public GraphWithPatternEmbeddingsMap map(GraphWithPatternEmbeddingsMap pair) throws Exception {
 
     // union k-1 edge frequent patterns with k-edge ones
-    if (pair.isCollector()) {
+    if (pair.isFrequentPatternCollector()) {
       for (int[] pattern : frequentPatterns) {
         pair.getPatternEmbeddings().collect(pattern);
       }

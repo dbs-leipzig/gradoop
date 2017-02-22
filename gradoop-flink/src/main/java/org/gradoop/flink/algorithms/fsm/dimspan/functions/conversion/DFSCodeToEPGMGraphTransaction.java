@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * int-array encoded graph => Gradoop Graph Transaction
  */
-public class SetPairToGraphTransaction extends RichMapFunction<int[], GraphTransaction> {
+public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphTransaction> {
 
   /**
    * frequent vertex labels
@@ -34,10 +34,10 @@ public class SetPairToGraphTransaction extends RichMapFunction<int[], GraphTrans
     super.open(parameters);
 
     vertexDictionary = getRuntimeContext()
-      .<String[]>getBroadcastVariable(DIMSpanConstants.FREQUENT_VERTEX_LABELS).get(0);
+      .<String[]>getBroadcastVariable(DIMSpanConstants.VERTEX_DICTIONARY).get(0);
 
     edgeDictionary = getRuntimeContext()
-      .<String[]>getBroadcastVariable(DIMSpanConstants.FREQUENT_EDGE_LABELS).get(0);
+      .<String[]>getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);
 
   }
 

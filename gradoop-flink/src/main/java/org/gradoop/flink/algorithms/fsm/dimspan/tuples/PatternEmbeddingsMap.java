@@ -1,8 +1,9 @@
-package org.gradoop.flink.algorithms.fsm.dimspan.model;
+package org.gradoop.flink.algorithms.fsm.dimspan.tuples;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 
 /**
  * f0 : [pattern1,..,patternN]

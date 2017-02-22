@@ -15,22 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion;
+package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanAlgorithm;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 
-// TODO: check if required
-public class DfsCodeToSetPair implements MapFunction<int[], int[]> {
-
-  private final GSpanAlgorithm gSpan;
-
-  public DfsCodeToSetPair(GSpanAlgorithm gSpan) {
-    this.gSpan = gSpan;
-  }
+/**
+ * (graph, pattern->embeddings) => true, if graph is empty
+ */
+public class IsFrequentPatternCollector implements FilterFunction<GraphWithPatternEmbeddingsMap> {
 
   @Override
-  public int[] map(int[] pattern) throws Exception {
-    return gSpan.getGraph(pattern);
+  public boolean filter(GraphWithPatternEmbeddingsMap graphWithPatternEmbeddingsMap) throws Exception {
+    return graphWithPatternEmbeddingsMap.isFrequentPatternCollector();
   }
 }

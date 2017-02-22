@@ -3,7 +3,7 @@ package org.gradoop.flink.algorithms.fsm;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.ToMinLabeledGraphStringString;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.EPGMGraphTransactionToLabeledGraph;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -47,7 +47,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
     DataSet<LabeledGraphStringString> input = collection
       .toTransactions()
       .getTransactions()
-      .map(new ToMinLabeledGraphStringString());
+      .map(new EPGMGraphTransactionToLabeledGraph());
 
     // run DIMSpan
     DataSet<GraphTransaction> output = dimSpan.execute(input);

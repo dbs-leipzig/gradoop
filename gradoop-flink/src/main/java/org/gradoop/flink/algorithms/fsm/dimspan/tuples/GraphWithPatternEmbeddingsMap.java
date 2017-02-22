@@ -18,17 +18,16 @@
 package org.gradoop.flink.algorithms.fsm.dimspan.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
 
 /**
  * (graph, pattern->embeddings)
  */
-public class GraphEmbeddingsPair extends Tuple2<int[], PatternEmbeddingsMap> {
+public class GraphWithPatternEmbeddingsMap extends Tuple2<int[], PatternEmbeddingsMap> {
 
   /**
    * Default constructor.
    */
-  public GraphEmbeddingsPair() {
+  public GraphWithPatternEmbeddingsMap() {
   }
 
   /**
@@ -36,7 +35,7 @@ public class GraphEmbeddingsPair extends Tuple2<int[], PatternEmbeddingsMap> {
    *  @param graph graph
    * @param patternEmbeddings pattern->embeddings
    */
-  public GraphEmbeddingsPair(int[] graph, PatternEmbeddingsMap patternEmbeddings) {
+  public GraphWithPatternEmbeddingsMap(int[] graph, PatternEmbeddingsMap patternEmbeddings) {
     super(graph, patternEmbeddings);
   }
 
@@ -45,7 +44,7 @@ public class GraphEmbeddingsPair extends Tuple2<int[], PatternEmbeddingsMap> {
    *
    * @return true, if collector
    */
-  public boolean isCollector() {
+  public boolean isFrequentPatternCollector() {
     return f0.length <= 1;
   }
 

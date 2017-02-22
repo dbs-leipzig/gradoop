@@ -30,28 +30,27 @@ import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DictionaryType;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.DFSCodeToEPGMGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CompressPattern;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CreateCollector;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ExpandResult;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.HasEmbeddings;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.InitSingleEdgeEmbeddings;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.IsCollector;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.PatternGrowth;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Report;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Validate;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.DfsCodeToSetPair;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.SetPairToGraphTransaction;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ExpandFrequentPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.GrowFrequentPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.InitSingleEdgePatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.IsFrequentPatternCollector;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.NotObsolete;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ReportSupportedPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.VerifyPattern;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.CreateDictionary;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneEdges;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneVertices;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.MinFrequency;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.NotEmpty;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.CreateDictionary;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportEdgeLabels;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportVertexLabels;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.DirectedGSpanAlgorithm;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanAlgorithm;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.UndirectedGSpanAlgorithm;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.DirectedGSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.UndirectedGSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
@@ -59,7 +58,6 @@ import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent
@@ -88,15 +86,10 @@ public class DIMSpan {
   protected DataSet<Long> minFrequency;
 
   /**
-   * Gradoop configuration
-   */
-  protected GradoopFlinkConfig gradoopFlinkConfig;
-
-  /**
    * Pattern growth and verification logic derived from gSpan.
    * See <a href="https://www.cs.ucsb.edu/~xyan/software/gSpan.htm">gSpan</a>
    */
-  protected final GSpanAlgorithm gSpan;
+  protected final GSpanLogic gSpan;
 
   /**
    * Vertex label dictionary for dictionary coding.
@@ -123,8 +116,8 @@ public class DIMSpan {
 
     // set gSpan implementation depending on direction mode
     gSpan = fsmConfig.isDirected() ?
-      new DirectedGSpanAlgorithm(fsmConfig) :
-      new UndirectedGSpanAlgorithm(fsmConfig);
+      new DirectedGSpanLogic(fsmConfig) :
+      new UndirectedGSpanLogic(fsmConfig);
 
     // set comparator based on dictionary type
     if (fsmConfig.getDictionaryType() == DictionaryType.PROPORTIONAL) {
@@ -178,12 +171,20 @@ public class DIMSpan {
       .filter(new NotEmpty());
   }
 
+  /**
+   * Triggers the iterative mining process.
+   *
+   * @param graphs preprocessed input graph collection
+   * @return frequent patterns
+   */
   protected DataSet<int[]> mine(DataSet<int[]> graphs) {
 
-    DataSet<GraphEmbeddingsPair> searchSpace = graphs
-      .map(new InitSingleEdgeEmbeddings(gSpan, fsmConfig));
+    DataSet<GraphWithPatternEmbeddingsMap> searchSpace = graphs
+      .map(new InitSingleEdgePatternEmbeddingsMap(gSpan, fsmConfig));
 
-    DataSet<GraphEmbeddingsPair> collector = graphs
+    // Workaround to support multiple data sinks: create pseudo-graph (collector),
+    // which embedding map will be used to union all k-edge frequent patterns
+    DataSet<GraphWithPatternEmbeddingsMap> collector = graphs
       .getExecutionEnvironment()
       .fromElements(true)
       .map(new CreateCollector());
@@ -192,35 +193,35 @@ public class DIMSpan {
 
     // ITERATION HEAD
 
-    IterativeDataSet<GraphEmbeddingsPair> iterative = searchSpace
+    IterativeDataSet<GraphWithPatternEmbeddingsMap> iterative = searchSpace
       .iterate(MAX_ITERATIONS);
 
     // ITERATION BODY
 
     DataSet<WithCount<int[]>> reports = iterative
-      .flatMap(new Report(fsmConfig));
+      .flatMap(new ReportSupportedPatterns(fsmConfig));
 
     DataSet<int[]> frequentPatterns = getFrequentPatterns(reports);
 
-    DataSet<GraphEmbeddingsPair> grownEmbeddings = iterative
-      .map(new PatternGrowth(gSpan, fsmConfig))
+    DataSet<GraphWithPatternEmbeddingsMap> grownEmbeddings = iterative
+      .map(new GrowFrequentPatterns(gSpan, fsmConfig))
       .withBroadcastSet(frequentPatterns, DIMSpanConstants.FREQUENT_PATTERNS)
-      .filter(new HasEmbeddings());
+      .filter(new NotObsolete());
 
     // ITERATION FOOTER
 
     return iterative
       .closeWith(grownEmbeddings, frequentPatterns)
-      .filter(new IsCollector())
-      .flatMap(new ExpandResult());
+      // keep only collector and expand embedding map keys
+      .filter(new IsFrequentPatternCollector())
+      .flatMap(new ExpandFrequentPatterns());
   }
 
   private DataSet<GraphTransaction> postProcess(DataSet<int[]> encodedOutput) {
     return encodedOutput
-      .map(new DfsCodeToSetPair(gSpan))
-      .map(new SetPairToGraphTransaction())
-      .withBroadcastSet(vertexDictionary, DIMSpanConstants.FREQUENT_VERTEX_LABELS)
-      .withBroadcastSet(edgeDictionary, DIMSpanConstants.FREQUENT_EDGE_LABELS);
+      .map(new DFSCodeToEPGMGraphTransaction())
+      .withBroadcastSet(vertexDictionary, DIMSpanConstants.VERTEX_DICTIONARY)
+      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY);
   }
 
   /**
@@ -245,7 +246,7 @@ public class DIMSpan {
 
     return graphs
       .map(new EncodeAndPruneVertices())
-      .withBroadcastSet(vertexDictionary, DIMSpanConstants.FREQUENT_VERTEX_LABELS);
+      .withBroadcastSet(vertexDictionary, DIMSpanConstants.VERTEX_DICTIONARY);
   }
 
   /**
@@ -266,7 +267,7 @@ public class DIMSpan {
 
     return graphs
       .map(new EncodeAndPruneEdges(fsmConfig))
-      .withBroadcastSet(edgeDictionary, DIMSpanConstants.FREQUENT_EDGE_LABELS);
+      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY);
   }
 
   private DataSet<WithCount<String>> pruneLabels(DataSet<WithCount<String>> labels) {
@@ -303,7 +304,7 @@ public class DIMSpan {
 
     if (fsmConfig.getPatternValidationInStep() == DataflowStep.COMBINE) {
       patterns = patterns
-        .filter(new Validate(gSpan, fsmConfig));
+        .filter(new VerifyPattern(gSpan, fsmConfig));
     }
 
     if (fsmConfig.getPatternCompressionInStep() == DataflowStep.COMBINE) {
@@ -325,7 +326,7 @@ public class DIMSpan {
 
     if (fsmConfig.getPatternValidationInStep() == DataflowStep.FILTER) {
       patterns = patterns
-        .filter(new Validate(gSpan, fsmConfig));
+        .filter(new VerifyPattern(gSpan, fsmConfig));
     }
 
     if (fsmConfig.getPatternCompressionInStep() == DataflowStep.FILTER) {

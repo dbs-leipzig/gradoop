@@ -35,12 +35,12 @@ public class DIMSpanConstants {
   /**
    * Vertex label dictionary.
    */
-  public static final String FREQUENT_VERTEX_LABELS = "vld";
+  public static final String VERTEX_DICTIONARY = "vld";
 
   /**
    * Edge label Dictionary
    */
-  public static final String FREQUENT_EDGE_LABELS = "eld";
+  public static final String EDGE_DICTIONARY = "eld";
 
   /**
    * set of frequent patterns

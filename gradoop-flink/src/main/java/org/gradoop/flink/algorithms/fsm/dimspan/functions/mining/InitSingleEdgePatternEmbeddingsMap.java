@@ -20,21 +20,21 @@ package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanAlgorithm;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 
 
 /**
  * graph => (graph, 1-edge pattern -> embeddings)
  */
-public class InitSingleEdgeEmbeddings implements MapFunction<int[], GraphEmbeddingsPair> {
+public class InitSingleEdgePatternEmbeddingsMap implements MapFunction<int[], GraphWithPatternEmbeddingsMap> {
 
   /**
    * pattern generation logic
    */
-  private final GSpanAlgorithm gSpan;
+  private final GSpanLogic gSpan;
 
   private final boolean graphCompressionEnabled;
   private final boolean patternCompressionEnabled;
@@ -46,7 +46,7 @@ public class InitSingleEdgeEmbeddings implements MapFunction<int[], GraphEmbeddi
    * @param gSpan pattern generation logic
    * @param fsmConfig
    */
-  public InitSingleEdgeEmbeddings(GSpanAlgorithm gSpan, DIMSpanConfig fsmConfig) {
+  public InitSingleEdgePatternEmbeddingsMap(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
     this.gSpan = gSpan;
     graphCompressionEnabled = fsmConfig.isGraphCompressionEnabled();
     embeddingCompressionEnabled = fsmConfig.isEmbeddingCompressionEnabled();
@@ -55,7 +55,7 @@ public class InitSingleEdgeEmbeddings implements MapFunction<int[], GraphEmbeddi
   }
 
   @Override
-  public GraphEmbeddingsPair map(int[] graph) throws Exception {
+  public GraphWithPatternEmbeddingsMap map(int[] graph) throws Exception {
 
     PatternEmbeddingsMap map = gSpan.getSingleEdgePatternEmbeddings(graph);
 
@@ -71,7 +71,7 @@ public class InitSingleEdgeEmbeddings implements MapFunction<int[], GraphEmbeddi
       Simple16Compressor.compressEmbeddings(map);
     }
 
-    return new GraphEmbeddingsPair(graph, map);
+    return new GraphWithPatternEmbeddingsMap(graph, map);
   }
 
 }

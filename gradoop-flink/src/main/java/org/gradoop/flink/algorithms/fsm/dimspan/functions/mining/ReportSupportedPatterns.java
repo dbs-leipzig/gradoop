@@ -22,25 +22,25 @@ import org.apache.flink.util.Collector;
 
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
-import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphEmbeddingsPair;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * (graph, pattern->embeddings) => (pattern, 1),..
  */
-public class Report implements FlatMapFunction<GraphEmbeddingsPair, WithCount<int[]>> {
+public class ReportSupportedPatterns implements FlatMapFunction<GraphWithPatternEmbeddingsMap, WithCount<int[]>> {
 
   private final boolean compress;
 
-  public Report(DIMSpanConfig fsmConfig) {
+  public ReportSupportedPatterns(DIMSpanConfig fsmConfig) {
     compress = fsmConfig.getPatternCompressionInStep() == DataflowStep.MAP;
   }
 
   @Override
-  public void flatMap(GraphEmbeddingsPair graphEmbeddings,
+  public void flatMap(GraphWithPatternEmbeddingsMap graphEmbeddings,
     Collector<WithCount<int[]>> collector) throws Exception {
 
-    if (! graphEmbeddings.isCollector()) {
+    if (! graphEmbeddings.isFrequentPatternCollector()) {
       for (int i = 0; i < graphEmbeddings.getPatternEmbeddings().getPatternCount(); i++) {
         int[] pattern = graphEmbeddings.getPatternEmbeddings().getPatternData()[i];
         collector.collect(new WithCount<>(pattern));

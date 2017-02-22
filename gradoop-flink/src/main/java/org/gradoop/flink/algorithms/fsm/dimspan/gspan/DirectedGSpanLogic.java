@@ -19,32 +19,32 @@ package org.gradoop.flink.algorithms.fsm.dimspan.gspan;
 
 
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 
 /**
- * Provides methods for logic related to the gSpan algorithm in undirected mode.
+ * Provides methods for logic related to the gSpan algorithm in directed mode.
  */
-public class UndirectedGSpanAlgorithm extends GSpanAlgorithmBase {
+public class DirectedGSpanLogic extends GSpanLogicBase {
+
 
   /**
    * Constructor.
    *
    * @param fsmConfig FSM configuration
    */
-  public UndirectedGSpanAlgorithm(DIMSpanConfig fsmConfig) {
+  public DirectedGSpanLogic(DIMSpanConfig fsmConfig) {
     super(fsmConfig);
   }
 
   @Override
   protected boolean getSingleEdgePatternIsOutgoing(int[] graph, int edgeId, boolean loop) {
-    // extensions are always considered to be outgoing in undirected mode
-    return true;
+    return loop || GraphUtilsBase.isOutgoing(graph, edgeId);
   }
 
   @Override
   protected boolean getExtensionIsOutgoing(int[] graph, int edgeId, boolean fromFrom) {
-    // extensions are always considered to be outgoing in undirected mode
-    return true;
+    return fromFrom == GraphUtilsBase.isOutgoing(graph, edgeId);
   }
 
   @Override
@@ -52,10 +52,6 @@ public class UndirectedGSpanAlgorithm extends GSpanAlgorithmBase {
     int[] pattern, int[] vertexIds, int[] edgeIds, int fromLabel, int toLabel, boolean loop) {
 
     patternEmbeddings.store(pattern, vertexIds, edgeIds);
-
-    // create a second embedding for 1-edge automorphism
-    if (fromLabel == toLabel && !loop) {
-      patternEmbeddings.store(pattern, new int[] {vertexIds[1], vertexIds[0]}, edgeIds);
-    }
   }
+
 }

@@ -19,7 +19,7 @@ package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
-import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanAlgorithm;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -27,12 +27,12 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 /**
  * DFS code => true, if minimal
  */
-public class Validate implements FilterFunction<WithCount<int[]>> {
+public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
 
   /**
    * validation logic
    */
-  private final GSpanAlgorithm gSpan;
+  private final GSpanLogic gSpan;
   private final boolean uncompress;
 
   /**
@@ -41,7 +41,7 @@ public class Validate implements FilterFunction<WithCount<int[]>> {
    * @param gSpan validation logic
    * @param fsmConfig
    */
-  public Validate(GSpanAlgorithm gSpan, DIMSpanConfig fsmConfig) {
+  public VerifyPattern(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {
     this.gSpan = gSpan;
     uncompress = fsmConfig.getPatternCompressionInStep()
       .compareTo(fsmConfig.getPatternValidationInStep()) < 0;

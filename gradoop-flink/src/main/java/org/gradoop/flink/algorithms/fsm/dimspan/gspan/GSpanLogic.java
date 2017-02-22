@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.algorithms.fsm.dimspan.gspan;
 
-import org.gradoop.flink.algorithms.fsm.dimspan.model.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * gSpan pattern growth and verification functionality.
  */
-public interface GSpanAlgorithm extends Serializable {
+public interface GSpanLogic extends Serializable {
 
   /**
    * Finds all 1-edge patterns and their embeddings in a given graph.

@@ -49,7 +49,7 @@ public class EncodeAndPruneVertices
 
     // create inverse dictionary at broadcast reception
     String[] broadcast = getRuntimeContext()
-      .<String[]>getBroadcastVariable(DIMSpanConstants.FREQUENT_VERTEX_LABELS).get(0);
+      .<String[]>getBroadcastVariable(DIMSpanConstants.VERTEX_DICTIONARY).get(0);
 
     for (int i = 0; i < broadcast.length; i++) {
       vertexDictionary.put(broadcast[i], i);

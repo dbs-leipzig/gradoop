@@ -3,6 +3,7 @@ package org.gradoop.flink.algorithms.fsm.dimspan.model;
 
 import me.lemire.integercompression.IntCompressor;
 import me.lemire.integercompression.Simple16;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 
 public class Simple16Compressor {
 
@@ -27,13 +28,6 @@ public class Simple16Compressor {
     int[][] patternData = map.getPatternData();
     for (int i = 0; i < map.getPatternCount(); i++ ) {
       patternData[i] = compress(patternData[i]);
-    }
-  }
-
-  public static void uncompressPatterns(PatternEmbeddingsMap map) {
-    int[][] patternData = map.getPatternData();
-    for (int i = 0; i < map.getPatternCount(); i++ ) {
-      patternData[i] = uncompress(patternData[i]);
     }
   }
 }
