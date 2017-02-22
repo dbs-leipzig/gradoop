@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.DropPropertiesAndGraphContainment;
@@ -134,7 +135,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions
@@ -146,7 +147,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions

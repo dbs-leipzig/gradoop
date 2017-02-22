@@ -19,6 +19,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CategoryCountableLabel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 
@@ -40,7 +41,7 @@ public class CategoryFrequent
     super.open(parameters);
 
     this.categoryMinFrequencies = getRuntimeContext()
-      .<Map<String, Long>>getBroadcastVariable(TFSMConstants.MIN_FREQUENCY).get(0);
+      .<Map<String, Long>>getBroadcastVariable(DIMSpanConstants.MIN_FREQUENCY).get(0);
   }
 
   @Override
