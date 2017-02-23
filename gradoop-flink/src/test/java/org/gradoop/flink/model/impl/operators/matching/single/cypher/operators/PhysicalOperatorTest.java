@@ -64,11 +64,12 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(edges);
   }
 
-  protected List<PropertyValue> getPropertyValues(List<String> propertyNames) {
-    List<PropertyValue> propertyValues = new ArrayList<>(propertyNames.size());
+  protected PropertyValue[] getPropertyValues(List<String> propertyNames) {
+    PropertyValue[] propertyValues = new PropertyValue[propertyNames.size()];
 
+    int i = 0;
     for(String property_name : propertyNames) {
-      propertyValues.add(PropertyValue.create(property_name));
+      propertyValues[i++] = PropertyValue.create(property_name);
     }
 
     return propertyValues;

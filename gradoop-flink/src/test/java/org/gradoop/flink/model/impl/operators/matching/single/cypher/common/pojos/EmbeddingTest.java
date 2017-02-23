@@ -65,12 +65,9 @@ public class EmbeddingTest {
   @Test
   public void testAppendSingleIdAndProperties() {
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("String"), PropertyValue.create(42)
-    );
 
     Embedding embedding = new Embedding();
-    embedding.add(id, properties);
+    embedding.add(id, PropertyValue.create("String"), PropertyValue.create(42));
 
     assertEquals(1, embedding.size());
     assertEquals(id, embedding.getId(0));
@@ -81,12 +78,9 @@ public class EmbeddingTest {
   @Test
   public void testAppendProjectionEntryToExistingEmbedding() {
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("String"), PropertyValue.create(42)
-    );
 
     Embedding embedding = createEmbedding(4);
-    embedding.add(id, properties);
+    embedding.add(id,PropertyValue.create("String"), PropertyValue.create(42));
 
     assertEquals(5, embedding.size());
 
@@ -137,12 +131,9 @@ public class EmbeddingTest {
   @Test
   public void testGetIdBytesOfProjectionEntry() {
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("String"), PropertyValue.create(42)
-    );
 
     Embedding embedding = new Embedding();
-    embedding.add(id, properties);
+    embedding.add(id, PropertyValue.create("String"), PropertyValue.create(42));
 
     assertArrayEquals(id.toByteArray(), embedding.getRawId(0));
   }
@@ -185,12 +176,9 @@ public class EmbeddingTest {
   @Test
   public void testGetIdOfProjectionEntry() {
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("String"), PropertyValue.create(42)
-    );
 
     Embedding embedding = new Embedding();
-    embedding.add(id, properties);
+    embedding.add(id, PropertyValue.create("String"), PropertyValue.create(42));
 
     assertEquals(id, embedding.getId(0));
   }
@@ -218,15 +206,8 @@ public class EmbeddingTest {
   public void testGetProperty() {
     Embedding embedding = new Embedding();
 
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("a"), PropertyValue.create(42)
-    );
-    embedding.add(GradoopId.get(), properties);
-
-    properties = Lists.newArrayList(
-      PropertyValue.create("b"), PropertyValue.create(23)
-    );
-    embedding.add(GradoopId.get(), properties);
+    embedding.add(GradoopId.get(), PropertyValue.create("a"), PropertyValue.create(42));
+    embedding.add(GradoopId.get(), PropertyValue.create("b"), PropertyValue.create(23));
 
     assertEquals(PropertyValue.create("a"), embedding.getProperty(0));
     assertEquals(PropertyValue.create(42),  embedding.getProperty(1));
@@ -268,10 +249,7 @@ public class EmbeddingTest {
   public void testGetPropertyThrowsUnsupportedOperationExceptionForProjectionEntries() {
     Embedding embedding = new Embedding();
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("a"), PropertyValue.create(42)
-    );
-    embedding.add(id, properties);
+    embedding.add(id, PropertyValue.create("a"), PropertyValue.create(42));
 
     embedding.getIdList(0);
   }
@@ -337,10 +315,7 @@ public class EmbeddingTest {
   public void testProject() {
     Embedding embedding = new Embedding();
     GradoopId id = GradoopId.get();
-    List<PropertyValue> properties = Lists.newArrayList(
-      PropertyValue.create("a"), PropertyValue.create(42), PropertyValue.create("foobar")
-    );
-    embedding.add(id, properties);
+    embedding.add(id, PropertyValue.create("a"), PropertyValue.create(42), PropertyValue.create("foobar"));
 
     Embedding projection = embedding.project(Lists.newArrayList(0,2));
     assertEquals(PropertyValue.create("a"), projection.getProperty(0));
@@ -380,8 +355,7 @@ public class EmbeddingTest {
   public void testToString() {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
-    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42), PropertyValue
-      .create("Foobar")));
+    embedding.add(GradoopId.get(), PropertyValue.create(42), PropertyValue.create("Foobar"));
     embedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get(), GradoopId.get()));
 
     assertNotNull(embedding.toString());
@@ -397,9 +371,7 @@ public class EmbeddingTest {
     outEmbedding = writeAndReadValue(Embedding.class, inEmbedding);
     assertEquals(inEmbedding, outEmbedding);
 
-    inEmbedding.add(GradoopId.get(), Lists.newArrayList(
-      PropertyValue.create(42), PropertyValue.create("Foobar")
-    ));
+    inEmbedding.add(GradoopId.get(), PropertyValue.create(42), PropertyValue.create("Foobar"));
     outEmbedding = writeAndReadValue(Embedding.class, inEmbedding);
     assertEquals(inEmbedding, outEmbedding);
 

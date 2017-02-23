@@ -49,9 +49,14 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   public static final transient int ID_ENTRY_SIZE = 1 + GradoopId.ID_SIZE;
 
   /**
+   * Indicates that an entry is an id entry
+   */
+  public static final transient byte ID_ENTRY_FLAG = 0x00;
+
+  /**
    * Indicates that an entry is an id list
    */
-  public static final transient int ID_LIST_FLAG = 1;
+  public static final transient byte ID_LIST_FLAG = 0x01;
 
   /**
    * Holds the idData of all id-able entries (IDListFlag, ID)
@@ -100,6 +105,26 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     add(id, false);
   }
 
+
+  /**
+   * Appends all ids to the embeddings
+   *
+   * @param ids list of ids
+   */
+  public void addAll(GradoopId... ids) {
+    byte[] newIds = new byte[idData.length + ids.length * ID_ENTRY_SIZE];
+
+    System.arraycopy(idData, 0, newIds, 0, idData.length);
+
+    int offset = idData.length;
+    for (GradoopId id : ids) {
+      newIds[offset] = ID_ENTRY_FLAG;
+      System.arraycopy(id.toByteArray(), 0, newIds, offset + 1, GradoopId.ID_SIZE);
+      offset += ID_ENTRY_SIZE;
+    }
+
+    idData = newIds;
+  }
   /**
    * Returns the Id of the entry stored at the specified position
    * @param column the position the entry is stored at
@@ -174,7 +199,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   private void add(GradoopId id, boolean isIdList) {
     byte[] newIds = new byte[idData.length + 1 + GradoopId.ID_SIZE];
     System.arraycopy(idData, 0, newIds, 0, idData.length);
-    newIds[idData.length] = (byte) (isIdList ? 1 : 0);
+    newIds[idData.length] = isIdList ? ID_LIST_FLAG : ID_ENTRY_FLAG;
     System.arraycopy(id.toByteArray(), 0, newIds, idData.length + 1, GradoopId.ID_SIZE);
 
     idData = newIds;
@@ -200,12 +225,21 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * @param id that will be added to the embedding
    * @param properties list of property values
    */
-  public void add(GradoopId id, List<PropertyValue> properties) {
+  public void add(GradoopId id, PropertyValue... properties) {
     add(id);
+    addPropertyValues(properties);
+  }
 
-    int newPropertiesSize = propertyData.length +
-      properties.stream().mapToInt(PropertyValue::getByteSize).sum() +
-      properties.size() * Integer.BYTES;
+  /**
+   * Adds the list of properties to the embedding
+   *
+   * @param properties new properties
+   */
+  public void addPropertyValues(PropertyValue... properties) {
+    int newPropertiesSize = propertyData.length;
+    for (PropertyValue property : properties) {
+      newPropertiesSize += property.getByteSize() + Integer.BYTES;
+    }
 
     byte[] newPropertyData = new byte[newPropertiesSize];
 

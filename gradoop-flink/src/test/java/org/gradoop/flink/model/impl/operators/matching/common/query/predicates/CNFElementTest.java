@@ -66,12 +66,12 @@ public class CNFElementTest {
     Embedding embedding = new Embedding();
     embedding.add(
       a,
-      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+      PropertyValue.create("Alfred"), PropertyValue.create(42)
     );
     embedding.add(a);
     embedding.add(
       c,
-      Lists.newArrayList(PropertyValue.create(42))
+      PropertyValue.create(42)
     );
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
@@ -79,12 +79,12 @@ public class CNFElementTest {
     embedding = new Embedding();
     embedding.add(
       a,
-      Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
+      PropertyValue.create("Alice"), PropertyValue.create(42)
     );
     embedding.add(GradoopId.get());
     embedding.add(
       c,
-      Lists.newArrayList(PropertyValue.create(42))
+      PropertyValue.create(42)
     );
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
@@ -92,12 +92,12 @@ public class CNFElementTest {
     embedding = new Embedding();
     embedding.add(
       a,
-      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+      PropertyValue.create("Alfred"), PropertyValue.create(42)
     );
     embedding.add(GradoopId.get());
     embedding.add(
       c,
-      Lists.newArrayList(PropertyValue.create(23))
+      PropertyValue.create(23)
     );
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
@@ -105,12 +105,12 @@ public class CNFElementTest {
     embedding = new Embedding();
     embedding.add(
       a,
-      Lists.newArrayList(PropertyValue.create("Alfred"), PropertyValue.create(42))
+      PropertyValue.create("Alfred"), PropertyValue.create(42)
     );
     embedding.add(GradoopId.get());
     embedding.add(
       c,
-      Lists.newArrayList(PropertyValue.create(42))
+      PropertyValue.create(42)
     );
     assertFalse(cnfElement.evaluate(embedding, metaData));
   }
