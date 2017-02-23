@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
