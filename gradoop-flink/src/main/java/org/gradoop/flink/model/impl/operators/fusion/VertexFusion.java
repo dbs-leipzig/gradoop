@@ -94,7 +94,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .cross(patternGraph.getGraphHead())
       .with(new CreateFusedVertex(vId))
       .cross(toBeReplaced.first(1))
-      .with(new LeftSide<Vertex, Vertex>())
+      .with(new LeftSide<>())
       .union(finalVertices);
 
     //In the final graph, all the edges appearing only in the search graph should appear
@@ -118,10 +118,10 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
      */
     DataSet<Edge> updatedEdges = leftEdges
       .fullOuterJoin(toBeReplaced)
-      .where(new SourceId<Edge>()).equalTo(new Id<Vertex>())
+      .where(new SourceId<>()).equalTo(new Id<>())
       .with(new UpdateEdgesThoughToBeFusedVertices(vId, true))
       .fullOuterJoin(toBeReplaced)
-      .where(new TargetId<Edge>()).equalTo(new Id<Vertex>())
+      .where(new TargetId<>()).equalTo(new Id<>())
       .with(new UpdateEdgesThoughToBeFusedVertices(vId, false));
 
     // All's well what ends well… farewell!
