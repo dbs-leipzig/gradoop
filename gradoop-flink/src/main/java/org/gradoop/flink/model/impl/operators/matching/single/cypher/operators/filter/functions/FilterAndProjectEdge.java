@@ -20,12 +20,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Applies a given predicate on a {@link Edge} and projects specified property values to the
@@ -40,14 +42,16 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
    * Property Keys used for the projection
    */
   private final List<String> projectionPropertyKeys;
+
   /**
-   * Meta data describing the vertex embedding used for filtering
+   * Variable the edge is assigned to
    */
-  private final EmbeddingMetaData filterMetaData;
+  private final String edgeVariable;
+
   /**
-   * PropertyKeys of the embedding used for filtering
+   * Maps the edge to it's variable
    */
-  private final List<String> filterPropertyKeys;
+  private final Map<String, GraphElement> edgeMapping;
 
   /**
    * New edge filter function
@@ -60,20 +64,14 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
     List<String> projectionPropertyKeys) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
-
-    this.filterMetaData = new EmbeddingMetaData();
-    this.filterMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
-    int i = 0;
-    for (String propertyKey : predicates.getPropertyKeys(edgeVariable)) {
-      this.filterMetaData.setPropertyColumn(edgeVariable, propertyKey, i++);
-    }
-
-    this.filterPropertyKeys = filterMetaData.getPropertyKeys(edgeVariable);
+    this.edgeVariable = edgeVariable;
+    this.edgeMapping = new HashMap<>();
   }
 
   @Override
   public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    if (predicates.evaluate(EmbeddingFactory.fromEdge(edge, filterPropertyKeys), filterMetaData)) {
+    edgeMapping.put(edgeVariable, edge);
+    if (predicates.evaluate(edgeMapping)) {
       out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys));
     }
   }

@@ -19,13 +19,15 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Applies a given predicate on a {@link Vertex} and projects specified property values to the
@@ -40,15 +42,16 @@ public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embeddin
    * Property keys used for value projection
    */
   private final List<String> projectionPropertyKeys;
-  /**
-   * Meta data describing the vertex embedding used for filtering
-   */
-  private final EmbeddingMetaData filterMetaData;
-  /**
-   * PropertyKeys of the embedding used for filtering
-   */
-  private final List<String> filterPropertyKeys;
 
+  /**
+   * Variable the vertex is assigned to
+   */
+  private final String vertexVariable;
+
+  /**
+   * Maps the variable onto a vertex
+   */
+  private final Map<String, GraphElement> vertexMapping;
   /**
    * New vertex filter function
    *
@@ -60,21 +63,14 @@ public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embeddin
     projectionPropertyKeys) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
-
-    this.filterMetaData = new EmbeddingMetaData();
-    this.filterMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
-    int i = 0;
-    for (String propertyKey : predicates.getPropertyKeys(vertexVariable)) {
-      this.filterMetaData.setPropertyColumn(vertexVariable, propertyKey, i++);
-    }
-
-    this.filterPropertyKeys = filterMetaData.getPropertyKeys(vertexVariable);
+    this.vertexVariable = vertexVariable;
+    this.vertexMapping = new HashMap<>();
   }
 
   @Override
   public void flatMap(Vertex vertex, Collector<Embedding> out) throws Exception {
-    if (predicates.evaluate(EmbeddingFactory.fromVertex(vertex, filterPropertyKeys),
-      filterMetaData)) {
+    vertexMapping.put(vertexVariable, vertex);
+    if (predicates.evaluate(vertexMapping)) {
       out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));
     }
   }

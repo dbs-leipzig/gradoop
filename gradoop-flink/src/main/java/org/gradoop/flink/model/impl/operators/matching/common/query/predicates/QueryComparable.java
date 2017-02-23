@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
@@ -29,6 +30,7 @@ import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,14 +59,21 @@ public abstract class QueryComparable implements Serializable {
   }
 
   /**
-   * Evaluates the expression with respect to the given variable mapping
+   * Evaluates the expression with respect to the given variable mapping to Embeddings
    *
    * @param embedding the embedding record holding the data
    * @param metaData the embedding meta data
    * @return evaluation result
    */
-  public abstract PropertyValue evaluate(Embedding embedding,
-    EmbeddingMetaData metaData);
+  public abstract PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData);
+
+  /**
+   * Evaluates the expression with respect to the given variable mapping to GraphElements
+   *
+   * @param mapping mapping of variables to GraphElements
+   * @return evaluation result
+   */
+  public abstract PropertyValue evaluate(Map<String, GraphElement> mapping);
 
   /**
    * Returns a set of property keys referenced by this expression for a given variable
