@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
@@ -63,6 +64,7 @@ public class ComparisonExpression extends QueryPredicate {
   }
 
   /**
+   * Evaluates the comparisson for the given embedding
    *
    * @param embedding the embedding record holding the data
    * @param metaData the embedding meta data
@@ -72,21 +74,46 @@ public class ComparisonExpression extends QueryPredicate {
     PropertyValue lhsValue = getLhs().evaluate(embedding, metaData);
     PropertyValue rhsValue = getRhs().evaluate(embedding, metaData);
 
+    return compare(lhsValue, rhsValue);
+  }
+
+  /**
+   * Evaluates the comparison for the given graph element
+   *
+   * @param element GraphElement under which the comparison will be evaluated
+   * @return evaluation result
+   */
+  public boolean evaluate(GraphElement element) {
+    PropertyValue lhsValue = getLhs().evaluate(element);
+    PropertyValue rhsValue = getRhs().evaluate(element);
+
+    return compare(lhsValue, rhsValue);
+  }
+
+  /**
+   * Compares two property values with the given comparator
+   *
+   * @param lhsValue left property value
+   * @param rhsValue right property value
+   * @return comparison result
+   */
+  private boolean compare(PropertyValue lhsValue, PropertyValue rhsValue) {
     try {
       int result = lhsValue.compareTo(rhsValue);
 
       return
         comparison.getComparator() == Comparator.EQ  && result ==  0 ||
-        comparison.getComparator() == Comparator.NEQ && result !=  0 ||
-        comparison.getComparator() == Comparator.LT  && result == -1 ||
-        comparison.getComparator() == Comparator.GT  && result ==  1 ||
-        comparison.getComparator() == Comparator.LTE && result <=  0 ||
-        comparison.getComparator() == Comparator.GTE && result >=  0;
+          comparison.getComparator() == Comparator.NEQ && result !=  0 ||
+          comparison.getComparator() == Comparator.LT  && result == -1 ||
+          comparison.getComparator() == Comparator.GT  && result ==  1 ||
+          comparison.getComparator() == Comparator.LTE && result <=  0 ||
+          comparison.getComparator() == Comparator.GTE && result >=  0;
 
     } catch (IllegalArgumentException e) {
       return comparison.getComparator() == Comparator.NEQ;
     }
   }
+
 
   /**
    * Returns the variables referenced by the expression
