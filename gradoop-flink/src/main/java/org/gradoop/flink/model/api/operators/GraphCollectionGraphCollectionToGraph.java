@@ -22,20 +22,19 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.ReduceVertexFusionOverGraphCollectionDataset;
 
 /**
- * Creates a {@link LogicalGraph} based on two input graphs and a {@link GraphCollection}
+ * Reduces two {@link GraphCollection}s into a single {@link LogicalGraph}
  *
  * @see ReduceVertexFusionOverGraphCollectionDataset
  */
-public interface GraphGraphGraphCollectionToGraph extends Operator {
+public interface GraphCollectionGraphCollectionToGraph extends Operator {
 
   /**
-   * Combining two logical graphs and a collection of graphs, we return a single logical graph
+   * Combining {@link GraphCollection}s and a collection of graphs, we return a single logical graph
    *
-   * @param left          Left operand
-   * @param right         Right operand
-   * @param hypervertices Graph collection as an input for both operands
-   * @return              The combination of the three data
+   * @param left      Graph collection
+   * @param right     Graph collection
+   * @return          Single fused graph
    */
-  LogicalGraph execute(LogicalGraph left, LogicalGraph right, GraphCollection hypervertices);
+  LogicalGraph execute(GraphCollection left, GraphCollection right);
 
 }

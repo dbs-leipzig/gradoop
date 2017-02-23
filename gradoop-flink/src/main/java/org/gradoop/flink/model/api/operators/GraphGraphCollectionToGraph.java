@@ -17,22 +17,24 @@
 
 package org.gradoop.flink.model.api.operators;
 
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.fusion.edgereduce.EdgeReduceVertexFusion;
+import org.gradoop.flink.model.impl.operators.fusion.reduce.ReduceVertexFusionOverBinaryGraphs;
 
 /**
- * Creates a {@link LogicalGraph} based on two input graphs.
+ * Creates a {@link LogicalGraph} based on two input graphs and a {@link GraphCollection}
  *
- * @see EdgeReduceVertexFusion
+ * @see ReduceVertexFusionOverBinaryGraphs
  */
-public interface TernaryGraphToGraphOperator extends Operator {
+public interface GraphGraphCollectionToGraph extends Operator {
+
   /**
-   * Executes the operator.
+   * Combining a logical graph into a collection
    *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @param thirdGraph third input graph
-   * @return operator result
+   * @param left           Single Graph
+   * @param collection     Graph collection
+   * @return               Single graph
    */
-  LogicalGraph execute(LogicalGraph firstGraph, LogicalGraph secondGraph, LogicalGraph thirdGraph);
+  LogicalGraph execute(LogicalGraph left, GraphCollection collection);
+
 }

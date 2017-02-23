@@ -35,17 +35,21 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadc
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
-import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.CoGroupAssociateOldVerticesWithNewIds;
+import org.gradoop.flink.model.impl.operators.fusion.reduce.functions
+  .CoGroupAssociateOldVerticesWithNewIds;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.CoGroupGraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.FlatJoinSourceEdgeReference;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.LeftElementId;
-import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapFunctionAddGraphElementToGraph2;
+import org.gradoop.flink.model.impl.operators.fusion.reduce.functions
+  .MapFunctionAddGraphElementToGraph2;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapGraphHeadForNewGraph;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapVertexToPairWithGraphId;
 import org.gradoop.flink.model.impl.operators.fusion.reduce.functions.MapVerticesAsTuplesWithNullId;
 
-import static org.gradoop.flink.model.impl.functions.graphcontainment.BiGraphContainmentFilterBroadcast.GRAPH_LEFT;
-import static org.gradoop.flink.model.impl.functions.graphcontainment.BiGraphContainmentFilterBroadcast.GRAPH_RIGHT;
+import static org.gradoop.flink.model.impl.functions.graphcontainment
+  .BiGraphContainmentFilterBroadcast.GRAPH_LEFT;
+import static org.gradoop.flink.model.impl.functions.graphcontainment
+  .BiGraphContainmentFilterBroadcast.GRAPH_RIGHT;
 
 /**
  * Given two graph operands and a graph collection of (solved)
@@ -59,7 +63,8 @@ import static org.gradoop.flink.model.impl.functions.graphcontainment.BiGraphCon
  * as a mere generalization.
  *
  */
-public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
+public class ReduceVertexFusionBiBroadcast implements GraphGraphGraphCollectionToGraph {
+
   @Override
   public LogicalGraph execute(LogicalGraph left, LogicalGraph right,
     GraphCollection hypervertices) {
@@ -118,6 +123,6 @@ public class ReduceVertexFusion implements GraphGraphGraphCollectionToGraph {
 
   @Override
   public String getName() {
-    return ReduceVertexFusion.class.getName();
+    return ReduceVertexFusionBiBroadcast.class.getName();
   }
 }

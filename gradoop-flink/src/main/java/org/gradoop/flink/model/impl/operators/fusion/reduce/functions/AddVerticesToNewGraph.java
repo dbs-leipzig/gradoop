@@ -15,12 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;
+
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
 /**
- * Provides an implementation for the join operand in different possible ways. A join is a binary
- * operand arbitrarly combining the two operands by using different semantics for both the
- * vertices and the edges.
- *
- * This subpackage provides the join with joins definition, that is the formal definition with
- * some enhancements (hashing function). Plus, it implements the R-join definition.
+ * Adds the elements to a graph head
  */
-package org.gradoop.flink.model.impl.operators.fusion.edgereduce.functions;
+public class AddVerticesToNewGraph implements CrossFunction<Vertex, GraphHead, Vertex> {
+  @Override
+  public Vertex cross(Vertex val1, GraphHead val2) throws Exception {
+    val1.addGraphId(val2.getId());
+    return val1;
+  }
+}
