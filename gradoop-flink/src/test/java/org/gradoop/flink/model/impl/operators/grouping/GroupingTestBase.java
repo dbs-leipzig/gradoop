@@ -1126,7 +1126,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .setStrategy(getStrategy())
         .build()
         .execute(input);
-
+    
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
