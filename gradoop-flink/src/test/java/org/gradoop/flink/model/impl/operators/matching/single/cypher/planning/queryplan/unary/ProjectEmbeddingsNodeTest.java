@@ -57,8 +57,8 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
     metaData.setPropertyColumn("b", "age", 1);
 
     Embedding embedding1 = new Embedding();
-    embedding1.add(vertexAId, Arrays.asList(PropertyValue.create(42)));
-    embedding1.add(vertexBId, Arrays.asList(PropertyValue.create(23)));
+    embedding1.add(vertexAId, PropertyValue.create(42));
+    embedding1.add(vertexBId, PropertyValue.create(23));
 
     DataSet<Embedding> input = getExecutionEnvironment().fromElements(embedding1);
     PlanNode mockChild = new MockPlanNode(input, metaData);

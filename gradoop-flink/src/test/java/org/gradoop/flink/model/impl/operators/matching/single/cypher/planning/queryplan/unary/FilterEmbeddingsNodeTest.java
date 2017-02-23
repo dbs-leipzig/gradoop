@@ -52,12 +52,12 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
     metaData.setPropertyColumn("b", "age", 1);
 
     Embedding embedding1 = new Embedding();
-    embedding1.add(vertexAId, Arrays.asList(PropertyValue.create(42)));
-    embedding1.add(vertexBId, Arrays.asList(PropertyValue.create(23)));
+    embedding1.add(vertexAId, PropertyValue.create(42));
+    embedding1.add(vertexBId, PropertyValue.create(23));
 
     Embedding embedding2 = new Embedding();
-    embedding2.add(vertexAId, Arrays.asList(PropertyValue.create(42)));
-    embedding2.add(vertexCId, Arrays.asList(PropertyValue.create(84)));
+    embedding2.add(vertexAId, PropertyValue.create(42));
+    embedding2.add(vertexCId, PropertyValue.create(84));
 
     DataSet<Embedding> input = getExecutionEnvironment().fromElements(embedding1, embedding2);
     PlanNode mockChild = new MockPlanNode(input, metaData);

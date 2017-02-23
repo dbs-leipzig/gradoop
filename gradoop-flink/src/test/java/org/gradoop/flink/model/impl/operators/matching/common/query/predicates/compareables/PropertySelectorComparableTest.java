@@ -39,7 +39,7 @@ public class PropertySelectorComparableTest {
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
+    embedding.add(GradoopId.get(), PropertyValue.create(42));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
@@ -55,7 +55,7 @@ public class PropertySelectorComparableTest {
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(1991)));
+    embedding.add(GradoopId.get(), PropertyValue.create(1991));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
@@ -70,7 +70,7 @@ public class PropertySelectorComparableTest {
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), Lists.newArrayList(PropertyValue.create(42)));
+    embedding.add(GradoopId.get(), PropertyValue.create(42));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("b", EntryType.VERTEX, 0);
