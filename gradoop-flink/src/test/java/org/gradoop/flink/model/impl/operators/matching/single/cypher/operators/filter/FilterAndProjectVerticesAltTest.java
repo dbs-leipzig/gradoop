@@ -26,8 +26,6 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
 import org.junit.Test;
 
@@ -37,7 +35,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
+public class FilterAndProjectVerticesAltTest extends PhysicalOperatorTest {
 
   @Test
   public void testFilterWithNoPredicates() throws Exception {
@@ -48,8 +46,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment()
       .fromElements(new VertexFactory().createVertex("Person", properties));
 
-    FilterAndProjectVertices filter =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>());
+    FilterAndProjectVerticesAlt filter =
+      new FilterAndProjectVerticesAlt(vertices, predicates, new ArrayList<>());
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -70,7 +68,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVerticesAlt(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
 
@@ -89,7 +87,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVerticesAlt(vertices, predicates, new ArrayList<>())
       .evaluate()
       .collect();
 
@@ -109,7 +107,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVerticesAlt(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);
@@ -131,7 +129,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     List<String> projectionPropertyKeys = Lists.newArrayList("name","age");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVerticesAlt(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);

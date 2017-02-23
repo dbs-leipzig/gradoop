@@ -20,13 +20,16 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectVertex;
 
 import java.util.List;
 
 /**
+ * Alternative FilterAndProjectVertices using Filter + Map operators
+ *
  * Filters a set of EPGM {@link Vertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
@@ -41,7 +44,7 @@ import java.util.List;
  *
  * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
  */
-public class FilterAndProjectVertices implements PhysicalOperator {
+public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   /**
    * Input vertices
    */
@@ -62,7 +65,7 @@ public class FilterAndProjectVertices implements PhysicalOperator {
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectVertices(DataSet<Vertex> input, CNF predicates,
+  public FilterAndProjectVerticesAlt(DataSet<Vertex> input, CNF predicates,
     List<String> projectionPropertyKeys) {
     this.input = input;
     this.predicates = predicates;
@@ -71,6 +74,8 @@ public class FilterAndProjectVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterAndProjectVertex(predicates, projectionPropertyKeys));
+    return input
+      .filter(new FilterVertex(predicates))
+      .map(new ProjectVertex(projectionPropertyKeys));
   }
 }

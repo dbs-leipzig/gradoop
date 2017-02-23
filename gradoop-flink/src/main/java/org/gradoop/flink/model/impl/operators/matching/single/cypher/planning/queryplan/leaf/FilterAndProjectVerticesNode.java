@@ -71,7 +71,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectVertices(vertices, vertexVariable, filterPredicate, projectionKeys)
+    return new FilterAndProjectVertices(vertices, filterPredicate, projectionKeys)
       .evaluate();
   }
 

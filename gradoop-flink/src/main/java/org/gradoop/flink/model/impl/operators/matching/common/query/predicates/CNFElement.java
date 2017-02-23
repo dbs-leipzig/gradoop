@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
@@ -58,6 +59,15 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
     return false;
   }
 
+  @Override
+  public boolean evaluate(GraphElement element) {
+    for (ComparisonExpression comparisonExpression : predicates) {
+      if (comparisonExpression.evaluate(element)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @Override
   public Set<String> getVariables() {
