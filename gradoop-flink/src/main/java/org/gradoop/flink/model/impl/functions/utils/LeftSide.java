@@ -19,7 +19,10 @@ package org.gradoop.flink.model.impl.functions.utils;
 
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * left, right => left
@@ -28,7 +31,8 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
  * @param <R> right type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements CrossFunction<L, R, L>, JoinFunction<L, R, L> {
+public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
+  MapFunction<Tuple2<L, R>, L>,CrossFunction<L, R, L> {
 
   @Override
   public L cross(L left, R right) throws Exception {
@@ -36,7 +40,18 @@ public class LeftSide<L, R> implements CrossFunction<L, R, L>, JoinFunction<L, R
   }
 
   @Override
-  public L join(L first, R second) throws Exception {
-    return first;
+  public L getKey(Tuple2<L, R> value) throws Exception {
+    return value.f0;
   }
+
+  @Override
+  public L map(Tuple2<L, R> value) throws Exception {
+    return value.f0;
+  }
+
+  @Override
+  public L join(L left, R right) throws Exception {
+    return left;
+  }
+
 }

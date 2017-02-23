@@ -14,7 +14,7 @@ import java.io.InputStream;
 /**
  * Created by Giacomo Bergami on 01/02/17.
  */
-public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
+public abstract class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
 
   /**
    * Defining the hashing functions required to break down the join function
@@ -24,6 +24,9 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
       .getResourceAsStream("/data/gdl/jointest.gdl");
     return getLoaderFromStream(inputStream);
   }
+
+  protected abstract void testGraphGraphGraphCollection(LogicalGraph left, LogicalGraph right,
+    GraphCollection gcl, LogicalGraph expected) throws Exception;
 
   /**
    * joining empties shall not return errors.
@@ -37,10 +40,8 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     GraphCollection empty = loader.getGraphCollectionByVariables();
     LogicalGraph left = loader.getLogicalGraphByVariable("research");
     LogicalGraph right = loader.getLogicalGraphByVariable("citation");
-    ReduceVertexFusion f = new ReduceVertexFusion();
-    LogicalGraph output = f.execute(left, right, empty);
     LogicalGraph expected = (new Combination().execute(left,right));
-    collectAndAssertTrue(output.equalsByData(expected));
+    testGraphGraphGraphCollection(left,right,empty,expected);
   }
 
   /**
@@ -54,9 +55,8 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     LogicalGraph left = loader.getLogicalGraphByVariable("research");
     LogicalGraph right = loader.getLogicalGraphByVariable("citation");
     ReduceVertexFusion f = new ReduceVertexFusion();
-    LogicalGraph output = f.execute(left, right, hypervertices);
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("result")));
-    collectAndAssertTrue(output.equalsByData(expected));
+    testGraphGraphGraphCollection(left,right,hypervertices,expected);
   }
 
 
