@@ -63,9 +63,8 @@ public class EmbeddingFactory {
    */
   public static Embedding fromEdge(Edge edge, List<String> propertyKeys) {
     Embedding embedding = new Embedding();
-    embedding.add(edge.getSourceId());
-    embedding.add(edge.getId(), project(edge, propertyKeys));
-    embedding.add(edge.getTargetId());
+    embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());
+    embedding.addPropertyValues(project(edge, propertyKeys));
 
     return embedding;
   }
@@ -79,14 +78,15 @@ public class EmbeddingFactory {
    * @param propertyKeys properties that will be projected from the specified element
    * @return projected property values
    */
-  private static List<PropertyValue> project(GraphElement element, List<String> propertyKeys) {
-    List<PropertyValue> propertyValues = new ArrayList<>();
+  private static PropertyValue[] project(GraphElement element, List<String> propertyKeys) {
+    PropertyValue[] propertyValues = new PropertyValue[propertyKeys.size()];
+    int i = 0;
     for (String propertyKey : propertyKeys) {
       if (propertyKey.equals("__label__")) {
-        propertyValues.add(PropertyValue.create(element.getLabel()));
+        propertyValues[i++] = PropertyValue.create(element.getLabel());
       } else {
-        propertyValues.add(element.hasProperty(propertyKey) ?
-          element.getPropertyValue(propertyKey) : PropertyValue.NULL_VALUE);
+        propertyValues[i++] = element.hasProperty(propertyKey) ?
+          element.getPropertyValue(propertyKey) : PropertyValue.NULL_VALUE;
       }
     }
     return propertyValues;

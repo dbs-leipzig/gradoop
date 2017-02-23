@@ -135,16 +135,22 @@ public class CNFTest {
     GradoopId a = GradoopId.get();
     GradoopId c = GradoopId.get();
 
+    PropertyValue[] propertiesA = new PropertyValue[]{
+      PropertyValue.create("Alice"),
+      PropertyValue.create(42)
+    };
+
     Embedding embedding = new Embedding();
     embedding.add(
       a,
-      Lists.newArrayList(PropertyValue.create("Alice"), PropertyValue.create(42))
+      propertiesA
     );
 
+    PropertyValue[] propertiesB = new PropertyValue[]{PropertyValue.create(23)};
     embedding.add(a);
     embedding.add(
       c,
-      Lists.newArrayList(PropertyValue.create(23))
+      propertiesB
     );
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
@@ -163,10 +169,11 @@ public class CNFTest {
     QueryHandler query = new QueryHandler(queryString);
     CNF predicates = query.getPredicates();
 
+    PropertyValue[] properties = new PropertyValue[]{PropertyValue.NULL_VALUE};
     Embedding embedding = new Embedding();
     embedding.add(
       GradoopId.get(),
-      Lists.newArrayList(PropertyValue.NULL_VALUE)
+      properties
     );
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();

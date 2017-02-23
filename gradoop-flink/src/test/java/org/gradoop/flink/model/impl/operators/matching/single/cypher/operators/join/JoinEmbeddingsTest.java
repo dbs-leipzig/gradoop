@@ -275,10 +275,8 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     ExecutionEnvironment env = getExecutionEnvironment();
 
-    List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
-
     Embedding embedding = new Embedding();
-    embedding.add(v0, properties);
+    embedding.add(v0, PropertyValue.create("Alice"));
     DataSet<Embedding> left = getExecutionEnvironment().fromElements(embedding);
 
     // [v0, e0, v1]
@@ -306,10 +304,9 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     // [(Id(v0)]
     DataSet<Embedding> left = createEmbeddings(env, 1, v0);
 
-    List<PropertyValue> properties = Lists.newArrayList(PropertyValue.create("Alice"));
     Embedding embedding = new Embedding();
     embedding.add(v0);
-    embedding.add(v1, properties);
+    embedding.add(v1, PropertyValue.create("Alice"));
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(embedding);
 
     // join operator
@@ -330,16 +327,14 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
 
-    List<PropertyValue> propertiesLeft = Lists.newArrayList(PropertyValue.create("Alice"));
     Embedding embeddingLeft = new Embedding();
     embeddingLeft.add(v0);
     embeddingLeft.add(e0);
-    embeddingLeft.add(v1, propertiesLeft);
+    embeddingLeft.add(v1, PropertyValue.create("Alice"));
     DataSet<Embedding> left = getExecutionEnvironment().fromElements(embeddingLeft);
 
-    List<PropertyValue> propertiesRight = Lists.newArrayList(PropertyValue.create(42));
     Embedding embeddingRight = new Embedding();
-    embeddingRight.add(v1, propertiesRight);
+    embeddingRight.add(v1, PropertyValue.create(42));
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(embeddingRight);
 
     // join operator
