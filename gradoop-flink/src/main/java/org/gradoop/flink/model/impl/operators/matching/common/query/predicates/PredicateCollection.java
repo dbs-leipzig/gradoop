@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
@@ -84,12 +85,21 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
   }
 
   /**
+   * Evaluates the predicate collection with respect to the given Embedding
    *
    * @param embedding the embedding record holding the data
    * @param metaData the embedding meta data
    * @return evaluation result
    */
   public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
+
+  /**
+   * Evaluates the predicate collection with respect to the given GraphElement
+   *
+   * @param element GraphElement under which the predicate will be evaluated
+   * @return evaluation result
+   */
+  public abstract boolean evaluate(GraphElement element);
 
   /**
    * Retrieves a set of all variables included in the predicate collection

@@ -23,7 +23,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.List;
 
@@ -40,41 +39,21 @@ public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embeddin
    * Property keys used for value projection
    */
   private final List<String> projectionPropertyKeys;
-  /**
-   * Meta data describing the vertex embedding used for filtering
-   */
-  private final EmbeddingMetaData filterMetaData;
-  /**
-   * PropertyKeys of the embedding used for filtering
-   */
-  private final List<String> filterPropertyKeys;
 
   /**
    * New vertex filter function
    *
-   * @param vertexVariable Variable assigned to the vertex
    * @param predicates predicates used for filtering
    * @param projectionPropertyKeys property keys that will be used for projection
    */
-  public FilterAndProjectVertex(String vertexVariable, CNF predicates, List<String>
-    projectionPropertyKeys) {
+  public FilterAndProjectVertex(CNF predicates, List<String> projectionPropertyKeys) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
-
-    this.filterMetaData = new EmbeddingMetaData();
-    this.filterMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
-    int i = 0;
-    for (String propertyKey : predicates.getPropertyKeys(vertexVariable)) {
-      this.filterMetaData.setPropertyColumn(vertexVariable, propertyKey, i++);
-    }
-
-    this.filterPropertyKeys = filterMetaData.getPropertyKeys(vertexVariable);
   }
 
   @Override
   public void flatMap(Vertex vertex, Collector<Embedding> out) throws Exception {
-    if (predicates.evaluate(EmbeddingFactory.fromVertex(vertex, filterPropertyKeys),
-      filterMetaData)) {
+    if (predicates.evaluate(vertex)) {
       out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));
     }
   }

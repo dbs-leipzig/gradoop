@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdgesAlt;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
@@ -33,9 +33,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Leaf node that wraps a {@link FilterAndProjectEdges} operator.
+ * Leaf node that wraps a {@link FilterAndProjectEdgesAlt} operator.
  */
-public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, ProjectionNode {
+public class FilterAndProjectEdgesAltNode extends LeafNode implements FilterNode, ProjectionNode {
   /**
    * Input data set
    */
@@ -71,7 +71,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
    */
-  public FilterAndProjectEdgesNode(DataSet<Edge> edges,
+  public FilterAndProjectEdgesAltNode(DataSet<Edge> edges,
     String sourceVariable, String edgeVariable, String targetVariable,
     CNF filterPredicate, Set<String> projectionKeys) {
     this.edges = edges;
@@ -84,7 +84,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectEdges(edges, filterPredicate, projectionKeys)
+    return new FilterAndProjectEdgesAlt(edges, filterPredicate, projectionKeys)
       .evaluate();
   }
 
