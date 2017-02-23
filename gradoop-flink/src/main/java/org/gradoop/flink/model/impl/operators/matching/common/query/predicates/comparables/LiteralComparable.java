@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.s1ck.gdl.model.comparables.Literal;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -68,7 +67,7 @@ public class LiteralComparable extends QueryComparable {
   }
 
   @Override
-  public PropertyValue evaluate(Map<String, GraphElement> mapping) {
+  public PropertyValue evaluate(GraphElement element) {
     return PropertyValue.create(literal.getValue());
   }
 

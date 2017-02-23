@@ -89,9 +89,7 @@ public class CNF extends PredicateCollection<CNFElement> {
         newPredicates.add(newCNFElement);
       }
     }
-
     predicates = newPredicates;
-
     return this;
   }
 
@@ -102,18 +100,16 @@ public class CNF extends PredicateCollection<CNFElement> {
         return false;
       }
     }
-
     return true;
   }
 
   @Override
-  public boolean evaluate(Map<String, GraphElement> mapping) {
+  public boolean evaluate(GraphElement graphElement) {
     for (CNFElement element : predicates) {
-      if (!element.evaluate(mapping)) {
+      if (!element.evaluate(graphElement)) {
         return false;
       }
     }
-
     return true;
   }
 

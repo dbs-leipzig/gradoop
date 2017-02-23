@@ -50,10 +50,6 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
    */
   private final DataSet<Vertex> input;
   /**
-   * Variable assigned to the vertex
-   */
-  private final String vertexVariable;
-  /**
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
@@ -66,14 +62,12 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
    * New vertex filter operator
    *
    * @param input Candidate vertices
-   * @param vertexVariable Variable assigned to the vertex
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectVerticesAlt(DataSet<Vertex> input, String vertexVariable, CNF predicates,
+  public FilterAndProjectVerticesAlt(DataSet<Vertex> input, CNF predicates,
     List<String> projectionPropertyKeys) {
     this.input = input;
-    this.vertexVariable = vertexVariable;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
   }
@@ -81,7 +75,7 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   @Override
   public DataSet<Embedding> evaluate() {
     return input
-      .filter(new FilterVertex(vertexVariable, predicates))
+      .filter(new FilterVertex(predicates))
       .map(new ProjectVertex(projectionPropertyKeys));
   }
 }

@@ -19,11 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Filters an Edge by a given predicate
@@ -36,30 +32,16 @@ public class FilterEdge implements FilterFunction<Edge> {
   private final CNF predicates;
 
   /**
-   * Mapping of variables to edges
-   */
-  private final Map<String, GraphElement> mapping;
-
-  /**
-   * Variable assigned to the edge
-   */
-  private final String edgeVariable;
-
-  /**
    * Creates a new UDF
    *
-   * @param edgeVariable variable assigned to the edge
    * @param predicates filter predicates
    */
-  public FilterEdge(String edgeVariable, CNF predicates) {
+  public FilterEdge(CNF predicates) {
     this.predicates = predicates;
-    this.edgeVariable = edgeVariable;
-    this.mapping = new HashMap<>();
   }
 
   @Override
   public boolean filter(Edge edge) throws Exception {
-    mapping.put(edgeVariable, edge);
-    return predicates.evaluate(mapping);
+    return predicates.evaluate(edge);
   }
 }

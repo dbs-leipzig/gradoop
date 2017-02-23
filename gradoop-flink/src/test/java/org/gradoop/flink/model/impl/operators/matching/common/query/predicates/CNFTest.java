@@ -19,7 +19,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -169,6 +174,32 @@ public class CNFTest {
     metaData.setPropertyColumn("a", "age", 0);
 
     assertFalse(predicates.evaluate(embedding, metaData));
+  }
+
+  @Test
+  public void testGraphElementEvaluationForProperties() {
+    String queryString = "MATCH (a) WHERE a.name = \"Alice\" AND a.__label__=\"Person\"";
+    QueryHandler query = new QueryHandler(queryString);
+    CNF cnf = query.getPredicates();
+
+    Properties properties = new Properties();
+    properties.set("name","Alice");
+    Vertex vertex = new VertexFactory().createVertex("Person", properties);
+    assertTrue(cnf.evaluate(vertex));
+
+    properties.set("name","Bob");
+    assertFalse(cnf.evaluate(vertex));
+  }
+
+  @Test public void testGraphElementEvaluationWithMissingProperty() {
+    String queryString = "MATCH (a) WHERE a.name = \"Alice\" AND __label__=\"Person\"";
+    QueryHandler query = new QueryHandler(queryString);
+    CNF cnf = query.getPredicates();
+
+    Properties properties = new Properties();
+    properties.set("age",42);
+    Vertex vertex = new VertexFactory().createVertex("Person", properties);
+    assertFalse(cnf.evaluate(vertex));
   }
 
   private CNF getPredicate(String queryString) {

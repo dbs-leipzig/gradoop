@@ -24,7 +24,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -95,13 +94,12 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
   public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
 
   /**
-   * Evaluates the predicate collection with respect to the given GraphElement mapping
+   * Evaluates the predicate collection with respect to the given GraphElement
    *
-   * @param mapping maps variables to graph elements
+   * @param element GraphElement under which the predicate will be evaluated
    * @return evaluation result
    */
-  public abstract boolean evaluate(Map<String, GraphElement> mapping);
-
+  public abstract boolean evaluate(GraphElement element);
 
   /**
    * Retrieves a set of all variables included in the predicate collection

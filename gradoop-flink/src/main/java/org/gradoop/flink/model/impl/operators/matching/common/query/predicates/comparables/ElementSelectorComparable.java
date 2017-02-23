@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -60,8 +59,8 @@ public class ElementSelectorComparable extends QueryComparable {
   }
 
   @Override
-  public PropertyValue evaluate(Map<String, GraphElement> mapping) {
-    return PropertyValue.create(mapping.get(elementSelector.getVariable()).getId());
+  public PropertyValue evaluate(GraphElement element) {
+    return PropertyValue.create(element.getId());
   }
 
   @Override

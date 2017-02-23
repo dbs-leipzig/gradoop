@@ -20,14 +20,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Applies a given predicate on a {@link Edge} and projects specified property values to the
@@ -44,34 +41,19 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
   private final List<String> projectionPropertyKeys;
 
   /**
-   * Variable the edge is assigned to
-   */
-  private final String edgeVariable;
-
-  /**
-   * Maps the edge to it's variable
-   */
-  private final Map<String, GraphElement> edgeMapping;
-
-  /**
    * New edge filter function
    *
-   * @param edgeVariable variable assigned to the edge
    * @param predicates predicates used for filtering
    * @param projectionPropertyKeys property keys that will be used for projection
    */
-  public FilterAndProjectEdge(String edgeVariable, CNF predicates,
-    List<String> projectionPropertyKeys) {
+  public FilterAndProjectEdge(CNF predicates, List<String> projectionPropertyKeys) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
-    this.edgeVariable = edgeVariable;
-    this.edgeMapping = new HashMap<>();
   }
 
   @Override
   public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
-    edgeMapping.put(edgeVariable, edge);
-    if (predicates.evaluate(edgeMapping)) {
+    if (predicates.evaluate(edge)) {
       out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys));
     }
   }

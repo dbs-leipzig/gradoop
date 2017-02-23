@@ -30,7 +30,6 @@ import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -68,12 +67,12 @@ public abstract class QueryComparable implements Serializable {
   public abstract PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData);
 
   /**
-   * Evaluates the expression with respect to the given variable mapping to GraphElements
+   * Evaluates the expression with respect to the given GraphElement
    *
-   * @param mapping mapping of variables to GraphElements
+   * @param element GraphElement under which the predicate will be evaluated
    * @return evaluation result
    */
-  public abstract PropertyValue evaluate(Map<String, GraphElement> mapping);
+  public abstract PropertyValue evaluate(GraphElement element);
 
   /**
    * Returns a set of property keys referenced by this expression for a given variable

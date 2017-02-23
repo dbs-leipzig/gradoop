@@ -28,7 +28,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -79,14 +78,14 @@ public class ComparisonExpression extends QueryPredicate {
   }
 
   /**
-   * Evaluates the comparison for the given mapping of variables to graph elements
+   * Evaluates the comparison for the given graph element
    *
-   * @param mapping maps variables to graph elements
+   * @param element GraphElement under which the comparison will be evaluated
    * @return evaluation result
    */
-  public boolean evaluate(Map<String, GraphElement> mapping) {
-    PropertyValue lhsValue = getLhs().evaluate(mapping);
-    PropertyValue rhsValue = getRhs().evaluate(mapping);
+  public boolean evaluate(GraphElement element) {
+    PropertyValue lhsValue = getLhs().evaluate(element);
+    PropertyValue rhsValue = getRhs().evaluate(element);
 
     return compare(lhsValue, rhsValue);
   }

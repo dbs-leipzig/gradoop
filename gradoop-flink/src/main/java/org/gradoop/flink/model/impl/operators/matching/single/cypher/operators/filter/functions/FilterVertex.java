@@ -18,12 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Filters vertices by a given predicate
@@ -36,30 +32,16 @@ public class FilterVertex implements FilterFunction<Vertex> {
   private final CNF predicates;
 
   /**
-   * Variable assigned to the vertex
-   */
-  private final String vertexVariable;
-
-  /**
-   * Mapping of variables to vertices
-   */
-  private final Map<String, GraphElement> mapping;
-
-  /**
    * Creates a new UDF
    *
-   * @param vertexVariable variable assigned to the vertex
    * @param predicates filter predicates
    */
-  public FilterVertex(String vertexVariable, CNF predicates) {
+  public FilterVertex(CNF predicates) {
     this.predicates = predicates;
-    this.vertexVariable = vertexVariable;
-    this.mapping = new HashMap<>();
   }
 
   @Override
   public boolean filter(Vertex vertex) throws Exception {
-    mapping.put(vertexVariable, vertex);
-    return predicates.evaluate(mapping);
+    return predicates.evaluate(vertex);
   }
 }

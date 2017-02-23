@@ -72,7 +72,7 @@ public class FilterAndProjectVerticesAltNode extends LeafNode implements FilterN
   @Override
   public DataSet<Embedding> execute() {
     return
-      new FilterAndProjectVerticesAlt(vertices, vertexVariable, filterPredicate, projectionKeys)
+      new FilterAndProjectVerticesAlt(vertices, filterPredicate, projectionKeys)
       .evaluate();
   }
 

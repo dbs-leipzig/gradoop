@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,9 +60,9 @@ public class CNFElement extends PredicateCollection<ComparisonExpression> {
   }
 
   @Override
-  public boolean evaluate(Map<String, GraphElement> mapping) {
+  public boolean evaluate(GraphElement element) {
     for (ComparisonExpression comparisonExpression : predicates) {
-      if (comparisonExpression.evaluate(mapping)) {
+      if (comparisonExpression.evaluate(element)) {
         return true;
       }
     }

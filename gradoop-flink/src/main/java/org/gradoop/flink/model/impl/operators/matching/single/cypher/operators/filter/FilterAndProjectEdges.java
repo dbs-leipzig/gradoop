@@ -50,10 +50,6 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    */
   private final DataSet<Edge> input;
   /**
-   * Variable assigned to the edge
-   */
-  private final String edgeVariable;
-  /**
    * Predicates in conjunctive normal form
    */
   private final CNF predicates;
@@ -66,21 +62,18 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * New edge filter operator
    *
    * @param input Candidate edges
-   * @param edgeVariable edgeVariable assigned to the Edge
    * @param predicates Predicates used to filter edges
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectEdges(DataSet<Edge> input, String edgeVariable, CNF predicates,
+  public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates,
     List<String> projectionPropertyKeys) {
     this.input = input;
-    this.edgeVariable = edgeVariable;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterAndProjectEdge(edgeVariable, predicates,
-      projectionPropertyKeys));
+    return input.flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys));
   }
 }
