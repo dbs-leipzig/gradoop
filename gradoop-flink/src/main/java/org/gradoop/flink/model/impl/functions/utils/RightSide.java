@@ -36,7 +36,7 @@ public class RightSide<L, R> implements JoinFunction<L, R, R>, CrossFunction<L, 
   }
 
   @Override
-  public R cross(L val1, R val2) throws Exception {
-    return val2;
+  public R cross(L left, R right) throws Exception {
+    return right;
   }
 }
