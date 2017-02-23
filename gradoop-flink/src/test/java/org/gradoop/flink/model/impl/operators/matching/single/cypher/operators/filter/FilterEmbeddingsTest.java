@@ -38,8 +38,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testFilterEmbeddings() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(23));
-    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(42));
+    PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(23)};
+    PropertyValue[] propertiesB = new PropertyValue[]{PropertyValue.create(42)};
 
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), propertiesA);
@@ -62,8 +62,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testKeepEmbeddings() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(42));
-    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(23));
+    PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};
+    PropertyValue[] propertiesB = new PropertyValue[]{PropertyValue.create(23)};
 
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), propertiesA);
@@ -86,8 +86,8 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   public void testDontAlterEmbedding() throws Exception{
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
-    List<PropertyValue> propertiesA = Lists.newArrayList(PropertyValue.create(42));
-    List<PropertyValue> propertiesB = Lists.newArrayList(PropertyValue.create(23));
+    PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};
+    PropertyValue[] propertiesB = new PropertyValue[]{PropertyValue.create(23)};
 
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get(), propertiesA);

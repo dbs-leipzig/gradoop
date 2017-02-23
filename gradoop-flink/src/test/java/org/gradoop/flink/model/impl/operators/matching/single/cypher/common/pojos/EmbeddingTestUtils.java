@@ -111,8 +111,14 @@ public class EmbeddingTestUtils {
    */
   public static Embedding createEmbedding(List<Pair<GradoopId, List<Object>>> entries) {
     Embedding e = new Embedding();
-    entries.forEach(entry -> e.add(entry.getLeft(), entry.getRight().stream()
-      .map(PropertyValue::create).collect(Collectors.toList())));
+
+    for (Pair<GradoopId, List<Object>> entry : entries) {
+      e.add(entry.getLeft());
+      for (Object o : entry.getRight()) {
+        e.addPropertyValues(PropertyValue.create(o));
+      }
+    }
+
     return e;
   }
 
