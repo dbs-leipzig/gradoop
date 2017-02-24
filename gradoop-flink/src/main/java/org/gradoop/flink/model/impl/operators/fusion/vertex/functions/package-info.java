@@ -18,4 +18,4 @@
 /**
  * Contains the UDF functions for the fusion operator.
  */
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+package org.gradoop.flink.model.impl.operators.fusion.vertex.functions;

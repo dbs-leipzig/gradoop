@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.operators.fusion.vertex;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -27,8 +27,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.fusion.functions.CreateFusedVertex;
-import org.gradoop.flink.model.impl.operators.fusion.functions.UpdateEdgesThoughToBeFusedVertices;
+import org.gradoop.flink.model.impl.operators.fusion.vertex.functions.CreateFusedVertex;
+import org.gradoop.flink.model.impl.operators.fusion.vertex.functions.UpdateEdgesThoughToBeFusedVertices;
 
 /**
  * Fusion is a binary operator taking two graphs: a search graph (first parameter) and a

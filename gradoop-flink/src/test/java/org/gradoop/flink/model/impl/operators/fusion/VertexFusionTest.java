@@ -19,6 +19,8 @@ package org.gradoop.flink.model.impl.operators.fusion;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.fusion.vertex.VertexFusion;
+import org.gradoop.flink.model.impl.operators.fusion.vertex.VertexFusionUtils;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

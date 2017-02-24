@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.operators.fusion.vertex;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -30,7 +30,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.fusion.functions.FilterSubgraphEdges;
+import org.gradoop.flink.model.impl.operators.fusion.vertex.functions.FilterSubgraphEdges;
 
 /**
  *
