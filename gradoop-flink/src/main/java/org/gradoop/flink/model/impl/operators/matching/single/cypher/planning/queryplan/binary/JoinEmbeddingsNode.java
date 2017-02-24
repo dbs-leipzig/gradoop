@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary;
 
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -46,6 +47,26 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
    * Morphism type for edges
    */
   private final MatchStrategy edgeStrategy;
+  /**
+   * Join hint for Flink optimizer
+   */
+  private final JoinOperatorBase.JoinHint joinHint;
+
+  /**
+   * Creates  a new node.
+   *
+   * @param leftChild left input plan node
+   * @param rightChild right right input plan node
+   * @param joinVariables query variables to join the inputs on
+   * @param vertexStrategy morphism setting for vertices
+   * @param edgeStrategy morphism setting for edges
+   */
+  public JoinEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
+    List<String> joinVariables,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+    this(leftChild, rightChild, joinVariables, vertexStrategy, edgeStrategy,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+  }
 
   /**
    * Creates a new node.
@@ -55,22 +76,27 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
    * @param joinVariables query variables to join the inputs on
    * @param vertexStrategy morphism setting for vertices
    * @param edgeStrategy morphism setting for edges
+   * @param joinHint Join hint for the Flink optimizer
    */
   public JoinEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
     List<String> joinVariables,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    JoinOperatorBase.JoinHint joinHint) {
     super(leftChild, rightChild);
     this.joinVariables = joinVariables;
     this.vertexStrategy = vertexStrategy;
     this.edgeStrategy = edgeStrategy;
+    this.joinHint = joinHint;
   }
 
   @Override
   public DataSet<Embedding> execute() {
     return new JoinEmbeddings(getLeftChild().execute(), getRightChild().execute(),
+      getRightChild().getEmbeddingMetaData().getEntryCount(),
       getJoinColumnsLeft(), getJoinColumnsRight(),
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
-      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight()).evaluate();
+      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),
+      joinHint).evaluate();
   }
 
   @Override
