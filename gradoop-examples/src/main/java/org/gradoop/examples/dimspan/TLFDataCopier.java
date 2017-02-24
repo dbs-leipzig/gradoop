@@ -17,23 +17,34 @@
 
 package org.gradoop.examples.dimspan;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.examples.dimspan.data_source.DIMSpanTLFSource;
-import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
-import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * A program to run DIMSpan standalone.
+ * A program to scale up graph data in TLF format by copying single graphs n times.
+ *
+ * TLF-format:
+ *
+ * t # <graphId>
+ * v <id> <label>
+ * ..
+ * e <source> <target> <label>
+ * ..
  */
-public class DIMSpanRunner extends AbstractRunner implements ProgramDescription {
+public class TLFDataCopier extends AbstractRunner implements ProgramDescription {
 
   /**
    * Option to set path to input file
@@ -44,14 +55,9 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
    */
   public static final String OPTION_OUTPUT_PATH = "o";
   /**
-   * Option to set minimum support threshold
+   * Option to set number of copies per graphs
    */
-  public static final String OPTION_MIN_SUPPORT = "ms";
-
-  /**
-   * Option to enable undirected mining mode
-   */
-  public static final String OPTION_UNDIRECTED_MODE = "u";
+  public static final String COPY_COUNT = "c";
 
   /**
    * Gradoop configuration
@@ -62,8 +68,7 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true, "Path to input file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
-    OPTIONS.addOption(OPTION_MIN_SUPPORT, "min-support", true, "Minimum support threshold");
-    OPTIONS.addOption(OPTION_UNDIRECTED_MODE, "undirected", false, "Enable undirected mode");
+    OPTIONS.addOption(COPY_COUNT, "copy-count", true, "Number of copies per input graph");
   }
 
   /**
@@ -74,7 +79,7 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, DIMSpanRunner.class.getName());
+    CommandLine cmd = parseArguments(args, TLFDataCopier.class.getName());
     if (cmd == null) {
       return;
     }
@@ -83,24 +88,29 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
     // read arguments from command line
     final String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
-
-    float minSupport = Float.valueOf(cmd.getOptionValue(OPTION_MIN_SUPPORT));
-
-    boolean directed = !cmd.hasOption(OPTION_UNDIRECTED_MODE);
+    int copyCount = Integer.parseInt(cmd.getOptionValue(COPY_COUNT));
 
     // Create data source and sink
-    DIMSpanTLFSource dataSource = new DIMSpanTLFSource(inputPath, GRADOOP_CONFIG);
+    DataSource dataSource = new TLFDataSource(inputPath, GRADOOP_CONFIG);
     DataSink dataSink = new TLFDataSink(outputPath, GRADOOP_CONFIG);
 
-    DIMSpanConfig fsmConfig = new DIMSpanConfig(minSupport, directed);
+    DataSet<GraphTransaction> input = dataSource
+      .getGraphTransactions()
+      .getTransactions();
 
-    // Change default configuration here using setter methods
+    DataSet<GraphTransaction> output = input
+      .flatMap(
+        (FlatMapFunction<GraphTransaction, GraphTransaction>) (graphTransaction, collector) -> {
+          for (int i = 1; i <= copyCount; i++) {
+            collector.collect(graphTransaction);
+          }
+        }
+      )
+      .returns(TypeExtractor
+        .getForObject(new GraphTransaction(new GraphHead(), Sets.newHashSet(), Sets.newHashSet())));
 
-    DataSet<GraphTransaction> frequentPatterns =
-      new DIMSpan(fsmConfig).execute(dataSource.getGraphs());
-
-    // Execute and write to disk
-    dataSink.write(new GraphTransactions(frequentPatterns, GRADOOP_CONFIG));
+    // execute and write to disk
+    dataSink.write(new GraphTransactions(output, GRADOOP_CONFIG));
     getExecutionEnvironment().execute();
   }
 
@@ -116,8 +126,8 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("No output file specified.");
     }
-    if (!cmd.hasOption(OPTION_MIN_SUPPORT)) {
-      throw new IllegalArgumentException("No min support specified.");
+    if (!cmd.hasOption(COPY_COUNT)) {
+      throw new IllegalArgumentException("No copy count specified.");
     }
   }
 
@@ -126,6 +136,6 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
    */
   @Override
   public String getDescription() {
-    return DIMSpanRunner.class.getName();
+    return TLFDataCopier.class.getName();
   }
 }
