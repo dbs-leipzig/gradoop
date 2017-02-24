@@ -451,6 +451,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     return this.idData;
   }
 
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public void setIdData(byte[] idData) {
+    this.idData = idData;
+  }
+
   /**
    * Returns the internal representation of the stored properties
    * @return Internal representation of the stored properties
@@ -460,6 +465,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     return this.propertyData;
   }
 
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public void setPropertyData(byte[] propertyData) {
+    this.propertyData = propertyData;
+  }
+
   /**
    * Returns the internal representation of the stored IdLists
    * @return Internal representation of the stored IdLists
@@ -467,6 +477,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getIdListData() {
     return idListData;
+  }
+
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public void setIdListData(byte[] idListData) {
+    this.idListData = idListData;
   }
 
 
