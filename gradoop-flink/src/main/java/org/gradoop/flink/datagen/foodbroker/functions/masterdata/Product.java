@@ -105,10 +105,10 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
     Random random = new Random();
     //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
-    properties.set(Constants.CATEGORY, nameGroupPair.f1);
-    properties.set(Constants.NAME, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    properties.set(Constants.CATEGORY_KEY, nameGroupPair.f1);
+    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nameGroupPair.f0);
-    properties.set(Constants.PRICE, generatePrice());
+    properties.set(Constants.PRICE_KEY, generatePrice());
     return vertexFactory.createVertex(Product.CLASS_NAME, properties);
   }
 

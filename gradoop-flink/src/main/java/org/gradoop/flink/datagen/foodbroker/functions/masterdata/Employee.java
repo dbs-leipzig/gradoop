@@ -127,7 +127,7 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
     Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set rnd city, name and gender
-    properties.set(Constants.CITY, cities.get(random.nextInt(cityCount)));
+    properties.set(Constants.CITY_KEY, cities.get(random.nextInt(cityCount)));
 
     String gender;
     String name;
@@ -142,8 +142,8 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
       name = firstNamesMale.get(random.nextInt(firstNameCountMale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
-    properties.set(Constants.NAME, name);
-    properties.set(Constants.GENDER, gender);
+    properties.set(Constants.NAME_KEY, name);
+    properties.set(Constants.GENDER_KEY, gender);
     return vertexFactory.createVertex(Employee.CLASS_NAME, properties);
   }
 }

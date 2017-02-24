@@ -35,23 +35,23 @@ public class Constants {
   /**
    * Property key for master data: name.
    */
-  public static final String NAME = "name";
+  public static final String NAME_KEY = "name";
   /**
    * Property key for master data: city.
    */
-  public static final String CITY = "city";
+  public static final String CITY_KEY = "city";
   /**
    * Property key for master data: gender.
    */
-  public static final String GENDER = "gender";
+  public static final String GENDER_KEY = "gender";
   /**
    * Property key for master data product: category.
    */
-  public static final String CATEGORY = "category";
+  public static final String CATEGORY_KEY = "category";
   /**
    * Property key for user: email.
    */
-  public static final String EMAIL = "email";
+  public static final String EMAIL_KEY = "email";
   /**
    * Reserved property key referring to the source identifier of vertices.
    */
@@ -59,71 +59,71 @@ public class Constants {
   /**
    * Property key for master data: quality.
    */
-  public static final String QUALITY = "quality";
+  public static final String QUALITY_KEY = "quality";
   /**
    * Property key for product: price property.
    */
-  public static final String PRICE = "price";
+  public static final String PRICE_KEY = "price";
   /**
    * Property key for transactional vertices: date.
    */
-  public static final String DATE = "date";
+  public static final String DATE_KEY = "date";
   /**
    * Property key for transactional vertices: delivery date.
    */
-  public static final String DELIVERYDATE = "deliveryDate";
+  public static final String DELIVERYDATE_KEY = "deliveryDate";
   /**
    * Property key for expense calculated for PurchInvoice.
    */
-  public static final String EXPENSE = "expense";
+  public static final String EXPENSE_KEY = "expense";
   /**
    * Property key for revenue calculated for SalesInvoice.
    */
-  public static final String REVENUE = "revenue";
+  public static final String REVENUE_KEY = "revenue";
   /**
    * Property key for line: quantity.
    */
-  public static final String QUANTITY = "quantity";
+  public static final String QUANTITY_KEY = "quantity";
   /**
    * Property key for line: sales price.
    */
-  public static final String SALESPRICE = "salesPrice";
+  public static final String SALESPRICE_KEY = "salesPrice";
   /**
    * Property key for line: purch price.
    */
-  public static final String PURCHPRICE = "purchPrice";
+  public static final String PURCHPRICE_KEY = "purchPrice";
   /**
    * Property key for ticket: creation date.
    */
-  public static final String CREATEDAT = "createdAt";
+  public static final String CREATEDATE_KEY = "createdAt";
   /**
    * Property key for ticket: problem.
    */
-  public static final String PROBLEM = "problem";
+  public static final String PROBLEM_KEY = "problem";
   /**
    * Property key for ticket: ERP SalesOrder Number.
    */
-  public static final String ERPSONUM = "erpSoNum";
+  public static final String ERPSONUM_KEY = "erpSoNum";
   /**
    * Property key for user: ERP Employee Number.
    */
-  public static final String ERPEMPLNUM = "erpEmplNum";
+  public static final String ERPEMPLNUM_KEY = "erpEmplNum";
   /**
    * Property key for client: ERP Customer Number.
    */
-  public static final String ERPCUSTNUM = "erpCustNum";
+  public static final String ERPCUSTNUM_KEY = "erpCustNum";
   /**
    * Property key for client: contact phone.
    */
-  public static final String CONTACTPHONE = "contactPhone";
+  public static final String CONTACTPHONE_KEY = "contactPhone";
   /**
    * Property key for client: account.
    */
-  public static final String ACCOUNT = "account";
+  public static final String ACCOUNT_KEY = "account";
   /**
    * Property key for purch and sales invoice.
    */
-  public static final String TEXT = "text";
+  public static final String TEXT_KEY = "text";
   /**
    * Property value start for purch and sales invoice.
    */

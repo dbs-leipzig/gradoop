@@ -32,6 +32,6 @@ public class MasterDataQualityMapper implements MapFunction<Vertex, Tuple2<Grado
   @Override
   public Tuple2<GradoopId, Float> map(Vertex v) throws Exception {
     return new Tuple2<>(v.getId(), v.getPropertyValue(
-      Constants.QUALITY).getFloat());
+      Constants.QUALITY_KEY).getFloat());
   }
 }

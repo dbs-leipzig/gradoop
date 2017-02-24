@@ -54,7 +54,7 @@ public class MasterData {
     Properties properties = new Properties();
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_MASTER);
-    properties.set(Constants.QUALITY, seed.getQuality());
+    properties.set(Constants.QUALITY_KEY, seed.getQuality());
     properties.set(Constants.SOURCEID_KEY, Constants.ERP_ACRONYM + "_" + bid);
 
     return properties;

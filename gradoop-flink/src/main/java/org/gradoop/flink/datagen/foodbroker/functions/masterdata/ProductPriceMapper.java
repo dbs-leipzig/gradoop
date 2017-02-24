@@ -34,7 +34,7 @@ public class ProductPriceMapper implements
 
   @Override
   public Tuple2<GradoopId, BigDecimal> map(Vertex v) throws Exception {
-    BigDecimal price = v.getPropertyValue(Constants.PRICE).getBigDecimal();
+    BigDecimal price = v.getPropertyValue(Constants.PRICE_KEY).getBigDecimal();
     return new Tuple2<>(v.getId(), price);
   }
 }

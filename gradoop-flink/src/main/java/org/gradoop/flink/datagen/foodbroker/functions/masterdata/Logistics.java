@@ -110,8 +110,8 @@ public class Logistics extends RichMapFunction<MasterDataSeed, Vertex> {
     Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
     Random random = new Random();
     //set rnd city and name
-    properties.set(Constants.CITY, cities.get(random.nextInt(cityCount)));
-    properties.set(Constants.NAME, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    properties.set(Constants.CITY_KEY, cities.get(random.nextInt(cityCount)));
+    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
     return vertexFactory.createVertex(Logistics.CLASS_NAME, properties);
   }

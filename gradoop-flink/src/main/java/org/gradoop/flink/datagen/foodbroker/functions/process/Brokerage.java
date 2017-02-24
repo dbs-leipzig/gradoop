@@ -160,7 +160,7 @@ public class Brokerage
 
     // set properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, startDate);
+    properties.set(Constants.DATE_KEY, startDate);
     properties.set(Constants.SOURCEID_KEY, bid);
 
     Vertex salesQuotation = newVertex(label, properties);
@@ -233,14 +233,14 @@ public class Brokerage
       Constants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.PURCHPRICE, productPriceMap.get(product));
-    properties.set(Constants.SALESPRICE,
+    properties.set(Constants.PURCHPRICE_KEY, productPriceMap.get(product));
+    properties.set(Constants.SALESPRICE_KEY,
       salesMargin
         .add(BigDecimal.ONE)
         .multiply(productPriceMap.get(product))
         .setScale(2, BigDecimal.ROUND_HALF_UP)
     );
-    properties.set(Constants.QUANTITY, quantity);
+    properties.set(Constants.QUANTITY_KEY, quantity);
 
     return newEdge(label, salesQuotation.getId(), product, properties);
   }
@@ -262,7 +262,7 @@ public class Brokerage
       Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
 
     Long salesQuotationDate = salesQuotation
-      .getPropertyValue(Constants.DATE)
+      .getPropertyValue(Constants.DATE_KEY)
       .getLong();
     long date = config.delayDelayConfiguration(salesQuotationDate,
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
@@ -278,9 +278,9 @@ public class Brokerage
 
     // set calculated properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, date);
+    properties.set(Constants.DATE_KEY, date);
     properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.DELIVERYDATE, config.delayDelayConfiguration(
+    properties.set(Constants.DELIVERYDATE_KEY, config.delayDelayConfiguration(
       date, influencingMasterQuality, Constants.SALESORDER_VERTEX_LABEL,
       Constants.SO_DELIVERYAGREEMENTDELAY_CONFIG_KEY));
 
@@ -329,10 +329,10 @@ public class Brokerage
 
     // set properties based on the sales quotation line
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.SALESPRICE, salesQuotationLine.getPropertyValue(
-      Constants.SALESPRICE).getBigDecimal());
-    properties.set(Constants.QUANTITY, salesQuotationLine.getPropertyValue(
-      Constants.QUANTITY).getInt());
+    properties.set(Constants.SALESPRICE_KEY, salesQuotationLine.getPropertyValue(
+      Constants.SALESPRICE_KEY).getBigDecimal());
+    properties.set(Constants.QUANTITY_KEY, salesQuotationLine.getPropertyValue(
+      Constants.QUANTITY_KEY).getInt());
 
     return newEdge(label, salesOrder.getId(),
       salesQuotationLine.getTargetId(), properties);
@@ -373,7 +373,7 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE).getLong();
+    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality(
         Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
@@ -381,7 +381,7 @@ public class Brokerage
     String bid = createBusinessIdentifier(currentId++, Constants.PURCHORDER_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, date);
+    properties.set(Constants.DATE_KEY, date);
     properties.set(Constants.SOURCEID_KEY, bid);
 
     Vertex purchOrder = newVertex(label, properties);
@@ -457,9 +457,9 @@ public class Brokerage
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     // create indirect connection to the corresponding sales order
     properties.set("salesOrderLine", salesOrderLine.getId().toString());
-    properties.set(Constants.QUANTITY,
-      salesOrderLine.getPropertyValue(Constants.QUANTITY).getInt());
-    properties.set(Constants.PURCHPRICE, purchPrice);
+    properties.set(Constants.QUANTITY_KEY,
+      salesOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt());
+    properties.set(Constants.PURCHPRICE_KEY, purchPrice);
 
     purchOrderLine = newEdge(label, purchOrder.getId(), salesOrderLine.getTargetId(),
       properties);
@@ -499,7 +499,7 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE).getLong();
+    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
     GradoopId operatedBy = getNextLogistic();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
@@ -513,7 +513,7 @@ public class Brokerage
     String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, date);
+    properties.set(Constants.DATE_KEY, date);
     properties.set(Constants.SOURCEID_KEY, bid);
     properties.set("trackingCode", "***TODO***");
 
@@ -548,9 +548,9 @@ public class Brokerage
         total = purchOrderTotals.get(purchOrder);
       }
       purchAmount = BigDecimal.valueOf(
-        purchOrderLine.getPropertyValue(Constants.QUANTITY).getInt());
+        purchOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt());
       purchAmount = purchAmount.multiply(purchOrderLine.getPropertyValue(
-        Constants.PURCHPRICE).getBigDecimal());
+        Constants.PURCHPRICE_KEY).getBigDecimal());
       total = total.add(purchAmount);
       purchOrderTotals.put(purchOrder, total);
     }
@@ -580,17 +580,17 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE).getLong();
+    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
     long date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality(
         Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC),
       Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_INVOICEDELAY_CONFIG_KEY);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, date);
+    properties.set(Constants.DATE_KEY, date);
     String bid = createBusinessIdentifier(currentId++, Constants.PURCHINVOICE_ACRONYM);
     properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.EXPENSE, total);
+    properties.set(Constants.EXPENSE_KEY, total);
     properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex purchInvoice = newVertex(label, properties);
@@ -613,17 +613,17 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE).getLong();
+    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality
         (Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
       Constants.SALESORDER_VERTEX_LABEL, Constants.SO_INVOICEDELAY_CONFIG_KEY);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE, date);
+    properties.set(Constants.DATE_KEY, date);
     String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
     properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.REVENUE, BigDecimal.ZERO);
+    properties.set(Constants.REVENUE_KEY, BigDecimal.ZERO);
     properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex salesInvoice = newVertex(label, properties);
@@ -633,12 +633,12 @@ public class Brokerage
     // set the invoices revenue considering all sales order lines
     for (Edge salesOrderLine : salesOrderLines) {
       salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue(
-        Constants.QUANTITY).getInt())
-        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE).getBigDecimal())
+        Constants.QUANTITY_KEY).getInt())
+        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
-      revenue = salesInvoice.getPropertyValue(Constants.REVENUE).getBigDecimal();
+      revenue = salesInvoice.getPropertyValue(Constants.REVENUE_KEY).getBigDecimal();
       revenue = revenue.add(salesAmount);
-      salesInvoice.setProperty(Constants.REVENUE, revenue);
+      salesInvoice.setProperty(Constants.REVENUE_KEY, revenue);
     }
 
     // create relevant edge

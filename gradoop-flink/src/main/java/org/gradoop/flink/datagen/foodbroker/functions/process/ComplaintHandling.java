@@ -180,7 +180,7 @@ public class ComplaintHandling
 
         Vertex ticket = newTicket(
           Constants.BADQUALITY_TICKET_PROBLEM,
-          deliveryNote.getPropertyValue(Constants.DATE).getLong());
+          deliveryNote.getPropertyValue(Constants.DATE_KEY).getLong());
         grantSalesRefund(badSalesOrderLines, ticket);
         claimPurchRefund(currentPurchOrderLines, ticket);
       }
@@ -198,8 +198,8 @@ public class ComplaintHandling
     // Iterate over all delivery notes and take the sales order lines of
     // sales orders, which are late
     for (Vertex deliveryNote : deliveryNotes) {
-      if (deliveryNote.getPropertyValue(Constants.DATE).getLong() >
-        salesOrder.getPropertyValue(Constants.DELIVERYDATE).getLong()) {
+      if (deliveryNote.getPropertyValue(Constants.DATE_KEY).getLong() >
+        salesOrder.getPropertyValue(Constants.DELIVERYDATE_KEY).getLong()) {
         lateSalesOrderLines.addAll(salesOrderLines);
       }
     }
@@ -212,7 +212,7 @@ public class ComplaintHandling
         latePurchOrderLines.add(getCorrespondingPurchOrderLine(salesOrderLine.getId()));
       }
       Calendar calendar = Calendar.getInstance();
-      calendar.setTimeInMillis(salesOrder.getPropertyValue(Constants.DELIVERYDATE).getLong());
+      calendar.setTimeInMillis(salesOrder.getPropertyValue(Constants.DELIVERYDATE_KEY).getLong());
       calendar.add(Calendar.DATE, 1);
       long createdDate = calendar.getTimeInMillis();
 
@@ -235,9 +235,9 @@ public class ComplaintHandling
     Properties properties = new Properties();
     // properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.CREATEDAT, createdAt);
-    properties.set(Constants.PROBLEM, problem);
-    properties.set(Constants.ERPSONUM, salesOrder.getId().toString());
+    properties.set(Constants.CREATEDATE_KEY, createdAt);
+    properties.set(Constants.PROBLEM_KEY, problem);
+    properties.set(Constants.ERPSONUM_KEY, salesOrder.getId().toString());
 
     GradoopId employeeId = getNextEmployee();
     GradoopId customerId = getEdgeTargetId(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId());
@@ -280,8 +280,9 @@ public class ComplaintHandling
     BigDecimal salesAmount;
 
     for (Edge salesOrderLine : salesOrderLines) {
-      salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue(Constants.QUANTITY).getInt())
-        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE).getBigDecimal())
+      salesAmount = BigDecimal.valueOf(
+        salesOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt())
+        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
       refundAmount = refundAmount.add(salesAmount);
     }
@@ -294,11 +295,12 @@ public class ComplaintHandling
 
       Properties properties = new Properties();
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-      properties.set(Constants.DATE, ticket.getPropertyValue(Constants.CREATEDAT).getLong());
+      properties.set(
+        Constants.DATE_KEY, ticket.getPropertyValue(Constants.CREATEDATE_KEY).getLong());
       String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
-      properties.set(Constants.REVENUE, refundAmount);
-      properties.set(Constants.TEXT, Constants.TEXT_CONTENT + ticket.getId());
+      properties.set(Constants.REVENUE_KEY, refundAmount);
+      properties.set(Constants.TEXT_KEY, Constants.TEXT_CONTENT + ticket.getId());
 
       Vertex salesInvoice = newVertex(label, properties);
 
@@ -329,8 +331,9 @@ public class ComplaintHandling
     BigDecimal purchAmount;
 
     for (Edge purchOrderLine : purchOrderLines) {
-      purchAmount = BigDecimal.valueOf(purchOrderLine.getPropertyValue(Constants.QUANTITY).getInt())
-        .multiply(purchOrderLine.getPropertyValue(Constants.PURCHPRICE).getBigDecimal())
+      purchAmount = BigDecimal.valueOf(
+        purchOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt())
+        .multiply(purchOrderLine.getPropertyValue(Constants.PURCHPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
       refundAmount = refundAmount.add(purchAmount);
     }
@@ -343,12 +346,13 @@ public class ComplaintHandling
       Properties properties = new Properties();
 
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-      properties.set(Constants.DATE, ticket.getPropertyValue(Constants.CREATEDAT).getLong());
+      properties.set(
+        Constants.DATE_KEY, ticket.getPropertyValue(Constants.CREATEDATE_KEY).getLong());
       String bid = createBusinessIdentifier(
         currentId++, Constants.PURCHINVOICE_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
-      properties.set(Constants.EXPENSE, refundAmount);
-      properties.set(Constants.TEXT, Constants.TEXT_CONTENT + ticket.getId());
+      properties.set(Constants.EXPENSE_KEY, refundAmount);
+      properties.set(Constants.TEXT_KEY, Constants.TEXT_CONTENT + ticket.getId());
 
       Vertex purchInvoice = newVertex(label, properties);
 
@@ -488,15 +492,15 @@ public class ComplaintHandling
       sourceIdKey = sourceIdKey.replace(Employee.ACRONYM, Constants.USER_ACRONYM);
       sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPEMPLNUM, employee.getId().toString());
-      String email = properties.get(Constants.NAME).getString();
+      properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
+      String email = properties.get(Constants.NAME_KEY).getString();
       email = email.replace(" ", ".").toLowerCase();
       email += "@biiig.org";
-      properties.set(Constants.EMAIL, email);
+      properties.set(Constants.EMAIL_KEY, email);
       //create the vertex and store it in a map for fast access
       Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
       masterDataMap.put(employeeId, user);
-      userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY).getFloat());
+      userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
 
       newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
       return user;
@@ -522,9 +526,9 @@ public class ComplaintHandling
       sourceIdKey = sourceIdKey.replace(Customer.ACRONYM, Constants.CLIENT_ACRONYM);
       sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPCUSTNUM, customer.getId().toString());
-      properties.set(Constants.CONTACTPHONE, "0123456789");
-      properties.set(Constants.ACCOUNT, "CL" + customer.getId().toString());
+      properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
+      properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
+      properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
       //create the vertex and store it in a map for fast access
       Vertex client = vertexFactory.createVertex(
         Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
