@@ -52,7 +52,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v0, e0, v1);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 3, 0, 0);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -90,7 +90,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v1, e2 ,v3);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right, 2, 0);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 3, 2, 0);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -130,7 +130,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v3, e2, v1, e3, v4);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right, 2, 2);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 5, 2, 2);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -164,7 +164,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v0, e1, v1);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,
+    PhysicalOperator join = new JoinEmbeddings(left, right, 3,
       Arrays.asList(0, 2), Arrays.asList(0, 2));
 
     // get results
@@ -206,7 +206,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
       v0, e2, v3, e3, v2);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,
+    PhysicalOperator join = new JoinEmbeddings(left, right, 5,
       Arrays.asList(0, 4), Arrays.asList(0, 4));
 
     // get results
@@ -250,7 +250,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v4, e3, v1, e4, v2, e5, v5);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,
+    PhysicalOperator join = new JoinEmbeddings(left, right, 7,
       Arrays.asList(2, 4), Arrays.asList(2, 4));
 
     // get results
@@ -283,7 +283,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = createEmbeddings(env, 1, v0, e0, v1);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,0, 0);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 3,0, 0);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -310,7 +310,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(embedding);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right, 0, 0);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 1, 0, 0);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -338,7 +338,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(embeddingRight);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,2, 0);
+    PhysicalOperator join = new JoinEmbeddings(left, right, 1, 2, 0);
 
     // get results
     Embedding result = join.evaluate().collect().get(0);
@@ -445,7 +445,8 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void testVertexHomomorphismEdgeIsomorphism() throws Exception {
     List<Integer> emptyList = Collections.emptyList();
-    testMorphisms(emptyList, emptyList, // vertex columns
+    testMorphisms(
+      emptyList, emptyList, // vertex columns
       Collections.singletonList(1), Collections.singletonList(1), // edge columns
       Lists.newArrayList(
         createEmbedding(v0, e0, v1, e1),
@@ -498,7 +499,7 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> right = getExecutionEnvironment().fromCollection(entries);
 
     // join operator
-    PhysicalOperator join = new JoinEmbeddings(left, right,
+    PhysicalOperator join = new JoinEmbeddings(left, right, 3,
       Arrays.asList(0, 2), Arrays.asList(0, 2),
       distinctVertexColumnsLeft, distinctVertexColumnsRight,
       distinctEdgeColumnsLeft, distinctEdgeColumnsRight);
