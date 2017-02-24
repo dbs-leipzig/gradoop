@@ -1,6 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.GDLHandler.Builder;
@@ -8,8 +9,10 @@ import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -26,8 +29,25 @@ public class QueryHandlerTest {
     "(v2)-[e3:a]->(v1)" +
     "(v3)-[e4:c]->(v3)";
 
-  static GDLHandler GDL_HANDLER = new Builder().buildFromString(TEST_QUERY);
+  private static GDLHandler GDL_HANDLER = new Builder().buildFromString(TEST_QUERY);
   static QueryHandler QUERY_HANDLER = new QueryHandler(TEST_QUERY);
+
+  @Test
+  public void testGetTriples() throws Exception {
+    Set<Triple> expected = Sets.newHashSet(
+      new Triple(GDL_HANDLER.getVertexCache().get("v1"), GDL_HANDLER.getEdgeCache().get("e1"),
+        GDL_HANDLER.getVertexCache().get("v2")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v2"), GDL_HANDLER.getEdgeCache().get("e2"),
+        GDL_HANDLER.getVertexCache().get("v3")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v2"), GDL_HANDLER.getEdgeCache().get("e3"),
+        GDL_HANDLER.getVertexCache().get("v1")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v3"), GDL_HANDLER.getEdgeCache().get("e4"),
+        GDL_HANDLER.getVertexCache().get("v3")));
+
+    Collection<Triple> triples = QUERY_HANDLER.getTriples();
+    assertEquals(expected.size(), triples.size());
+    assertTrue(triples.stream().allMatch(expected::contains));
+  }
 
   @Test
   public void testGetVertexCount() {
@@ -64,7 +84,7 @@ public class QueryHandlerTest {
   }
 
   @Test
-  public void testIsedge() {
+  public void testIsEdge() {
     assertTrue(QUERY_HANDLER.isEdge("e1"));
     assertFalse(QUERY_HANDLER.isEdge("v1"));
   }
