@@ -22,6 +22,7 @@ import org.apache.flink.hadoop.shaded.com.google.common.collect.Sets;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.foodbroker.config.Constants;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Set;
@@ -38,13 +39,19 @@ public class RelevantElementsFromBrokerage
     //take only vertices which have the needed label
     Set<Vertex> vertices = Sets.newHashSet();
     for (Vertex vertex : graphTransaction.getVertices()) {
-      if (vertex.getLabel().equals("DeliveryNote") || vertex.getLabel().equals("SalesOrder")) {
+      if (vertex.getLabel().equals(Constants.DELIVERYNOTE_VERTEX_LABEL) ||
+        vertex.getLabel().equals(Constants.SALESORDER_VERTEX_LABEL)) {
         vertices.add(vertex);
       }
     }
     //take only edges which have the needed label
-    Set<String> edgelabels = Sets.newHashSet("contains", "receives", "operatedBy", "placedAt",
-      "receivedFrom", "SalesOrderLine", "PurchOrderLine");
+    Set<String> edgelabels = Sets.newHashSet(
+      Constants.CONTAINS_EDGE_LABEL,
+      Constants.OPERATEDBY_EDGE_LABEL,
+      Constants.PLACEDAT_EDGE_LABEL,
+      Constants.RECEIVEDFROM_EDGE_LABEL,
+      Constants.SALESORDERLINE_EDGE_LABEL,
+      Constants.PURCHORDERLINE_EDGE_LABEL);
     Set<Edge> edges = Sets.newHashSet();
     for (Edge edge : graphTransaction.getEdges()) {
       if (edgelabels.contains(edge.getLabel())) {

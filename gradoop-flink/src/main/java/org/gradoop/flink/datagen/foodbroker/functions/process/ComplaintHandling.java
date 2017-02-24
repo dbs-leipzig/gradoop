@@ -115,10 +115,10 @@ public class ComplaintHandling
 
     edgeMap = createEdgeMap(transaction);
     //get needed transactional objects created during brokerage process
-    deliveryNotes = getVertexByLabel(transaction, "DeliveryNote");
-    salesOrderLines = getEdgesByLabel(transaction, "SalesOrderLine");
-    purchOrderLines = getEdgesByLabel(transaction, "PurchOrderLine");
-    salesOrder = getVertexByLabel(transaction, "SalesOrder").iterator().next();
+    deliveryNotes = getVertexByLabel(transaction, Constants.DELIVERYNOTE_VERTEX_LABEL);
+    salesOrderLines = getEdgesByLabel(transaction, Constants.SALESORDERLINE_EDGE_LABEL);
+    purchOrderLines = getEdgesByLabel(transaction, Constants.PURCHORDERLINE_EDGE_LABEL);
+    salesOrder = getVertexByLabel(transaction, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
 
     //create new graph head
     graphHead = graphHeadFactory.createGraphHead();
@@ -156,7 +156,7 @@ public class ComplaintHandling
       influencingMasterQuality = Lists.newArrayList();
       badSalesOrderLines = Sets.newHashSet();
       //get the corresponding purch order and purch order lines
-      purchOrderId = getEdgeTargetId("contains", deliveryNote.getId());
+      purchOrderId = getEdgeTargetId(Constants.CONTAINS_EDGE_LABEL, deliveryNote.getId());
       currentPurchOrderLines = getPurchOrderLinesByPurchOrder(purchOrderId);
 
       for (Edge purchOrderLine : currentPurchOrderLines) {
@@ -165,19 +165,21 @@ public class ComplaintHandling
       int containedProducts = influencingMasterQuality.size();
       // increase relative influence of vendor and logistics
       for (int i = 1; i <= containedProducts / 2; i++) {
-        influencingMasterQuality.add(getEdgeTargetQuality("operatedBy",
-          deliveryNote.getId(), Constants.LOGISTIC_MAP_BC));
-        influencingMasterQuality.add(getEdgeTargetQuality("placedAt",
+        influencingMasterQuality.add(getEdgeTargetQuality(
+          Constants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), Constants.LOGISTIC_MAP_BC));
+        influencingMasterQuality.add(getEdgeTargetQuality(Constants.PLACEDAT_EDGE_LABEL,
           purchOrderId, Constants.VENDOR_MAP_BC));
       }
-      if (config.happensTransitionConfiguration(influencingMasterQuality, "Ticket",
-        "badQualityProbability", false)) {
+      if (config.happensTransitionConfiguration(
+        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
+        Constants.TI_BADQUALITYPROBABILITY_CONFIG_KEY, false)) {
 
         for (Edge purchOrderLine : currentPurchOrderLines) {
           badSalesOrderLines.add(getCorrespondingSalesOrderLine(purchOrderLine.getId()));
         }
 
-        Vertex ticket = newTicket("bad quality",
+        Vertex ticket = newTicket(
+          Constants.BADQUALITY_TICKET_PROBLEM,
           deliveryNote.getPropertyValue(Constants.DATE).getLong());
         grantSalesRefund(badSalesOrderLines, ticket);
         claimPurchRefund(currentPurchOrderLines, ticket);
@@ -215,7 +217,7 @@ public class ComplaintHandling
       long createdDate = calendar.getTimeInMillis();
 
       // Create ticket and process refunds
-      Vertex ticket = newTicket("late delivery", createdDate);
+      Vertex ticket = newTicket(Constants.LATEDELIVERY_TICKET_PROBLEM, createdDate);
       grantSalesRefund(lateSalesOrderLines, ticket);
       claimPurchRefund(latePurchOrderLines, ticket);
     }
@@ -229,7 +231,7 @@ public class ComplaintHandling
    * @return the ticket
    */
   private Vertex newTicket(String problem, long createdAt) {
-    String label = "Ticket";
+    String label = Constants.TICKET_VERTEX_LABEL;
     Properties properties = new Properties();
     // properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -238,21 +240,21 @@ public class ComplaintHandling
     properties.set(Constants.ERPSONUM, salesOrder.getId().toString());
 
     GradoopId employeeId = getNextEmployee();
-    GradoopId customerId = getEdgeTargetId("receivedFrom", salesOrder.getId());
+    GradoopId customerId = getEdgeTargetId(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId());
 
     Vertex ticket = newVertex(label, properties);
 
-    newEdge("concerns", ticket.getId(), salesOrder.getId());
+    newEdge(Constants.CONCERNS_EDGE_LABEL, ticket.getId(), salesOrder.getId());
     //new master data, user
     Vertex user = getUserFromEmployeeId(employeeId);
-    newEdge("createdBy", ticket.getId(), user.getId());
+    newEdge(Constants.CREATEDBY_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, user
     employeeId = getNextEmployee();
     user = getUserFromEmployeeId(employeeId);
-    newEdge("allocatedTo", ticket.getId(), user.getId());
+    newEdge(Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, client
     Vertex client = getClientFromCustomerId(customerId);
-    newEdge("openedBy", ticket.getId(), client.getId());
+    newEdge(Constants.OPENEDBY_EDGE_LABEL, ticket.getId(), client.getId());
 
     return ticket;
   }
@@ -265,14 +267,15 @@ public class ComplaintHandling
    */
   private void grantSalesRefund(Set<Edge> salesOrderLines, Vertex ticket) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality("allocatedTo", ticket
-      .getId(), Constants.USER_MAP));
-    influencingMasterQuality.add(getEdgeTargetQuality("receivedFrom",
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), Constants.USER_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(Constants.RECEIVEDFROM_EDGE_LABEL,
       salesOrder.getId(), Constants.CUSTOMER_MAP_BC));
     //calculate refund
     BigDecimal refundHeight = config
-      .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
-        "salesRefund", false);
+      .getDecimalVariationConfigurationValue(
+        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
+        Constants.TI_SALESREFUND_CONFIG_KEY, false);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal salesAmount;
 
@@ -287,7 +290,7 @@ public class ComplaintHandling
         .setScale(2, BigDecimal.ROUND_HALF_UP);
     //create sales invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
-      String label = "SalesInvoice";
+      String label = Constants.SALESINVOICE_VERTEX_LABEL;
 
       Properties properties = new Properties();
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -295,11 +298,11 @@ public class ComplaintHandling
       String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
       properties.set(Constants.REVENUE, refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
+      properties.set(Constants.TEXT, Constants.TEXT_CONTENT + ticket.getId());
 
       Vertex salesInvoice = newVertex(label, properties);
 
-      newEdge("createdFor", salesInvoice.getId(), salesOrder.getId());
+      newEdge(Constants.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
     }
   }
 
@@ -313,14 +316,15 @@ public class ComplaintHandling
     GradoopId purchOrderId = purchOrderLines.iterator().next().getSourceId();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality("allocatedTo", ticket
-      .getId(), Constants.USER_MAP));
-    influencingMasterQuality.add(getEdgeTargetQuality("placedAt",
+    influencingMasterQuality.add(getEdgeTargetQuality(
+      Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), Constants.USER_MAP));
+    influencingMasterQuality.add(getEdgeTargetQuality(Constants.PLACEDAT_EDGE_LABEL,
       purchOrderId, Constants.VENDOR_MAP_BC));
     //calculate refund
     BigDecimal refundHeight = config
-      .getDecimalVariationConfigurationValue(influencingMasterQuality, "Ticket",
-        "purchRefund", true);
+      .getDecimalVariationConfigurationValue(
+        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
+        Constants.TI_PURCHREFUND_CONFIG_KEY, true);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal purchAmount;
 
@@ -335,7 +339,7 @@ public class ComplaintHandling
         .setScale(2, BigDecimal.ROUND_HALF_UP);
     //create purch invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
-      String label = "PurchInvoice";
+      String label = Constants.PURCHINVOICE_VERTEX_LABEL;
       Properties properties = new Properties();
 
       properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -344,11 +348,11 @@ public class ComplaintHandling
         currentId++, Constants.PURCHINVOICE_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
       properties.set(Constants.EXPENSE, refundAmount);
-      properties.set("text", "*** TODO @ ComplaintHandling ***");
+      properties.set(Constants.TEXT, Constants.TEXT_CONTENT + ticket.getId());
 
       Vertex purchInvoice = newVertex(label, properties);
 
-      newEdge("createdFor", purchInvoice.getId(), purchOrderId);
+      newEdge(Constants.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrderId);
     }
   }
 
@@ -490,11 +494,11 @@ public class ComplaintHandling
       email += "@biiig.org";
       properties.set(Constants.EMAIL, email);
       //create the vertex and store it in a map for fast access
-      Vertex user = vertexFactory.createVertex("User", properties, graphIds);
+      Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
       masterDataMap.put(employeeId, user);
       userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY).getFloat());
 
-      newEdge("sameAs", user.getId(), employeeId);
+      newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
       return user;
     }
   }
@@ -522,10 +526,11 @@ public class ComplaintHandling
       properties.set(Constants.CONTACTPHONE, "0123456789");
       properties.set(Constants.ACCOUNT, "CL" + customer.getId().toString());
       //create the vertex and store it in a map for fast access
-      Vertex client = vertexFactory.createVertex("Client", properties, graphIds);
+      Vertex client = vertexFactory.createVertex(
+        Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
       masterDataMap.put(customerId, client);
 
-      newEdge("sameAs", client.getId(), customerId);
+      newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
       return client;
     }
   }

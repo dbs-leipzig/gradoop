@@ -137,12 +137,13 @@ public class Brokerage
   private boolean confirmed(Vertex salesQuotation) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
+      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
 
-    return config.happensTransitionConfiguration(influencingMasterQuality,
-      "SalesQuotation", "confirmationProbability", false);
+    return config.happensTransitionConfiguration(
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
+      Constants.SQ_CONFIRMATIONPROBABILITY_CONFIG_KEY, false);
   }
 
   /**
@@ -152,7 +153,7 @@ public class Brokerage
    * @return vertex representation of a sales quotation
    */
   private Vertex newSalesQuotation(long startDate) {
-    String label = "SalesQuotation";
+    String label = Constants.SALESQUOTATION_VERTEX_LABEL;
     Properties properties = new Properties();
 
     String bid = createBusinessIdentifier(currentId++, Constants.SALESQUOTATION_ACRONYM);
@@ -168,8 +169,8 @@ public class Brokerage
     GradoopId rndEmployee = getNextEmployee();
     GradoopId rndCustomer = getNextCustomer();
 
-    newEdge("sentBy", salesQuotation.getId(), rndEmployee);
-    newEdge("sentTo", salesQuotation.getId(), rndCustomer);
+    newEdge(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), rndEmployee);
+    newEdge(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), rndCustomer);
 
     return salesQuotation;
   }
@@ -187,12 +188,13 @@ public class Brokerage
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
+      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
-      influencingMasterQuality, "SalesQuotation", "lines", true);
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
+      Constants.SQ_LINES_CONFIG_KEY, true);
 
     // create sales quotation lines based on calculated amount
     for (int i = 0; i < numberOfQuotationLines; i++) {
@@ -211,22 +213,24 @@ public class Brokerage
    * @return vertex representation of a sales quotation line
    */
   private Edge newSalesQuotationLine(Vertex salesQuotation, GradoopId product) {
-    String label = "SalesQuotationLine";
+    String label = Constants.SALESQUOTATIONLINE_EDGE_LABEL;
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
+      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
     influencingMasterQuality.add(productQualityMap.get(product));
 
     // calculate and set the lines properties
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, "SalesQuotation", "salesMargin", true);
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
+      Constants.SQ_SALESMARGIN_CONFIG_KEY, true);
 
     int quantity = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), "SalesQuotation", "lineQuantity", true);
+      new ArrayList<Float>(), Constants.SALESQUOTATION_VERTEX_LABEL,
+      Constants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set(Constants.PURCHPRICE, productPriceMap.get(product));
@@ -248,43 +252,45 @@ public class Brokerage
    * @return vertex representation of a sales order
    */
   private Vertex newSalesOrder(Vertex salesQuotation) {
-    String label = "SalesOrder";
+    String label = Constants.SALESORDER_VERTEX_LABEL;
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentBy", salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
+      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
 
     Long salesQuotationDate = salesQuotation
       .getPropertyValue(Constants.DATE)
       .getLong();
     long date = config.delayDelayConfiguration(salesQuotationDate,
-      influencingMasterQuality, "SalesQuotation", "confirmationDelay");
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
+      Constants.SQ_CONFIRMATIONDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(
       currentId++, Constants.SALESORDER_ACRONYM);
     // get random employee and collect all quality values from influencing master data objects
     GradoopId rndEmployee = getNextEmployee();
     influencingMasterQuality.clear();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "sentTo", salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
     influencingMasterQuality.add(employeeMap.get(rndEmployee));
 
     // set calculated properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set(Constants.DATE, date);
     properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.DELIVERYDATE, config.delayDelayConfiguration(date,
-      influencingMasterQuality, "SalesOrder", "deliveryAgreementDelay"));
+    properties.set(Constants.DELIVERYDATE, config.delayDelayConfiguration(
+      date, influencingMasterQuality, Constants.SALESORDER_VERTEX_LABEL,
+      Constants.SO_DELIVERYAGREEMENTDELAY_CONFIG_KEY));
 
     Vertex salesOrder = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge("receivedFrom", salesOrder.getId(), getEdgeTargetId(
-      "sentTo", salesQuotation.getId()));
-    newEdge("processedBy", salesOrder.getId(), rndEmployee);
-    newEdge("basedOn", salesOrder.getId(), salesQuotation.getId());
+    newEdge(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId(), getEdgeTargetId(
+      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId()));
+    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), rndEmployee);
+    newEdge(Constants.BASEDON_EDGE_LABEL, salesOrder.getId(), salesQuotation.getId());
 
     return salesOrder;
   }
@@ -318,7 +324,7 @@ public class Brokerage
    * @return vertex representation of a sales order line
    */
   private Edge newSalesOrderLine(Vertex salesOrder, Edge salesQuotationLine) {
-    String label = "SalesOrderLine";
+    String label = Constants.SALESORDERLINE_EDGE_LABEL;
     Properties properties = new Properties();
 
     // set properties based on the sales quotation line
@@ -344,7 +350,8 @@ public class Brokerage
     Vertex purchOrder;
 
     int numberOfVendors = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), "PurchOrder", "numberOfVendors", true);
+      new ArrayList<Float>(), Constants.PURCHORDER_VERTEX_LABEL,
+      Constants.PO_NUMBEROFVENDORS_CONFIG_KEY, true);
     for (int i = 0; i < (numberOfVendors > salesOrderLines.size() ?
       salesOrderLines.size() : numberOfVendors); i++) {
       purchOrder = newPurchOrder(salesOrder, getNextEmployee());
@@ -362,14 +369,15 @@ public class Brokerage
    * @return vertex representation of a purch order
    */
   private Vertex newPurchOrder(Vertex salesOrder, GradoopId processedBy) {
-    String label = "PurchOrder";
+    String label = Constants.PURCHORDER_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
     long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE).getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
-      getEdgeTargetQuality("processedBy", salesOrder.getId(),
-        Constants.EMPLOYEE_MAP_BC), "PurchOrder", "purchaseDelay");
+      getEdgeTargetQuality(
+        Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
+        Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_PURCHASEDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(currentId++, Constants.PURCHORDER_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -379,9 +387,9 @@ public class Brokerage
     Vertex purchOrder = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge("serves", purchOrder.getId(), salesOrder.getId());
-    newEdge("placedAt", purchOrder.getId(), getNextVendor());
-    newEdge("processedBy", purchOrder.getId(), processedBy);
+    newEdge(Constants.SERVES_EDGE_LABEL, purchOrder.getId(), salesOrder.getId());
+    newEdge(Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), getNextVendor());
+    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), processedBy);
 
     return purchOrder;
   }
@@ -425,7 +433,7 @@ public class Brokerage
    * @return vertex representation of a purch order line
    */
   private Edge newPurchOrderLine(Vertex purchOrder, Edge salesOrderLine) {
-    String label = "PurchOrderLine";
+    String label = Constants.PURCHORDERLINE_EDGE_LABEL;
     Edge purchOrderLine;
     Properties properties = new Properties();
 
@@ -434,13 +442,14 @@ public class Brokerage
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "processedBy", purchOrder.getId(), Constants.EMPLOYEE_MAP_BC));
+      Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), Constants.EMPLOYEE_MAP_BC));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "placedAt", purchOrder.getId(), Constants.VENDOR_MAP_BC));
+      Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, "PurchOrder", "priceVariation", false)
+      influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
+      Constants.PO_PRICEVARIATION_CONFIG_KEY, false)
       .add(BigDecimal.ONE)
       .multiply(purchPrice)
       .setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -486,7 +495,7 @@ public class Brokerage
    * @return vertex representation of a delivery note
    */
   private Vertex newDeliveryNote(Vertex purchOrder) {
-    String label = "DeliveryNote";
+    String label = Constants.DELIVERYNOTE_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
@@ -496,10 +505,11 @@ public class Brokerage
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(logisticMap.get(operatedBy));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      "placedAt", purchOrder.getId(), Constants.VENDOR_MAP_BC));
+      Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
 
-    long date = config.delayDelayConfiguration(purchOrderDate,
-      influencingMasterQuality, "PurchOrder", "deliveryDelay");
+    long date = config.delayDelayConfiguration(
+      purchOrderDate, influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
+      Constants.PO_DELIVERYDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -510,8 +520,8 @@ public class Brokerage
     Vertex deliveryNote = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge("contains", deliveryNote.getId(), purchOrder.getId());
-    newEdge("operatedBy", deliveryNote.getId(), operatedBy);
+    newEdge(Constants.CONTAINS_EDGE_LABEL, deliveryNote.getId(), purchOrder.getId());
+    newEdge(Constants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), operatedBy);
 
     return deliveryNote;
   }
@@ -566,14 +576,15 @@ public class Brokerage
    * @return vertex representation of a purch invoice
    */
   private Vertex newPurchInvoice(Vertex purchOrder, BigDecimal total) {
-    String label = "PurchInvoice";
+    String label = Constants.PURCHINVOICE_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
     long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE).getLong();
     long date = config.delayDelayConfiguration(purchOrderDate,
-      getEdgeTargetQuality("placedAt", purchOrder.getId(),
-        Constants.VENDOR_MAP_BC), "PurchOrder", "invoiceDelay");
+      getEdgeTargetQuality(
+        Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC),
+      Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_INVOICEDELAY_CONFIG_KEY);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set(Constants.DATE, date);
@@ -585,7 +596,7 @@ public class Brokerage
     Vertex purchInvoice = newVertex(label, properties);
 
     // create relevant edge
-    newEdge("createdFor", purchInvoice.getId(), purchOrder.getId());
+    newEdge(Constants.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrder.getId());
 
     return purchInvoice;
   }
@@ -597,15 +608,16 @@ public class Brokerage
    * @return vertex representation of a sales invoice
    */
   private Vertex newSalesInvoice(List<Edge> salesOrderLines) {
-    String label = "SalesInvoice";
+    String label = Constants.SALESINVOICE_VERTEX_LABEL;
     Vertex salesOrder = vertexMap.get(salesOrderLines.get(0).getSourceId());
     Properties properties = new Properties();
 
     // calculate and set the properties
     long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE).getLong();
     long date = config.delayDelayConfiguration(salesOrderDate,
-      getEdgeTargetQuality("processedBy", salesOrder.getId(),
-        Constants.EMPLOYEE_MAP_BC), "SalesOrder", "invoiceDelay");
+      getEdgeTargetQuality
+        (Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
+      Constants.SALESORDER_VERTEX_LABEL, Constants.SO_INVOICEDELAY_CONFIG_KEY);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
     properties.set(Constants.DATE, date);
@@ -630,7 +642,7 @@ public class Brokerage
     }
 
     // create relevant edge
-    newEdge("createdFor", salesInvoice.getId(), salesOrder.getId());
+    newEdge(Constants.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
 
     return salesInvoice;
   }

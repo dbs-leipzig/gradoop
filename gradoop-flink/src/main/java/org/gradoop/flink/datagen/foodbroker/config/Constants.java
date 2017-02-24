@@ -121,6 +121,190 @@ public class Constants {
    */
   public static final String ACCOUNT = "account";
   /**
+   * Property key for purch and sales invoice.
+   */
+  public static final String TEXT = "text";
+  /**
+   * Property value start for purch and sales invoice.
+   */
+  public static final String TEXT_CONTENT = "Refund Ticket ";
+  /**
+   * Edge label.
+   */
+  public static final String SENTBY_EDGE_LABEL = "sentBy";
+  /**
+   * Edge label.
+   */
+  public static final String SENTTO_EDGE_LABEL = "sentTo";
+  /**
+   * Edge label.
+   */
+  public static final String RECEIVEDFROM_EDGE_LABEL = "receivedFrom";
+  /**
+   * Edge label.
+   */
+  public static final String PROCESSEDBY_EDGE_LABEL = "processedBy";
+  /**
+   * Edge label.
+   */
+  public static final String BASEDON_EDGE_LABEL = "basedOn";
+  /**
+   * Edge label.
+   */
+  public static final String SERVES_EDGE_LABEL = "serves";
+  /**
+   * Edge label.
+   */
+  public static final String PLACEDAT_EDGE_LABEL = "placedAt";
+  /**
+   * Edge label.
+   */
+  public static final String CONTAINS_EDGE_LABEL = "contains";
+  /**
+   * Edge label.
+   */
+  public static final String OPERATEDBY_EDGE_LABEL = "operatedBy";
+  /**
+   * Edge label.
+   */
+  public static final String SALESQUOTATIONLINE_EDGE_LABEL = "SalesQuotationLine";
+  /**
+   * Edge label.
+   */
+  public static final String SALESORDERLINE_EDGE_LABEL = "SalesOrderLine";
+  /**
+   * Edge label.
+   */
+  public static final String PURCHORDERLINE_EDGE_LABEL = "PurchOrderLine";
+  /**
+   * Edge label.
+   */
+  public static final String CREATEDFOR_EDGE_LABEL = "createdFor";
+  /**
+   * Edge label.
+   */
+  public static final String CONCERNS_EDGE_LABEL = "concerns";
+  /**
+   * Edge label.
+   */
+  public static final String CREATEDBY_EDGE_LABEL = "createdBy";
+  /**
+   * Edge label.
+   */
+  public static final String ALLOCATEDTO_EDGE_LABEL = "allocatedTo";
+  /**
+   * Edge label.
+   */
+  public static final String OPENEDBY_EDGE_LABEL = "openedBy";
+  /**
+   * Edge label.
+   */
+  public static final String SAMEAS_EDGE_LABEL = "sameAS";
+  /**
+   * Vertex label.
+   */
+  public static final String SALESQUOTATION_VERTEX_LABEL = "SalesQuotation";
+  /**
+   * Vertex label.
+   */
+  public static final String SALESORDER_VERTEX_LABEL = "SalesOrder";
+  /**
+   * Vertex label.
+   */
+  public static final String PURCHORDER_VERTEX_LABEL = "PurchOrder";
+  /**
+   * Vertex label.
+   */
+  public static final String DELIVERYNOTE_VERTEX_LABEL = "DeliveryNote";
+  /**
+   * Vertex label.
+   */
+  public static final String PURCHINVOICE_VERTEX_LABEL = "PurchInvoice";
+  /**
+   * Vertex label.
+   */
+  public static final String SALESINVOICE_VERTEX_LABEL = "SalesInvoice";
+  /**
+   * Vertex label.
+   */
+  public static final String TICKET_VERTEX_LABEL = "Ticket";
+  /**
+   * Vertex label.
+   */
+  public static final String USER_VERTEX_LABEL = "User";
+  /**
+   * Vertex label.
+   */
+  public static final String CLIENT_VERTEX_LABEL = "Client";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SQ_CONFIRMATIONPROBABILITY_CONFIG_KEY = "confirmationProbability";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SQ_LINES_CONFIG_KEY = "lines";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SQ_SALESMARGIN_CONFIG_KEY = "salesMargin";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SQ_LINEQUANTITY_CONFIG_KEY = "lineQuantity";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SQ_CONFIRMATIONDELAY_CONFIG_KEY = "confirmationDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SO_DELIVERYAGREEMENTDELAY_CONFIG_KEY = "deliveryAgreementDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String PO_NUMBEROFVENDORS_CONFIG_KEY = "numberOfVendors";
+  /**
+   * Key for configuration property.
+   */
+  public static final String PO_PURCHASEDELAY_CONFIG_KEY = "purchaseDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String PO_PRICEVARIATION_CONFIG_KEY = "priceVariation";
+  /**
+   * Key for configuration property.
+   */
+  public static final String PO_DELIVERYDELAY_CONFIG_KEY = "deliveryDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String PO_INVOICEDELAY_CONFIG_KEY = "invoiceDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String SO_INVOICEDELAY_CONFIG_KEY = "invoiceDelay";
+  /**
+   * Key for configuration property.
+   */
+  public static final String TI_BADQUALITYPROBABILITY_CONFIG_KEY = "badQualityProbability";
+  /**
+   * Key for configuration property.
+   */
+  public static final String TI_SALESREFUND_CONFIG_KEY = "salesRefund";
+  /**
+   * Key for configuration property.
+   */
+  public static final String TI_PURCHREFUND_CONFIG_KEY = "purchRefund";
+  /**
+   * Text for Ticket
+   */
+  public static final String BADQUALITY_TICKET_PROBLEM = "bad quality";
+  /**
+   * Text for Ticket
+   */
+  public static final String LATEDELIVERY_TICKET_PROBLEM = "late delivery";
+  /**
    * Broadcast variable which is needed to spread the precalculated customer map.
    */
   public static final String CUSTOMER_MAP_BC = "customerMap";
