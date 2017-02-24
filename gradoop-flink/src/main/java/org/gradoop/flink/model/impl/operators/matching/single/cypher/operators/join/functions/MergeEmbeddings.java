@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
+import java.util.stream.IntStream;
 
 /**
  * Given two input embeddings, the function merges them according to the given parameters and
@@ -90,21 +91,9 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
     List<Integer> distinctEdgeColumnsLeft,
     List<Integer> distinctEdgeColumnsRight) {
 
-    this.nonJoinColumnsRight = new int[rightColumns - joinColumnsRight.size()];
-    int idx = 0;
-    boolean isJoinColumn;
-    for (int i = 0; i < rightColumns; i++) {
-      isJoinColumn = false;
-      for (int j : joinColumnsRight) {
-        if (i == j) {
-          isJoinColumn = true;
-          break;
-        }
-      }
-      if (!isJoinColumn) {
-        this.nonJoinColumnsRight[idx++] = i;
-      }
-    }
+    this.nonJoinColumnsRight = IntStream.range(0, rightColumns)
+      .filter(col -> !joinColumnsRight.contains(col))
+      .toArray();
     this.joinColumnsRightSize = joinColumnsRight.size();
 
     ToIntFunction<Integer> f = i -> i;
@@ -127,11 +116,6 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
     // Vertex-Homomorphism + Edge-Homomorphism
     if (!checkDistinctVertices && !checkDistinctEdges) {
       collect = true;
-      // Vertex-Isomorphism + Edge-Homomorphism
-    } else if (checkDistinctVertices && !checkDistinctEdges) {
-      if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right)) {
-        collect = true;
-      }
       // Vertex-Homomorphism + Edge-Isomorphism
     } else if (!checkDistinctVertices) {
       if (isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
