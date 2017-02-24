@@ -19,8 +19,16 @@ package org.gradoop.examples.dimspan;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.examples.dimspan.data_source.DIMSpanTLFSource;
+import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A program to run DIMSpan standalone.
@@ -44,6 +52,12 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
    * Option to enable undirected mining mode
    */
   public static final String OPTION_UNDIRECTED_MODE = "u";
+
+  /**
+   * Gradoop configuration
+   */
+  private static GradoopFlinkConfig GRADOOP_CONFIG =
+    GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true, "Path to input file");
@@ -74,9 +88,18 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
 
     boolean directed = !cmd.hasOption(OPTION_UNDIRECTED_MODE);
 
+    // Create data source and sink
+    DIMSpanTLFSource dataSource = new DIMSpanTLFSource(inputPath, GRADOOP_CONFIG);
+    DataSink dataSink = new TLFDataSink(outputPath, GRADOOP_CONFIG);
+
     DIMSpanConfig fsmConfig = new DIMSpanConfig(minSupport, directed);
 
-    System.out.println(inputPath + outputPath + fsmConfig.toString());
+    // Change default configuration here using setter methods
+
+    DataSet<GraphTransaction> frequentPatterns =
+      new DIMSpan(fsmConfig).execute(dataSource.getGraphs());
+
+    dataSink.write(new GraphTransactions(frequentPatterns, GRADOOP_CONFIG));
   }
 
   /**
