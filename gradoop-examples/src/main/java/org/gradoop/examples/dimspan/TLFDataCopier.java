@@ -110,7 +110,7 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
         .getForObject(new GraphTransaction(new GraphHead(), Sets.newHashSet(), Sets.newHashSet())));
 
     // execute and write to disk
-    dataSink.write(new GraphTransactions(output, GRADOOP_CONFIG));
+    dataSink.write(new GraphTransactions(output, GRADOOP_CONFIG), true);
     getExecutionEnvironment().execute();
   }
 

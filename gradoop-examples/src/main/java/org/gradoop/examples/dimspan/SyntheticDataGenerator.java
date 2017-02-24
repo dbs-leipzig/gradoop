@@ -75,7 +75,7 @@ public class SyntheticDataGenerator
     DataSink dataSink = new TLFDataSink(outputPath, GRADOOP_CONFIG);
 
     // execute and write to disk
-    dataSink.write(dataSource.execute());
+    dataSink.write(dataSource.execute(), true);
     getExecutionEnvironment().execute();
   }
 

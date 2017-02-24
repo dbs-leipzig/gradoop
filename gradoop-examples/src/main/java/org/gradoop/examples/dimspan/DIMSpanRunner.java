@@ -100,7 +100,7 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
       new DIMSpan(fsmConfig).execute(dataSource.getGraphs());
 
     // Execute and write to disk
-    dataSink.write(new GraphTransactions(frequentPatterns, GRADOOP_CONFIG));
+    dataSink.write(new GraphTransactions(frequentPatterns, GRADOOP_CONFIG), true);
     getExecutionEnvironment().execute();
   }
 
