@@ -18,7 +18,6 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -35,11 +34,10 @@ import java.util.regex.Pattern;
  * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
  * required to parse the property values.
  *
- * @param <T> input tuple type
  * @param <E> EPGM element type
  */
-abstract class CSVToElement<T extends Tuple, E extends Element>
-  extends RichMapFunction<T, E> {
+abstract class CSVLineToElement<E extends Element>
+  extends RichMapFunction<String, E> {
   /**
    * Stores the properties for the {@link Element} to be parsed.
    */
@@ -49,6 +47,10 @@ abstract class CSVToElement<T extends Tuple, E extends Element>
    */
   private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
   /**
+   * Used for splitting the CSV line.
+   */
+  private final Pattern pattern = Pattern.compile(CSVConstants.TOKEN_DELIMITER);
+  /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
   private MetaData metaData;
@@ -56,7 +58,7 @@ abstract class CSVToElement<T extends Tuple, E extends Element>
   /**
    * Constructor
    */
-  CSVToElement() {
+  CSVLineToElement() {
     this.properties = Properties.create();
   }
 
@@ -86,5 +88,16 @@ abstract class CSVToElement<T extends Tuple, E extends Element>
       }
     }
     return properties;
+  }
+
+  /**
+   * Splits the specified string.
+   *
+   * @param s string
+   * @param limit resulting array length
+   * @return tokens
+   */
+  public String[] split(String s, int limit) {
+    return pattern.split(s, limit);
   }
 }

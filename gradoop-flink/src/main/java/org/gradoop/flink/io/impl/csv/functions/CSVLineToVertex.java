@@ -17,41 +17,41 @@
 
 package org.gradoop.flink.io.impl.csv.functions;
 
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
- * Creates an {@link Edge} from a CSV string. The function uses a
+ * /**
+ * Creates a {@link Vertex} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
- * edge-id;source-id;target-id;edge-label;value_1|value_2|...|value_n
+ * vertex-id;vertex-label;value_1|value_2|...|value_n
  */
-public class CSVToEdge extends CSVToElement<Tuple5<String, String, String, String, String>, Edge> {
+public class CSVLineToVertex extends CSVLineToElement<Vertex> {
   /**
-   * Used to instantiate the edge.
+   * Used to instantiate the vertex.
    */
-  private final EdgeFactory edgeFactory;
+  private final VertexFactory vertexFactory;
 
   /**
-   * Constructor.
+   * Constructor
    *
-   * @param edgeFactory EPGM edge factory
+   * @param vertexFactory EPGM vertex factory
    */
-  public CSVToEdge(EdgeFactory edgeFactory) {
-    this.edgeFactory = edgeFactory;
+  public CSVLineToVertex(VertexFactory vertexFactory) {
+    this.vertexFactory = vertexFactory;
   }
 
   @Override
-  public Edge map(Tuple5<String, String, String, String, String> csvEdge) throws Exception {
-    return edgeFactory.initEdge(GradoopId.fromString(csvEdge.f0),
-      csvEdge.f3,
-      GradoopId.fromString(csvEdge.f1),
-      GradoopId.fromString(csvEdge.f2),
-      parseProperties(csvEdge.f3, csvEdge.f4));
+  public Vertex map(String csvLine) throws Exception {
+    String[] tokens = split(csvLine, 3);
+    return vertexFactory.initVertex(
+      GradoopId.fromString(tokens[0]),
+      tokens[1],
+      parseProperties(tokens[1], tokens[2]));
   }
 }

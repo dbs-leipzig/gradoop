@@ -20,13 +20,11 @@ package org.gradoop.flink.io.impl.csv;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.CSVToEdge;
-import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
+import org.gradoop.flink.io.impl.csv.functions.CSVEdgeToEdge;
+import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -55,22 +53,12 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
-      .map(line -> {
-          String[] split = line.split(CSVConstants.TOKEN_DELIMITER, 3);
-          return Tuple3.of(split[0], split[1], split[2]);
-        })
-      .returns(new TypeHint<Tuple3<String, String, String>>() { })
-      .map(new CSVToVertex(getConfig().getVertexFactory()))
+      .map(new CSVLineToVertex(getConfig().getVertexFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     DataSet<Edge> edges = getConfig().getExecutionEnvironment()
       .readTextFile(getEdgeCSVPath())
-      .map(line -> {
-          String[] split = line.split(CSVConstants.TOKEN_DELIMITER, 5);
-          return Tuple5.of(split[0], split[1], split[2], split[3], split[4]);
-        })
-      .returns(new TypeHint<Tuple5<String, String, String, String, String>>() { })
-      .map(new CSVToEdge(getConfig().getEdgeFactory()))
+      .map(new CSVEdgeToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     return LogicalGraph.fromDataSets(vertices, edges, getConfig());

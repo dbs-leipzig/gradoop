@@ -20,17 +20,17 @@ package org.gradoop.flink.io.impl.csv;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.csv.functions.EdgeToCSV;
+import org.gradoop.flink.io.impl.csv.functions.EdgeToCSVEdge;
 import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
-import org.gradoop.flink.io.impl.csv.functions.VertexToCSV;
+import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
+import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
+import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -75,12 +75,12 @@ public class CSVDataSink extends CSVBase implements DataSink {
 
     DataSet<Tuple2<String, String>> metaData = createMetaData(logicalGraph);
 
-    DataSet<Tuple3<String, String, String>> csvVertices = logicalGraph.getVertices()
-      .map(new VertexToCSV())
+    DataSet<CSVVertex> csvVertices = logicalGraph.getVertices()
+      .map(new VertexToCSVVertex())
       .withBroadcastSet(metaData, BC_METADATA);
 
-    DataSet<Tuple5<String, String, String, String, String>> csvEdges = logicalGraph.getEdges()
-      .map(new EdgeToCSV())
+    DataSet<CSVEdge> csvEdges = logicalGraph.getEdges()
+      .map(new EdgeToCSVEdge())
       .withBroadcastSet(metaData, BC_METADATA);
 
     // write everything

@@ -34,7 +34,7 @@ public class MetaData {
    *
    * @param metaData meta data
    */
-  public MetaData(Map<String, List<PropertyMetaData>> metaData) {
+  MetaData(Map<String, List<PropertyMetaData>> metaData) {
     this.metaData = metaData;
   }
 

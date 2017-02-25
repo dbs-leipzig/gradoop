@@ -18,30 +18,28 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 
 /**
- * Converts an {@link Edge} into a CSV representation.
+ * Converts an {@link Vertex} into a CSV representation.
  *
  * Forwarded fields:
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f3")
-public class EdgeToCSV extends ElementToCSV<Edge, Tuple5<String, String, String, String, String>> {
+@FunctionAnnotation.ForwardedFields("label->f1")
+public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
   /**
-   * Reduce object instantiations
+   * Reduce object instantiations.
    */
-  private final Tuple5<String, String, String, String, String> tuple = new Tuple5<>();
+  private final CSVVertex csvVertex = new CSVVertex();
 
   @Override
-  public Tuple5<String, String, String, String, String> map(Edge edge) throws Exception {
-    tuple.f0 = edge.getId().toString();
-    tuple.f1 = edge.getSourceId().toString();
-    tuple.f2 = edge.getTargetId().toString();
-    tuple.f3 = edge.getLabel();
-    tuple.f4 = getPropertyString(edge);
-    return tuple;
+  public CSVVertex map(Vertex vertex) throws Exception {
+    csvVertex.setId(vertex.getId().toString());
+    csvVertex.setLabel(vertex.getLabel());
+    csvVertex.setProperties(getPropertyString(vertex));
+    return csvVertex;
   }
 }
