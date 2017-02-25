@@ -21,44 +21,28 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
- * required to parse the property values.
+ * Base class to convert an EPGM element into a CSV representation.
  *
- * @param <T> input tuple type
  * @param <E> EPGM element type
+ * @param <T> output tuple type
  */
-abstract class CSVToElement<T extends Tuple, E extends Element>
-  extends RichMapFunction<T, E> {
+public abstract class ElementToCSV<E extends Element, T extends Tuple> extends RichMapFunction<E , T> {
   /**
-   * Stores the properties for the {@link Element} to be parsed.
+   * Constant for an empty string.
    */
-  private final Properties properties;
-  /**
-   * Needed for splitting the input.
-   */
-  private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
+  private static final String EMPTY_STRING = "";
   /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
   private MetaData metaData;
-
-  /**
-   * Constructor
-   */
-  CSVToElement() {
-    this.properties = Properties.create();
-  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -68,23 +52,15 @@ abstract class CSVToElement<T extends Tuple, E extends Element>
   }
 
   /**
-   * Parses the given property values according to the meta data associated with the specified
-   * label.
+   * Returns the concatenated property values of the specified element according to the meta data.
    *
-   * @param label element label
-   * @param propertyValueString string representation of elements' property values
-   * @return parsed properties
+   * @param element EPGM element
+   * @return property value string
    */
-  Properties parseProperties(String label, String propertyValueString) {
-    String[] propertyValues = propertyValueString.split(valueDelimiter);
-    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(label);
-    properties.clear();
-    for (int i = 0; i < propertyValues.length; i++) {
-      if (propertyValues[i].length() > 0) {
-        properties.set(metaDataList.get(i).getKey(),
-          metaDataList.get(i).getValueParser().apply(propertyValues[i]));
-      }
-    }
-    return properties;
+  String getPropertyString(E element) {
+    return metaData.getPropertyMetaData(element.getLabel()).stream()
+      .map(metaData -> element.getPropertyValue(metaData.getKey()))
+      .map(value -> value == null ? EMPTY_STRING : value.toString())
+      .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
   }
 }

@@ -17,97 +17,63 @@
 
 package org.gradoop.flink.io.impl.csv;
 
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVToVertex;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * A graph data source for CSV files.
  */
-public class CSVDataSource implements DataSource {
-  /**
-   * Broadcast set identifier for meta data.
-   */
-  public static final String BC_METADATA = "metadata";
-  /**
-   * CSV file for vertices.
-   */
-  private static final String VERTEX_FILE = "vertices.csv";
-  /**
-   * CSV file for edges.
-   */
-  private static final String EDGE_FILE = "edges.csv";
-  /**
-   * CSV file for meta data.
-   */
-  private static final String METADATA_FILE = "metadata.csv";
-  /**
-   * Path to the vertex CSV file.
-   */
-  private final String vertexCSVPath;
-  /**
-   * Path to the edge CSV file.
-   */
-  private final String edgeCSVPath;
-  /**
-   * Path to the meta data CSV file.
-   */
-  private final String metaDataPath;
-  /**
-   * Gradoop Flink configuration
-   */
-  private final GradoopFlinkConfig config;
+public class CSVDataSource extends CSVBase implements DataSource {
 
   /**
-   * Path where the CSV files are stored
+   * Creates a new CSV data source.
    *
    * @param csvPath path to the directory containing the CSV files
    * @param config Gradoop Flink configuration
    */
   public CSVDataSource(String csvPath, GradoopFlinkConfig config) {
-    Objects.requireNonNull(csvPath);
-    Objects.requireNonNull(config);
-    this.vertexCSVPath = csvPath + File.separator + VERTEX_FILE;
-    this.edgeCSVPath = csvPath + File.separator + EDGE_FILE;
-    this.metaDataPath = csvPath + File.separator + METADATA_FILE;
-    this.config = config;
+    super(csvPath, config);
   }
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    DataSet<Tuple2<String, String>> metaData = config.getExecutionEnvironment()
-      .readCsvFile(metaDataPath)
-      .fieldDelimiter(MetaDataParser.TOKEN_DELIMITER)
-      .types(String.class, String.class);
+    DataSet<Tuple2<String, String>> metaData = readMetaData();
 
-    DataSet<Vertex> vertices = config.getExecutionEnvironment()
-      .readCsvFile(vertexCSVPath)
-      .fieldDelimiter(CSVToVertex.TOKEN_SEPARATOR)
-      .types(String.class, String.class, String.class)
-      .map(new CSVToVertex(config.getVertexFactory()))
+    DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
+      .readTextFile(getVertexCSVPath())
+      .map(line -> {
+          String[] split = line.split(CSVConstants.TOKEN_DELIMITER, 3);
+          return Tuple3.of(split[0], split[1], split[2]);
+        })
+      .returns(new TypeHint<Tuple3<String, String, String>>() { })
+      .map(new CSVToVertex(getConfig().getVertexFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    DataSet<Edge> edges = config.getExecutionEnvironment()
-      .readCsvFile(edgeCSVPath)
-      .fieldDelimiter(CSVToEdge.TOKEN_SEPARATOR)
-      .types(String.class, String.class, String.class, String.class, String.class)
-      .map(new CSVToEdge(config.getEdgeFactory()))
+    DataSet<Edge> edges = getConfig().getExecutionEnvironment()
+      .readTextFile(getEdgeCSVPath())
+      .map(line -> {
+          String[] split = line.split(CSVConstants.TOKEN_DELIMITER, 5);
+          return Tuple5.of(split[0], split[1], split[2], split[3], split[4]);
+        })
+      .returns(new TypeHint<Tuple5<String, String, String, String, String>>() { })
+      .map(new CSVToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    return LogicalGraph.fromDataSets(vertices, edges, config);
+    return LogicalGraph.fromDataSets(vertices, edges, getConfig());
   }
 
   @Override
@@ -118,5 +84,20 @@ public class CSVDataSource implements DataSource {
   @Override
   public GraphTransactions getGraphTransactions() throws IOException {
     return getGraphCollection().toTransactions();
+  }
+
+  /**
+   * Reads the meta data for the specified data source.
+   *
+   * @return meta data information
+   */
+  private DataSet<Tuple2<String, String>> readMetaData() {
+    return getConfig().getExecutionEnvironment()
+      .readTextFile(getMetaDataPath())
+      .map(line -> {
+          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
+          return Tuple2.of(tokens[0], tokens[1]);
+        })
+      .returns(new TypeHint<Tuple2<String, String>>() { });
   }
 }

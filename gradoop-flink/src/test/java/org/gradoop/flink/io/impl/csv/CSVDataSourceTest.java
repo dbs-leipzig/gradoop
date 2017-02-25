@@ -6,9 +6,8 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.junit.Test;
 
-import static org.gradoop.flink.model.impl.GradoopFlinkTestUtils.printLogicalGraph;
-
 public class CSVDataSourceTest extends GradoopFlinkTestBase {
+
   @Test
   public void testRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class

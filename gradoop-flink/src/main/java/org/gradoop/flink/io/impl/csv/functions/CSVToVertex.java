@@ -52,6 +52,6 @@ public class CSVToVertex extends CSVToElement<Tuple3<String, String, String>, Ve
     return vertexFactory.initVertex(
       GradoopId.fromString(csvVertex.f0),
       csvVertex.f1,
-      parseProperties(csvVertex.f1, csvVertex.f2.split(VALUE_DELIMITER)));
+      parseProperties(csvVertex.f1, csvVertex.f2));
   }
 }

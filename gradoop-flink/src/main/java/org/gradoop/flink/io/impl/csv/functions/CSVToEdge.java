@@ -52,6 +52,6 @@ public class CSVToEdge extends CSVToElement<Tuple5<String, String, String, Strin
       csvEdge.f3,
       GradoopId.fromString(csvEdge.f1),
       GradoopId.fromString(csvEdge.f2),
-      parseProperties(csvEdge.f3, csvEdge.f4.split(VALUE_DELIMITER)));
+      parseProperties(csvEdge.f3, csvEdge.f4));
   }
 }

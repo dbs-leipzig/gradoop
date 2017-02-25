@@ -55,15 +55,12 @@ public class JSONDataSink extends JSONBase implements DataSink {
   }
 
   @Override
-  public void write(GraphCollection graphCollection) throws
-    IOException {
+  public void write(GraphCollection graphCollection) throws IOException {
     write(graphCollection, false);
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws
-    IOException {
-
+  public void write(GraphTransactions graphTransactions) throws IOException {
     write(graphTransactions, false);
   }
 
