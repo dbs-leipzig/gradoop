@@ -111,13 +111,13 @@ public class Brokerage
       List<Edge> purchOrderLines = newPurchOrderLines(purchOrders, salesOrderLines);
 
       // DeliveryNotes
-      List<Vertex> deliveryNotes = newDeliveryNotes(purchOrders);
+      newDeliveryNotes(purchOrders);
 
       // PurchInvoices
-      List<Vertex> purchInvoices = newPurchInvoices(purchOrderLines);
+      newPurchInvoices(purchOrderLines);
 
       // SalesInvoices
-      Vertex salesInvoice = newSalesInvoice(salesOrderLines);
+      newSalesInvoice(salesOrderLines);
     }
     // fill the graph transaction
     graphTransaction.setGraphHead(graphHead);

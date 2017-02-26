@@ -23,13 +23,17 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
+/**
+ * Sets all graph ids for master data vertices. The graph ids of each edge of which the vertex is
+ * the target of are added to the vertex.
+ */
 public class GraphIdsFromEdges implements CoGroupFunction<Vertex, Edge, Vertex> {
 
   @Override
   public void coGroup(Iterable<Vertex> vertices, Iterable<Edge> edges,
     Collector<Vertex> collector) throws Exception {
     for (Vertex vertex : vertices) {
-        for (Edge edge : edges) {
+      for (Edge edge : edges) {
         for (GradoopId gradoopId : edge.getGraphIds()) {
           vertex.addGraphId(gradoopId);
         }
