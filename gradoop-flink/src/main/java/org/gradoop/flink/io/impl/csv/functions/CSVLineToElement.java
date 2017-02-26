@@ -36,8 +36,7 @@ import java.util.regex.Pattern;
  *
  * @param <E> EPGM element type
  */
-abstract class CSVLineToElement<E extends Element>
-  extends RichMapFunction<String, E> {
+abstract class CSVLineToElement<E extends Element> extends RichMapFunction<String, E> {
   /**
    * Stores the properties for the {@link Element} to be parsed.
    */
