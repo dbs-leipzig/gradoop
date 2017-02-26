@@ -32,6 +32,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,7 +49,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSalesQuotationLineCount() throws IOException, JSONException {
+  public void testSalesQuotationLineCount() throws IOException, JSONException, URISyntaxException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotationLine"));
@@ -66,7 +69,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSalesOrderCount() throws IOException, JSONException {
+  public void testSalesOrderCount() throws IOException, JSONException, URISyntaxException {
     GraphCollection cases = generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotation"));
@@ -92,7 +95,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMaxVertexCount() throws IOException, JSONException {
+  public void testMaxVertexCount() throws IOException, JSONException, URISyntaxException {
     GraphCollection cases = generateCollection();
     int casesCount = 10;
     double actual = 0;
@@ -112,7 +115,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMaxEdgeCount() throws IOException, JSONException {
+  public void testMaxEdgeCount() throws IOException, JSONException, URISyntaxException {
     GraphCollection cases = generateCollection();
     int casesCount = 10;
     double actual = 0;
@@ -129,10 +132,12 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     Assert.assertTrue(actual < max);
   }
 
-  private GraphCollection generateCollection() throws
-    IOException, JSONException {
-    FoodBrokerConfig config = FoodBrokerConfig.fromFile(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile());
+  private GraphCollection generateCollection()
+    throws IOException, JSONException, URISyntaxException {
+    String configPath = Paths.get(
+      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+
+    FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 
     config.setScaleFactor(0);
 
@@ -142,6 +147,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     try {
       return foodBroker.execute();
     } catch (Exception e) {
+      e.printStackTrace();
       return null;
     }
   }
