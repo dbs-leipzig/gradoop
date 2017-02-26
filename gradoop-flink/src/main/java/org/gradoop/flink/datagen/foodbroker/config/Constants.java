@@ -329,10 +329,6 @@ public class Constants {
    */
   public static final String PRODUCT_PRICE_MAP_BC = "productPriceMap";
   /**
-   * Broadcast variable which is needed to spread the .
-   */
-  public static final String GRAPH_IDS_BC = "graphIds";
-  /**
    * Used to select the map which is then used to get the object from a gradoop id.
    */
   public static final String USER_MAP = "userMap";
