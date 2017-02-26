@@ -159,7 +159,7 @@ public class FoodBroker implements GraphCollectionGenerator {
       .getCaseCount());
 
     DataSet<GraphTransaction> brokerage = caseSeeds
-      .mapPartition(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
+      .map(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
         .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
       .withBroadcastSet(customerQualityMap, Constants.CUSTOMER_MAP_BC)
       .withBroadcastSet(vendorQualityMap, Constants.VENDOR_MAP_BC)

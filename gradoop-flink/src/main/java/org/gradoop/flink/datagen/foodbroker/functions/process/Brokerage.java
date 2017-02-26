@@ -19,9 +19,8 @@ package org.gradoop.flink.datagen.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.flink.api.common.functions.MapPartitionFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class Brokerage
   extends AbstractProcess
-  implements MapPartitionFunction<Long, GraphTransaction> {
+  implements MapFunction<Long, GraphTransaction> {
 
   /**
    * Valued constructor
@@ -74,7 +73,7 @@ public class Brokerage
   }
 
   @Override
-  public void mapPartition(Iterable<Long> iterable, Collector<GraphTransaction> collector)
+  public GraphTransaction map(Long seed)
     throws Exception {
     GraphHead graphHead;
     GraphTransaction graphTransaction;
@@ -82,50 +81,49 @@ public class Brokerage
     long startDate = config.getStartDate();
 
     // each seed stands for one created sales quotation
-    for (Long seed: iterable) {
-      globalSeed = seed;
-      vertexMap = Maps.newHashMap();
-      edgeMap = Maps.newHashMap();
-      graphHead = graphHeadFactory.createGraphHead();
-      graphIds = new GradoopIdList();
-      graphIds.add(graphHead.getId());
-      graphTransaction = new GraphTransaction();
 
-      // SalesQuotation
-      Vertex salesQuotation = newSalesQuotation(startDate);
+    globalSeed = seed;
+    vertexMap = Maps.newHashMap();
+    edgeMap = Maps.newHashMap();
+    graphHead = graphHeadFactory.createGraphHead();
+    graphIds = new GradoopIdList();
+    graphIds.add(graphHead.getId());
+    graphTransaction = new GraphTransaction();
 
-      // SalesQuotationLines
-      List<Edge> salesQuotationLines = newSalesQuotationLines(salesQuotation);
+    // SalesQuotation
+    Vertex salesQuotation = newSalesQuotation(startDate);
 
-      if (confirmed(salesQuotation)) {
-        // SalesOrder
-        Vertex salesOrder = newSalesOrder(salesQuotation);
+    // SalesQuotationLines
+    List<Edge> salesQuotationLines = newSalesQuotationLines(salesQuotation);
 
-        // SalesOrderLines
-        List<Edge> salesOrderLines = newSalesOrderLines(salesOrder,
-          salesQuotationLines);
+    if (confirmed(salesQuotation)) {
+      // SalesOrder
+      Vertex salesOrder = newSalesOrder(salesQuotation);
 
-        // newPurchOrders
-        List<Vertex> purchOrders = newPurchOrders(salesOrder, salesOrderLines);
+      // SalesOrderLines
+      List<Edge> salesOrderLines = newSalesOrderLines(salesOrder,
+        salesQuotationLines);
 
-        // PurchOrderLines
-        List<Edge> purchOrderLines = newPurchOrderLines(purchOrders, salesOrderLines);
+      // newPurchOrders
+      List<Vertex> purchOrders = newPurchOrders(salesOrder, salesOrderLines);
 
-        // DeliveryNotes
-        List<Vertex> deliveryNotes = newDeliveryNotes(purchOrders);
+      // PurchOrderLines
+      List<Edge> purchOrderLines = newPurchOrderLines(purchOrders, salesOrderLines);
 
-        // PurchInvoices
-        List<Vertex> purchInvoices = newPurchInvoices(purchOrderLines);
+      // DeliveryNotes
+      List<Vertex> deliveryNotes = newDeliveryNotes(purchOrders);
 
-        // SalesInvoices
-        Vertex salesInvoice = newSalesInvoice(salesOrderLines);
-      }
-      // fill the graph transaction
-      graphTransaction.setGraphHead(graphHead);
-      graphTransaction.setVertices(getVertices());
-      graphTransaction.setEdges(getEdges());
-      collector.collect(graphTransaction);
+      // PurchInvoices
+      List<Vertex> purchInvoices = newPurchInvoices(purchOrderLines);
+
+      // SalesInvoices
+      Vertex salesInvoice = newSalesInvoice(salesOrderLines);
     }
+    // fill the graph transaction
+    graphTransaction.setGraphHead(graphHead);
+    graphTransaction.setVertices(getVertices());
+    graphTransaction.setEdges(getEdges());
+    return graphTransaction;
   }
 
   /**
