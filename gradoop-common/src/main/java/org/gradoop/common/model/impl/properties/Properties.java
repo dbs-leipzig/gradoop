@@ -201,6 +201,13 @@ public class Properties implements Iterable<Property>, Writable, Serializable {
   }
 
   /**
+   * Removes all elements from these properties.
+   */
+  public void clear() {
+    this.properties.clear();
+  }
+
+  /**
    * Returns the number of properties.
    *
    * @return number of properties

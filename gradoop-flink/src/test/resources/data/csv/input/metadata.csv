@@ -1,0 +1,4 @@
+A;a:string,b:int,c:float
+B;a:long,b:boolean,c:double
+a;a:int,b:float
+b;a:long
