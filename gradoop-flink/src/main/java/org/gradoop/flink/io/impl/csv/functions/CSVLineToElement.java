@@ -47,10 +47,6 @@ abstract class CSVLineToElement<E extends Element>
    */
   private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
   /**
-   * Used for splitting the CSV line.
-   */
-  private final Pattern pattern = Pattern.compile(CSVConstants.TOKEN_DELIMITER);
-  /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
   private MetaData metaData;
@@ -93,11 +89,13 @@ abstract class CSVLineToElement<E extends Element>
   /**
    * Splits the specified string.
    *
+   * Note: Using {@link Pattern#split(CharSequence)} leads to a significant performance loss.
+   *
    * @param s string
    * @param limit resulting array length
    * @return tokens
    */
   public String[] split(String s, int limit) {
-    return pattern.split(s, limit);
+    return s.split(CSVConstants.TOKEN_DELIMITER, limit);
   }
 }
