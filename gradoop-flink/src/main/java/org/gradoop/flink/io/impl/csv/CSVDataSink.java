@@ -128,6 +128,8 @@ public class CSVDataSink extends CSVBase implements DataSink {
     return elements
       .map(new ElementToPropertyMetaData<>())
       .groupBy(0)
+      .combineGroup(new ReducePropertyMetaData())
+      .groupBy(0)
       .reduceGroup(new ReducePropertyMetaData())
       .map(tuple -> Tuple2.of(tuple.f0, MetaDataParser.getPropertiesMetaData(tuple.f1)))
       .returns(new TupleTypeInfo<>(BasicTypeInfo.STRING_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO))
