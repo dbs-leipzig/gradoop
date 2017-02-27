@@ -75,10 +75,16 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
    * Target vertex propertyKeys of the embedding used for filtering
    */
   private final List<String> targetFilterPropertyKeys;
+
   /**
-   * Vertex match strategy
+   * True if vertex and target variable are the same
    */
-  private final MatchStrategy vertexMatchStrategy;
+  private final boolean isLoop;
+
+  /**
+   * Set to true if vertex matching strategy is isomorphism
+   */
+  private final boolean isVertexIso;
 
   /**
    * New FilterAndProjectTriples
@@ -96,7 +102,6 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
     this.predicates = predicates;
     this.sourceVariable = sourceVariable;
     this.targetVariable = targetVariable;
-    this.vertexMatchStrategy = vertexMatchStrategy;
 
     this.sourceProjectionPropertyKeys =
       projectionPropertyKeys.getOrDefault(sourceVariable, new ArrayList<>());
@@ -104,6 +109,9 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
       projectionPropertyKeys.getOrDefault(edgeVariable, new ArrayList<>());
     this.targetProjectionPropertyKeys =
       projectionPropertyKeys.getOrDefault(targetVariable, new ArrayList<>());
+
+    this.isLoop = sourceVariable.equals(targetVariable);
+    this.isVertexIso = vertexMatchStrategy.equals(MatchStrategy.ISOMORPHISM);
 
     filterMetaData = createFilterMetaData(predicates, sourceVariable, edgeVariable, targetVariable);
     sourceFilterPropertyKeys = filterMetaData.getPropertyKeys(sourceVariable);
@@ -114,18 +122,17 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
 
   @Override
   public void flatMap(Triple triple, Collector<Embedding> out) throws Exception {
+    boolean isValid = true;
 
-    if (sourceVariable.equals(targetVariable)) {
-      // Check if source and target are expected to be the same
-      if (!triple.getSourceVertex().getId().equals(triple.getTargetVertex().getId())) {
-        return;
+    if (isLoop) {
+      if (!(triple.getSourceId().equals(triple.getTargetId()))) {
+        isValid = false;
       }
-    } else if (vertexMatchStrategy.equals(MatchStrategy.ISOMORPHISM) &&
-      triple.getSourceVertex().getId().equals(triple.getTargetVertex().getId())) {
-      return;
+    } else if (isVertexIso && triple.getSourceId().equals(triple.getTargetId())) {
+      isValid = false;
     }
 
-    if (filter(triple)) {
+    if (isValid && filter(triple)) {
       out.collect(
         EmbeddingFactory.fromTriple(
           triple,

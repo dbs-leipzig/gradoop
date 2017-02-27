@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.poj
 
 
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
@@ -68,6 +69,30 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    */
   public Vertex getTargetVertex() {
     return f2;
+  }
+
+  /**
+   * Returns the source id
+   * @return source id
+   */
+  public GradoopId getSourceId() {
+    return f1.getSourceId();
+  }
+
+  /**
+   * Returns the edge id
+   * @return edge id
+   */
+  public GradoopId getEdgeId() {
+    return f1.getId();
+  }
+
+  /**
+   * Returns the target id
+   * @return target id
+   */
+  public GradoopId getTargetId() {
+    return f1.getTargetId();
   }
 
   /**
