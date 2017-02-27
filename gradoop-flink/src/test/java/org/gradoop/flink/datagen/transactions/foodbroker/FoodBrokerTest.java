@@ -125,7 +125,6 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    System.out.println(actual + "  " + max);
 
     Assert.assertTrue(actual < max);
   }
