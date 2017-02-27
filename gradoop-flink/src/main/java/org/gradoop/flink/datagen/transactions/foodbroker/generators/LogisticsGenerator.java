@@ -46,9 +46,12 @@ public class LogisticsGenerator
   @Override
   public DataSet<Vertex> generate() {
     List<MasterDataSeed> seeds = getMasterDataSeeds(Logistics.CLASS_NAME);
-    List<String> cities = getStringValuesFromFile("cities");
-    List<String> adjectives = getStringValuesFromFile("logistics.adjectives");
-    List<String> nouns = getStringValuesFromFile("logistics.nouns");
+    List<String> cities = foodBrokerConfig
+      .getStringValuesFromFile("cities");
+    List<String> adjectives = foodBrokerConfig
+      .getStringValuesFromFile("logistics.adjectives");
+    List<String> nouns = foodBrokerConfig
+      .getStringValuesFromFile("logistics.nouns");
 
     return env.fromCollection(seeds)
       .map(new Logistics(vertexFactory))

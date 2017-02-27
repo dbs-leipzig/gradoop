@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -77,6 +79,28 @@ public class FoodBrokerConfig implements Serializable {
   public static FoodBrokerConfig fromFile(String path) throws
     IOException, JSONException {
     return new FoodBrokerConfig(path);
+  }
+
+  /**
+   * Returns list of all lines from the given file which is located in the foodbroker folder
+   *
+   * @param fileName name of the file
+   * @return list of String
+   */
+  public List<String> getStringValuesFromFile(String fileName) {
+    List<String> values = null;
+    String adjectivesPath = null;
+    // get path relevant to the config file
+    Path parentDirectory = Paths.get(path).getParent();
+    if (parentDirectory != null) {
+      adjectivesPath = parentDirectory.toString() + "/" + fileName;
+    }
+    try {
+      values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return values;
   }
 
   /**

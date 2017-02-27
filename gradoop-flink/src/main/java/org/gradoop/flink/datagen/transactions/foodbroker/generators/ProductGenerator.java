@@ -47,10 +47,14 @@ public class ProductGenerator extends AbstractMasterDataGenerator {
   @Override
   public DataSet<Vertex> generate() {
     List<MasterDataSeed> seeds = getMasterDataSeeds(Product.CLASS_NAME);
-    List<String> adjectives = getStringValuesFromFile("product.adjectives");
-    List<String> fruits = getStringValuesFromFile("product.fruits");
-    List<String> vegetables = getStringValuesFromFile("product.vegetables");
-    List<String> nuts = getStringValuesFromFile("product.nuts");
+    List<String> adjectives = foodBrokerConfig
+      .getStringValuesFromFile("product.adjectives");
+    List<String> fruits = foodBrokerConfig
+      .getStringValuesFromFile("product.fruits");
+    List<String> vegetables = foodBrokerConfig
+      .getStringValuesFromFile("product.vegetables");
+    List<String> nuts = foodBrokerConfig
+      .getStringValuesFromFile("product.nuts");
     List<Tuple2<String, String>> nameGroupPairs = new ArrayList<>();
 
     for (String name : fruits) {

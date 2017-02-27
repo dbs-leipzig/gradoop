@@ -17,16 +17,12 @@
 
 package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,27 +96,5 @@ public abstract class AbstractMasterDataGenerator
     Collections.shuffle(seedList);
 
     return seedList;
-  }
-
-  /**
-   * Returns list of all lines from the given file which is located in the foodbroker folder
-   *
-   * @param fileName name of the file
-   * @return list of String
-   */
-  List<String> getStringValuesFromFile(String fileName) {
-    List<String> values = null;
-    String adjectivesPath = null;
-    // get path relevant to the config file
-    Path parentDirectory = Paths.get(foodBrokerConfig.getPath()).getParent();
-    if (parentDirectory != null) {
-      adjectivesPath = parentDirectory.toString() + "/" + fileName;
-    }
-    try {
-      values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return values;
   }
 }

@@ -45,9 +45,12 @@ public class CustomerGenerator extends AbstractMasterDataGenerator {
   @Override
   public DataSet<Vertex> generate() {
     List<MasterDataSeed> seeds = getMasterDataSeeds(Customer.CLASS_NAME);
-    List<String> cities = getStringValuesFromFile("cities");
-    List<String> adjectives = getStringValuesFromFile("customer.adjectives");
-    List<String> nouns = getStringValuesFromFile("customer.nouns");
+    List<String> cities = foodBrokerConfig
+      .getStringValuesFromFile("cities");
+    List<String> adjectives = foodBrokerConfig
+      .getStringValuesFromFile("customer.adjectives");
+    List<String> nouns = foodBrokerConfig
+      .getStringValuesFromFile("customer.nouns");
 
     return env.fromCollection(seeds)
       .map(new Customer(vertexFactory))

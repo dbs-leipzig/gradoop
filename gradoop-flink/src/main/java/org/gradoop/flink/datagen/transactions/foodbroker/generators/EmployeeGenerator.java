@@ -46,10 +46,14 @@ public class EmployeeGenerator
   @Override
   public DataSet<Vertex> generate() {
     List<MasterDataSeed> seeds = getMasterDataSeeds(Employee.CLASS_NAME);
-    List<String> cities = getStringValuesFromFile("cities");
-    List<String> firstNamesFemale = getStringValuesFromFile("employee.first_names_female");
-    List<String> firstNamesMale = getStringValuesFromFile("employee.first_names_male");
-    List<String> nouns = getStringValuesFromFile("employee.last_names");
+    List<String> cities = foodBrokerConfig
+      .getStringValuesFromFile("cities");
+    List<String> firstNamesFemale = foodBrokerConfig
+      .getStringValuesFromFile("employee.first_names_female");
+    List<String> firstNamesMale = foodBrokerConfig
+      .getStringValuesFromFile("employee.first_names_male");
+    List<String> nouns = foodBrokerConfig
+      .getStringValuesFromFile("employee.last_names");
 
     return env.fromCollection(seeds)
       .map(new Employee(vertexFactory))
