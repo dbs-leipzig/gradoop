@@ -141,15 +141,6 @@ public class FoodBroker implements GraphCollectionGenerator {
 
   @Override
   public GraphCollection execute() {
-    // used for type hinting when loading graph head data
-    TypeInformation<GraphHead> graphHeadTypeInfo = TypeExtractor
-      .createTypeInfo(gradoopFlinkConfig.getGraphHeadFactory().getType());
-    // used for type hinting when loading vertex data
-    TypeInformation<Vertex> vertexTypeInfo = TypeExtractor
-      .createTypeInfo(gradoopFlinkConfig.getVertexFactory().getType());
-    // used for type hinting when loading edge data
-    TypeInformation<Edge> edgeTypeInfo = TypeExtractor
-      .createTypeInfo(gradoopFlinkConfig.getEdgeFactory().getType());
 
     // Phase 1: Create MasterData
     initMasterData();
@@ -194,16 +185,13 @@ public class FoodBroker implements GraphCollectionGenerator {
       .map(new GraphTransactionTriple());
 
     DataSet<Vertex> transactionalVertices = transactionTriple
-      .flatMap(new TransactionVertices())
-      .returns(vertexTypeInfo);
+      .flatMap(new TransactionVertices());
 
     DataSet<Edge> transactionalEdges = transactionTriple
-      .flatMap(new TransactionEdges())
-      .returns(edgeTypeInfo);
+      .flatMap(new TransactionEdges());
 
     DataSet<GraphHead> graphHeads = transactionTriple
-      .map(new TransactionGraphHead())
-      .returns(graphHeadTypeInfo);
+      .map(new TransactionGraphHead());
 
     // get the new master data which was generated in complaint handling
     DataSet<Vertex> complaintHandlingMasterData = complaintHandlingTuple
