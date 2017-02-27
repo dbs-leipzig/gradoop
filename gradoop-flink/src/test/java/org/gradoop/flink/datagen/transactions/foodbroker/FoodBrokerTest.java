@@ -15,25 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.datagen.foodbroker;
+package org.gradoop.flink.datagen.transactions.foodbroker;
 
 import org.apache.flink.api.java.DataSet;
 import org.codehaus.jettison.json.JSONException;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.datagen.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
-import org.gradoop.flink.model.impl.functions.epgm.Label;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
