@@ -15,11 +15,11 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
+package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.model.api.tuples.Countable;
 
 /**
@@ -39,7 +39,7 @@ public class Frequent<T extends Countable> extends RichFilterFunction<T> {
     super.open(parameters);
 
     this.minFrequency = getRuntimeContext()
-      .<Long>getBroadcastVariable(TFSMConstants.MIN_FREQUENCY).get(0);
+      .<Long>getBroadcastVariable(DIMSpanConstants.MIN_FREQUENCY).get(0);
   }
 
   @Override

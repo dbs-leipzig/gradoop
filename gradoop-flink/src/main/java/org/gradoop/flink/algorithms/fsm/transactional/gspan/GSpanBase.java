@@ -20,6 +20,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.gspan;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToUndirectedAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.DirectedGSpanKernel;
@@ -27,7 +28,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.GSpanKerne
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.algorithm.UndirectedGSpanKernel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.ToDirectedAdjacencyList;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.ToGraphTransaction;
 import org.gradoop.flink.algorithms.fsm.transactional.gspan.functions.Validate;
@@ -107,6 +108,6 @@ public abstract class GSpanBase extends TransactionalFSMBase {
         .groupBy(0)
         .sum(1)
         .filter(new Frequent<>())
-        .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY);
+        .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);
   }
 }

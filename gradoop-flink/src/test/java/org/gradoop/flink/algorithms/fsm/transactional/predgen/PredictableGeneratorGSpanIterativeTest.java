@@ -15,8 +15,8 @@ public class PredictableGeneratorGSpanIterativeTest extends PredictableGenerator
   }
 
   @Override
-  public TransactionalFSMBase getImplementation(FSMConfig config) {
-    return new GSpanIterative(config);
+  public TransactionalFSMBase getImplementation(float minSupport, boolean directed) {
+    return new GSpanIterative(new FSMConfig(minSupport, directed));
   }
 
 }

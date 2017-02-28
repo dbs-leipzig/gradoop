@@ -21,6 +21,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.DropPropertiesAndGraphContainment;
@@ -29,7 +30,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterEdg
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterVerticesByLabel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.NotEmpty;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLabels;
-import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -134,7 +135,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions
@@ -146,7 +147,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
       .groupBy(0)
       .sum(1)
       .filter(new Frequent<>())
-      .withBroadcastSet(minFrequency, TFSMConstants.MIN_FREQUENCY)
+      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)
       .map(new ValueOfWithCount<>());
 
     transactions = transactions
