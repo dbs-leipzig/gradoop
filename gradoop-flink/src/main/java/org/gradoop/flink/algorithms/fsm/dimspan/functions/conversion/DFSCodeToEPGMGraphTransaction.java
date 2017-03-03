@@ -95,8 +95,6 @@ public class DFSCodeToEPGMGraphTransaction
   @Override
   public GraphTransaction map(WithCount<int[]> patternWithCount) throws Exception {
 
-    System.out.println(patternWithCount);
-
     int[] pattern = patternWithCount.getObject();
 
     if (uncompressPatterns) {
@@ -112,8 +110,6 @@ public class DFSCodeToEPGMGraphTransaction
     graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);
 
     GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
-
-    System.out.println(graphHead);
 
     // VERTICES
     int[] vertexLabels = graphUtils.getVertexLabels(pattern);
