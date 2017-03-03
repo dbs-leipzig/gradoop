@@ -54,7 +54,6 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbedding
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
-import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
@@ -139,7 +138,7 @@ public class DIMSpan {
   public DataSet<GraphTransaction> execute(DataSet<LabeledGraphStringString> input) {
 
     DataSet<int[]> encodedInput = preProcess(input);
-    DataSet<int[]> encodedOutput = mine(encodedInput);
+    DataSet<WithCount<int[]>> encodedOutput = mine(encodedInput);
 
     return postProcess(encodedOutput);
   }
@@ -177,7 +176,7 @@ public class DIMSpan {
    * @param graphs preprocessed input graph collection
    * @return frequent patterns
    */
-  protected DataSet<int[]> mine(DataSet<int[]> graphs) {
+  protected DataSet<WithCount<int[]>> mine(DataSet<int[]> graphs) {
 
     DataSet<GraphWithPatternEmbeddingsMap> searchSpace = graphs
       .map(new InitSingleEdgePatternEmbeddingsMap(gSpan, fsmConfig));
@@ -201,7 +200,7 @@ public class DIMSpan {
     DataSet<WithCount<int[]>> reports = iterative
       .flatMap(new ReportSupportedPatterns());
 
-    DataSet<int[]> frequentPatterns = getFrequentPatterns(reports);
+    DataSet<WithCount<int[]>> frequentPatterns = getFrequentPatterns(reports);
 
     DataSet<GraphWithPatternEmbeddingsMap> grownEmbeddings = iterative
       .map(new GrowFrequentPatterns(gSpan, fsmConfig))
@@ -223,11 +222,12 @@ public class DIMSpan {
    * @param encodedOutput frequent patterns represented by multiplexed int-arrays
    * @return Gradoop graph transactions
    */
-  private DataSet<GraphTransaction> postProcess(DataSet<int[]> encodedOutput) {
+  private DataSet<GraphTransaction> postProcess(DataSet<WithCount<int[]>> encodedOutput) {
     return encodedOutput
-      .map(new DFSCodeToEPGMGraphTransaction())
+      .map(new DFSCodeToEPGMGraphTransaction(fsmConfig))
       .withBroadcastSet(vertexDictionary, DIMSpanConstants.VERTEX_DICTIONARY)
-      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY);
+      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY)
+      .withBroadcastSet(graphCount, DIMSpanConstants.GRAPH_COUNT);
   }
 
   /**
@@ -308,7 +308,7 @@ public class DIMSpan {
    * @param patterns reported patterns
    * @return valid frequent patterns
    */
-  protected DataSet<int[]> getFrequentPatterns(DataSet<WithCount<int[]>> patterns) {
+  private DataSet<WithCount<int[]>> getFrequentPatterns(DataSet<WithCount<int[]>> patterns) {
     // COMBINE
 
     patterns = patterns
@@ -347,8 +347,7 @@ public class DIMSpan {
         .map(new CompressPattern());
     }
 
-    return patterns
-      .map(new ValueOfWithCount<>());
+    return patterns;
   }
 
   /**

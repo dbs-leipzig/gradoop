@@ -28,6 +28,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.List;
 
@@ -46,6 +47,11 @@ public class GrowFrequentPatterns
    * uncompressed k-edge frequent patterns for pattern growth
    */
   private List<int[]> frequentPatterns;
+
+  /**
+   * patterns with frequency for collector
+   */
+  private List<WithCount<int[]>> patternFrequencies;
 
   /**
    * list of rightmost paths, index relates to frequent patterns
@@ -109,14 +115,16 @@ public class GrowFrequentPatterns
 
     // broadcast reception
 
-    List<int[]> broadcast =
+    patternFrequencies =
       getRuntimeContext().getBroadcastVariable(DIMSpanConstants.FREQUENT_PATTERNS);
 
-    int patternCount = broadcast.size();
+    int patternCount = patternFrequencies.size();
 
     this.frequentPatterns = Lists.newArrayListWithExpectedSize(patternCount);
 
-    for (int[] pattern : broadcast) {
+    for (WithCount<int[]> patternWithCount : patternFrequencies) {
+      int[] pattern = patternWithCount.getObject();
+
       // uncompress
       if (uncompressFrequentPatterns) {
         pattern = Simple16Compressor.uncompress(pattern);
@@ -145,8 +153,8 @@ public class GrowFrequentPatterns
 
     // union k-1 edge frequent patterns with k-edge ones
     if (pair.isFrequentPatternCollector()) {
-      for (int[] pattern : frequentPatterns) {
-        pair.getMap().collect(pattern);
+      for (WithCount<int[]> patternWithFrequency : patternFrequencies) {
+        pair.getMap().collect(patternWithFrequency);
       }
     } else {
       int[] graph = pair.getGraph();
