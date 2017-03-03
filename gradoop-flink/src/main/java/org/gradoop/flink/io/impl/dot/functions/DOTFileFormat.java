@@ -231,6 +231,7 @@ public class DOTFileFormat implements TextOutputFormat.TextFormatter<GraphTransa
    *
    * output: ["label"="label","propertyKey1=propertyValue1,propertyKey2=propertyValue2,...]
    *
+   * @param builder string builder to append
    * @param label label
    * @param properties properties
    */
