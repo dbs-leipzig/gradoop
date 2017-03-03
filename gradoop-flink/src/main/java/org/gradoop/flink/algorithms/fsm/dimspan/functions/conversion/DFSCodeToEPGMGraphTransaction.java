@@ -113,8 +113,6 @@ public class DFSCodeToEPGMGraphTransaction
 
     GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
-    System.out.println(graphHead);
-
     // VERTICES
     int[] vertexLabels = graphUtils.getVertexLabels(pattern);
 
