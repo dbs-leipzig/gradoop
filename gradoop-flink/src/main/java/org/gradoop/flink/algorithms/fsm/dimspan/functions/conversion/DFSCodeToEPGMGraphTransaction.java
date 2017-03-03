@@ -25,9 +25,13 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.Set;
@@ -35,8 +39,14 @@ import java.util.Set;
 /**
  * int-array encoded graph => Gradoop Graph Transaction
  */
-public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphTransaction> {
+public class DFSCodeToEPGMGraphTransaction
+  extends RichMapFunction<WithCount<int[]>, GraphTransaction> {
 
+
+  /**
+   * flag to enable decompression of patterns (true=enabled)
+   */
+  private final boolean uncompressPatterns;
   /**
    * frequent vertex labels
    */
@@ -52,6 +62,21 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
    */
   private final GraphUtils graphUtils = new GraphUtilsBase();
 
+  /**
+   * Input graph collection size
+   */
+  private long graphCount;
+
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration.
+   */
+  public DFSCodeToEPGMGraphTransaction(DIMSpanConfig fsmConfig) {
+    this.uncompressPatterns =
+      ! fsmConfig.getPatternCompressionInStep().equals(DataflowStep.WITHOUT);
+  }
+
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
@@ -62,17 +87,36 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
     edgeDictionary = getRuntimeContext()
       .<String[]>getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);
 
+
+    graphCount = getRuntimeContext()
+      .<Long>getBroadcastVariable(DIMSpanConstants.GRAPH_COUNT).get(0);
   }
 
   @Override
-  public GraphTransaction map(int[] inGraph) throws Exception {
+  public GraphTransaction map(WithCount<int[]> patternWithCount) throws Exception {
+
+    System.out.println(patternWithCount);
+
+    int[] pattern = patternWithCount.getObject();
+
+    if (uncompressPatterns) {
+      pattern = Simple16Compressor.uncompress(pattern);
+    }
+
+    long frequency = patternWithCount.getCount();
+
 
     // GRAPH HEAD
     GraphHead graphHead = new GraphHead(GradoopId.get(), "", null);
+    graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);
+    graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);
+
     GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
 
+    System.out.println(graphHead);
+
     // VERTICES
-    int[] vertexLabels = graphUtils.getVertexLabels(inGraph);
+    int[] vertexLabels = graphUtils.getVertexLabels(pattern);
 
     GradoopId[] vertexIds = new GradoopId[vertexLabels.length];
 
@@ -92,18 +136,18 @@ public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<int[], GraphT
     // EDGES
     Set<Edge> edges = Sets.newHashSet();
 
-    for (int edgeId = 0; edgeId < graphUtils.getEdgeCount(inGraph); edgeId++) {
-      String label = edgeDictionary[graphUtils.getEdgeLabel(inGraph, edgeId)];
+    for (int edgeId = 0; edgeId < graphUtils.getEdgeCount(pattern); edgeId++) {
+      String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];
 
       GradoopId sourceId;
       GradoopId targetId;
 
-      if (graphUtils.isOutgoing(inGraph, edgeId)) {
-        sourceId = vertexIds[graphUtils.getFromId(inGraph, edgeId)];
-        targetId = vertexIds[graphUtils.getToId(inGraph, edgeId)];
+      if (graphUtils.isOutgoing(pattern, edgeId)) {
+        sourceId = vertexIds[graphUtils.getFromId(pattern, edgeId)];
+        targetId = vertexIds[graphUtils.getToId(pattern, edgeId)];
       } else {
-        sourceId = vertexIds[graphUtils.getToId(inGraph, edgeId)];
-        targetId = vertexIds[graphUtils.getFromId(inGraph, edgeId)];
+        sourceId = vertexIds[graphUtils.getToId(pattern, edgeId)];
+        targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];
       }
 
       edges.add(new Edge(GradoopId.get(), label, sourceId, targetId, null, graphIds));

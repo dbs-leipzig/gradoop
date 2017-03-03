@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import java.util.Objects;
 
@@ -149,11 +150,11 @@ public class PatternEmbeddingsMap extends Tuple2<int[][], int[][]> {
   /**
    * Adds a pattern but no embeddings.
    *
-   * @param patternMux pattern
+   * @param muxWithCount pattern
    */
-  public void collect(int[] patternMux) {
-    setKeys(ArrayUtils.add(getKeys(), patternMux));
-    setValues(ArrayUtils.add(getValues(), new int[0]));
+  public void collect(WithCount<int[]> muxWithCount) {
+    setKeys(ArrayUtils.add(getKeys(), muxWithCount.getObject()));
+    setValues(ArrayUtils.add(getValues(), new int[] {(int) muxWithCount.getCount()}));
   }
 
   /**
