@@ -95,8 +95,6 @@ public class DFSCodeToEPGMGraphTransaction
   @Override
   public GraphTransaction map(WithCount<int[]> patternWithCount) throws Exception {
 
-    System.out.println(patternWithCount);
-
     int[] pattern = patternWithCount.getObject();
 
     if (uncompressPatterns) {
