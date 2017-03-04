@@ -42,15 +42,32 @@ import java.io.IOException;
  * A graph data sink for CSV files.
  */
 public class CSVDataSink extends CSVBase implements DataSink {
+  /**
+   * Path to meta data file that is used to write the output.
+   */
+  private final String metaDataPath;
 
   /**
-   * Creates a new CSV data source.
+   * Creates a new CSV data sink. Computes the meta data based on the given graph.
    *
    * @param csvPath directory to write to
    * @param config Gradoop Flink configuration
    */
   public CSVDataSink(String csvPath, GradoopFlinkConfig config) {
     super(csvPath, config);
+    this.metaDataPath = null;
+  }
+
+  /**
+   * Creates a new CSV data sink. Uses the specified meta data to write the CSV output.
+   *
+   * @param csvPath directory to write CSV files to
+   * @param metaDataPath path to meta data CSV file
+   * @param config Gradoop Flink configuration
+   */
+  public CSVDataSink(String csvPath, String metaDataPath, GradoopFlinkConfig config) {
+    super(csvPath, config);
+    this.metaDataPath = metaDataPath;
   }
 
   @Override
@@ -73,7 +90,12 @@ public class CSVDataSink extends CSVBase implements DataSink {
     FileSystem.WriteMode writeMode = overWrite ?
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
-    DataSet<Tuple2<String, String>> metaData = createMetaData(logicalGraph);
+    DataSet<Tuple2<String, String>> metaData;
+    if (!reuseMetadata()) {
+      metaData = createMetaData(logicalGraph);
+    } else {
+      metaData = readMetaData(metaDataPath);
+    }
 
     DataSet<CSVVertex> csvVertices = logicalGraph.getVertices()
       .map(new VertexToCSVVertex())
@@ -104,6 +126,15 @@ public class CSVDataSink extends CSVBase implements DataSink {
   public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
     throw new UnsupportedOperationException(
       "Writing graph transactions is currently not supported by this data sink");
+  }
+
+  /**
+   * Returns true, if the meta data shall be reused.
+   *
+   * @return true, iff reuse is possible
+   */
+  private boolean reuseMetadata() {
+    return this.metaDataPath != null && !this.metaDataPath.isEmpty();
   }
 
   /**

@@ -17,6 +17,9 @@
 
 package org.gradoop.flink.io.impl.csv;
 
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -65,7 +68,7 @@ public abstract class CSVBase {
    * @param csvPath directory to the CSV files
    * @param config Gradoop Flink configuration
    */
-  public CSVBase(String csvPath, GradoopFlinkConfig config) {
+  CSVBase(String csvPath, GradoopFlinkConfig config) {
     Objects.requireNonNull(csvPath);
     Objects.requireNonNull(config);
     this.vertexCSVPath = csvPath + File.separator + VERTEX_FILE;
@@ -88,5 +91,21 @@ public abstract class CSVBase {
 
   GradoopFlinkConfig getConfig() {
     return config;
+  }
+
+  /**
+   * Reads the meta data from the specified file.
+   *
+   * @param path path to meta data csv file
+   * @return meta data information
+   */
+  DataSet<Tuple2<String, String>> readMetaData(String path) {
+    return getConfig().getExecutionEnvironment()
+      .readTextFile(path)
+      .map(line -> {
+          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
+          return Tuple2.of(tokens[0], tokens[1]);
+        })
+      .returns(new TypeHint<Tuple2<String, String>>() { });
   }
 }
