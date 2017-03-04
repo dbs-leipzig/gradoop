@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.io.impl.csv;
 
-import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -49,7 +48,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    DataSet<Tuple2<String, String>> metaData = readMetaData();
+    DataSet<Tuple2<String, String>> metaData = readMetaData(getMetaDataPath());
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
@@ -72,20 +71,5 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public GraphTransactions getGraphTransactions() throws IOException {
     return getGraphCollection().toTransactions();
-  }
-
-  /**
-   * Reads the meta data for the specified data source.
-   *
-   * @return meta data information
-   */
-  private DataSet<Tuple2<String, String>> readMetaData() {
-    return getConfig().getExecutionEnvironment()
-      .readTextFile(getMetaDataPath())
-      .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
-          return Tuple2.of(tokens[0], tokens[1]);
-        })
-      .returns(new TypeHint<Tuple2<String, String>>() { });
   }
 }
