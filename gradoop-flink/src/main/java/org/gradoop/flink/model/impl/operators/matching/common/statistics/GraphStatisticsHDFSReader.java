@@ -114,25 +114,25 @@ public class GraphStatisticsHDFSReader extends GraphStatisticsReader {
     }
 
     p = new Path(root,
-      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY);
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
       distinctPropertyValuesByEdgeLabelAndPropertyName = readNestedKeyValueMap(br.lines());
     }
 
     p = new Path(root,
-      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY);
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
       distinctPropertyValuesByVertexLabelAndPropertyName = readNestedKeyValueMap(br.lines());
     }
 
     p = new Path(root,
-      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY);
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
       distinctEdgePropertyValuesByPropertyName = readKeyValueMap(br.lines());
     }
 
     p = new Path(root,
-      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY);
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {
       distinctVertexPropertyValuesByPropertyName = readKeyValueMap(br.lines());
     }

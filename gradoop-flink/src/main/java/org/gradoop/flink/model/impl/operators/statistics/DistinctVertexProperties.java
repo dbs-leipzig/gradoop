@@ -29,8 +29,7 @@ import java.util.Set;
 /**
  * Computes the number of distinct property values for vertex label - property name pairs
  */
-public class DistinctVertexPropertyValuesByPropertyName
-  extends DistinctPropertyValues<Vertex, String> {
+public class DistinctVertexProperties extends DistinctProperties<Vertex, String> {
 
   @Override
   protected DataSet<Tuple2<String, Set<PropertyValue>>> extractValuePairs(LogicalGraph graph) {

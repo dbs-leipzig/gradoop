@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains example programs to compute graph statistics.
+ * Contains utility programs for Gradoop.
  */
-package org.gradoop.examples.statistics;
+package org.gradoop.utils;

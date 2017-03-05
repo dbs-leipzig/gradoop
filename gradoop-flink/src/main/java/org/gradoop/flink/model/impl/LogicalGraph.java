@@ -146,8 +146,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new AddToGraph<>(graphHead));
-    edges = edges.map(new AddToGraph<>(graphHead));
+    vertices = vertices
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+    edges = edges
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return new LogicalGraph(graphHeadSet, vertices, edges, config);
   }
@@ -207,10 +211,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
     DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
 
     DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return fromDataSets(
       createGraphHeadDataSet(new ArrayList<>(0), config),
