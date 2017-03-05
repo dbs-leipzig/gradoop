@@ -18,17 +18,15 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Adds the given graph head identifier to the graph element.
  *
  * @param <GE> EPGM graph element
  */
-@FunctionAnnotation.ForwardedFields("id;label;properties")
 public class AddToGraph<GE extends GraphElement> implements
   MapFunction<GE, GE> {
 

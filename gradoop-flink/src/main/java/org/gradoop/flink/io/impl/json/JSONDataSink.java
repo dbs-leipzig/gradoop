@@ -37,6 +37,20 @@ import java.io.IOException;
 public class JSONDataSink extends JSONBase implements DataSink {
 
   /**
+   * Creates a new data sink. The graph is written into the specified directory. Paths can be local
+   * (file://) or HDFS (hdfs://).
+   *
+   * @param outputPath directory to write the graph to
+   * @param config     Gradoop Flink configuration
+   */
+  public JSONDataSink(String outputPath, GradoopFlinkConfig config) {
+    this(outputPath + DEFAULT_GRAPHS_FILE,
+      outputPath + DEFAULT_VERTEX_FILE,
+      outputPath + DEFAULT_EDGE_FILE,
+      config);
+  }
+
+  /**
    * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
    *
    * @param graphHeadPath graph data file
