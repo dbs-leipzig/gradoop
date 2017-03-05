@@ -99,7 +99,7 @@ public class GroupingRunner extends AbstractRunner implements
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // initialize EPGM database
-    LogicalGraph graphDatabase = readLogicalGraph(inputPath, false);
+    LogicalGraph graphDatabase = readLogicalGraph(inputPath);
 
     // initialize grouping method
     Grouping grouping = getOperator(

@@ -131,8 +131,8 @@ public abstract class GraphStatisticsReader {
    * connecting,isActive,2
    * EOF
    */
-  public static final String FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY =
-    "distinct_edge_property_values_by_label_and_property_name";
+  public static final String FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL =
+    "distinct_edge_properties_by_label";
 
   /**
    * Each line contains the vertex label a property name and the number of distinct property
@@ -143,8 +143,8 @@ public abstract class GraphStatisticsReader {
    * City,name,25
    * EOF
    */
-  public static final String FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY =
-    "distinct_vertex_property_values_by_label_and_property_name";
+  public static final String FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL =
+    "distinct_vertex_properties_by_label";
 
   /**
    * Each line contains the edge property name and the number of distinct property
@@ -155,8 +155,7 @@ public abstract class GraphStatisticsReader {
    * isActive,2
    * EOF
    */
-  public static final String FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY =
-    "distinct_edge_property_values_by_property_name";
+  public static final String FILE_DISTINCT_EDGE_PROPERTIES = "distinct_edge_properties";
 
   /**
    * Each line contains the vertex property name and the number of distinct property
@@ -167,8 +166,7 @@ public abstract class GraphStatisticsReader {
    * name,25
    * EOF
    */
-  public static final String FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY =
-    "distinct_vertex_property_values_by_property_name";
+  public static final String FILE_DISTINCT_VERTEX_PROPERTIES = "distinct_vertex_properties";
 
   /**
    * Reads a single {@link Long} value from the specified file.

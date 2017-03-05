@@ -29,8 +29,6 @@ import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
-
 /**
  * A graph data source for CSV files.
  */
@@ -47,7 +45,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
   }
 
   @Override
-  public LogicalGraph getLogicalGraph() throws IOException {
+  public LogicalGraph getLogicalGraph() {
     DataSet<Tuple2<String, String>> metaData = readMetaData(getMetaDataPath());
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
@@ -64,12 +62,12 @@ public class CSVDataSource extends CSVBase implements DataSource {
   }
 
   @Override
-  public GraphCollection getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() {
     return GraphCollection.fromGraph(getLogicalGraph());
   }
 
   @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
+  public GraphTransactions getGraphTransactions() {
     return getGraphCollection().toTransactions();
   }
 }

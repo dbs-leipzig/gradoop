@@ -35,7 +35,7 @@ import java.util.Set;
  * @param <T> element type
  * @param <K> grouping key
  */
-public abstract class DistinctPropertyValues<T extends GraphElement, K>
+public abstract class DistinctProperties<T extends GraphElement, K>
   implements UnaryGraphToValueOperator<DataSet<WithCount<K>>> {
 
 

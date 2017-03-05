@@ -80,22 +80,22 @@ public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {
     Map<String, Long> distTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(
-        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY));
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL));
     Map<String, Map<String, Long>> distinctPropertyValuesByEdgeLabelAndPropertyName =
       readNestedKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(
-      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_LABEL_AND_PROPERTY_KEY));
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL));
     Map<String, Map<String, Long>> distinctPropertyValuesByVertexLabelAndPropertyName =
       readNestedKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(
-      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTY_VALUES_BY_PROPERTY_KEY));
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES));
     Map<String, Long> distinctEdgePropertyValuesByPropertyName =
       readKeyValueMap(Files.lines(p, charset));
 
     p = statisticsDir.resolve(Paths.get(
-      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTY_VALUES_BY_PROPERTY_KEY));
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES));
     Map<String, Long> distinctVertexPropertyValuesByPropertyName =
       readKeyValueMap(Files.lines(p, charset));
 
