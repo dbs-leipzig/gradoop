@@ -135,13 +135,11 @@ class JoinEstimator extends Estimator {
   private void processEdge(String sourceVariable, String edgeVariable, String targetVariable) {
     String edgeLabel = getLabel(edgeVariable, false);
 
-    long distinctSourceCount = getGraphStatistics()
-      .getDistinctSourceVertexCountByEdgeLabel(edgeLabel);
+    long distinctSourceCount = getGraphStatistics().getDistinctSourceVertexCount(edgeLabel);
     if (distinctSourceCount == 0L) {
       distinctSourceCount = getGraphStatistics().getDistinctSourceVertexCount();
     }
-    long distinctTargetCount = getGraphStatistics()
-      .getDistinctTargetVertexCountByEdgeLabel(edgeLabel);
+    long distinctTargetCount = getGraphStatistics().getDistinctTargetVertexCount(edgeLabel);
     if (distinctTargetCount == 0L) {
       distinctTargetCount = getGraphStatistics().getDistinctTargetVertexCount();
     }

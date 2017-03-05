@@ -72,8 +72,8 @@ abstract class Estimator {
    * @return number of elements with the given label
    */
   long getCardinality(String label, boolean isVertex) {
-    long cardinality = isVertex ? graphStatistics.getVertexCountByLabel(label) :
-      graphStatistics.getEdgeCountByLabel(label);
+    long cardinality = isVertex ? graphStatistics.getVertexCount(label) :
+      graphStatistics.getEdgeCount(label);
 
     return cardinality > 0 ? cardinality :
       isVertex ? graphStatistics.getVertexCount() : graphStatistics.getEdgeCount();
