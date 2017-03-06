@@ -181,6 +181,6 @@ public class PlanTableEntry {
     return String.format("PlanTableEntry | type: %s | all-vars: %s | " +
         "proc-vars: %s | attr-vars: %s | est-card: %d | prediates: %s | Plan :%n%s",
       type, getAllVariables(), getProcessedVariables(), getAttributedVariables(),
-      estimator.getCardinality(), predicates, estimator.getQueryPlan());
+      estimatedCardinality, predicates, estimator.getQueryPlan());
   }
 }
