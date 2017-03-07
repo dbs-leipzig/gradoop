@@ -25,11 +25,12 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.*;
 import static org.junit.Assert.assertEquals;
 
-public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
+public abstract class ExpandEmbeddingsTest extends PhysicalOperatorTest {
   //define some vertices
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();
@@ -57,7 +58,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
     );
 
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input, candidateEdges, 2, 1, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -95,7 +96,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -115,7 +116,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(d,e3,c)
     );
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input, candidateEdges, 0, 2, 4,
       ExpandDirection.IN, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -135,7 +136,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(c,e3,d)
     );
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -154,7 +155,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(b,e2,c)
     );
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input,candidateEdges, 0, 2, 2,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(),-1
     ).evaluate();
@@ -172,7 +173,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(a,e1,b)
     );
 
-    DataSet<Embedding> result = new ExpandEmbeddings(
+    DataSet<Embedding> result = getOperator(
       input,candidateEdges, 0, 0, 3,
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
@@ -196,7 +197,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    ExpandEmbeddings op = new ExpandEmbeddings(
+    ExpandEmbeddings op = getOperator(
       input, candidateEdges,
       2, 2, 3,
       ExpandDirection.OUT,
@@ -220,7 +221,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    ExpandEmbeddings op = new ExpandEmbeddings(
+    ExpandEmbeddings op = getOperator(
       input, candidateEdges,
       2, 1, 2,
       ExpandDirection.OUT,
@@ -245,7 +246,7 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       createEmbedding(a,e0,b)
     );
 
-    ExpandEmbeddings op = new ExpandEmbeddings(
+    ExpandEmbeddings op = getOperator(
       input, candidateEdges,
       2, 1, 2,
       ExpandDirection.OUT,
@@ -259,4 +260,10 @@ public class ExpandEmbeddingsTest extends PhysicalOperatorTest {
     assertEquals(1, result.count());
     assertEmbeddingExists(result, a,e0,b,e2,a);
   }
+
+  protected abstract ExpandEmbeddings getOperator(
+    DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
+    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn);
+
 }

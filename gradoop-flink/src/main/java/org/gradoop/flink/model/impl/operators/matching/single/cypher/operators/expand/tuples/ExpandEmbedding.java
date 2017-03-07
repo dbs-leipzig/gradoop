@@ -16,7 +16,6 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -102,11 +101,11 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @return embedding representation of the expand intermediate result
    */
   public Embedding toEmbedding() {
-    Embedding embedding = getBase().copy();
-
-    embedding.add(Lists.newArrayList(f1));
+    Embedding embedding = getBase();
+    
+    embedding.add(f1);
     embedding.add(f2);
 
-    return embedding;
+    return getBase();
   }
 }

@@ -19,9 +19,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.EdgeWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -31,8 +33,10 @@ import java.util.List;
  * the intermediate result.
  * Before growing it is checked whether distinctiveness conditions would still apply.
  */
+@FunctionAnnotation.ForwardedFieldsFirst("f0")
+@FunctionAnnotation.ReadFieldsSecond("f1")
 public class MergeExpandEmbeddings
-  extends RichFlatJoinFunction<ExpandEmbedding, Embedding, ExpandEmbedding> {
+  extends RichFlatJoinFunction<ExpandEmbedding, EdgeWithTiePoint, ExpandEmbedding> {
 
   /**
    * Holds the index of all vertex columns that should be distinct
@@ -62,8 +66,10 @@ public class MergeExpandEmbeddings
   }
 
   @Override
-  public void join(ExpandEmbedding base, Embedding extension,
+  public void join(ExpandEmbedding base, EdgeWithTiePoint edgeWithKey,
     Collector<ExpandEmbedding> out) throws Exception {
+
+    Embedding extension = edgeWithKey.f1;
 
     if (checkDistinctiveness(base, extension)) {
       out.collect(base.grow(extension));
