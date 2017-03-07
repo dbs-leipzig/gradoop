@@ -102,7 +102,6 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    */
   public Embedding toEmbedding() {
     Embedding embedding = getBase();
-    
     embedding.add(f1);
     embedding.add(f2);
 
