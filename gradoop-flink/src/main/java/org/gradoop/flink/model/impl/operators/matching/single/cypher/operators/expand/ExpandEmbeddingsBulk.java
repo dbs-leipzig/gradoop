@@ -36,7 +36,7 @@ import java.util.List;
  *
  * Iteration is done with {@code BulkIteration}
  */
-public class ExpandEmbeddingsIteration extends ExpandEmbeddings {
+public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
 
   /**
    * New Expand One Operator
@@ -52,7 +52,7 @@ public class ExpandEmbeddingsIteration extends ExpandEmbeddings {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public ExpandEmbeddingsIteration(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsBulk(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -74,7 +74,7 @@ public class ExpandEmbeddingsIteration extends ExpandEmbeddings {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public ExpandEmbeddingsIteration(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsBulk(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -95,7 +95,7 @@ public class ExpandEmbeddingsIteration extends ExpandEmbeddings {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public ExpandEmbeddingsIteration(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsBulk(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -114,8 +114,7 @@ public class ExpandEmbeddingsIteration extends ExpandEmbeddings {
     DataSet<ExpandEmbedding> nextWorkingSet = iteration
       .filter(new FilterPreviousExpandEmbedding())
       .join(candidateEdgeTuples, joinHint)
-        .where(2)
-        .equalTo(0)
+        .where(2).equalTo(0)
         .with(new MergeExpandEmbeddings(
           distinctVertexColumns,
           distinctEdgeColumns,

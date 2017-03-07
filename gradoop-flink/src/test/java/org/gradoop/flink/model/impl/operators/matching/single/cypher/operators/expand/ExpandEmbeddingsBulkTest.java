@@ -22,14 +22,14 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 
 import java.util.List;
 
-public class ExpandEmbeddingsLoopTest extends ExpandEmbeddingsTest {
+public class ExpandEmbeddingsBulkTest extends ExpandEmbeddingsTest {
 
   protected ExpandEmbeddings getOperator(
     DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
-    return new ExpandEmbeddingsLoop(input, candidateEdges, expandColumn, lowerBound,
+    return new ExpandEmbeddingsBulk(input, candidateEdges, expandColumn, lowerBound,
       upperBound, direction, distinctVertexColumns, distinctEdgeColumns, closingColumn);
   }
 

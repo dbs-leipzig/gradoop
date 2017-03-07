@@ -34,7 +34,7 @@ import java.util.List;
  *
  * Iteration is done with {@code LoopUnrolling}
  */
-public class ExpandEmbeddingsLoop extends ExpandEmbeddings {
+public class ExpandEmbeddingsForLoop extends ExpandEmbeddings {
 
   /**
    * New Expand One Operator
@@ -50,7 +50,7 @@ public class ExpandEmbeddingsLoop extends ExpandEmbeddings {
    * @param closingColumn defines the column which should be equal with the paths end
    * @param joinHint join strategy
    */
-  public ExpandEmbeddingsLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsForLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
     JoinOperatorBase.JoinHint joinHint) {
@@ -72,7 +72,7 @@ public class ExpandEmbeddingsLoop extends ExpandEmbeddings {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public ExpandEmbeddingsLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsForLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -93,7 +93,7 @@ public class ExpandEmbeddingsLoop extends ExpandEmbeddings {
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
    */
-  public ExpandEmbeddingsLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
+  public ExpandEmbeddingsForLoop(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
     int expandColumn, int lowerBound, ExpandDirection direction,
     List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
 
@@ -108,8 +108,11 @@ public class ExpandEmbeddingsLoop extends ExpandEmbeddings {
 
     for (int i = 1; i < upperBound; i++) {
       DataSet<ExpandEmbedding> nextResult =
-        intermediateResults.get(i - 1).join(candidateEdgeTuples, joinHint).where(2).equalTo(0).with(
-          new MergeExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns, closingColumn));
+        intermediateResults.get(i - 1)
+          .join(candidateEdgeTuples, joinHint)
+            .where(2).equalTo(0)
+            .with(new MergeExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns,
+              closingColumn));
 
       intermediateResults.add(nextResult);
     }

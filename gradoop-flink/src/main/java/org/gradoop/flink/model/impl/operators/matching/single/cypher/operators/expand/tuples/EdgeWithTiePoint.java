@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 
@@ -25,15 +25,15 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
  * Represents an Edge with an extracted tie point
  *
  * f0 -> edge join key
- * f1 -> edge
+ * f1 -> edge id
+ * f2 -> edge expand key
  */
-public class EdgeWithTiePoint extends Tuple2<GradoopId, Embedding> {
+public class EdgeWithTiePoint extends Tuple3<GradoopId, GradoopId, GradoopId> {
 
   /**
    * Creates an empty Object
    */
   public EdgeWithTiePoint() {
-    super();
   }
 
   /**
@@ -42,6 +42,55 @@ public class EdgeWithTiePoint extends Tuple2<GradoopId, Embedding> {
    */
   public EdgeWithTiePoint(Embedding edge) {
     this.f0 = edge.getId(0);
-    this.f1 = edge;
+    this.f1 = edge.getId(1);
+    this.f2 = edge.getId(2);
+  }
+
+  /**
+   * Set source id
+   * @param id source id
+   */
+  public void setSource(GradoopId id) {
+    f0 = id;
+  }
+
+  /**
+   * Get source id
+   * @return source id
+   */
+  public GradoopId getSource() {
+    return f0;
+  }
+
+  /**
+   * Set edge id
+   * @param id edge id
+   */
+  public void setId(GradoopId id) {
+    f1 = id;
+  }
+
+  /**
+   * Get edge id
+   * @return edge id
+   */
+  public GradoopId getId() {
+    return f1;
+  }
+
+  /**
+   * Set target id
+   * @param id target id
+   */
+  public void setTarget(GradoopId id) {
+    f2 = id;
+  }
+
+  /**
+   * Get target id
+   * @return target id
+   */
+  public GradoopId getTarget() {
+    return f2;
   }
 }

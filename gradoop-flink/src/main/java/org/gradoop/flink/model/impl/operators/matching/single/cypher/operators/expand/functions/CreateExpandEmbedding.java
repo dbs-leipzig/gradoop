@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Creates the initial expand embeddings
  */
-@FunctionAnnotation.ReadFieldsSecond("f1")
+@FunctionAnnotation.ReadFieldsSecond("f1; f2")
 public class CreateExpandEmbedding
   extends RichFlatJoinFunction<Embedding, EdgeWithTiePoint, ExpandEmbedding> {
 
@@ -62,12 +62,11 @@ public class CreateExpandEmbedding
   }
 
   @Override
-  public void join(Embedding input, EdgeWithTiePoint edgeWithKey, Collector<ExpandEmbedding> out)
+  public void join(Embedding input, EdgeWithTiePoint edge, Collector<ExpandEmbedding> out)
       throws Exception {
-    Embedding edge = edgeWithKey.f1;
 
     if (checkDistinctiveness(input, edge)) {
-      GradoopId[] path = new GradoopId[]{edge.getId(1), edge.getId(2)};
+      GradoopId[] path = new GradoopId[]{edge.getId(), edge.getTarget()};
       out.collect(new ExpandEmbedding(input, path));
     }
   }
@@ -78,9 +77,9 @@ public class CreateExpandEmbedding
    * @param edge edge along which we expand
    * @return true if distinct criteria hold for the expansion
    */
-  private boolean checkDistinctiveness(Embedding input, Embedding edge) {
-    GradoopId edgeId = edge.getId(1);
-    GradoopId tgt = edge.getId(2);
+  private boolean checkDistinctiveness(Embedding input, EdgeWithTiePoint edge) {
+    GradoopId edgeId = edge.getId();
+    GradoopId tgt = edge.getTarget();
 
     for (int i : distinctVertices) {
       if (input.getIdAsList(i).contains(tgt) && i != closingColumn) {

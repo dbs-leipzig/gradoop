@@ -79,10 +79,10 @@ public class ExpandEmbedding extends Tuple3<Embedding, GradoopId[], GradoopId> {
    * @param edge the edge along which we expand
    * @return new expanded intermediate result
    */
-  public ExpandEmbedding grow(Embedding edge) {
+  public ExpandEmbedding grow(EdgeWithTiePoint edge) {
     return new ExpandEmbedding(
       f0,
-      ArrayUtils.addAll(f1, f2, edge.getId(1), edge.getId(2))
+      ArrayUtils.addAll(f1, f2, edge.f1, edge.f2)
     );
   }
 

@@ -17,7 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.EdgeWithTiePoint;
 
@@ -25,10 +26,24 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.e
  * Extract the join key from an edge embedding and stores both in an {@link EdgeWithTiePoint}
  */
 public class ExtractKeyedCandidateEdges
-  implements MapFunction<Embedding, EdgeWithTiePoint> {
+  extends RichMapFunction<Embedding, EdgeWithTiePoint> {
+
+  /**
+   * Reuse Tuple
+   */
+  private EdgeWithTiePoint reuseEdgeWitTiePoint;
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    this.reuseEdgeWitTiePoint = new EdgeWithTiePoint();
+  }
 
   @Override
   public EdgeWithTiePoint map(Embedding edge) throws Exception {
-    return new EdgeWithTiePoint(edge);
+    reuseEdgeWitTiePoint.setSource(edge.getId(0));
+    reuseEdgeWitTiePoint.setId(edge.getId(1));
+    reuseEdgeWitTiePoint.setTarget(edge.getId(2));
+
+    return reuseEdgeWitTiePoint;
   }
 }

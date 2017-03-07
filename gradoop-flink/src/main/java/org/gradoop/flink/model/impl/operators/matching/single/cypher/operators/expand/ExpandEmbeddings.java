@@ -154,8 +154,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
       .partitionByHash(0);
 
     return input.join(candidateEdgeTuples, joinHint)
-      .where(new ExtractExpandColumn(expandColumn))
-      .equalTo(0)
+      .where(new ExtractExpandColumn(expandColumn)).equalTo(0)
       .with(new CreateExpandEmbedding(
         distinctVertexColumns,
         distinctEdgeColumns,
