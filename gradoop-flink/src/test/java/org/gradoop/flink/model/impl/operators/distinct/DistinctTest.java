@@ -17,7 +17,7 @@ public class DistinctTest extends GradoopFlinkTestBase {
     GraphCollection expectedCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
 
-    GraphCollection outputCollection = inputCollection.distinct();
+    GraphCollection outputCollection = inputCollection.distinctById();
 
     collectAndAssertTrue(outputCollection
       .equalsByGraphElementIds(expectedCollection));
@@ -33,7 +33,7 @@ public class DistinctTest extends GradoopFlinkTestBase {
     GraphCollection expectedCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
 
-    GraphCollection outputCollection = inputCollection.distinct();
+    GraphCollection outputCollection = inputCollection.distinctById();
 
     collectAndAssertTrue(outputCollection
       .equalsByGraphElementIds(expectedCollection));

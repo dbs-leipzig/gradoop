@@ -86,12 +86,20 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   GraphCollection select(FilterFunction<GraphHead> predicateFunction);
 
   /**
-   * Returns a distinct collection of logical graphs. Graph equality is based on
-   * graph identifiers.
+   * Returns a distinct collection of logical graphs.
+   * Graph equality is based on graph identifiers.
    *
    * @return distinct graph collection
    */
-  GraphCollection distinct();
+  GraphCollection distinctById();
+
+  /**
+   * Returns a distinct collection of logical graphs.
+   * Graph equality is based on isomorphism including labels and properties.
+   *
+   * @return distinct graph collection
+   */
+  GraphCollection distinctByIsomorphism();
 
   /**
    * Returns a graph collection that is sorted by a given graph property key.
