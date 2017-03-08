@@ -5,7 +5,7 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class DistinctTest extends GradoopFlinkTestBase {
+public class DistinctByIdTest extends GradoopFlinkTestBase {
 
   @Test
   public void testNonDistinctCollection() throws Exception {

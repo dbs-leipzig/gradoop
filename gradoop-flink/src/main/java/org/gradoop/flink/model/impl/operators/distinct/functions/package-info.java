@@ -15,19 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.distinct.functions;
-
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-
 /**
- * (graphId, canonicalLabel) => graphId
+ * Flink functions used by distinct operators.
  */
-public class IdFromGraphHeadString implements MapFunction<GraphHeadString, GradoopId> {
-
-  @Override
-  public GradoopId map(GraphHeadString graphHeadString) throws Exception {
-    return graphHeadString.f0;
-  }
-}
+package org.gradoop.flink.model.impl.operators.distinct.functions;
