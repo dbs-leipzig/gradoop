@@ -17,22 +17,20 @@
 
 package org.gradoop.flink.model.impl.operators.distinct;
 
-import org.gradoop.flink.model.api.operators
-  .UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * Returns a distinct collection of logical graphs. Graph heads are compared
  * based on their identifier.
  */
-public class Distinct implements UnaryCollectionToCollectionOperator {
+public class DistinctById implements UnaryCollectionToCollectionOperator {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
     return GraphCollection.fromDataSets(
-      collection.getGraphHeads().distinct(new Id<GraphHead>()),
+      collection.getGraphHeads().distinct(new Id<>()),
       collection.getVertices(),
       collection.getEdges(),
       collection.getConfig()
@@ -41,6 +39,6 @@ public class Distinct implements UnaryCollectionToCollectionOperator {
 
   @Override
   public String getName() {
-    return Distinct.class.getName();
+    return DistinctById.class.getName();
   }
 }

@@ -56,7 +56,7 @@ import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
-import org.gradoop.flink.model.impl.operators.distinct.Distinct;
+import org.gradoop.flink.model.impl.operators.distinct.DistinctById;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
@@ -288,7 +288,7 @@ public class GraphCollection extends GraphBase implements
    */
   @Override
   public GraphCollection distinct() {
-    return callForCollection(new Distinct());
+    return callForCollection(new DistinctById());
   }
 
   /**
