@@ -17,9 +17,23 @@
 
 package org.gradoop.flink.model.impl.operators.distinct;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.JoinOperator;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * Returns a distinct collection of logical graphs.
@@ -29,12 +43,18 @@ public class DistinctByIsomorphism implements UnaryCollectionToCollectionOperato
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-    return GraphCollection.fromDataSets(
-      collection.getGraphHeads().distinct(new Id<>()),
-      collection.getVertices(),
-      collection.getEdges(),
-      collection.getConfig()
-    );
+
+    // Init builder for canonical labels
+    CanonicalAdjacencyMatrixBuilder camBuilder = new CanonicalAdjacencyMatrixBuilder(
+      new GraphHeadToEmptyString(),  new VertexToDataString(), new EdgeToDataString(), true);
+
+    // create canonical labels for all graph heads
+    DataSet<GraphHeadString> graphLabels = camBuilder
+      .getGraphHeadStrings(collection);
+
+    // TODO: wait for delete operator
+
+    return null;
   }
 
   @Override
