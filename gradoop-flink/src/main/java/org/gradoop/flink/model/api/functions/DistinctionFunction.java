@@ -21,10 +21,12 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
+import java.io.Serializable;
+
 /**
  * Marker interface for reduce functions used for group by isomorphism operator.
  * For example, to count isomorphic graphs in a collection.
  */
 public interface DistinctionFunction
-  extends GroupReduceFunction<Tuple2<String, GraphHead>, GraphHead> {
+  extends GroupReduceFunction<Tuple2<String, GraphHead>, GraphHead>, Serializable {
 }

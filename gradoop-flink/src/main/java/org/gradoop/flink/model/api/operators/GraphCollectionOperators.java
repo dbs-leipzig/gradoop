@@ -19,6 +19,7 @@ package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.api.functions.DistinctionFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
@@ -303,4 +304,13 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return graph transactions representing the graph collection
    */
   GraphTransactions toTransactions();
+
+  /**
+   * Groups a graph collection by isomorphism including labels and values.
+   *
+   * @param distinctionFunction function to generate the final group representative graph head.
+   *
+   * @return grouped graph collection
+   */
+  GraphCollection groupBy(DistinctionFunction distinctionFunction);
 }

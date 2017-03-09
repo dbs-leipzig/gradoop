@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.api.functions.DistinctionFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.GraphCollectionOperators;
@@ -58,6 +59,7 @@ import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
@@ -561,6 +563,11 @@ public class GraphCollection extends GraphBase implements
       .with(new TransactionFromSets());
 
     return new GraphTransactions(graphTransactions, getConfig());
+  }
+
+  @Override
+  public GraphCollection groupBy(DistinctionFunction distinctionFunction) {
+    return callForCollection(new GroupByIsomorphism(distinctionFunction));
   }
 
   /**
