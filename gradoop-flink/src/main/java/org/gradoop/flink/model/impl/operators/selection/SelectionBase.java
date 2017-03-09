@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 
@@ -41,13 +42,15 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
    * Creates a graph collection representing selection result.
    *
    * @param collection input collection
-   * @param graphIds selected graph ids
    * @param graphHeads selected graph heads
    *
    * @return selection result
    */
-  protected GraphCollection selectVerticesAndEdges(GraphCollection collection,
-    DataSet<GradoopId> graphIds, DataSet<GraphHead> graphHeads) {
+  protected GraphCollection selectVerticesAndEdges(
+    GraphCollection collection, DataSet<GraphHead> graphHeads) {
+
+    // get the identifiers of these logical graphs
+    DataSet<GradoopId> graphIds = graphHeads.map(new Id<GraphHead>());
 
     // use graph ids to filter vertices from the actual graph structure
     DataSet<Vertex> vertices = collection.getVertices()

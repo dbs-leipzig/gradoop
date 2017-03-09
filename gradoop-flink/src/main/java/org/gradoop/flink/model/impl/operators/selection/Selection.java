@@ -19,10 +19,8 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,14 +46,13 @@ public class Selection extends SelectionBase {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
+
     // find graph heads matching the predicate
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<GraphHead> graphHeads = collection
+      .getGraphHeads()
       .filter(predicate);
 
-    // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
-
-    return selectVerticesAndEdges(collection, graphIDs, graphHeads);
+    return selectVerticesAndEdges(collection, graphHeads);
   }
 
   @Override

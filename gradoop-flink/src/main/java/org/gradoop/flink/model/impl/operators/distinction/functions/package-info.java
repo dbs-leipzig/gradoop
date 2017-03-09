@@ -16,7 +16,6 @@
  */
 
 /**
- * Contains the implementation of distinct operators which can be applied on
- * graph collections.
+ * Flink functions used by distinct operators.
  */
-package org.gradoop.flink.model.impl.operators.distinct;
+package org.gradoop.flink.model.impl.operators.distinction.functions;

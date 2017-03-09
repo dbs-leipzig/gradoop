@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.distinct;
+package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;

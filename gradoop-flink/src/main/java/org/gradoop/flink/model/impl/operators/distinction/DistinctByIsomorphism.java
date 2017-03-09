@@ -15,36 +15,33 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.distinct;
+package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
-import org.gradoop.flink.model.impl.operators.distinct.functions.IdFromGraphHeadString;
-import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
+import org.gradoop.flink.model.impl.operators.distinction.functions.IdFromGraphHeadString;
 
 /**
  * Returns a distinct collection of logical graphs.
  * Graphs are compared by isomorphism testing.
  */
-public class DistinctByIsomorphism extends
-  org.gradoop.flink.model.impl.operators.selection.SelectionBase {
+public class DistinctByIsomorphism extends GroupByIsomorphism {
+
+  /**
+   * Default constructor.
+   */
+  public DistinctByIsomorphism() {
+    super(new FirstGraphHead());
+  }
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-
-    // Init builder for canonical labels
-    CanonicalAdjacencyMatrixBuilder camBuilder = new CanonicalAdjacencyMatrixBuilder(
-      new GraphHeadToEmptyString(),  new VertexToDataString(), new EdgeToDataString(), true);
-
     // create canonical labels for all graph heads and choose representative for all distinct ones
-    DataSet<GradoopId> graphIds = camBuilder
-      .getGraphHeadStrings(collection)
+    DataSet<GradoopId> graphIds = getCanonicalLabels(collection)
       .distinct(1)
       .map(new IdFromGraphHeadString());
 
@@ -52,7 +49,7 @@ public class DistinctByIsomorphism extends
       .filter(new IdInBroadcast<>())
       .withBroadcastSet(graphIds, IdInBroadcast.IDS);
 
-    return selectVerticesAndEdges(collection, graphIds, graphHeads);
+    return selectVerticesAndEdges(collection, graphHeads);
   }
 
   @Override

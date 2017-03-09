@@ -15,19 +15,16 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.distinct.functions;
+package org.gradoop.flink.model.api.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
- * (graphId, canonicalLabel) => graphId
+ * Marker interface for reduce functions used for group by isomorphism operator.
+ * For example, to count isomorphic graphs in a collection.
  */
-public class IdFromGraphHeadString implements MapFunction<GraphHeadString, GradoopId> {
-
-  @Override
-  public GradoopId map(GraphHeadString graphHeadString) throws Exception {
-    return graphHeadString.f0;
-  }
+public interface DistinctionFunction
+  extends GroupReduceFunction<Tuple2<String, GraphHead>, GraphHead> {
 }
