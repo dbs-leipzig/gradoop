@@ -19,14 +19,9 @@ package org.gradoop.flink.model.impl.operators.distinct;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
-import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.flink.model.impl.operators.distinct.functions.IdFromGraphHeadString;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -37,7 +32,8 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
  * Returns a distinct collection of logical graphs.
  * Graphs are compared by isomorphism testing.
  */
-public class DistinctByIsomorphism implements UnaryCollectionToCollectionOperator {
+public class DistinctByIsomorphism extends
+  org.gradoop.flink.model.impl.operators.selection.SelectionBase {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
@@ -56,19 +52,7 @@ public class DistinctByIsomorphism implements UnaryCollectionToCollectionOperato
       .filter(new IdInBroadcast<>())
       .withBroadcastSet(graphIds, IdInBroadcast.IDS);
 
-    // TODO: wait for delete operator
-
-    // use graph ids to filter vertices from the actual graph structure
-    DataSet<Vertex> vertices = collection.getVertices()
-      .filter(new InAnyGraphBroadcast<>())
-      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    DataSet<Edge> edges = collection.getEdges()
-      .filter(new InAnyGraphBroadcast<>())
-      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    return GraphCollection.fromDataSets(
-      graphHeads, vertices, edges, collection.getConfig());
+    return selectVerticesAndEdges(collection, graphIds, graphHeads);
   }
 
   @Override
