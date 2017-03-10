@@ -73,6 +73,7 @@ public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionT
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
+    // TODO       JOIN COUNT: (1)
     DataSet<Tuple2<Vertex, GradoopId>> vWithGid = hypervertices.getVertices()
       .filter(new InGraphBroadcast<>())
       .withBroadcastSet(gU.getGraphHead().map(new Id<>()), GRAPH_ID)
@@ -83,6 +84,7 @@ public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionT
       .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
+    // TODO       JOIN COUNT: (1)
     DataSet<Vertex> vi = gU.getVertices()
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(subgraphIds, GRAPH_IDS);
@@ -93,12 +95,15 @@ public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionT
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
     // PHASE 3: Recreating the edges
+    // TODO       JOIN COUNT: (1)
     DataSet<Tuple2<Vertex, GradoopId>> idJoin = vWithGid
       .coGroup(nuWithGid)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new CoGroupAssociateOldVerticesWithNewIds())
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
+    // TODO       JOIN COUNT: (3)
+    // TODO           -> NotInGraphBroadcast (a)
     DataSet<Edge> edges = gU.getEdges()
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(subgraphIds, GRAPH_IDS)

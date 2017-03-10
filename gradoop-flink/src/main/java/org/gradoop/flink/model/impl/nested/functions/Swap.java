@@ -1,0 +1,42 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.gradoop.flink.model.impl.nested.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+
+/**
+ * Swaps the position within the tuple
+ */
+@FunctionAnnotation.ForwardedFields("f0 -> f1; f1 -> f0")
+public class Swap<X,Y> implements MapFunction<Tuple2<X,Y>,Tuple2<Y,X>> {
+
+  private final Tuple2<Y,X> reusable;
+
+  public Swap() {
+    reusable = new Tuple2<Y, X>();
+  }
+
+  @Override
+  public Tuple2<Y, X> map(Tuple2<X, Y> value) throws Exception {
+    reusable.f0 = value.f1;
+    reusable.f1 = value.f0;
+    return reusable;
+  }
+}

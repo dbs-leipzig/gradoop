@@ -55,6 +55,17 @@ result {}[
    (dMu)-[:follows]->(cProj)
 ]
 
+resulting {}[
+   (aGr)-[:follows]->(bOwl)
+   (aJoin)-[:follows]->(bOwl)
+   (aJoin)-[:follows]->(cProj)
+   (aGr)-[:follows]->(cProj)
+   (bOwl)-[:follows]->(dMu)
+   (dMu)-[:follows]->(cProj)
+   (grieg)-[:follows]->(aGr)
+   (grieg)-[:follows]->(aJoin)
+]
+
 // logical graphs
 g0:fused {paper : "Graphs", author : "Alice"} [
     (alice)-->(graphs)
@@ -69,5 +80,24 @@ g3:fused {paper : "Projection", author : "Carl"} [
      (carl)-->(proj)
 ]
 g4:fused {paper : "muCalc", author : "Dan"} [
+     (dan)-->(mu)
+]
+
+
+//Nesting test
+// logical graphs
+n0:first {paper : "Graphs", author : "Alice"} [
+    (alice)-->(graphs)
+]
+n1:second {paper : "Join", author : "Alice"} [
+    (alice)-->(join)
+]
+n2:third {paper : "OWL", author : "Bob"} [
+     (bob)-->(owl)
+]
+n3:fourth {paper : "Projection", author : "Carl"} [
+     (carl)-->(proj)
+]
+n4:fifth {paper : "muCalc", author : "Dan"} [
      (dan)-->(mu)
 ]

@@ -51,8 +51,10 @@ public class FlatJoinSourceEdgeReference implements
     Exception {
     if (second != null && !(second.f1.equals(GradoopId.NULL_VALUE))) {
       if (isItSourceDoingNow) {
+        first.setId(GradoopId.get());
         first.setSourceId(second.f1);
       } else {
+        first.setId(GradoopId.get());
         first.setTargetId(second.f1);
       }
     }

@@ -65,6 +65,4 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     testGraphGraphGraphCollection(left,right,hypervertices,expected);
   }
 
-
-
 }
