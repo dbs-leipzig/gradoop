@@ -45,17 +45,22 @@ public class BuildVertexWithSuperVertexAndEdge implements
     Set<GradoopId> sources = superEdgeGroupItem.getSourceIds();
     Set<GradoopId> targets = superEdgeGroupItem.getTargetIds();
 
-    GradoopId superVertexId = GradoopId.get();
-
-    reuseTuple.setSuperVertexId(superVertexId);
+    if (sources.size() != 1) {
+      reuseTuple.setSuperVertexId(GradoopId.get());
+    } else {
+      reuseTuple.setSuperVertexId(sources.iterator().next());
+    }
     reuseTuple.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
     for (GradoopId source : sources) {
       reuseTuple.setVertexId(source);
       reuseTuple.setSource(true);
       collector.collect(reuseTuple);
     }
-    superVertexId = GradoopId.get();
-    reuseTuple.setSuperVertexId(superVertexId);
+    if (targets.size() != 1) {
+      reuseTuple.setSuperVertexId(GradoopId.get());
+    } else {
+      reuseTuple.setSuperVertexId(targets.iterator().next());
+    }
     for (GradoopId target : targets) {
       reuseTuple.setVertexId(target);
       reuseTuple.setSource(false);
