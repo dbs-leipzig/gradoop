@@ -80,15 +80,9 @@ public class BuildSuperEdges
 
     for (Tuple3<Set<GradoopId>, GradoopId, GradoopId> vertexWithSuperVertexAndEdge :
       vertexWithSuperVertexAndEdges) {
-
-
-
-
-
-
-      if (vertexWithSuperVertexAndEdge.equals(superEdgeGroupItem.getSourceIds())) {
+      if (vertexWithSuperVertexAndEdge.f0.equals(superEdgeGroupItem.getSourceIds())) {
         sourceId = vertexWithSuperVertexAndEdge.f1;
-      } else if (vertexWithSuperVertexAndEdge.equals(superEdgeGroupItem.getTargetIds())) {
+      } else if (vertexWithSuperVertexAndEdge.f0.equals(superEdgeGroupItem.getTargetIds())) {
         targetId = vertexWithSuperVertexAndEdge.f1;
       }
     }
