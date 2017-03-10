@@ -17,12 +17,9 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -31,16 +28,10 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperEdges;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertexAndEdge;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-
-
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
 import java.util.Iterator;
 import java.util.List;
@@ -82,35 +73,60 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), getEdgeAggregators(),
         sourceSpecificGrouping, targetSpecificGrouping));
 
-    // TODO edgeitem -> set<GradoopId>+edgeid -> groupby set -> set,edgeid,superVid ->..
+    //vertexIds - superVId - edgeId
     DataSet<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> vertexWithSuper = superEdgeGroupItems
       //get all resulting (maybe concatenated) vertices
       //vertexIds - superedgeId
-      .flatMap(new FlatMapFunction<SuperEdgeGroupItem, Tuple2<Set<GradoopId>, GradoopId>>() {
+      .flatMap(new FlatMapFunction<SuperEdgeGroupItem, Tuple3<Integer, Set<GradoopId>, GradoopId>>() {
         @Override
         public void flatMap(SuperEdgeGroupItem superEdgeGroupItem,
-          Collector<Tuple2<Set<GradoopId>, GradoopId>> collector) throws Exception {
-          collector.collect(new Tuple2<Set<GradoopId>, GradoopId>(superEdgeGroupItem.getSourceIds(), superEdgeGroupItem.getEdgeId()));
-          collector.collect(new Tuple2<Set<GradoopId>, GradoopId>(superEdgeGroupItem.getTargetIds(), superEdgeGroupItem.getEdgeId()));
+          Collector<Tuple3<Integer, Set<GradoopId>, GradoopId>> collector) throws Exception {
+          Tuple3<Integer, Set<GradoopId>, GradoopId> reuseTuple;
+          reuseTuple = new Tuple3<Integer, Set<GradoopId>, GradoopId>();
+          reuseTuple.setFields(
+            superEdgeGroupItem.getSourceIds().hashCode(),
+            superEdgeGroupItem.getSourceIds(),
+            superEdgeGroupItem.getEdgeId());
+          collector.collect(reuseTuple);
+
+          reuseTuple.setFields(
+            superEdgeGroupItem.getTargetIds().hashCode(),
+            superEdgeGroupItem.getTargetIds(),
+            superEdgeGroupItem.getEdgeId()
+          );
+          collector.collect(reuseTuple);
         }
       })
-      .groupBy(1)
+      .groupBy(0)
       //assign supervertex id
       //vertexIds - superVId - edgeId
-      .reduceGroup(new GroupReduceFunction<Tuple2<Set<GradoopId>,GradoopId>,
+      .reduceGroup(new GroupReduceFunction<Tuple3<Integer, Set<GradoopId>,GradoopId>,
         Tuple3<Set<GradoopId>, GradoopId, GradoopId>>() {
         @Override
-        public void reduce(Iterable<Tuple2<Set<GradoopId>, GradoopId>> iterable,
+        public void reduce(Iterable<Tuple3<Integer, Set<GradoopId>, GradoopId>> iterable,
           Collector<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> collector) throws Exception {
 
-          Tuple2<Set<GradoopId>, GradoopId> supervertex = new Tuple2<Set<GradoopId>, GradoopId>
-            (iterable.iterator().next().f0, GradoopId.get());
+          Tuple3<Set<GradoopId>, GradoopId, GradoopId> reuseTuple = new Tuple3<>();
+          Iterator<Tuple3<Integer, Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
+          Tuple3<Integer, Set<GradoopId>, GradoopId> tuple = iterator.next();
+          GradoopId superVertexId;
+          Set<GradoopId> vertices;
 
-          Iterator<Tuple2<Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
-          while (iterator.hasNext()) {
-            collector.collect(new Tuple3<>(supervertex.f0, supervertex.f1, iterator.next().f1));
+          vertices = tuple.f1;
+          if (vertices.size() != 1) {
+            superVertexId = GradoopId.get();
+          } else {
+            superVertexId = vertices.iterator().next();
           }
+          reuseTuple.setField(vertices, 0);
+          reuseTuple.setField(superVertexId, 1);
+          reuseTuple.setField(tuple.f2, 2);
+          collector.collect(reuseTuple);
 
+          while (iterator.hasNext()) {
+            reuseTuple.setField(iterator.next().f2, 2);
+            collector.collect(reuseTuple);
+          }
         }
       });
 
