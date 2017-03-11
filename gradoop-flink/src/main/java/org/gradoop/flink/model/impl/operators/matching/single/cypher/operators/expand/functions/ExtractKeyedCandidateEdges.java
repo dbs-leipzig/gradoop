@@ -14,31 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
-import org.apache.flink.api.common.functions.RichFilterFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.EdgeWithTiePoint;
 
 /**
- * Filters results from previous iterations
+ * Extract the join key from an edge embedding and stores both in an {@link EdgeWithTiePoint}
  */
-@FunctionAnnotation.ReadFields("f1")
-public class FilterPreviousExpandEmbedding extends RichFilterFunction<ExpandEmbedding> {
+public class ExtractKeyedCandidateEdges
+  extends RichMapFunction<Embedding, EdgeWithTiePoint> {
+
   /**
-   * super step
+   * Reuse Tuple
    */
-  private int currentIteration;
+  private EdgeWithTiePoint reuseEdgeWitTiePoint;
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    super.open(parameters);
-    currentIteration = getIterationRuntimeContext().getSuperstepNumber() * 2 - 1;
+    this.reuseEdgeWitTiePoint = new EdgeWithTiePoint();
   }
 
   @Override
-  public boolean filter(ExpandEmbedding expandEmbedding) {
-    return expandEmbedding.pathSize() >= currentIteration;
+  public EdgeWithTiePoint map(Embedding edge) throws Exception {
+    reuseEdgeWitTiePoint.setSource(edge.getId(0));
+    reuseEdgeWitTiePoint.setId(edge.getId(1));
+    reuseEdgeWitTiePoint.setTarget(edge.getId(2));
+
+    return reuseEdgeWitTiePoint;
   }
 }

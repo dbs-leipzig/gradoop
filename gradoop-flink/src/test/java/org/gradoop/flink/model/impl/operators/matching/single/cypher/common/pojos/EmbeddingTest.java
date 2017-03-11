@@ -92,32 +92,28 @@ public class EmbeddingTest {
 
   @Test
   public void testStoreSingleListEntry() {
-    List<GradoopId> ids = Lists.newArrayList(
-      GradoopId.get(),
-      GradoopId.get(),
-      GradoopId.get()
-    );
+    GradoopId[] ids = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
 
     Embedding embedding = new Embedding();
     embedding.add(ids);
 
     assertEquals(1, embedding.size());
-    assertEquals(ids, embedding.getIdList(0));
+    assertEquals(Lists.newArrayList(ids), embedding.getIdList(0));
   }
 
   @Test
   public void testAppendListEntryToExistingEmbedding() {
-    List<GradoopId> ids = Lists.newArrayList(
-      GradoopId.get(),
-      GradoopId.get(),
-      GradoopId.get()
-    );
+    GradoopId[] ids = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
 
     Embedding embedding = createEmbedding(4);
     embedding.add(ids);
 
     assertEquals(5, embedding.size());
-    assertEquals(ids, embedding.getIdList(4));
+    assertEquals(Lists.newArrayList(ids), embedding.getIdList(4));
   }
 
   @Test
@@ -140,11 +136,9 @@ public class EmbeddingTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testGettingIdBytesForListEntryThrowsArgumentError() {
-    List<GradoopId> ids = Lists.newArrayList(
-      GradoopId.get(),
-      GradoopId.get(),
-      GradoopId.get()
-    );
+    GradoopId[] ids = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
     Embedding embedding = new Embedding();
     embedding.add(ids);
 
@@ -185,13 +179,12 @@ public class EmbeddingTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testGettingIdForListEntryThrowsArgumentError() {
-    List<GradoopId> ids = Lists.newArrayList(
-      GradoopId.get(),
-      GradoopId.get(),
-      GradoopId.get()
-    );
+    GradoopId[] idList = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
+
     Embedding embedding = new Embedding();
-    embedding.add(ids);
+    embedding.add(idList);
 
     embedding.getId(0);
   }
@@ -227,14 +220,12 @@ public class EmbeddingTest {
   public void testGetIdList() {
     Embedding embedding = new Embedding();
 
-    List<GradoopId> ids = Lists.newArrayList(
-      GradoopId.get(),
-      GradoopId.get(),
-      GradoopId.get()
-    );
+    GradoopId[] ids = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
     embedding.add(ids);
 
-    assertEquals(ids, embedding.getIdList(0));
+    assertEquals(Lists.newArrayList(ids), embedding.getIdList(0));
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -272,10 +263,18 @@ public class EmbeddingTest {
     GradoopId a = new GradoopId();
     GradoopId b = new GradoopId();
 
+    GradoopId[] ab = new GradoopId[] {
+      a,b
+    };
+
+    GradoopId[] ba = new GradoopId[] {
+      b,a
+    };
+
     Embedding embedding = new Embedding();
     embedding.add(a);
-    embedding.add(Lists.newArrayList(a,b));
-    embedding.add(Lists.newArrayList(b,a));
+    embedding.add(ab);
+    embedding.add(ba);
 
     assertEquals(Lists.newArrayList(a,b), embedding.getIdAsList(1));
     assertEquals(Lists.newArrayList(b,a), embedding.getIdAsList(2));
@@ -288,11 +287,15 @@ public class EmbeddingTest {
     GradoopId c = new GradoopId();
     GradoopId d = new GradoopId();
 
+    GradoopId[] da = new GradoopId[] {
+      d,a
+    };
+
     Embedding embedding = new Embedding();
     embedding.add(a);
     embedding.add(b);
     embedding.add(c);
-    embedding.add(Lists.newArrayList(d,a));
+    embedding.add(da);
 
     assertEquals(Lists.newArrayList(a,b,c), embedding.getIdsAsList(Lists.newArrayList(0,1,2)));
     assertEquals(Lists.newArrayList(a,c), embedding.getIdsAsList(Lists.newArrayList(0,2)));
@@ -307,7 +310,11 @@ public class EmbeddingTest {
     embedding.add(GradoopId.get());
     assertEquals(1, embedding.size());
 
-    embedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get()));
+    GradoopId[] idList = new GradoopId[] {
+      GradoopId.get(), GradoopId.get()
+    };
+
+    embedding.add(idList);
     assertEquals(2, embedding.size());
   }
 
@@ -353,10 +360,14 @@ public class EmbeddingTest {
 
   @Test
   public void testToString() {
+    GradoopId[] idList = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
+
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
     embedding.add(GradoopId.get(), PropertyValue.create(42), PropertyValue.create("Foobar"));
-    embedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get(), GradoopId.get()));
+    embedding.add(idList);
 
     assertNotNull(embedding.toString());
   }
@@ -375,7 +386,11 @@ public class EmbeddingTest {
     outEmbedding = writeAndReadValue(Embedding.class, inEmbedding);
     assertEquals(inEmbedding, outEmbedding);
 
-    inEmbedding.add(Lists.newArrayList(GradoopId.get(), GradoopId.get(), GradoopId.get()));
+    GradoopId[] idList = new GradoopId[] {
+      GradoopId.get(), GradoopId.get(), GradoopId.get()
+    };
+
+    inEmbedding.add(idList);
     outEmbedding = writeAndReadValue(Embedding.class, inEmbedding);
     assertEquals(inEmbedding, outEmbedding);
   }

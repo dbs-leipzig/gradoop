@@ -18,8 +18,11 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples
+  .EdgeWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 import org.junit.Test;
 
@@ -149,15 +152,16 @@ public class MergeExpandEmbeddingsTest {
     base.add(e0);
     base.add(n);
 
+    EdgeWithTiePoint edgeTuple = new EdgeWithTiePoint(edge);
+
     ExpandEmbedding expandEmbedding = new ExpandEmbedding(
-      base, new GradoopId[]{e1,a}
-    );
+      base, e1,a);
 
     MergeExpandEmbeddings op =
       new MergeExpandEmbeddings(distinctVertices, distinctEdges, closingColumn);
     
     List<ExpandEmbedding> results = new ArrayList<>();
-    op.join(expandEmbedding, edge, new ListCollector<>(results));
+    op.join(expandEmbedding, edgeTuple, new ListCollector<>(results));
     
     assertEquals(isResult ? 1:0, results.size());
     

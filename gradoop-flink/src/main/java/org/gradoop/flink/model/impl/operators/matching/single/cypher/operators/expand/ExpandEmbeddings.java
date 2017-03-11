@@ -19,7 +19,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ReverseEdgeEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -27,9 +26,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.AdoptEmptyPaths;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateExpandEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractExpandColumn;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractKeyedCandidateEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.PostProcessExpandEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.EdgeWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
 
 import java.util.List;
@@ -39,49 +38,51 @@ import java.util.List;
  * The input embedding is appended by 2 Entries, the first one represents the path (edge, vertex,
  * edge, vertex, ..., edge), the second one the end vertex
  */
-
-public class ExpandEmbeddings implements PhysicalOperator {
-
+public abstract class ExpandEmbeddings implements PhysicalOperator {
   /**
    * Input Embeddings
    */
-  private final DataSet<Embedding> input;
-  /**
-   * Candidate edges
-   */
-  private DataSet<Embedding> candidateEdges;
+  protected final DataSet<Embedding> input;
   /**
    * specifies the input column that will be expanded
    */
-  private final int expandColumn;
+  protected final int expandColumn;
   /**
    * minimum hops
    */
-  private final int lowerBound;
+  protected final int lowerBound;
   /**
    * maximum hops
    */
-  private final int upperBound;
+  protected final int upperBound;
   /**
    * expand direction
    */
-  private final ExpandDirection direction;
+  protected final ExpandDirection direction;
   /**
    * Holds indices of input vertex columns that should be distinct
    */
-  private final List<Integer> distinctVertexColumns;
+  protected final List<Integer> distinctVertexColumns;
   /**
    * Holds indices of input edge columns that should be distinct
    */
-  private final List<Integer> distinctEdgeColumns;
+  protected final List<Integer> distinctEdgeColumns;
   /**
    * Define the column which should be equal with the paths end
    */
-  private final int closingColumn;
+  protected final int closingColumn;
   /**
    * join hint
    */
-  private final JoinOperatorBase.JoinHint joinHint;
+  protected final JoinOperatorBase.JoinHint joinHint;
+  /**
+   * Candidate edges
+   */
+  protected DataSet<Embedding> candidateEdges;
+  /**
+   * candidate edges with extracted map key
+   */
+  protected DataSet<EdgeWithTiePoint> candidateEdgeTuples;
 
   /**
    * New Expand One Operator
@@ -115,49 +116,6 @@ public class ExpandEmbeddings implements PhysicalOperator {
   }
 
   /**
-   * New Expand One Operator with default join strategy
-   *
-   * @param input the embedding which should be expanded
-   * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the column that represents the vertex from which we expand
-   * @param lowerBound specifies the minimum hops we want to expand
-   * @param upperBound specifies the maximum hops we want to expand
-   * @param direction direction of the expansion {@see ExpandDirection}
-   * @param distinctVertexColumns indices of distinct vertex columns
-   * @param distinctEdgeColumns indices of distinct edge columns
-   * @param closingColumn defines the column which should be equal with the paths end
-   */
-  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
-    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
-
-    this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,
-      distinctVertexColumns, distinctEdgeColumns, closingColumn,
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
-   * New Expand One Operator with no upper bound
-   *
-   * @param input the embedding which should be expanded
-   * @param candidateEdges candidate edges along which we expand
-   * @param expandColumn specifies the column that represents the vertex from which we expand
-   * @param lowerBound specifies the minimum hops we want to expand
-   * @param direction direction of the expansion {@see ExpandDirection}
-   * @param distinctVertexColumns indices of distinct vertex columns
-   * @param distinctEdgeColumns indices of distinct edge columns
-   * @param closingColumn defines the column which should be equal with the paths end
-   */
-  public ExpandEmbeddings(DataSet<Embedding> input, DataSet<Embedding> candidateEdges,
-    int expandColumn, int lowerBound, ExpandDirection direction,
-    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn) {
-
-    this(input, candidateEdges, expandColumn, lowerBound, Integer.MAX_VALUE, direction,
-      distinctVertexColumns, distinctEdgeColumns, closingColumn,
-      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-  }
-
-  /**
    * Runs a traversal over the given edgeCandidates withing the given bounds
    *
    * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
@@ -172,6 +130,14 @@ public class ExpandEmbeddings implements PhysicalOperator {
   }
 
   /**
+   * Runs the iterative traversal
+   *
+   * @param initialWorkingSet the initial edges which are used as starting points for the traversal
+   * @return set of paths produced by the iteration (length 1..upperBound)
+   */
+  protected abstract DataSet<ExpandEmbedding> iterate(DataSet<ExpandEmbedding> initialWorkingSet);
+
+  /**
    * creates the initial working set from the edge candidates
    *
    * @return initial working set with the expand embeddings
@@ -183,41 +149,17 @@ public class ExpandEmbeddings implements PhysicalOperator {
       candidateEdges = candidateEdges.union(candidateEdges.map(new ReverseEdgeEmbedding()));
     }
 
-    return input.join(candidateEdges, joinHint)
-      .where(new ExtractExpandColumn(expandColumn))
-      .equalTo(new ExtractExpandColumn(0))
+    this.candidateEdgeTuples = candidateEdges
+      .map(new ExtractKeyedCandidateEdges())
+      .partitionByHash(0);
+
+    return input.join(candidateEdgeTuples, joinHint)
+      .where(new ExtractExpandColumn(expandColumn)).equalTo(0)
       .with(new CreateExpandEmbedding(
         distinctVertexColumns,
         distinctEdgeColumns,
         closingColumn
       ));
-  }
-
-  /**
-   * Runs the iterative traversal
-   *
-   * @param initialWorkingSet the initial edges which are used as starting points for the traversal
-   * @return set of paths produced by the iteration (length 1..upperBound)
-   */
-  private DataSet<ExpandEmbedding> iterate(DataSet<ExpandEmbedding> initialWorkingSet) {
-
-    IterativeDataSet<ExpandEmbedding> iteration =
-      initialWorkingSet.iterate(upperBound - 1);
-
-    DataSet<ExpandEmbedding> nextWorkingSet = iteration
-      .filter(new FilterPreviousExpandEmbedding())
-      .join(candidateEdges, joinHint)
-        .where(2)
-        .equalTo(new ExtractExpandColumn(0))
-        .with(new MergeExpandEmbeddings(
-          distinctVertexColumns,
-          distinctEdgeColumns,
-          closingColumn
-        ));
-
-    DataSet<ExpandEmbedding> solutionSet = nextWorkingSet.union(iteration);
-
-    return iteration.closeWith(solutionSet, nextWorkingSet);
   }
 
   /**
@@ -239,4 +181,3 @@ public class ExpandEmbeddings implements PhysicalOperator {
     return results;
   }
 }
-

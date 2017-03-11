@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
@@ -57,7 +56,7 @@ public class AdoptEmptyPaths extends RichFlatMapFunction<Embedding, Embedding> {
       return;
     }
 
-    value.add(Lists.newArrayListWithExpectedSize(0));
+    value.add();
     value.add(value.getId(expandColumn));
     out.collect(value);
   }

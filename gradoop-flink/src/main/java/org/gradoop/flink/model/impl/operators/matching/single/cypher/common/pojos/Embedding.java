@@ -346,17 +346,17 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * Adds an IdList a.k.a. PathEntry to the embedding
    * @param ids the path that will be added to the embedding
    */
-  public void add(List<GradoopId> ids) {
+  public void add(GradoopId... ids) {
     GradoopId pointer = GradoopId.get();
     add(pointer, true);
 
     byte[] newIdLists = new byte[idListData.length +
       GradoopId.ID_SIZE + Integer.BYTES +
-      ids.size() * GradoopId.ID_SIZE];
+      ids.length * GradoopId.ID_SIZE];
 
     System.arraycopy(idListData, 0, newIdLists, 0, idListData.length);
     writeId(pointer, newIdLists, idListData.length);
-    writeInt(ids.size(), newIdLists, idListData.length + GradoopId.ID_SIZE);
+    writeInt(ids.length, newIdLists, idListData.length + GradoopId.ID_SIZE);
 
     int offset = idListData.length + GradoopId.ID_SIZE + Integer.BYTES;
     for (GradoopId id: ids) {
