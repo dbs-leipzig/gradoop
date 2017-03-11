@@ -32,11 +32,13 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
-import org.gradoop.flink.model.impl.nested.functions.SelfId;
-import org.gradoop.flink.model.impl.nested.functions.SwapGradoopIds;
-import org.gradoop.flink.model.impl.nested.functions.UpdateEdges;
-import org.gradoop.flink.model.impl.nested.functions.UpdateVertices;
-import org.gradoop.flink.model.impl.nested.functions.VertexToGraphHead;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.AssociateElementToIdAndGraph;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.ExceptGraphHead;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.SelfId;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.SwapGradoopIds;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.UpdateEdges;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.UpdateVertices;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.VertexToGraphHead;
 
 /**
  * Defines a graph collection only by using the graph id elements (and hence, reducing the
@@ -99,26 +101,49 @@ public class IdGraphDatabase {
       .with(new LeftSide<>());
   }*/
 
+  private void initVertices(DataSet<Vertex> v, DataSet<Edge> e) {
+    //Creating the map for the graphheads appearing in the logical graph
+    this.graphHeadToVertex = v
+      .flatMap(new AssociateElementToIdAndGraph<>())
+      .joinWithTiny(this.graphHeads)
+      .where(new Value0Of2<>()).equalTo(new SelfId())
+      .with(new LeftSide<>())
+      .filter(new ExceptGraphHead());
+
+    //Same as above
+    this.graphHeadToEdge = e
+      .flatMap(new AssociateElementToIdAndGraph<>())
+      .joinWithTiny(this.graphHeads)
+      .where(new Value0Of2<>()).equalTo(new SelfId())
+      .with(new LeftSide<>())
+      .filter(new ExceptGraphHead());
+  }
+
   /**
    * Extracts the id from the normalized graph
    * @param logicalGraph  Graph where to extract the ids from
    */
   public IdGraphDatabase(NormalizedGraph logicalGraph) {
     this.graphHeads = logicalGraph.getGraphHeads().map(new Id<>());
+    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
+  }
 
-    //Creating the map for the graphheads appearing in the logical graph
-    this.graphHeadToVertex = logicalGraph.getVertices()
-      .flatMap(new AssociateElementToIdAndGraph<>())
-      .joinWithTiny(this.graphHeads)
-      .where(new Value0Of2<>()).equalTo(new SelfId())
-      .with(new LeftSide<>());
+  /**
+   * Extracts the id from the normalized graph
+   * @param logicalGraph  Graph where to extract the ids from
+   */
+  public IdGraphDatabase(LogicalGraph logicalGraph) {
+    this.graphHeads = logicalGraph.getGraphHead().map(new Id<>());
+    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
+  }
 
-    //Same as above
-    this.graphHeadToEdge = logicalGraph.getEdges()
-      .flatMap(new AssociateElementToIdAndGraph<>())
-      .joinWithTiny(this.graphHeads)
-      .where(new Value0Of2<>()).equalTo(new SelfId())
-      .with(new LeftSide<>());
+  /**
+   * Extracts the id from the normalized graph
+   * @param logicalGraph  Graph where to extract the ids from
+   */
+  public IdGraphDatabase(GraphCollection logicalGraph) {
+    this.graphHeads = logicalGraph.getGraphHeads().map(new Id<>());
+    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
   }
 
   /**
@@ -179,6 +204,11 @@ public class IdGraphDatabase {
       .with(new UpdateEdges());
 
     DataSet<GraphHead> heads = getActualGraphHeads(dataLake);
+    /*try {
+      System.out.println("HEADER " + heads.collect() +" " + heads.count());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }*/
 
     return new NormalizedGraph(heads,vertices,edges,dataLake.getConfig());
   }
@@ -212,7 +242,7 @@ public class IdGraphDatabase {
 
   public DataSet<GraphHead> getActualGraphHeads(NormalizedGraph dataLake) {
     return graphHeads
-      .join(dataLake.getVertices())
+      .leftOuterJoin(dataLake.getVertices())
       .where(new SelfId()).equalTo(new Id<>())
       .with(new VertexToGraphHead());
   }
@@ -238,5 +268,9 @@ public class IdGraphDatabase {
 
   public void addNewEdges(DataSet<Tuple2<GradoopId, GradoopId>> tuple2DataSet) {
     graphHeadToEdge = graphHeadToEdge.union(tuple2DataSet);
+  }
+
+  public void addNewVertices(DataSet<Tuple2<GradoopId, GradoopId>> cross) {
+    graphHeadToVertex = graphHeadToVertex.union(cross);
   }
 }

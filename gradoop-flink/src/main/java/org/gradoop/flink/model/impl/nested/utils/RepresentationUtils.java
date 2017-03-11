@@ -1,6 +1,5 @@
 package org.gradoop.flink.model.impl.nested.utils;
 
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -12,6 +11,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -21,10 +21,11 @@ import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
 import org.gradoop.flink.model.impl.nested.datastructures.equality
   .CanonicalAdjacencyMatrixBuilderForNormalizedGraphs;
-import org.gradoop.flink.model.impl.nested.functions.AsQuadsMatchingSource;
-import org.gradoop.flink.model.impl.nested.functions.Tuple2Comparator;
-import org.gradoop.flink.model.impl.nested.functions.TupleOfIdsToString;
-import org.gradoop.flink.model.impl.nested.tuples.Quad;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.MapGraphHeadAsVertex;
+import org.gradoop.flink.model.impl.nested.utils.functions.AsQuadsMatchingSource;
+import org.gradoop.flink.model.impl.nested.utils.functions.Tuple2Comparator;
+import org.gradoop.flink.model.impl.nested.utils.functions.TupleOfIdsToString;
+import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -83,7 +84,7 @@ public class RepresentationUtils {
     }
   }
 
-  public static DataSet<Quad> datalakeEdgesToQuadMatchingSource(DataLake dataLake) {
+  public static DataSet<Hexaplet> datalakeEdgesToQuadMatchingSource(DataLake dataLake) {
     return dataLake.getEdges().map(new AsQuadsMatchingSource());
   }
 
@@ -179,9 +180,13 @@ public class RepresentationUtils {
   public static DataSet<Boolean> dataSetEquality(DataSet<Tuple2<GradoopId, GradoopId>> left,
     DataSet<Tuple2<GradoopId, GradoopId>> right) {
     return left.fullOuterJoin(right)
-      .where(new TupleOfIdsToString())
-      .equalTo(new TupleOfIdsToString())
+      .where(new TupleOfIdsToString()).equalTo(new TupleOfIdsToString())
       .with(new Tuple2Comparator());
+  }
+
+  public static DataSet<Boolean> dataSetEqualityIds(DataSet<GradoopId> left,
+    DataSet<GradoopId> right) {
+    return Equals.cross(left,right);
   }
 
 }

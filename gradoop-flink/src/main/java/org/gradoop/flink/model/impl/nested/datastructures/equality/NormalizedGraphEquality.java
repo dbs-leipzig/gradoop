@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gradoop.flink.model.impl.nested.datastructures.equality;
 
 import org.apache.flink.api.java.DataSet;
@@ -57,12 +58,15 @@ public class NormalizedGraphEquality {
       graphHeadToString, vertexToString, edgeToString, this.directed);
   }
 
+  /**
+   * Main execution point
+   * @param firstGraph    Left operand
+   * @param secondGraph   Right operand
+   * @return              If the two datasets are equal or not
+   */
   public DataSet<Boolean> execute(
     NormalizedGraph firstGraph, NormalizedGraph secondGraph) {
     return collectionEquality.execute(firstGraph,secondGraph);
   }
 
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
 }

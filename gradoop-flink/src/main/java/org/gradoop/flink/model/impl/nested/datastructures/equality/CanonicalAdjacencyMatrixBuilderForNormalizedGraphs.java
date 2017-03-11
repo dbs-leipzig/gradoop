@@ -82,6 +82,11 @@ public class CanonicalAdjacencyMatrixBuilderForNormalizedGraphs {
     this.directed = directed;
   }
 
+  /**
+   * Main run poin for the NormalisedGraph operator
+   * @param collection  graph over which define the operation
+   * @return
+   */
   public DataSet<String> execute(NormalizedGraph collection) {
 
     // 1. label graph heads

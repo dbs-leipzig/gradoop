@@ -20,15 +20,35 @@ public class FileSystemUtils {
     return doOverwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
   }
 
+  /**
+   * Gets a file from Hadoop
+   * @param ds    Hadoop data source
+   * @param fif   How to serialize the given file into machine-readable elements
+   * @param path  Path to the file
+   * @param <T>   Class of the resulting data type
+   * @return
+   */
   public static <T> DataSource<T> hadoopFile(HadoopDataSource ds, FileInputFormat<T> fif, String
   path) {
     return ds.getConf().getExecutionEnvironment().readFile(fif,path);
   }
 
+  /**
+   * File containing the data structure for the IdGraphDatabase, containing the vertices'
+   * information
+   * @param f   String from which generate the result
+   * @return    the vertex file name
+   */
   public static String generateVertexFile(String f) {
     return f+".vertex";
   }
 
+  /**
+   * File containing the data structure for the IdGraphDatabase, containing the edges'
+   * information
+   * @param f   String from which generate the result
+   * @return    the edge file name
+   */
   public static String generateEdgeFile(String f) {
     return f+".edge";
   }

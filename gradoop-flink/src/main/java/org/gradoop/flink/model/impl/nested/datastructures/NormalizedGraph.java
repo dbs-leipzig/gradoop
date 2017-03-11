@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.nested.datastructures;
 
 import org.apache.flink.api.java.DataSet;
@@ -8,13 +25,11 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.nested.datastructures.equality.NormalizedGraphEquality;
-import org.gradoop.flink.model.impl.nested.utils.MapGraphHeadAsVertex;
-import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.MapGraphHeadAsVertex;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import sun.rmi.runtime.Log;
 
 /**
  * The normalization process consists of creating a new Graph containing a vertex per graph
@@ -64,31 +79,63 @@ public class NormalizedGraph {
     this.conf = conf;
   }
 
-
+  /**
+   * Returns…
+   * @return  the graph head
+   */
   public DataSet<GraphHead> getGraphHeads() {
     return heads;
   }
 
+  /**
+   * Returns…
+   * @return  the vertices
+   */
   public DataSet<Vertex> getVertices() {
     return vertices;
   }
 
+  /**
+   * Returs…
+   * @return  the edges
+   */
   public DataSet<Edge> getEdges() {
     return edges;
   }
 
+  /**
+   * Returns…
+   * @return  the gradoop configuration
+   */
   public GradoopFlinkConfig getConfig() {
     return conf;
   }
 
+  /**
+   * Adds some new edges to the dataset
+   * @param edges Edges to be added through union
+   */
   public void updateEdgesWithUnion(DataSet<Edge> edges) {
     this.edges = this.edges.union(edges);
   }
 
+  /**
+   * Checks if the two NormalizedGraph are similar by data
+   * @param research  Element to which the similarity has to be compared
+   * @return          A dataset containing the result
+   */
   public DataSet<Boolean> equalsByData(NormalizedGraph research) {
       return new NormalizedGraphEquality(
         new GraphHeadToDataString(),
         new VertexToDataString(),
         new EdgeToDataString(), true).execute(this, research);
+  }
+
+  /**
+   * Adds some new vertices to the dataset
+   * @param map Vertices to be added through union
+   */
+  public void updateVerticesWithUnion(DataSet<Vertex> map) {
+    this.vertices = this.vertices.union(map);
   }
 }

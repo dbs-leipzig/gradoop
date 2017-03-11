@@ -10,11 +10,11 @@
 (proj:Paper {title: "Projection", fstAuth: "Carl"})    
 (mu:Paper {title: "muCalc", fstAuth: "Dan"})    
 (matita:Paper {title: "Matita", fstAuth: "Asperti"}) 
-(aGr:fused {paper: "Graphs", author: "Alice"})
-(aJoin:fused {paper: "Join", author: "Alice"})
-(bOwl:fused {paper: "OWL", author: "Bob"})
-(cProj:fused {paper: "Projection", author: "Carl"})
-(dMu:fused {paper: "muCalc", author: "Dan"})
+(aGr:first {paper: "Graphs", author: "Alice"})
+(aJoin:second {paper: "Join", author: "Alice"})
+(bOwl:third {paper: "OWL", author: "Bob"})
+(cProj:fourth {paper: "Projection", author: "Carl"})
+(dMu:fifth {paper: "muCalc", author: "Dan"})
 
 // left operand
 research:RG {}[
@@ -67,37 +67,18 @@ resulting {}[
 ]
 
 // logical graphs
-g0:fused {paper : "Graphs", author : "Alice"} [
+g0:first {paper : "Graphs", author : "Alice"} [
     (alice)-->(graphs)
 ]
-g1:fused {paper : "Join", author : "Alice"} [
+g1:second {paper : "Join", author : "Alice"} [
     (alice)-->(join)
 ]
-g2:fused {paper : "OWL", author : "Bob"} [
+g2:third {paper : "OWL", author : "Bob"} [
      (bob)-->(owl)
 ]
-g3:fused {paper : "Projection", author : "Carl"} [
+g3:fourth {paper : "Projection", author : "Carl"} [
      (carl)-->(proj)
 ]
-g4:fused {paper : "muCalc", author : "Dan"} [
-     (dan)-->(mu)
-]
-
-
-//Nesting test
-// logical graphs
-n0:first {paper : "Graphs", author : "Alice"} [
-    (alice)-->(graphs)
-]
-n1:second {paper : "Join", author : "Alice"} [
-    (alice)-->(join)
-]
-n2:third {paper : "OWL", author : "Bob"} [
-     (bob)-->(owl)
-]
-n3:fourth {paper : "Projection", author : "Carl"} [
-     (carl)-->(proj)
-]
-n4:fifth {paper : "muCalc", author : "Dan"} [
+g4:fifth {paper : "muCalc", author : "Dan"} [
      (dan)-->(mu)
 ]
