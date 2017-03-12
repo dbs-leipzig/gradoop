@@ -77,6 +77,11 @@
             <artifactId>JavaFastPFOR</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>me.lemire.integercompression</groupId>
+            <artifactId>JavaFastPFOR</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
 
         <!-- Gradoop -->
