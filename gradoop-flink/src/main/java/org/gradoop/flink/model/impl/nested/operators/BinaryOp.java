@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.nested.operators;
 
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 
 /**
  * Defines a binary operator

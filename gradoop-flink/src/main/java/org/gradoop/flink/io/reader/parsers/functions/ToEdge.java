@@ -26,6 +26,9 @@ import org.gradoop.flink.model.api.functions.Function;
 /**
  * Converts an object that could be represented as a vertex (Vertexable) into a
  * proper vertex instance.
+ *
+ * @param <K> Comparable Type
+ * @param <X> Edge Type
  */
 public class ToEdge<K extends Comparable<K>, X extends Edgable<K>> implements
   MapFunction<X, ImportEdge<K>> {
@@ -40,6 +43,10 @@ public class ToEdge<K extends Comparable<K>, X extends Edgable<K>> implements
    */
   private Function<GradoopId, K> conversion;
 
+  /**
+   * Default constructor
+   * @param conversion  Element applying the conversion
+   */
   public ToEdge(Function<GradoopId, K> conversion) {
     this.conversion = conversion;
   }

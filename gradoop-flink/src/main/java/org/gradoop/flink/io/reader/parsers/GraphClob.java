@@ -26,11 +26,24 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Represents a to-be-created graph as a DatSet of vertices and edges.
+ *
+ * @param <Element> comparable element
  */
 public class GraphClob<Element extends Comparable<Element>> {
 
+  /**
+   * Representation of the parsed vertices
+   */
   private DataSet<ImportVertex<Element>> vertices;
+
+  /**
+   * Representation of the parsed edges
+   */
   private DataSet<ImportEdge<Element>> edges;
+
+  /**
+   * Default environment
+   */
   private GradoopFlinkConfig env;
 
   /**
@@ -53,7 +66,8 @@ public class GraphClob<Element extends Comparable<Element>> {
   }
 
   /**
-   * Updates the current GraphClob with another one. Merges the two to-be created graphs together
+   * Updates the current ParsableGraphClob with another one.
+   * Merges the two to-be created graphs together
    * @param x To-be created graph
    * @return  The update instance of the current object
    */
@@ -64,7 +78,8 @@ public class GraphClob<Element extends Comparable<Element>> {
   }
 
   /**
-   * Updates the current GraphClob with another one. Merges the two to-be created graphs together
+   * Updates the current GraphClob with another one.
+   * Merges the two to-be created graphs together
    * @param v Vertex Set
    * @param e Edge Set
    * @return  The update instance of the current object

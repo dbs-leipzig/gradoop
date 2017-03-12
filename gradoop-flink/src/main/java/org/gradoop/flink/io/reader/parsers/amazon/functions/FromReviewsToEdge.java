@@ -25,6 +25,9 @@ import org.gradoop.flink.io.reader.parsers.functions.ToEdge;
  * Providing a concrete instantiation of the type parameters
  */
 public class FromReviewsToEdge extends ToEdge<String, Reviews> {
+  /**
+   * Default constructor
+   */
   public FromReviewsToEdge() {
     super(new GradoopIdToString());
   }

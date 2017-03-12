@@ -15,26 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.nested;
-
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-
 /**
- * Defines a HadoopDataSource
+ * Package containing some utility functions
  */
-public abstract class HadoopDataSource<DefaultRepresentation> implements DataSource {
-
-  private final GradoopFlinkConfig conf;
-
-  public HadoopDataSource(GradoopFlinkConfig conf) {
-    this.conf = conf;
-  }
-
-  public GradoopFlinkConfig getConf() {
-    return conf;
-  }
-
-  public abstract DefaultRepresentation getDefaultRepresentation();
-
-}
+package org.gradoop.flink.model.impl.nested.utils;

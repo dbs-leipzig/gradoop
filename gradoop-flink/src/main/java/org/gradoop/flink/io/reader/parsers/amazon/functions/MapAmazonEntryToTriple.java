@@ -55,10 +55,11 @@ public class MapAmazonEntryToTriple implements MapFunction<String, Tuple3<Review
 
     //Return the Reviewer
     String id = "R" + object.getString(AmazonAttributes.reviewerID.value());
-    String name = "anonymous";
+    String name;
     try {
       name = object.getString(AmazonAttributes.reviewerName.value());
-    } catch (JSONException e) {
+    } catch (JSONException ignored) {
+      name = "anonymous";
     }
     reusableTriple.f0.setRewId(id);
     reusableTriple.f0.setRewName(name);

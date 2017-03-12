@@ -24,11 +24,11 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 
-import java.util.HashSet;
-
 /**
  * Used for both updating vertices and edges. Sets the vertices to be
  * returned as appearing in the right GraphId elements
+ *
+ * @param <X> the GraphElement
  */
 public class CoGroupIdsWithActualElements<X extends GraphElement> implements
   CoGroupFunction<Tuple2<GradoopId, GradoopId>, X, X> {

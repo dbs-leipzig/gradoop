@@ -20,10 +20,8 @@ package org.gradoop.flink.io.reader;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
 import org.gradoop.flink.io.reader.parsers.GraphClob;
 import org.gradoop.flink.io.reader.parsers.memetracker.MemeTrackerFileParser;
-import org.gradoop.flink.model.impl.LogicalGraph;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 /**
  * Utility Class showing how to parse the MemeTracker folder
@@ -55,29 +53,31 @@ public class MemeTrackerExample {
    */
   public GraphDataSource<String> asGraphDataSourcesCollection() {
     File dir = new File(folderPath);
-    File[] files = dir.listFiles(new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        return name.toLowerCase().endsWith(".txt") && name.toLowerCase().startsWith("quotes_");
-      }
-    });
+    File[] files = dir.listFiles((dir1, name) ->
+      name.toLowerCase().endsWith(".txt") && name.toLowerCase().startsWith("quotes_"));
     GraphClob<String> clob = null;
-    for (File file : files) {
-      GraphClob<String> x = defaulter.fromFile(file.toString()).asGeneralGraphDataSource();
-      if (clob == null)
-         clob = x;
-      else
-         clob.addAll(x);
+    if (files == null) {
+      return null;
+    } else {
+      for (File file : files) {
+        GraphClob<String> x = defaulter.fromFile(file.toString()).asGeneralGraphDataSource();
+        if (clob == null) {
+          clob = x;
+        } else {
+          clob.addAll(x);
+        }
+      }
+      return clob != null ? clob.asGraphDataSource() : null;
     }
-    return clob.asGraphDataSource();
   }
 
   /**
    * Example showing how to read a single file
-   * @param args
+   * @param args  Sys.env arguments
    */
   public static void main(String[] args) {
     MemeTrackerExample mte = new MemeTrackerExample("/Volumes/Untitled/Data/Meme Tracker/");
-    LogicalGraph lg = mte.asGraphDataSourcesCollection().getLogicalGraph();
+    mte.asGraphDataSourcesCollection().getLogicalGraph(); // lg
   }
 
 }

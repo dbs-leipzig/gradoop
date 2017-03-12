@@ -19,16 +19,13 @@ package org.gradoop.flink.model.impl.nested.datastructures.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
-import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
-import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
-import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
-import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
+import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 
 /**
  * Operator to determine if two graph collections are equal according to given
@@ -59,15 +56,17 @@ class NormalizedGraphEquality2  {
         graphHeadToString, vertexToString, edgeToString, directed);
   }
 
+  /**
+   * Default running method
+   * @param firstCollection   Left Argument
+   * @param secondCollection  Right Argument
+   * @return    Comparion's result
+   */
   public DataSet<Boolean> execute(NormalizedGraph firstCollection,
     NormalizedGraph secondCollection) {
     return Equals.cross(
       canonicalAdjacencyMatrixBuilder.execute(firstCollection),
       canonicalAdjacencyMatrixBuilder.execute(secondCollection)
     );
-  }
-
-  public String getName() {
-    return this.getClass().getSimpleName();
   }
 }

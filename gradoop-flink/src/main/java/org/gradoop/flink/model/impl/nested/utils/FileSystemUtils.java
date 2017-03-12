@@ -1,10 +1,25 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.nested.utils;
 
 import org.apache.flink.api.common.io.FileInputFormat;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.api.common.io.*;
-import org.gradoop.flink.model.impl.nested.HadoopDataSource;
 
 /**
  * Utility functions for handling FileSystems in ApacheFlink
@@ -21,12 +36,12 @@ public class FileSystemUtils {
   }
 
   /**
-   * Gets a file from Hadoop
+   * Gets a file from Hadoop, transforms it into a machine readable representation
    * @param ds    Hadoop data source
    * @param fif   How to serialize the given file into machine-readable elements
    * @param path  Path to the file
    * @param <T>   Class of the resulting data type
-   * @return
+   * @return      machine readable representation
    */
   public static <T> DataSource<T> hadoopFile(HadoopDataSource ds, FileInputFormat<T> fif, String
   path) {

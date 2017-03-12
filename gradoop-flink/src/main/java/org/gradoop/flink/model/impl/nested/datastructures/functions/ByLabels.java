@@ -44,7 +44,9 @@ public class ByLabels<L extends EPGMLabeled> implements FilterFunction<L> {
   public boolean filter(L l) throws Exception {
     String lab = l.getLabel();
     for (String x : label) {
-      if (lab.equals(x)) return true;
+      if (lab.equals(x)) {
+        return true;
+      }
     }
     return false;
   }

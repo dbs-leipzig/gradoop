@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.nested.operators;
 
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 
 /**
@@ -38,6 +38,7 @@ public abstract class Op {
    * Setting the mother. This method is accessible only to the main interface
    * @param toSet   Element to be updated
    * @return        The called object (this)
+   * @param <X>     Returns this
    */
   public <X extends Op> X setDataLake(DataLake toSet) {
     this.mother = toSet;

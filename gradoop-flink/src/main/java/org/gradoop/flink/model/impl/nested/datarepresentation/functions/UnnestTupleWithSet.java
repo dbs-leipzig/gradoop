@@ -22,16 +22,23 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 
-import java.util.Set;
-
 /**
  * Demultiplexes <X,[Y]> into <X,Y>
+ *
+ * @param <X> key parameter
+ * @param <Y> value parameter, to be demultiplexed
  */
 @FunctionAnnotation.ForwardedFields("f0 -> f0")
 public class UnnestTupleWithSet<X, Y> implements FlatMapFunction<Tuple2<X, Y[]>, Tuple2<X, Y>> {
 
+  /**
+   * Reusable element
+   */
   private final Tuple2<X, Y> reusable;
 
+  /**
+   * Default constructor
+   */
   public UnnestTupleWithSet() {
     reusable = new Tuple2<X, Y>();
   }

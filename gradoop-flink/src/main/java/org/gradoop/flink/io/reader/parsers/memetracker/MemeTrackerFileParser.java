@@ -30,7 +30,8 @@ public class MemeTrackerFileParser extends AdjacencyListFileParser<String, MemeT
    * Default constructor
    */
   public MemeTrackerFileParser() {
-    super(new FromStringToMemeAdjacency(), new FromMemeEntryToVertex(), new FromMemeAdjacencyToEdges());
+    super(new FromStringToMemeAdjacency(),
+          new FromMemeEntryToVertex(), new FromMemeAdjacencyToEdges());
     super.splitWith("\n\n");
   }
 }

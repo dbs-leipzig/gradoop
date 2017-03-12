@@ -38,9 +38,24 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class NormalizedGraph {
 
+  /**
+   * Normalized heads
+   */
   private DataSet<GraphHead> heads;
+
+  /**
+   * Normalized vertices
+   */
   private DataSet<Vertex> vertices;
+
+  /**
+   * Normalized edges
+   */
   private DataSet<Edge> edges;
+
+  /**
+   * Default configuration
+   */
   private GradoopFlinkConfig conf;
 
   /**
@@ -71,7 +86,14 @@ public class NormalizedGraph {
     conf = lg.getConfig();
   }
 
-  public NormalizedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices, DataSet<Edge> edges,
+  /**
+   * NormalizedGraph constructor from raw elements
+   * @param heads     GraphHeads
+   * @param vertices  Graph vertices
+   * @param edges     Graph edges
+   * @param conf      Default configuration
+   */
+  NormalizedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices, DataSet<Edge> edges,
     GradoopFlinkConfig conf) {
     this.heads = heads;
     this.vertices = vertices;

@@ -36,12 +36,12 @@ public class VertexOrEdgeArray implements MapFunction<GraphTransaction, Tuple2<G
   /**
    * Reusable element to be returned
    */
-  public final Tuple2<GradoopId, Set<GradoopId>> reusable;
+  private final Tuple2<GradoopId, Set<GradoopId>> reusable;
 
   /**
    * Checks which projection has to be applied
    */
-  public final boolean isVertex;
+  private final boolean isVertex;
 
   /**
    * Mappeing a GraphTransaction into GradoopIds

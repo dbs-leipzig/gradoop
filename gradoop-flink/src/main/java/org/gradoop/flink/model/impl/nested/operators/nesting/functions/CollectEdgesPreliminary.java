@@ -19,7 +19,6 @@ package org.gradoop.flink.model.impl.nested.operators.nesting.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;

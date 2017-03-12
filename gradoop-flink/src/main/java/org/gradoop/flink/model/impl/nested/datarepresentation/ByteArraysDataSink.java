@@ -42,11 +42,11 @@ public class ByteArraysDataSink implements DataSink {
   /**
    * Project GraphTransaction into a set of edges
    */
-  private static final VertexOrEdgeArray vertexReduction;
+  private static final VertexOrEdgeArray VERTEX_REDUCTION;
   /**
    * Project GraphTransaction into a set of vertices
    */
-  private static final VertexOrEdgeArray edgeReduction;
+  private static final VertexOrEdgeArray EDGE_REDUCTION;
   /**
    * File where to write the vertices
    */
@@ -61,8 +61,8 @@ public class ByteArraysDataSink implements DataSink {
   private final boolean overwrite;
 
   static {
-    vertexReduction = new VertexOrEdgeArray(true);
-    edgeReduction = new VertexOrEdgeArray(false);
+    VERTEX_REDUCTION = new VertexOrEdgeArray(true);
+    EDGE_REDUCTION = new VertexOrEdgeArray(false);
   }
 
   /**
@@ -81,10 +81,10 @@ public class ByteArraysDataSink implements DataSink {
     FileSystem.WriteMode wm = FileSystemUtils.overwrite(overWrite);
     DataSet<Tuple2<GradoopId, Set<GradoopId>>> vertices =
       graphTransactions.getTransactions()
-        .map(vertexReduction);
+        .map(VERTEX_REDUCTION);
     DataSet<Tuple2<GradoopId, Set<GradoopId>>> edges =
       graphTransactions.getTransactions()
-        .map(edgeReduction);
+        .map(EDGE_REDUCTION);
     vertices.write(new WriteGradoopIdGradoopIdSet(), vertexFile, wm);
     edges.write(new WriteGradoopIdGradoopIdSet(), edgeFile, wm);
   }

@@ -67,4 +67,32 @@ public class Reviews extends Edgable<String> {
   public void setSrc(String src) {
     this.src = src;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Reviews)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    Reviews that = (Reviews) o;
+
+    if (src != null ? !src.equals(that.src) : that.src != null) {
+      return false;
+    }
+    return dst != null ? dst.equals(that.dst) : that.dst == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (src != null ? src.hashCode() : 0);
+    result = 31 * result + (dst != null ? dst.hashCode() : 0);
+    return result;
+  }
 }

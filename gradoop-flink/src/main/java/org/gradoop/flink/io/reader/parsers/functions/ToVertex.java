@@ -24,6 +24,7 @@ import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Vertexable;
 /**
  * Converts an object that could be represented as a vertex (Vertexable) into a
  * proper vertex instance.
+ * @param <K> comparable element
  */
 public class ToVertex<K extends Comparable<K>> implements MapFunction<String,
   ImportVertex<K>> {

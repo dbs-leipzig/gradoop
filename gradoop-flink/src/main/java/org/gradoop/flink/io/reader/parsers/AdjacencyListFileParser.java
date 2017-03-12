@@ -49,10 +49,6 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * Source file where to read the data
    */
   private String file;
-  /**
-   * Element delimiting a block of an Adjacency List
-   */
-  private String fileDelimiter;
 
   /**
    * Transformation from a String into an intermediate Adjacency List (Adj)
@@ -99,7 +95,7 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * @return      Updated instance of this
    */
   public AdjacencyListFileParser<Element, Edge, Adj> fromFile(String file) {
-    this.file = (file);
+    this.file = file;
     return this;
   }
 

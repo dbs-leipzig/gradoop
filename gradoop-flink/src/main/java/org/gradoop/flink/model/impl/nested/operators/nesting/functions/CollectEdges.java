@@ -37,10 +37,17 @@ public class CollectEdges implements
   private final Tuple2<GradoopId, GradoopId> reusable;
 
   /**
-   * Check if the
+   * Checks if even the edges that are still the same have to
+   * be included or not
    */
   private final boolean includeNotUpdatedEdges;
 
+  /**
+   * Default constructor
+   * @param newGraphId              Graph belonging to the new resulting graph
+   * @param includeNotUpdatedEdges  Checks if even the edges that are still the same have to
+   *                                be included or not
+   */
   public CollectEdges(GradoopId newGraphId, boolean includeNotUpdatedEdges) {
     reusable = new Tuple2<>();
     reusable.f0 = newGraphId;

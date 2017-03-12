@@ -19,17 +19,14 @@ package org.gradoop.flink.io.reader.parsers.inputfilerepresentations;
 
 import org.gradoop.common.model.impl.properties.Properties;
 
-import java.util.Collection;
-import java.util.Optional;
-
 /**
  *  Defines an object that is updated by a string. Hence, implementing a reusable object acting
  *  as a parser for a specific instance
  */
 public abstract class Parsable extends Properties {
   /**
-   * Updates the element if
-   * @param toParse
+   * Updates the element with the provided argument
+   * @param toParse   String contained the information
    */
   public abstract void updateByParse(String toParse);
 }

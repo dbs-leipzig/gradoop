@@ -85,7 +85,7 @@ public class CanonicalAdjacencyMatrixBuilderForNormalizedGraphs {
   /**
    * Main run poin for the NormalisedGraph operator
    * @param collection  graph over which define the operation
-   * @return
+   * @return  Collected string
    */
   public DataSet<String> execute(NormalizedGraph collection) {
 

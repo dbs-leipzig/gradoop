@@ -3,7 +3,7 @@ package org.gradoop.flink.io.impl.nested;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;

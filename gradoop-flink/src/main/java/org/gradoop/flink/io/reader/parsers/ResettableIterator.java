@@ -22,6 +22,8 @@ import java.util.Iterator;
 /**
  * Defines an interator that could be rewinded.
  * Convenience class used when two Iterables are already defined and cannot be overridden
+ *
+ * @param <K> Type parameter
  */
 public interface ResettableIterator<K> extends Iterator<K> {
   /**

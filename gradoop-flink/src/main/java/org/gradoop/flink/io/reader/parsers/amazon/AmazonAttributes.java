@@ -71,10 +71,20 @@ public enum AmazonAttributes {
    */
   private String val;
 
-  public String value() {
-    return val;
-  }
+  /**
+   * Default constructor
+   * @param reviewerName string associated to the constant
+   */
   AmazonAttributes(String reviewerName) {
     this.val = reviewerName;
   }
+
+  /**
+   * Returns…
+   * @return  the default value
+   */
+  public String value() {
+    return val;
+  }
+
 }

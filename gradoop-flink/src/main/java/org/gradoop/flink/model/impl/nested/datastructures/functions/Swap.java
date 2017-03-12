@@ -23,14 +23,22 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Swaps the position within the tuple
+ * @param <X> left type
+ * @param <Y> right type
  */
 @FunctionAnnotation.ForwardedFields("f0 -> f1; f1 -> f0")
 public class Swap<X, Y> implements MapFunction<Tuple2<X, Y>, Tuple2<Y, X>> {
 
+  /**
+   * Reusable element
+   */
   private final Tuple2<Y, X> reusable;
 
+  /**
+   * Defaulct constructor
+   */
   public Swap() {
-    reusable = new Tuple2<Y, X>();
+    reusable = new Tuple2<>();
   }
 
   @Override

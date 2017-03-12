@@ -19,7 +19,6 @@ package org.gradoop.flink.io.reader.parsers.memetracker;
 
 import com.google.common.collect.HashMultimap;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.AdjacencyListable;
-import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,6 +47,9 @@ public class MemeTrackerRecordParser extends AdjacencyListable<String, MemeTrack
    */
   private Set<String> outgoingEdges;
 
+  /**
+   * Default constructor
+   */
   public MemeTrackerRecordParser() {
     setIterator = null;
     outgoingEdges = new HashSet<>();
@@ -76,6 +78,8 @@ public class MemeTrackerRecordParser extends AdjacencyListable<String, MemeTrack
         outgoingEdges.addAll(x.getValue());
         setIterator = outgoingEdges.iterator();
         break;
+      default:
+        break;
       }
     }
   }
@@ -92,7 +96,7 @@ public class MemeTrackerRecordParser extends AdjacencyListable<String, MemeTrack
 
   @Override
   public boolean hasNext() {
-    return (setIterator != null && setIterator.hasNext());
+    return setIterator != null && setIterator.hasNext();
   }
 
   @Override
@@ -109,5 +113,38 @@ public class MemeTrackerRecordParser extends AdjacencyListable<String, MemeTrack
     if (setIterator != null) {
       setIterator = outgoingEdges.iterator();
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof MemeTrackerRecordParser)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    MemeTrackerRecordParser that = (MemeTrackerRecordParser) o;
+
+    if (id != null ? !id.equals(that.id) : that.id != null) {
+      return false;
+    }
+    if (setIterator != null ? !setIterator.equals(that.setIterator) : that.setIterator != null) {
+      return false;
+    }
+    return outgoingEdges != null ? outgoingEdges.equals(that.outgoingEdges) :
+      that.outgoingEdges == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    result = 31 * result + (setIterator != null ? setIterator.hashCode() : 0);
+    result = 31 * result + (outgoingEdges != null ? outgoingEdges.hashCode() : 0);
+    return result;
   }
 }

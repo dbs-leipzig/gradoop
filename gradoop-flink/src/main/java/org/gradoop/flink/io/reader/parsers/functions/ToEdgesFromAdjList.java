@@ -19,14 +19,15 @@ package org.gradoop.flink.io.reader.parsers.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.AdjacencyListable;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
-import org.gradoop.flink.model.api.functions.Function;
 
 /**
  * Maps each element from the adjacency list to a collection of edges
+ * @param <K> comparable type
+ * @param <X> Edge Type
+ * @param <T> Adjacency List Type
  */
 public class ToEdgesFromAdjList<K extends Comparable<K>, X extends Edgable<K>, T extends AdjacencyListable<K, X>> implements
   FlatMapFunction<T, ImportEdge<K>> {

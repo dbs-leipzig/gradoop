@@ -1,19 +1,18 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * This file is part of Gradoop.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.gradoop.flink.io.reader.parsers.amazon.vertices;
@@ -77,5 +76,33 @@ public class Reviewer extends Vertexable<String> implements Comparable<Reviewer>
   @Override
   public void updateByParse(String toParse) {
     throw new RuntimeException("Error: this method should never be invoked");
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Reviewer)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    Reviewer that = (Reviewer) o;
+
+    if (rewId != null ? !rewId.equals(that.rewId) : that.rewId != null) {
+      return false;
+    }
+    return rewName != null ? rewName.equals(that.rewName) : that.rewName == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (rewId != null ? rewId.hashCode() : 0);
+    result = 31 * result + (rewName != null ? rewName.hashCode() : 0);
+    return result;
   }
 }

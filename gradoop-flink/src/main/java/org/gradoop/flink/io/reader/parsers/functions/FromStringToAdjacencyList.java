@@ -24,6 +24,10 @@ import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
 /**
  * Converts an object that could be represented as a vertex (Vertexable) into a
  * proper vertex instance.
+ *
+ * @param <K> Comparable Type
+ * @param <X> Edge Type
+ * @param <T> Adjacency List Type
  */
 public class FromStringToAdjacencyList<K extends Comparable<K>, X extends Edgable<K>, T extends AdjacencyListable<K, X>>
   implements
@@ -34,6 +38,10 @@ public class FromStringToAdjacencyList<K extends Comparable<K>, X extends Edgabl
    */
   private final T reusableToConvert;
 
+  /**
+   * Default constructor
+   * @param reusableToConvert element to be passed that is updated
+   */
   public FromStringToAdjacencyList(T reusableToConvert) {
     this.reusableToConvert = reusableToConvert;
   }

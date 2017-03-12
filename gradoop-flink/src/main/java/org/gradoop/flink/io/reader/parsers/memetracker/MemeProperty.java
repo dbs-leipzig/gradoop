@@ -41,11 +41,11 @@ enum MemeProperty {
   /**
    * Default value
    */
-  public final String param;
+  private final String param;
 
   /**
    * Default constructor
-   * @param l
+   * @param l Default value associated to each constant
    */
   MemeProperty(String l) {
     this.param = l;
@@ -58,8 +58,9 @@ enum MemeProperty {
    */
   public static MemeProperty fromString(String s) {
     for (MemeProperty x : MemeProperty.values()) {
-      if (x.param.equals(s))
+      if (x.param.equals(s)) {
         return x;
+      }
     }
     return null;
   }

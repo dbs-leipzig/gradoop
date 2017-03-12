@@ -31,7 +31,6 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.operators.BinaryOp;
 import org.gradoop.flink.model.impl.nested.operators.UnaryOp;
 import org.gradoop.flink.model.impl.nested.datastructures.functions.ByLabels;
@@ -134,6 +133,11 @@ public class DataLake  {
     return dataLake;
   }
 
+  /**
+   * Extract a (sub) DataLake from the main one having the designed label
+   * @param label   Designed label
+   * @return  (sub) DataLake havint the parameter as a specific label
+   */
   public DataLake extractGraphFromLabel(String label) {
     // the vertex could belong either to a former LogicalGraph (and hence, it appears as a vertex)
     // or as a vertex. The last case is always compliant, even for nested graphs.
@@ -253,7 +257,8 @@ public class DataLake  {
    * @param edges           New edges' values
    * @param tuple2DataSet   The nesting information for the edges in the first argument
    */
-  public void incrementalUpdateEdges(DataSet<Edge> edges, DataSet<Tuple2<GradoopId, GradoopId>> tuple2DataSet) {
+  public void incrementalUpdateEdges(DataSet<Edge> edges,
+                                     DataSet<Tuple2<GradoopId, GradoopId>> tuple2DataSet) {
     dataLake.updateEdgesWithUnion(edges);
     dataLakeIdDatabase.addNewEdges(tuple2DataSet);
   }

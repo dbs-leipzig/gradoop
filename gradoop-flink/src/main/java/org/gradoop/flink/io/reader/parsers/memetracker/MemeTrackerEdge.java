@@ -24,9 +24,21 @@ import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
  */
 public class MemeTrackerEdge extends Edgable<String> {
 
+  /**
+   * Source
+   */
   private String src;
+
+  /**
+   * Destination
+   */
   private String dst;
 
+  /**
+   * Default constructor
+   * @param src Edge source
+   * @param dst Edge Edge
+   */
   public MemeTrackerEdge(String src, String dst) {
     this.src = src;
     this.dst = dst;
@@ -50,5 +62,33 @@ public class MemeTrackerEdge extends Edgable<String> {
   @Override
   public void updateByParse(String toParse) {
     // noop
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof MemeTrackerEdge)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    MemeTrackerEdge that = (MemeTrackerEdge) o;
+
+    if (src != null ? !src.equals(that.src) : that.src != null) {
+      return false;
+    }
+    return dst != null ? dst.equals(that.dst) : that.dst == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (src != null ? src.hashCode() : 0);
+    result = 31 * result + (dst != null ? dst.hashCode() : 0);
+    return result;
   }
 }

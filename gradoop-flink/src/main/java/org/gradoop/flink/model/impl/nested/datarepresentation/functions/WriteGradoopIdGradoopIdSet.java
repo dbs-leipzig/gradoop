@@ -34,8 +34,9 @@ public class WriteGradoopIdGradoopIdSet extends FileOutputFormat<Tuple2<GradoopI
     stream.write(0); // Delimiter
     stream.write(record.f0.toByteArray());
     stream.write(record.f1.size());
-    for (GradoopId x : record.f1)
+    for (GradoopId x : record.f1) {
       stream.write(x.toByteArray());
+    }
   }
 
 }

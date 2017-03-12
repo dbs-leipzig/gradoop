@@ -15,18 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.io.reader.parsers.functions;
-
-import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-
 /**
- * Returning the vertex's id
- * @param <K> Comparable element
+ * Package containing the projection function for the Hexaplet
  */
-public class ImportVertexId<K extends Comparable<K>> implements KeySelector<ImportVertex<K>, K> {
-  @Override
-  public K getKey(ImportVertex<K> value) throws Exception {
-    return value.getId();
-  }
-}
+package org.gradoop.flink.model.impl.nested.operators.nesting.tuples.functions;

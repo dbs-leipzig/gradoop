@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.io.reader;
 
-import org.gradoop.flink.io.reader.parsers.GraphClob;
 import org.gradoop.flink.io.reader.parsers.amazon.AmazonFileParser;
 
 /**
@@ -32,7 +31,7 @@ public class AmazonExample {
   public static void main(String[] args) {
     AmazonFileParser afp = new AmazonFileParser();
     afp.fromFile("/Volumes/Untitled/Data/Amazon product data/aggressive_dedup.json");
-    GraphClob<String> clob = afp.asGeneralGraphDataSource();
+    afp.asGeneralGraphDataSource(); // clob
   }
 
 }

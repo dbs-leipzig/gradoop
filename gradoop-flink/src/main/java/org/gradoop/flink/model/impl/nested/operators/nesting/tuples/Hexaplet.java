@@ -52,9 +52,9 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
       f0 = GradoopId.NULL_VALUE;
     }
     if (fromGraphCollection != null) {
-      if (fromDataLake.f1.equals(fromDataLake.f1))
+      if (fromDataLake != null && fromDataLake.f1.equals(fromGraphCollection.f1)) {
         f2 = fromGraphCollection.f0;
-      else {
+      } else {
         f2 = GradoopId.NULL_VALUE;
         f1 = GradoopId.NULL_VALUE;
         f0 = GradoopId.NULL_VALUE;
@@ -173,7 +173,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
    *
    * If the Exaplet represents an edge, then the match will be with a vertex appearing in a
    * GraphCollection, and could be either its source or target id.
-   * @param val
+   * @param val The aforementioned value to be set
    */
   private void setMatchWith(GradoopId val) {
     f2 = val;

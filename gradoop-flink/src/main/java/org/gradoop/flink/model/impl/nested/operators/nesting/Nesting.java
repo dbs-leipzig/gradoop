@@ -23,16 +23,26 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.operators.BinaryOp;
-import org.gradoop.flink.model.impl.nested.operators.nesting.functions.*;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.CollectEdgesPreliminary;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.CollectEdges;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.AssociateAndMark;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.CollectVertices;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions
+  .CombineGraphBelongingInformation;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.DoQuadMatchTarget;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.DuplicateEdgeInformations;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.GetVerticesToBeNested;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.QuadEdgeDifference;
+import org.gradoop.flink.model.impl.nested.operators.nesting.functions.UpdateEdgeSource;
 import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
 import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.functions.Hex0;
 import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.functions.Hex4;
 import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.functions.HexMatch;
 import org.gradoop.flink.model.impl.nested.operators.nesting.functions.MapGradoopIdAsVertex;
-import org.gradoop.flink.model.impl.nested.utils.RepresentationUtils;
+import org.gradoop.flink.model.impl.nested.utils.functions.AsQuadsMatchingSource;
 
 /**
  * Fuses each Logical Graph's set of vertices appearing in the same hypervertex into a single
@@ -53,7 +63,7 @@ public class Nesting extends BinaryOp {
 
   /**
    * Constructor for specifying the to-be-returned graph's head
-   * @param newGraphId
+   * @param newGraphId  the aforementioned id
    */
   public Nesting(GradoopId newGraphId) {
     this.newGraphId = newGraphId;
@@ -89,7 +99,7 @@ public class Nesting extends BinaryOp {
     // TODO       JOIN COUNT: (1)
     DataSet<Hexaplet> quads =
       gU.getGraphHeadToVertex()
-        .leftOuterJoin(hypervertices.getGraphHeadToVertex())   // XXX: newVertexIdContainingOldVertex
+        .leftOuterJoin(hypervertices.getGraphHeadToVertex())
         .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
         // If the vertex does not appear in the graph collection, the f2 element is null.
         // These vertices are the ones to be returned as vertices alongside with the new
@@ -106,9 +116,9 @@ public class Nesting extends BinaryOp {
 
     // Edges to return and update are the ones that do not appear in the collection
     // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)
-    DataSet<Hexaplet> edgesToUpdateOrReturn = RepresentationUtils
+    DataSet<Hexaplet> edgesToUpdateOrReturn =
       // Each edge is associated to each possible graph
-      .datalakeEdgesToQuadMatchingSource(dataLake)
+      dataLake.getEdges().map(new AsQuadsMatchingSource())
       // (1) Now, we want to select the edge information only for the graphs in gU
       .joinWithTiny(gU.getGraphHeadToEdge())
       .where(new Hex0()).equalTo(new Value1Of2<>())

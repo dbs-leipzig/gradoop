@@ -4,7 +4,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.nested.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.operators.nesting.Nesting;
 import org.gradoop.flink.model.impl.nested.operators.union.Union;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;

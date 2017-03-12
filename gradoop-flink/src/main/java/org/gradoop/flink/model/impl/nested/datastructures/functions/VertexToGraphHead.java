@@ -27,8 +27,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 public class VertexToGraphHead implements JoinFunction<GradoopId, Vertex, GraphHead> {
 
+  /**
+   * Reusable element
+   */
   private final GraphHead reusable;
 
+  /**
+   * Default constructor
+   */
   public VertexToGraphHead() {
     reusable = new GraphHead();
   }
