@@ -6,6 +6,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.NormalizedGraph;
+import org.gradoop.flink.model.impl.nested.utils.RepresentationUtils;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

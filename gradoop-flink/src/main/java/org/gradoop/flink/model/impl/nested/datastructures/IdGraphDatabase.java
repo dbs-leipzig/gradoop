@@ -32,6 +32,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.nested.datastructures.functions.AssociateElementToIdAndGraph;
 import org.gradoop.flink.model.impl.nested.datastructures.functions.ExceptGraphHead;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.MapGraphHeadAsVertex;
 import org.gradoop.flink.model.impl.nested.datastructures.functions.SelfId;
 import org.gradoop.flink.model.impl.nested.datastructures.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.nested.operators.nesting.functions.UpdateEdges;
@@ -172,6 +173,10 @@ public class IdGraphDatabase {
       .with(new UpdateEdges());
 
     DataSet<GraphHead> heads = getActualGraphHeads(dataLake);
+
+    vertices = vertices
+      .union(heads.map(new MapGraphHeadAsVertex()))
+      .distinct(new Id<>());
 
     return new NormalizedGraph(heads, vertices, edges, dataLake.getConfig());
   }

@@ -51,6 +51,8 @@ public class NestedFusionTest extends GradoopFlinkTestBase {
       unionOp.getGraphHeadToVertex()));
     collectAndAssertTrue(RepresentationUtils.dataSetEquality(result.getGraphHeadToEdge(),
       unionOp.getGraphHeadToEdge()));
+    collectAndAssertTrue(result.asNormalizedGraph(dataLake)
+      .equalsByData(unionOp.asNormalizedGraph(dataLake)));
   }
 
   @Test
