@@ -45,13 +45,13 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
     f3 = GradoopId.NULL_VALUE;
     f4 = GradoopId.NULL_VALUE;
     f5 = GradoopId.NULL_VALUE;
-    if (fromDataLake!=null) {
+    if (fromDataLake != null) {
       f0 = fromDataLake.f0;
       f1 = fromDataLake.f1;
     } else {
       f0 = GradoopId.NULL_VALUE;
     }
-    if (fromGraphCollection!=null) {
+    if (fromGraphCollection != null) {
       if (fromDataLake.f1.equals(fromDataLake.f1))
         f2 = fromGraphCollection.f0;
       else {
@@ -136,7 +136,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
    * Match an edge with a vertex id only if the vertex appears in a graph collection
    */
   public void setGCAsVertexIdAndStoreGCInf4() {
-    if ((!isEdge())&&(appearsInGraphCollection())) {
+    if ((!isEdge()) && (appearsInGraphCollection())) {
       f4 = getMatch();            // The new information with which the edge has to be
       setMatchWith(getVertexId());
     }

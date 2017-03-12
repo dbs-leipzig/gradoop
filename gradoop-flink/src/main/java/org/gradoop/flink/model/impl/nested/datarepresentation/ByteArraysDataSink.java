@@ -85,35 +85,35 @@ public class ByteArraysDataSink implements DataSink {
     DataSet<Tuple2<GradoopId, Set<GradoopId>>> edges =
       graphTransactions.getTransactions()
         .map(edgeReduction);
-    vertices.write(new WriteGradoopIdGradoopIdSet(),vertexFile,wm);
-    edges.write(new WriteGradoopIdGradoopIdSet(),edgeFile,wm);
+    vertices.write(new WriteGradoopIdGradoopIdSet(), vertexFile, wm);
+    edges.write(new WriteGradoopIdGradoopIdSet(), edgeFile, wm);
   }
 
   // Bogus methods
 
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
-    write(RepresentationUtils.toTransaction(logicalGraph),overwrite);
+    write(RepresentationUtils.toTransaction(logicalGraph), overwrite);
   }
 
   @Override
   public void write(GraphCollection graphCollection) throws IOException {
-    write(RepresentationUtils.toTransaction(graphCollection),overwrite);
+    write(RepresentationUtils.toTransaction(graphCollection), overwrite);
   }
 
   @Override
   public void write(GraphTransactions graphTransactions) throws IOException {
-    write(graphTransactions,overwrite);
+    write(graphTransactions, overwrite);
   }
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(RepresentationUtils.toTransaction(logicalGraph),overWrite);
+    write(RepresentationUtils.toTransaction(logicalGraph), overWrite);
   }
 
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
-    write(RepresentationUtils.toTransaction(graphCollection),overWrite);
+    write(RepresentationUtils.toTransaction(graphCollection), overWrite);
   }
 
 

@@ -27,11 +27,11 @@ import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
  * Implements the edge difference for quads using the join as a primitive function
  */
 public class QuadEdgeDifference implements
-  FlatJoinFunction<Hexaplet, Tuple2<GradoopId,GradoopId>, Hexaplet> {
+  FlatJoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet> {
   @Override
   public void join(Hexaplet first, Tuple2<GradoopId, GradoopId> second, Collector<Hexaplet> out) throws
     Exception {
-    if (second==null)
+    if (second == null)
       out.collect(first);
   }
 }

@@ -66,7 +66,7 @@ public class NormalizedGraphEquality {
    */
   public DataSet<Boolean> execute(
     NormalizedGraph firstGraph, NormalizedGraph secondGraph) {
-    return collectionEquality.execute(firstGraph,secondGraph);
+    return collectionEquality.execute(firstGraph, secondGraph);
   }
 
 }

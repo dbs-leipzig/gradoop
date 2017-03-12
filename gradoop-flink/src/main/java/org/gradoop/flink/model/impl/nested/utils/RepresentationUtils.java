@@ -68,8 +68,8 @@ public class RepresentationUtils {
    * @throws IOException
    */
   private static byte[] privateToByteArray(Set<byte[]> elements) throws IOException {
-    try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
-      try(ObjectOutputStream o = new ObjectOutputStream(b)){
+    try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
+      try (ObjectOutputStream o = new ObjectOutputStream(b)) {
         o.writeObject(elements);
       }
       return b.toByteArray();
@@ -77,9 +77,9 @@ public class RepresentationUtils {
   }
 
   public static Set<byte[]> fromGraph(byte[] bytes) throws IOException, ClassNotFoundException {
-    try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
-      try(ObjectInputStream o = new ObjectInputStream(b)){
-        return (Set<byte[]>)o.readObject();
+    try (ByteArrayInputStream b = new ByteArrayInputStream(bytes)) {
+      try (ObjectInputStream o = new ObjectInputStream(b)) {
+        return (Set<byte[]>) o.readObject();
       }
     }
   }
@@ -98,7 +98,7 @@ public class RepresentationUtils {
       .map(new MapGraphHeadAsVertex())
       .union(lg.getVertices())
       .distinct(new Id<>());
-    return LogicalGraph.fromDataSets(lg.getGraphHead(),v,lg.getEdges(),lg.getConfig());
+    return LogicalGraph.fromDataSets(lg.getGraphHead(), v, lg.getEdges(), lg.getConfig());
   }
 
   /**
@@ -111,7 +111,7 @@ public class RepresentationUtils {
       .map(new MapGraphHeadAsVertex())
       .union(lg.getVertices())
       .distinct(new Id<>());
-    return GraphCollection.fromDataSets(lg.getGraphHeads(),v,lg.getEdges(),lg.getConfig());
+    return GraphCollection.fromDataSets(lg.getGraphHeads(), v, lg.getEdges(), lg.getConfig());
   }
 
   public static GraphTransactions toTransaction(GraphCollection gc) {
@@ -119,29 +119,29 @@ public class RepresentationUtils {
   }
 
   public static GraphTransactions toTransaction(LogicalGraph g) {
-      DataSet<Tuple2<GradoopId, GraphElement>> vertices = g.getVertices()
+    DataSet<Tuple2<GradoopId, GraphElement>> vertices = g.getVertices()
         .map(new Cast<>(GraphElement.class))
         .returns(TypeExtractor.getForClass(GraphElement.class))
         .flatMap(new GraphElementExpander<>());
 
-      DataSet<Tuple2<GradoopId, GraphElement>> edges = g.getEdges()
+    DataSet<Tuple2<GradoopId, GraphElement>> edges = g.getEdges()
         .map(new Cast<>(GraphElement.class))
         .returns(TypeExtractor.getForClass(GraphElement.class))
         .flatMap(new GraphElementExpander<>());
 
-      DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
+    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
         .union(edges)
         .groupBy(0)
         .combineGroup(new GraphVerticesEdges())
         .groupBy(0)
         .reduceGroup(new GraphVerticesEdges());
 
-      DataSet<GraphTransaction> graphTransactions = g.getGraphHead()
+    DataSet<GraphTransaction> graphTransactions = g.getGraphHead()
         .leftOuterJoin(transactions)
         .where(new Id<>()).equalTo(0)
         .with(new TransactionFromSets());
 
-      return new GraphTransactions(graphTransactions, g.getConfig());
+    return new GraphTransactions(graphTransactions, g.getConfig());
   }
 
   public static String utilCanonicalRepresentation(LogicalGraph lg) {
@@ -186,7 +186,7 @@ public class RepresentationUtils {
 
   public static DataSet<Boolean> dataSetEqualityIds(DataSet<GradoopId> left,
     DataSet<GradoopId> right) {
-    return Equals.cross(left,right);
+    return Equals.cross(left, right);
   }
 
 }

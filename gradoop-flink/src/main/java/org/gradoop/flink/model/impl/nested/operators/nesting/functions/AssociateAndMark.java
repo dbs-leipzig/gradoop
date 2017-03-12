@@ -51,7 +51,7 @@ public class AssociateAndMark implements
   @Override
   public Hexaplet join(Tuple2<GradoopId, GradoopId> fromDataLake,
                    Tuple2<GradoopId, GradoopId> fromGraphCollection) throws Exception {
-    q.update(fromDataLake,fromGraphCollection);
+    q.update(fromDataLake, fromGraphCollection);
     q.setGCAsVertexIdAndStoreGCInf4();
     return q;
   }

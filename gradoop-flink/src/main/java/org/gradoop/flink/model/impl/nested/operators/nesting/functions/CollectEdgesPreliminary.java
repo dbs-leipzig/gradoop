@@ -35,7 +35,7 @@ public class CollectEdgesPreliminary implements MapFunction<Hexaplet, Tuple2<Gra
   /**
    * Reusable element
    */
-  private final Tuple2<GradoopId,GradoopId> reusable;
+  private final Tuple2<GradoopId, GradoopId> reusable;
 
   /**
    * Default constructor

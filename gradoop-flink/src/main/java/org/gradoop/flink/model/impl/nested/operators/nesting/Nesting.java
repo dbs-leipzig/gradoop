@@ -97,7 +97,7 @@ public class Nesting extends BinaryOp {
         .with(new AssociateAndMark());
 
     // Vertices to be returend within the IdGraphDatabase
-    DataSet<Tuple2<GradoopId,GradoopId>> vertices = quads
+    DataSet<Tuple2<GradoopId, GradoopId>> vertices = quads
       .groupBy(new Hex4())
       .reduceGroup(new CollectVertices(newGraphId));
 
@@ -135,11 +135,11 @@ public class Nesting extends BinaryOp {
     DataSet<Tuple2<GradoopId, GradoopId>> v0 = gh.cross(gh);
     vertices = vertices.union(v0);
 
-    DataSet<Tuple2<GradoopId,GradoopId>> preliminaryEdge = updatedEdges
+    DataSet<Tuple2<GradoopId, GradoopId>> preliminaryEdge = updatedEdges
       .map(new CollectEdgesPreliminary());
 
-    DataSet<Tuple2<GradoopId,GradoopId>> edgesToProvide = preliminaryEdge
-      .flatMap(new CollectEdges(newGraphId,false));
+    DataSet<Tuple2<GradoopId, GradoopId>> edgesToProvide = preliminaryEdge
+      .flatMap(new CollectEdges(newGraphId, false));
 
     // Create new edges in the dataLake
     DataSet<Edge> newlyCreatedEdges = dataLake.getEdges()
@@ -147,14 +147,14 @@ public class Nesting extends BinaryOp {
       .coGroup(updatedEdges)
       .where(new Id<>()).equalTo(new Hex0())
       .with(new DuplicateEdgeInformations());
-    dataLake.incrementalUpdateEdges(newlyCreatedEdges,edgesToProvide);
-    dataLake.incrementalUpdateVertices(gh.map(new MapGradoopIdAsVertex()),gh.cross(gh));
+    dataLake.incrementalUpdateEdges(newlyCreatedEdges, edgesToProvide);
+    dataLake.incrementalUpdateVertices(gh.map(new MapGradoopIdAsVertex()), gh.cross(gh));
 
     // Edges to be set within the IdGraphDatabase
-    DataSet<Tuple2<GradoopId,GradoopId>> edges = preliminaryEdge
-      .flatMap(new CollectEdges(newGraphId,true));
+    DataSet<Tuple2<GradoopId, GradoopId>> edges = preliminaryEdge
+      .flatMap(new CollectEdges(newGraphId, true));
 
-    return new IdGraphDatabase(gh,vertices,edges);
+    return new IdGraphDatabase(gh, vertices, edges);
   }
 
   @Override

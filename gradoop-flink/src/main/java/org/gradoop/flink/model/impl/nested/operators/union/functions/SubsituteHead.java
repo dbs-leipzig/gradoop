@@ -16,7 +16,7 @@ public class SubsituteHead implements FlatMapFunction<Tuple2<GradoopId, GradoopI
   /**
    * reusable element, to be returned
    */
-  private final Tuple2<GradoopId,GradoopId> reusable;
+  private final Tuple2<GradoopId, GradoopId> reusable;
 
   /**
    * Changes the head of the IdGraphDatabase information mapping it

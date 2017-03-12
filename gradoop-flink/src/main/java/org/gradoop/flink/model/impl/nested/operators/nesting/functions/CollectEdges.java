@@ -34,7 +34,7 @@ public class CollectEdges implements
   /**
    * Reusable tuple to be returned
    */
-  private final Tuple2<GradoopId,GradoopId> reusable;
+  private final Tuple2<GradoopId, GradoopId> reusable;
 
   /**
    * Check if the

@@ -32,7 +32,7 @@ public abstract class BinaryOp extends Op {
    *                state, is updated with either new vertices or new edges
    */
   public IdGraphDatabase with(IdGraphDatabase left, IdGraphDatabase right) {
-    return runWithArgAndLake(mother,left,right);
+    return runWithArgAndLake(mother, left, right);
   }
 
 }

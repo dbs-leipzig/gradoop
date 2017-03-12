@@ -33,7 +33,7 @@ public class CollectVertices extends RichGroupReduceFunction<Hexaplet, Tuple2<Gr
   /**
    * Reusable element
    */
-  private final Tuple2<GradoopId,GradoopId> reusable;
+  private final Tuple2<GradoopId, GradoopId> reusable;
 
 
   /**
@@ -55,7 +55,7 @@ public class CollectVertices extends RichGroupReduceFunction<Hexaplet, Tuple2<Gr
       do {
         x = it.next();
         // First iteration
-        if (y==null) {
+        if (y == null) {
           y = x.f4;
         }
         if (!y.equals(GradoopId.NULL_VALUE)) {

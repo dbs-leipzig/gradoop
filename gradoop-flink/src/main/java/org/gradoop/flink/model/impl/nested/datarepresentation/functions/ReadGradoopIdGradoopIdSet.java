@@ -44,7 +44,7 @@ public class ReadGradoopIdGradoopIdSet extends FileInputFormat<Tuple2<GradoopId,
   @Override
   public boolean reachedEnd() throws IOException {
     try {
-      return stream.available()>0;
+      return stream.available() > 0;
     } catch (IOException e) {
       return false;
     }
@@ -57,12 +57,12 @@ public class ReadGradoopIdGradoopIdSet extends FileInputFormat<Tuple2<GradoopId,
     stream.read(gradoopIdArray);
     reuse.f0 = GradoopId.fromByteArray(gradoopIdArray);
     int len = stream.read();
-    boolean toUpdate =false;
+    boolean toUpdate = false;
     // Grow-only allocation policy
-    if (len>array.length)
+    if (len > array.length)
       toUpdate = true;
     toreturn.clear();
-    for (int i = len; i>0; i--) {
+    for (int i = len; i > 0; i--) {
       stream.read(gradoopIdArray);
       toreturn.add(GradoopId.fromByteArray(gradoopIdArray));
     }

@@ -28,9 +28,9 @@ import java.util.Set;
  * Demultiplexes <X,[Y]> into <X,Y>
  */
 @FunctionAnnotation.ForwardedFields("f0 -> f0")
-public class UnnestTupleWithSet<X,Y> implements FlatMapFunction<Tuple2<X, Y[]>, Tuple2<X, Y>> {
+public class UnnestTupleWithSet<X, Y> implements FlatMapFunction<Tuple2<X, Y[]>, Tuple2<X, Y>> {
 
-  private final Tuple2<X,Y> reusable;
+  private final Tuple2<X, Y> reusable;
 
   public UnnestTupleWithSet() {
     reusable = new Tuple2<X, Y>();

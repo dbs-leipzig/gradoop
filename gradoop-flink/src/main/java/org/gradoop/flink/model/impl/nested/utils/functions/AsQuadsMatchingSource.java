@@ -44,7 +44,7 @@ public class AsQuadsMatchingSource implements MapFunction<Edge, Hexaplet> {
 
   @Override
   public Hexaplet map(Edge value) throws Exception {
-    r.update(value,true);
+    r.update(value, true);
     return r;
   }
 }

@@ -10,7 +10,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * Maps a vertex back to a GraphHead
  */
 public class MapVertexAsGraphHead implements MapFunction<Vertex, GraphHead>,
-  FlatJoinFunction<Vertex,GraphHead,GraphHead> {
+  FlatJoinFunction<Vertex, GraphHead, GraphHead> {
 
   /**
    * Reusable element
@@ -34,7 +34,7 @@ public class MapVertexAsGraphHead implements MapFunction<Vertex, GraphHead>,
 
   @Override
   public void join(Vertex first, GraphHead second, Collector<GraphHead> out) throws Exception {
-    if (second==null) {
+    if (second == null) {
       out.collect(map(first));
     }
   }

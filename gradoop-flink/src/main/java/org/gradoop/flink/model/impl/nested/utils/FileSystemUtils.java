@@ -30,7 +30,7 @@ public class FileSystemUtils {
    */
   public static <T> DataSource<T> hadoopFile(HadoopDataSource ds, FileInputFormat<T> fif, String
   path) {
-    return ds.getConf().getExecutionEnvironment().readFile(fif,path);
+    return ds.getConf().getExecutionEnvironment().readFile(fif, path);
   }
 
   /**
@@ -40,7 +40,7 @@ public class FileSystemUtils {
    * @return    the vertex file name
    */
   public static String generateVertexFile(String f) {
-    return f+".vertex";
+    return f + ".vertex";
   }
 
   /**
@@ -50,7 +50,7 @@ public class FileSystemUtils {
    * @return    the edge file name
    */
   public static String generateEdgeFile(String f) {
-    return f+".edge";
+    return f + ".edge";
   }
 
 }

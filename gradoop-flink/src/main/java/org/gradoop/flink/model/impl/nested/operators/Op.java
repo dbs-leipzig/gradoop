@@ -41,7 +41,7 @@ public abstract class Op {
    */
   public <X extends Op> X setDataLake(DataLake toSet) {
     this.mother = toSet;
-    return (X)this;
+    return (X) this;
   }
 
   /**

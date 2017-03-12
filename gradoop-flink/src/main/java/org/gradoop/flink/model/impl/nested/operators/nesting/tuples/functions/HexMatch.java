@@ -10,7 +10,7 @@ import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
  * Third projection of the exaplet
  */
 @FunctionAnnotation.ForwardedFields("f2->*")
-public class HexMatch implements MapFunction<Hexaplet,GradoopId>, KeySelector<Hexaplet,GradoopId> {
+public class HexMatch implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
   @Override
   public GradoopId map(Hexaplet triple) throws Exception {
     return triple.f2;

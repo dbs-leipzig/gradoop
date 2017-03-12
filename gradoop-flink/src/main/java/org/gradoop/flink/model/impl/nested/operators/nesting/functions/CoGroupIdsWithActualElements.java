@@ -48,14 +48,14 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
   @Override
   public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>> first, Iterable<X> second,
     Collector<X> out) throws Exception {
-      appearing.clear();
-      first.forEach(x -> appearing.add(x.f0));
-      if (appearing.isEmpty()) {
-        return;
-      }
-      for (X y : second) {
-        y.setGraphIds(appearing);
-        out.collect(y);
-      }
+    appearing.clear();
+    first.forEach(x -> appearing.add(x.f0));
+    if (appearing.isEmpty()) {
+      return;
+    }
+    for (X y : second) {
+      y.setGraphIds(appearing);
+      out.collect(y);
+    }
   }
 }

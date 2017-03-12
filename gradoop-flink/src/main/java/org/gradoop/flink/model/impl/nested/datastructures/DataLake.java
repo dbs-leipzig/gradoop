@@ -223,9 +223,9 @@ public class DataLake  {
                                                 subDataLakeEdges,
                                                 dataLake.getConfig());
 
-    IdGraphDatabase igdb = new IdGraphDatabase(graphHead,vertices,edges);
+    IdGraphDatabase igdb = new IdGraphDatabase(graphHead, vertices, edges);
 
-    return new DataLake(lg,igdb);
+    return new DataLake(lg, igdb);
   }
 
   /**

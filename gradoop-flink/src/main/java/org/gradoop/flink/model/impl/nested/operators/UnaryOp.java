@@ -28,7 +28,7 @@ public abstract class UnaryOp extends BinaryOp {
   @Override
   protected IdGraphDatabase runWithArgAndLake(DataLake lake, IdGraphDatabase left,
     IdGraphDatabase right) {
-    return runWithArgAndLake(lake,left);
+    return runWithArgAndLake(lake, left);
   }
 
   /**
@@ -45,7 +45,7 @@ public abstract class UnaryOp extends BinaryOp {
    * @return      The result of the operation
    */
   public IdGraphDatabase with(IdGraphDatabase data) {
-    return runWithArgAndLake(mother,data,null);
+    return runWithArgAndLake(mother, data, null);
   }
 
 }

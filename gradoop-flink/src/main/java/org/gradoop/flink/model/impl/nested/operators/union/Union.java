@@ -43,7 +43,7 @@ public class Union extends UnaryOp {
     DataSet<Tuple2<GradoopId, GradoopId>> edges = data.getGraphHeadToEdge()
       .flatMap(new SubsituteHead(id))
       .distinct(1);
-    return new IdGraphDatabase(head,vertices,edges);
+    return new IdGraphDatabase(head, vertices, edges);
   }
 
   @Override

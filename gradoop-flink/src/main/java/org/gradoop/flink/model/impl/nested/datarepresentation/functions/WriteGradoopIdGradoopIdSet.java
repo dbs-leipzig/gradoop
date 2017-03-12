@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * Writing the tuple into a binary file
  */
-public class WriteGradoopIdGradoopIdSet extends FileOutputFormat<Tuple2<GradoopId,Set<GradoopId>>> {
+public class WriteGradoopIdGradoopIdSet extends FileOutputFormat<Tuple2<GradoopId, Set<GradoopId>>> {
 
   @Override
   public void writeRecord(Tuple2<GradoopId, Set<GradoopId>> record) throws IOException {

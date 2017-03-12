@@ -22,5 +22,5 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Specific instance of swap for GradoopIds
  */
-public class SwapGradoopIds extends Swap<GradoopId,GradoopId> {
+public class SwapGradoopIds extends Swap<GradoopId, GradoopId> {
 }

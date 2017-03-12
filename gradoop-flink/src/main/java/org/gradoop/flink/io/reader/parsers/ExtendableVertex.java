@@ -39,7 +39,7 @@ public class ExtendableVertex<Id extends Comparable<Id>> extends Vertexable<Id> 
       splitted[0] = splitted[0].trim();
       splitted[1] = splitted[1].trim();
       if (id.toString().equals(splitted[0])) {
-        super.set(currentProperty,splitted[1]);
+        super.set(currentProperty, splitted[1]);
       }
     }
   }

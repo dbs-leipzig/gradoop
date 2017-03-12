@@ -14,7 +14,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * indexing structure, that is the IdGraphDatabase
  */
 public class AssociateElementToIdAndGraph<X extends GraphElement> implements
-  FlatMapFunction<X, Tuple2<GradoopId,GradoopId>> {
+  FlatMapFunction<X, Tuple2<GradoopId, GradoopId>> {
 
   private final Tuple2<GradoopId, GradoopId> reusable;
 

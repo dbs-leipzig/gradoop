@@ -31,12 +31,12 @@ import java.util.Set;
  * Mapping the GraphTransaction into a tuple (projection function)
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id -> f0")
-public class VertexOrEdgeArray implements MapFunction<GraphTransaction,Tuple2<GradoopId,Set<GradoopId>>> {
+public class VertexOrEdgeArray implements MapFunction<GraphTransaction, Tuple2<GradoopId, Set<GradoopId>>> {
 
   /**
    * Reusable element to be returned
    */
-  public final Tuple2<GradoopId,Set<GradoopId>> reusable;
+  public final Tuple2<GradoopId, Set<GradoopId>> reusable;
 
   /**
    * Checks which projection has to be applied
@@ -54,7 +54,7 @@ public class VertexOrEdgeArray implements MapFunction<GraphTransaction,Tuple2<Gr
   }
 
   @Override
-  public Tuple2<GradoopId,Set<GradoopId>> map(GraphTransaction value) throws Exception {
+  public Tuple2<GradoopId, Set<GradoopId>> map(GraphTransaction value) throws Exception {
     reusable.f0 = value.f0.getId();
     reusable.f1.clear();
     (isVertex ? value.getVertices() : value.getEdges()).stream()

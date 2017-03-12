@@ -29,7 +29,7 @@ public class ParametricInputFormat extends DelimitedInputFormat<String> {
 	@Override
 	public String readRecord(String reuse, byte[] bytes, int offset, int numBytes)
 		throws IOException {
-		return new String(bytes, offset, numBytes);
+		reing(bytes, offset, numBytes);
 	}
 
 }

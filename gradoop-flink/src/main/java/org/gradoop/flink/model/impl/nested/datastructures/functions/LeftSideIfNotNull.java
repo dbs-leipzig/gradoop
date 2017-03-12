@@ -35,11 +35,11 @@ public class LeftSideIfNotNull<L> implements JoinFunction<L, L, L>, CrossFunctio
 
   @Override
   public L cross(L left, L right) throws Exception {
-    return left!=null ? left : right;
+    return left != null ? left : right;
   }
 
   @Override
   public L join(L first, L second) throws Exception {
-    return first!=null ? first : second;
+    return first != null ? first : second;
   }
 }

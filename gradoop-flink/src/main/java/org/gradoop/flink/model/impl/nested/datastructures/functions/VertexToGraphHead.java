@@ -36,7 +36,7 @@ public class VertexToGraphHead implements JoinFunction<GradoopId, Vertex, GraphH
   @Override
   public GraphHead join(GradoopId first, Vertex second) throws Exception {
     reusable.setId(first);
-    if (second!=null) {
+    if (second != null) {
       reusable.setLabel(second.getLabel());
       reusable.setProperties(second.getProperties());
     }

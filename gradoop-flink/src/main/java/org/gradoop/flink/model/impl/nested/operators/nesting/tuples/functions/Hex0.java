@@ -11,7 +11,7 @@ import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
  */
 @FunctionAnnotation.ForwardedFields("f0->*")
 public class Hex0
-  implements MapFunction<Hexaplet,GradoopId>, KeySelector<Hexaplet,GradoopId> {
+  implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
 
   @Override
   public GradoopId map(Hexaplet triple) throws Exception {

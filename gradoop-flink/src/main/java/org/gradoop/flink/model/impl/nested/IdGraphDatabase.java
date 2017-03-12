@@ -47,8 +47,8 @@ import org.gradoop.flink.model.impl.nested.datastructures.functions.VertexToGrap
 public class IdGraphDatabase {
 
   private DataSet<GradoopId> graphHeads;
-  private DataSet<Tuple2<GradoopId,GradoopId>> graphHeadToVertex;
-  private DataSet<Tuple2<GradoopId,GradoopId>> graphHeadToEdge;
+  private DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex;
+  private DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge;
 
   /**
    * Creating an instance of the graph database by just using the elements' ids
@@ -125,7 +125,7 @@ public class IdGraphDatabase {
    */
   public IdGraphDatabase(NormalizedGraph logicalGraph) {
     this.graphHeads = logicalGraph.getGraphHeads().map(new Id<>());
-    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
+    initVertices(logicalGraph.getVertices(), logicalGraph.getEdges());
   }
 
   /**
@@ -134,7 +134,7 @@ public class IdGraphDatabase {
    */
   public IdGraphDatabase(LogicalGraph logicalGraph) {
     this.graphHeads = logicalGraph.getGraphHead().map(new Id<>());
-    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
+    initVertices(logicalGraph.getVertices(), logicalGraph.getEdges());
   }
 
   /**
@@ -143,7 +143,7 @@ public class IdGraphDatabase {
    */
   public IdGraphDatabase(GraphCollection logicalGraph) {
     this.graphHeads = logicalGraph.getGraphHeads().map(new Id<>());
-    initVertices(logicalGraph.getVertices(),logicalGraph.getEdges());
+    initVertices(logicalGraph.getVertices(), logicalGraph.getEdges());
   }
 
   /**
@@ -164,7 +164,7 @@ public class IdGraphDatabase {
 
     DataSet<GraphHead> heads = getActualGraphHeads(dataLake);
 
-    return GraphCollection.fromDataSets(heads,vertices,edges,dataLake.getConfig());
+    return GraphCollection.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
   /**
@@ -185,7 +185,7 @@ public class IdGraphDatabase {
 
     DataSet<GraphHead> heads = getActualGraphHeads(dataLake);
 
-    return LogicalGraph.fromDataSets(heads,vertices,edges,dataLake.getConfig());
+    return LogicalGraph.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
   public NormalizedGraph asNormalizedGraph(DataLake dataLake) {
@@ -210,7 +210,7 @@ public class IdGraphDatabase {
       e.printStackTrace();
     }*/
 
-    return new NormalizedGraph(heads,vertices,edges,dataLake.getConfig());
+    return new NormalizedGraph(heads, vertices, edges, dataLake.getConfig());
   }
 
   public NormalizedGraph asNormalizedGraph(LogicalGraph dataLake) {
@@ -226,7 +226,7 @@ public class IdGraphDatabase {
 
     DataSet<GraphHead> heads = getActualGraphHeads(dataLake);
 
-    return new NormalizedGraph(heads,vertices,edges,dataLake.getConfig());
+    return new NormalizedGraph(heads, vertices, edges, dataLake.getConfig());
   }
 
   public DataSet<GradoopId> getGraphHeads() {

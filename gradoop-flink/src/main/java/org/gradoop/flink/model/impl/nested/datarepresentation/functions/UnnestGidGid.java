@@ -22,5 +22,5 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Practical instance of UnnestTupleWithSet
  */
-public class UnnestGidGid extends UnnestTupleWithSet<GradoopId,GradoopId> {
+public class UnnestGidGid extends UnnestTupleWithSet<GradoopId, GradoopId> {
 }

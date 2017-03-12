@@ -125,7 +125,7 @@ public class NormalizedGraph {
    * @return          A dataset containing the result
    */
   public DataSet<Boolean> equalsByData(NormalizedGraph research) {
-      return new NormalizedGraphEquality(
+    return new NormalizedGraphEquality(
         new GraphHeadToDataString(),
         new VertexToDataString(),
         new EdgeToDataString(), true).execute(this, research);

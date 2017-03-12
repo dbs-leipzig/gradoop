@@ -87,9 +87,9 @@ public class ByteArraysDataSource extends HadoopDataSource<IdGraphDatabase> {
       edges = FileSystemUtils.hadoopFile(this, new ReadGradoopIdGradoopIdSet(), edgeFile)
       .flatMap(new UnnestGidGid());
     DataSet<GradoopId> heads = FileSystemUtils
-      .hadoopFile(this,new ReadGradoopIdGradoopIdSet(),vertexFile)
+      .hadoopFile(this, new ReadGradoopIdGradoopIdSet(), vertexFile)
       .map(new Value0Of2<>());
-    return new IdGraphDatabase(heads,vertices,edges);
+    return new IdGraphDatabase(heads, vertices, edges);
 
   }
 }

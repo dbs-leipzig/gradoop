@@ -98,7 +98,7 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * @param file  overmentioned file
    * @return      Updated instance of this
    */
-  public AdjacencyListFileParser<Element,Edge,Adj> fromFile(String file) {
+  public AdjacencyListFileParser<Element, Edge, Adj> fromFile(String file) {
     this.file = (file);
     return this;
   }

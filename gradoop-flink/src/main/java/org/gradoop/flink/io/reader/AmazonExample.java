@@ -29,7 +29,7 @@ public class AmazonExample {
    * Main program
    * @param args        Default arguments
    */
-  public static void main(String[] args){
+  public static void main(String[] args) {
     AmazonFileParser afp = new AmazonFileParser();
     afp.fromFile("/Volumes/Untitled/Data/Amazon product data/aggressive_dedup.json");
     GraphClob<String> clob = afp.asGeneralGraphDataSource();
