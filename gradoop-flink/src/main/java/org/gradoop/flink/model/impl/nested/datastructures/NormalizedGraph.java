@@ -63,7 +63,7 @@ public class NormalizedGraph {
    * @param lg    Graph Collection to be normalized
    */
   public NormalizedGraph(GraphCollection lg) {
-    this(lg.getGraphHeads(),lg.getVertices(),lg.getEdges(),lg.getConfig());
+    this(lg.getGraphHeads(), lg.getVertices(), lg.getEdges(), lg.getConfig());
   }
 
   /**
@@ -71,7 +71,7 @@ public class NormalizedGraph {
    * @param lg  Logical Graph to be normalized
    */
   public NormalizedGraph(LogicalGraph lg) {
-    this(lg.getGraphHead(),lg.getVertices(),lg.getEdges(),lg.getConfig());
+    this(lg.getGraphHead(), lg.getVertices(), lg.getEdges(), lg.getConfig());
   }
 
   /**

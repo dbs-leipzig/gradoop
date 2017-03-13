@@ -37,12 +37,12 @@ public class Collect {
   /**
    * Vertices contained by each graph within the collection
    */
-  private DataSet<Tuple2<GradoopId,GradoopId>> vertices;
+  private DataSet<Tuple2<GradoopId, GradoopId>> vertices;
 
   /**
    * Edges contained by each graph within  the collection
    */
-  private DataSet<Tuple2<GradoopId,GradoopId>> edges;
+  private DataSet<Tuple2<GradoopId, GradoopId>> edges;
 
   /**
    * Initializes the operator by using the default configuration
@@ -79,7 +79,7 @@ public class Collect {
    * @return  The aforementioned result.
    */
   public IdGraphDatabase asIdGraphDatabase() {
-    return new IdGraphDatabase(head,vertices,edges);
+    return new IdGraphDatabase(head, vertices, edges);
   }
 
 }

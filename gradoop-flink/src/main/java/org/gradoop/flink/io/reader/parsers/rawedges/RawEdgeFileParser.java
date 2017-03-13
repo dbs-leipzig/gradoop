@@ -21,14 +21,17 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.io.reader.parsers.FileReaderForParser;
 import org.gradoop.flink.io.reader.parsers.GraphClob;
-import org.gradoop.flink.io.reader.parsers.utilities.FileReaderForParser;
 
 /**
  * Parses a file containing the edge information
  */
 public class RawEdgeFileParser extends FileReaderForParser {
 
+  /**
+   * Default constructor
+   */
   public RawEdgeFileParser() {
     super("\n");
   }
@@ -49,7 +52,7 @@ public class RawEdgeFileParser extends FileReaderForParser {
     DataSet<ImportVertex<String>> vertices = edges
       .flatMap(new CollectSourceAndDest())
       .distinct(0);
-    return new GraphClob<>(vertices,edges).asGraphDataSource();
+    return new GraphClob<>(vertices, edges).asGraphDataSource();
   }
 
 }

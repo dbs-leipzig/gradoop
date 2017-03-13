@@ -59,10 +59,10 @@ public class CollectSourceAndDest implements
   @Override
   public void flatMap(ImportEdge<String> value, Collector<ImportVertex<String>> out) throws
     Exception {
-    reusableProperties.set("id",value.getSourceId());
+    reusableProperties.set("id", value.getSourceId());
     reusable.setId(value.getSourceId());
     out.collect(reusable);
-    reusableProperties.set("id",value.getTargetId());
+    reusableProperties.set("id", value.getTargetId());
     reusable.setId(value.getTargetId());
     out.collect(reusable);
   }

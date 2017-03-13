@@ -19,10 +19,8 @@ package org.gradoop.flink.io.reader.parsers.rawedges;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Represents a raw edge, that is an edge with no ancillary information
@@ -71,7 +69,7 @@ public class RawEdge extends ImportEdge<String>
     setSourceId(elements.get(0));
     setTargetId(elements.get(1));
     setLabel(label);
-    setId(elements.get(0)+"-"+elements.get(1));
+    setId(elements.get(0) + "-" + elements.get(1));
     return this;
   }
 }

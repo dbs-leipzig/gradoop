@@ -1,11 +1,11 @@
-package org.gradoop.flink.io.reader.parsers.utilities;
+package org.gradoop.flink.io.reader.parsers;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.flink.io.reader.parsers.ParametricInputFormat;
 
 /**
- * Created by vasistas on 12/03/17.
+ * Defining a generic reader.
+ * TODO: there are some better ways to read from a file
  */
 public class FileReaderForParser {
 
@@ -49,7 +49,7 @@ public class FileReaderForParser {
    */
   public <X extends FileReaderForParser> X fromFile(String file) {
     this.file = file;
-    return (X)this;
+    return (X) this;
   }
 
   public DataSet<String> readAsStringDataSource() {

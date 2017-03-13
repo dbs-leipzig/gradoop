@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -35,7 +34,7 @@ public class NumberTokenizer<Format> {
   /**
    * Function converting doubles to the desired format
    */
-  private final Function<Double,Format> converter;
+  private final Function<Double, Format> converter;
 
   /**
    * Returns the string representation for the edge. Each edge is represented by source++destination
@@ -63,7 +62,7 @@ public class NumberTokenizer<Format> {
     t.parseNumbers();
     ArrayList<Format> toret = new ArrayList<>();
     try {
-      while(t.nextToken() != StreamTokenizer.TT_EOF) {
+      while (t.nextToken() != StreamTokenizer.TT_EOF) {
         if (t.ttype == StreamTokenizer.TT_NUMBER) {
           toret.add(converter.apply(t.nval));
           sb.append(t.sval);

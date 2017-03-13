@@ -58,7 +58,7 @@ public class RandomSample extends UnaryOp {
    * @param sampleSize relative sample size
    */
   public RandomSample(float sampleSize) {
-    this(GradoopId.get(),sampleSize, 0L);
+    this(GradoopId.get(), sampleSize, 0L);
   }
 
   /**
@@ -97,7 +97,7 @@ public class RandomSample extends UnaryOp {
     DataSet<Tuple2<GradoopId, GradoopId>> newEdges = head
       .crossWithHuge(edgeId);
 
-    return new IdGraphDatabase(head,newVertices,newEdges);
+    return new IdGraphDatabase(head, newVertices, newEdges);
   }
 
   @Override

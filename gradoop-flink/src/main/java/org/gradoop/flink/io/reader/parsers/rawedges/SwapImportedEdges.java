@@ -31,7 +31,7 @@ public class SwapImportedEdges implements MapFunction<ImportEdge<String>, Import
     String tmp = value.getSourceId();
     value.setSourceId(value.getTargetId());
     value.setTargetId(tmp);
-    value.setId(value.getSourceId()+"-"+value.getTargetId());
+    value.setId(value.getSourceId() + "-" + value.getTargetId());
     return value;
   }
 }

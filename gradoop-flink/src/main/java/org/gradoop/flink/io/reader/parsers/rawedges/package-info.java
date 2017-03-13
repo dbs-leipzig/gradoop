@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.nested.operators.random.functions;
-
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
-
 /**
- * Specific instance for (GradoopId,GradoopId)
+ * Reading raw edges from file. Providing an automated way to do it.
  */
-public class RandomFilterOfGidTuple extends RandomFilter<Tuple2<GradoopId, GradoopId>> {
-  /**
-   * Creates a new filter instance.
-   *
-   * @param sampleSize relative sample size
-   * @param randomSeed random seed (can be {@code} null)
-   */
-  public RandomFilterOfGidTuple(float sampleSize, long randomSeed) {
-    super(sampleSize, randomSeed);
-  }
-}
+package org.gradoop.flink.io.reader.parsers.rawedges;

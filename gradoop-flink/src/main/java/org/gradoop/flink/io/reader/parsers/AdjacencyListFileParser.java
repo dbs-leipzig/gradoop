@@ -19,7 +19,6 @@ package org.gradoop.flink.io.reader.parsers;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.reader.parsers.functions.FromAdjacencyListableToVertex;
