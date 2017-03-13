@@ -49,9 +49,9 @@ public class Collect {
    * @param conf  Default configuration
    */
   public Collect(GradoopFlinkConfig conf) {
-    this.head = conf.getExecutionEnvironment().fromElements();
-    this.vertices = conf.getExecutionEnvironment().fromElements();
-    this.edges = conf.getExecutionEnvironment().fromElements();
+    this.head = null;
+    this.vertices = null;
+    this.edges = null;
   }
 
   /**
@@ -59,9 +59,15 @@ public class Collect {
    * @param x Graph to be added to the collection
    */
   public void add(IdGraphDatabase x) {
-    head = head.union(x.getGraphHeads());
-    vertices = vertices.union(x.getGraphHeadToVertex());
-    edges = edges.union(x.getGraphHeadToEdge());
+    head = head == null ?
+      x.getGraphHeads() :
+      head.union(x.getGraphHeads());
+    vertices = vertices == null?
+      x.getGraphHeadToVertex() :
+      vertices.union(x.getGraphHeadToVertex());
+    edges = edges == null ?
+      x.getGraphHeadToEdge() :
+      edges.union(x.getGraphHeadToEdge());
   }
 
   /**
