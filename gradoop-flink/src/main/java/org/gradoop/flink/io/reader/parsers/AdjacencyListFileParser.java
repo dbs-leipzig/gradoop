@@ -27,6 +27,7 @@ import org.gradoop.flink.io.reader.parsers.functions.FromStringToAdjacencyList;
 import org.gradoop.flink.io.reader.parsers.functions.ToEdgesFromAdjList;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.AdjacencyListable;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
+import org.gradoop.flink.io.reader.parsers.utilities.FileReaderForParser;
 
 
 /**
@@ -39,16 +40,10 @@ import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
  */
 public class AdjacencyListFileParser<Element extends Comparable<Element>,
                           Edge extends Edgable<Element>,
-                          Adj extends AdjacencyListable<Element, Edge>> {
+                          Adj extends AdjacencyListable<Element, Edge>>
+                          extends FileReaderForParser {
 
-  /**
-   * Main Framework
-   */
-  private ExecutionEnvironment env;
-  /**
-   * Source file where to read the data
-   */
-  private String file;
+
 
   /**
    * Transformation from a String into an intermediate Adjacency List (Adj)
@@ -65,10 +60,6 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    */
   private final ToEdgesFromAdjList<Element, Edge, Adj> fromElementToAdjConcrete;
 
-  /**
-   * File reader with a specific delimitation
-   */
-  private final ParametricInputFormat pif;
 
   /**
    * Default constructor
@@ -81,23 +72,12 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
     FromStringToAdjacencyList<Element, Edge, Adj> fromStringToAdjConcrete,
     FromAdjacencyListableToVertex<Element, Edge, Adj> fromElementToVertexConcrete,
     ToEdgesFromAdjList<Element, Edge, Adj> fromElementToAdjConcrete) {
+    super("\n");
     this.fromStringToAdjConcrete = fromStringToAdjConcrete;
     this.fromElementToVertexConcrete = fromElementToVertexConcrete;
     this.fromElementToAdjConcrete = fromElementToAdjConcrete;
-    pif = new ParametricInputFormat();
-    pif.setDelimiter("\n");
-    env = ExecutionEnvironment.getExecutionEnvironment();
   }
 
-  /**
-   * Source file where to read the data
-   * @param file  overmentioned file
-   * @return      Updated instance of this
-   */
-  public AdjacencyListFileParser<Element, Edge, Adj> fromFile(String file) {
-    this.file = file;
-    return this;
-  }
 
   /**
    * Specifies the file delimiter containing the String
@@ -105,17 +85,7 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * @return      Updated instance of this
    */
   public AdjacencyListFileParser splitWith(String delimiter) {
-    pif.setDelimiter(delimiter);
-    return this;
-  }
-
-  /**
-   * Changes the default environment to a more specific one
-   * @param env   environment
-   * @return      Updated instance of this
-   */
-  public AdjacencyListFileParser withCustomExecutionEnvironment(ExecutionEnvironment env) {
-    this.env = env;
+    super.setDelimiter(delimiter);
     return this;
   }
 
@@ -126,7 +96,7 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * @return            Dataset of <T>
    */
   public <T> DataSet<T> getDataset(MapFunction<String, T> concrete) {
-    return env.readFile(pif, file).map(concrete);
+    return readAsStringDataSource().map(concrete);
   }
 
   /**
@@ -134,7 +104,7 @@ public class AdjacencyListFileParser<Element extends Comparable<Element>,
    * @return    General datasource that has already to be processed with other files
    */
   public GraphClob<Element> asGeneralGraphDataSource() {
-    DataSet<Adj> tmpVertices = env.readFile(pif, file).map(fromStringToAdjConcrete);
+    DataSet<Adj> tmpVertices = readAsStringDataSource().map(fromStringToAdjConcrete);
     DataSet<ImportVertex<Element>> vertices = tmpVertices.map(fromElementToVertexConcrete);
     DataSet<ImportEdge<Element>> edges = tmpVertices.flatMap(fromElementToAdjConcrete);
     return new GraphClob<Element>(vertices, edges);

@@ -52,7 +52,7 @@ public class AmazonFileParser extends AdjacencyListFileParser<String, MemeTracke
   @Override
   public GraphClob<String> asGeneralGraphDataSource() {
     DataSet<Tuple3<Reviewer, Reviews, Item>> coll = super.getDataset(new MapAmazonEntryToTriple());
-    DataSet<ImportVertex<String>> reviewers = coll.map(new Value0Of3<Reviewer, Reviews, Item>())
+    DataSet<ImportVertex<String>> reviewers = coll.map(new Value0Of3<>())
       .map(new FromReviewerToVertex())
       .distinct(new ImportVertexId<>());
     DataSet<ImportVertex<String>> items = coll.map(new Value2Of3<>())

@@ -58,12 +58,12 @@ public class NestedConversionTest extends GradoopFlinkTestBase {
 
   @Test
   public void testConversionGraphCollectionWithManyElementsExtractOne() throws Exception {
-    LogicalGraph lg = getBibNetworkLoader().getLogicalGraphByVariable("n0");
+    LogicalGraph lg = getBibNetworkLoader().getLogicalGraphByVariable("g0");
     NormalizedGraph n0 = new NormalizedGraph(lg);
 
     //Loading the collection from the dataset
-    GraphCollection research = getBibNetworkLoader().getGraphCollectionByVariables("n0","n1",
-      "n2","n3","n4");
+    GraphCollection research = getBibNetworkLoader().getGraphCollectionByVariables("g0","g1",
+      "g2","g3","g4");
 
     //Creating a data-lake from the extended graph network
     DataLake lake = new DataLake(research);
@@ -76,6 +76,21 @@ public class NestedConversionTest extends GradoopFlinkTestBase {
     DataLake dl = lake.extractGraphFromLabel("first");
 
     collectAndAssertTrue(dl.asNormalizedGraph().equalsByData(n0));
+  }
+
+  @Test
+  public void testForLabelExtraction() throws Exception {
+    //Loading the collection from the dataset
+    GraphCollection research = getBibNetworkLoader().getGraphCollectionByVariables("g5","g6");
+
+    //Creating a data-lake from the extended graph network
+    DataLake lake = new DataLake(research);
+
+    //From the datalake, I extract a graph where the head has an unique and distiguishible label.
+    //We also pass a GradoopId or a collection of GradoopId
+    DataLake dl = lake.extractGraphFromLabel("sixth");
+
+    collectAndAssertTrue(dl.asNormalizedGraph().equalsByData(lake.asNormalizedGraph()));
   }
 
 }

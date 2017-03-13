@@ -82,3 +82,9 @@ g3:fourth {paper : "Projection", author : "Carl"} [
 g4:fifth {paper : "muCalc", author : "Dan"} [
      (dan)-->(mu)
 ]
+g5:sixth {paper : "Projection", author : "Carl"} [
+     (carl)-->(proj)
+]
+g6:sixth {paper : "OWL", author : "Bob"} [
+     (bob)-->(owl)
+]

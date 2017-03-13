@@ -63,13 +63,7 @@ public class NormalizedGraph {
    * @param lg    Graph Collection to be normalized
    */
   public NormalizedGraph(GraphCollection lg) {
-    vertices = lg.getGraphHeads()
-      .map(new MapGraphHeadAsVertex())
-      .union(lg.getVertices())
-      .distinct(new Id<>()); // Keep only 1 if such vertex already exists
-    heads = lg.getGraphHeads();
-    edges = lg.getEdges();
-    conf = lg.getConfig();
+    this(lg.getGraphHeads(),lg.getVertices(),lg.getEdges(),lg.getConfig());
   }
 
   /**
@@ -77,13 +71,7 @@ public class NormalizedGraph {
    * @param lg  Logical Graph to be normalized
    */
   public NormalizedGraph(LogicalGraph lg) {
-    vertices = lg.getGraphHead()
-      .map(new MapGraphHeadAsVertex())
-      .union(lg.getVertices())
-      .distinct(new Id<>()); // Keep only 1 if such vertex already exists
-    heads = lg.getGraphHead();
-    edges = lg.getEdges();
-    conf = lg.getConfig();
+    this(lg.getGraphHead(),lg.getVertices(),lg.getEdges(),lg.getConfig());
   }
 
   /**
@@ -95,8 +83,11 @@ public class NormalizedGraph {
    */
   NormalizedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices, DataSet<Edge> edges,
     GradoopFlinkConfig conf) {
+    this.vertices = heads
+      .map(new MapGraphHeadAsVertex())
+      .union(vertices)
+      .distinct(new Id<>());
     this.heads = heads;
-    this.vertices = vertices;
     this.edges = edges;
     this.conf = conf;
   }

@@ -197,12 +197,14 @@ public class DataLake  {
     DataSet<Vertex> subDataLakeVertices = dataLake.getVertices()
       .joinWithTiny(vertices)
       .where(new Id<>()).equalTo(new Value1Of2<>())
-      .with(new LeftSide<>());
+      .with(new LeftSide<>())
+      .distinct(new Id<>());
 
     DataSet<Edge> subDataLakeEdges = dataLake.getEdges()
       .joinWithTiny(edges)
       .where(new Id<>()).equalTo(new Value1Of2<>())
-      .with(new LeftSide<>());
+      .with(new LeftSide<>())
+      .distinct(new Id<>());
 
     // Checking if the id is a graph head.
     DataSet<GraphHead> actualGraphHead = dataLake.getGraphHeads()
@@ -220,7 +222,8 @@ public class DataLake  {
       // The recreated vertex is always there. It is not said for the
       actualGraphHead.rightOuterJoin(recreatedGraphHead)
       .where((GraphHead x)->0).equalTo((GraphHead x)->0)
-      .with(new LeftSideIfNotNull<GraphHead>());
+      .with(new LeftSideIfNotNull<GraphHead>())
+      .distinct(new Id<>());
 
     NormalizedGraph lg = new NormalizedGraph(toReturnGraphHead,
                                                 subDataLakeVertices,

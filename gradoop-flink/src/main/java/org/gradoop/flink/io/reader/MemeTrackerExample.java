@@ -60,7 +60,8 @@ public class MemeTrackerExample {
       return null;
     } else {
       for (File file : files) {
-        GraphClob<String> x = defaulter.fromFile(file.toString()).asGeneralGraphDataSource();
+        GraphClob<String> x = defaulter.
+          <MemeTrackerFileParser>fromFile(file.toString()).asGeneralGraphDataSource();
         if (clob == null) {
           clob = x;
         } else {
