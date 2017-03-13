@@ -62,7 +62,7 @@ public class Collect {
     head = head == null ?
       x.getGraphHeads() :
       head.union(x.getGraphHeads());
-    vertices = vertices == null?
+    vertices = vertices == null ?
       x.getGraphHeadToVertex() :
       vertices.union(x.getGraphHeadToVertex());
     edges = edges == null ?
