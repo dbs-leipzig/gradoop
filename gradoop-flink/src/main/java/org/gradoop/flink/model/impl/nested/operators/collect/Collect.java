@@ -46,7 +46,7 @@ public class Collect {
 
   /**
    * Initializes the operator by using the default configuration
-   * @param conf
+   * @param conf  Default configuration
    */
   public Collect(GradoopFlinkConfig conf) {
     this.head = conf.getExecutionEnvironment().fromElements();

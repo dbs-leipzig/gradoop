@@ -26,7 +26,6 @@ import org.gradoop.flink.io.reader.parsers.functions.FromStringToAdjacencyList;
 import org.gradoop.flink.io.reader.parsers.functions.ToEdgesFromAdjList;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.AdjacencyListable;
 import org.gradoop.flink.io.reader.parsers.inputfilerepresentations.Edgable;
-import org.gradoop.flink.io.reader.parsers.utilities.FileReaderForParser;
 
 
 /**

@@ -29,6 +29,11 @@ public class RawEdge extends ImportEdge<String>
                      implements MapFunction<String, ImportEdge<String>> {
 
   /**
+   * Fixed serializable element
+   */
+  private static final long serialVersionUID = 6145030L;
+
+  /**
    * Default label for all the edges
    */
   private String label;
@@ -36,7 +41,7 @@ public class RawEdge extends ImportEdge<String>
   /**
    * Tokenizes strings into numbers
    */
-  private NumberTokenizer<String> tokenizer;
+  private transient NumberTokenizer<String> tokenizer;
 
   /**
    * Using a default label
@@ -45,13 +50,14 @@ public class RawEdge extends ImportEdge<String>
   public RawEdge(String label) {
     super();
     this.label = label;
+    this.tokenizer = new NumberTokenizer<>(Object::toString);
   }
 
   /**
    * Using a default label, remarking Lapalissian truths
    */
   public RawEdge() {
-    label = "Edge";
+    this("Edge");
   }
 
   @Override
@@ -71,5 +77,33 @@ public class RawEdge extends ImportEdge<String>
     setLabel(label);
     setId(elements.get(0) + "-" + elements.get(1));
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof RawEdge)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    RawEdge rawEdge = (RawEdge) o;
+
+    if (label != null ? !label.equals(rawEdge.label) : rawEdge.label != null) {
+      return false;
+    }
+    return tokenizer != null ? tokenizer.equals(rawEdge.tokenizer) : rawEdge.tokenizer == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (label != null ? label.hashCode() : 0);
+    result = 31 * result + (tokenizer != null ? tokenizer.hashCode() : 0);
+    return result;
   }
 }
