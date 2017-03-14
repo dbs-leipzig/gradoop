@@ -18,22 +18,19 @@
 package org.gradoop.flink.io.reader.parsers.rawedges;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.io.impl.graph.GraphDataSource;
-import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.flink.io.reader.parsers.GraphClob;
-import org.gradoop.flink.io.reader.parsers.rawedges.functions.SwapImportedEdges;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.List;
 
 /**
  * Parses a file containing the edge information
  */
-public class RawEdgeFileParser extends FileReaderForParser {
+public class IntegerLineFileParser extends FileReaderForParser {
 
   /**
    * Default constructor
    */
-  public RawEdgeFileParser() {
+  public IntegerLineFileParser() {
     super("\n");
   }
 
@@ -43,18 +40,8 @@ public class RawEdgeFileParser extends FileReaderForParser {
    * @param conf          Configuration
    * @return              The instantiated graph
    */
-  public GraphDataSource<String> getDataset(boolean isUndirected, GradoopFlinkConfig conf) {
-    DataSet<ImportEdge<String>> edges = readAsStringDataSource().map(new RawEdge());
-    if (isUndirected) {
-      edges
-        .map(new SwapImportedEdges())
-        .union(edges)
-        .distinct(0);
-    }
-    DataSet<ImportVertex<String>> vertices = edges
-      .flatMap(new CollectSourceAndDest())
-      .distinct(0);
-    return new GraphClob<>(vertices, edges, conf).asGraphDataSource();
+  public DataSet<List<String>> getDataset(boolean isUndirected, GradoopFlinkConfig conf) {
+    return readAsStringDataSource().map(new NumberTokenizer<>(Object::toString));
   }
 
 }

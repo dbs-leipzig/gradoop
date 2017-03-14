@@ -16,10 +16,11 @@
  */
 
 
-package org.gradoop.flink.io.reader.parsers;
+package org.gradoop.flink.io.reader.parsers.rawedges;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.reader.parsers.ParametricInputFormat;
 
 /**
  * Defining a generic reader.
@@ -84,5 +85,14 @@ public class FileReaderForParser {
    */
   public void setDelimiter(String delimiter) {
     this.pif.setDelimiter(delimiter);
+  }
+
+
+  /**
+   * Setting the running environment
+   * @param env The environment
+   */
+  public void setEnvironment(ExecutionEnvironment env) {
+    this.env = env;
   }
 }

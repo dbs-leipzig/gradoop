@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.io.reader.parsers.rawedges;
 
+import org.apache.flink.api.common.functions.MapFunction;
+
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -29,7 +31,7 @@ import java.util.function.Function;
  *
  * @param <Format> The resulting desired format type
  */
-public class NumberTokenizer<Format> {
+public class NumberTokenizer<Format> implements MapFunction<String,List<Format>> {
 
   /**
    * Function converting doubles to the desired format
@@ -83,4 +85,8 @@ public class NumberTokenizer<Format> {
     return returned;
   }
 
+  @Override
+  public List<Format> map(String value) throws Exception {
+    return tokenize(value);
+  }
 }
