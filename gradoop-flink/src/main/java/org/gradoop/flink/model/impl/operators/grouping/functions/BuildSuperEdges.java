@@ -30,6 +30,7 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertexAndEdge;
 
 import java.util.List;
@@ -43,7 +44,7 @@ import java.util.Set;
 @FunctionAnnotation.ReadFields("f1;f4;f5;f6")
 public class BuildSuperEdges
   extends BuildBase
-  implements CoGroupFunction<SuperEdgeGroupItem, Tuple3<Set<GradoopId>, GradoopId, GradoopId>, Edge>, ResultTypeQueryable<Edge> {
+  implements CoGroupFunction<SuperEdgeGroupItem, SuperVertexGroupItem, Edge>, ResultTypeQueryable<Edge> {
 
   /**
    * Edge edgeFactory.
@@ -69,7 +70,7 @@ public class BuildSuperEdges
 
   @Override
   public void coGroup(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
-    Iterable<Tuple3<Set<GradoopId>, GradoopId, GradoopId>> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
+    Iterable<SuperVertexGroupItem> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
     Exception {
 
     // only one Edge per id
@@ -78,12 +79,12 @@ public class BuildSuperEdges
     GradoopId sourceId = null;
     GradoopId targetId = null;
 
-    for (Tuple3<Set<GradoopId>, GradoopId, GradoopId> vertexWithSuperVertexAndEdge :
+    for (SuperVertexGroupItem superVertexGroupItem :
       vertexWithSuperVertexAndEdges) {
-      if (vertexWithSuperVertexAndEdge.f0.equals(superEdgeGroupItem.getSourceIds())) {
-        sourceId = vertexWithSuperVertexAndEdge.f1;
-      } else if (vertexWithSuperVertexAndEdge.f0.equals(superEdgeGroupItem.getTargetIds())) {
-        targetId = vertexWithSuperVertexAndEdge.f1;
+      if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getSourceIds())) {
+        sourceId = superVertexGroupItem.f1;
+      } else if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getTargetIds())) {
+        targetId = superVertexGroupItem.f1;
       }
     }
 
