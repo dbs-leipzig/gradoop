@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.nested.datarepresentation;
+package org.gradoop.examples.nestedmodel.datarepresentation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -25,8 +25,8 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.nested.datarepresentation.functions.VertexOrEdgeArray;
-import org.gradoop.flink.model.impl.nested.datarepresentation.functions.WriteGradoopIdGradoopIdSet;
+import org.gradoop.examples.nestedmodel.datarepresentation.functions.VertexOrEdgeArray;
+import org.gradoop.examples.nestedmodel.datarepresentation.functions.WriteGradoopIdGradoopIdSet;
 import org.gradoop.flink.model.impl.nested.utils.FileSystemUtils;
 import org.gradoop.flink.model.impl.nested.utils.RepresentationUtils;
 

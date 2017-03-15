@@ -16,7 +16,7 @@
  */
 
 /**
- * Functions used inside the definition of data representations of
- * graphs in secondary memory
+ * Contains the definition of the main components for
+ * accessing the data structures in secondary memory
  */
-package org.gradoop.flink.model.impl.nested.datarepresentation.functions;
+package org.gradoop.examples.nestedmodel.datarepresentation;

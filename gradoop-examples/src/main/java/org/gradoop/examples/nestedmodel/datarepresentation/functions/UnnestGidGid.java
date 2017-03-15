@@ -15,28 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.nested.datarepresentation.functions;
+package org.gradoop.examples.nestedmodel.datarepresentation.functions;
 
-import org.apache.flink.api.common.io.FileOutputFormat;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
-import java.io.IOException;
-import java.util.Set;
-
 /**
- * Writing the tuple into a binary file
+ * Practical instance of UnnestTupleWithSet
  */
-public class WriteGradoopIdGradoopIdSet extends FileOutputFormat<Tuple2<GradoopId, Set<GradoopId>>> {
-
-  @Override
-  public void writeRecord(Tuple2<GradoopId, Set<GradoopId>> record) throws IOException {
-    stream.write(0); // Delimiter
-    stream.write(record.f0.toByteArray());
-    stream.write(record.f1.size());
-    for (GradoopId x : record.f1) {
-      stream.write(x.toByteArray());
-    }
-  }
-
+public class UnnestGidGid extends UnnestTupleWithSet<GradoopId, GradoopId> {
 }
