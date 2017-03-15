@@ -129,9 +129,7 @@ public class BenchmarkResult extends CsvHeader {
    * @param time  Time value
    */
   public void setUnit(TimeUnit tu, long time) {
-    this.unit = new Time(tu,time);
+    this.unit = new Time(tu, time);
   }
-
-
 
 }

@@ -79,7 +79,7 @@ public class Time {
     case SECONDS:
       return (right.equals(TimeUnit.NANOSECONDS)  ||
                right.equals(TimeUnit.MICROSECONDS) ||
-               right.equals(TimeUnit.MILLISECONDS)   ) ?
+               right.equals(TimeUnit.MILLISECONDS)) ?
         right :
         left;
     case MINUTES:
