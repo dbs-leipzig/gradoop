@@ -31,7 +31,6 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
 import org.gradoop.flink.model.impl.nested.operators.collect.Collect;
-import org.gradoop.flink.model.impl.nested.operators.nesting.Nesting;
 import org.gradoop.flink.model.impl.nested.operators.random.RandomSample;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
