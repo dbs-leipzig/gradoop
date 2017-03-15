@@ -127,7 +127,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
         DataLake dl = new DataLake(logicalGraph);
         Collect collector = new Collect(dl.asNormalizedGraph().getConfig());
         IdGraphDatabase leftOperand = dl.getIdDatabase();
-        Nesting n = new Nesting();
+        //Nesting n = new Nesting();
         for (int i = 0; i < 10; i++) {
           RandomSample s = new RandomSample(GradoopId.get(), size, i);
           collector.add(dl.run(s).with(leftOperand));
