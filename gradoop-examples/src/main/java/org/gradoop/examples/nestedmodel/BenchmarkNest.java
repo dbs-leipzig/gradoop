@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.examples.nestedmodel;
 
 import org.apache.commons.cli.CommandLine;
@@ -88,23 +105,29 @@ public class BenchmarkNest extends AbstractRunner implements ProgramDescription 
 
     toCSV.setDatasetSize(Integer.MAX_VALUE);
 
-    for (long size = 10; size<1000000; size = size * 10) {
-      System.out.println("Size: "+size);
+    for (long size = 10; size < 1000000; size = size * 10) {
+      System.out.println("Size: " + size);
       toCSV.setNestingOperandSizeForEachElement(size);
-      for (int times = 0; times<10; times++) {
-        System.out.println("\tTime: "+times);
+      for (int times = 0; times < 10; times++) {
+        System.out.println("\tTime: " + times);
         // Where to run the operations
         DataLake dl = new DataLake(logicalGraph);
         Collect collector = new Collect(dl.asNormalizedGraph().getConfig());
         IdGraphDatabase leftOperand = dl.getIdDatabase();
         Nesting n = new Nesting();
-        for (int i=0; i<10; i++) {
-          RandomSample s = new RandomSample(GradoopId.get(),size,i);
+        for (int i=0; i < 10; i++) {
+          RandomSample s = new RandomSample(GradoopId.get(), size, i);
           collector.add(dl.run(s).with(leftOperand));
         }
         IdGraphDatabase rightOperand = collector.asIdGraphDatabase();
         Time t = Time.milliseconds();
         IdGraphDatabase resultGdb = dl.run(n).with(leftOperand,rightOperand);
+
+        /*
+        TODO: best solution to check the reading of all the elements
+          * no secondary memory writing as in WriteCSV
+          * only check the time required to create one element, without allocating the
+            result in main memory
         try {
           resultGdb.getGraphHeads().collect();
           resultGdb.getGraphHeadToVertex().collect();
@@ -112,8 +135,10 @@ public class BenchmarkNest extends AbstractRunner implements ProgramDescription 
         } catch (Exception e) {
 
         }
+        */
+
         Time result = Time.milliseconds().difference(t);
-        toCSV.setUnit(result.getRepresentation(),result.getTime());
+        toCSV.setUnit(result.getRepresentation(), result.getTime());
         csv.write(toCSV.valueRowToCSV());
         csv.newLine();
       }

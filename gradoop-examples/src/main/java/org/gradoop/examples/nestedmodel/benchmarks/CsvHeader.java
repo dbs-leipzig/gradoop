@@ -41,7 +41,7 @@ public abstract class CsvHeader {
    * @return  the header in a CSV format
    */
   public String getHeader() {
-    return String.join(",",header);
+    return String.join(",", header);
   }
 
   /**

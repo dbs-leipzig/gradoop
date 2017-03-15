@@ -71,23 +71,23 @@ public class Time {
     case NANOSECONDS:
       return right;
     case MICROSECONDS:
-      return (right.equals(TimeUnit.NANOSECONDS) ? right : left);
+      return right.equals(TimeUnit.NANOSECONDS) ? right : left;
     case MILLISECONDS:
-      return (right.equals(TimeUnit.NANOSECONDS) || right.equals(TimeUnit.MICROSECONDS) ?
+      return right.equals(TimeUnit.NANOSECONDS) || right.equals(TimeUnit.MICROSECONDS) ?
               right :
-              left);
+              left;
     case SECONDS:
-      return ((right.equals(TimeUnit.NANOSECONDS)  ||
+      return (right.equals(TimeUnit.NANOSECONDS)  ||
                right.equals(TimeUnit.MICROSECONDS) ||
                right.equals(TimeUnit.MILLISECONDS)   ) ?
         right :
-        left);
+        left;
     case MINUTES:
-      return (right.equals(TimeUnit.HOURS) || right.equals(TimeUnit.DAYS) ?
+      return right.equals(TimeUnit.HOURS) || right.equals(TimeUnit.DAYS) ?
         left :
-        right);
+        right;
     case HOURS:
-      return (right.equals(TimeUnit.DAYS) ? left : right);
+      return right.equals(TimeUnit.DAYS) ? left : right;
     case DAYS:
       return left;
     default:
@@ -101,7 +101,7 @@ public class Time {
    * @return      Converted time
    */
   public Time convertTo(TimeUnit tu) {
-    return new Time(tu,unit.convert(time,tu));
+    return new Time(tu, unit.convert(time, tu));
   }
 
   /**
@@ -112,10 +112,10 @@ public class Time {
    *                between the two.
    */
   public Time difference(Time right) {
-    TimeUnit smallest = smallestRepresentation(unit,right.unit);
+    TimeUnit smallest = smallestRepresentation(unit, right.unit);
     Time thisTime = convertTo(smallest);
     Time rightTime = right.convertTo(smallest);
-    return new Time(smallest,thisTime.time-rightTime.time);
+    return new Time(smallest, thisTime.time - rightTime.time);
   }
 
   /**
