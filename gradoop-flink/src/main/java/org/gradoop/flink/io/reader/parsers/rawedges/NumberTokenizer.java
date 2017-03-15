@@ -18,7 +18,6 @@
 package org.gradoop.flink.io.reader.parsers.rawedges;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.model.api.functions.Function;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
