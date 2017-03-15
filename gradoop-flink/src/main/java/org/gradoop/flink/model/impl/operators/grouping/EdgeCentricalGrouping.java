@@ -17,22 +17,16 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeWithSuperEdgeGroupItem;
@@ -47,7 +41,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -56,10 +49,29 @@ import java.util.Set;
  */
 public class EdgeCentricalGrouping extends CentricalGrouping {
 
+  /**
+   * True, iff the source vertex shall be considered for grouping.
+   */
   private boolean sourceSpecificGrouping;
 
+  /**
+   * True, iff the target vertex shall be considered for grouping.
+   */
   private boolean targetSpecificGrouping;
 
+  /**
+   * Creates an edge grouping grouping operator instance.
+   *
+   * @param vertexGroupingKeys      property keys to group vertices
+   * @param useVertexLabels         group on vertex label true/false
+   * @param vertexAggregators       aggregate functions for grouped vertices
+   * @param edgeGroupingKeys        property keys to group edges
+   * @param useEdgeLabels           group on edge label true/false
+   * @param edgeAggregators         aggregate functions for grouped edges
+   * @param groupingStrategy        group by vertices or edges
+   * @param sourceSpecificGrouping  set true to consider source on grouping
+   * @param targetSpecificGrouping  set true to consider target on grouping
+   */
   public EdgeCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
     boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
@@ -71,26 +83,29 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     this.targetSpecificGrouping = targetSpecificGrouping;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
 
     DataSet<EdgeWithSuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
-      // map edg to edge group item
+      // map edge to edge group item
       .map(new BuildEdgeWithSuperEdgeGroupItem(getEdgeGroupingKeys(), useEdgeLabels(),
         getEdgeAggregators()));
 
-    //group edges by label / properties / both
+    // group edges by label / properties / both
     // additionally: source specific / target specific / both
     DataSet<SuperEdgeGroupItem> superEdgeGroupItems = groupSuperEdges(edgesForGrouping,
       sourceSpecificGrouping, targetSpecificGrouping)
-      //apply aggregate function
+      // apply aggregate function
       .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), getEdgeAggregators(),
         sourceSpecificGrouping, targetSpecificGrouping));
 
-    //vertexIds - superVId - edgeId
+    // vertexIds - superVId - edgeId
     DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
-      //get all resulting (maybe concatenated) vertices
-      //vertexIds - superedgeId
+      // get all resulting (maybe concatenated) vertices
+      // vertexIds - superedgeId
       .flatMap(new FlatMapFunction<SuperEdgeGroupItem, Tuple3<Integer, Set<GradoopId>, GradoopId>>() {
         @Override
         public void flatMap(SuperEdgeGroupItem superEdgeGroupItem,
@@ -112,21 +127,24 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
         }
       })
       .groupBy(0)
-      //assign supervertex id
-      //vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
+//      .groupBy(0)
+      // assign supervertex id
+      // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
       .reduceGroup(new BuildSuperVertexGroupItem());
 
-
+    // create super edges based on grouped edges and resulting super vertex ids
     DataSet<Edge> superEdges = superEdgeGroupItems
       .coGroup(superVertexGroupItems)
+      // same super vertex id
       .where(0)
       .equalTo(2)
       // build super edges
       .with(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
         config.getEdgeFactory()));
 
+    // store vertices, where the vertex is its own super vertex, so the vertex stays itself
     DataSet<Vertex> normalSuperVertices = superVertexGroupItems
-      //filter ids where vertex is its own super vertex
+      // filter ids where vertex is its own super vertex
       .filter(new FilterFunction<SuperVertexGroupItem>() {
         @Override
         public boolean filter(
@@ -136,7 +154,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
             (superVertexGroupItem.f0.iterator().next() == superVertexGroupItem.f1);
         }
       })
-      //take vertex respectively to the filtered id
+      // take vertex respectively to the filtered id
       .rightOuterJoin(graph.getVertices())
       .where(1)
       .equalTo(new Id<>())
@@ -148,8 +166,18 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
         }
       });
 
-
+    // get for a super vertex id each single relevant vertex id
     DataSet<VertexWithSuperVertex> vertexWithSuper = superVertexGroupItems
+      // only real super vertices
+      .filter(new FilterFunction<SuperVertexGroupItem>() {
+        @Override
+        public boolean filter(
+          SuperVertexGroupItem tuple) throws
+          Exception {
+          return (tuple.f0.size() > 1);
+        }
+      })
+      // assign the vertex ids
       .flatMap(new FlatMapFunction<SuperVertexGroupItem, VertexWithSuperVertex>() {
         VertexWithSuperVertex vertexWithSuperVertex = new VertexWithSuperVertex();
         @Override
@@ -166,6 +194,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
 
     superVertexGroupItems = superVertexGroupItems
+      // take all vertices by their id, which is stored in the super vertex group item
       .coGroup(vertexWithSuper
         .rightOuterJoin(graph.getVertices())
         .where(0).equalTo(new Id<>())
@@ -177,12 +206,13 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
           }
         }))
       .where(1).equalTo(0)
+      // and aggregate the super vertex group item based on the vertex aggregations
       .with(new UpdateSuperVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators()));
 
 
     DataSet<Vertex> superVertices = superVertexGroupItems
-      //take super vertex ids where vertex is not its own super vertex
+      // take super vertex ids where vertex is not its own super vertex
       .filter(new FilterFunction<SuperVertexGroupItem>() {
         @Override
         public boolean filter(
@@ -191,15 +221,13 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
           return (tuple.f0.size() > 1);
         }
       })
-
+      // and create the vertex element
       .map(new BuildSuperVertices(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators(), config.getVertexFactory()));
+        getVertexAggregators(), config.getVertexFactory()))
+      // union with vertices which stay as they are
+      .union(normalSuperVertices);
 
-
-    DataSet<Vertex> allVertices = normalSuperVertices
-      .union(superVertices);
-
-    return LogicalGraph.fromDataSets(allVertices, superEdges, graph.getConfig());
+    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
   @Override
