@@ -41,7 +41,7 @@ public class RawEdge extends ImportEdge<String>
   /**
    * Tokenizes strings into numbers
    */
-  private transient NumberTokenizer<String> tokenizer;
+  private transient NumberTokenizer<String> tokenizer = new NumberTokenizer<>(Object::toString);
 
   /**
    * Using a default label
@@ -49,8 +49,7 @@ public class RawEdge extends ImportEdge<String>
    */
   public RawEdge(String label) {
     super();
-    this.label = label;
-    this.tokenizer = new NumberTokenizer<>(Object::toString);
+    this.label = label;;
   }
 
   /**
