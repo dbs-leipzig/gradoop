@@ -40,6 +40,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 /**
  * Benchmarks the nested model by nesting with samples of the main subgraph.
@@ -88,7 +89,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
     // read arguments from command line
     final String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
-    final String groupsPath = cmd.getOptionValue(OPTION_GROUP_PATH);
+    //final String groupsPath = cmd.getOptionValue(OPTION_GROUP_PATH);
 
     // init Flink execution environment
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -104,14 +105,14 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
     LogicalGraph logicalGraph = gds.getLogicalGraph();
 
     // Reading the file from
-    NumberTokenizer tokenizer = new NumberTokenizer();
+    //NumberTokenizer tokenizer = new NumberTokenizer();
 
 
     // Output file
     BenchmarkResult toCSV = new BenchmarkResult();
     File fout = new File(outputPath);
     FileOutputStream fos = new FileOutputStream(fout);
-    BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(fos));
+    BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(fos, Charset.forName("UTF-8")));
     csv.write(toCSV.getHeader());
     csv.newLine();
     toCSV.setNestingOperandNumberOfElements(10);
@@ -134,7 +135,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
         }
         IdGraphDatabase rightOperand = collector.asIdGraphDatabase();
         Time t = Time.milliseconds();
-        IdGraphDatabase resultGdb = dl.run(n).with(leftOperand, rightOperand);
+        //IdGraphDatabase resultGdb = dl.run(n).with(leftOperand, rightOperand);
         /*
         TODO: best solution to check the reading of all the elements
           * no secondary memory writing as in WriteCSV

@@ -39,6 +39,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 /**
  * Benchmarks the nested model by nesting with samples of the main subgraph
@@ -96,7 +97,7 @@ public class BenchmarkNest extends AbstractRunner implements ProgramDescription 
     BenchmarkResult toCSV = new BenchmarkResult();
     File fout = new File(outputPath);
     FileOutputStream fos = new FileOutputStream(fout);
-    BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(fos));
+    BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(fos, Charset.forName("UTF-8")));
     csv.write(toCSV.getHeader());
     csv.newLine();
     toCSV.setNestingOperandNumberOfElements(10);
