@@ -60,13 +60,13 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
   private boolean targetSpecificGrouping;
 
-  public EdgeCentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators,
+  public EdgeCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
+    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
+    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
     GroupingStrategy groupingStrategy, Boolean sourceSpecificGrouping,
     Boolean targetSpecificGrouping) {
-    super(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
-      useEdgeLabels, secondaryAggregators, groupingStrategy);
+    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
+      useEdgeLabels, edgeAggregators, groupingStrategy);
     this.sourceSpecificGrouping = sourceSpecificGrouping;
     this.targetSpecificGrouping = targetSpecificGrouping;
   }

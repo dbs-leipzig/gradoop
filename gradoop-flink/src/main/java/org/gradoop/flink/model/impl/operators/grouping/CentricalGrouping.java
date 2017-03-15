@@ -29,13 +29,13 @@ public abstract class CentricalGrouping extends Grouping {
 
   private final GroupingStrategy groupingStrategy;
 
-  CentricalGrouping(List<String> primaryGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> primaryAggregators, List<String> secondaryGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> secondaryAggregators,
+  CentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
+    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
+    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
     GroupingStrategy groupingStrategy) {
 
-    super(primaryGroupingKeys, useVertexLabels, primaryAggregators, secondaryGroupingKeys,
-      useEdgeLabels, secondaryAggregators);
+    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
+      useEdgeLabels, edgeAggregators);
     this.groupingStrategy = groupingStrategy;
   }
 
