@@ -90,7 +90,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
     LogicalGraph logicalGraph = gds.getLogicalGraph();
 
     // Reading the file from
-    NumberTokenizer<String> tokenizer = new NumberTokenizer<>(Object::toString);
+    NumberTokenizer tokenizer = new NumberTokenizer();
 
 
     // Output file
