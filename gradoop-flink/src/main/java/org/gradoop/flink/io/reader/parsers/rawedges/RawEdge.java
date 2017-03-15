@@ -49,7 +49,7 @@ public class RawEdge extends ImportEdge<String>
    */
   public RawEdge(String label) {
     super();
-    this.label = label;;
+    this.label = label;
   }
 
   /**
