@@ -17,20 +17,16 @@
 
 package org.gradoop.flink.io.reader.parsers;
 
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.common.functions.GroupCombineFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
+import javafx.util.Pair;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
 import org.gradoop.flink.io.impl.graph.functions.InitEdge;
@@ -40,13 +36,17 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.reader.parsers.rawedges.functions.CreateEdgesFromVertices;
 import org.gradoop.flink.io.reader.parsers.rawedges.functions.CreateIdGraphDatabaseVertices;
+import org.gradoop.flink.io.reader.parsers.rawedges.functions.MapRightEdgeToItsId;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of3;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
+import org.gradoop.flink.model.impl.nested.datastructures.functions.SelfId;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -146,7 +146,10 @@ public class GraphClob<Element extends Comparable<Element>> {
       .map(new InitVertex<>(env.getVertexFactory(), null, externalIdType));
   }
 
-  public void mapEdges() {
+  /**
+   * Istantiates a Logical Graph from this graph representation.
+   */
+  public LogicalGraph mapEdges() {
     DataSet<Tuple3<Element, GradoopId, Vertex>> avid = associateVertexToId();
     DataSet<Vertex> epgmVertices = avid
       .map(new Value2Of3<Element, GradoopId, Vertex>());
@@ -162,21 +165,46 @@ public class GraphClob<Element extends Comparable<Element>> {
       .join(vertexIdPair)
       .where(0).equalTo(0)
       .with(new UpdateEdge<>());
+
+
+    GraphHead heads = env.getGraphHeadFactory().createGraphHead();
+    DataSet<GraphHead> epgmHeads = env.getExecutionEnvironment().fromElements(heads);
+    return LogicalGraph.fromDataSets(epgmHeads,epgmVertices,epgmEdges,env);
   }
 
-  public void generateCollateralDataset(DataSet<List<Element>> groups) {
+  /**
+   * Creates an IdGraphDatabase from a set of elements that are provided, so that it could
+   * be used as an operator.
+   * @param groups   A dataset of groups from which create full connected components
+   * @return         A pair, where the first element is the IdGraphdatabase that could be
+   *                 used as an operand. This part contains the representation of the list
+   *                 of elements as a graph collection of many operands
+   *
+   *                 The second element is a dataset of edges, containing all the newly
+   *                 created edges required.
+   */
+  public Pair<IdGraphDatabase, DataSet<Edge>> generateCollateralDataset(DataSet<List<Element>> groups) {
     // Raw vertices that could be written as plain elements
-    DataSet<Tuple2<GradoopId,GradoopId>> vertices = groups
+    DataSet<Tuple2<GradoopId,GradoopId>> idVertices = groups
       .flatMap(new ExtendListOfElementWithId<>(env.getGraphHeadFactory()))
       .join(associateVertexToId())
       .where(new Value1Of2<>()).equalTo(new Value1Of3<>())
       .with(new CreateIdGraphDatabaseVertices<>());
 
     // Edges that are created
-    DataSet<Tuple2<GradoopId,Edge>> edges =
-    vertices
+    DataSet<Tuple2<GradoopId, Edge>> edges = idVertices
       .groupBy(0)
       .combineGroup(new CreateEdgesFromVertices(env.getEdgeFactory()));
+
+    DataSet<Edge> epgmEdges = edges.map(new Value1Of2<>());
+
+    // Final elements required to creat the id for the edges
+    DataSet<Tuple2<GradoopId,GradoopId>> idEdges = edges.map(new MapRightEdgeToItsId());
+    DataSet<GradoopId> idHead = idVertices.map(new Value0Of2<>()).distinct(new SelfId());
+
+    // Id Graph Database
+    IdGraphDatabase igdb = new IdGraphDatabase(idHead,idVertices,idEdges);
+    return new Pair<>(igdb,epgmEdges);
   }
 
 }
