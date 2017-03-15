@@ -18,7 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class BuildSuperVertexGroupItem
-  implements GroupReduceFunction<Tuple3<Integer, Set<GradoopId>,GradoopId>, SuperVertexGroupItem> {
+  implements GroupReduceFunction<Tuple2<Set<GradoopId>,GradoopId>, SuperVertexGroupItem> {
 
   /**
    * Avoid object initialization in each call.
@@ -43,31 +43,32 @@ public class BuildSuperVertexGroupItem
   }
 
   @Override
-  public void reduce(Iterable<Tuple3<Integer, Set<GradoopId>, GradoopId>> iterable,
+  public void reduce(Iterable<Tuple2<Set<GradoopId>, GradoopId>> iterable,
     Collector<SuperVertexGroupItem> collector) throws Exception {
 
-    Iterator<Tuple3<Integer, Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
-    Tuple3<Integer, Set<GradoopId>, GradoopId> tuple = iterator.next();
+    Iterator<Tuple2<Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
+    Tuple2<Set<GradoopId>, GradoopId> tuple = iterator.next();
     GradoopId superVertexId;
     Set<GradoopId> vertices;
 
-
-
-    vertices = tuple.f1;
+    vertices = tuple.f0;
     if (vertices.size() != 1) {
       superVertexId = GradoopId.get();
     } else {
       superVertexId = vertices.iterator().next();
     }
-    reuseSuperVertexGroupItem.setField(vertices, 0);
-    reuseSuperVertexGroupItem.setField(superVertexId, 1);
-    reuseSuperVertexGroupItem.setField(tuple.f2, 2);
+    reuseSuperVertexGroupItem.setVertexIds(vertices);
+    reuseSuperVertexGroupItem.setSuperVertexId(superVertexId);
+    reuseSuperVertexGroupItem.setSuperEdgeId(tuple.f1);
 
     collector.collect(reuseSuperVertexGroupItem);
 
     while (iterator.hasNext()) {
-      reuseSuperVertexGroupItem.setField(iterator.next().f2, 2);
+      reuseSuperVertexGroupItem.setSuperEdgeId(iterator.next().f1);
       collector.collect(reuseSuperVertexGroupItem);
     }
   }
 }
+
+
+
