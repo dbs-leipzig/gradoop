@@ -18,25 +18,18 @@
 package org.gradoop.flink.io.reader.parsers.rawedges;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.flink.model.api.functions.Function;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Extracts from a string just the numbers
- *
- * @param <Format> The resulting desired format type
  */
-public class NumberTokenizer<Format> implements MapFunction<String, List<Format>> {
-
-  /**
-   * Function converting doubles to the desired format
-   */
-  private final Function<Double, Format> converter;
+public class NumberTokenizer implements MapFunction<String, List<String>> {
 
   /**
    * Returns the string representation for the edge. Each edge is represented by source++destination
@@ -44,29 +37,20 @@ public class NumberTokenizer<Format> implements MapFunction<String, List<Format>
   private String returned = "";
 
   /**
-   * Default constructor
-   * @param converter Function converting doubles to the desired format
-   */
-  public NumberTokenizer(Function<Double, Format> converter) {
-    this.converter = converter;
-  }
-
-
-  /**
    * Parses a string retrieving some numbers
    * @param toread  String where to extract numbers
    * @return        List of the retrieved numbers
    */
-  public List<Format> tokenize(String toread) {
+  public List<String> tokenize(String toread) {
     StringBuilder sb = new StringBuilder();
     StreamTokenizer t = new StreamTokenizer(new StringReader(toread));
     t.resetSyntax();
     t.parseNumbers();
-    ArrayList<Format> toret = new ArrayList<>();
+    ArrayList<String> toret = new ArrayList<>();
     try {
       while (t.nextToken() != StreamTokenizer.TT_EOF) {
         if (t.ttype == StreamTokenizer.TT_NUMBER) {
-          toret.add(converter.apply(t.nval));
+          toret.add(t.sval.trim());
           sb.append(t.sval);
         }
       }
@@ -86,7 +70,7 @@ public class NumberTokenizer<Format> implements MapFunction<String, List<Format>
   }
 
   @Override
-  public List<Format> map(String value) throws Exception {
+  public List<String> map(String value) throws Exception {
     return tokenize(value);
   }
 }
