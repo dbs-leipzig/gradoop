@@ -41,7 +41,7 @@ public class IntegerLineFileParser extends FileReaderForParser {
    * @return              The instantiated graph
    */
   public DataSet<List<String>> getDataset(boolean isUndirected, GradoopFlinkConfig conf) {
-    return readAsStringDataSource().map(new NumberTokenizer<>(Object::toString));
+    return readAsStringDataSource().map(new NumberTokenizer());
   }
 
 }
