@@ -115,13 +115,13 @@ public class BenchmarkNest extends AbstractRunner implements ProgramDescription 
         Collect collector = new Collect(dl.asNormalizedGraph().getConfig());
         IdGraphDatabase leftOperand = dl.getIdDatabase();
         Nesting n = new Nesting();
-        for (int i=0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
           RandomSample s = new RandomSample(GradoopId.get(), size, i);
           collector.add(dl.run(s).with(leftOperand));
         }
         IdGraphDatabase rightOperand = collector.asIdGraphDatabase();
         Time t = Time.milliseconds();
-        IdGraphDatabase resultGdb = dl.run(n).with(leftOperand,rightOperand);
+        IdGraphDatabase resultGdb = dl.run(n).with(leftOperand, rightOperand);
 
         /*
         TODO: best solution to check the reading of all the elements

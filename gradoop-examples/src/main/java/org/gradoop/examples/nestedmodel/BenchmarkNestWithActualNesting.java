@@ -98,7 +98,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
     RawEdgeFileParser files = new RawEdgeFileParser();
     files.fromFile(inputPath);
     files.setEnvironment(env);
-    GraphDataSource<String> gds = files.getDataset(false,conf);
+    GraphDataSource<String> gds = files.getDataset(false, conf);
 
     // read logical graph
     LogicalGraph logicalGraph = gds.getLogicalGraph();
@@ -128,13 +128,13 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
         Collect collector = new Collect(dl.asNormalizedGraph().getConfig());
         IdGraphDatabase leftOperand = dl.getIdDatabase();
         Nesting n = new Nesting();
-        for (int i=0; i < 10; i++) {
-          RandomSample s = new RandomSample(GradoopId.get(),size,i);
+        for (int i = 0; i < 10; i++) {
+          RandomSample s = new RandomSample(GradoopId.get(), size, i);
           collector.add(dl.run(s).with(leftOperand));
         }
         IdGraphDatabase rightOperand = collector.asIdGraphDatabase();
         Time t = Time.milliseconds();
-        IdGraphDatabase resultGdb = dl.run(n).with(leftOperand,rightOperand);
+        IdGraphDatabase resultGdb = dl.run(n).with(leftOperand, rightOperand);
         /*
         TODO: best solution to check the reading of all the elements
           * no secondary memory writing as in WriteCSV
@@ -149,7 +149,7 @@ public class BenchmarkNestWithActualNesting extends AbstractRunner implements Pr
         }
         */
         Time result = Time.milliseconds().difference(t);
-        toCSV.setUnit(result.getRepresentation(),result.getTime());
+        toCSV.setUnit(result.getRepresentation(), result.getTime());
         csv.write(toCSV.valueRowToCSV());
         csv.newLine();
       }

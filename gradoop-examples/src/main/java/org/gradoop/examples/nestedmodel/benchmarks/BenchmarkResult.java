@@ -44,10 +44,12 @@ public class BenchmarkResult extends CsvHeader {
    */
   private Time unit;
 
-
+  /**
+   * Default constructor
+   */
   public BenchmarkResult() {
-    super("datasetSize","nestingOperandNumberOfElements","nestingOperandSizeForEachElement",
-      "Representation","Time");
+    super("datasetSize", "nestingOperandNumberOfElements",
+      "nestingOperandSizeForEachElement", "Representation", "Time");
   }
 
   @Override
