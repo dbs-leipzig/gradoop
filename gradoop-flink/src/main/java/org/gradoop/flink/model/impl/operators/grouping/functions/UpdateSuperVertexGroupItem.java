@@ -88,8 +88,6 @@ public class UpdateSuperVertexGroupItem
         isFirst = false;
       }
     }
-    System.out.println("superVertexGroupItem = " + superVertexGroupItem);
-    System.out.println("label = " + label.toString());
     superVertexGroupItem.setGroupLabel(label.toString());
     superVertexGroupItem.setAggregateValues(getAggregateValues());
 
