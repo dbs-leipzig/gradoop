@@ -190,7 +190,7 @@ public class GraphClob<Element extends Comparable<Element>> {
    *                 created edges required.
    */
   public Pair<IdGraphDatabase, DataSet<Edge>> generateIdGraphWithNewEdges
-    (DataSet<List<Element>> groups) {
+  (DataSet<List<Element>> groups) {
     // Raw vertices that could be written as plain elements
     DataSet<Tuple2<GradoopId, GradoopId>> idVertices = groups
       .flatMap(new ExtendListOfElementWithId<>(env.getGraphHeadFactory()))
@@ -199,15 +199,19 @@ public class GraphClob<Element extends Comparable<Element>> {
       .with(new CreateIdGraphDatabaseVertices<>());
 
     // Edges that are created
-    DataSet<Tuple2<GradoopId, Edge>> edges = idVertices
+    DataSet<Tuple2<GradoopId, Edge>> enrichedEdges = idVertices
       .groupBy(0)
       .combineGroup(new CreateEdgesFromVertices(env.getEdgeFactory()));
 
-    DataSet<Edge> epgmEdges = edges.map(new Value1Of2<>());
+    DataSet<Edge> epgmEdges = enrichedEdges
+      .map(new Value1Of2<>());
 
     // Final elements required to creat the id for the edges
-    DataSet<Tuple2<GradoopId, GradoopId>> idEdges = edges.map(new MapRightEdgeToItsId());
-    DataSet<GradoopId> idHead = idVertices.map(new Value0Of2<>()).distinct(new SelfId());
+    DataSet<Tuple2<GradoopId, GradoopId>> idEdges = enrichedEdges
+      .map(new MapRightEdgeToItsId());
+    DataSet<GradoopId> idHead = idVertices
+      .map(new Value0Of2<>())
+      .distinct(new SelfId());
 
     // Id Graph Database
     IdGraphDatabase igdb = new IdGraphDatabase(idHead, idVertices, idEdges);
