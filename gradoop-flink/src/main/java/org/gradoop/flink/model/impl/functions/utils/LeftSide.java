@@ -32,7 +32,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
 public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
-  MapFunction<Tuple2<L, R>, L>,CrossFunction<L, R, L> {
+  MapFunction<Tuple2<L, R>, L>, CrossFunction<L, R, L> {
 
   @Override
   public L cross(L left, R right) throws Exception {

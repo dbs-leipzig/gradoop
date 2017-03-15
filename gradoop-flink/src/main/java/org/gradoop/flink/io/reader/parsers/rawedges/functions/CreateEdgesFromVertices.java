@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.io.reader.parsers.rawedges.functions;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
@@ -13,8 +30,8 @@ import java.util.ArrayList;
 /**
  * Defines the edges from the sole vertices
  */
-public class CreateEdgesFromVertices implements GroupCombineFunction<Tuple2<GradoopId,GradoopId>,
-  Tuple2<GradoopId,Edge>> {
+public class CreateEdgesFromVertices implements GroupCombineFunction<Tuple2<GradoopId, GradoopId>,
+  Tuple2<GradoopId, Edge>> {
 
   /**
    * Array of vertices. This list is updated when a new input is read
@@ -36,6 +53,10 @@ public class CreateEdgesFromVertices implements GroupCombineFunction<Tuple2<Grad
    */
   private GradoopIdList gil;
 
+  /**
+   * Default constructor
+   * @param ef    Edge factory used to create edges
+   */
   public CreateEdgesFromVertices(EdgeFactory ef) {
     this.ef = ef;
     this.elements = new ArrayList<>();
@@ -49,20 +70,20 @@ public class CreateEdgesFromVertices implements GroupCombineFunction<Tuple2<Grad
     int listSize = elements.size();
     gil.clear();
     int count = 0;
-    for (Tuple2<GradoopId,GradoopId> x : values) {
+    for (Tuple2<GradoopId, GradoopId> x : values) {
       reusable.f0 = x.f0; // Element over which the combination is defined
-      if (listSize>count) {
-        elements.set(count++,x.f1);
+      if (listSize > count) {
+        elements.set(count++, x.f1);
       } else {
         elements.add(x.f1);
       }
     }
     gil.add(reusable.f0);
-    for (int i=0; i<count; i++) {
+    for (int i = 0; i < count; i++) {
       GradoopId src = elements.get(i);
-      for (int j=0; j<count; j++) {
+      for (int j = 0; j < count; j++) {
         GradoopId dst = elements.get(j);
-        reusable.f1 = ef.createEdge("Edge"+reusable.f0.toString(),src,dst,gil);
+        reusable.f1 = ef.createEdge("Edge" + reusable.f0.toString(), src, dst, gil);
         out.collect(reusable);
       }
     }
