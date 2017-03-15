@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Associate to each vertex id its graph id
+ * @param <Element> The element that will be associated to an unique id
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1 -> f1")

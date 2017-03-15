@@ -31,7 +31,7 @@ import java.util.function.Function;
  *
  * @param <Format> The resulting desired format type
  */
-public class NumberTokenizer<Format> implements MapFunction<String,List<Format>> {
+public class NumberTokenizer<Format> implements MapFunction<String, List<Format>> {
 
   /**
    * Function converting doubles to the desired format

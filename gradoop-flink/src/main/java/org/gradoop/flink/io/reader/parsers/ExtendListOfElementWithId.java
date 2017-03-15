@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.io.reader.parsers;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -11,6 +28,7 @@ import java.util.List;
 
 /**
  * Associates to each group a different id
+ * @param <Element> the element type that has defines a key identifier for the GraphClob
  */
 @FunctionAnnotation.ForwardedFieldsSecond("* -> f1")
 public class ExtendListOfElementWithId<Element> implements
@@ -19,7 +37,7 @@ public class ExtendListOfElementWithId<Element> implements
   /**
    * Reusable element
    */
-  private final Tuple2<GradoopId,Element> reusable;
+  private final Tuple2<GradoopId, Element> reusable;
 
   /**
    * Defines the graph head factory for defining new graphs
@@ -28,6 +46,7 @@ public class ExtendListOfElementWithId<Element> implements
 
   /**
    * Default constructor
+   * @param fact  The GraphHead factory used for generating graph heads
    */
   public ExtendListOfElementWithId(GraphHeadFactory fact) {
     reusable = new Tuple2<>();
@@ -37,8 +56,7 @@ public class ExtendListOfElementWithId<Element> implements
   @Override
   public void flatMap(List<Element> value, Collector<Tuple2<GradoopId, Element>> out) throws
     Exception {
-    GradoopId id = fact.createGraphHead().getId();
-    reusable.f0 = id;
+    reusable.f0 = fact.createGraphHead().getId();
     for (Element x : value) {
       reusable.f1 = x;
       out.collect(reusable);

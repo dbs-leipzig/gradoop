@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * Maps each group to a different clique. Defines the vertices for the IdGraphDatabase
+ * @param <Element> The element that will be associated to an unique id
  */
 public class MapGroupToClique<Element> implements
   FlatJoinFunction<Tuple3<Element, GradoopId, Vertex>, Tuple2<GradoopId, List<Element>>,

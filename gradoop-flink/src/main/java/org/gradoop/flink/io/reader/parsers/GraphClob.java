@@ -141,21 +141,27 @@ public class GraphClob<Element extends Comparable<Element>> {
     return new GraphDataSource<>(vertices, edges, env);
   }
 
+  /**
+   * Returns…
+   * @return  the associations between the element that is used to infer ids,
+   *          the actual newly-created id, and the actual returned vertex
+   */
   public DataSet<Tuple3<Element, GradoopId, Vertex>> associateVertexToId() {
     return vertices
       .map(new InitVertex<>(env.getVertexFactory(), null, externalIdType));
   }
 
   /**
-   * Istantiates a Logical Graph from this graph representation.
+   * Returns…
+   * @return Istantiates a Logical Graph from this graph representation.
    */
   public LogicalGraph mapEdges() {
     DataSet<Tuple3<Element, GradoopId, Vertex>> avid = associateVertexToId();
     DataSet<Vertex> epgmVertices = avid
-      .map(new Value2Of3<Element, GradoopId, Vertex>());
+      .map(new Value2Of3<>());
 
     DataSet<Tuple2<Element, GradoopId>> vertexIdPair = avid
-      .map(new Project3To0And1<Element, GradoopId, Vertex>());
+      .map(new Project3To0And1<>());
 
     DataSet<Edge> epgmEdges = edges
       .join(vertexIdPair)
@@ -169,7 +175,7 @@ public class GraphClob<Element extends Comparable<Element>> {
 
     GraphHead heads = env.getGraphHeadFactory().createGraphHead();
     DataSet<GraphHead> epgmHeads = env.getExecutionEnvironment().fromElements(heads);
-    return LogicalGraph.fromDataSets(epgmHeads,epgmVertices,epgmEdges,env);
+    return LogicalGraph.fromDataSets(epgmHeads, epgmVertices, epgmEdges, env);
   }
 
   /**
@@ -183,9 +189,10 @@ public class GraphClob<Element extends Comparable<Element>> {
    *                 The second element is a dataset of edges, containing all the newly
    *                 created edges required.
    */
-  public Pair<IdGraphDatabase, DataSet<Edge>> generateCollateralDataset(DataSet<List<Element>> groups) {
+  public Pair<IdGraphDatabase, DataSet<Edge>> generateIdGraphWithNewEdges
+    (DataSet<List<Element>> groups) {
     // Raw vertices that could be written as plain elements
-    DataSet<Tuple2<GradoopId,GradoopId>> idVertices = groups
+    DataSet<Tuple2<GradoopId, GradoopId>> idVertices = groups
       .flatMap(new ExtendListOfElementWithId<>(env.getGraphHeadFactory()))
       .join(associateVertexToId())
       .where(new Value1Of2<>()).equalTo(new Value1Of3<>())
@@ -199,12 +206,12 @@ public class GraphClob<Element extends Comparable<Element>> {
     DataSet<Edge> epgmEdges = edges.map(new Value1Of2<>());
 
     // Final elements required to creat the id for the edges
-    DataSet<Tuple2<GradoopId,GradoopId>> idEdges = edges.map(new MapRightEdgeToItsId());
+    DataSet<Tuple2<GradoopId, GradoopId>> idEdges = edges.map(new MapRightEdgeToItsId());
     DataSet<GradoopId> idHead = idVertices.map(new Value0Of2<>()).distinct(new SelfId());
 
     // Id Graph Database
-    IdGraphDatabase igdb = new IdGraphDatabase(idHead,idVertices,idEdges);
-    return new Pair<>(igdb,epgmEdges);
+    IdGraphDatabase igdb = new IdGraphDatabase(idHead, idVertices, idEdges);
+    return new Pair<>(igdb, epgmEdges);
   }
 
 }
