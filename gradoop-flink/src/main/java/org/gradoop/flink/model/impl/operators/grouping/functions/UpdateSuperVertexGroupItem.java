@@ -31,6 +31,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexIdWithVertex;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +46,7 @@ import java.util.Set;
 //@FunctionAnnotation.ReadFields("label;properties")
 public class UpdateSuperVertexGroupItem
   extends BuildBase
-  implements CoGroupFunction<SuperVertexGroupItem, Tuple2<GradoopId, Vertex>, SuperVertexGroupItem> {
+  implements CoGroupFunction<SuperVertexGroupItem, SuperVertexIdWithVertex, SuperVertexGroupItem> {
 
   private final String LABEL_SEPARATOR = "_";
 
@@ -62,18 +63,20 @@ public class UpdateSuperVertexGroupItem
   }
 
   @Override
-  public void coGroup(Iterable<SuperVertexGroupItem> superVertexGroupItemsIterable,
-    Iterable<Tuple2<GradoopId, Vertex>> vertexIterable, Collector<SuperVertexGroupItem> collector)
+  public void coGroup(
+    Iterable<SuperVertexGroupItem> superVertexGroupItems,
+    Iterable<SuperVertexIdWithVertex> superVertexIdWithVertices,
+    Collector<SuperVertexGroupItem> collector)
     throws Exception {
 
     boolean isFirst;
     StringBuilder label = new StringBuilder();
-    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItemsIterable.iterator().next();
+    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
 
     isFirst = true;
     Vertex vertex;
-    for (Tuple2<GradoopId, Vertex> tuple : vertexIterable) {
-      vertex = tuple.f1;
+    for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
+      vertex = superVertexIdWithVertex.getVertex();
       if (useLabel()) {
         if (!isFirst) {
           label.append(LABEL_SEPARATOR);

@@ -18,22 +18,15 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeWithSuperEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperEdges;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertices;
-import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceSuperEdgeGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateSuperVertexGroupItem;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.grouping.functions.*;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.operators.SetInTupleKeySelector;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeWithSuperEdgeGroupItem;
@@ -106,26 +99,8 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
       // get all resulting (maybe concatenated) vertices
       // vertexIds - superedgeId
-      .flatMap(new FlatMapFunction<SuperEdgeGroupItem, Tuple2<Set<GradoopId>, GradoopId>>() {
-        @Override
-        public void flatMap(SuperEdgeGroupItem superEdgeGroupItem,
-          Collector<Tuple2<Set<GradoopId>, GradoopId>> collector) throws Exception {
-          Tuple2<Set<GradoopId>, GradoopId> reuseTuple;
-          reuseTuple = new Tuple2<Set<GradoopId>, GradoopId>();
-          reuseTuple.setFields(
-            superEdgeGroupItem.getSourceIds(),
-            superEdgeGroupItem.getEdgeId());
-          collector.collect(reuseTuple);
-
-          reuseTuple.setFields(
-            superEdgeGroupItem.getTargetIds(),
-            superEdgeGroupItem.getEdgeId()
-          );
-          collector.collect(reuseTuple);
-        }
-      })
+      .flatMap(new PrepareSuperVertexGroupItem())
       .groupBy(new SetInTupleKeySelector<Tuple2<Set<GradoopId>, GradoopId>, GradoopId>(0))
-//      .groupBy(0)
       // assign supervertex id
       // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
       .reduceGroup(new BuildSuperVertexGroupItem());
@@ -134,8 +109,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     DataSet<Edge> superEdges = superEdgeGroupItems
       .coGroup(superVertexGroupItems)
       // same super vertex id
-      .where(0)
-      .equalTo(2)
+      .where(0).equalTo(2)
       // build super edges
       .with(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
         config.getEdgeFactory()));
@@ -143,82 +117,34 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     // store vertices, where the vertex is its own super vertex, so the vertex stays itself
     DataSet<Vertex> normalSuperVertices = superVertexGroupItems
       // filter ids where vertex is its own super vertex
-      .filter(new FilterFunction<SuperVertexGroupItem>() {
-        @Override
-        public boolean filter(
-          SuperVertexGroupItem superVertexGroupItem) throws
-          Exception {
-          return (superVertexGroupItem.f0.size() == 1) &&
-            (superVertexGroupItem.f0.iterator().next() == superVertexGroupItem.f1);
-        }
-      })
+      .filter(new FilterSuperVertexGroupItem(false))
       // take vertex respectively to the filtered id
       .rightOuterJoin(graph.getVertices())
       .where(1)
       .equalTo(new Id<>())
-      .with(new JoinFunction<SuperVertexGroupItem, Vertex, Vertex>() {
-        @Override
-        public Vertex join(SuperVertexGroupItem superVertexGroupItem, Vertex vertex)
-          throws Exception {
-          return vertex;
-        }
-      });
+      .with(new RightSide<>());
 
     // get for a super vertex id each single relevant vertex id
     DataSet<VertexWithSuperVertex> vertexWithSuper = superVertexGroupItems
       // only real super vertices
-      .filter(new FilterFunction<SuperVertexGroupItem>() {
-        @Override
-        public boolean filter(
-          SuperVertexGroupItem tuple) throws
-          Exception {
-          return (tuple.f0.size() > 1);
-        }
-      })
+      .filter(new FilterSuperVertexGroupItem(true))
       // assign the vertex ids
-      .flatMap(new FlatMapFunction<SuperVertexGroupItem, VertexWithSuperVertex>() {
-        VertexWithSuperVertex vertexWithSuperVertex = new VertexWithSuperVertex();
-        @Override
-        public void flatMap(SuperVertexGroupItem superVertexGroupItem,
-          Collector<VertexWithSuperVertex> collector) throws Exception {
-
-          vertexWithSuperVertex.setSuperVertexId(superVertexGroupItem.getSuperVertexId());
-          for (GradoopId gradoopId : superVertexGroupItem.getVertexIds()) {
-            vertexWithSuperVertex.setVertexId(gradoopId);
-            collector.collect(vertexWithSuperVertex);
-          }
-        }
-      });
-
+      .flatMap(new BuildvertexWithSuperVertexFromItem());
 
     superVertexGroupItems = superVertexGroupItems
       // take all vertices by their id, which is stored in the super vertex group item
       .coGroup(vertexWithSuper
         .rightOuterJoin(graph.getVertices())
         .where(0).equalTo(new Id<>())
-        .with(new JoinFunction<VertexWithSuperVertex, Vertex, Tuple2<GradoopId, Vertex>>() {
-          @Override
-          public Tuple2<GradoopId, Vertex> join(VertexWithSuperVertex vertexWithSuperVertex, Vertex
-            vertex) throws Exception {
-            return new Tuple2<GradoopId, Vertex>(vertexWithSuperVertex.getSuperVertexId(), vertex);
-          }
-        }))
+        .with(new BuildSuperVertexIdWithVertex()))
       .where(1).equalTo(0)
       // and aggregate the super vertex group item based on the vertex aggregations
       .with(new UpdateSuperVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators()));
 
-
     DataSet<Vertex> superVertices = superVertexGroupItems
       // take super vertex ids where vertex is not its own super vertex
-      .filter(new FilterFunction<SuperVertexGroupItem>() {
-        @Override
-        public boolean filter(
-          SuperVertexGroupItem tuple) throws
-          Exception {
-          return (tuple.f0.size() > 1);
-        }
-      })
+      .filter(new FilterSuperVertexGroupItem(true))
       // and create the vertex element
       .map(new BuildSuperVertices(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators(), config.getVertexFactory()))
