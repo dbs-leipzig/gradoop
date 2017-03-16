@@ -26,7 +26,7 @@ import org.gradoop.examples.grouping.GroupingRunner;
 import org.gradoop.examples.nestedmodel.benchmarks.BenchmarkResult;
 import org.gradoop.examples.nestedmodel.benchmarks.Time;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
-import org.gradoop.flink.io.reader.parsers.rawedges.RawEdgeFileParser;
+import org.gradoop.examples.io.parsers.rawedges.RawEdgeFileParser;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.nested.datastructures.DataLake;
 import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
