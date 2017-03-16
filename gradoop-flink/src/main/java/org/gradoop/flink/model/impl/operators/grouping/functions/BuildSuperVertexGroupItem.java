@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class BuildSuperVertexGroupItem
-  implements GroupReduceFunction<Tuple2<Set<GradoopId>,GradoopId>, SuperVertexGroupItem> {
+  implements GroupReduceFunction<SuperVertexGroupItem, SuperVertexGroupItem> {
 
   /**
    * Avoid object initialization in each call.
@@ -43,29 +43,26 @@ public class BuildSuperVertexGroupItem
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<Set<GradoopId>, GradoopId>> iterable,
-    Collector<SuperVertexGroupItem> collector) throws Exception {
+  public void reduce(
+    Iterable<SuperVertexGroupItem> superVertexGroupItems, Collector<SuperVertexGroupItem> collector)
+    throws Exception {
 
-    Iterator<Tuple2<Set<GradoopId>, GradoopId>> iterator = iterable.iterator();
-    Tuple2<Set<GradoopId>, GradoopId> tuple = iterator.next();
-    GradoopId superVertexId;
+    GradoopId superVertexId = null;
     Set<GradoopId> vertices;
+    boolean isFirst = true;
 
-    vertices = tuple.f0;
-    if (vertices.size() != 1) {
-      superVertexId = GradoopId.get();
-    } else {
-      superVertexId = vertices.iterator().next();
-    }
-    reuseSuperVertexGroupItem.setVertexIds(vertices);
-    reuseSuperVertexGroupItem.setSuperVertexId(superVertexId);
-    reuseSuperVertexGroupItem.setSuperEdgeId(tuple.f1);
-
-    collector.collect(reuseSuperVertexGroupItem);
-
-    while (iterator.hasNext()) {
-      reuseSuperVertexGroupItem.setSuperEdgeId(iterator.next().f1);
-      collector.collect(reuseSuperVertexGroupItem);
+    for (SuperVertexGroupItem superVertexGroupItem : superVertexGroupItems) {
+      if (isFirst) {
+        vertices = superVertexGroupItem.getVertexIds();
+        if (vertices.size() != 1) {
+          superVertexId = GradoopId.get();
+        } else {
+          superVertexId = vertices.iterator().next();
+        }
+        isFirst = false;
+      }
+      superVertexGroupItem.setSuperVertexId(superVertexId);
+      collector.collect(superVertexGroupItem);
     }
   }
 }

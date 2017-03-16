@@ -17,9 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -35,7 +33,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexGroupIt
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -100,7 +97,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // get all resulting (maybe concatenated) vertices
       // vertexIds - superedgeId
       .flatMap(new PrepareSuperVertexGroupItem())
-      .groupBy(new SetInTupleKeySelector<Tuple2<Set<GradoopId>, GradoopId>, GradoopId>(0))
+      .groupBy(new SetInTupleKeySelector<SuperVertexGroupItem, GradoopId>(0))
       // assign supervertex id
       // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
       .reduceGroup(new BuildSuperVertexGroupItem());

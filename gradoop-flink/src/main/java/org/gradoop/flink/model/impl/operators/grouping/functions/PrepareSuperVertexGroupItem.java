@@ -18,29 +18,33 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperEdgeGroupItem;
-
-import java.util.Set;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.SuperVertexGroupItem;
 
 /**
- * Returns a tuple which assigns each source/target set of gradoop ids the edhe id
+ * Returns a tuple which assigns each source/target set of gradoop ids the edge id.
  */
 public class PrepareSuperVertexGroupItem
-  implements FlatMapFunction<SuperEdgeGroupItem, Tuple2<Set<GradoopId>, GradoopId>> {
+  implements FlatMapFunction<SuperEdgeGroupItem, SuperVertexGroupItem> {
 
   /**
    * Avoid object initialization in each call.
    */
-  private Tuple2<Set<GradoopId>, GradoopId> reuseTuple;
+  private SuperVertexGroupItem reuseSuperVertexGroupItem;
 
   /**
    * Constructor to initialize object.
    */
   public PrepareSuperVertexGroupItem() {
-    reuseTuple = new Tuple2<Set<GradoopId>, GradoopId>();
+    reuseSuperVertexGroupItem = new SuperVertexGroupItem();
+    reuseSuperVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
+//    reuseSuperVertexGroupItem.setGroupLabel("");
+    reuseSuperVertexGroupItem.setGroupingValues(PropertyValueList.createEmptyList());
+    reuseSuperVertexGroupItem.setAggregateValues(PropertyValueList.createEmptyList());
+
   }
 
   /**
@@ -48,12 +52,14 @@ public class PrepareSuperVertexGroupItem
    */
   @Override
   public void flatMap(SuperEdgeGroupItem superEdgeGroupItem,
-    Collector<Tuple2<Set<GradoopId>, GradoopId>> collector) throws Exception {
+    Collector<SuperVertexGroupItem> collector) throws Exception {
 
-    reuseTuple.setFields(superEdgeGroupItem.getSourceIds(), superEdgeGroupItem.getEdgeId());
-    collector.collect(reuseTuple);
+    reuseSuperVertexGroupItem.setVertexIds(superEdgeGroupItem.getSourceIds());
+    reuseSuperVertexGroupItem.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
+    collector.collect(reuseSuperVertexGroupItem);
 
-    reuseTuple.setFields(superEdgeGroupItem.getTargetIds(), superEdgeGroupItem.getEdgeId());
-    collector.collect(reuseTuple);
+    reuseSuperVertexGroupItem.setVertexIds(superEdgeGroupItem.getTargetIds());
+    reuseSuperVertexGroupItem.setSuperEdgeId(superEdgeGroupItem.getEdgeId());
+    collector.collect(reuseSuperVertexGroupItem);
   }
 }
