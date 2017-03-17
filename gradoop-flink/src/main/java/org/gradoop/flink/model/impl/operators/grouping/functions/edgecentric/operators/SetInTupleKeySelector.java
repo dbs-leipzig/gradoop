@@ -21,29 +21,35 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;
 
 import java.util.TreeSet;
+import java.util.Set;
 
 
 public class SetInTupleKeySelector<T extends Tuple, E> implements KeySelector<T, String> {
 
   private final StringBuilder sb;
   private final TreeSet<E> sortedSet;
-  private final int field;
+  private final int[] fields;
 
-  public SetInTupleKeySelector(int field) {
-    this.field = field;
+  public SetInTupleKeySelector(int... fields) {
+    this.fields = fields;
     sb = new StringBuilder();
     sortedSet = new TreeSet<>();
   }
 
-
   @Override
   public String getKey(T tuple) throws Exception {
     sb.setLength(0);
-    sortedSet.clear();
-    sortedSet.addAll(tuple.getField(field));
 
-    for (E element : sortedSet) {
-      sb.append(element.toString());
+    for (int i = 0; i < fields.length; i++) {
+      if (Set.class.isInstance(tuple.getField(fields[i]))) {
+        sortedSet.clear();
+        sortedSet.addAll(tuple.getField(fields[i]));
+        for (E element : sortedSet) {
+          sb.append(element.hashCode());
+        }
+      } else {
+        sb.append(tuple.getField(fields[i]).hashCode());
+      }
     }
     return sb.toString();
   }
