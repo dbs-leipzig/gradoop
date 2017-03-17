@@ -70,27 +70,4 @@ abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
     return targetSpecificGrouping;
   }
 
-  /**
-   * Creates one super edge tuple representing the whole group. This tuple is
-   * later used to create a super edge for each group.
-   *
-   * @param superEdgeId         super edge id
-   * @param groupLabel          group label
-   * @param groupPropertyValues group property values
-   * @return edge group item representing the super edge
-   */
-  protected SuperEdgeGroupItem createSuperEdgeTuple(GradoopId superEdgeId,
-    String groupLabel, PropertyValueList groupPropertyValues, Set<GradoopId> sources,
-    Set<GradoopId> targets)
-      throws IOException {
-    reuseSuperEdgeGroupItem.setEdgeId(superEdgeId);
-    reuseSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
-    reuseSuperEdgeGroupItem.setGroupLabel(groupLabel);
-    reuseSuperEdgeGroupItem.setGroupingValues(groupPropertyValues);
-    reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues());
-    reuseSuperEdgeGroupItem.setSuperEdge(true);
-    reuseSuperEdgeGroupItem.setSourceIds(sources);
-    reuseSuperEdgeGroupItem.setTargetIds(targets);
-    return reuseSuperEdgeGroupItem;
-  }
 }

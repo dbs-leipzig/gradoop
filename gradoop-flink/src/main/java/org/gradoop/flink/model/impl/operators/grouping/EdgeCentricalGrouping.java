@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.*;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators.SetInTupleKeySelector;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.EdgeWithSuperEdgeGroupItem;
+
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
@@ -81,9 +81,9 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
 
-    DataSet<EdgeWithSuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
+    DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
       // map edge to edge group item
-      .map(new BuildEdgeWithSuperEdgeGroupItem(getEdgeGroupingKeys(), useEdgeLabels(),
+      .map(new PrepareSuperEdgeGroupItem(getEdgeGroupingKeys(), useEdgeLabels(),
         getEdgeAggregators()));
 
     // group edges by label / properties / both
@@ -133,7 +133,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     superVertexGroupItems = superVertexGroupItems
       // take all vertices by their id, which is stored in the super vertex group item
       .coGroup(vertexWithSuper
-        .rightOuterJoin(graph.getVertices())
+        .join(graph.getVertices())
         .where(0).equalTo(new Id<>())
         .with(new BuildSuperVertexIdWithVertex()))
       .where(1).equalTo(0)

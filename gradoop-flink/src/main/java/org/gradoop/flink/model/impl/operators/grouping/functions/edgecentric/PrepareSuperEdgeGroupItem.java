@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.EdgeWithSuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 
 import java.util.List;
@@ -38,14 +38,14 @@ import java.util.List;
  */
 //@FunctionAnnotation.ForwardedFields("id->f0")
 //@FunctionAnnotation.ReadFields("label;properties") //TODO check for updates (source,target)
-public class BuildEdgeWithSuperEdgeGroupItem
+public class PrepareSuperEdgeGroupItem
   extends BuildBase
-  implements MapFunction<Edge, EdgeWithSuperEdgeGroupItem> {
+  implements MapFunction<Edge, SuperEdgeGroupItem> {
 
   /**
    * Reduce object instantiations.
    */
-  private final EdgeWithSuperEdgeGroupItem reuseEdgeWithSuperEdgeGroupItem;
+  private final SuperEdgeGroupItem reuseSuperEdgeGroupItem;
 
   /**
    * Creates map function
@@ -54,15 +54,14 @@ public class BuildEdgeWithSuperEdgeGroupItem
    * @param useLabel          true, if label shall be considered
    * @param edgeAggregators aggregate functions for super edges
    */
-  public BuildEdgeWithSuperEdgeGroupItem(List<String> groupPropertyKeys,
+  public PrepareSuperEdgeGroupItem(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> edgeAggregators) {
     super(groupPropertyKeys, useLabel, edgeAggregators);
 
-    this.reuseEdgeWithSuperEdgeGroupItem = new EdgeWithSuperEdgeGroupItem();
-    this.reuseEdgeWithSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
-    this.reuseEdgeWithSuperEdgeGroupItem.setSuperEdge(false);
+    this.reuseSuperEdgeGroupItem = new SuperEdgeGroupItem();
+    this.reuseSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
     if (!doAggregate()) {
-      this.reuseEdgeWithSuperEdgeGroupItem.setAggregateValues(
+      this.reuseSuperEdgeGroupItem.setAggregateValues(
         PropertyValueList.createEmptyList());
     }
   }
@@ -71,15 +70,15 @@ public class BuildEdgeWithSuperEdgeGroupItem
    * {@inheritDoc}
    */
   @Override
-  public EdgeWithSuperEdgeGroupItem map(Edge edge) throws Exception {
-    reuseEdgeWithSuperEdgeGroupItem.setEdgeId(edge.getId());
-    reuseEdgeWithSuperEdgeGroupItem.setSourceId(edge.getSourceId());
-    reuseEdgeWithSuperEdgeGroupItem.setTargetId(edge.getTargetId());
-    reuseEdgeWithSuperEdgeGroupItem.setGroupLabel(getLabel(edge));
-    reuseEdgeWithSuperEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
+  public SuperEdgeGroupItem map(Edge edge) throws Exception {
+    reuseSuperEdgeGroupItem.setEdgeId(edge.getId());
+    reuseSuperEdgeGroupItem.setSourceId(edge.getSourceId());
+    reuseSuperEdgeGroupItem.setTargetId(edge.getTargetId());
+    reuseSuperEdgeGroupItem.setGroupLabel(getLabel(edge));
+    reuseSuperEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
     if (doAggregate()) {
-      reuseEdgeWithSuperEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
+      reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
     }
-    return reuseEdgeWithSuperEdgeGroupItem;
+    return reuseSuperEdgeGroupItem;
   }
 }

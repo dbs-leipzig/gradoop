@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.EdgeWithSuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -39,7 +39,9 @@ import java.util.Set;
  // )
   public class ReduceSuperEdgeGroupItems
     extends ReduceSuperEdgeGroupItemBase
-    implements GroupReduceFunction<EdgeWithSuperEdgeGroupItem, SuperEdgeGroupItem> {
+    implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {
+
+    private SuperEdgeGroupItem reuseSuperEdgeGroupItem;
 
     /**
      * Creates group reduce function.
@@ -54,18 +56,15 @@ import java.util.Set;
     }
 
     @Override
-    public void reduce(Iterable<EdgeWithSuperEdgeGroupItem> superEdgeGroupItems,
+    public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
       Collector<SuperEdgeGroupItem> collector) throws Exception {
 
-      GradoopId superEdgeId                 = null;
-      String groupLabel                     = null;
-      PropertyValueList groupPropertyValues = null;
       boolean isFirst                       = true;
 
       Set<GradoopId> sources = Sets.newHashSet();
       Set<GradoopId> targets = Sets.newHashSet();
 
-      for (EdgeWithSuperEdgeGroupItem groupItem : superEdgeGroupItems) {
+      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
         // grouped by source and target
         if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
           if (isFirst) {
@@ -90,10 +89,8 @@ import java.util.Set;
           targets.add(groupItem.getTargetId());
         }
         if (isFirst) {
-          superEdgeId       = GradoopId.get();
-          groupLabel          = groupItem.getGroupLabel();
-          groupPropertyValues = groupItem.getGroupingValues();
-
+          reuseSuperEdgeGroupItem = groupItem;
+          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
           isFirst = false;
         }
         if (doAggregate()) {
@@ -101,12 +98,9 @@ import java.util.Set;
         }
       }
       // collect single item representing the whole group
-      collector.collect(createSuperEdgeTuple(
-        superEdgeId,
-        groupLabel,
-        groupPropertyValues,
-        sources,
-        targets));
+      reuseSuperEdgeGroupItem.setSourceIds(sources);
+      reuseSuperEdgeGroupItem.setTargetIds(targets);
+      collector.collect(reuseSuperEdgeGroupItem);
 
       resetAggregators();
     }
