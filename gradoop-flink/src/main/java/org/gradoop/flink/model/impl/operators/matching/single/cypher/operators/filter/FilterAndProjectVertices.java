@@ -71,6 +71,7 @@ public class FilterAndProjectVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.flatMap(new FilterAndProjectVertex(predicates, projectionPropertyKeys));
+    return input.flatMap(new FilterAndProjectVertex(predicates, projectionPropertyKeys))
+      .name("FilterAndProjectVertices( " + predicates + ")");
   }
 }

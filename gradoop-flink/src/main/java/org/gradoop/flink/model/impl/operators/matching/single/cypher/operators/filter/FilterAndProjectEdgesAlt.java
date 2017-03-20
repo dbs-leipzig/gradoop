@@ -78,7 +78,9 @@ public class FilterAndProjectEdgesAlt implements PhysicalOperator {
   @Override
   public DataSet<Embedding> evaluate() {
     return input.
-      filter(new FilterEdge(predicates)).
-      map(new ProjectEdge(projectionPropertyKeys));
+      filter(new FilterEdge(predicates))
+        .name("FilterEdges(" + predicates + ")")
+      .map(new ProjectEdge(projectionPropertyKeys))
+        .name("ProjectEdges(" + projectionPropertyKeys + ")");
   }
 }

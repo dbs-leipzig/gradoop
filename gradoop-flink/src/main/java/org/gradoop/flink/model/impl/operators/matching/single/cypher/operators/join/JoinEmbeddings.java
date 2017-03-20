@@ -180,6 +180,7 @@ public class JoinEmbeddings implements PhysicalOperator {
       .equalTo(new ExtractJoinColumns(rightJoinColumns))
       .with(new MergeEmbeddings(rightColumns, rightJoinColumns,
         distinctVertexColumnsLeft, distinctVertexColumnsRight,
-        distinctEdgeColumnsLeft, distinctEdgeColumnsRight));
+        distinctEdgeColumnsLeft, distinctEdgeColumnsRight))
+      .name("JoinEmbeddings(" + leftJoinColumns + " |x| " + rightJoinColumns + ")");
   }
 }

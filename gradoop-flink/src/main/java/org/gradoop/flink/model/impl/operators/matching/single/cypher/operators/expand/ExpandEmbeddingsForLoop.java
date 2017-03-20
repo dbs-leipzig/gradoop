@@ -112,7 +112,8 @@ public class ExpandEmbeddingsForLoop extends ExpandEmbeddings {
           .join(candidateEdgeTuples, joinHint)
             .where(2).equalTo(0)
             .with(new MergeExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns,
-              closingColumn));
+              closingColumn))
+            .name("Expand - Expansion Step " + i);
 
       intermediateResults.add(nextResult);
     }

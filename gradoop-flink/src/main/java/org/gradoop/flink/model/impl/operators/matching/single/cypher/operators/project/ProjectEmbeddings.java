@@ -51,6 +51,8 @@ public class ProjectEmbeddings implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectEmbedding(propertyWhiteList));
+    return input
+      .map(new ProjectEmbedding(propertyWhiteList))
+      .name("ProjectEmbeddings(" + propertyWhiteList + ")");
   }
 }

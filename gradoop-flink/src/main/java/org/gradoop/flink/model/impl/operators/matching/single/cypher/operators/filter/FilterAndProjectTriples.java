@@ -115,6 +115,10 @@ public class FilterAndProjectTriples implements PhysicalOperator {
         projectionPropertyKeys,
         vertexMatchStrategy
       )
+    ).name(
+      "FilterAndProjectTriples(" +
+        sourceVariable + "-[" + targetVariable + "]->" + targetVariable +
+      ")"
     );
   }
 }

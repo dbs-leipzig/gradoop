@@ -144,14 +144,20 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
    */
   private DataSet<ExpandEmbedding> preProcess() {
     if (direction == ExpandDirection.IN) {
-      candidateEdges = candidateEdges.map(new ReverseEdgeEmbedding());
+      candidateEdges = candidateEdges
+        .map(new ReverseEdgeEmbedding())
+        .name("Expand - Reverse Edges");
     } else  if (direction == ExpandDirection.ALL) {
-      candidateEdges = candidateEdges.union(candidateEdges.map(new ReverseEdgeEmbedding()));
+      candidateEdges = candidateEdges.union(
+        candidateEdges.map(new ReverseEdgeEmbedding()).name("Expand - Reverse Edges")
+      );
     }
 
     this.candidateEdgeTuples = candidateEdges
       .map(new ExtractKeyedCandidateEdges())
-      .partitionByHash(0);
+        .name("Expand - Create candidate edge tuples")
+      .partitionByHash(0)
+        .name("Expand - Partition edge tuples");
 
     return input.join(candidateEdgeTuples, joinHint)
       .where(new ExtractExpandColumn(expandColumn)).equalTo(0)
@@ -159,7 +165,8 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
         distinctVertexColumns,
         distinctEdgeColumns,
         closingColumn
-      ));
+      ))
+      .name("Expand - Initial expansion");
   }
 
   /**
@@ -169,12 +176,14 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
    * @return iteration results filtered by upper and lower bound and combined with input data
    */
   private DataSet<Embedding> postProcess(DataSet<ExpandEmbedding> iterationResults) {
-    DataSet<Embedding> results =
-      iterationResults.flatMap(new PostProcessExpandEmbedding(lowerBound, closingColumn));
+    DataSet<Embedding> results = iterationResults
+      .flatMap(new PostProcessExpandEmbedding(lowerBound, closingColumn))
+        .name("Expand - Post Processing");
 
     if (lowerBound == 0) {
       results = results.union(
         input.flatMap(new AdoptEmptyPaths(expandColumn, closingColumn))
+          .name("Expand - Append empty paths")
       );
     }
 

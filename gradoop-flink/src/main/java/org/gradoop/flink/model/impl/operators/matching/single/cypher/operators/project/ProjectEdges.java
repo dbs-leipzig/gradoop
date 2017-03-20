@@ -64,6 +64,8 @@ public class ProjectEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectEdge(propertyKeys));
+    return input
+      .map(new ProjectEdge(propertyKeys))
+      .name("ProjectEdges(" + propertyKeys + ")");
   }
 }
