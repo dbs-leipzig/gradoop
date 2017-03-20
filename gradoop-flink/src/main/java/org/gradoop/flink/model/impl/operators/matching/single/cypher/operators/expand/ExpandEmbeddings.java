@@ -146,7 +146,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
     if (direction == ExpandDirection.IN) {
       candidateEdges = candidateEdges
         .map(new ReverseEdgeEmbedding())
-        .name("Expand - Reverse Edges");
+         .name("Expand - Reverse Edges");
     } else  if (direction == ExpandDirection.ALL) {
       candidateEdges = candidateEdges.union(
         candidateEdges.map(new ReverseEdgeEmbedding()).name("Expand - Reverse Edges")
