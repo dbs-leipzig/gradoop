@@ -59,6 +59,11 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   private final List<String> projectionPropertyKeys;
 
   /**
+   * Operator name
+   */
+  private String name;
+
+  /**
    * New vertex filter operator
    *
    * @param input Candidate vertices
@@ -70,15 +75,26 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
     this.input = input;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
+    this.setName("FilterAndProjectVerticesAlt");
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
     return input
       .filter(new FilterVertex(predicates))
-        .name("FilterVertices(" + predicates + ")")
+        .name(getName())
       .map(new ProjectVertex(projectionPropertyKeys))
-        .name("ProjectVertices(" + projectionPropertyKeys + ")");
+        .name(getName());
 
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

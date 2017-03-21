@@ -32,4 +32,16 @@ public interface PhysicalOperator {
    */
   DataSet<Embedding> evaluate();
 
+  /**
+   * Set the operator description
+   * @param newName operator description
+   */
+  void setName(String newName);
+
+  /**
+   * Get the operator description
+   * @return operator description
+   */
+  String getName();
+
 }

@@ -62,6 +62,11 @@ public class FilterAndProjectEdgesAlt implements PhysicalOperator {
   private final List<String> projectionPropertyKeys;
 
   /**
+   * Operator name
+   */
+  private String name;
+
+  /**
    * New edge filter operator
    *
    * @param input Candidate edges
@@ -73,14 +78,25 @@ public class FilterAndProjectEdgesAlt implements PhysicalOperator {
     this.input = input;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
+    this.setName("FilterAndProjectEdges");
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
     return input.
       filter(new FilterEdge(predicates))
-        .name("FilterEdges(" + predicates + ")")
+        .name(getName())
       .map(new ProjectEdge(projectionPropertyKeys))
-        .name("ProjectEdges(" + projectionPropertyKeys + ")");
+        .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

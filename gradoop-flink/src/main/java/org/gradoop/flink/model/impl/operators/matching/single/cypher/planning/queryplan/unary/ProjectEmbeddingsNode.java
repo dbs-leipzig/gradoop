@@ -63,7 +63,9 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new ProjectEmbeddings(getChildNode().execute(), whiteListColumns).evaluate();
+    ProjectEmbeddings op =  new ProjectEmbeddings(getChildNode().execute(), whiteListColumns);
+    op.setName(getOperatorName());
+    return op.evaluate();
   }
 
   @Override
@@ -88,5 +90,13 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
   @Override
   public String toString() {
     return String.format("ProjectEmbeddingsNode{projectionKeys=%s}", projectionKeys);
+  }
+
+  /**
+   * Generates the operator description
+   * @return operator description
+   */
+  private String getOperatorName() {
+    return String.format("ProjectEmbeddings(projectionKeys: %s", projectionKeys);
   }
 }

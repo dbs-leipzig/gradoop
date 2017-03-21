@@ -110,11 +110,11 @@ public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
 
     IterativeDataSet<ExpandEmbedding> iteration = initialWorkingSet
         .iterate(upperBound - 1)
-        .name("Expand - BulkIteration");
+        .name(getName());
 
     DataSet<ExpandEmbedding> nextWorkingSet = iteration
       .filter(new FilterPreviousExpandEmbedding())
-        .name("Expand - FilterRecent")
+        .name(getName() + " - FilterRecent")
       .join(candidateEdgeTuples, joinHint)
         .where(2).equalTo(0)
         .with(new MergeExpandEmbeddings(
@@ -122,7 +122,7 @@ public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
           distinctEdgeColumns,
           closingColumn
         ))
-        .name("Expand - Expansion");
+        .name(getName() + " - Expansion");
 
     DataSet<ExpandEmbedding> solutionSet = nextWorkingSet.union(iteration);
 

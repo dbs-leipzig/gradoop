@@ -85,6 +85,11 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
   protected DataSet<EdgeWithTiePoint> candidateEdgeTuples;
 
   /**
+   * Operator name
+   */
+  protected String name;
+
+  /**
    * New Expand One Operator
    *
    * @param input the embedding which should be expanded
@@ -113,6 +118,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
     this.distinctEdgeColumns = distinctEdgeColumns;
     this.closingColumn = closingColumn;
     this.joinHint = joinHint;
+    this.setName("ExpandEmbeddings");
   }
 
   /**
@@ -146,18 +152,18 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
     if (direction == ExpandDirection.IN) {
       candidateEdges = candidateEdges
         .map(new ReverseEdgeEmbedding())
-         .name("Expand - Reverse Edges");
+         .name(getName() + " - Reverse Edges");
     } else  if (direction == ExpandDirection.ALL) {
       candidateEdges = candidateEdges.union(
-        candidateEdges.map(new ReverseEdgeEmbedding()).name("Expand - Reverse Edges")
+        candidateEdges.map(new ReverseEdgeEmbedding()).name(getName() + "- Reverse Edges")
       );
     }
 
     this.candidateEdgeTuples = candidateEdges
       .map(new ExtractKeyedCandidateEdges())
-        .name("Expand - Create candidate edge tuples")
+        .name(getName() + " - Create candidate edge tuples")
       .partitionByHash(0)
-        .name("Expand - Partition edge tuples");
+        .name(getName() + " - Partition edge tuples");
 
     return input.join(candidateEdgeTuples, joinHint)
       .where(new ExtractExpandColumn(expandColumn)).equalTo(0)
@@ -166,7 +172,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
         distinctEdgeColumns,
         closingColumn
       ))
-      .name("Expand - Initial expansion");
+      .name(getName() + " - Initial expansion");
   }
 
   /**
@@ -178,15 +184,25 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
   private DataSet<Embedding> postProcess(DataSet<ExpandEmbedding> iterationResults) {
     DataSet<Embedding> results = iterationResults
       .flatMap(new PostProcessExpandEmbedding(lowerBound, closingColumn))
-        .name("Expand - Post Processing");
+        .name(getName() + " - Post Processing");
 
     if (lowerBound == 0) {
       results = results.union(
         input.flatMap(new AdoptEmptyPaths(expandColumn, closingColumn))
-          .name("Expand - Append empty paths")
+          .name(getName() + " - Append empty paths")
       );
     }
 
     return results;
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

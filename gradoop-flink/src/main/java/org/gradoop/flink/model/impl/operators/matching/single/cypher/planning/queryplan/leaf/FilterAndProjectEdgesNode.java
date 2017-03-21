@@ -84,8 +84,9 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterAndProjectEdges(edges, filterPredicate, projectionKeys)
-      .evaluate();
+    FilterAndProjectEdges op =  new FilterAndProjectEdges(edges, filterPredicate, projectionKeys);
+    op.setName(getOperatorName());
+    return op.evaluate();
   }
 
   /**
@@ -127,5 +128,16 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
         "filterPredicate=%s, " +
         "projectionKeys=%s}",
       sourceVariable, edgeVariable, targetVariable, filterPredicate, projectionKeys);
+  }
+
+  /**
+   * Returns the operator name
+   * @return operator name
+   */
+  private String getOperatorName() {
+    return String.format(
+      "FilterAndProjectEdges(from: %s, via: %s, to: %s, filter: %s, projection: %s)",
+      sourceVariable, edgeVariable, targetVariable, filterPredicate, projectionKeys
+    );
   }
 }

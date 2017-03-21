@@ -113,7 +113,7 @@ public class ExpandEmbeddingsForLoop extends ExpandEmbeddings {
             .where(2).equalTo(0)
             .with(new MergeExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns,
               closingColumn))
-            .name("Expand - Expansion Step " + i);
+            .name(getName() + " - Expansion " + i);
 
       intermediateResults.add(nextResult);
     }
