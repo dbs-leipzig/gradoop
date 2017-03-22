@@ -43,7 +43,7 @@ public class FilterEmbeddings implements PhysicalOperator {
   private final EmbeddingMetaData metaData;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   private String name;
 

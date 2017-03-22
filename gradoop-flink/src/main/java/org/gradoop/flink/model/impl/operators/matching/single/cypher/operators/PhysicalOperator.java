@@ -34,12 +34,14 @@ public interface PhysicalOperator {
 
   /**
    * Set the operator description
+   * This is used for Flink operator naming
    * @param newName operator description
    */
   void setName(String newName);
 
   /**
    * Get the operator description
+   * This is used for Flink operator naming
    * @return operator description
    */
   String getName();

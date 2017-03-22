@@ -59,7 +59,7 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   private final List<String> projectionPropertyKeys;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   private String name;
 

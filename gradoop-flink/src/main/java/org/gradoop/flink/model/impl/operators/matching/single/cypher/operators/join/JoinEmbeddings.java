@@ -176,7 +176,7 @@ public class JoinEmbeddings implements PhysicalOperator {
     this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;
     this.distinctEdgeColumnsRight   = distinctEdgeColumnsRight;
     this.joinHint                   = joinHint;
-    this.name                       = "JoinEmbeddings";
+    this.setName("JoinEmbeddings");
   }
 
   @Override

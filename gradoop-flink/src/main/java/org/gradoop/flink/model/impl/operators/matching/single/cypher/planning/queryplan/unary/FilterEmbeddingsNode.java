@@ -50,7 +50,7 @@ public class FilterEmbeddingsNode extends UnaryNode implements FilterNode {
     FilterEmbeddings op =
       new FilterEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData());
 
-    op.setName(getOperatorName());
+    op.setName(toString());
     return op.evaluate();
   }
 
@@ -71,13 +71,5 @@ public class FilterEmbeddingsNode extends UnaryNode implements FilterNode {
   @Override
   public String toString() {
     return String.format("FilterEmbeddingsNode{filterPredicate=%s}", filterPredicate);
-  }
-
-  /**
-   * Returns the operator name
-   * @return operator name
-   */
-  private String getOperatorName() {
-    return String.format("FilterEmbeddings(predicatse: %s)", filterPredicate);
   }
 }

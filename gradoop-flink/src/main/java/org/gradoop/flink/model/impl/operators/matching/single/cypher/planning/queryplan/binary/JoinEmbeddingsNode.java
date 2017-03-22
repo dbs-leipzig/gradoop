@@ -97,7 +97,7 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
       getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),
       joinHint);
-    op.setName(getOperatorName());
+    op.setName(toString());
     return op.evaluate();
   }
 
@@ -226,13 +226,5 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
       "vertexMorphismType=%s, " +
       "edgeMorphismType=%s}",
       joinVariables, vertexStrategy, edgeStrategy);
-  }
-
-  /**
-   * Generates the operator description
-   * @return operator description
-   */
-  private String getOperatorName() {
-    return String.format("JoinEmbeddings(on: %s", joinVariables);
   }
 }

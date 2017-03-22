@@ -42,7 +42,7 @@ public class ProjectEdges implements PhysicalOperator {
   private final List<String> propertyKeys;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   private String name;
 

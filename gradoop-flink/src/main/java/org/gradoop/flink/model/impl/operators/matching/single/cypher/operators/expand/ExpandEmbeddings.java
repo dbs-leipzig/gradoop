@@ -85,7 +85,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
   protected DataSet<EdgeWithTiePoint> candidateEdgeTuples;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   protected String name;
 

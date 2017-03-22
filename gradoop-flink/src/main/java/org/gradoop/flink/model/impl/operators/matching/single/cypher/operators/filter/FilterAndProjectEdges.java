@@ -59,7 +59,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
   private final List<String> projectionPropertyKeys;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   private String name;
 
@@ -75,7 +75,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
     this.input = input;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
-    this.name = "FilterAndProjectEdges";
+    this.setName("FilterAndProjectEdges");
   }
 
   @Override

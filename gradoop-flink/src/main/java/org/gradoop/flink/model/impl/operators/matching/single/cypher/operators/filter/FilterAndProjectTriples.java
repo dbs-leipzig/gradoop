@@ -82,7 +82,7 @@ public class FilterAndProjectTriples implements PhysicalOperator {
   private final MatchStrategy vertexMatchStrategy;
 
   /**
-   * Operator name
+   * Operator name used for Flink operator description
    */
   private String name;
 

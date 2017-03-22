@@ -73,7 +73,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
   public DataSet<Embedding> execute() {
     FilterAndProjectVertices op =
       new FilterAndProjectVertices(vertices, filterPredicate, projectionKeys);
-    op.setName(getOperatorName());
+    op.setName(toString());
     return op.evaluate();
   }
 
@@ -111,16 +111,5 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
         "filterPredicate=%s, " +
         "projectionKeys=%s}",
       vertexVariable, filterPredicate, projectionKeys);
-  }
-
-  /**
-   * Returns the operator name
-   * @return operator name
-   */
-  private String getOperatorName() {
-    return String.format(
-      "FilterAndProjectVertices(variable: %s, filter: %s, projection: %s)",
-      vertexVariable, filterPredicate, projectionKeys
-    );
   }
 }

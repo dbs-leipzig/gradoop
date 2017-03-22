@@ -120,7 +120,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
       getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData()),
       getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData()),
       closingColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
-    op.setName(getOperatorName());
+    op.setName(toString());
     return op.evaluate();
   }
 
@@ -171,6 +171,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
   @Override
   public String toString() {
     return String.format("ExpandEmbeddingsNode={" +
+        "Bulk, " +
         "startVariable='%s', " +
         "pathVariable='%s', " +
         "endVariable='%s', " +
@@ -181,16 +182,5 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
         "edgeMorphismType=%s}",
       startVariable, pathVariable, endVariable, lowerBound, upperBound, expandDirection,
       vertexStrategy, edgeStrategy);
-  }
-
-  /**
-   * Generates the operator description
-   * @return operator description
-   */
-  private String getOperatorName() {
-    return String.format(
-      "ExpandEmbeddings(Bulk, from: %s, via: %s, to: %s, lowerBound: %s, upperBound: %s)",
-      startVariable, pathVariable, endVariable, lowerBound, upperBound
-    );
   }
 }
