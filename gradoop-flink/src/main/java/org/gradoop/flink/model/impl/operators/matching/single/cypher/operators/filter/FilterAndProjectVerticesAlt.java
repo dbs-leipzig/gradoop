@@ -82,9 +82,9 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   public DataSet<Embedding> evaluate() {
     return input
       .filter(new FilterVertex(predicates))
-        .name(getName())
+      .name(getName())
       .map(new ProjectVertex(projectionPropertyKeys))
-        .name(getName());
+      .name(getName());
 
   }
 

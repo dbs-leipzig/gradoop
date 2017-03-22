@@ -73,7 +73,7 @@ public class ProjectVertices implements PhysicalOperator {
   public DataSet<Embedding> evaluate() {
     return input
       .map(new ProjectVertex(propertyKeys))
-        .name(getName());
+      .name(getName());
   }
 
   @Override

@@ -82,7 +82,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
   public DataSet<Embedding> evaluate() {
     return input
       .flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys))
-        .name(getName());
+      .name(getName());
   }
 
   @Override

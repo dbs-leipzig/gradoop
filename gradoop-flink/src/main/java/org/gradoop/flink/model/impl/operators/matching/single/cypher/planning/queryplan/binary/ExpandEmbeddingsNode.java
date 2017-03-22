@@ -171,7 +171,6 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
   @Override
   public String toString() {
     return String.format("ExpandEmbeddingsNode={" +
-        "Bulk, " +
         "startVariable='%s', " +
         "pathVariable='%s', " +
         "endVariable='%s', " +
