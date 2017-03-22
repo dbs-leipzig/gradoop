@@ -48,8 +48,10 @@
 
         <!-- Checks for blocks. -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
-        <!-- No empty blocks (i.e. catch) -->
-        <module name="EmptyBlock"/>
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT"/>
+            <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
         <!-- No if/else/do/for/while without braces -->
         <module name="NeedBraces"/>
         <!-- Checks for the placement of left curly braces for code blocks -->
