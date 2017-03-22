@@ -25,7 +25,9 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.LogicalGraphOperators;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -47,6 +49,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+
+
+import org.gradoop.flink.model.impl.operators.neighborhood.GroupReduceEdgesFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.GroupReduceNeighborsFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.NeighborsFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgesFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceNeighborsFunction;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.flink.model.impl.operators.split.Split;
@@ -418,6 +428,26 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
     }
     return callForGraph(builder.build());
+  }
+
+  public LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceEdgesFunction(function, edgeDirection));
+  }
+
+  public LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceNeighborsFunction(function, edgeDirection));
+  }
+
+  public LogicalGraph groupReduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new GroupReduceEdgesFunction(function, edgeDirection));
+  }
+
+  public LogicalGraph groupReduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new GroupReduceNeighborsFunction(function, edgeDirection));
   }
 
   //----------------------------------------------------------------------------
