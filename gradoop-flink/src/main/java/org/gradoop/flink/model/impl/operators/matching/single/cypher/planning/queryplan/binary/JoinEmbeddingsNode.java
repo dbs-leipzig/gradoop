@@ -91,12 +91,14 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new JoinEmbeddings(getLeftChild().execute(), getRightChild().execute(),
+    JoinEmbeddings op = new JoinEmbeddings(getLeftChild().execute(), getRightChild().execute(),
       getRightChild().getEmbeddingMetaData().getEntryCount(),
       getJoinColumnsLeft(), getJoinColumnsRight(),
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
       getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),
-      joinHint).evaluate();
+      joinHint);
+    op.setName(toString());
+    return op.evaluate();
   }
 
   @Override

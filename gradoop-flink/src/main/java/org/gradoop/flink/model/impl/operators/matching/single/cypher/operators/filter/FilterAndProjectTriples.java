@@ -82,6 +82,11 @@ public class FilterAndProjectTriples implements PhysicalOperator {
   private final MatchStrategy vertexMatchStrategy;
 
   /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
    * New vertex filter operator
    *
    * @param input Candidate vertices
@@ -102,6 +107,7 @@ public class FilterAndProjectTriples implements PhysicalOperator {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
     this.vertexMatchStrategy = vertexMatchStrategy;
+    this.setName("FilterAndProjectTriples");
   }
 
   @Override
@@ -115,6 +121,16 @@ public class FilterAndProjectTriples implements PhysicalOperator {
         projectionPropertyKeys,
         vertexMatchStrategy
       )
-    );
+    ).name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

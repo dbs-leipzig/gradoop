@@ -24,6 +24,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.Expa
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand
+  .ExpandEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsBulk;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
@@ -112,11 +114,14 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new ExpandEmbeddingsBulk(getLeftChild().execute(), getRightChild().execute(),
+    ExpandEmbeddings op = new ExpandEmbeddingsBulk(
+      getLeftChild().execute(), getRightChild().execute(),
       expandColumn, lowerBound, upperBound, expandDirection,
       getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData()),
       getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData()),
-      closingColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES).evaluate();
+      closingColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+    op.setName(toString());
+    return op.evaluate();
   }
 
   @Override

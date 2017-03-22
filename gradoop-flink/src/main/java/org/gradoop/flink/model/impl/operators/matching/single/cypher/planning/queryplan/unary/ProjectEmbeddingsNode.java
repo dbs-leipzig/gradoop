@@ -63,7 +63,9 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new ProjectEmbeddings(getChildNode().execute(), whiteListColumns).evaluate();
+    ProjectEmbeddings op =  new ProjectEmbeddings(getChildNode().execute(), whiteListColumns);
+    op.setName(toString());
+    return op.evaluate();
   }
 
   @Override

@@ -40,6 +40,11 @@ public class ProjectEmbeddings implements PhysicalOperator {
   private final List<Integer> propertyWhiteList;
 
   /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
    * Creates a new embedding projection operator
    * @param input Embeddings that should be projected
    * @param propertyWhiteList property columns in the embedding that are taken over to the output
@@ -47,10 +52,23 @@ public class ProjectEmbeddings implements PhysicalOperator {
   public ProjectEmbeddings(DataSet<Embedding> input, List<Integer> propertyWhiteList) {
     this.input = input;
     this.propertyWhiteList = propertyWhiteList.stream().sorted().collect(Collectors.toList());
+    this.name = "ProjectEmbeddings";
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectEmbedding(propertyWhiteList));
+    return input
+      .map(new ProjectEmbedding(propertyWhiteList))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

@@ -42,6 +42,11 @@ public class ProjectEdges implements PhysicalOperator {
   private final List<String> propertyKeys;
 
   /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
    * Creates a new edge projection operator
    * @param input edges that should be projected
    * @param propertyKeys List of property names that will be kept in the projection
@@ -49,6 +54,7 @@ public class ProjectEdges implements PhysicalOperator {
   public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
+    this.name = "ProjectEdges";
   }
 
   /**
@@ -64,6 +70,18 @@ public class ProjectEdges implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectEdge(propertyKeys));
+    return input
+      .map(new ProjectEdge(propertyKeys))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

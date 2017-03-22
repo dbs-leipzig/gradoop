@@ -67,4 +67,14 @@ public class CartesianProduct implements PhysicalOperator {
   public DataSet<Embedding> evaluate() {
     return null;
   }
+
+  @Override
+  public void setName(String newName) {
+
+  }
+
+  @Override
+  public String getName() {
+    return null;
+  }
 }

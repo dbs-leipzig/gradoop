@@ -43,6 +43,11 @@ public class FilterEmbeddings implements PhysicalOperator {
   private final EmbeddingMetaData metaData;
 
   /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
    * New embedding filter operator
    * @param input Candidate embeddings
    * @param predicates Predicates to used for filtering
@@ -53,12 +58,25 @@ public class FilterEmbeddings implements PhysicalOperator {
     this.input = input;
     this.predicates = predicates;
     this.metaData = metaData;
+    this.setName("FilterEmbeddings");
   }
 
   /**
    * {@inheritDoc}
    */
   public DataSet<Embedding> evaluate() {
-    return input.filter(new FilterEmbedding(predicates, metaData));
+    return input
+      .filter(new FilterEmbedding(predicates, metaData))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

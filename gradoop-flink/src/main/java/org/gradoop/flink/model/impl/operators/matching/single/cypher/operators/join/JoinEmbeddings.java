@@ -83,6 +83,11 @@ public class JoinEmbeddings implements PhysicalOperator {
   private final JoinOperatorBase.JoinHint joinHint;
 
   /**
+   * Operator name
+   */
+  private String name;
+
+  /**
    * Instantiates a new join operator.
    *
    * @param left embeddings of the left side of the join
@@ -171,6 +176,7 @@ public class JoinEmbeddings implements PhysicalOperator {
     this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;
     this.distinctEdgeColumnsRight   = distinctEdgeColumnsRight;
     this.joinHint                   = joinHint;
+    this.setName("JoinEmbeddings");
   }
 
   @Override
@@ -180,6 +186,17 @@ public class JoinEmbeddings implements PhysicalOperator {
       .equalTo(new ExtractJoinColumns(rightJoinColumns))
       .with(new MergeEmbeddings(rightColumns, rightJoinColumns,
         distinctVertexColumnsLeft, distinctVertexColumnsRight,
-        distinctEdgeColumnsLeft, distinctEdgeColumnsRight));
+        distinctEdgeColumnsLeft, distinctEdgeColumnsRight))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

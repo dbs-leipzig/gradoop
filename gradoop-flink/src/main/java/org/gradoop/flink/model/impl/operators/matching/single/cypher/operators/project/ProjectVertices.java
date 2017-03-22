@@ -42,6 +42,11 @@ public class ProjectVertices implements PhysicalOperator {
   private final List<String> propertyKeys;
 
   /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
    * Creates a new vertex projection operator
    *
    * @param input vertices that should be projected
@@ -50,6 +55,7 @@ public class ProjectVertices implements PhysicalOperator {
   public ProjectVertices(DataSet<Vertex> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
+    this.name = "ProjectVertices";
   }
 
   /**
@@ -65,6 +71,18 @@ public class ProjectVertices implements PhysicalOperator {
 
   @Override
   public DataSet<Embedding> evaluate() {
-    return input.map(new ProjectVertex(propertyKeys));
+    return input
+      .map(new ProjectVertex(propertyKeys))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

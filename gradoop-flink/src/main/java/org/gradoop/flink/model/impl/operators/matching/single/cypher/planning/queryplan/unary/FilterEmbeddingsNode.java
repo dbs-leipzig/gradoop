@@ -47,8 +47,10 @@ public class FilterEmbeddingsNode extends UnaryNode implements FilterNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new FilterEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData())
-      .evaluate();
+    FilterEmbeddings op =
+      new FilterEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData());
+    op.setName(toString());
+    return op.evaluate();
   }
 
   /**
