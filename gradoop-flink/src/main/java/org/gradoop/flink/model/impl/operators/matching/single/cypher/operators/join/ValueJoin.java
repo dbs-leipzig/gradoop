@@ -84,6 +84,10 @@ public class ValueJoin implements PhysicalOperator {
    * Flink join Hint
    */
   private final JoinOperatorBase.JoinHint joinHint;
+  /**
+   * Stores the operator name used for flink operator naming
+   */
+  private String name;
 
   /**
    * New value equi join operator
@@ -141,6 +145,7 @@ public class ValueJoin implements PhysicalOperator {
     this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft;
     this.distinctEdgeColumnsRight = distinctEdgeColumnsRight;
     this.joinHint = joinHint;
+    this.setName("ValueJoin");
   }
 
   @Override
@@ -155,16 +160,17 @@ public class ValueJoin implements PhysicalOperator {
         distinctVertexColumnsRight,
         distinctEdgeColumnsLeft,
         distinctEdgeColumnsRight
-      ));
+      ))
+      .name(getName());
   }
 
   @Override
   public void setName(String newName) {
-
+    this.name = newName;
   }
 
   @Override
   public String getName() {
-    return null;
+    return this.name;
   }
 }

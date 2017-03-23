@@ -99,12 +99,14 @@ public class ValueJoinNode extends BinaryNode implements JoinNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new ValueJoin(getLeftChild().execute(), getRightChild().execute(),
+    ValueJoin op = new ValueJoin(getLeftChild().execute(), getRightChild().execute(),
       getJoinPropertiesLeft(), getJoinPropertiesRight(),
       getRightChild().getEmbeddingMetaData().getEntryCount(),
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
       getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),
-      joinHint).evaluate();
+      joinHint);
+    op.setName(this.toString());
+    return op.evaluate();
   }
 
   @Override

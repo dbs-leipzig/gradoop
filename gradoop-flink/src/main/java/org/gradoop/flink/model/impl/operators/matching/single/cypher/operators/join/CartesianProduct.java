@@ -71,6 +71,10 @@ public class CartesianProduct implements PhysicalOperator {
    * Flink cross Hint
    */
   private final CrossOperatorBase.CrossHint crossHint;
+  /**
+   * Operator name used for Flink operator naming
+   */
+  private String name;
 
   /**
    * New value join operator
@@ -102,6 +106,7 @@ public class CartesianProduct implements PhysicalOperator {
     this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft;
     this.distinctEdgeColumnsRight = distinctEdgeColumnsRight;
     this.crossHint = crossHint;
+    this.setName("CartesianProduct");
   }
 
   @Override
@@ -113,6 +118,17 @@ public class CartesianProduct implements PhysicalOperator {
         distinctVertexColumnsRight,
         distinctEdgeColumnsLeft,
         distinctEdgeColumnsRight
-      ));
+      ))
+      .name(getName());
+  }
+
+  @Override
+  public void setName(String newName) {
+    this.name = newName;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }

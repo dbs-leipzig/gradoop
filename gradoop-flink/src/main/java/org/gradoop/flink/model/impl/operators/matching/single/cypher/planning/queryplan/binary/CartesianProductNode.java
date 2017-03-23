@@ -82,10 +82,12 @@ public class CartesianProductNode extends BinaryNode implements JoinNode {
 
   @Override
   public DataSet<Embedding> execute() {
-    return new CartesianProduct(getLeftChild().execute(), getRightChild().execute(),
+    CartesianProduct op = new CartesianProduct(getLeftChild().execute(), getRightChild().execute(),
       getRightChild().getEmbeddingMetaData().getEntryCount(),
       getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
-      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(), crossHint).evaluate();
+      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(), crossHint);
+    op.setName(this.toString());
+    return op.evaluate();
   }
 
   @Override
