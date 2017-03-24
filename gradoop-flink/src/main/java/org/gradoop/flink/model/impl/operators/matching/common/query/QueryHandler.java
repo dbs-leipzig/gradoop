@@ -53,6 +53,10 @@ public class QueryHandler {
    */
   private Integer radius;
   /**
+   * Graph components
+   */
+  private Map<Integer, Set<String>> components;
+  /**
    * Cache: vId --> Vertex with Id == vId
    */
   private Map<Long, Vertex> idToVertexCache;
@@ -182,6 +186,18 @@ public class QueryHandler {
       radius = GraphMetrics.getRadius(this);
     }
     return radius;
+  }
+
+  /**
+   * Returns the mapping of vertices to connected graph components
+   *
+   * @return connected components
+   */
+  public Map<Integer, Set<String>> getComponents() {
+    if (components == null) {
+      components = GraphMetrics.getComponents(this);
+    }
+    return components;
   }
 
   /**
