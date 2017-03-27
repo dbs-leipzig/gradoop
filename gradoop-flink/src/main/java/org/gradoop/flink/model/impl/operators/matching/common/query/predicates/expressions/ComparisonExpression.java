@@ -63,6 +63,10 @@ public class ComparisonExpression extends QueryPredicate {
     return QueryComparable.createFrom(comparison.getComparableExpressions()[1]);
   }
 
+  public Comparator getComparator() {
+    return comparison.getComparator();
+  }
+
   /**
    * Evaluates the comparisson for the given embedding
    *

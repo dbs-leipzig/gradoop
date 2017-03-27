@@ -5,8 +5,10 @@ import com.google.common.collect.Sets;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
@@ -149,4 +151,68 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     assertThat(estimator.getCardinality(), is(42L));
   }
+
+  @Test
+  public void testCartesianProductVertices() throws Exception {
+    String query = "MATCH (a),(b)";
+    QueryHandler queryHandler = new QueryHandler(query);
+
+    LeafNode aNode = new FilterAndProjectVerticesNode(null, "a",
+      queryHandler.getPredicates().getSubCNF("a"), Sets.newHashSet());
+    LeafNode bNode = new FilterAndProjectVerticesNode(null, "b",
+      queryHandler.getPredicates().getSubCNF("b"), Sets.newHashSet());
+    CartesianProductNode crossNode = new CartesianProductNode(aNode, bNode, MatchStrategy
+      .HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
+
+    QueryPlan queryPlan = new QueryPlan(crossNode);
+
+    QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+
+    assertThat(estimator.getCardinality(), is(STATS.getVertexCount() * STATS.getVertexCount()));
+  }
+
+
+  @Test
+  public void testComplexCartesianProduct() throws Exception {
+    String query = "MATCH (a:Person)-[e1:knows]->(b:Person),(c:Forum)-[e2:hasTag]->(d:Tag)";
+    QueryHandler queryHandler = new QueryHandler(query);
+
+    LeafNode aNode = new FilterAndProjectVerticesNode(null, "a",
+      queryHandler.getPredicates().getSubCNF("a"), Sets.newHashSet());
+    LeafNode bNode = new FilterAndProjectVerticesNode(null, "b",
+      queryHandler.getPredicates().getSubCNF("b"), Sets.newHashSet());
+    LeafNode cNode = new FilterAndProjectVerticesNode(null, "c",
+      queryHandler.getPredicates().getSubCNF("c"), Sets.newHashSet());
+    LeafNode dNode = new FilterAndProjectVerticesNode(null, "d",
+      queryHandler.getPredicates().getSubCNF("d"), Sets.newHashSet());
+
+    LeafNode e1Node = new FilterAndProjectEdgesNode(null, "a","e1","b",
+      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet());
+    LeafNode e2Node = new FilterAndProjectEdgesNode(null, "c","e2","d",
+      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet());
+
+    BinaryNode ae1 = new JoinEmbeddingsNode(aNode, e1Node, Lists.newArrayList("a"),
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+    BinaryNode ae1b = new JoinEmbeddingsNode(ae1, bNode, Lists.newArrayList("b"),
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+    BinaryNode ce2 = new JoinEmbeddingsNode(cNode, e2Node, Lists.newArrayList("c"),
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+    BinaryNode ce2d = new JoinEmbeddingsNode(ce2, dNode, Lists.newArrayList("d"),
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+
+    CartesianProductNode crossNode = new CartesianProductNode(ae1b, ce2d, MatchStrategy
+      .HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+
+    QueryPlan ae1bPlan = new QueryPlan(ae1b);
+    QueryPlan ce2dPlan = new QueryPlan(ce2d);
+    QueryPlan crossPlan = new QueryPlan(crossNode);
+
+    QueryPlanEstimator ae1bEstimator = new QueryPlanEstimator(ae1bPlan, queryHandler, STATS);
+    QueryPlanEstimator ce2dEstimator = new QueryPlanEstimator(ce2dPlan, queryHandler, STATS);
+    QueryPlanEstimator crossEstimator = new QueryPlanEstimator(crossPlan, queryHandler, STATS);
+
+    assertThat(crossEstimator.getCardinality(), is(ae1bEstimator.getCardinality() *
+      ce2dEstimator.getCardinality()));
+  }
+
 }

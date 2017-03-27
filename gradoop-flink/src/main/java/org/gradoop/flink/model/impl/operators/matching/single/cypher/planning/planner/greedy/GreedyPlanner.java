@@ -23,6 +23,12 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables
+  .PropertySelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions
+  .ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
@@ -30,15 +36,19 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.pl
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectEdgesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.ProjectEmbeddingsNode;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
+import org.s1ck.gdl.utils.Comparator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,12 +114,18 @@ public class GreedyPlanner {
 
     while (planTable.size() > 1) {
       PlanTable newPlans = evaluateJoins(planTable);
+
+      if (newPlans.size() == 0) {
+        newPlans = evaluateCartesianProducts(planTable);
+      }
+
       newPlans = evaluateFilter(newPlans);
       newPlans = evaluateProjection(newPlans);
-      // get plan with minimum costs and remove all plans covered by this plan
       PlanTableEntry bestEntry = newPlans.min();
       planTable.removeCoveredBy(bestEntry);
+      // get plan with minimum costs and remove all plans covered by this plan
       planTable.add(bestEntry);
+
     }
 
     return planTable.get(0);
@@ -386,5 +402,164 @@ public class GreedyPlanner {
       }
     }
     return newTable;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Join and Expand
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Evaluates which entries in the specified plan table can be joined. The joined entries
+   * are added to a new table which is returned.
+   *
+   * @param currentTable query plan table
+   * @return new table containing solely joined plans from the input table
+   */
+  private PlanTable evaluateCartesianProducts(PlanTable currentTable) {
+    PlanTable newTable = new PlanTable();
+    for (int i = 0; i < currentTable.size(); i++) {
+      PlanTableEntry leftEntry = currentTable.get(i);
+      for (int j = i + 1; j < currentTable.size(); j++) {
+        PlanTableEntry rightEntry = currentTable.get(j);
+        CNF joinPredicate = getJoinPredicate(leftEntry, rightEntry);
+        if (joinPredicate.size() > 0) {
+          newTable.add(createValueJoinEntry(leftEntry, rightEntry, joinPredicate));
+        } else {
+          // regular join or join with variable length path on source or target vertex
+          newTable.add(createCartesianProductEntry(leftEntry, rightEntry));
+        }
+      }
+    }
+    return newTable;
+  }
+
+
+  /**
+   * Computes the overlapping query variables of the specified entries.
+   *
+   * @param leftEntry first entry
+   * @param rightEntry second entry
+   * @return variables that are available in both input entries
+   */
+  private CNF getJoinPredicate(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
+    Set<String> allVariables = leftEntry.getAllVariables();
+    allVariables.addAll(rightEntry.getAllVariables());
+
+    CNF leftPredicates = new CNF(leftEntry.getPredicates());
+    CNF rightPredicates = new CNF(rightEntry.getPredicates());
+    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
+    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+    CNF predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);
+
+    return new CNF(
+      predicates.getPredicates().stream().filter(p ->
+        p.size() == 1 && p.getPredicates().get(0).getComparator().equals(Comparator.EQ)
+      ).collect(Collectors.toList())
+    );
+  }
+
+  /**
+   * Creates an {@link CartesianProductNode} from the specified arguments.
+   *
+   * @param leftEntry left entry
+   * @param rightEntry right entry
+   *
+   * @return new expand node
+   */
+  private PlanTableEntry createCartesianProductEntry(PlanTableEntry leftEntry,
+    PlanTableEntry rightEntry) {
+    CartesianProductNode node = new CartesianProductNode(
+      leftEntry.getQueryPlan().getRoot(),
+      rightEntry.getQueryPlan().getRoot(),
+      vertexStrategy, edgeStrategy
+    );
+
+    Set<String> processedVariables = leftEntry.getProcessedVariables();
+    processedVariables.addAll(rightEntry.getProcessedVariables());
+
+    CNF leftPredicates = new CNF(leftEntry.getPredicates());
+    CNF rightPredicates = new CNF(rightEntry.getPredicates());
+    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
+    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+    CNF predicates = leftPredicates.and(rightPredicates);
+
+    return new PlanTableEntry(
+      GRAPH,
+      processedVariables,
+      predicates,
+      new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)
+    );
+  }
+
+  /**
+   * Creates an {@link ValueJoinNode} from the specified arguments.
+   *
+   * @param leftEntry left entry
+   * @param rightEntry right entry
+   * @param joinPredicate join predicate
+   *
+   * @return new value join node
+   */
+  private PlanTableEntry createValueJoinEntry(PlanTableEntry leftEntry,
+    PlanTableEntry rightEntry, CNF joinPredicate) {
+
+    List<Pair<String, String>> leftProperties = new ArrayList<>();
+    List<Pair<String, String>> rightProperties = new ArrayList<>();
+
+    for (CNFElement e : joinPredicate.getPredicates()) {
+      ComparisonExpression comparison = e.getPredicates().get(0);
+
+      Pair<String, String> joinProperty = extractJoinProperty(comparison.getLhs());
+      if (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
+        leftProperties.add(joinProperty);
+      } else {
+        rightProperties.add(joinProperty);
+      }
+
+      joinProperty = extractJoinProperty(comparison.getRhs());
+      if (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
+        leftProperties.add(joinProperty);
+      } else {
+        rightProperties.add(joinProperty);
+      }
+    }
+
+    ValueJoinNode node = new ValueJoinNode(
+      leftEntry.getQueryPlan().getRoot(),
+      rightEntry.getQueryPlan().getRoot(),
+      leftProperties, rightProperties,
+      vertexStrategy, edgeStrategy
+    );
+
+    Set<String> processedVariables = leftEntry.getProcessedVariables();
+    processedVariables.addAll(rightEntry.getProcessedVariables());
+
+    CNF leftPredicates = new CNF(leftEntry.getPredicates());
+    CNF rightPredicates = new CNF(rightEntry.getPredicates());
+    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
+    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+    CNF predicates = leftPredicates.and(rightPredicates);
+
+    return new PlanTableEntry(
+      GRAPH,
+      processedVariables,
+      predicates,
+      new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)
+    );
+  }
+
+  /**
+   * Turns a QueryComparable into a {@code Pair<Variable, PropertyKey>}
+   * @param comparable query comparable
+   * @return join property
+   */
+  private Pair<String, String> extractJoinProperty(QueryComparable comparable) {
+    if (comparable instanceof PropertySelectorComparable) {
+      PropertySelectorComparable propertySelector = (PropertySelectorComparable) comparable;
+      return Pair.of(propertySelector.getVariable(), propertySelector.getPropertyKey());
+    } else {
+      //TODO Include ElementSelector -> ID needs to be projected as property
+      throw new RuntimeException("Comparable " + comparable + "cant be used for ValueJoin");
+    }
   }
 }

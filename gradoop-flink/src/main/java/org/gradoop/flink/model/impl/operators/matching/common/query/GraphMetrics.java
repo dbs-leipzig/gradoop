@@ -134,8 +134,8 @@ public class GraphMetrics {
             graph.getEdges()
               .stream()
               .filter(edge ->
-                edge.getSourceVertexId().equals(vertexId) || edge
-                .getTargetVertexId().equals(vertexId)
+                edge.getSourceVertexId().equals(vertexId) ||
+                edge.getTargetVertexId().equals(vertexId)
               )
               .map(edge -> edge.getSourceVertexId().equals(vertexId) ?
                 edge.getTargetVertexId() : edge.getSourceVertexId()
