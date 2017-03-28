@@ -58,6 +58,11 @@ public class QueryEngineITTests extends GradoopFlinkTestBase {
     assertCardinalities("MATCH ()-[*0..10]->()", 98, 97);
   }
 
+  @Test
+  public void testMatchWithValueJoin() throws Exception {
+    assertCardinalities("MATCH (a:Person), (b:Person) WHERE a.city = b.city", 36, 8);
+  }
+
   /**
    * Executed the given query and checks if the estimated and exact cardinality applies to the
    * specified values.

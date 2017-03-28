@@ -19,6 +19,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
@@ -36,7 +38,14 @@ import java.util.stream.IntStream;
  *
  * The constraints for merging are defined at {@link JoinEmbeddings}.
  */
-public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, Embedding> {
+public class MergeEmbeddings implements
+  FlatJoinFunction<Embedding, Embedding, Embedding>,
+  FlatMapFunction<Tuple2<Embedding, Embedding>, Embedding> {
+
+  /**
+   * Reduce object instantiations.
+   */
+  protected final Embedding reuseEmbedding;
   /**
    * Non-Join columns from the right side.
    */
@@ -69,10 +78,6 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
    * Flag, if vertex distinctiveness needs to be checked.
    */
   private final boolean checkDistinctEdges;
-  /**
-   * Reduce object instantiations.
-   */
-  private final Embedding reuseEmbedding;
 
   /**
    * Creates a new UDF instance.
@@ -111,6 +116,25 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
 
   @Override
   public void join(Embedding left, Embedding right, Collector<Embedding> out) throws Exception {
+    if (isValid(left, right)) {
+      buildEmbedding(left, right);
+      out.collect(reuseEmbedding);
+    }
+  }
+
+  @Override
+  public void flatMap(Tuple2<Embedding, Embedding> value, Collector<Embedding> out)
+      throws Exception {
+    join(value.f0, value.f1, out);
+  }
+
+  /**
+   * Checks if the merged embedding would hold under morphism setting
+   * @param left left embedding
+   * @param right right embedding
+   * @return true if the morphism condition holds
+   */
+  protected boolean isValid(Embedding left, Embedding right) {
     boolean collect = false;
 
     // Vertex-Homomorphism + Edge-Homomorphism
@@ -128,12 +152,19 @@ public class MergeEmbeddings implements FlatJoinFunction<Embedding, Embedding, E
         collect = true;
       }
     }
-    if (collect) {
-      reuseEmbedding.setIdData(mergeIdData(left, right));
-      reuseEmbedding.setPropertyData(mergePropertyData(left, right));
-      reuseEmbedding.setIdListData(mergeIdListData(left, right));
-      out.collect(reuseEmbedding);
-    }
+
+    return collect;
+  }
+
+  /**
+   * Merges left and right embeddings into {@link MergeEmbeddings#reuseEmbedding}
+   * @param left left embedding
+   * @param right right embedding
+   */
+  protected void buildEmbedding(Embedding left, Embedding right) {
+    reuseEmbedding.setIdData(mergeIdData(left, right));
+    reuseEmbedding.setPropertyData(mergePropertyData(left, right));
+    reuseEmbedding.setIdListData(mergeIdListData(left, right));
   }
 
   /**

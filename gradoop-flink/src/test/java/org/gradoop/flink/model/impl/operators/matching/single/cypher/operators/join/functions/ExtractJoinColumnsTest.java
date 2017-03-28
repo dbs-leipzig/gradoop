@@ -48,10 +48,9 @@ public class ExtractJoinColumnsTest extends PhysicalOperatorTest {
 
     Embedding embedding = createEmbedding(v0, v1);
 
-    ExtractJoinColumns udf = new ExtractJoinColumns(Arrays.asList(1, 0));
+    ExtractJoinColumns udf1 = new ExtractJoinColumns(Arrays.asList(0, 1));
+    ExtractJoinColumns udf2 = new ExtractJoinColumns(Arrays.asList(1, 0));
 
-    Assert.assertEquals(
-      ArrayUtils.toString(v1.toByteArray()) + ArrayUtils.toString(v0.toByteArray()),
-      udf.getKey(embedding)
-    );  }
+    Assert.assertNotEquals(udf1.getKey(embedding), udf2.getKey(embedding));
+  }
 }
