@@ -53,8 +53,7 @@ public class CreateDictionary implements GroupReduceFunction<WithCount<String>, 
     stringsWithCount.sort(comparator);
 
     // Create dictionary with default label
-    // TODO: Find out why default label is required
-    List<String> dictionary = Lists.newArrayList("#");
+    List<String> dictionary = Lists.newArrayList();
 
     for (WithCount<String> stringWithCount : stringsWithCount) {
       dictionary.add(stringWithCount.getObject());
