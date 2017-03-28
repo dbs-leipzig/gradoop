@@ -55,7 +55,7 @@ public class QueryEngineITTests extends GradoopFlinkTestBase {
 
   @Test
   public void testMatchVariableLengthPath() throws Exception {
-    assertCardinalities("MATCH ()-[*0..10]->()", 98, 97);
+    assertCardinalities("MATCH ()-[*0..10]->()", 98, 86);
   }
 
   @Test

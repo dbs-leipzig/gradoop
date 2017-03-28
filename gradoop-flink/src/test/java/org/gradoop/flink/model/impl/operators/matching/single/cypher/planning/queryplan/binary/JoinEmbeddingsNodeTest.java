@@ -115,7 +115,7 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2, 4)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
