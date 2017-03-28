@@ -84,7 +84,12 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
 
   @Override
   public DataSet<Embedding> execute() {
-    FilterAndProjectEdges op =  new FilterAndProjectEdges(edges, filterPredicate, projectionKeys);
+    FilterAndProjectEdges op =  new FilterAndProjectEdges(
+      edges,
+      filterPredicate,
+      projectionKeys,
+      isLoop()
+    );
     op.setName(toString());
     return op.evaluate();
   }
@@ -107,12 +112,18 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
     return new ArrayList<>(projectionKeys);
   }
 
+  public boolean isLoop() {
+    return sourceVariable.equals(targetVariable);
+  }
+
   @Override
   protected EmbeddingMetaData computeEmbeddingMetaData() {
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
     embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
     embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
-    embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
+    if (!isLoop()) {
+      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
+    }
 
     embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);
 

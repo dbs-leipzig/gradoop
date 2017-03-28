@@ -61,12 +61,35 @@ public class EmbeddingFactoryTest {
     );
 
     Embedding embedding =
-      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo","bar"));
+      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo","bar"), false);
 
     assertEquals(3, embedding.size());
     assertEquals(edge.getSourceId(), embedding.getId(0));
     assertEquals(edge.getId(), embedding.getId(1));
     assertEquals(edge.getTargetId(), embedding.getId(2));
+    assertEquals(PropertyValue.create(1), embedding.getProperty(0));
+    assertEquals(PropertyValue.create("42"), embedding.getProperty(1));
+  }
+
+  @Test
+  public void convertEdgeWithLoop() throws Exception {
+    Properties properties = new Properties();
+    properties.set("foo", 1);
+    properties.set("bar", "42");
+    properties.set("baz", false);
+
+    GradoopId a = GradoopId.get();
+
+    Edge edge = new EdgeFactory().createEdge(
+      "TestVertex", a, a, properties
+    );
+
+    Embedding embedding =
+      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo","bar"), true);
+
+    assertEquals(2, embedding.size());
+    assertEquals(edge.getSourceId(), embedding.getId(0));
+    assertEquals(edge.getId(), embedding.getId(1));
     assertEquals(PropertyValue.create(1), embedding.getProperty(0));
     assertEquals(PropertyValue.create("42"), embedding.getProperty(1));
   }

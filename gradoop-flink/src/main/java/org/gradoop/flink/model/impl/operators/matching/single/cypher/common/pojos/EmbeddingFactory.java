@@ -58,11 +58,18 @@ public class EmbeddingFactory {
    *
    * @param edge edge to create embedding from
    * @param propertyKeys properties that will be stored in the embedding
+   * @param isLoop indicates if the edges is a loop
    * @return Embedding
    */
-  public static Embedding fromEdge(Edge edge, List<String> propertyKeys) {
+  public static Embedding fromEdge(Edge edge, List<String> propertyKeys, boolean isLoop) {
     Embedding embedding = new Embedding();
-    embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());
+
+    if (isLoop) {
+      embedding.addAll(edge.getSourceId(), edge.getId());
+    } else {
+      embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());
+    }
+
     embedding.addPropertyValues(project(edge, propertyKeys));
 
     return embedding;

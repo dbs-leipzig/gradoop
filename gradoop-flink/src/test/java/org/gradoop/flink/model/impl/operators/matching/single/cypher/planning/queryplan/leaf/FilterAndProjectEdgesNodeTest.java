@@ -40,6 +40,21 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
   }
 
   @Test
+  public void testMetaDataInitializationWithLoop() throws Exception {
+    String sourceVariable = "a";
+    String edgeVariable   = "e";
+    String targetVariable = "a";
+    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>());
+
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
+    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
+    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(0));
+    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+  }
+
+  @Test
   public void testExecute() throws Exception {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();

@@ -39,22 +39,28 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<Edge, Embedding> {
    * Property Keys used for the projection
    */
   private final List<String> projectionPropertyKeys;
+  /**
+   * Signals that the edge is a loop
+   */
+  private boolean isLoop;
 
   /**
    * New edge filter function
    *
    * @param predicates predicates used for filtering
    * @param projectionPropertyKeys property keys that will be used for projection
+   * @param isLoop is the edge a loop
    */
-  public FilterAndProjectEdge(CNF predicates, List<String> projectionPropertyKeys) {
+  public FilterAndProjectEdge(CNF predicates, List<String> projectionPropertyKeys, boolean isLoop) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
+    this.isLoop = isLoop;
   }
 
   @Override
   public void flatMap(Edge edge, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(edge)) {
-      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys));
+      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));
     }
   }
 }

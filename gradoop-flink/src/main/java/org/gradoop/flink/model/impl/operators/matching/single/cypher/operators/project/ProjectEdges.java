@@ -40,6 +40,10 @@ public class ProjectEdges implements PhysicalOperator {
    * Names of the properties that will be kept in the projection
    */
   private final List<String> propertyKeys;
+  /**
+   * Indicates if the edges is loop
+   */
+  private final boolean isLoop;
 
   /**
    * Operator name used for Flink operator description
@@ -50,11 +54,13 @@ public class ProjectEdges implements PhysicalOperator {
    * Creates a new edge projection operator
    * @param input edges that should be projected
    * @param propertyKeys List of property names that will be kept in the projection
+   * @param isLoop indicates if the edges is a loop
    */
-  public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys) {
+  public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys, boolean isLoop) {
     this.input = input;
     this.propertyKeys = propertyKeys;
     this.name = "ProjectEdges";
+    this.isLoop = isLoop;
   }
 
   /**
@@ -62,16 +68,16 @@ public class ProjectEdges implements PhysicalOperator {
    * Evaluate will return Embedding(IDEntry)
    *
    * @param input vertices that will be projected
+   * @param isLoop indicates if the edges is a loop
    */
-  public ProjectEdges(DataSet<Edge> input) {
-    this.input = input;
-    this.propertyKeys = new ArrayList<>();
+  public ProjectEdges(DataSet<Edge> input, boolean isLoop) {
+    this(input, new ArrayList<>(), isLoop);
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
     return input
-      .map(new ProjectEdge(propertyKeys))
+      .map(new ProjectEdge(propertyKeys, isLoop))
       .name(getName());
   }
 

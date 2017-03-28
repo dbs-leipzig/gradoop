@@ -50,12 +50,14 @@ public class PrintEmbedding extends Printer<Embedding, GradoopId> {
   @Override
   protected String getDebugString(Embedding embedding) {
     String vertexMapping = embeddingMetaData.getVertexVariables().stream()
-      .map(var -> var + " : " + vertexMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var))))
-      .collect(Collectors.joining(","));
+      .map(var -> String.format("%s : %s", var,
+        vertexMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))
+      .collect(Collectors.joining(", "));
 
     String edgeMapping = embeddingMetaData.getEdgeVariables().stream()
-      .map(var -> var + " : " + edgeMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var))))
-      .collect(Collectors.joining(","));
+      .map(var -> String.format("%s : %s", var,
+        edgeMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))
+      .collect(Collectors.joining(", "));
 
     return String.format("vertex-mapping: {%s}, edge-mapping: {%s}", vertexMapping, edgeMapping);
   }

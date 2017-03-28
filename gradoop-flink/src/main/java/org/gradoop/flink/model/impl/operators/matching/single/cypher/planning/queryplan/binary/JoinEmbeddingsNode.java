@@ -151,32 +151,28 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
   /**
    * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
    * the columns that need to contain distinct entries in the left embedding.
+   * This includes the join columns
    *
    * @return distinct vertex columns of the left embedding
    */
   private List<Integer> getDistinctVertexColumnsLeft() {
-    return getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData());
+    EmbeddingMetaData metaData = getLeftChild().getEmbeddingMetaData();
+
+    return vertexStrategy == MatchStrategy.ISOMORPHISM ?
+      metaData.getVertexVariables().stream()
+        .map(metaData::getEntryColumn)
+        .collect(Collectors.toList()) : Collections.emptyList();
   }
 
   /**
    * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
    * the columns that need to contain distinct entries in the right embedding.
+   * This excludes the join columns
    *
    * @return distinct vertex columns of the right embedding
    */
   private List<Integer> getDistinctVertexColumnsRight() {
-    return getDistinctVertexColumns(getRightChild().getEmbeddingMetaData());
-  }
-
-  /**
-   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy} and the specified
-   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
-   * entries.
-   *
-   * @param metaData meta data for the embedding
-   * @return distinct vertex columns
-   */
-  private List<Integer> getDistinctVertexColumns(final EmbeddingMetaData metaData) {
+    EmbeddingMetaData metaData = getRightChild().getEmbeddingMetaData();
     return vertexStrategy == MatchStrategy.ISOMORPHISM ?
       metaData.getVertexVariables().stream()
         .filter(var -> !joinVariables.contains(var))
