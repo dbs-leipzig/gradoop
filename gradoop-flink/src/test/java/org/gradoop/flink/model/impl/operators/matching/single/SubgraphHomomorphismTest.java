@@ -1,6 +1,5 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatchingWithBindingTest;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;

@@ -30,11 +30,17 @@ import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphSt
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions.ElementsFromEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
+
+
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
  * Implementation of a query engine based on the Cypher graph query language.
@@ -84,11 +90,15 @@ public class CypherPatternMatching extends PatternMatching {
   protected GraphCollection executeForPattern(LogicalGraph graph) {
     // Query planning
     QueryHandler queryHandler = getQueryHandler();
-    PlanTableEntry planTableEntry = new GreedyPlanner(graph, queryHandler, graphStatistics,
-      vertexStrategy, edgeStrategy).plan();
+    QueryPlan plan = new GreedyPlanner(graph, queryHandler, graphStatistics,
+      vertexStrategy, edgeStrategy).plan().getQueryPlan();
 
     // Query execution
-    DataSet<Embedding> embeddings = planTableEntry.getQueryPlan().execute();
+    DataSet<Embedding> embeddings = plan.execute();
+    EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();
+
+    embeddings = log(embeddings, new PrintEmbedding(embeddingMetaData),
+      getVertexMapping(), getEdgeMapping());
 
     // Post processing
     Map<String, Pair<String, String>> sourceTargetVars = queryHandler.getEdges().stream()
@@ -102,7 +112,7 @@ public class CypherPatternMatching extends PatternMatching {
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory(),
-        planTableEntry.getQueryPlan().getRoot().getEmbeddingMetaData(),
+        embeddingMetaData,
         sourceTargetVars
       ));
 

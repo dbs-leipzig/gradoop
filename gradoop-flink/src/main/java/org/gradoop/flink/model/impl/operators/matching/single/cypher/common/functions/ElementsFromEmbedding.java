@@ -34,7 +34,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Extracts EPGM elements from an {@link Embedding}.
@@ -65,6 +67,10 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    * to the graph head representing an embedding.
    */
   private final Map<PropertyValue, PropertyValue> variableMapping;
+  /**
+   * Stores the identifiers that have already been processed.
+   */
+  private final Set<GradoopId> processedIds;
 
   /**
    * Constructor.
@@ -84,19 +90,26 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     this.metaData = embeddingMetaData;
     this.sourceTargetVariables = sourceTargetVariables;
     this.variableMapping = new HashMap<>(embeddingMetaData.getEntryCount());
+    this.processedIds = new HashSet<>(embeddingMetaData.getEntryCount());
   }
 
   @Override
   public void flatMap(Embedding embedding, Collector<Element> out) throws Exception {
+    // clear for each embedding
+    processedIds.clear();
+
     // create graph head for this embedding
     GraphHead graphHead = graphHeadFactory.createGraphHead();
 
     // vertices
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
-      Vertex v = vertexFactory.initVertex(id);
-      v.addGraphId(graphHead.getId());
-      out.collect(v);
+      if (!processedIds.contains(id)) {
+        Vertex v = vertexFactory.initVertex(id);
+        v.addGraphId(graphHead.getId());
+        out.collect(v);
+        processedIds.add(id);
+      }
       variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));
     }
 
@@ -104,13 +117,16 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     for (String edgeVariable : metaData.getEdgeVariables()) {
       if (metaData.getEntryType(edgeVariable) == EmbeddingMetaData.EntryType.EDGE) {
         GradoopId edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));
-        GradoopId sourceId = embedding.getId(metaData.getEntryColumn(
-          sourceTargetVariables.get(edgeVariable).getLeft()));
-        GradoopId targetId = embedding.getId(metaData.getEntryColumn(
-          sourceTargetVariables.get(edgeVariable).getRight()));
-        Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
-        e.addGraphId(graphHead.getId());
-        out.collect(e);
+        if (!processedIds.contains(edgeId)) {
+          GradoopId sourceId = embedding.getId(
+            metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));
+          GradoopId targetId = embedding.getId(
+            metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
+          Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
+          e.addGraphId(graphHead.getId());
+          out.collect(e);
+          processedIds.add(edgeId);
+        }
         variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
       }
     }

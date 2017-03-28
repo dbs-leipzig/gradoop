@@ -77,8 +77,7 @@ public class ExplorativePatternMatching
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    ExplorativePatternMatching.class);
+  private static final Logger LOG = Logger.getLogger(ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
