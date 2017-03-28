@@ -1,8 +1,7 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.DistinctionFunction;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.operators.distinction.functions.CountGraphHeads;
 import org.junit.Test;
@@ -21,9 +20,9 @@ public class GroupByIsomorphismTest extends DistinctByIsomorphismTestBase {
 
     String propertyKey = "count";
 
-    DistinctionFunction countFunc = new CountGraphHeads(propertyKey);
+    GraphHeadReduceFunction countFunc = new CountGraphHeads(propertyKey);
 
-    collection = collection.groupBy(countFunc);
+    collection = collection.groupByIsomorphism(countFunc);
 
     List<GraphHead> graphHeads = collection.getGraphHeads().collect();
 

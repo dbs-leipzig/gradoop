@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.functions.DistinctionFunction;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.distinction.functions.GraphHeadGroup;
@@ -39,14 +39,14 @@ public class GroupByIsomorphism extends SelectionBase {
   /**
    * Distinction function.
    */
-  private final DistinctionFunction function;
+  private final GraphHeadReduceFunction function;
 
   /**
    * Constructor.
    *
    * @param function reduce function to merge multiple heads of isomorphic graphs
    */
-  public GroupByIsomorphism(DistinctionFunction function) {
+  public GroupByIsomorphism(GraphHeadReduceFunction function) {
     this.function = function;
   }
 

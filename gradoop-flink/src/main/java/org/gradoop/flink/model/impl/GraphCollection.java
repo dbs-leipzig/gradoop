@@ -32,7 +32,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.api.functions.DistinctionFunction;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.GraphCollectionOperators;
@@ -284,22 +284,6 @@ public class GraphCollection extends GraphBase implements
   @Override
   public GraphCollection select(final FilterFunction<GraphHead> predicate) {
     return callForCollection(new Selection(predicate));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphCollection distinctById() {
-    return callForCollection(new DistinctById());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphCollection distinctByIsomorphism() {
-    return callForCollection(new DistinctByIsomorphism());
   }
 
   /**
@@ -565,9 +549,25 @@ public class GraphCollection extends GraphBase implements
     return new GraphTransactions(graphTransactions, getConfig());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection groupBy(DistinctionFunction distinctionFunction) {
-    return callForCollection(new GroupByIsomorphism(distinctionFunction));
+  public GraphCollection distinctById() {
+    return callForCollection(new DistinctById());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection distinctByIsomorphism() {
+    return callForCollection(new DistinctByIsomorphism());
+  }
+
+  @Override
+  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
+    return callForCollection(new GroupByIsomorphism(func));
   }
 
   /**

@@ -25,8 +25,9 @@ import java.io.Serializable;
 
 /**
  * Marker interface for reduce functions used for group by isomorphism operator.
+ * Such functions can be used to calculate aggregates based on graph heads.
  * For example, to count isomorphic graphs in a collection.
  */
-public interface DistinctionFunction
+public interface GraphHeadReduceFunction
   extends GroupReduceFunction<Tuple2<String, GraphHead>, GraphHead>, Serializable {
 }

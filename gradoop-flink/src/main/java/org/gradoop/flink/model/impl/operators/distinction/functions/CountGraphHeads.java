@@ -20,14 +20,14 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.functions.DistinctionFunction;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 import java.util.Iterator;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
  */
-public class CountGraphHeads implements DistinctionFunction {
+public class CountGraphHeads implements GraphHeadReduceFunction {
 
   /**
    * property key to store graph count.
