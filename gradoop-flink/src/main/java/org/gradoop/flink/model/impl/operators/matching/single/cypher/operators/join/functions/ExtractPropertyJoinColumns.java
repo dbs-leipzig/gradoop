@@ -24,18 +24,18 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojo
 import java.util.List;
 
 /**
- * Given a set of columns, this key selector returns a concatenated string containing the
- * identifiers of the specified columns.
+ * Given a set of property columns, this key selector returns a concatenated string containing the
+ * property values of the specified columns.
  *
- * (id0,id1,...,idn),[0,2] -> "id0id2"
+ * ("Foo",42,0.5),[0,2] -> "Foo0.5"
  */
 public class ExtractPropertyJoinColumns implements KeySelector<Embedding, String> {
   /**
-   * Columns to concatenate ids from
+   * Property columns to concatenate properties from
    */
   private final List<Integer> properties;
   /**
-   * Stores the concatenated id string
+   * Stores the concatenated key string
    */
   private final StringBuilder sb;
 

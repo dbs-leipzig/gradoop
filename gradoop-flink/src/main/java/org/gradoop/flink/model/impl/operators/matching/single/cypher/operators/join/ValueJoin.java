@@ -25,6 +25,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractPropertyJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
 
+
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,11 +55,11 @@ public class ValueJoin implements PhysicalOperator {
    */
   private final DataSet<Embedding> right;
   /**
-   * left properties used for the join
+   * left property columns used for the join
    */
   private final List<Integer> leftJoinProperties;
   /**
-   * right properties used for the join
+   * right properties columns used for the join
    */
   private final List<Integer> rightJoinProperties;
   /**
@@ -107,12 +109,12 @@ public class ValueJoin implements PhysicalOperator {
       leftJoinProperties,
       rightJoinProperties,
       rightColumns,
-      Lists.newArrayListWithCapacity(0),
-      Lists.newArrayListWithCapacity(0),
-      Lists.newArrayListWithCapacity(0),
-      Lists.newArrayListWithCapacity(0),
+      Collections.emptyList(),
+      Collections.emptyList(),
+      Collections.emptyList(),
+      Collections.emptyList(),
       JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES
-    );
+      );
   }
 
   /**
