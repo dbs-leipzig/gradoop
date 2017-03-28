@@ -38,8 +38,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 /**
  * Base class for pattern matching implementations.
  */
-public abstract class PatternMatching implements
-  UnaryGraphToCollectionOperator {
+public abstract class PatternMatching implements UnaryGraphToCollectionOperator {
 
   /**
    * The property key used to stored the variable mappings inside the GraphHead properties
@@ -83,7 +82,7 @@ public abstract class PatternMatching implements
     Preconditions.checkState(!Strings.isNullOrEmpty(query),
       "Query must not be null or empty");
     this.query         = query;
-    this.queryHandler  = getQueryHandler();
+    this.queryHandler  = new QueryHandler(query);
     this.attachData    = attachData;
     this.log           = log;
   }
@@ -122,11 +121,13 @@ public abstract class PatternMatching implements
   protected abstract GraphCollection executeForPattern(LogicalGraph graph);
 
   /**
-   * Returns the query handler used by the concrete implementation.
+   * Returns the query handler.
    *
    * @return query handler
    */
-  protected abstract QueryHandler getQueryHandler();
+  protected QueryHandler getQueryHandler() {
+    return queryHandler;
+  }
 
   /**
    * Returns the GDL query processed by this operator instance.

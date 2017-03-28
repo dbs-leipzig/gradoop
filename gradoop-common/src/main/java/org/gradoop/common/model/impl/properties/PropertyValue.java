@@ -44,8 +44,7 @@ import java.util.Map;
  *
  * A property value wraps a value that implements a supported data type.
  */
-public class PropertyValue
-  implements WritableComparable<PropertyValue>, Serializable {
+public class PropertyValue implements WritableComparable<PropertyValue>, Serializable {
 
   /**
    * Represents a property value that is {@code null}.

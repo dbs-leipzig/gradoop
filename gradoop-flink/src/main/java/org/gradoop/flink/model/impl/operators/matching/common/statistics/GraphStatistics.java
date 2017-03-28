@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -83,6 +84,32 @@ public class GraphStatistics {
    * Number of distinct vertex property values for property names
    */
   private Map<String, Long> distinctVertexProperties;
+
+  /**
+   * Constructor using basic statistics.
+   *
+   * @param vertexCount total number of vertices
+   * @param edgeCount total number of edges
+   * @param distinctSourceVertexCount number of distinct source vertices
+   * @param distinctTargetVertexCount number of distinct target vertices
+   */
+  public GraphStatistics(long vertexCount, long edgeCount,
+    long distinctSourceVertexCount, long distinctTargetVertexCount) {
+    this(vertexCount,
+      edgeCount,
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      distinctSourceVertexCount,
+      distinctTargetVertexCount,
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap(),
+      Collections.emptyMap());
+  }
 
   /**
    * Constructor.

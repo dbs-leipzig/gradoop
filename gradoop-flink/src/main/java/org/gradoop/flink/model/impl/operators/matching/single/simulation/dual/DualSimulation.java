@@ -34,7 +34,6 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintDeletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintFatVertex;
@@ -133,14 +132,6 @@ public class DualSimulation extends PatternMatching {
     //--------------------------------------------------------------------------
 
     return postProcess(graph, result);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected QueryHandler getQueryHandler() {
-    return new QueryHandler(getQuery());
   }
 
   /**
