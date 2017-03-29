@@ -47,18 +47,13 @@ public class CypherPatternMatchingIsomorphismTest extends SubgraphIsomorphismTes
     data.add(new String[] {
       "Graph3_VarLength3",
       GRAPH_3, VAR_LENGTH_PATH_PATTERN_3,
-      "expected1,expected2,expected3,expected4,expected5,expected6," +
-        "expected7,expected8,expected9,expected10",
-      "expected1[(v0)]" +
-        "expected2[(v0)-[e0]->(v1)]" +
-        "expected3[(v0)-[e0]->(v1)-[e1]->(v2)]" +
-        "expected4[(v0)-[e0]->(v1)-[e1]->(v2)-[e2]->(v3)]" +
-        "expected5[(v1)]" +
-        "expected6[(v1)-[e1]->(v2)]" +
-        "expected7[(v1)-[e1]->(v2)-[e2]->(v3)]" +
-        "expected8[(v2)]" +
-        "expected9[(v2)-[e2]->(v3)]" +
-        "expected10[(v3)]"
+      "expected1,expected2,expected3,expected4,expected5,expected6",
+      "expected1[(v0)-[e0]->(v1)]" +
+      "expected2[(v0)-[e0]->(v1)-[e1]->(v2)]" +
+      "expected3[(v0)-[e0]->(v1)-[e1]->(v2)-[e2]->(v3)]" +
+      "expected4[(v1)-[e1]->(v2)]" +
+      "expected5[(v1)-[e1]->(v2)-[e2]->(v3)]" +
+      "expected6[(v2)-[e2]->(v3)]"
     });
     data.add(new String[] {
       "Graph2_VarLength4",
