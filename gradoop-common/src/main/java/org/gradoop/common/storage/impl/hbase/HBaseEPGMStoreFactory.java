@@ -255,7 +255,7 @@ public class HBaseEPGMStoreFactory {
    * Deletes a HBase table.
    *
    * @param admin           HBase admin
-   * @param tableDescriptor descriptor for the table to remove
+   * @param tableDescriptor descriptor for the table to delete
    * @throws IOException
    */
   private static void deleteTable(final HBaseAdmin admin,

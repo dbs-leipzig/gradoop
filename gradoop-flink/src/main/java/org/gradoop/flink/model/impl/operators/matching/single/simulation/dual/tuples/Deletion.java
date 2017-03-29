@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util.MessageType;
 
 /**
- * Represents a remove information sent by a vertex to another vertex.
+ * Represents a delete information sent by a vertex to another vertex.
  *
  * f0: recipient vertex id
  * f1: sender vertex id

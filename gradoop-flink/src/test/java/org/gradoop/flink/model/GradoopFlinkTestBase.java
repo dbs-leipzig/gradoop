@@ -104,7 +104,7 @@ public abstract class GradoopFlinkTestBase {
   @BeforeClass
   public static void setup() throws Exception {
     File logDir = File.createTempFile("TestBaseUtils-logdir", null);
-    Assert.assertTrue("Unable to remove temp file", logDir.delete());
+    Assert.assertTrue("Unable to delete temp file", logDir.delete());
     Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
 
     Files.createFile((new File(logDir, "jobmanager.out")).toPath());

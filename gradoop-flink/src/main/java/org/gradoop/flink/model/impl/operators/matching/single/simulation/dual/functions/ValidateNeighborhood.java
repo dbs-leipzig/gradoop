@@ -42,7 +42,7 @@ import java.util.Set;
  *
  * For each query vertex candidate, the flatMap function checks if the vertex
  * has the corresponding incident incoming and outgoing edges. If this is not
- * the case, the vertex sends remove messages to all of its neighbors.
+ * the case, the vertex sends delete messages to all of its neighbors.
  *
  * fatVertex -> [deletion]
  *
@@ -170,7 +170,7 @@ public class ValidateNeighborhood
   }
 
   /**
-   * Sends remove messages to the vertex' neighborhood including itself.
+   * Sends delete messages to the vertex' neighborhood including itself.
    *
    * @param deletions vertex candidates that need to be deleted
    * @param fatVertex current vertex
@@ -189,7 +189,7 @@ public class ValidateNeighborhood
   }
 
   /**
-   * Sends remove message to itself.
+   * Sends delete message to itself.
    *
    * @param fatVertex fat vertex
    * @param collector message collector
@@ -201,7 +201,7 @@ public class ValidateNeighborhood
   }
 
   /**
-   * Sends remove messages to all parents.
+   * Sends delete messages to all parents.
    *
    * @param fatVertex   fat vertex
    * @param collector   message collector
@@ -219,7 +219,7 @@ public class ValidateNeighborhood
   }
 
   /**
-   * Sends remove messages to all children.
+   * Sends delete messages to all children.
    *
    * @param fatVertex   fat vertex
    * @param collector   message collector
