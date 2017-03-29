@@ -18,7 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ReverseEdgeEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

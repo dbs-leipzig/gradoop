@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains classes used by all cypher pattern matching operators.
+ * Contains utility classes related to Cypher pattern matching.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 

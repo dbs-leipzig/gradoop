@@ -1,8 +1,9 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 
 import java.util.Arrays;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;

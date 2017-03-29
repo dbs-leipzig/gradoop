@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.util.List;
 import java.util.stream.IntStream;

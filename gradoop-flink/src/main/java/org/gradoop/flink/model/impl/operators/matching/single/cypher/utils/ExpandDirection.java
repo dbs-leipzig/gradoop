@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
 /**
  * Specifies the direction of an expand operation

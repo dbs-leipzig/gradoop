@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.io.Serializable;
 import java.util.Iterator;

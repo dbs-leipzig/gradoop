@@ -17,23 +17,10 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataInputViewStreamWrapper;
-import org.apache.flink.core.memory.DataOutputView;
-import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
-import org.apache.flink.types.Value;
-import org.apache.hadoop.io.Writable;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadValue;
 import static org.hamcrest.core.Is.is;
