@@ -195,8 +195,10 @@ public class GreedyPlanner {
       CNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
       Set<String> projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
 
+      boolean isPath = edge.getUpperBound() != 1;
+
       FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(graph.getEdges(),
-        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys);
+        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
 
       PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
 

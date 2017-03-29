@@ -93,8 +93,6 @@ public class CypherPatternMatching extends PatternMatching {
     QueryPlan plan = new GreedyPlanner(graph, queryHandler, graphStatistics,
       vertexStrategy, edgeStrategy).plan().getQueryPlan();
 
-    System.out.println(plan);
-
     // Query execution
     DataSet<Embedding> embeddings = plan.execute();
     EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();

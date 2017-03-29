@@ -60,6 +60,10 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * Property keys used for projection
    */
   private final List<String> projectionKeys;
+  /**
+   * Indicates if the edges is actually a path
+   */
+  private final boolean isPath;
 
   /**
    * Creates a new node.
@@ -70,16 +74,18 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @param targetVariable query variable of the target vertex
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
+   * @param isPath indicates if the edges is actually a path
    */
   public FilterAndProjectEdgesNode(DataSet<Edge> edges,
     String sourceVariable, String edgeVariable, String targetVariable,
-    CNF filterPredicate, Set<String> projectionKeys) {
+    CNF filterPredicate, Set<String> projectionKeys, boolean isPath) {
     this.edges = edges;
     this.sourceVariable = sourceVariable;
     this.edgeVariable = edgeVariable;
     this.targetVariable = targetVariable;
     this.filterPredicate = filterPredicate;
     this.projectionKeys = projectionKeys.stream().collect(Collectors.toList());
+    this.isPath = isPath;
   }
 
   @Override
@@ -113,7 +119,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
   }
 
   public boolean isLoop() {
-    return sourceVariable.equals(targetVariable);
+    return sourceVariable.equals(targetVariable) && !isPath;
   }
 
   @Override

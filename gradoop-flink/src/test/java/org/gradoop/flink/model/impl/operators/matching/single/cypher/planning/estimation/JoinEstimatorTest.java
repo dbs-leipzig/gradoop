@@ -30,7 +30,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -56,7 +56,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -82,7 +82,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -108,7 +108,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -134,7 +134,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("__v1"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "__v0", "__e0", "__v1",
-      queryHandler.getPredicates().getSubCNF("__e0"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("__e0"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("__v0"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -159,7 +159,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     ExpandEmbeddingsNode neJoin = new ExpandEmbeddingsNode(nNode, eNode,
       "n", "e", "m", 1, 10,
@@ -185,7 +185,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     ExpandEmbeddingsNode neJoin = new ExpandEmbeddingsNode(nNode, eNode,
       "n", "e", "m", 1, 10,
@@ -213,10 +213,10 @@ public class JoinEstimatorTest extends EstimatorTestBase {
       queryHandler.getPredicates().getSubCNF("o"), Sets.newHashSet());
     LeafNode e1Node = new FilterAndProjectEdgesNode(null,
       "n", "e1", "m",
-      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet(), false);
     LeafNode e2Node = new FilterAndProjectEdgesNode(null,
       "m", "e2", "o",
-      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet(), false);
 
     ExpandEmbeddingsNode ne1Join = new ExpandEmbeddingsNode(nNode, e1Node,
       "n", "e", "m", 2, 2,

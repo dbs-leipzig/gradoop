@@ -30,7 +30,7 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     String edgeVariable   = "e";
     String targetVariable = "b";
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>());
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
@@ -45,7 +45,7 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     String edgeVariable   = "e";
     String targetVariable = "a";
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>());
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(),false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
@@ -77,7 +77,7 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
 
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      edges, "a", "e", "b", filterPredicate, projectionKeys);
+      edges, "a", "e", "b", filterPredicate, projectionKeys, false);
 
     List<Embedding> filteredEdges = node.execute().collect();
 

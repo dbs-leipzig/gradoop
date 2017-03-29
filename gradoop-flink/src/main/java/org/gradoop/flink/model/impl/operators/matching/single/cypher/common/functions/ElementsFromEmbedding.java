@@ -28,7 +28,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
@@ -132,7 +131,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
       ExpandDirection direction = metaData.getDirection(pathVariable);
       List<GradoopId> path = embedding.getIdList(metaData.getEntryColumn(pathVariable));
       List<PropertyValue> mappingValue = new ArrayList<>(path.size());
-      for (int i = 0; i < path.size(); i+=2) {
+      for (int i = 0; i < path.size(); i += 2) {
         edgeId = path.get(i);
         mappingValue.add(PropertyValue.create(edgeId));
 
