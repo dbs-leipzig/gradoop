@@ -44,13 +44,13 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,sum_b : 4})" +
-      "(v1:Blue {a : 2,sum_b : 2})" +
-      "(v2:Blue {a : 4,sum_b : 4})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_b : 4})" +
+      "(v1_1:Blue {a : 2,sum_b : 2})" +
+      "(v1_2:Blue {a : 4,sum_b : 4})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
@@ -75,13 +75,13 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,sum_b : 3})" +
-      "(v1:Blue {a : 2,sum_b : 3})" +
-      "(v2:Blue {a : 4,sum_b : 4})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_b : 3})" +
+      "(v1_1:Blue {a : 2,sum_b : 3})" +
+      "(v1_2:Blue {a : 4,sum_b : 4})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
@@ -106,13 +106,13 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,sum_b : 7})" +
-      "(v1:Blue {a : 2,sum_b : 5})" +
-      "(v2:Blue {a : 4,sum_b : 8})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_b : 7})" +
+      "(v1_1:Blue {a : 2,sum_b : 5})" +
+      "(v1_2:Blue {a : 4,sum_b : 8})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
@@ -140,13 +140,13 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,suma : 4})" +
-      "(v1:Blue {a : 2,suma : 3})" +
-      "(v2:Blue {a : 4,suma : 5})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_a : 4})" +
+      "(v1_1:Blue {a : 2,sum_a : 3})" +
+      "(v1_2:Blue {a : 4,sum_a : 5})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
@@ -171,13 +171,13 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,suma : 6})" +
-      "(v1:Blue {a : 2,suma : 4})" +
-      "(v2:Blue {a : 4,suma : 3})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_a : 6})" +
+      "(v1_1:Blue {a : 2,sum_a : 4})" +
+      "(v1_2:Blue {a : 4,sum_a : 3})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
@@ -190,7 +190,7 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
   @Test
   public void testReduceOnNeighborsSumAggBothEdges() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
-      "(v0:Blue {a : 3,b : 5})" +
+      "(v0:Blue {a : 3})" +
       "(v1:Blue {a : 2})" +
       "(v2:Blue {a : 4})" +
       "(v0)-[{b : 2}]->(v1)" +
@@ -202,22 +202,17 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v0:Blue {a : 3,sum_a : 10})" +
-      "(v1:Blue {a : 2,sum_a : 7})" +
-      "(v2:Blue {a : 4,sum_a : 8})" +
-      "(v0)-[{b : 2}]->(v1)" +
-      "(v0)-[{b : 1}]->(v2)" +
-      "(v1)-[{b : 3}]->(v2)" +
-      "(v2)-[{b : 4}]->(v0)" +
+      "(v1_0:Blue {a : 3,sum_a : 10})" +
+      "(v1_1:Blue {a : 2,sum_a : 7})" +
+      "(v1_2:Blue {a : 4,sum_a : 8})" +
+      "(v1_0)-[{b : 2}]->(v1_1)" +
+      "(v1_0)-[{b : 1}]->(v1_2)" +
+      "(v1_1)-[{b : 3}]->(v1_2)" +
+      "(v1_2)-[{b : 4}]->(v1_0)" +
       "]");
 
     LogicalGraph output = input
       .reduceOnNeighbors(new SumVertexProperty("a"), Neighborhood.EdgeDirection.BOTH);
-
-    System.out.println();
-    System.out.println();
-
-    loader.getLogicalGraphByVariable("expected").getVertices().print();
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
