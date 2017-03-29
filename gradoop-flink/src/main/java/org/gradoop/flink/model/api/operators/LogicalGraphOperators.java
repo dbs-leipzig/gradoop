@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 
 import java.util.List;
@@ -53,8 +54,31 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
+   * @param query Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query Cypher query
+   * @param attachData  attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * @param pattern  GDL graph pattern
    *
@@ -63,8 +87,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control if the original vertex and edge data
    * (labels and properties) shall be attached to the resulting subgraphs.
@@ -77,8 +100,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern, boolean attachData);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control the match strategy. This influences mostly
    * if vertices and edges can be matched to multiple vertices/edges in the

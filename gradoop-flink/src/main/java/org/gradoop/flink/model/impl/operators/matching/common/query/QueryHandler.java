@@ -20,6 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.GraphElement;
@@ -50,6 +52,10 @@ public class QueryHandler {
    * Graph radius
    */
   private Integer radius;
+  /**
+   * Graph components
+   */
+  private Map<Integer, Set<String>> components;
   /**
    * Cache: vId --> Vertex with Id == vId
    */
@@ -107,6 +113,31 @@ public class QueryHandler {
   }
 
   /**
+   * Returns the query graph as a collection of triples.
+   *
+   * @return triples
+   */
+  public Collection<Triple> getTriples() {
+    return getEdges().stream()
+      .map(e -> new Triple(
+        getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))
+      .collect(Collectors.toList());
+  }
+  /**
+   * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
+   * predicated defined in the query, a CNF containing zero predicates is returned.
+   *
+   * @return predicates
+   */
+  public CNF getPredicates() {
+    if (gdlHandler.getPredicates().isPresent()) {
+      return QueryPredicate.createFrom(gdlHandler.getPredicates().get()).asCNF();
+    } else {
+      return new CNF();
+    }
+  }
+
+  /**
    * Returns the number of vertices in the query graph.
    *
    * @return vertex count
@@ -158,6 +189,18 @@ public class QueryHandler {
   }
 
   /**
+   * Returns the mapping of vertices to connected graph components
+   *
+   * @return connected components
+   */
+  public Map<Integer, Set<String>> getComponents() {
+    if (components == null) {
+      components = GraphMetrics.getComponents(this);
+    }
+    return components;
+  }
+
+  /**
    * Checks if the given variable points to a vertex.
    *
    * @param variable the elements variable
@@ -206,26 +249,26 @@ public class QueryHandler {
   }
 
   /**
-   * Returns the Vertex assiciated with the given variable or {@code null} if the variable does
-   * not exist
+   * Returns the vertex associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
    *
-   * @param variable variable
+   * @param variable query vertex variable
    * @return vertex or {@code null}
    */
   public Vertex getVertexByVariable(String variable) {
-    return gdlHandler.getVertexCache().get(variable);
+    return gdlHandler.getVertexCache(true, true).get(variable);
   }
 
 
   /**
-   * Returns the Edge assiciated with the given variable or {@code null} if the variable does
-   * not exist
+   * Returns the Edge associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
    *
-   * @param variable variable
+   * @param variable query edge variable
    * @return edge or {@code null}
    */
   public Edge getEdgeByVariable(String variable) {
-    return gdlHandler.getEdgeCache().get(variable);
+    return gdlHandler.getEdgeCache(true, true).get(variable);
   }
 
   /**

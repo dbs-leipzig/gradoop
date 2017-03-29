@@ -64,6 +64,21 @@ public class TestData {
   public static final String UNLABELED_PATTERN_3 =
     "(:A)-->(:B)";
 
+  public static final String VAR_LENGTH_PATH_PATTERN_0 =
+    "(:B)-[:a*2..2]->(:B)";
+
+  public static final String VAR_LENGTH_PATH_PATTERN_1 =
+    "(:B)<-[:a*2..2]-(:B)";
+
+  public static final String VAR_LENGTH_PATH_PATTERN_2 =
+    "(:B)-[:d*2..3]->()";
+
+  public static final String VAR_LENGTH_PATH_PATTERN_3 =
+    "(:A)-[:a*]->()";
+
+  public static final String VAR_LENGTH_PATH_PATTERN_4 =
+    "(s:A)-[:a*1..2]->(s)";
+
   public static final String GRAPH_1 = DATA_GRAPH_VARIABLE +
     "[" +
     "(v0:B {id : 0})" +

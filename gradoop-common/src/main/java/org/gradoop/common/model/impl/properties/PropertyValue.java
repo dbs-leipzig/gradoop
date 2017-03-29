@@ -17,6 +17,7 @@
 
 package org.gradoop.common.model.impl.properties;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -43,8 +44,7 @@ import java.util.Map;
  *
  * A property value wraps a value that implements a supported data type.
  */
-public class PropertyValue
-  implements WritableComparable<PropertyValue>, Serializable {
+public class PropertyValue implements WritableComparable<PropertyValue>, Serializable {
 
   /**
    * Represents a property value that is {@code null}.
@@ -606,6 +606,19 @@ public class PropertyValue
       GradoopId.class   : rawBytes[0] == TYPE_MAP         ?
       Map.class         : rawBytes[0] == TYPE_LIST        ?
       List.class        : null;
+  }
+
+  public int getByteSize() {
+    return rawBytes.length;
+  }
+
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public byte[] getRawBytes() {
+    return this.rawBytes;
+  }
+
+  public static PropertyValue fromRawBytes(byte[] rawBytes) {
+    return new PropertyValue(rawBytes);
   }
 
   @Override

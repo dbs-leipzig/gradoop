@@ -28,8 +28,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Cou
 /**
  * A dedicated program for parametrized graph grouping.
  */
-public class GroupingRunner extends AbstractRunner implements
-  ProgramDescription {
+public class GroupingRunner extends AbstractRunner implements ProgramDescription {
 
   /**
    * Option to declare path to input graph
