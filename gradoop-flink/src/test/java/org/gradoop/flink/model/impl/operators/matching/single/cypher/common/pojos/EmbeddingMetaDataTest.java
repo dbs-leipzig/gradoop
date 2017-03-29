@@ -1,6 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
 
@@ -32,7 +33,10 @@ public class EmbeddingMetaDataTest {
     propertyMap.put(Pair.of("b", "age"), 1);
     propertyMap.put(Pair.of("c", "since"), 2);
 
-    EmbeddingMetaData metaData = new EmbeddingMetaData(entryMap, propertyMap);
+    Map<String, ExpandDirection> directionMap = new HashMap<>();
+    directionMap.put("b", ExpandDirection.OUT);
+
+    EmbeddingMetaData metaData = new EmbeddingMetaData(entryMap, propertyMap, directionMap);
 
     assertThat(metaData.getEntryCount(), is(3));
     assertThat(metaData.getEntryColumn("a"), is(0));
@@ -46,27 +50,41 @@ public class EmbeddingMetaDataTest {
     assertThat(metaData.getPropertyColumn("a", "age"), is(0));
     assertThat(metaData.getPropertyColumn("b", "age"), is(1));
     assertThat(metaData.getPropertyColumn("c", "since"), is(2));
+
+    assertThat(metaData.getDirection("b"), is(ExpandDirection.OUT));
   }
 
   @Test
   public void testFromEmbeddingMetaData() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    metaData.setEntryColumn("b", EntryType.VERTEX, 1);
+    metaData.setEntryColumn("e", EntryType.EDGE, 1);
+    metaData.setEntryColumn("b", EntryType.VERTEX, 2);
+    metaData.setEntryColumn("f", EntryType.PATH, 3);
+    metaData.setDirection("f", ExpandDirection.OUT);
+
     metaData.setPropertyColumn("a", "age", 0);
+
 
     EmbeddingMetaData copy = new EmbeddingMetaData(metaData);
     assertThat(copy.getEntryColumn("a"), is(0));
-    assertThat(copy.getEntryColumn("b"), is(1));
+    assertThat(copy.getEntryColumn("e"), is(1));
+    assertThat(copy.getEntryColumn("b"), is(2));
+    assertThat(copy.getEntryColumn("f"), is(3));
     assertThat(copy.getPropertyColumn("a", "age"), is(0));
+    assertThat(copy.getDirection("f"), is(ExpandDirection.OUT));
 
-    copy.setEntryColumn("c", EntryType.VERTEX, 2);
-    assertThat(copy.getEntryCount(), is(3));
-    assertThat(metaData.getEntryCount(), is(2));
+    copy.setEntryColumn("c", EntryType.VERTEX, 4);
+    assertThat(copy.getEntryCount(), is(5));
+    assertThat(metaData.getEntryCount(), is(4));
 
-    copy.setEntryColumn("a", EntryType.VERTEX, 3);
-    assertThat(copy.getEntryColumn("a"), is(3));
+    copy.setEntryColumn("a", EntryType.VERTEX, 5);
+    assertThat(copy.getEntryColumn("a"), is(5));
     assertThat(metaData.getEntryColumn("a"), is(0));
+
+    copy.setDirection("f", ExpandDirection.IN);
+    assertThat(copy.getDirection("f"), is(ExpandDirection.IN));
+    assertThat(metaData.getDirection("f"), is(ExpandDirection.OUT));
   }
 
   @Test
@@ -160,6 +178,19 @@ public class EmbeddingMetaDataTest {
   public void testGetPropertyColumnForMissingVariable() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.getPropertyColumn("a", "age");
+  }
+
+  @Test
+  public void testGetDirection() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.setDirection("a", ExpandDirection.OUT);
+    assertThat(metaData.getDirection("a"), is(ExpandDirection.OUT));
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetDirectionForMissingVariable() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    metaData.getDirection("a");
   }
 
   @Test

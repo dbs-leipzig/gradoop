@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -67,12 +68,16 @@ public class EmbeddingMetaData implements Serializable {
    * the embedding
    */
   private Map<Pair<String, String>, Integer> propertyMapping;
+  /**
+   * Stores the direction in which paths are stored in the embedding
+   */
+  private Map<String, ExpandDirection> directionMapping;
 
   /**
    * Initialises an empty EmbeddingMetaData object
    */
   public EmbeddingMetaData() {
-    this(new HashMap<>(), new HashMap<>());
+    this(new HashMap<>(), new HashMap<>(), new HashMap<>());
   }
 
   /**
@@ -80,11 +85,14 @@ public class EmbeddingMetaData implements Serializable {
    *
    * @param entryMapping maps variables to embedding entries
    * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
+   * @param directionMapping maps (path) variables to their direction
    */
   public EmbeddingMetaData(Map<Pair<String, EntryType>, Integer> entryMapping,
-    Map<Pair<String, String>, Integer> propertyMapping) {
+    Map<Pair<String, String>, Integer> propertyMapping,
+    Map<String, ExpandDirection> directionMapping) {
     this.entryMapping = entryMapping;
     this.propertyMapping = propertyMapping;
+    this.directionMapping = directionMapping;
   }
 
   /**
@@ -95,12 +103,16 @@ public class EmbeddingMetaData implements Serializable {
   public EmbeddingMetaData(EmbeddingMetaData metaData) {
     this.entryMapping = new HashMap<>(metaData.getEntryCount());
     this.propertyMapping = new HashMap<>(metaData.getPropertyCount());
+    this.directionMapping = new HashMap<>(metaData.getPathCount());
 
     metaData.getVariables().forEach(var -> {
         this.entryMapping.put(
           Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
         metaData.getPropertyKeys(var).forEach(key ->
           this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+        if (metaData.getEntryType(var) == EntryType.PATH) {
+          this.directionMapping.put(var, metaData.getDirection(var));
+        }
       }
     );
   }
@@ -121,6 +133,15 @@ public class EmbeddingMetaData implements Serializable {
    */
   public int getPropertyCount() {
     return propertyMapping.size();
+  }
+
+  /**
+   * Returns the number of variable length paths mapped in this meta data.
+   *
+   * @return number of variable length paths
+   */
+  public int getPathCount() {
+    return directionMapping.size();
   }
 
   /**
@@ -202,6 +223,32 @@ public class EmbeddingMetaData implements Serializable {
         String.format("no value for property %s.%s", variable, propertyKey));
     }
     return column;
+  }
+
+  /**
+   * Inserts or updates the direction for the specified path variable.
+   *
+   * @param variable variable associated with a variable length path
+   * @param direction direction in which the path is stored in the embedding
+   */
+  public void setDirection(String variable, ExpandDirection direction) {
+    directionMapping.put(variable, direction);
+  }
+
+  /**
+   * Returns the direction in which the path associated with the specified variable is stored
+   * in the embedding.
+   *
+   * @param variable variable associated with a variable length path
+   * @return direction
+   * @throws NoSuchElementException if the variable has no assigned direction
+   */
+  public ExpandDirection getDirection(String variable) {
+    ExpandDirection expandDirection = directionMapping.get(variable);
+    if (expandDirection == null) {
+      throw new NoSuchElementException("No direction for: " + variable);
+    }
+    return expandDirection;
   }
 
   /**

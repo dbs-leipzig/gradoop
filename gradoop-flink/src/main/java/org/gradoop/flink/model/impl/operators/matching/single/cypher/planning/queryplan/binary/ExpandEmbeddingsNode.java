@@ -132,6 +132,8 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
     metaData.setEntryColumn(pathVariable, EmbeddingMetaData.EntryType.PATH,
       inputMetaData.getEntryCount());
 
+    metaData.setDirection(pathVariable, expandDirection);
+
     if (!inputMetaData.containsEntryColumn(endVariable)) {
       metaData.setEntryColumn(endVariable, EmbeddingMetaData.EntryType.VERTEX,
         inputMetaData.getEntryCount() + 1);

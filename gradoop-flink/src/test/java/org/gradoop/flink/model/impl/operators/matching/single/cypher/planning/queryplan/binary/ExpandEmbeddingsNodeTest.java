@@ -50,6 +50,7 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     assertThat(outputMetaData.getEntryType("v1"), is(EntryType.VERTEX));
     assertThat(outputMetaData.getEntryType("e1"), is(EntryType.PATH));
     assertThat(outputMetaData.getEntryType("v2"), is(EntryType.VERTEX));
+    assertThat(outputMetaData.getDirection("e1"), is(ExpandDirection.OUT));
   }
 
   @Test
