@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectVertices;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
@@ -30,7 +30,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectVertices} operator.
@@ -66,7 +65,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
     this.vertices = vertices;
     this.vertexVariable = vertexVariable;
     this.filterPredicate = filterPredicate;
-    this.projectionKeys = projectionKeys.stream().collect(Collectors.toList());
+    this.projectionKeys = new ArrayList<>(projectionKeys);
   }
 
   @Override

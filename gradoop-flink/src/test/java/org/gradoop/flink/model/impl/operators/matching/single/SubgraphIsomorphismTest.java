@@ -1,6 +1,5 @@
-package org.gradoop.flink.model.impl.operators.matching.single.preserving;
+package org.gradoop.flink.model.impl.operators.matching.single;
 
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatchingWithBindingTest;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
@@ -21,7 +20,7 @@ public abstract class SubgraphIsomorphismTest extends PatternMatchingWithBinding
   }
 
   @Parameterized.Parameters(name = "{index}: {0}")
-  public static Iterable data() {
+  public static Iterable<String[]> data() {
     return Arrays.asList(
       new String[] {
         "Graph1_Chain0",

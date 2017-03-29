@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 
 import org.apache.flink.api.java.tuple.Tuple3;

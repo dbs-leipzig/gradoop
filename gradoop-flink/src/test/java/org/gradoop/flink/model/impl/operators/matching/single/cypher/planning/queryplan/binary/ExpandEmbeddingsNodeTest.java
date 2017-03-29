@@ -4,10 +4,10 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
 
 import org.junit.Test;
@@ -50,6 +50,7 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     assertThat(outputMetaData.getEntryType("v1"), is(EntryType.VERTEX));
     assertThat(outputMetaData.getEntryType("e1"), is(EntryType.PATH));
     assertThat(outputMetaData.getEntryType("v2"), is(EntryType.VERTEX));
+    assertThat(outputMetaData.getDirection("e1"), is(ExpandDirection.OUT));
   }
 
   @Test

@@ -19,8 +19,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;

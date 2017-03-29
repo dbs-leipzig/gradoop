@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
@@ -47,11 +47,11 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     LeafNode fNode = new FilterAndProjectEdgesNode(null,
       "m", "f", "o",
-      queryHandler.getPredicates().getSubCNF("f"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("f"), Sets.newHashSet(), false);
 
     QueryPlan queryPlan = new QueryPlan(eNode);
     QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
@@ -75,10 +75,10 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
       queryHandler.getPredicates().getSubCNF("o"), Sets.newHashSet());
     LeafNode eNode = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
     LeafNode fNode = new FilterAndProjectEdgesNode(null,
       "m", "f", "o",
-      queryHandler.getPredicates().getSubCNF("f"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("f"), Sets.newHashSet(), false);
 
     // (n)-[e]->
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
@@ -130,10 +130,10 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
       queryHandler.getPredicates().getSubCNF("o"), Sets.newHashSet());
     LeafNode e1Node = new FilterAndProjectEdgesNode(null,
       "n", "e1", "m",
-      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet(), false);
     LeafNode e2Node = new FilterAndProjectEdgesNode(null,
       "m", "e2", "o",
-      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet(), false);
 
     ExpandEmbeddingsNode ne1Join = new ExpandEmbeddingsNode(nNode, e1Node,
       "n", "e", "m", 2, 2,
@@ -187,9 +187,9 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
       queryHandler.getPredicates().getSubCNF("d"), Sets.newHashSet());
 
     LeafNode e1Node = new FilterAndProjectEdgesNode(null, "a","e1","b",
-      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet(), false);
     LeafNode e2Node = new FilterAndProjectEdgesNode(null, "c","e2","d",
-      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet(), false);
 
     BinaryNode ae1 = new JoinEmbeddingsNode(aNode, e1Node, Lists.newArrayList("a"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);

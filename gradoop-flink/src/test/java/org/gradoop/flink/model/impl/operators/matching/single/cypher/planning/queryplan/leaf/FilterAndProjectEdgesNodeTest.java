@@ -9,8 +9,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -30,12 +30,27 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     String edgeVariable   = "e";
     String targetVariable = "b";
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>());
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
     assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
     assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(2));
+    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+  }
+
+  @Test
+  public void testMetaDataInitializationWithLoop() throws Exception {
+    String sourceVariable = "a";
+    String edgeVariable   = "e";
+    String targetVariable = "a";
+    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(),false);
+
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
+    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
+    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(0));
     assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
   }
 
@@ -62,7 +77,7 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
 
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      edges, "a", "e", "b", filterPredicate, projectionKeys);
+      edges, "a", "e", "b", filterPredicate, projectionKeys, false);
 
     List<Embedding> filteredEdges = node.execute().collect();
 

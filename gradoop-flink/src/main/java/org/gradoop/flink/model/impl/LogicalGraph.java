@@ -45,6 +45,8 @@ import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
@@ -252,6 +254,25 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
 
   /**
    * {@inheritDoc}

@@ -48,7 +48,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
 
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
@@ -64,7 +64,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
 
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(null,
       "n", "e", "m",
-      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet());
+      queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);

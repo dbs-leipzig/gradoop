@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand
   .ExpandEmbeddings;
@@ -103,7 +103,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
     this.startVariable = startVariable;
     this.endVariable = endVariable;
     this.lowerBound = lowerBound;
-    this.upperBound = upperBound;
+    this.upperBound = upperBound == 0 ? Integer.MAX_VALUE : upperBound;
     this.expandDirection = expandDirection;
     this.vertexStrategy = vertexStrategy;
     this.edgeStrategy = edgeStrategy;
@@ -131,6 +131,8 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
 
     metaData.setEntryColumn(pathVariable, EmbeddingMetaData.EntryType.PATH,
       inputMetaData.getEntryCount());
+
+    metaData.setDirection(pathVariable, expandDirection);
 
     if (!inputMetaData.containsEntryColumn(endVariable)) {
       metaData.setEntryColumn(endVariable, EmbeddingMetaData.EntryType.VERTEX,

@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectEdge;
 
@@ -57,6 +57,10 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * Property keys used for projection
    */
   private final List<String> projectionPropertyKeys;
+  /**
+   * Signals that the edge is a loop
+   */
+  private boolean isLoop;
 
   /**
    * Operator name used for Flink operator description
@@ -69,19 +73,21 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * @param input Candidate edges
    * @param predicates Predicates used to filter edges
    * @param projectionPropertyKeys Property keys used for projection
+   * @param isLoop is the edge a loop
    */
   public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates,
-    List<String> projectionPropertyKeys) {
+    List<String> projectionPropertyKeys, boolean isLoop) {
     this.input = input;
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
+    this.isLoop = isLoop;
     this.setName("FilterAndProjectEdges");
   }
 
   @Override
   public DataSet<Embedding> evaluate() {
     return input
-      .flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys))
+      .flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys, isLoop))
       .name(getName());
   }
 

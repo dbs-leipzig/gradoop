@@ -19,7 +19,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
 /**
  * Represents an executable Cypher query plan.

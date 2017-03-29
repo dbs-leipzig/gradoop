@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
@@ -30,7 +30,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectEdges} operator.
@@ -60,6 +59,10 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * Property keys used for projection
    */
   private final List<String> projectionKeys;
+  /**
+   * Indicates if the edges is actually a path
+   */
+  private final boolean isPath;
 
   /**
    * Creates a new node.
@@ -70,21 +73,28 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @param targetVariable query variable of the target vertex
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
+   * @param isPath indicates if the edges is actually a path
    */
   public FilterAndProjectEdgesNode(DataSet<Edge> edges,
     String sourceVariable, String edgeVariable, String targetVariable,
-    CNF filterPredicate, Set<String> projectionKeys) {
+    CNF filterPredicate, Set<String> projectionKeys, boolean isPath) {
     this.edges = edges;
     this.sourceVariable = sourceVariable;
     this.edgeVariable = edgeVariable;
     this.targetVariable = targetVariable;
     this.filterPredicate = filterPredicate;
-    this.projectionKeys = projectionKeys.stream().collect(Collectors.toList());
+    this.projectionKeys = new ArrayList<>(projectionKeys);
+    this.isPath = isPath;
   }
 
   @Override
   public DataSet<Embedding> execute() {
-    FilterAndProjectEdges op =  new FilterAndProjectEdges(edges, filterPredicate, projectionKeys);
+    FilterAndProjectEdges op =  new FilterAndProjectEdges(
+      edges,
+      filterPredicate,
+      projectionKeys,
+      isLoop()
+    );
     op.setName(toString());
     return op.evaluate();
   }
@@ -107,12 +117,18 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
     return new ArrayList<>(projectionKeys);
   }
 
+  public boolean isLoop() {
+    return sourceVariable.equals(targetVariable) && !isPath;
+  }
+
   @Override
   protected EmbeddingMetaData computeEmbeddingMetaData() {
     EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
     embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
     embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
-    embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
+    if (!isLoop()) {
+      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
+    }
 
     embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);
 

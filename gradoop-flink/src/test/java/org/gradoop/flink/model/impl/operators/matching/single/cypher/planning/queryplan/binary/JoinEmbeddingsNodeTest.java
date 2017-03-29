@@ -6,9 +6,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData.EntryType;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.junit.Test;
@@ -115,7 +115,7 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2)));
+    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2, 4)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
     assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));

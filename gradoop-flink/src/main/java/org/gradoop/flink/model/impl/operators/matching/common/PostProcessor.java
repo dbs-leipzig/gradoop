@@ -96,8 +96,7 @@ public class PostProcessor {
     GradoopFlinkConfig config = inputGraph.getConfig();
 
     // get result collection without data
-    GraphCollection collection =
-      extractGraphCollection(elements, config, mayOverlap);
+    GraphCollection collection = extractGraphCollection(elements, config, mayOverlap);
 
     // attach data by joining first and merging the graph head ids
     DataSet<Vertex> newVertices = inputGraph.getVertices()

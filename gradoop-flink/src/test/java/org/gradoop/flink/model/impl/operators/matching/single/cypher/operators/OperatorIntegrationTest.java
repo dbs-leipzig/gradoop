@@ -26,7 +26,7 @@
 //import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 //import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 //import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-//import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+//import Embedding;
 //import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.*;
 //import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.cartesian
 //  .CartesianProduct;
@@ -39,7 +39,7 @@
 //import java.util.ArrayList;
 //import java.util.HashMap;
 //
-//import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection.*;
+//import static org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection.*;
 //
 //@Ignore
 //public class OperatorIntegrationTest extends GradoopFlinkTestBase {

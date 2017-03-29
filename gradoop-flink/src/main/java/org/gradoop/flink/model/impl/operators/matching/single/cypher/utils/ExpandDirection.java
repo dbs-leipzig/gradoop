@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common.functions;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.utils;
 
 /**
- * Reverses an EdgeEmbedding, as it switches source and target
- * This is used for traversing incoming edges
+ * Specifies the direction of an expand operation
  */
-public class ReverseEdgeEmbedding extends RichMapFunction<Embedding, Embedding> {
-
-  @Override
-  public Embedding map(Embedding value) throws Exception {
-    return value.reverse();
-  }
+public enum ExpandDirection {
+  /**
+   * Expand along incoming edges
+   */
+  IN,
+  /**
+   * Expand along outgoing edges
+   */
+  OUT
 }

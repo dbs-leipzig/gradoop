@@ -15,22 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.matching.single.cypher.common;
-
 /**
- * Specifies the direction of an expand operation
+ * Contains debug related classed (e.g., printers for embeddings)
  */
-public enum ExpandDirection {
-  /**
-   * Expand along incoming edges
-   */
-  IN,
-  /**
-   * Expand along outgoing edges
-   */
-  OUT,
-  /**
-   * Expand along both incoming and outgoing edges
-   */
-  ALL
-}
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.debug;

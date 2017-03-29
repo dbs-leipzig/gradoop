@@ -18,9 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples
   .EdgeWithTiePoint;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;

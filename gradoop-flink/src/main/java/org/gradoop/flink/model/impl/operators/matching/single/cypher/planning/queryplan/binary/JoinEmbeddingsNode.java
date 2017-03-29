@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
@@ -114,6 +114,10 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
       if (!joinVariables.contains(var)) {
         embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);
       }
+      // copy the direction information from the right to the left side
+      if (rightInputMetaData.getEntryType(var) == EmbeddingMetaData.EntryType.PATH) {
+        embeddingMetaData.setDirection(var, rightInputMetaData.getDirection(var));
+      }
     }
 
     // append all property mappings from the right to the left side
@@ -151,32 +155,28 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
   /**
    * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
    * the columns that need to contain distinct entries in the left embedding.
+   * This includes the join columns
    *
    * @return distinct vertex columns of the left embedding
    */
   private List<Integer> getDistinctVertexColumnsLeft() {
-    return getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData());
+    EmbeddingMetaData metaData = getLeftChild().getEmbeddingMetaData();
+
+    return vertexStrategy == MatchStrategy.ISOMORPHISM ?
+      metaData.getVertexVariables().stream()
+        .map(metaData::getEntryColumn)
+        .collect(Collectors.toList()) : Collections.emptyList();
   }
 
   /**
    * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
    * the columns that need to contain distinct entries in the right embedding.
+   * This excludes the join columns
    *
    * @return distinct vertex columns of the right embedding
    */
   private List<Integer> getDistinctVertexColumnsRight() {
-    return getDistinctVertexColumns(getRightChild().getEmbeddingMetaData());
-  }
-
-  /**
-   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy} and the specified
-   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
-   * entries.
-   *
-   * @param metaData meta data for the embedding
-   * @return distinct vertex columns
-   */
-  private List<Integer> getDistinctVertexColumns(final EmbeddingMetaData metaData) {
+    EmbeddingMetaData metaData = getRightChild().getEmbeddingMetaData();
     return vertexStrategy == MatchStrategy.ISOMORPHISM ?
       metaData.getVertexVariables().stream()
         .filter(var -> !joinVariables.contains(var))
