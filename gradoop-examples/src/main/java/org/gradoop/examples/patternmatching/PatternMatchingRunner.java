@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
 /**
- * Performs graph pattern matching on an arbitrary input graph.
+ * This program can be used to run the different pattern matching engines implemented in Gradoop.
  */
 public class PatternMatchingRunner extends AbstractRunner implements ProgramDescription {
   /**
