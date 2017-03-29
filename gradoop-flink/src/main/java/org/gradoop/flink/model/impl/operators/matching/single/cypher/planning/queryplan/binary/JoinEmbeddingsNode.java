@@ -114,6 +114,10 @@ public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
       if (!joinVariables.contains(var)) {
         embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);
       }
+      // copy the direction information from the right to the left side
+      if (rightInputMetaData.getEntryType(var) == EmbeddingMetaData.EntryType.PATH) {
+        embeddingMetaData.setDirection(var, rightInputMetaData.getDirection(var));
+      }
     }
 
     // append all property mappings from the right to the left side

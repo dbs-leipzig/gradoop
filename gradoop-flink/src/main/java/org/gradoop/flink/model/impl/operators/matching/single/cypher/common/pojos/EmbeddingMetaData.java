@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -278,31 +279,33 @@ public class EmbeddingMetaData implements Serializable {
   }
 
   /**
-   * Returns a list of variables that are contained in the embedding and referring to vertices. The
+   * Returns a list of variables that are contained in the embedding and refer to vertices. The
    * order of the variables is determined by their position within the embedding.
    *
    * @return a list of all vertex variables
    */
   public List<String> getVertexVariables() {
-    return entryMapping.entrySet().stream()
-      .filter(entry -> entry.getKey().getRight() == EntryType.VERTEX)
-      .sorted(Comparator.comparingInt(Map.Entry::getValue))
-      .map(entry -> entry.getKey().getLeft())
-      .collect(Collectors.toList());
+    return getVariables(entry -> entry == EntryType.VERTEX);
   }
 
   /**
-   * Returns a list of variables that are contained in the embedding and referring to edges. The
+   * Returns a list of variables that are contained in the embedding and refer to edges. The
    * order of the variables is determined by their position within the embedding.
    *
    * @return a list of all edge variables
    */
   public List<String> getEdgeVariables() {
-    return entryMapping.entrySet().stream()
-      .filter(entry -> entry.getKey().getRight() == EntryType.EDGE)
-      .sorted(Comparator.comparingInt(Map.Entry::getValue))
-      .map(entry -> entry.getKey().getLeft())
-      .collect(Collectors.toList());
+    return getVariables(entry -> entry == EntryType.EDGE);
+  }
+
+  /**
+   * Returns a list of variables that are contained in the embedding and refer to paths. The order
+   * of the variables is determined by their position within the embedding.
+   *
+   * @return a list of all path variables
+   */
+  public List<String> getPathVariables() {
+    return getVariables(entry -> entry == EntryType.PATH);
   }
 
   /**
@@ -355,5 +358,20 @@ public class EmbeddingMetaData implements Serializable {
 
     return String.format("EmbeddingMetaData{entryMapping=%s, propertyMapping=%s}",
       sortedEntries, sortiedProperties);
+  }
+
+  /**
+   * Returns the variables that fulfil the specified predicate. The variables are ordered by
+   * their appearance in the entry mapping.
+   *
+   * @param predicate predicate for entry types
+   * @return variables that fulfil the predicate
+   */
+  private List<String> getVariables(Predicate<EntryType> predicate) {
+    return entryMapping.entrySet().stream()
+      .filter(entry -> predicate.test(entry.getKey().getRight()))
+      .sorted(Comparator.comparingInt(Map.Entry::getValue))
+      .map(entry -> entry.getKey().getLeft())
+      .collect(Collectors.toList());
   }
 }

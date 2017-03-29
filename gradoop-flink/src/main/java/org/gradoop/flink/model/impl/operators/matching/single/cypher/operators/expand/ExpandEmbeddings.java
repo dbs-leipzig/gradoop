@@ -153,12 +153,6 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
       candidateEdges = candidateEdges
         .map(new ReverseEdgeEmbedding())
         .name(getName() + " - Reverse Edges");
-    } else  if (direction == ExpandDirection.ALL) {
-      candidateEdges = candidateEdges.union(
-        candidateEdges
-          .map(new ReverseEdgeEmbedding())
-          .name(getName() + "- Reverse Edges")
-      );
     }
 
     this.candidateEdgeTuples = candidateEdges

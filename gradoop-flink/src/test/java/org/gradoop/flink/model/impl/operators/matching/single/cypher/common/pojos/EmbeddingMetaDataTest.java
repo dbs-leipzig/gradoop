@@ -247,6 +247,21 @@ public class EmbeddingMetaDataTest {
   }
 
   @Test
+  public void testGetPathVariables() throws Exception {
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
+    List<String> inputVariables = Arrays.asList("a", "b", "c", "d");
+    IntStream.range(0, inputVariables.size())
+      .forEach(i -> metaData
+        .setEntryColumn(inputVariables.get(i), i % 2 == 0 ? EntryType.VERTEX : EntryType.PATH, i));
+
+    List<String> expectedVariables = inputVariables.stream()
+      .filter(var -> inputVariables.indexOf(var) % 2 == 1)
+      .collect(Collectors.toList());
+
+    assertThat(metaData.getPathVariables(), is(expectedVariables));
+  }
+
+  @Test
   public void testGetPropertyKeys() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setPropertyColumn("a", "age", 0);

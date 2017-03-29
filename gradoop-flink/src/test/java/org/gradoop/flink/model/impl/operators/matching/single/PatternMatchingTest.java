@@ -1,6 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -46,9 +47,9 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    collectAndAssertTrue(getImplementation(queryGraph, false).execute(db)
-      .equalsByGraphElementIds(loader
-        .getGraphCollectionByVariables(expectedGraphVariables)));
+    GraphCollection result = getImplementation(queryGraph, false).execute(db);
+    GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+    collectAndAssertTrue(result.equalsByGraphElementIds(expected));
   }
 
   @Test
@@ -62,8 +63,8 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    collectAndAssertTrue(getImplementation(queryGraph, true).execute(db)
-      .equalsByGraphElementData(loader
-        .getGraphCollectionByVariables(expectedGraphVariables)));
+    GraphCollection result = getImplementation(queryGraph, true).execute(db);
+    GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+    collectAndAssertTrue(result.equalsByGraphElementData(expected));
   }
 }

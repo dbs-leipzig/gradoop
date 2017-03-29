@@ -103,7 +103,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
     this.startVariable = startVariable;
     this.endVariable = endVariable;
     this.lowerBound = lowerBound;
-    this.upperBound = upperBound;
+    this.upperBound = upperBound == 0 ? Integer.MAX_VALUE : upperBound;
     this.expandDirection = expandDirection;
     this.vertexStrategy = vertexStrategy;
     this.edgeStrategy = edgeStrategy;

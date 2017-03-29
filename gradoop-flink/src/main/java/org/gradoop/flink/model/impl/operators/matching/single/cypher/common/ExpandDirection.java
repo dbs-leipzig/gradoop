@@ -28,9 +28,5 @@ public enum ExpandDirection {
   /**
    * Expand along outgoing edges
    */
-  OUT,
-  /**
-   * Expand along both incoming and outgoing edges
-   */
-  ALL
+  OUT
 }

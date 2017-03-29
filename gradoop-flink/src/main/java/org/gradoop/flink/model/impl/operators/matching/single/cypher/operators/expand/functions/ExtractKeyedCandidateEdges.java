@@ -42,7 +42,13 @@ public class ExtractKeyedCandidateEdges
   public EdgeWithTiePoint map(Embedding edge) throws Exception {
     reuseEdgeWitTiePoint.setSource(edge.getId(0));
     reuseEdgeWitTiePoint.setId(edge.getId(1));
-    reuseEdgeWitTiePoint.setTarget(edge.getId(2));
+    if (edge.size() == 3) {
+      // normal edge
+      reuseEdgeWitTiePoint.setTarget(edge.getId(2));
+    } else {
+      // loop edge
+      reuseEdgeWitTiePoint.setTarget(edge.getId(0));
+    }
 
     return reuseEdgeWitTiePoint;
   }

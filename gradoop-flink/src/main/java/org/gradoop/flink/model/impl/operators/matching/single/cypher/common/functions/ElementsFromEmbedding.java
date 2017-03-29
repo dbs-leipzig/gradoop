@@ -28,13 +28,17 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingMetaData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -104,34 +108,107 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     // vertices
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
-      if (!processedIds.contains(id)) {
-        Vertex v = vertexFactory.initVertex(id);
-        v.addGraphId(graphHead.getId());
-        out.collect(v);
-        processedIds.add(id);
-      }
+      initVertex(out, graphHead, id);
       variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));
     }
 
     // edges
+    GradoopId edgeId;
+    GradoopId sourceId;
+    GradoopId targetId;
     for (String edgeVariable : metaData.getEdgeVariables()) {
-      if (metaData.getEntryType(edgeVariable) == EmbeddingMetaData.EntryType.EDGE) {
-        GradoopId edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));
-        if (!processedIds.contains(edgeId)) {
-          GradoopId sourceId = embedding.getId(
-            metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));
-          GradoopId targetId = embedding.getId(
-            metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
-          Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
-          e.addGraphId(graphHead.getId());
-          out.collect(e);
-          processedIds.add(edgeId);
+      edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));
+      sourceId = embedding.getId(
+        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));
+      targetId = embedding.getId(
+        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
+
+      initEdge(out, graphHead, edgeId, sourceId, targetId);
+      variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
+    }
+
+    // paths
+    for (String pathVariable : metaData.getPathVariables()) {
+      ExpandDirection direction = metaData.getDirection(pathVariable);
+      List<GradoopId> path = embedding.getIdList(metaData.getEntryColumn(pathVariable));
+      List<PropertyValue> mappingValue = new ArrayList<>(path.size());
+      for (int i = 0; i < path.size(); i+=2) {
+        edgeId = path.get(i);
+        mappingValue.add(PropertyValue.create(edgeId));
+
+        if (direction == ExpandDirection.OUT) {
+          sourceId = i > 0 ?
+            path.get(i - 1) :
+            embedding.getId(
+              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));
+
+          targetId = i < path.size() - 1 ?
+            path.get(i + 1) :
+            embedding.getId(
+              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));
+
+          if (i + 2 < path.size()) {
+            mappingValue.add(PropertyValue.create(targetId));
+          }
+        } else {
+          sourceId = i < path.size() - 1 ?
+            path.get(i + 1) :
+            embedding.getId(
+              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));
+
+          targetId = i > 0 ?
+            path.get(i - 1) :
+            embedding.getId(
+              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));
+
+          if (i > 0) {
+            mappingValue.add(PropertyValue.create(sourceId));
+          }
         }
-        variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
+
+        initVertex(out, graphHead, sourceId);
+        initVertex(out, graphHead, targetId);
+        initEdge(out, graphHead, edgeId, sourceId, targetId);
       }
+      variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));
     }
 
     graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
     out.collect(graphHead);
+  }
+
+  /**
+   * Initializes an EPGM vertex using the specified parameters
+   *
+   * @param out flat map collector
+   * @param graphHead graph head to assign vertex to
+   * @param vertexId vertex identifier
+   */
+  private void initVertex(Collector<Element> out, GraphHead graphHead, GradoopId vertexId) {
+    if (!processedIds.contains(vertexId)) {
+      Vertex v = vertexFactory.initVertex(vertexId);
+      v.addGraphId(graphHead.getId());
+      out.collect(v);
+      processedIds.add(vertexId);
+    }
+  }
+
+  /**
+   * Initializes an EPGM edge using the speciified parameters.
+   *
+   * @param out flat map collector
+   * @param graphHead graph head to assign edge to
+   * @param edgeId edge identifier
+   * @param sourceId source vertex identifier
+   * @param targetId target vertex identifier
+   */
+  private void initEdge(Collector<Element> out, GraphHead graphHead, GradoopId edgeId,
+    GradoopId sourceId, GradoopId targetId) {
+    if (!processedIds.contains(edgeId)) {
+      Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
+      e.addGraphId(graphHead.getId());
+      out.collect(e);
+      processedIds.add(edgeId);
+    }
   }
 }
