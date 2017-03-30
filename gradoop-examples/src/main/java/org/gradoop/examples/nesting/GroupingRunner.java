@@ -41,7 +41,7 @@ public class GroupingRunner extends AbstractRunner implements
   /**
    * Option to declare path to input graph
    */
-  public static final String OPTION_GRAPH_COLLECTION_PATH = "i";
+  public static final String OPTION_GRAPH_COLLECTION_PATH = "g";
   /**
    * Option to declare path to output graph
    */
