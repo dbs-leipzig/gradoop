@@ -16,9 +16,9 @@ import org.gradoop.flink.model.impl.operators.nest.functions.filter.ByLabels;
 import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfNotNull;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.MapVertexAsGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.keys.SelfId;
-import org.gradoop.flink.model.impl.operators.nest.model.FlatModel;
-import org.gradoop.flink.model.impl.operators.nest.model.NestedIndexing;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
+import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 
 /**
  * This class contains all the transformations required to convert a FlatModel into a EPGM

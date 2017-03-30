@@ -54,7 +54,10 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
       return;
     }
     for (X y : second) {
-      y.setGraphIds(appearing);
+      for (GradoopId z : appearing) {
+        if (!y.getGraphIds().contains(z))
+          y.addGraphId(z);
+      }
       out.collect(y);
     }
   }

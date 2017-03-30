@@ -1,4 +1,4 @@
-package org.gradoop.flink.model.impl.operators.nest.transformations;
+package org.gradoop.flink.model.impl.operators.nest2.transformations;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -13,16 +13,16 @@ import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.MapGraphHeadAsVertex;
-import org.gradoop.flink.model.impl.operators.nest.model.FlatModel;
-import org.gradoop.flink.model.impl.operators.nest.model.NestedIndexing;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
+import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 
 /**
  * Created by vasistas on 29/03/17.
  */
 public class NestedIndexingToEPGMTransformations {
 
-  public static GraphCollection nestedIndexingToGraphCollection(NestedIndexing self,
+  public static GraphCollection toGraphCollection(NestedIndexing self,
     FlatModel dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
@@ -41,7 +41,7 @@ public class NestedIndexingToEPGMTransformations {
       dataLake.asNormalizedGraph().getConfig());
   }
 
-  public static LogicalGraph nestedIndexingToLogicalGraph(NestedIndexing self,
+  public static LogicalGraph toLogicalGraph(NestedIndexing self,
     FlatModel dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()

@@ -24,23 +24,24 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.nest.functions.*;
-import org.gradoop.flink.model.impl.operators.nest.functions.joins.AssociateAndMark;
+import org.gradoop.flink.model.impl.operators.nest2.functions.AssociateAndMark;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.AsQuadsMatchingSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.CollectEdgesPreliminary;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.MapGradoopIdAsVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.projections.Hex0;
 import org.gradoop.flink.model.impl.operators.nest.functions.projections.Hex4;
 import org.gradoop.flink.model.impl.operators.nest.functions.projections.HexMatch;
-import org.gradoop.flink.model.impl.operators.nest.model.BinaryOp;
-import org.gradoop.flink.model.impl.operators.nest.model.FlatModel;
-import org.gradoop.flink.model.impl.operators.nest.model.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest2.model.ops.BinaryOp;
+import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
+import org.gradoop.flink.model.impl.operators.nest2.functions.CollectVertices;
 
 /**
  * Fuses each Logical Graph's set of vertices appearing in the same hypervertex into a single
  * vertex.
  */
-public class Nesting extends BinaryOp {
+public class Nesting extends BinaryOp  {
 
   /**
    * Debug mode
@@ -88,8 +89,7 @@ public class Nesting extends BinaryOp {
 
     // Mark each vertex if either it's present or not in the final match
     // TODO       JOIN COUNT: (1)
-    DataSet<Hexaplet> hexas =
-      gU.getGraphHeadToVertex()
+    DataSet<Hexaplet> hexas = gU.getGraphHeadToVertex()
         .leftOuterJoin(hypervertices.getGraphHeadToVertex())
         .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
         // If the vertex does not appear in the graph collection, the f2 element is null.

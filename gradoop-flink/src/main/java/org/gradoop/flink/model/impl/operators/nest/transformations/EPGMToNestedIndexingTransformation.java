@@ -13,8 +13,8 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateElementToIdAndGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.ExceptGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.keys.SelfId;
-import org.gradoop.flink.model.impl.operators.nest.model.NestedIndexing;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 
 /**
  * Created by vasistas on 29/03/17.
@@ -25,7 +25,7 @@ public class EPGMToNestedIndexingTransformation {
    * Extracts the id from the normalized graph
    * @param logicalGraph  Graph where to extract the ids from
    */
-  public NestedIndexing fromNormalizedGraph(NormalizedGraph logicalGraph) {
+  public static NestedIndexing fromNormalizedGraph(NormalizedGraph logicalGraph) {
     DataSet<GradoopId> graphHeads = logicalGraph.getGraphHeads()
       .map(new Id<>());
     return initVertices(graphHeads,logicalGraph.getVertices(), logicalGraph.getEdges());

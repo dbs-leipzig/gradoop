@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.model;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -24,6 +24,9 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.nest.transformations
+  .EPGMToNestedIndexingTransformation;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 
 /**
  * A FlatModel represents a LogicalGraph containing all the ground truth information concerning
@@ -67,7 +70,7 @@ public class FlatModel {
    */
   public FlatModel(LogicalGraph dataLake) {
     this.dataLake = new NormalizedGraph(dataLake);
-    dataLakeIdDatabase = new NestedIndexing(dataLake);
+    dataLakeIdDatabase = EPGMToNestedIndexingTransformation.fromLogicalGraph(dataLake);
   }
 
   /**
@@ -76,7 +79,7 @@ public class FlatModel {
    */
   public FlatModel(GraphCollection dataLake) {
     this.dataLake = new NormalizedGraph(dataLake);
-    dataLakeIdDatabase = new NestedIndexing(dataLake);
+    dataLakeIdDatabase = EPGMToNestedIndexingTransformation.fromGraphCollection(dataLake);
   }
 
   /**
@@ -85,7 +88,7 @@ public class FlatModel {
    */
   public FlatModel(NormalizedGraph dataLake) {
     this.dataLake = dataLake;
-    dataLakeIdDatabase = new NestedIndexing(dataLake);
+    dataLakeIdDatabase = EPGMToNestedIndexingTransformation.fromNormalizedGraph(dataLake);
   }
 
   /**
@@ -120,25 +123,8 @@ public class FlatModel {
     return dataLake;
   }
 
-
-  /**
-   * Performs a binary operation over the current graph datastructure, while updating it
-   * @param op    Operation to be carried out
-   * @param <X>   Acutal operand's instance
-   * @return      The same operand, that now will only take the
-   */
-  public <X extends BinaryOp> X run(X op) {
-    return op.setDataLake(this);
-  }
-
-  /**
-   * Performs an unary operation over the current graph datastructure, while updating it
-   * @param op    Operation to be carried out
-   * @param <X>   Acutal operand's instance
-   * @return      The same operand, that now will only take the
-   */
-  public <X extends UnaryOp> X run(X op) {
-    return op.setDataLake(this);
+  public DataSet<GradoopId> generateNewSingleton(GradoopId element) {
+    return dataLake.getConfig().getExecutionEnvironment().fromElements(element);
   }
 
   /**

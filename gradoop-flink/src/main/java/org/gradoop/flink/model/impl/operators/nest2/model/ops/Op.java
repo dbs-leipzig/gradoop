@@ -15,7 +15,10 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.model.ops;
+
+import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 
 /**
  * Defines a generic operator.
@@ -23,8 +26,18 @@ package org.gradoop.flink.model.impl.operators.nest.model;
  * Please note that within this nested model, a unary operation
  * is an operation that is either over one graph or over a collection of graphs while a binary
  * operator is an operator over two distinct graphs or over two distinct graph collections
+ *
+ * @param <Left> Elements extending the NestedIndexing and supporting the previous state of the
+ *            computation for the left operand
+ * @param <Right> Elements extending the NestedIndexing and supporting the previous state of the
+ *            computation for the right operand
+ * @param <Res> Elements extending the NestedIndexing and supporting the previous state of the
+ *            computation for the result
  */
-public abstract class Op {
+public abstract class Op<Left extends NestedIndexing,
+  Right extends NestedIndexing,
+  Res extends NestedIndexing> {
+
 
   /**
    * DataLake that undergoes the updates
@@ -42,16 +55,15 @@ public abstract class Op {
     return (X) this;
   }
 
+
   /**
    * Implementation of the actual function
-   * @param lake      Update the data values
    * @param left      Left argument
    * @param right     Right argument
    * @return          Result as a graph with just ids. The Data Lake is updated either with
    *                  new edges or new vertices
    */
-  protected abstract NestedIndexing runWithArgAndLake(FlatModel lake, NestedIndexing left,
-    NestedIndexing right);
+  protected abstract Res runWithArgAndLake(FlatModel flat, Left left, Right right);
 
   /**
    * Defines the operation's name

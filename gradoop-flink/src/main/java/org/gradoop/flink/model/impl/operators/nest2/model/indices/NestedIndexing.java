@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.model.indices;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.keys.SelfId;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 
 /**
  * A NestedIndexing defines a graph collection only by using the graph id elements (and hence,

@@ -15,22 +15,15 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.model;
 
 /**
- * Defines a binary operator
+ * Defines an operation that keeps the state of the final result
+ *
+ * @param <T> Representation of the previous state
  */
-public abstract class BinaryOp extends Op {
+public interface VertexCentricResult<T> {
 
-  /**
-   * Public access to the internal operation. The data lake is not exposed
-   * @param left    Left argument
-   * @param right   Right argument
-   * @return        Result as a graph with just ids. The DataLake, representing the computation
-   *                state, is updated with either new vertices or new edges
-   */
-  public NestedIndexing with(NestedIndexing left, NestedIndexing right) {
-    return runWithArgAndLake(mother, left, right);
-  }
+  T getPreviousComputation();
 
 }

@@ -15,7 +15,10 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.model.ops;
+
+import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 
 /**
  * Defines an unary operator for the ensted model

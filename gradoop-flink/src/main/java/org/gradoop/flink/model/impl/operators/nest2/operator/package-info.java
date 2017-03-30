@@ -16,6 +16,9 @@
  */
 
 /**
- * Defining the nesting operator for the nested model
+ * An nesting operator is a binary operator: taking as a first input the graph that has to be
+ * nested and the graph collection containing the elements that will be nested, returns a graph
+ * summarizing as a single vertex each set of vertices appearing in each element of the graph
+ * collection
  */
-package org.gradoop.flink.model.impl.operators.nest.model;
+package org.gradoop.flink.model.impl.operators.nest2.operator;
