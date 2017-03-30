@@ -23,9 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctive;
 
 /**
@@ -87,28 +84,6 @@ public class NestingRunner extends AbstractRunner implements
     } else {
       System.err.println("wrong parameter constellation");
     }
-  }
-
-  /**
-   * Returns the grouping operator implementation based on the given strategy.
-   *
-   * @param vertexKey             vertex property key used for grouping
-   * @param edgeKey               edge property key used for grouping
-   * @param useVertexLabels       use vertex label for grouping, true/false
-   * @param useEdgeLabels         use edge label for grouping, true/false
-   * @return grouping operator implementation
-   */
-  private static Grouping getOperator(String vertexKey,
-    String edgeKey, boolean useVertexLabels, boolean useEdgeLabels) {
-    return new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .addVertexGroupingKey(vertexKey)
-      .addEdgeGroupingKey(edgeKey)
-      .useVertexLabel(useVertexLabels)
-      .useEdgeLabel(useEdgeLabels)
-      .addVertexAggregator(new CountAggregator())
-      .addEdgeAggregator(new CountAggregator())
-      .build();
   }
 
   /**
