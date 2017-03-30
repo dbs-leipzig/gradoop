@@ -35,7 +35,11 @@ import org.gradoop.flink.model.impl.operators.nest.transformations
   .NestedIndexingToEPGMTransformations;
 
 /**
- * Implements the nesting operator for the EPGM data model
+ * Implements the nesting operator for the EPGM data model. Given a graph describing the groundtruth
+ * information and a collection of graph representing the mined patterns, it returns a nested graph
+ * where each vertex is either a vertex representing a graph in the graph collection that contains
+ * at least one match with the ground truth or a non-matcher vertex. The edges from the former
+ * graph are also inherited.
  */
 public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult<DataSet<Hexaplet>> {
 

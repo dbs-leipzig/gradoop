@@ -11,7 +11,9 @@ import org.gradoop.flink.model.impl.operators.nest.transformations
   .NestedIndexingToEPGMTransformations;
 
 /**
- * Implements the nesting operation
+ * Extends the nesting operation by adding the edges as in the Join Disjunctive Semantics
+ *
+ * @see Nesting
  */
 public class NestingWithDisjunctive extends Nesting {
 
