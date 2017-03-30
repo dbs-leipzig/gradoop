@@ -32,28 +32,6 @@ public class NestingRunner extends AbstractRunner implements
   ProgramDescription {
 
   /**
-   * Option to declare path to input graph
-   */
-  public static final String OPTION_TO_BE_NESTED_PATH = "i";
-  /**
-   * Option to declare path to input graph
-   */
-  public static final String OPTION_GRAPH_COLLECTION_PATH = "g";
-  /**
-   * Option to declare path to output graph
-   */
-  public static final String OPTION_OUTPUT_PATH = "o";
-
-  static {
-    OPTIONS.addOption(OPTION_TO_BE_NESTED_PATH, "to-be-nested-graph", true,
-      "Path to the folder containing the graph undergoing the nesting operation");
-    OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
-      "Path to write output files to");
-    OPTIONS.addOption(OPTION_GRAPH_COLLECTION_PATH, "graph-collection-path", true,
-      "Path to the folder containing the graph collection providing the nesting information");
-  }
-
-  /**
    * Main program to run the example. Arguments are the available options.
    *
    * @param args program arguments
@@ -61,16 +39,10 @@ public class NestingRunner extends AbstractRunner implements
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, NestingRunner.class.getName());
-    if (cmd == null) {
-      return;
-    }
-    performSanityCheck(cmd);
-
     // read arguments from command line
-    final String inputPath = cmd.getOptionValue(OPTION_TO_BE_NESTED_PATH);
-    final String collectionPath = cmd.getOptionValue(OPTION_GRAPH_COLLECTION_PATH);
-    final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
+    final String inputPath = args[0];
+    final String collectionPath = args[1];
+    final String outputPath = args[2];
 
     // initialize graphs
     LogicalGraph graphDatabase = readLogicalGraph(inputPath,  true);
@@ -83,28 +55,6 @@ public class NestingRunner extends AbstractRunner implements
       writeLogicalGraph(nestedGraph, outputPath);
     } else {
       System.err.println("wrong parameter constellation");
-    }
-  }
-
-  /**
-   * Checks if the minimum of arguments is provided
-   *
-   * @param cmd command line
-   */
-  private static void performSanityCheck(final CommandLine cmd) {
-    if (!cmd.hasOption(OPTION_TO_BE_NESTED_PATH)) {
-      throw new IllegalArgumentException("Define a graph input directory containing the graph " +
-        "that has to be nested" +
-        ".");
-    }
-    if (!cmd.hasOption(OPTION_GRAPH_COLLECTION_PATH)) {
-      throw new IllegalArgumentException("Define a graph collection input directory containing " +
-        "the nesting information" +
-        ".");
-    }
-    if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
-      throw new IllegalArgumentException("Please provide an output path where to store the result" +
-        ".");
     }
   }
 
