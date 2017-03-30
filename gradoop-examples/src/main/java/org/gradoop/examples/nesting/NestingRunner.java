@@ -17,7 +17,6 @@
 
 package org.gradoop.examples.nesting;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.examples.AbstractRunner;
@@ -43,10 +42,11 @@ public class NestingRunner extends AbstractRunner implements
     final String inputPath = args[0];
     final String collectionPath = args[1];
     final String outputPath = args[2];
+    final String format = args[3];
 
     // initialize graphs
-    LogicalGraph graphDatabase = readLogicalGraph(inputPath,  true);
-    GraphCollection graphCollection = readGraphCollection(collectionPath, true);
+    LogicalGraph graphDatabase = readLogicalGraph(inputPath,  format);
+    GraphCollection graphCollection = readGraphCollection(collectionPath, format);
 
     LogicalGraph nestedGraph = new NestingWithDisjunctive(GradoopId.get())
       .execute(graphDatabase, graphCollection);

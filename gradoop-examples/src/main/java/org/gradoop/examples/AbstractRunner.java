@@ -111,19 +111,24 @@ public abstract class AbstractRunner {
    * Reads a GraphCollection from a given directory.
    *
    * @param directory       path to EPGM database
-   * @param readGraphHeads  true, if graph heads are contained
+   * @param format    format in which the graph is stored (csv, json)
    * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
   protected static GraphCollection readGraphCollection(String directory,
-    boolean readGraphHeads) {
+    String format) {
     directory = appendSeparator(directory);
-    return new JSONDataSource(
-      readGraphHeads ? directory + GRAPHS_JSON : null,
-      directory + VERTICES_JSON,
-      directory + EDGES_JSON,
-      GradoopFlinkConfig.createConfig(getExecutionEnvironment()))
-      .getGraphCollection();
+
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    format = format.toLowerCase();
+
+    if (format.equals("json")) {
+      return new JSONDataSource(directory, config).getGraphCollection();
+    } else if (format.equals("csv")) {
+      return new CSVDataSource(directory, config).getGraphCollection();
+    } else {
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
   }
 
   /**
