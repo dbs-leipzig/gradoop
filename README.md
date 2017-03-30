@@ -17,6 +17,7 @@ as a proof of concept implementation and far from production ready.
 
 ##### Further Information (articles and talks)
 
+* [DIMSpan - Transactional Frequent Subgraph Mining with Distributed In-Memory Dataflow Systems, arXiv, March 2017](https://arxiv.org/pdf/1703.01910.pdf)
 * [Distributed Grouping of Property Graphs with GRADOOP, BTW Conf., March 2017](http://dbs.uni-leipzig.de/file/BTW17_Grouping_Research.pdf)
 * [Graph Mining for Complex Data Analytics, ICDM Demo, December 2016](http://dbs.uni-leipzig.de/file/Graph_Mining_for_Complex_Data_Analytics.pdf)
 * [[german] Graph Mining für Business Intelligence, data2day, October 2016](http://www.slideshare.net/s1ck/gut-vernetzt-skalierbares-graph-mining-fr-business-intelligence)

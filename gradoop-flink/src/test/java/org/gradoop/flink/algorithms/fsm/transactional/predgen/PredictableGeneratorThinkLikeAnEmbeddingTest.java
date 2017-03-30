@@ -15,7 +15,7 @@ public class PredictableGeneratorThinkLikeAnEmbeddingTest extends PredictableGen
   }
 
   @Override
-  public TransactionalFSMBase getImplementation(FSMConfig config) {
-    return new ThinkLikeAnEmbeddingTFSM(config);
+  public TransactionalFSMBase getImplementation(float minSupport, boolean directed) {
+    return new ThinkLikeAnEmbeddingTFSM(new FSMConfig(minSupport, directed));
   }
 }

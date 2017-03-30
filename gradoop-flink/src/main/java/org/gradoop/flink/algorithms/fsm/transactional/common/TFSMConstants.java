@@ -28,11 +28,6 @@ public class TFSMConstants {
   public static final String GRAPH_COUNT = "graphCount";
 
   /**
-   * 1-element set with minimum frequency
-   */
-  public static final String MIN_FREQUENCY = "minFrequency";
-
-  /**
    * frequent vertex labels
    */
   public static final String FREQUENT_VERTEX_LABELS = "fvl";

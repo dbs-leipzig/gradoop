@@ -24,6 +24,18 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 abstract class JSONBase {
   /**
+   * Default file name for storing graph heads
+   */
+  static final String DEFAULT_GRAPHS_FILE = "/graphs.json";
+  /**
+   * Default file name for storing vertices
+   */
+  static final String DEFAULT_VERTEX_FILE = "/vertices.json";
+  /**
+   * Default file name for storing edges
+   */
+  static final String DEFAULT_EDGE_FILE = "/edges.json";
+  /**
    * Gradoop Flink configuration
    */
   private final GradoopFlinkConfig config;

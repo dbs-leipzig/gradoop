@@ -45,7 +45,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraph
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
@@ -62,8 +61,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
-import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint
-  .OPTIMIZER_CHOOSES;
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
@@ -79,8 +77,7 @@ public class ExplorativePatternMatching
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    ExplorativePatternMatching.class);
+  private static final Logger LOG = Logger.getLogger(ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
@@ -198,11 +195,6 @@ public class ExplorativePatternMatching
 
       embeddings = distributedTraverser.traverse(vertices, edges);
     } else if (traverserStrategy == TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION) {
-
-      //--------------------------------------------------------------------------
-      // Pre-processing (filter candidates)
-      //--------------------------------------------------------------------------
-
       DataSet<TripleWithCandidates<GradoopId>> triples = PreProcessor
         .filterTriplets(graph, getQuery());
 
@@ -233,11 +225,6 @@ public class ExplorativePatternMatching
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
       PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
-  }
-
-  @Override
-  protected QueryHandler getQueryHandler() {
-    return new QueryHandler(getQuery());
   }
 
   @Override

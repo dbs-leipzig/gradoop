@@ -20,8 +20,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
   @Test
   public void testWrite() throws Exception {
 
-    String gdlFile = DOTDataSinkTest.class
-      .getResource("/data/dot/input.gdl").getFile();
+    String gdlFile = DOTDataSinkTest.class.getResource("/data/dot/input.gdl").getFile();
 
     // load from gdl
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
@@ -35,7 +34,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     final String dotFile = tmpDir + "/check.dot";
 
     // create data sink
-    DataSink dataSink = new DOTDataSink(dotFile, false);
+    DataSink dataSink = new DOTDataSink(dotFile, true);
 
     // write graph
     dataSink.write(inputGraph);
@@ -43,6 +42,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // execute
     getExecutionEnvironment().execute();
 
+    int graphLines = 0;
     int vertexLines = 0;
     int edgeLines = 0;
 
@@ -56,15 +56,15 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
 
       if (line.contains("->")){
         edgeLines++;
-      } else if (
-          !line.contains("di") &&
-          !line.contains("{") &&
-          !line.contains("}")){
+      } else if (line.startsWith("v")) {
         vertexLines++;
+      } else if (line.startsWith("graph") || line.startsWith("digraph")) {
+        graphLines++;
       }
     }
 
     // assert
+    assertEquals("Wrong number of graph lines", 2, graphLines);
     assertEquals("Wrong number of edge lines", 4, edgeLines);
     assertEquals("Wrong number of vertex lines", 3, vertexLines);
  }
