@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields("f1 -> f1")
 public class SetEdgesToNewGraph implements
-  MapFunction<Tuple2<GradoopId, GradoopId>,Tuple2<GradoopId, GradoopId>> {
+  MapFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>> {
 
   /**
    * New id for the header

@@ -85,7 +85,7 @@ public class NestingWithNestedModel extends BinaryOp<NestedIndexing, NestedIndex
     DataSet<Tuple2<GradoopId, GradoopId>> edges = gU.getGraphHeadToEdge()
       .map(new SetEdgesToNewGraph(newGraphId));
 
-    return new IndexingBeforeNesting(gh,vertices,edges,hexas);
+    return new IndexingBeforeNesting(gh, vertices, edges, hexas);
   }
 
   @Override

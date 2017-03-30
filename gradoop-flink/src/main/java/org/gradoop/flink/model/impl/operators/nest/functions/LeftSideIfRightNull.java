@@ -17,9 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 
@@ -51,7 +49,8 @@ public class LeftSideIfRightNull<L> implements FlatJoinFunction<L, L, L> {
 
   @Override
   public void join(L l, L l2, Collector<L> collector) throws Exception {
-    if (l2==null)
+    if (l2 == null) {
       collector.collect(l);
+    }
   }
 }

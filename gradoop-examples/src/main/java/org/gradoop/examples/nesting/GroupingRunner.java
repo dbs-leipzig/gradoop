@@ -76,11 +76,11 @@ public class GroupingRunner extends AbstractRunner implements
     final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
 
     // initialize graphs
-    LogicalGraph graphDatabase = readLogicalGraph(inputPath, true);
-    GraphCollection graphCollection = readGraphCollection(collectionPath,true);
+    LogicalGraph graphDatabase = readLogicalGraph(inputPath,  true);
+    GraphCollection graphCollection = readGraphCollection(collectionPath, true);
 
     LogicalGraph nestedGraph = new NestingWithDisjunctive(GradoopId.get())
-      .execute(graphDatabase,graphCollection);
+      .execute(graphDatabase, graphCollection);
 
     if (nestedGraph != null) {
       writeLogicalGraph(nestedGraph, outputPath);

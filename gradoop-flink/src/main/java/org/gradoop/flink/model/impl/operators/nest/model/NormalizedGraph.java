@@ -137,12 +137,20 @@ public class NormalizedGraph {
       .execute(this.asLogicalGraph(), research.asLogicalGraph());
   }
 
+  /**
+   * Returns…
+   * @return its representation as an EPGM Logical Graph
+   */
   public LogicalGraph asLogicalGraph() {
-    return LogicalGraph.fromDataSets(heads,vertices,edges,conf);
+    return LogicalGraph.fromDataSets(heads, vertices, edges, conf);
   }
 
+  /**
+   * Returns…
+   * @return its representation as an EPGM Graph Collection
+   */
   public GraphCollection asGraphCollection() {
-    return GraphCollection.fromDataSets(heads,vertices,edges,conf);
+    return GraphCollection.fromDataSets(heads, vertices, edges, conf);
   }
 
 }

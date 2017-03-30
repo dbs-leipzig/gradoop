@@ -42,6 +42,7 @@ public class IndexingBeforeNesting extends NestedIndexing implements
    * @param graphHeadToVertex The vertices defining the components at the intermediately down
    *                          level
    * @param graphHeadToEdge   The edges appearing between each possible level
+   * @param state             Describing the previous computation step
    */
   public IndexingBeforeNesting(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,

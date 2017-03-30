@@ -15,20 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.model;
-
 /**
- * Defines an operation that keeps the state of the final result
- *
- * @param <T> Representation of the previous state
+ * Contains the utility functions providing the conversions between nested and EPGM data
+ * representation
  */
-public interface VertexCentricResult<T> {
-
-  /**
-   * Retrieves…
-   * @return  an intermediate step of the previous computation that could be used in the following
-   * processes
-   */
-  T getPreviousComputation();
-
-}
+package org.gradoop.flink.model.impl.operators.nest.transformations;

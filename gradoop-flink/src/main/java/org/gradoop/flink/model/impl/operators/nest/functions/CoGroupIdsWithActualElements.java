@@ -55,8 +55,9 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
     }
     for (X y : second) {
       for (GradoopId z : appearing) {
-        if (!y.getGraphIds().contains(z))
+        if (!y.getGraphIds().contains(z)) {
           y.addGraphId(z);
+        }
       }
       out.collect(y);
     }

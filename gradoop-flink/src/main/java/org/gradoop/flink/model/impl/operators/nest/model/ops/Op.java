@@ -58,6 +58,7 @@ public abstract class Op<Left extends NestedIndexing,
 
   /**
    * Implementation of the actual function
+   * @param flat      The normalized graph containing the ground truth.
    * @param left      Left argument
    * @param right     Right argument
    * @return          Result as a graph with just ids. The Data Lake is updated either with

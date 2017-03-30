@@ -96,6 +96,11 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
     return getClass().getName();
   }
 
+  /**
+   * Default internal initialization for the operator
+   * @param left        Graph to be nested
+   * @param collection  Nesting information
+   */
   protected void initialize(LogicalGraph left, GraphCollection collection) {
 
     // Generating the model only if it is required
@@ -116,7 +121,7 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
 
     // Suppose that both operands must share the same execution environment
     NestingWithNestedModel
-      operator = new NestingWithNestedModel(n,left.getConfig().getExecutionEnvironment());
+      operator = new NestingWithNestedModel(n, left.getConfig().getExecutionEnvironment());
 
     // Extracting the indexing structures for both graphs
     leftIdx = EPGMToNestedIndexingTransformation.fromLogicalGraph(left);
@@ -167,7 +172,7 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
     initialize(left, collection);
 
     // Converting the result to the standard EPGM model
-    return NestedIndexingToEPGMTransformations.toLogicalGraph(intermediateResult,fm);
+    return NestedIndexingToEPGMTransformations.toLogicalGraph(intermediateResult, fm);
   }
 
   @Override

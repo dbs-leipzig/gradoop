@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.nest.transformations;
 
 import org.apache.flink.api.java.DataSet;
@@ -21,6 +38,13 @@ import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
  */
 public class NestedIndexingToEPGMTransformations {
 
+  /**
+   * Converts the NestedIndexing information into a GraphCollection by using the ground truth
+   * information
+   * @param self      Indexed representation of the data
+   * @param dataLake  ground truth containing all the informations
+   * @return          EPGM representation
+   */
   public static GraphCollection toGraphCollection(NestedIndexing self,
     NormalizedGraph dataLake) {
 
@@ -34,11 +58,18 @@ public class NestedIndexingToEPGMTransformations {
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
 
-    DataSet<GraphHead> heads = getActualGraphHeads(self,dataLake);
+    DataSet<GraphHead> heads = getActualGraphHeads(self, dataLake);
 
     return GraphCollection.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
+  /**
+   * Converts the NestedIndexing information into a LogicalGraph by using the ground truth
+   * information
+   * @param self      Indexed representation of the data
+   * @param dataLake  ground truth containing all the informations
+   * @return          EPGM representation
+   */
   public static LogicalGraph toLogicalGraph(NestedIndexing self,
     NormalizedGraph dataLake) {
 
@@ -52,7 +83,7 @@ public class NestedIndexingToEPGMTransformations {
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
 
-    DataSet<GraphHead> heads = getActualGraphHeads(self,dataLake);
+    DataSet<GraphHead> heads = getActualGraphHeads(self, dataLake);
 
     return LogicalGraph.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
@@ -103,7 +134,7 @@ public class NestedIndexingToEPGMTransformations {
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
 
-    DataSet<GraphHead> heads = getActualGraphHeads(ni,dataLake);
+    DataSet<GraphHead> heads = getActualGraphHeads(ni, dataLake);
 
     vertices = vertices
       .union(heads.map(new MapGraphHeadAsVertex()))

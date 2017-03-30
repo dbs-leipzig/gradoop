@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.nest.operators;
 
 import org.apache.flink.api.java.DataSet;
@@ -44,9 +61,10 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestedInde
   public DisjunctiveEdges(GradoopId newGraphId) {
     this.newGraphId = newGraphId;
   }
-  
+
   @Override
-  protected IndexingAfterNesting runWithArgAndLake(NormalizedGraph dataLake, IndexingBeforeNesting nested,
+  protected IndexingAfterNesting runWithArgAndLake(NormalizedGraph dataLake,
+    IndexingBeforeNesting nested,
     NestedIndexing hypervertices) {
 
     DataSet<Hexaplet> hexas = nested.getPreviousComputation();
@@ -55,7 +73,7 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestedInde
     // The vertices appearing in a nested graph are the ones that induce the to-be-updated edges.
     DataSet<Hexaplet> verticesPromotingEdgeUpdate = hexas.filter(new GetVerticesToBeNested());
 
-    DataSet<Tuple2<GradoopId,GradoopId>> gids = nested.getGraphHeadToEdge()
+    DataSet<Tuple2<GradoopId, GradoopId>> gids = nested.getGraphHeadToEdge()
       .leftOuterJoin(hypervertices.getGraphHeadToEdge())
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new LeftSideIfRightNull<>());
@@ -96,11 +114,14 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestedInde
     return new IndexingAfterNesting(gh, nested.getGraphHeadToVertex(), edges, updatedEdges);
   }
 
+  /**
+   * Updates the ground truth by using the outcomes of the previous computations
+   * @param dataLake  ground truth information
+   * @param ian       indexed information
+   * @return          updated ground truth information
+   */
   public NormalizedGraph updateFlatModel(NormalizedGraph dataLake, IndexingAfterNesting ian) {
     DataSet<GradoopId> gh = ian.getGraphHeads();
-
-    DataSet<Tuple2<GradoopId, GradoopId>> preliminaryEdge = ian.getPreviousComputation()
-      .map(new CollectEdgesPreliminary());
 
     // Create new edges in the dataLake
     DataSet<Edge> newlyCreatedEdges = dataLake.getEdges()
@@ -108,9 +129,6 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestedInde
       .coGroup(ian.getPreviousComputation())
       .where(new Id<>()).equalTo(new Hex0())
       .with(new DuplicateEdgeInformations());
-
-    DataSet<Tuple2<GradoopId, GradoopId>> edgesToProvide = preliminaryEdge
-      .flatMap(new CollectEdges(newGraphId, false));
 
     // Updates the data lake with a new model
     return new NormalizedGraph(
