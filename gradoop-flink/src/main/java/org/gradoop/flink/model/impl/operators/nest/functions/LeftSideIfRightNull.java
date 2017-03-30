@@ -18,8 +18,10 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.util.Collector;
 
 /*
  * This file is part of Gradoop.
@@ -45,15 +47,11 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
  * @param <L> left and right type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSideIfNotNull<L> implements JoinFunction<L, L, L>, CrossFunction<L, L, L> {
+public class LeftSideIfRightNull<L> implements FlatJoinFunction<L, L, L> {
 
   @Override
-  public L cross(L left, L right) throws Exception {
-    return left != null ? left : right;
-  }
-
-  @Override
-  public L join(L first, L second) throws Exception {
-    return first != null ? first : second;
+  public void join(L l, L l2, Collector<L> collector) throws Exception {
+    if (l2==null)
+      collector.collect(l);
   }
 }

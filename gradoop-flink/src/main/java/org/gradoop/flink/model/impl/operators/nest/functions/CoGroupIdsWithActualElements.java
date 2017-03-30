@@ -58,8 +58,7 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
         if (!y.getGraphIds().contains(z))
           y.addGraphId(z);
       }
-      if (!y.getGraphIds().contains(y.getId()))
-        out.collect(y);
+      out.collect(y);
     }
   }
 }

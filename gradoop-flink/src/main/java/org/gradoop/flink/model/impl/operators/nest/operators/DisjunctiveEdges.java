@@ -11,6 +11,7 @@ import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongi
 import org.gradoop.flink.model.impl.operators.nest.functions.DoQuadMatchTarget;
 import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
+import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
 import org.gradoop.flink.model.impl.operators.nest.functions.QuadEdgeDifference;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.AsQuadsMatchingSource;
@@ -54,13 +55,18 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestedInde
     // The vertices appearing in a nested graph are the ones that induce the to-be-updated edges.
     DataSet<Hexaplet> verticesPromotingEdgeUpdate = hexas.filter(new GetVerticesToBeNested());
 
+    DataSet<Tuple2<GradoopId,GradoopId>> gids = nested.getGraphHeadToEdge()
+      .leftOuterJoin(hypervertices.getGraphHeadToEdge())
+      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
+      .with(new LeftSideIfRightNull<>());
+
     // Edges to return and update are the ones that do not appear in the collection
     // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)
-    DataSet<Hexaplet> edgesToUpdateOrReturn =
+    DataSet<Hexaplet> edgesToUpdateOrReturn = dataLake.getEdges()
       // Each edge is associated to each possible graph
-      dataLake.getEdges().map(new AsQuadsMatchingSource())
+        .map(new AsQuadsMatchingSource())
         // (1) Now, we want to select the edge information only for the graphs in gU
-        .joinWithTiny(nested.getGraphHeadToEdge())
+        .joinWithTiny(gids)
         .where(new Hex0()).equalTo(new Value1Of2<>())
         .with(new CombineGraphBelongingInformation())
         .distinct(0)

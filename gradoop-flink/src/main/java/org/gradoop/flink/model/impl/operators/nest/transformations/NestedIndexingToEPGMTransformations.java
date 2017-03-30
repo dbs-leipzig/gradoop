@@ -52,13 +52,6 @@ public class NestedIndexingToEPGMTransformations {
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
 
-    try {
-      System.out.println(vertices.count());
-      System.out.println(edges.count());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     DataSet<GraphHead> heads = getActualGraphHeads(self,dataLake);
 
     return LogicalGraph.fromDataSets(heads, vertices, edges, dataLake.getConfig());
