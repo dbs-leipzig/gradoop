@@ -15,42 +15,28 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions.map;
+package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Creates an empty vertex from a GradoopId
+ * Fith projection of the Exaplet
  */
-public class MapGradoopIdAsVertex implements MapFunction<GradoopId, Vertex>  {
+@FunctionAnnotation.ForwardedFields("f4->*")
+public class Hex4
+  implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
 
-  /**
-   * Reusable element
-   */
-  private final Vertex reusable;
-
-  /**
-   * Reusable list
-   */
-  private final GradoopIdList list;
-
-  /**
-   * Default constructor
-   */
-  public MapGradoopIdAsVertex() {
-    reusable = new Vertex();
-    list = new GradoopIdList();
+  @Override
+  public GradoopId map(Hexaplet triple) throws Exception {
+    return triple.f4;
   }
 
   @Override
-  public Vertex map(GradoopId value) throws Exception {
-    reusable.setId(value);
-    list.clear();
-    list.add(value);
-    reusable.setGraphIds(list);
-    return reusable;
+  public GradoopId getKey(Hexaplet triple) throws Exception {
+    return triple.f4;
   }
 }

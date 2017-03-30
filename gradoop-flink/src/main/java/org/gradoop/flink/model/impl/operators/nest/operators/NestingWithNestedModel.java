@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
-import org.gradoop.flink.model.impl.operators.nest.functions.projections.Hex4;
+import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
 import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;

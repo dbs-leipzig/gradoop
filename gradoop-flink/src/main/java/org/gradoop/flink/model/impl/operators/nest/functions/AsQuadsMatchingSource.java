@@ -15,28 +15,36 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions.projections;
+package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Fith projection of the Exaplet
+ * Maps an edge into a Hex.
+ *
+ * <p> Used by RepresentationUtils </p>
  */
-@FunctionAnnotation.ForwardedFields("f4->*")
-public class Hex4
-  implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
+@FunctionAnnotation.ForwardedFields("id -> f0")
+public class AsQuadsMatchingSource implements MapFunction<Edge, Hexaplet> {
 
-  @Override
-  public GradoopId map(Hexaplet triple) throws Exception {
-    return triple.f4;
+  /**
+   * Reusable element
+   */
+  private Hexaplet r;
+
+  /**
+   * Default constructor
+   */
+  public AsQuadsMatchingSource() {
+    r = new Hexaplet();
   }
 
   @Override
-  public GradoopId getKey(Hexaplet triple) throws Exception {
-    return triple.f4;
+  public Hexaplet map(Edge value) throws Exception {
+    r.update(value, true);
+    return r;
   }
 }

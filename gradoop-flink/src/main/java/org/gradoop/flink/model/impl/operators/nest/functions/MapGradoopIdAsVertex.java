@@ -15,54 +15,42 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions.map;
+package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Defines a new vertex from a GraphHead
+ * Creates an empty vertex from a GradoopId
  */
-public class MapGraphHeadAsVertex implements MapFunction<GraphHead, Vertex>,
-  FlatJoinFunction<GraphHead, Vertex, Vertex> {
+public class MapGradoopIdAsVertex implements MapFunction<GradoopId, Vertex>  {
 
   /**
-   * Reusable vertex
+   * Reusable element
    */
   private final Vertex reusable;
 
   /**
-   * List to be set inside the reusable element
+   * Reusable list
    */
   private final GradoopIdList list;
 
   /**
    * Default constructor
    */
-  public MapGraphHeadAsVertex() {
+  public MapGradoopIdAsVertex() {
     reusable = new Vertex();
     list = new GradoopIdList();
   }
 
   @Override
-  public Vertex map(GraphHead value) throws Exception {
-    reusable.setId(value.getId());
-    reusable.setLabel(value.getLabel());
-    reusable.setProperties(value.getProperties());
+  public Vertex map(GradoopId value) throws Exception {
+    reusable.setId(value);
     list.clear();
-    list.add(value.getId());
+    list.add(value);
     reusable.setGraphIds(list);
     return reusable;
-  }
-
-  @Override
-  public void join(GraphHead first, Vertex second, Collector<Vertex> out) throws Exception {
-    if (second == null) {
-      out.collect(map(first));
-    }
   }
 }

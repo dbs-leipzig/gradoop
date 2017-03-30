@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Created by vasistas on 09/03/17.
+ * Filters the to-be nested vertices
  */
 public class GetVerticesToBeNested implements FilterFunction<Hexaplet> {
   @Override

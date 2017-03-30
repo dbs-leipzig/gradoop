@@ -14,18 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.gradoop.flink.model.impl.operators.nest.functions.keys;
-
-import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
-
 /**
- * Uses the GradoopId element itself as a selection criterion
+ * Program to run parametrized Grouping on extended property graphs.
  */
-public class SelfId implements KeySelector<GradoopId, GradoopId> {
-  @Override
-  public GradoopId getKey(GradoopId value) throws Exception {
-    return value;
-  }
-}
+package org.gradoop.examples.nesting;

@@ -12,7 +12,7 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateElementToIdAndGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.ExceptGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.functions.keys.SelfId;
+import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
 import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 

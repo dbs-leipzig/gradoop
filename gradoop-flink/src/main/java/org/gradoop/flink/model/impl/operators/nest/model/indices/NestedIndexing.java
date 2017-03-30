@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.functions.keys.SelfId;
+import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
 import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 
 /**

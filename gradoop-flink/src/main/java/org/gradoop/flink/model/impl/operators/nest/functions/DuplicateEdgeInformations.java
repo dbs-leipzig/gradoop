@@ -26,7 +26,8 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 import java.util.Iterator;
 
 /**
- * Created by vasistas on 09/03/17.
+ * This method is used to create new edges and copy old edges
+ * in order to create new ones
  */
 public class DuplicateEdgeInformations implements CoGroupFunction<Edge, Hexaplet, Edge> {
 
