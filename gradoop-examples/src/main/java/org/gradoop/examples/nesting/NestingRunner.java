@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctive;
 /**
  * A dedicated program for Graph Nesting over the EPGM model.
  */
-public class GroupingRunner extends AbstractRunner implements
+public class NestingRunner extends AbstractRunner implements
   ProgramDescription {
 
   /**
@@ -64,7 +64,7 @@ public class GroupingRunner extends AbstractRunner implements
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, GroupingRunner.class.getName());
+    CommandLine cmd = parseArguments(args, NestingRunner.class.getName());
     if (cmd == null) {
       return;
     }
@@ -138,6 +138,6 @@ public class GroupingRunner extends AbstractRunner implements
    */
   @Override
   public String getDescription() {
-    return GroupingRunner.class.getName();
+    return NestingRunner.class.getName();
   }
 }
