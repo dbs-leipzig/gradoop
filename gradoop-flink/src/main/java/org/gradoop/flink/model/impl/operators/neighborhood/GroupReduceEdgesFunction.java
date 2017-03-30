@@ -17,7 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -25,6 +30,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborEdgeCoGroupFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborEdgesCoGroupFunction;
 
 public class GroupReduceEdgesFunction extends EdgesFunction {
 
@@ -37,26 +43,37 @@ public class GroupReduceEdgesFunction extends EdgesFunction {
     DataSet<Vertex> vertices;
     switch (getDirection()) {
     case IN:
-      vertices = graph.getEdges()
-        .coGroup(graph.getVertices())
-        .where(new TargetId<>()).equalTo(new Id<>())
+      vertices = graph.getVertices()
+        .coGroup(graph.getEdges())
+        .where(new Id<>()).equalTo(new TargetId<>())
         .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction()));
       break;
     case OUT:
-      vertices = graph.getEdges()
-        .coGroup(graph.getVertices())
-        .where(new SourceId<>()).equalTo(new Id<>())
+      vertices = graph.getVertices()
+        .coGroup(graph.getEdges())
+        .where(new Id<>()).equalTo(new TargetId<>())
         .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction()));
       break;
     case BOTH:
-      vertices = graph.getEdges()
-        .coGroup(graph.getVertices())
-        .where(new TargetId<>()).equalTo(new Id<>())
-        .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction()))
-        .union(graph.getEdges()
-          .coGroup(graph.getVertices())
-          .where(new SourceId<>()).equalTo(new Id<>())
-          .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction())));
+      vertices = graph.getVertices()
+        .coGroup(graph.getEdges()
+          .flatMap(new FlatMapFunction<Edge, Tuple2<GradoopId, Edge>>() {
+            Tuple2<GradoopId, Edge> reuseTuple = new Tuple2<GradoopId, Edge>();
+            @Override
+            public void flatMap(Edge edge, Collector<Tuple2<GradoopId, Edge>> collector) throws
+              Exception {
+              reuseTuple.setFields(edge.getSourceId(), edge);
+              collector.collect(reuseTuple);
+              reuseTuple.setFields(edge.getTargetId(), edge);
+              collector.collect(reuseTuple);
+            }
+          }))
+        .where(new Id<>()).equalTo(0)
+        .with(new NeighborEdgesCoGroupFunction((EdgeAggregateFunction) getFunction()));
+//        .union(graph.getEdges()
+//          .coGroup(graph.getVertices())
+//          .where(new SourceId<>()).equalTo(new Id<>())
+//          .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction())));
       break;
     default:
       vertices = null;

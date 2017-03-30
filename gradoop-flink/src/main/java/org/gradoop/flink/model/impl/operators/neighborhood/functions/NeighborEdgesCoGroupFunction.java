@@ -18,28 +18,31 @@
 package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
-public class NeighborEdgeCoGroupFunction implements CoGroupFunction<Vertex, Edge, Vertex> {
+public class NeighborEdgesCoGroupFunction implements CoGroupFunction<Vertex, Tuple2<GradoopId, Edge>, Vertex> {
 
   private EdgeAggregateFunction function;
 
-  public NeighborEdgeCoGroupFunction(EdgeAggregateFunction function) {
+  public NeighborEdgesCoGroupFunction(EdgeAggregateFunction function) {
     this.function = function;
   }
 
   @Override
-  public void coGroup(Iterable<Vertex> vertices, Iterable<Edge> edges,
+  public void coGroup(Iterable<Vertex> vertices, Iterable<Tuple2<GradoopId, Edge>> tuples,
     Collector<Vertex> collector) throws Exception {
     Vertex vertex = vertices.iterator().next();
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
     boolean isFirst = true;
 
-    for (Edge edge : edges) {
+    for (Tuple2<GradoopId, Edge> tuple : tuples) {
+      Edge edge = tuple.f1;
       if (isFirst) {
         isFirst = false;
         propertyValue = function.getEdgeIncrement(edge);
