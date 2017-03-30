@@ -125,14 +125,6 @@ public class NormalizedGraph {
   }
 
   /**
-   * Adds some new edges to the dataset
-   * @param edges Edges to be added through union
-   */
-  public void updateEdgesWithUnion(DataSet<Edge> edges) {
-    this.edges = this.edges.union(edges);
-  }
-
-  /**
    * Checks if the two NormalizedGraph are similar by data
    * @param research  Element to which the similarity has to be compared
    * @return          A dataset containing the result
@@ -153,11 +145,4 @@ public class NormalizedGraph {
     return GraphCollection.fromDataSets(heads,vertices,edges,conf);
   }
 
-  /**
-   * Adds some new vertices to the dataset
-   * @param map Vertices to be added through union
-   */
-  public void updateVerticesWithUnion(DataSet<Vertex> map) {
-    this.vertices = this.vertices.union(map);
-  }
 }

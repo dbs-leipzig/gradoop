@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.nest2.model.ops;
 
-import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 
 /**
@@ -42,7 +42,7 @@ public abstract class Op<Left extends NestedIndexing,
   /**
    * DataLake that undergoes the updates
    */
-  protected FlatModel mother;
+  protected NormalizedGraph mother;
 
   /**
    * Setting the mother. This method is accessible only to the main interface
@@ -50,7 +50,7 @@ public abstract class Op<Left extends NestedIndexing,
    * @return        The called object (this)
    * @param <X>     Returns this
    */
-  public <X extends Op> X setDataLake(FlatModel toSet) {
+  public <X extends Op> X setDataLake(NormalizedGraph toSet) {
     this.mother = toSet;
     return (X) this;
   }
@@ -63,7 +63,7 @@ public abstract class Op<Left extends NestedIndexing,
    * @return          Result as a graph with just ids. The Data Lake is updated either with
    *                  new edges or new vertices
    */
-  protected abstract Res runWithArgAndLake(FlatModel flat, Left left, Right right);
+  protected abstract Res runWithArgAndLake(NormalizedGraph flat, Left left, Right right);
 
   /**
    * Defines the operation's name

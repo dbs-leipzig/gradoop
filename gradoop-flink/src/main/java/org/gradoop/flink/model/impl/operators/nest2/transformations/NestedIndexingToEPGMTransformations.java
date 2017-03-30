@@ -13,7 +13,6 @@ import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.map.MapGraphHeadAsVertex;
-import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
 import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 
@@ -23,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 public class NestedIndexingToEPGMTransformations {
 
   public static GraphCollection toGraphCollection(NestedIndexing self,
-    FlatModel dataLake) {
+    NormalizedGraph dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
       .coGroup(dataLake.getVertices())
@@ -37,12 +36,11 @@ public class NestedIndexingToEPGMTransformations {
 
     DataSet<GraphHead> heads = getActualGraphHeads(self,dataLake);
 
-    return GraphCollection.fromDataSets(heads, vertices, edges,
-      dataLake.asNormalizedGraph().getConfig());
+    return GraphCollection.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
   public static LogicalGraph toLogicalGraph(NestedIndexing self,
-    FlatModel dataLake) {
+    NormalizedGraph dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
       .coGroup(dataLake.getVertices())
@@ -56,22 +54,7 @@ public class NestedIndexingToEPGMTransformations {
 
     DataSet<GraphHead> heads = getActualGraphHeads(self,dataLake);
 
-    return LogicalGraph.fromDataSets(heads, vertices, edges,
-      dataLake.asNormalizedGraph().getConfig());
-  }
-
-  /**
-   * Instantiates the GraphHeads using the LogicalGraph as a primary source
-   * @param self      ground truth for elements
-   * @param dataLake  primary source
-   * @return          GraphHeads
-   */
-  public static DataSet<GraphHead> getActualGraphHeads(NestedIndexing self,
-                                                       FlatModel dataLake) {
-    return self.getGraphHeads()
-      .join(dataLake.getVertices())
-      .where(new SelfId()).equalTo(new Id<>())
-      .with(new VertexToGraphHead());
+    return LogicalGraph.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
   /**
@@ -99,18 +82,6 @@ public class NestedIndexingToEPGMTransformations {
       .join(dataLake.getVertices())
       .where(new SelfId()).equalTo(new Id<>())
       .with(new VertexToGraphHead());
-  }
-
-  /**
-   * Recreates the NormalizedGraph of the informations stored within
-   * the NestedIndexing through the DataLake
-   * @param self      ground truth for elements
-   * @param dataLake  Element containing all the required and necessary
-   *                  informations
-   * @return          Actual values
-   */
-  public NormalizedGraph asNormalizedGraph(NestedIndexing self, FlatModel dataLake) {
-    return asNormalizedGraph(self, dataLake.asNormalizedGraph());
   }
 
   /**

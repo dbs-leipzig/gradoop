@@ -23,14 +23,14 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraph;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
+import org.gradoop.flink.model.impl.operators.nest2.tuples.Hexaplet;
+import org.gradoop.flink.model.impl.operators.nest2.model.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.nest2.model.VertexCentricResult;
-import org.gradoop.flink.model.impl.operators.nest2.model.indices.IndexingForNesting;
+import org.gradoop.flink.model.impl.operators.nest2.model.indices.IndexingBeforeNesting;
 import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
-import org.gradoop.flink.model.impl.operators.nest.transformations
+import org.gradoop.flink.model.impl.operators.nest2.transformations
   .EPGMToNestedIndexingTransformation;
-import org.gradoop.flink.model.impl.operators.nest2.operator.Nesting;
+import org.gradoop.flink.model.impl.operators.nest2.operators.Nesting;
 import org.gradoop.flink.model.impl.operators.nest2.transformations
   .NestedIndexingToEPGMTransformations;
 
@@ -47,7 +47,7 @@ public class Nest implements GraphGraphCollectionToGraph, VertexCentricResult<Da
   /**
    * Using the FlatModel if we have a chain of different operations to be optimized
    */
-  private FlatModel fm;
+  private NormalizedGraph fm;
 
   /**
    * Setting the outcome of the previous computation
@@ -59,16 +59,17 @@ public class Nest implements GraphGraphCollectionToGraph, VertexCentricResult<Da
    * @param ghf Generating the ids for the headers
    */
   public Nest(GraphHeadFactory ghf) {
-    this.n = ghf.createGraphHead().getId();
-    this.fm = null;
-    this.previousComputation = null;
+    this(ghf.createGraphHead().getId());
   }
 
   /**
-   * Default constructor. A default id is associated to the graph
+   * A default id is associated to the graph
+   * @param id Id to be associated to the new graph
    */
   public Nest(GradoopId id) {
     this.n = id;
+    this.fm = null;
+    this.previousComputation = null;
   }
 
   @Override
@@ -92,7 +93,7 @@ public class Nest implements GraphGraphCollectionToGraph, VertexCentricResult<Da
         left.getConfig());
 
       // Getting the model for defining the associated model
-      fm = new FlatModel(groundTruth);
+      fm = new NormalizedGraph(groundTruth);
     }
 
     // Suppose that both operands must share the same execution environment
@@ -103,7 +104,7 @@ public class Nest implements GraphGraphCollectionToGraph, VertexCentricResult<Da
     NestedIndexing rightIdx = EPGMToNestedIndexingTransformation.fromGraphCollection(collection);
 
     // At this step the FlatModel is never used, since I only change the index representation
-    IndexingForNesting resultingIndices = operator.with(leftIdx, rightIdx);
+    IndexingBeforeNesting resultingIndices = operator.with(leftIdx, rightIdx);
     previousComputation = resultingIndices.getPreviousComputation();
 
     // Converting the result to the standard EPGM model

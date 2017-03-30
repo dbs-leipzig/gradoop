@@ -17,16 +17,24 @@
 
 package org.gradoop.flink.model.impl.operators.nest2.model.ops;
 
+import org.apache.jasper.tagplugins.jstl.core.Out;
 import org.gradoop.flink.model.impl.operators.nest2.model.FlatModel;
 import org.gradoop.flink.model.impl.operators.nest2.model.indices.NestedIndexing;
 
 /**
  * Defines an unary operator for the ensted model
+ *
+ * @param <Input> Elements extending the NestedIndexing and supporting the previous state of the
+ *            computation for the left operand
+ * @param <Output> Elements extending the NestedIndexing and supporting the previous state of the
+ *            computation for the result
  */
-public abstract class UnaryOp extends BinaryOp {
+public abstract class UnaryOp<Input extends NestedIndexing,
+                              Output extends NestedIndexing>
+  extends BinaryOp<Input,NestedIndexing,Output> {
 
   @Override
-  protected NestedIndexing runWithArgAndLake(FlatModel lake, NestedIndexing left,
+  protected Output runWithArgAndLake(FlatModel lake, Input left,
     NestedIndexing right) {
     return runWithArgAndLake(lake, left);
   }
@@ -37,14 +45,14 @@ public abstract class UnaryOp extends BinaryOp {
    * @param data  A subgraph within the datalake containing only ids and the nesting information
    * @return      The result of the operation
    */
-  protected abstract NestedIndexing runWithArgAndLake(FlatModel lake, NestedIndexing data);
+  protected abstract Output runWithArgAndLake(FlatModel lake, Input data);
 
   /**
    * Uses the data hiding for updating the DataLake with the outcome of the unary operator
    * @param data  A subgraph within the datalake containing only ids and the nesting information
    * @return      The result of the operation
    */
-  public NestedIndexing with(NestedIndexing data) {
+  public NestedIndexing with(Input data) {
     return runWithArgAndLake(mother, data, null);
   }
 
