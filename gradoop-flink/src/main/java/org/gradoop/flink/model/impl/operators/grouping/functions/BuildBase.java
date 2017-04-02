@@ -105,6 +105,15 @@ abstract class BuildBase implements Serializable {
     }
   }
 
+  /**
+   * Returns the property keys used for Grouping.
+   *
+   * @return group property keys
+   */
+  protected List<String> getGroupPropertyKeys() {
+    return groupPropertyKeys;
+  }
+
   //----------------------------------------------------------------------------
   // Aggregation
   //----------------------------------------------------------------------------
