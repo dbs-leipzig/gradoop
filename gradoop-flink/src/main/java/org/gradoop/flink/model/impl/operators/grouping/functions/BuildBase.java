@@ -25,6 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -155,16 +156,25 @@ abstract class BuildBase implements Serializable {
    *
    * @param attributed          attributed element
    * @param groupPropertyValues group property values
+   * @param vertexLabelGroup    vertex label group
    */
   protected void setGroupProperties(EPGMAttributed attributed,
-    PropertyValueList groupPropertyValues) {
+    PropertyValueList groupPropertyValues, LabelGroup vertexLabelGroup) {
 
-    Iterator<String> keyIterator = groupPropertyKeys.iterator();
     Iterator<PropertyValue> valueIterator = groupPropertyValues.iterator();
 
-    while (keyIterator.hasNext() && valueIterator.hasNext()) {
-      attributed.setProperty(keyIterator.next(), valueIterator.next());
+    for (String groupPropertyKey : vertexLabelGroup.getPropertyKeys()) {
+      attributed.setProperty(groupPropertyKey, valueIterator.next());
     }
+  }
+
+  /**
+   * Returns the property keys used for Grouping.
+   *
+   * @return group property keys
+   */
+  protected List<String> getGroupPropertyKeys() {
+    return groupPropertyKeys;
   }
 
   //----------------------------------------------------------------------------

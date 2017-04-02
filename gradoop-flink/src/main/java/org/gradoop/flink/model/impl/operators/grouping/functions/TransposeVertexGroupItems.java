@@ -24,7 +24,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
+  .PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
@@ -85,6 +87,7 @@ public class TransposeVertexGroupItems
     GradoopId superVertexId               = null;
     String groupLabel                     = null;
     PropertyValueList groupPropertyValues = null;
+    LabelGroup vertexLabelGroup           = null;
 
     boolean isFirst = true;
 
@@ -95,6 +98,7 @@ public class TransposeVertexGroupItems
         superVertexId = GradoopId.get();
         groupLabel            = groupItem.getGroupLabel();
         groupPropertyValues   = groupItem.getGroupingValues();
+        vertexLabelGroup      = groupItem.getVertexLabelGroup();
 
         isFirst = false;
       }
@@ -112,6 +116,7 @@ public class TransposeVertexGroupItems
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
       groupPropertyValues);
     reuseOuterTuple.f0.setSuperVertexId(superVertexId);
+    reuseOuterTuple.f0.setVertexLabelGroup(vertexLabelGroup);
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group

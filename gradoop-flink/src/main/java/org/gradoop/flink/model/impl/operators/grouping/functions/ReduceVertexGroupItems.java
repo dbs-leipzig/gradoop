@@ -76,6 +76,7 @@ public class ReduceVertexGroupItems
         reuseTuple.setSuperVertexId(superVertexId);
         reuseTuple.setAggregateValues(groupItem.getAggregateValues());
         reuseTuple.setSuperVertex(groupItem.isSuperVertex());
+        reuseTuple.setVertexLabelGroup(groupItem.getVertexLabelGroup());
 
         isFirst = false;
       }

@@ -17,18 +17,23 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
+  .PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 import java.util.List;
 
 /**
- * Creates a minimal representation of vertex data to be used for grouping.
+ * Creates a minimal representation of vertex data to be used for label specific grouping.
  *
  * The output of that mapper is {@link VertexGroupItem} that contains
  * the vertex id, vertex label, vertex group properties and vertex aggregate
@@ -38,7 +43,7 @@ import java.util.List;
 @FunctionAnnotation.ReadFields("label;properties")
 public class BuildVertexGroupItem
   extends BuildBase
-  implements MapFunction<Vertex, VertexGroupItem> {
+  implements FlatMapFunction<Vertex, VertexGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -46,16 +51,24 @@ public class BuildVertexGroupItem
   private final VertexGroupItem reuseVertexGroupItem;
 
   /**
+   * Contains vertex labels with associated grouping keys.
+   */
+  private final List<LabelGroup> vertexLabelGroups;
+
+  /**
    * Creates map function
    *
    * @param groupPropertyKeys vertex property keys
    * @param useLabel          true, if label shall be considered
    * @param vertexAggregators aggregate functions for super vertices
+   * @param vertexLabelGroups stores grouping properties for vertex labels
    */
   public BuildVertexGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> vertexAggregators) {
+    boolean useLabel, List<PropertyValueAggregator> vertexAggregators,
+    List<LabelGroup> vertexLabelGroups) {
     super(groupPropertyKeys, useLabel, vertexAggregators);
 
+    this.vertexLabelGroups = vertexLabelGroups;
     this.reuseVertexGroupItem = new VertexGroupItem();
     this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
     this.reuseVertexGroupItem.setSuperVertex(false);
@@ -69,13 +82,40 @@ public class BuildVertexGroupItem
    * {@inheritDoc}
    */
   @Override
-  public VertexGroupItem map(Vertex vertex) throws Exception {
+  public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
+    List<PropertyValue> values =
+      Lists.newArrayListWithCapacity(vertex.getPropertyCount());
+    boolean usedVertexLabelGroup = false;
+
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
-    reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
     if (doAggregate()) {
       reuseVertexGroupItem.setAggregateValues(getAggregateValues(vertex));
     }
-    return reuseVertexGroupItem;
+    // check if vertex shall be grouped by a special set of keys
+    for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
+      if (vertexLabelGroup.getLabel().equals(vertex.getLabel())) {
+        usedVertexLabelGroup = true;
+        // add value for grouping if exist
+        for (String groupPropertyKey : vertexLabelGroup.getPropertyKeys()) {
+          if (vertex.hasProperty(groupPropertyKey)) {
+            values.add(vertex.getPropertyValue(groupPropertyKey));
+          } else {
+            values.add(PropertyValue.NULL_VALUE);
+          }
+        }
+        reuseVertexGroupItem.setVertexLabelGroup(vertexLabelGroup);
+        reuseVertexGroupItem.setGroupingValues(PropertyValueList.fromPropertyValues(values));
+        collector.collect(reuseVertexGroupItem);
+        values.clear();
+      }
+    }
+    // standard grouping case
+    if (!usedVertexLabelGroup) {
+      reuseVertexGroupItem.setVertexLabelGroup(new LabelGroup(vertex.getLabel(),
+        getGroupPropertyKeys().toArray(new String[getGroupPropertyKeys().size()])));
+      reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
+      collector.collect(reuseVertexGroupItem);
+    }
   }
 }

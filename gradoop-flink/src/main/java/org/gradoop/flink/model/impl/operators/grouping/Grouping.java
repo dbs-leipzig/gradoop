@@ -28,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroup
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -111,6 +112,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   private final List<PropertyValueAggregator> edgeAggregators;
 
   /**
+   * Stores grouping properties for vertex labels.
+   */
+  private final List<LabelGroup> vertexLabelGroups;
+
+  /**
+   * Stores grouping properties for edge labels.
+   */
+  private final List<LabelGroup> edgeLabelGroups;
+
+  /**
    * Creates grouping operator instance.
    *
    * @param vertexGroupingKeys  property keys to group vertices
@@ -119,18 +130,24 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param edgeGroupingKeys    property keys to group edges
    * @param useEdgeLabels       group on edge label true/false
    * @param edgeAggregators     aggregate functions for grouped edges
+   * @param vertexLabelGroups   stores grouping properties for vertex labels
+   * @param edgeLabelGroups     stores grouping properties for edge labels
    */
   Grouping(
     List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators,
     List<String> edgeGroupingKeys, boolean useEdgeLabels,
-    List<PropertyValueAggregator> edgeAggregators) {
+    List<PropertyValueAggregator> edgeAggregators,
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups) {
     this.vertexGroupingKeys = vertexGroupingKeys;
     this.useVertexLabels    = useVertexLabels;
     this.vertexAggregators  = vertexAggregators;
     this.edgeGroupingKeys   = edgeGroupingKeys;
     this.useEdgeLabels      = useEdgeLabels;
     this.edgeAggregators    = edgeAggregators;
+    this.vertexLabelGroups  = vertexLabelGroups;
+    this.edgeLabelGroups    = edgeLabelGroups;
   }
 
   /**
@@ -159,7 +176,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @return true iff vertex properties shall be used for grouping
    */
   protected boolean useVertexProperties() {
-    return !vertexGroupingKeys.isEmpty();
+    return !getVertexGroupingKeys().isEmpty() || !vertexLabelGroups.isEmpty();
   }
 
   /**
@@ -195,7 +212,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @return true, iff edge properties shall be used for grouping
    */
   protected boolean useEdgeProperties() {
-    return !edgeGroupingKeys.isEmpty();
+    return !edgeGroupingKeys.isEmpty() || !edgeLabelGroups.isEmpty();
   }
 
   /**
@@ -223,6 +240,24 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   protected List<PropertyValueAggregator> getEdgeAggregators() {
     return edgeAggregators;
+  }
+
+  /**
+   * Returns tuple which contains the properties used for a specific vertex label.
+   *
+   * @return vertex label groups
+   */
+  public List<LabelGroup> getVertexLabelGroups() {
+    return vertexLabelGroups;
+  }
+
+  /**
+   * Returns tuple which contains the properties used for a specific edge label.
+   *
+   * @return edge label groups
+   */
+  public List<LabelGroup> getEdgeLabelGroups() {
+    return edgeLabelGroups;
   }
 
   /**
@@ -278,8 +313,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
-      .map(new BuildEdgeGroupItem(
-        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators()))
+      .flatMap(new BuildEdgeGroupItem(
+        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(), getEdgeLabelGroups()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)
       .where(0).equalTo(0)
@@ -355,6 +390,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     private List<PropertyValueAggregator> edgeValueAggregators;
 
     /**
+     * Stores grouping keys for a specific vertex label.
+     */
+    private List<LabelGroup> vertexLabelGroups;
+
+    /**
+     * Stores grouping keys for a specific edge label.
+     */
+    private List<LabelGroup> edgeLabelGroups;
+
+    /**
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
@@ -364,6 +409,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       this.useEdgeLabel           = false;
       this.vertexValueAggregators = new ArrayList<>();
       this.edgeValueAggregators   = new ArrayList<>();
+      this.vertexLabelGroups      = new ArrayList<>();
+      this.edgeLabelGroups        = new ArrayList<>();
     }
 
     /**
@@ -379,17 +426,23 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a property key to the vertex grouping keys.
+     * Adds a property key to the vertex grouping keys, or adds a new label group to the vertex
+     * label groups.
      *
-     * @param key property key
+     * @param key either property key or label if propertyKeys are used
+     * @param propertyKeys property keys used for different labels
      * @return this builder
      */
-    public GroupingBuilder addVertexGroupingKey(String key) {
+    public GroupingBuilder addVertexGroupingKey(String key, String... propertyKeys) {
       Objects.requireNonNull(key);
-      if (key.equals(Grouping.LABEL_SYMBOL)) {
-        useVertexLabel(true);
+      if (propertyKeys.length == 0) {
+        if (key.equals(Grouping.LABEL_SYMBOL)) {
+          useVertexLabel(true);
+        } else {
+          this.vertexGroupingKeys.add(key);
+        }
       } else {
-        this.vertexGroupingKeys.add(key);
+        vertexLabelGroups.add(new LabelGroup(key, propertyKeys));
       }
       return this;
     }
@@ -409,17 +462,23 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a property key to the edge grouping keys.
+     * Adds a property key to the edge grouping keys, or adds a new label group to the edge label
+     * groups.
      *
-     * @param key property key
+     * @param key either property key or label if propertyKeys are used
+     * @param propertyKeys property keys used for different labels
      * @return this builder
      */
-    public GroupingBuilder addEdgeGroupingKey(String key) {
+    public GroupingBuilder addEdgeGroupingKey(String key, String... propertyKeys) {
       Objects.requireNonNull(key);
-      if (key.equals(Grouping.LABEL_SYMBOL)) {
-        useEdgeLabel(true);
+      if (propertyKeys.length == 0) {
+        if (key.equals(Grouping.LABEL_SYMBOL)) {
+          useEdgeLabel(true);
+        } else {
+          this.edgeGroupingKeys.add(key);
+        }
       } else {
-        this.edgeGroupingKeys.add(key);
+        edgeLabelGroups.add(new LabelGroup(key, propertyKeys));
       }
       return this;
     }
@@ -505,13 +564,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
         groupingOperator =
           new GroupingGroupReduce(vertexGroupingKeys, useVertexLabel,
             vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
-            edgeValueAggregators);
+            edgeValueAggregators, vertexLabelGroups, edgeLabelGroups);
         break;
       case GROUP_COMBINE:
         groupingOperator =
           new GroupingGroupCombine(vertexGroupingKeys, useVertexLabel,
             vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
-            edgeValueAggregators);
+            edgeValueAggregators, vertexLabelGroups, edgeLabelGroups);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

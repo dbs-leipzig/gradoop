@@ -69,6 +69,7 @@ abstract class BuildSuperEdge extends BuildBase {
           edgeGroupItem.setGroupLabel(GConstants.DEFAULT_EDGE_LABEL);
         }
         edgeGroupItem.setGroupingValues(edge.getGroupingValues());
+        edgeGroupItem.setEdgeLabelGroup(edge.getEdgeLabelGroup());
         firstElement = false;
       }
 

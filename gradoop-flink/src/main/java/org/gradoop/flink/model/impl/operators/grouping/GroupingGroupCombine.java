@@ -32,6 +32,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVert
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
@@ -76,21 +77,28 @@ public class GroupingGroupCombine extends Grouping {
    * @param edgeGroupingKeys   property keys to group edges
    * @param useEdgeLabels      group on edge label true/false
    * @param edgeAggregators    aggregate functions for grouped edges
+   * @param vertexLabelGroups   stores grouping properties for vertex labels
+   * @param edgeLabelGroups     stores grouping properties for edge labels
    */
-  GroupingGroupCombine(List<String> vertexGroupingKeys, boolean useVertexLabels,
+  GroupingGroupCombine(
+    List<String> vertexGroupingKeys,
+    boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators,
-    List<String> edgeGroupingKeys, boolean useEdgeLabels,
-    List<PropertyValueAggregator> edgeAggregators) {
+    List<String> edgeGroupingKeys,
+    boolean useEdgeLabels,
+    List<PropertyValueAggregator> edgeAggregators,
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups) {
     super(vertexGroupingKeys, useVertexLabels, vertexAggregators,
-      edgeGroupingKeys, useEdgeLabels, edgeAggregators);
+      edgeGroupingKeys, useEdgeLabels, edgeAggregators, vertexLabelGroups, edgeLabelGroups);
   }
 
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .map(new BuildVertexGroupItem(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators()));
+      .flatMap(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
+        getVertexAggregators(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)

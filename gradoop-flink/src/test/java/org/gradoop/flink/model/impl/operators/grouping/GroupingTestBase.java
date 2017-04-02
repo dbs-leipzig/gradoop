@@ -1346,4 +1346,174 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
+
+  @Test
+  public void testVertexLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
+      "(v01:Forum {count : 1L,topic : \"graph\"})" +
+      "(v02:User  {count : 3L,gender : \"male\"})" +
+      "(v03:User  {count : 1L,gender : \"female\"})" +
+      "(v02)-->(v00)" +
+      "(v02)-->(v01)" +
+      "(v02)-->(v02)" +
+      "(v02)-->(v03)" +
+      "(v03)-->(v01)" +
+      "(v03)-->(v02)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("topic")
+      .addVertexGroupingKey("User", "gender")
+      .addVertexAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+
+  @Test
+  public void testCrossVertexLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
+      "(v01:Forum {count : 1L,topic : \"graph\"})" +
+      "(v02:User  {count : 3L,gender : \"male\"})" +
+      "(v03:User  {count : 1L,gender : \"female\"})" +
+      "(v04:User  {count : 3L,age : 20})" +
+      "(v05:User  {count : 1L,age : 30})" +
+      "(v02)-->(v00)" +
+      "(v02)-->(v01)" +
+      "(v02)-->(v02)" +
+      "(v02)-->(v03)" +
+      "(v02)-->(v04)" +
+      "(v02)-->(v05)" +
+      "(v03)-->(v01)" +
+      "(v03)-->(v02)" +
+      "(v03)-->(v05)" +
+      "(v04)-->(v00)" +
+      "(v04)-->(v01)" +
+      "(v04)-->(v02)" +
+      "(v04)-->(v03)" +
+      "(v04)-->(v04)" +
+      "(v04)-->(v05)" +
+      "(v05)-->(v01)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("topic")
+      .addVertexGroupingKey("User", "gender")
+      .addVertexGroupingKey("User", "age")
+      .addVertexAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testEdgeLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
+      "(v01:Forum {count : 1L,topic : \"graph\"})" +
+      "(v02:User  {count : 3L,gender : \"male\"})" +
+      "(v03:User  {count : 1L,gender : \"female\"})" +
+      "(v02)-[{count : 2L}]->(v00)" +
+      "(v02)-[{count : 2L}]->(v01)" +
+      "(v02)-[{since : 2014, count : 2L}]->(v02)" +
+      "(v02)-[{since : 2013, count : 1L}]->(v02)" +
+      "(v02)-[{since : 2013, count : 1L}]->(v03)" +
+      "(v03)-[{count : 1L}]->(v01)" +
+      "(v03)-[{since : 2013, count : 1L}]->(v02)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("topic")
+      .addVertexGroupingKey("User", "gender")
+      .addEdgeGroupingKey("knows", "since")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testCrossEdgeLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
+      "(v01:Forum {count : 1L,topic : \"graph\"})" +
+      "(v02:User  {count : 3L,gender : \"male\"})" +
+      "(v03:User  {count : 1L,gender : \"female\"})" +
+      "(v02)-[{until : 2014, count : 2L}]->(v00)" +
+      "(v02)-[{until : 2013, count : 2L}]->(v01)" +
+      "(v02)-[{since : 2014, count : 2L}]->(v02)" +
+      "(v02)-[{since : 2013, count : 1L}]->(v02)" +
+      "(v02)-[{since : 2013, count : 1L}]->(v03)" +
+      "(v03)-[{until : 2013, count : 1L}]->(v01)" +
+      "(v03)-[{since : 2013, count : 1L}]->(v02)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("topic")
+      .addVertexGroupingKey("User", "gender")
+      .addEdgeGroupingKey("knows", "since")
+      .addEdgeGroupingKey("member", "until")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  private String getLabelSpecificInput() {
+    return "input[" +
+      "(v0:Forum {theme : \"db\",topic : \"rdf\"})" +
+      "(v1:Forum {theme : \"db\",topic : \"graph\"})" +
+      "(v2:User {theme : \"db\",gender : \"male\",age : 20})" +
+      "(v3:User {theme : \"db\",gender : \"male\",age : 20})" +
+      "(v4:User {theme : \"db\",gender : \"male\",age : 30})" +
+      "(v5:User {theme : \"db\",gender : \"female\",age : 20})" +
+      "(v2)-[:member {until : 2014}]->(v0)" +
+      "(v3)-[:member {until : 2014}]->(v0)" +
+      "(v3)-[:member {until : 2013}]->(v1)" +
+      "(v4)-[:member {until : 2013}]->(v1)" +
+      "(v5)-[:member {until : 2013}]->(v1)" +
+      "(v2)-[:knows {since : 2014}]->(v3)" +
+      "(v3)-[:knows {since : 2014}]->(v2)" +
+      "(v3)-[:knows {since : 2013}]->(v4)" +
+      "(v3)-[:knows {since : 2013}]->(v5)" +
+      "(v5)-[:knows {since : 2013}]->(v4)" +
+      "]";
+  }
 }

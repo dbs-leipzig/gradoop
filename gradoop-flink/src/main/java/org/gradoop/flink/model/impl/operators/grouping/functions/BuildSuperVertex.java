@@ -27,7 +27,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
-
 import java.util.List;
 
 /**
@@ -75,7 +74,7 @@ public class BuildSuperVertex
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     setLabel(supVertex, groupItem.getGroupLabel());
-    setGroupProperties(supVertex, groupItem.getGroupingValues());
+    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getVertexLabelGroup());
     setAggregateValues(supVertex, groupItem.getAggregateValues());
 
     return supVertex;
