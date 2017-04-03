@@ -223,7 +223,8 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
     //tuple used to create the source and the target key
     ReferenceTuple referenceTuple;
-    // normal edge, so information about the source can be read by the xmlbasedcsv-edge meta information
+    // normal edge, so information about the source can be read by the
+    // xmlbasedcsv-edge meta information
     if (fullKey.equals("")) {
       //relevant key information for the source
       referenceTuple = createKeyTupleFromStaticOrRefOrReference(
@@ -266,8 +267,8 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       }
       //adds a key of a graph to the 'list'
       sb.append(createKey(createKeyTupleFromStaticOrRefOrReference(
-        graph.getContent(), fields, datasourceName, domainName, className))
-        .replaceAll(XMLBasedCSVConstants.SEPARATOR_GRAPHS, XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS));
+        graph.getContent(), fields, datasourceName, domainName, className)).replaceAll(
+          XMLBasedCSVConstants.SEPARATOR_GRAPHS, XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS));
     }
     return sb.toString();
   }

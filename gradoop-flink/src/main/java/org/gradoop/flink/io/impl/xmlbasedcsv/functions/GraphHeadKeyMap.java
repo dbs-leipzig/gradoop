@@ -36,8 +36,8 @@ public class GraphHeadKeyMap implements GroupReduceFunction<GraphHead, Map<Strin
     Map<String, GradoopId> graphHeadMap = Maps.newHashMap();
     //select the key property and store it in the map together with the id
     for (GraphHead graphHead : iterable) {
-      graphHeadMap.put(
-        graphHead.getPropertyValue(XMLBasedCSVConstants.PROPERTY_KEY_KEY).getString(), graphHead.getId());
+      graphHeadMap.put(graphHead.getPropertyValue(
+        XMLBasedCSVConstants.PROPERTY_KEY_KEY).getString(), graphHead.getId());
     }
     collector.collect(graphHeadMap);
   }

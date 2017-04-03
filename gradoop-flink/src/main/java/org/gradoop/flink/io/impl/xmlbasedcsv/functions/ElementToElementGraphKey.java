@@ -36,7 +36,8 @@ public class ElementToElementGraphKey<T extends EPGMGraphElement>
     String graphs = element.getPropertyValue(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS).getString();
     //get all graph keys which are stored in a property
     for (String graph : graphs.split(XMLBasedCSVConstants.SEPARATOR_GRAPHS)) {
-      graph = graph.replaceAll(XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS, XMLBasedCSVConstants.SEPARATOR_GRAPHS);
+      graph = graph.replaceAll(
+        XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS, XMLBasedCSVConstants.SEPARATOR_GRAPHS);
       collector.collect(new Tuple2<T, String>(element, graph));
     }
   }
