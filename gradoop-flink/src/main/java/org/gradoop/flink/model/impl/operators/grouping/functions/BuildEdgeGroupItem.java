@@ -29,6 +29,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
@@ -52,15 +54,17 @@ public class BuildEdgeGroupItem extends BuildBase implements FlatMapFunction<Edg
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
-   * @param useLabel          true, if vertex label shall be used
-   * @param edgeAggregators   aggregate functions for super edges
-   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param groupPropertyKeys               vertex property key for grouping
+   * @param useLabel                        true, if vertex label shall be used
+   * @param edgeAggregators                 aggregate functions for super edges
+   * @param edgeLabelGroups                 stores grouping properties for edge labels
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public BuildEdgeGroupItem(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> edgeAggregators,
-    List<LabelGroup> edgeLabelGroups) {
-    super(groupPropertyKeys, useLabel, edgeAggregators);
+    List<LabelGroup> edgeLabelGroups,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, edgeAggregators, labelWithAggregatorPropertyKeys);
     this.edgeLabelGroups = edgeLabelGroups;
     this.reuseEdgeGroupItem = new EdgeGroupItem();
     if (!doAggregate()) {
@@ -74,30 +78,29 @@ public class BuildEdgeGroupItem extends BuildBase implements FlatMapFunction<Edg
    */
   @Override
   public void flatMap(Edge edge, Collector<EdgeGroupItem> collector) throws Exception {
-    List<PropertyValue> values =
-      Lists.newArrayListWithCapacity(edge.getPropertyCount());
+    List<PropertyValue> values = Lists.newArrayList();
     boolean usedEdgeLabelGroup = false;
 
     reuseEdgeGroupItem.setSourceId(edge.getSourceId());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
-    reuseEdgeGroupItem.setGroupLabel(getLabel(edge));
+    reuseEdgeGroupItem.setGroupLabel(edge.getLabel());
     if (doAggregate()) {
       reuseEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
     }
 
     // check if edge shall be grouped by a special set of keys
-    for (LabelGroup vertexLabelGroup : edgeLabelGroups) {
-      if (vertexLabelGroup.getLabel().equals(edge.getLabel())) {
+    for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
+      if (edgeLabelGroup.getLabel().equals(edge.getLabel())) {
         usedEdgeLabelGroup = true;
         // add value for grouping if exist
-        for (String groupPropertyKey : vertexLabelGroup.getPropertyKeys()) {
+        for (String groupPropertyKey : edgeLabelGroup.getPropertyKeys()) {
           if (edge.hasProperty(groupPropertyKey)) {
             values.add(edge.getPropertyValue(groupPropertyKey));
           } else {
             values.add(PropertyValue.NULL_VALUE);
           }
         }
-        reuseEdgeGroupItem.setEdgeLabelGroup(vertexLabelGroup);
+        reuseEdgeGroupItem.setEdgeLabelGroup(edgeLabelGroup);
         reuseEdgeGroupItem.setGroupingValues(PropertyValueList.fromPropertyValues(values));
         collector.collect(reuseEdgeGroupItem);
         values.clear();

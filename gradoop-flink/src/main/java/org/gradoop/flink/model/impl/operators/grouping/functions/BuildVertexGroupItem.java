@@ -31,6 +31,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates a minimal representation of vertex data to be used for label specific grouping.
@@ -58,15 +60,17 @@ public class BuildVertexGroupItem
   /**
    * Creates map function
    *
-   * @param groupPropertyKeys vertex property keys
-   * @param useLabel          true, if label shall be considered
-   * @param vertexAggregators aggregate functions for super vertices
-   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param groupPropertyKeys               vertex property keys
+   * @param useLabel                        true, if label shall be considered
+   * @param vertexAggregators               aggregate functions for super vertices
+   * @param vertexLabelGroups               stores grouping properties for vertex labels
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public BuildVertexGroupItem(List<String> groupPropertyKeys,
     boolean useLabel, List<PropertyValueAggregator> vertexAggregators,
-    List<LabelGroup> vertexLabelGroups) {
-    super(groupPropertyKeys, useLabel, vertexAggregators);
+    List<LabelGroup> vertexLabelGroups,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, vertexAggregators, labelWithAggregatorPropertyKeys);
 
     this.vertexLabelGroups = vertexLabelGroups;
     this.reuseVertexGroupItem = new VertexGroupItem();
@@ -83,12 +87,11 @@ public class BuildVertexGroupItem
    */
   @Override
   public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
-    List<PropertyValue> values =
-      Lists.newArrayListWithCapacity(vertex.getPropertyCount());
+    List<PropertyValue> values = Lists.newArrayList();
     boolean usedVertexLabelGroup = false;
 
     reuseVertexGroupItem.setVertexId(vertex.getId());
-    reuseVertexGroupItem.setGroupLabel(getLabel(vertex));
+    reuseVertexGroupItem.setGroupLabel(vertex.getLabel());
     if (doAggregate()) {
       reuseVertexGroupItem.setAggregateValues(getAggregateValues(vertex));
     }

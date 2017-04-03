@@ -18,6 +18,9 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .CountAggregator;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
@@ -31,6 +34,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Encapsulates logic that is used for building summarized vertices and edges.
@@ -63,17 +68,25 @@ abstract class BuildBase implements Serializable {
   private final List<PropertyValueAggregator> valueAggregators;
 
   /**
+   * Stores all aggregator property keys for each label.
+   */
+  private final Map<String, Set<String>> labelWithAggregatorPropertyKeys;
+
+  /**
    * Creates build base.
    *
-   * @param groupPropertyKeys property keys used for grouping
-   * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  aggregate functions for super elements
+   * @param groupPropertyKeys               property keys used for grouping
+   * @param useLabel                        true, if element label shall be used for grouping
+   * @param valueAggregators                aggregate functions for super elements
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   protected BuildBase(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
+    boolean useLabel, List<PropertyValueAggregator> valueAggregators,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
     this.groupPropertyKeys  = groupPropertyKeys;
     this.useLabel           = useLabel;
     this.valueAggregators   = valueAggregators;
+    this.labelWithAggregatorPropertyKeys = labelWithAggregatorPropertyKeys;
   }
 
   /**
@@ -85,6 +98,15 @@ abstract class BuildBase implements Serializable {
         valueAggregator.resetAggregate();
       }
     }
+  }
+
+  /**
+   * Returns a map which stores all aggregator property keys for each label.
+   *
+   * @return aggregator key to element labels map
+   */
+  protected Map<String, Set<String>> getLabelWithAggregatorPropertyKeys() {
+    return labelWithAggregatorPropertyKeys;
   }
 
   //----------------------------------------------------------------------------
@@ -195,22 +217,30 @@ abstract class BuildBase implements Serializable {
    * aggregation. If the EPGM element does not have a property, it uses
    * {@code PropertyValue.NULL_VALUE} instead.
    *
-   * @param   attributed attributed EPGM element
+   * @param   element attributed EPGM element
    * @return  property values for aggregation
    */
-  protected PropertyValueList getAggregateValues(EPGMAttributed attributed)
-      throws IOException {
-    List<PropertyValue> propertyValues =
-      Lists.newArrayListWithCapacity(valueAggregators.size());
+  protected PropertyValueList getAggregateValues(EPGMElement element)
+    throws IOException {
+    List<PropertyValue> propertyValues = Lists.newArrayList();
 
     for (PropertyValueAggregator valueAggregator : valueAggregators) {
-      String propertyKey = valueAggregator.getPropertyKey();
-      if (valueAggregator instanceof CountAggregator) {
-        propertyValues.add(ONE);
-      } else if (attributed.hasProperty(propertyKey)) {
-        propertyValues.add(attributed.getPropertyValue(propertyKey));
-      } else {
-        propertyValues.add(PropertyValue.NULL_VALUE);
+      // check if the aggregator is used for the elements label
+      if (verifyAggregatorForLabel(valueAggregator.getAggregatePropertyKey(), element.getLabel()) ||
+        // or used for all vertices
+        verifyAggregatorForLabel(
+          valueAggregator.getAggregatePropertyKey(), Grouping.VERTEX_AGGREGATOR) ||
+        // or used for all edges
+        verifyAggregatorForLabel(
+          valueAggregator.getAggregatePropertyKey(), Grouping.EDGE_AGGREGATOR)) {
+        String propertyKey = valueAggregator.getPropertyKey();
+        if (valueAggregator instanceof CountAggregator) {
+          propertyValues.add(ONE);
+        } else if (element.hasProperty(propertyKey)) {
+          propertyValues.add(element.getPropertyValue(propertyKey));
+        } else {
+          propertyValues.add(PropertyValue.NULL_VALUE);
+        }
       }
     }
     return PropertyValueList.fromPropertyValues(propertyValues);
@@ -219,17 +249,24 @@ abstract class BuildBase implements Serializable {
   /**
    * Add the given values to the corresponding aggregate.
    *
+   * @param label element label
    * @param values property values
    */
-  protected void aggregate(PropertyValueList values) {
-    Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
+  protected void aggregate(String label, PropertyValueList values) {
     Iterator<PropertyValue> valueIt = values.iterator();
 
-    while (aggIt.hasNext() && valueIt.hasNext()) {
-      PropertyValueAggregator aggregator = aggIt.next();
-      PropertyValue value = valueIt.next();
-
-      aggregator.aggregate(value);
+    for (PropertyValueAggregator valueAggregator : valueAggregators) {
+      // check if the aggregator is used for the elements label
+      if (verifyAggregatorForLabel(valueAggregator.getAggregatePropertyKey(), label) ||
+        // or used for all vertices
+        verifyAggregatorForLabel(
+          valueAggregator.getAggregatePropertyKey(), Grouping.VERTEX_AGGREGATOR) ||
+        // or used for all edges
+        verifyAggregatorForLabel(
+          valueAggregator.getAggregatePropertyKey(), Grouping.EDGE_AGGREGATOR)) {
+        PropertyValue value = valueIt.next();
+        valueAggregator.aggregate(value);
+      }
     }
   }
 
@@ -258,13 +295,20 @@ abstract class BuildBase implements Serializable {
    * values are fetched from the internal aggregators.
    *
    * @param element attributed element
+   * @param label   element label
    */
-  protected void setAggregateValues(EPGMAttributed element) {
+  protected void setAggregateValues(EPGMAttributed element, String label) {
     if (doAggregate()) {
       for (PropertyValueAggregator valueAggregator : valueAggregators) {
-        element.setProperty(
-          valueAggregator.getAggregatePropertyKey(),
-          valueAggregator.getAggregate());
+        // check if the aggregator is used for the elements label
+        if (verifyAggregatorForLabel(valueAggregator.getAggregatePropertyKey(), label) ||
+          // or used for all edges
+          verifyAggregatorForLabel(
+            valueAggregator.getAggregatePropertyKey(), Grouping.EDGE_AGGREGATOR)) {
+          element.setProperty(
+            valueAggregator.getAggregatePropertyKey(),
+            valueAggregator.getAggregate());
+        }
       }
     }
   }
@@ -273,20 +317,39 @@ abstract class BuildBase implements Serializable {
    * Sets the given property values as new properties at the given element.
    *
    * @param element attributed element
-   * @param values  aggregate values
+   * @param label element label
+   * @param values aggregate values
    */
   protected void setAggregateValues(
-    EPGMAttributed element, PropertyValueList values) {
+    EPGMAttributed element, String label, PropertyValueList values) {
     if (doAggregate()) {
-      Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
       Iterator<PropertyValue> valueIt = values.iterator();
 
-      while (aggIt.hasNext() && valueIt.hasNext()) {
-        PropertyValueAggregator aggregator = aggIt.next();
-        PropertyValue value = valueIt.next();
-
-        element.setProperty(aggregator.getAggregatePropertyKey(), value);
+      for (PropertyValueAggregator valueAggregator : valueAggregators) {
+        // check if the aggregator is used for the elements label
+        if (verifyAggregatorForLabel(valueAggregator.getAggregatePropertyKey(), label) ||
+          // or used for all vertices
+          verifyAggregatorForLabel(
+            valueAggregator.getAggregatePropertyKey(), Grouping.VERTEX_AGGREGATOR)) {
+          PropertyValue value = valueIt.next();
+          element.setProperty(
+            valueAggregator.getAggregatePropertyKey(),
+            value);
+        }
       }
     }
+  }
+
+  /**
+   * Verifies if the given aggregator property key shall be used fo the elements label.
+   *
+   * @param aggregatorPropertyKey aggregator property key
+   * @param elementLabel element label
+   * @return true if the aggregator shall be used for the element
+   */
+  private boolean verifyAggregatorForLabel(String aggregatorPropertyKey, String elementLabel) {
+    return labelWithAggregatorPropertyKeys
+      .getOrDefault(aggregatorPropertyKey, Sets.newHashSet())
+      .contains(elementLabel);
   }
 }

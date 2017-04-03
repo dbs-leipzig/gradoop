@@ -25,11 +25,14 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
@@ -48,14 +51,16 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param groupPropertyKeys edge property keys
-   * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
-   * @param epgmEdgeFactory       edge factory
+   * @param groupPropertyKeys               edge property keys
+   * @param useLabel                        use edge label
+   * @param valueAggregators                aggregate functions for edge values
+   * @param epgmEdgeFactory                 edge factory
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+    List<PropertyValueAggregator> valueAggregators, EPGMEdgeFactory<Edge> epgmEdgeFactory,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
     this.edgeFactory = epgmEdgeFactory;
   }
 
@@ -72,15 +77,22 @@ public class ReduceEdgeGroupItems
     Collector<Edge> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
+    String groupLabel;
+
+    if (useLabel()) {
+      groupLabel = edgeGroupItem.getGroupLabel();
+    } else {
+      groupLabel = GConstants.DEFAULT_EDGE_LABEL;
+    }
 
     Edge superEdge = edgeFactory.createEdge(
-      edgeGroupItem.getGroupLabel(),
+      groupLabel,
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 
     setGroupProperties(
       superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getEdgeLabelGroup());
-    setAggregateValues(superEdge);
+    setAggregateValues(superEdge, edgeGroupItem.getGroupLabel());
     resetAggregators();
 
     collector.collect(superEdge);

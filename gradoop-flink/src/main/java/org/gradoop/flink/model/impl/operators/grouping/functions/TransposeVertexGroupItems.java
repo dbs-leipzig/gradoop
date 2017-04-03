@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -69,12 +70,14 @@ public class TransposeVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param useLabel                        true, iff labels are used for grouping
+   * @param vertexAggregators               aggregate functions for super vertices
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public TransposeVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators) {
-    super(null, useLabel, vertexAggregators);
+    List<PropertyValueAggregator> vertexAggregators,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(null, useLabel, vertexAggregators, labelWithAggregatorPropertyKeys);
     this.reuseOuterTuple = new Tuple2<>();
     this.reuseInnerTuple = new IdWithIdSet();
   }
@@ -106,7 +109,7 @@ public class TransposeVertexGroupItems
       superVertexIds.add(groupItem.getSuperVertexId());
 
       if (doAggregate()) {
-        aggregate(groupItem.getAggregateValues());
+        aggregate(groupLabel, groupItem.getAggregateValues());
       }
     }
 

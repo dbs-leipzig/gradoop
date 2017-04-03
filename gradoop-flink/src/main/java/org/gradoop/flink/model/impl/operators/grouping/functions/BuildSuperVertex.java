@@ -28,6 +28,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
@@ -47,16 +49,18 @@ public class BuildSuperVertex
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
-   * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregators  aggregate functions for vertex values
-   * @param epgmVertexFactory     vertex factory
+   * @param groupPropertyKeys               vertex property key for grouping
+   * @param useLabel                        true, if vertex label shall be considered
+   * @param valueAggregators                aggregate functions for vertex values
+   * @param epgmVertexFactory               vertex factory
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public BuildSuperVertex(List<String> groupPropertyKeys,
     boolean useLabel,
     List<PropertyValueAggregator> valueAggregators,
-    EPGMVertexFactory<Vertex> epgmVertexFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+    EPGMVertexFactory<Vertex> epgmVertexFactory,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
     this.vertexFactory = epgmVertexFactory;
   }
 
@@ -75,7 +79,7 @@ public class BuildSuperVertex
 
     setLabel(supVertex, groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getVertexLabelGroup());
-    setAggregateValues(supVertex, groupItem.getAggregateValues());
+    setAggregateValues(supVertex, groupItem.getGroupLabel(), groupItem.getAggregateValues());
 
     return supVertex;
   }

@@ -24,6 +24,8 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base class for reducer/combiner implementations on vertices.
@@ -37,13 +39,15 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
   /**
    * Creates build base.
    *
-   * @param groupPropertyKeys property keys used for grouping
-   * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  aggregate functions for super elements
+   * @param groupPropertyKeys               property keys used for grouping
+   * @param useLabel                        true, if element label shall be used for grouping
+   * @param valueAggregators                aggregate functions for super elements
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   protected ReduceVertexGroupItemBase(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+    boolean useLabel, List<PropertyValueAggregator> valueAggregators,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
     this.reuseVertexGroupItem = new VertexGroupItem();
   }
 

@@ -39,6 +39,8 @@ import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Grouping implementation that uses group + groupCombine + groupReduce for
@@ -71,14 +73,15 @@ public class GroupingGroupCombine extends Grouping {
   /**
    * Creates grouping operator instance.
    *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param useVertexLabels    group on vertex label true/false
-   * @param vertexAggregators  aggregate functions for grouped vertices
-   * @param edgeGroupingKeys   property keys to group edges
-   * @param useEdgeLabels      group on edge label true/false
-   * @param edgeAggregators    aggregate functions for grouped edges
-   * @param vertexLabelGroups   stores grouping properties for vertex labels
-   * @param edgeLabelGroups     stores grouping properties for edge labels
+   * @param vertexGroupingKeys              property keys to group vertices
+   * @param useVertexLabels                 group on vertex label true/false
+   * @param vertexAggregators               aggregate functions for grouped vertices
+   * @param edgeGroupingKeys                property keys to group edges
+   * @param useEdgeLabels                   group on edge label true/false
+   * @param edgeAggregators                 aggregate functions for grouped edges
+   * @param vertexLabelGroups               stores grouping properties for vertex labels
+   * @param edgeLabelGroups                 stores grouping properties for edge labels
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   GroupingGroupCombine(
     List<String> vertexGroupingKeys,
@@ -88,9 +91,11 @@ public class GroupingGroupCombine extends Grouping {
     boolean useEdgeLabels,
     List<PropertyValueAggregator> edgeAggregators,
     List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
+    List<LabelGroup> edgeLabelGroups,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
     super(vertexGroupingKeys, useVertexLabels, vertexAggregators,
-      edgeGroupingKeys, useEdgeLabels, edgeAggregators, vertexLabelGroups, edgeLabelGroups);
+      edgeGroupingKeys, useEdgeLabels, edgeAggregators, vertexLabelGroups, edgeLabelGroups,
+      labelWithAggregatorPropertyKeys);
   }
 
   @Override
@@ -98,25 +103,27 @@ public class GroupingGroupCombine extends Grouping {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       .flatMap(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators(), getVertexLabelGroups()));
+        getVertexAggregators(), getVertexLabelGroups(), getLabelWithAggregatorPropertyKeys()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function per combined partition
-      .combineGroup(new CombineVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+      .combineGroup(new CombineVertexGroupItems(useVertexLabels(), getVertexAggregators(),
+        getLabelWithAggregatorPropertyKeys()));
 
     // filter super vertex tuples (1..n per partition/group)
     // group  super vertex tuples
     // create super vertex tuple (1 per group) + previous super vertex ids
     DataSet<Tuple2<VertexGroupItem, IdWithIdSet>> superVertexTuples =
       groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))
-        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(), getVertexAggregators(),
+          getLabelWithAggregatorPropertyKeys()));
 
     // build super vertices from super vertex tuples
     DataSet<Vertex> superVertices = superVertexTuples
       .map(new Value0Of2<>())
       .map(new BuildSuperVertex(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators(), config.getVertexFactory()));
+        getVertexAggregators(), config.getVertexFactory(), getLabelWithAggregatorPropertyKeys()));
 
     // extract mapping
     DataSet<IdWithIdSet> mapping = superVertexTuples

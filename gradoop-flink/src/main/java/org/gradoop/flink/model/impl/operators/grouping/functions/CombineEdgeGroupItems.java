@@ -24,6 +24,8 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Combines a group of {@link EdgeGroupItem} to a single {@link EdgeGroupItem}.
@@ -34,13 +36,15 @@ public class CombineEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param groupPropertyKeys edge property keys
-   * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param groupPropertyKeys               edge property keys
+   * @param useLabel                        use edge label
+   * @param valueAggregators                aggregate functions for edge values
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public CombineEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+    List<PropertyValueAggregator> valueAggregators,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
   }
 
   /**

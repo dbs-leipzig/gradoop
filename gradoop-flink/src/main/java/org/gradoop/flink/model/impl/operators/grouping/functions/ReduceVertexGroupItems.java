@@ -26,6 +26,8 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Reduces a group of {@link VertexGroupItem} instances.
@@ -42,12 +44,14 @@ public class ReduceVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param useLabel                        true, iff labels are used for grouping
+   * @param vertexAggregators               aggregate functions for super vertices
+   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public ReduceVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators) {
-    super(null, useLabel, vertexAggregators);
+    List<PropertyValueAggregator> vertexAggregators,
+    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
+    super(null, useLabel, vertexAggregators, labelWithAggregatorPropertyKeys);
   }
 
   @Override
@@ -68,10 +72,7 @@ public class ReduceVertexGroupItems
         groupLabel          = groupItem.getGroupLabel();
         groupPropertyValues = groupItem.getGroupingValues();
 
-        if (useLabel()) {
-          reuseTuple.setGroupLabel(groupLabel);
-        }
-
+        reuseTuple.setGroupLabel(groupLabel);
         reuseTuple.setGroupingValues(groupPropertyValues);
         reuseTuple.setSuperVertexId(superVertexId);
         reuseTuple.setAggregateValues(groupItem.getAggregateValues());
@@ -86,7 +87,7 @@ public class ReduceVertexGroupItems
       collector.collect(reuseTuple);
 
       if (doAggregate()) {
-        aggregate(groupItem.getAggregateValues());
+        aggregate(groupLabel, groupItem.getAggregateValues());
       }
     }
 
