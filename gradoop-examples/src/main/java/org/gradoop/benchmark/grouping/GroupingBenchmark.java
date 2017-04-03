@@ -113,7 +113,7 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static String EDGE_GROUPING_KEYS;
   /**
-   * Used xmlbasedcsv path
+   * Used csv path
    */
   private static String CSV_PATH;
   /**
@@ -177,7 +177,7 @@ public class GroupingBenchmark extends AbstractRunner
       "EPGMProperty key to group vertices on.");
     OPTIONS.addOption(OPTION_EDGE_GROUPING_KEY, "edge-grouping-key", true,
       "EPGMProperty key to group edges on.");
-    OPTIONS.addOption(OPTION_CSV_PATH, "xmlbasedcsv-path", true, "Path of the " +
+    OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path of the " +
       "generated CSV-File");
     OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_FUNCS, "vertex-aggregator",
       true, "Applied aggregation function on vertices");
@@ -445,7 +445,7 @@ public class GroupingBenchmark extends AbstractRunner
 
 
   /**
-   * Method to create and add lines to a xmlbasedcsv-file
+   * Method to create and add lines to a csv-file
    * @throws IOException
    */
   private static void writeCSV() throws IOException {
