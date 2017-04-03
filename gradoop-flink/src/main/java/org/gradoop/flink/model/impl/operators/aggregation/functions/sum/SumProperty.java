@@ -41,6 +41,6 @@ public abstract class SumProperty extends Sum implements AggregateFunction {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "sum(" + propertyKey + ")";
+    return "sum_" + propertyKey;
   }
 }

@@ -37,6 +37,6 @@ public abstract class MinProperty extends Min {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "min(" + propertyKey + ")";
+    return "min_" + propertyKey;
   }
 }
