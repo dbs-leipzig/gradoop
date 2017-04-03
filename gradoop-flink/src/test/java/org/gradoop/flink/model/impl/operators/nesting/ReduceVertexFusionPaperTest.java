@@ -23,11 +23,10 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     return getLoaderFromStream(inputStream);
   }
 
-  protected void testGraphGraphGraphCollection(GraphCollection right,
+  protected void testGraphGraphGraphCollection(LogicalGraph right,
     GraphCollection gcl, LogicalGraph expected) throws Exception {
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
-    ReduceCombination rc = new ReduceCombination();
-    LogicalGraph output = f.execute(rc.execute(right), gcl);
+    LogicalGraph output = f.execute(right, gcl);
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -43,7 +42,7 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     GraphCollection empty = loader.getGraphCollectionByVariables();
     GraphCollection data = loader.getGraphCollectionByVariables("research","citation");
     LogicalGraph expected = new ReduceCombination().execute(data);
-    testGraphGraphGraphCollection(data,empty,expected);
+    testGraphGraphGraphCollection(expected,empty,expected);
   }
 
   /**
@@ -56,7 +55,8 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     GraphCollection hypervertices = loader.getGraphCollectionByVariables("g0","g1","g2","g3","g4");
     GraphCollection data = loader.getGraphCollectionByVariables("research","citation");
     LogicalGraph expected = ((loader.getLogicalGraphByVariable("result")));
-    testGraphGraphGraphCollection(data,hypervertices,expected);
+    LogicalGraph actual = new ReduceCombination().execute(data);
+    testGraphGraphGraphCollection(actual,hypervertices,expected);
   }
 
 }
