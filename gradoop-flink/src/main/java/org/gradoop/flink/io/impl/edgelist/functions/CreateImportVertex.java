@@ -19,50 +19,38 @@ package org.gradoop.flink.io.impl.edgelist.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * (vertexId, label) => ImportVertex
+ * (vertexId) => ImportVertex
  *
  * Forwarded fields:
  *
  * f0: vertexId
+ *
+ * @param <K> comparable key
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class CreateImportVertex
-  implements MapFunction<Tuple2<Long, String>, ImportVertex<Long>> {
-
+public class CreateImportVertex<K extends Comparable<K>>
+  implements MapFunction<Tuple1<K>, ImportVertex<K>> {
   /**
-   * reused ImportVertex
+   * Reduce object instantiations
    */
-  private ImportVertex<Long> reuseVertex;
-
-  /**
-   * PropertyKey of property value
-   */
-  private String propertyKey;
+  private final ImportVertex<K> reuseVertex;
 
   /**
    * Constructor
-   *
-   * @param propertyKey used PropertyKey
    */
-  public CreateImportVertex(String propertyKey) {
-    this.propertyKey = propertyKey;
+  public CreateImportVertex() {
     this.reuseVertex = new ImportVertex<>();
-    reuseVertex.setLabel(GConstants.DEFAULT_VERTEX_LABEL);
+    this.reuseVertex.setLabel(GConstants.DEFAULT_VERTEX_LABEL);
   }
 
   @Override
-  public ImportVertex<Long> map(Tuple2<Long, String> inputTuple) throws
-    Exception {
-    reuseVertex.setId(inputTuple.f0);
-    Properties properties = Properties.createWithCapacity(1);
-    properties.set(propertyKey, inputTuple.f1);
-    reuseVertex.setProperties(properties);
+  public ImportVertex<K> map(Tuple1<K> value) throws Exception {
+    reuseVertex.f0 = value.f0;
     return reuseVertex;
   }
 }

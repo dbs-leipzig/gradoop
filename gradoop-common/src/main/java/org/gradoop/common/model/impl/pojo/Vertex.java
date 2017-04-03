@@ -19,7 +19,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -42,7 +42,7 @@ public class Vertex extends GraphElement implements EPGMVertex {
    * @param graphs     graphs that vertex is contained in
    */
   public Vertex(final GradoopId id, final String label,
-    final Properties properties, final GradoopIdSet graphs) {
+    final Properties properties, final GradoopIdList graphs) {
     super(id, label, properties, graphs);
   }
 

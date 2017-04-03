@@ -27,9 +27,11 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving
-  .explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 
 import java.util.List;
 
@@ -52,8 +54,31 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
+   * @param query Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query Cypher query
+   * @param attachData  attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * @param pattern  GDL graph pattern
    *
@@ -62,8 +87,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control if the original vertex and edge data
    * (labels and properties) shall be attached to the resulting subgraphs.
@@ -76,8 +100,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern, boolean attachData);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control the match strategy. This influences mostly
    * if vertices and edges can be matched to multiple vertices/edges in the
@@ -90,7 +113,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return subgraphs of the input graph that match the given graph pattern
    */
   GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, IterationStrategy iterationStrategy);
+    MatchStrategy matchStrategy, TraverserStrategy iterationStrategy);
 
   /**
    * Creates a copy of the logical graph.
@@ -198,152 +221,74 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param sampleSize relative amount of nodes in the result graph
    * @return logical graph with random nodes and their associated edges
    */
-  LogicalGraph sampleRandomNodes(Float sampleSize);
+  LogicalGraph sampleRandomNodes(float sampleSize);
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
+   * Creates a condensed version of the logical graph by grouping vertices based on the specified
+   * property keys.
    *
-   * Vertices are grouped by the given property key. Edges are grouped
-   * accordingly. Vertices with missing property key are represented by an
-   * additional vertex.
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices.
+   *
+   * Note: To group vertices by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return grouped logical graph
+   *
+   * @return summary graph
    * @see Grouping
    */
   LogicalGraph groupBy(List<String> vertexGroupingKeys);
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
+   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * property keys.
    *
-   * Vertices are grouped by the given property key, edges are grouped by the
-   * given property key. Vertices and edges with missing property key are
-   * represented by an additional vertex.
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices and explicitly by the specified edge grouping keys.
    *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys   property keys to group edges
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys,
-    List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
+   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
+   * {@code null}.
    *
-   * Vertices are grouped by their label. Edges are grouped accordingly.
-   *
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexLabel();
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   *
-   * Vertices are grouped by their label and the given property key. Edges are
-   * grouped accordingly. Vertices with missing property key are represented
-   * by an additional vertex.
+   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexLabelAndVertexProperties(
-    List<String> vertexGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   *
-   * Vertices are grouped by their label. Edges are grouped by the given
-   * property key. Edges with missing property key are represented by an
-   * additional edge.
-   *
    * @param edgeGroupingKeys property keys to group edges
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexLabelAndEdgeProperties(
-    List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   * <p/>
-   * Vertices are grouped by their label and the given property key. Edges are
-   * grouped the given property key.
-   * Vertices and edges with missing property keys are represented by an
-   * additional vertex / edge.
    *
-   * @param vertexGroupingKeys  property keys to group vertices
-   * @param edgeGroupingKeys    property keys to group edges
-   * @return grouped logical graph
+   * @return summary graph
    * @see Grouping
    */
-  LogicalGraph groupByVertexLabel(List<String> vertexGroupingKeys,
-    List<String> edgeGroupingKeys);
+  LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   * <p/>
-   * Vertices are grouped by their label, edges are grouped by their label.
+   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * property keys.
    *
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexAndEdgeLabel();
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   * <p/>
-   * Vertices are grouped by their label and the  given property key. Edges are
-   * grouped by their label. Vertices with missing property key are
-   * represented by an additional vertex.
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
+   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
+   * represented by the same super vertex/edge.
+   *
+   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
+   * {@code null}.
+   *
+   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexAndEdgeLabelAndVertexProperties(
-    List<String> vertexGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   * <p/>
-   * Vertices are grouped by their label. Edges are grouped by their label
-   * and the given property key. Edges with missing property key are represented
-   * by an additional edge.
-   *
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
    * @param edgeGroupingKeys property keys to group edges
-   * @return grouped logical graph
-   * @see Grouping
-   */
-  LogicalGraph groupByVertexAndEdgeLabelAndEdgeProperties(
-    List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices
-   * and edges.
-   * <p/>
-   * Vertices and edges are grouped by their label and the given property keys.
-   * Vertices and edges with missing property key are represented by an
-   * additional vertex / edge.
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @param groupingStrategy execution strategy for vertex grouping
    *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys   property keys to group edges
-   * @return grouped logical graph
+   * @return summary graph
    * @see Grouping
    */
-  LogicalGraph groupByVertexAndEdgeLabel(
-    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
+  LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy);
 
   /**
    * Checks, if another logical graph contains exactly the same vertices and
@@ -429,8 +374,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param operator unary graph to graph operator
    * @return result of given operator
    */
-  LogicalGraph callForGraph(
-    UnaryGraphToGraphOperator operator);
+  LogicalGraph callForGraph(UnaryGraphToGraphOperator operator);
 
   /**
    * Creates a logical graph from that graph and the input graph using the
@@ -440,9 +384,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param otherGraph other graph
    * @return result of given operator
    */
-  LogicalGraph callForGraph(
-    BinaryGraphToGraphOperator operator,
-    LogicalGraph otherGraph);
+  LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph);
 
   /**
    * Creates a graph collection from that grpah using the given unary graph
@@ -451,6 +393,5 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param operator unary graph to collection operator
    * @return result of given operator
    */
-  GraphCollection callForCollection(
-    UnaryGraphToCollectionOperator operator);
+  GraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
 }

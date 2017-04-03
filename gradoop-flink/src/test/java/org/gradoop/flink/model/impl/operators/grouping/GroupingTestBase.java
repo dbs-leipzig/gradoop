@@ -27,11 +27,46 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Sum
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.gradoop.common.util.GConstants.NULL_STRING;
 
 public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
   public abstract GroupingStrategy getStrategy();
+
+  @Test
+  public void testAPIFunction() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    LogicalGraph input = loader
+      .getLogicalGraphByVariable("g0")
+      .combine(loader.getLogicalGraphByVariable("g1"))
+      .combine(loader.getLogicalGraphByVariable("g2"));
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(pL:Person {city : \"Leipzig\", count : 2L})" +
+      "(pD:Person {city : \"Dresden\", count : 3L})" +
+      "(pB:Person {city : \"Berlin\", count : 1L})" +
+      "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
+      "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
+      "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
+      "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
+      "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
+      "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
+      "]");
+
+    LogicalGraph output = input.groupBy(
+      Arrays.asList(Grouping.LABEL_SYMBOL, "city"),
+      Arrays.asList(new CountAggregator("count")),
+      Arrays.asList(Grouping.LABEL_SYMBOL, "since"),
+      Arrays.asList(new CountAggregator("count")),
+      getStrategy()
+    );
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
 
   @Test
   public void testVertexPropertySymmetricGraph() throws Exception {
@@ -48,14 +83,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresden)-[{count : 1L}]->(leipzig)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -81,14 +115,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlin)-[{count : 2L}]->(dresden)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -120,15 +153,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlinM)-[{count : 1L}]->(dresdenM)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addVertexGroupingKey("gender")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addVertexGroupingKey("gender")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -140,7 +172,6 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
-
     loader.appendToDatabaseFromString("expected[" +
       "(dresden {city : \"Dresden\", count : 2L})" +
       "(others  {city : " + NULL_STRING + ", count : 1L})" +
@@ -148,14 +179,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresden)-[{count : 1L}]->(dresden)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -176,15 +206,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(dresdenF)-[{count : 1L}]->(dresdenM)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addVertexGroupingKey("gender")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addVertexGroupingKey("gender")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -211,15 +240,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(berlin)-[{since : 2015, count : 2L}]->(dresden)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addEdgeGroupingKey("since")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addEdgeGroupingKey("since")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -263,16 +291,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[{a : 1,b : 3,count : 1L}]->(v00)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("a")
-        .addEdgeGroupingKey("a")
-        .addEdgeGroupingKey("b")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(loader.getLogicalGraphByVariable("input"));
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("a")
+      .addEdgeGroupingKey("a")
+      .addEdgeGroupingKey("b")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -318,17 +345,16 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v11)-[{a : 1,b : 2,count : 1L}]->(v01)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("a")
-        .addVertexGroupingKey("b")
-        .addEdgeGroupingKey("a")
-        .addEdgeGroupingKey("b")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(loader.getLogicalGraphByVariable("input"));
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("a")
+      .addVertexGroupingKey("b")
+      .addEdgeGroupingKey("a")
+      .addEdgeGroupingKey("b")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -338,8 +364,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgePropertyWithAbsentValues() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader
-      .getLogicalGraphByVariable("g3");
+    LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
       "(dresden {city : \"Dresden\", count : 2L})" +
@@ -379,14 +404,13 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{count :  4L}]->(t)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -412,27 +436,24 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[{count : 2L}]->(d)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addVertexGroupingKey("city")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("city")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
-  public void testVertexLabelAndSingleVertexPropertyWithAbsentValue()
-    throws Exception {
+  public void testVertexLabelAndSingleVertexPropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city : \"Leipzig\", count : 2L})" +
@@ -453,15 +474,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{count : 4L}]->(t)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addVertexGroupingKey("city")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("city")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -483,15 +503,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[{since : 2015, count : 3L}]->(p)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addEdgeGroupingKey("since")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addEdgeGroupingKey("since")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -516,15 +535,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[{since : " + NULL_STRING + ", count : 5L}]->(p)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addEdgeGroupingKey("since")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addEdgeGroupingKey("since")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -551,16 +569,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[{since : 2015, count : 2L}]->(d)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .addVertexGroupingKey("city")
-        .addEdgeGroupingKey("since")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("city")
+      .addEdgeGroupingKey("since")
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -570,8 +587,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgeLabel() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -584,15 +600,14 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[:knows        {count : 10L}]->(p)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .setStrategy(getStrategy())
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .setStrategy(getStrategy())
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -618,16 +633,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(b)-[:knows {count : 2L}]->(d)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -660,16 +674,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(f)-[:hasTag {count : 4L}]->(t)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -691,16 +704,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(p)-[:knows {since : 2015, count : 3L}]->(p)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addEdgeGroupingKey("since")
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addEdgeGroupingKey("since")
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -710,8 +722,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgeLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -728,16 +739,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addEdgeGroupingKey("since")
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addEdgeGroupingKey("since")
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -764,17 +774,16 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
       "]");
 
-    LogicalGraph output =
-      new GroupingBuilder()
-        .addVertexGroupingKey("city")
-        .addEdgeGroupingKey("since")
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
-        .setStrategy(getStrategy())
-        .build()
-        .execute(input);
+    LogicalGraph output = new GroupingBuilder()
+      .addVertexGroupingKey("city")
+      .addEdgeGroupingKey("since")
+      .useVertexLabel(true)
+      .useEdgeLabel(true)
+      .addVertexAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -1117,7 +1126,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .setStrategy(getStrategy())
         .build()
         .execute(input);
-
+    
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }

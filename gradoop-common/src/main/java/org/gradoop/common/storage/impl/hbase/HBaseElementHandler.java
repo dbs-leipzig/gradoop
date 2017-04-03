@@ -59,10 +59,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public byte[] getRowKey(final GradoopId elementId) throws IOException {
-    if (elementId == null) {
-      throw new IllegalArgumentException("elementId must not be null");
-    }
-    return Writables.getBytes(elementId);
+    return elementId.toByteArray();
   }
 
   /**
@@ -73,9 +70,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
     if (rowKey == null) {
       throw new IllegalArgumentException("rowKey must not be null");
     }
-    GradoopId id = new GradoopId();
-    Writables.getWritable(rowKey, id);
-    return id;
+    return GradoopId.fromByteArray(rowKey);
   }
 
   /**
@@ -91,8 +86,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperty(final Put put, Property property)
-      throws IOException {
+  public Put writeProperty(final Put put, Property property) throws IOException {
     put.add(CF_PROPERTIES_BYTES,
       Bytes.toBytes(property.getKey()),
       Writables.getBytes(property.getValue()));
@@ -103,8 +97,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperties(final Put put, final EPGMElement entity)
-      throws IOException {
+  public Put writeProperties(final Put put, final EPGMElement entity) throws IOException {
     if (entity.getPropertyCount() > 0) {
       for (Property property : entity.getProperties()) {
         writeProperty(put, property);
@@ -143,8 +136,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * @param columnFamily column family to get keys from
    * @return all keys inside column family.
    */
-  protected Set<Long> getColumnKeysFromFamily(final Result res,
-    final byte[] columnFamily) {
+  protected Set<Long> getColumnKeysFromFamily(final Result res, final byte[] columnFamily) {
     Set<Long> keys = Sets.newHashSet();
     for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily).entrySet()) {
       keys.add(Bytes.toLong(column.getKey()));
@@ -168,8 +160,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * @param encValue encoded property value
    * @return property value
    */
-  protected PropertyValue readPropertyValue(final byte[] encValue) throws
-    IOException {
+  protected PropertyValue readPropertyValue(final byte[] encValue) throws IOException {
     PropertyValue p = new PropertyValue();
     Writables.getWritable(encValue, p);
     return p;
@@ -183,9 +174,6 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * @throws IOException
    */
   protected GradoopId readId(Result res) throws IOException {
-    GradoopId id = new GradoopId();
-    Writables.getWritable(res.getRow(), id);
-
-    return id;
+    return GradoopId.fromByteArray(res.getRow());
   }
 }

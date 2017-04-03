@@ -81,8 +81,7 @@ public class BuildTripleWithCandidates<E extends Edge>
     reuseTuple.setSourceId(e.getSourceId());
     reuseTuple.setTargetId(e.getTargetId());
     reuseTuple.setCandidates(
-      getCandidates(edgeCount,
-        ElementMatcher.getMatches(e, queryEdges, DEFAULT_EDGE_LABEL)));
+      getCandidates(edgeCount, ElementMatcher.getMatches(e, queryEdges, DEFAULT_EDGE_LABEL)));
     return reuseTuple;
   }
 }

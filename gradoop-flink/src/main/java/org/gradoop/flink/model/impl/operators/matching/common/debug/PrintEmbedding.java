@@ -28,8 +28,7 @@ import java.util.Arrays;
  *
  * @param <K> key type
  */
-public class PrintEmbedding<K extends Comparable<K>>
-  extends Printer<Embedding<K>, K> {
+public class PrintEmbedding<K extends Comparable<K>> extends Printer<Embedding<K>, K> {
   /**
    * Logger
    */
@@ -39,9 +38,9 @@ public class PrintEmbedding<K extends Comparable<K>>
   protected String getDebugString(Embedding<K> embedding) {
     return String.format("([%s],[%s])",
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getVertexMappings()), true), ' '),
+        embedding.getVertexMapping()), true), ' '),
       StringUtils.join(convertList(Arrays.asList(
-        embedding.getEdgeMappings()), false), ' '));
+        embedding.getEdgeMapping()), false), ' '));
   }
 
   @Override

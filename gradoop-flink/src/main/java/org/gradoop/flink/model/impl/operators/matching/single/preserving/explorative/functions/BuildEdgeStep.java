@@ -32,8 +32,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  *
  * @param <K> key type
  */
-public class BuildEdgeStep<K>
-  extends RichMapFunction<TripleWithCandidates<K>, EdgeStep<K>> {
+public class BuildEdgeStep<K> extends RichMapFunction<TripleWithCandidates<K>, EdgeStep<K>> {
 
   /**
    * Reduce instantiations

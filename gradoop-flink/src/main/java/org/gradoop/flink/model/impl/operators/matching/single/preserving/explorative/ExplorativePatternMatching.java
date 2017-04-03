@@ -38,8 +38,6 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
@@ -47,14 +45,18 @@ import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraph
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.BulkTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.ForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairBulkTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.SetPairTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
@@ -65,7 +67,8 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativePatternMatching extends PatternMatching
+public class ExplorativePatternMatching
+  extends PatternMatching
   implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
@@ -74,8 +77,7 @@ public class ExplorativePatternMatching extends PatternMatching
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    ExplorativePatternMatching.class);
+  private static final Logger LOG = Logger.getLogger(ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
@@ -95,7 +97,7 @@ public class ExplorativePatternMatching extends PatternMatching
   /**
    * Strategy iterating the graph
    */
-  private final IterationStrategy iterationStrategy;
+  private final TraverserStrategy traverserStrategy;
 
   /**
    * Create new operator instance
@@ -104,20 +106,20 @@ public class ExplorativePatternMatching extends PatternMatching
    * @param attachData              true, if original data shall be attached
    *                                to the result
    * @param matchStrategy           match strategy for vertex and edge mappings
-   * @param iterationStrategy       iteration strategy for distributed traversal
+   * @param traverserStrategy       iteration strategy for distributed traversal
    * @param traverser               Traverser used for the query graph
    * @param edgeStepJoinStrategy    Join strategy for edge extension
    * @param vertexStepJoinStrategy  Join strategy for vertex extension
    */
   private ExplorativePatternMatching(String query, boolean attachData,
     MatchStrategy matchStrategy,
-    IterationStrategy iterationStrategy,
+    TraverserStrategy traverserStrategy,
     Traverser traverser,
     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
     super(query, attachData, LOG);
     this.matchStrategy          = matchStrategy;
-    this.iterationStrategy      = iterationStrategy;
+    this.traverserStrategy = traverserStrategy;
     this.traverser = traverser;
     this.traverser.setQueryHandler(getQueryHandler());
     this.edgeStepJoinStrategy   = edgeStepJoinStrategy;
@@ -129,6 +131,7 @@ public class ExplorativePatternMatching extends PatternMatching
     GradoopFlinkConfig config = graph.getConfig();
     GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
     VertexFactory vertexFactory = config.getVertexFactory();
+    String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<Vertex> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<>(getQuery()));
@@ -141,7 +144,7 @@ public class ExplorativePatternMatching extends PatternMatching
     }
 
     DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<>(graphHeadFactory))
+      .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable))
       .returns(new TupleTypeInfo<>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
@@ -155,47 +158,57 @@ public class ExplorativePatternMatching extends PatternMatching
   @Override
   protected GraphCollection executeForPattern(LogicalGraph graph) {
 
-    //--------------------------------------------------------------------------
-    // Pre-processing (filter candidates)
-    //--------------------------------------------------------------------------
-
-    DataSet<IdWithCandidates<GradoopId>> vertices = PreProcessor.filterVertices(
-      graph, getQuery());
-
-    DataSet<TripleWithCandidates<GradoopId>> edges = PreProcessor.filterEdges(
-      graph, getQuery());
-
-    //--------------------------------------------------------------------------
-    // Exploration via Traversal
-    //--------------------------------------------------------------------------
-
     TraversalCode traversalCode = traverser.traverse();
 
-    DistributedTraverser<GradoopId> distributedTraverser;
+    DataSet<Tuple1<Embedding<GradoopId>>> embeddings;
 
-    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
-      distributedTraverser = new BulkTraverser<>(
+    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION ||
+      traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
+
+      //--------------------------------------------------------------------------
+      // Pre-processing (filter candidates)
+      //--------------------------------------------------------------------------
+
+      DataSet<IdWithCandidates<GradoopId>> vertices = PreProcessor.filterVertices(
+        graph, getQuery());
+
+      DataSet<TripleWithCandidates<GradoopId>> edges = PreProcessor.filterEdges(
+        graph, getQuery());
+
+      //--------------------------------------------------------------------------
+      // Exploration via Traversal
+      //--------------------------------------------------------------------------
+
+      SetPairTraverser<GradoopId> distributedTraverser;
+
+      if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
+        distributedTraverser = new SetPairBulkTraverser<>(traversalCode, matchStrategy,
+          traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
+          GradoopId.class, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
+          getEdgeMapping());
+      } else {
+        distributedTraverser = new SetPairForLoopTraverser<>(traversalCode, matchStrategy,
+          traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
+          GradoopId.class, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
+          getEdgeMapping());
+      }
+
+      embeddings = distributedTraverser.traverse(vertices, edges);
+    } else if (traverserStrategy == TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION) {
+      DataSet<TripleWithCandidates<GradoopId>> triples = PreProcessor
+        .filterTriplets(graph, getQuery());
+
+      TripleTraverser<GradoopId> distributedTraverser = new TripleForLoopTraverser<>(
         traversalCode, matchStrategy,
         traverser.getQueryHandler().getVertexCount(),
         traverser.getQueryHandler().getEdgeCount(),
-        GradoopId.class,
-        edgeStepJoinStrategy, vertexStepJoinStrategy,
-        getVertexMapping(), getEdgeMapping());
-    } else if (iterationStrategy == IterationStrategy.LOOP_UNROLLING) {
-      distributedTraverser = new ForLoopTraverser<>(
-        traversalCode, matchStrategy,
-        traverser.getQueryHandler().getVertexCount(),
-        traverser.getQueryHandler().getEdgeCount(),
-        GradoopId.class,
-        edgeStepJoinStrategy, vertexStepJoinStrategy,
-        getVertexMapping(), getEdgeMapping());
+        GradoopId.class, edgeStepJoinStrategy, getVertexMapping(), getEdgeMapping());
+
+      embeddings = distributedTraverser.traverse(triples);
+
     } else {
-      throw new UnsupportedOperationException(
-        "Unsupported iteration strategy: " + iterationStrategy);
+      throw new IllegalArgumentException("Unsupported traverser strategy: " + traverserStrategy);
     }
-
-    DataSet<Tuple1<Embedding<GradoopId>>> embeddings = distributedTraverser
-      .traverse(vertices, edges);
 
     //--------------------------------------------------------------------------
     // Post-Processing (build Graph Collection from embeddings)
@@ -205,16 +218,13 @@ public class ExplorativePatternMatching extends PatternMatching
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory()));
+        graph.getConfig().getEdgeFactory(),
+        getQueryHandler()
+      ));
 
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
       PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
-  }
-
-  @Override
-  protected QueryHandler getQueryHandler() {
-    return new QueryHandler(getQuery());
   }
 
   @Override
@@ -243,7 +253,7 @@ public class ExplorativePatternMatching extends PatternMatching
     /**
      * Iteration strategy for traversing the graph
      */
-    private IterationStrategy iterationStrategy;
+    private TraverserStrategy traverserStrategy;
     /**
      * Provides a traversal description for the distributed traverser
      */
@@ -263,7 +273,7 @@ public class ExplorativePatternMatching extends PatternMatching
     public Builder() {
       this.attachData             = false;
       this.matchStrategy          = MatchStrategy.ISOMORPHISM;
-      this.iterationStrategy      = IterationStrategy.BULK_ITERATION;
+      this.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
       this.traverser              = new DFSTraverser();
       this.edgeStepJoinStrategy   = OPTIMIZER_CHOOSES;
       this.vertexStepJoinStrategy = OPTIMIZER_CHOOSES;
@@ -305,11 +315,11 @@ public class ExplorativePatternMatching extends PatternMatching
     /**
      * Set iteration strategy for traversing the graph (e.g. bulk traversal).
      *
-     * @param iterationStrategy iteration strategy
+     * @param traverserStrategy iteration strategy
      * @return modified builder
      */
-    public Builder setIterationStrategy(IterationStrategy iterationStrategy) {
-      this.iterationStrategy = iterationStrategy;
+    public Builder setTraverserStrategy(TraverserStrategy traverserStrategy) {
+      this.traverserStrategy = traverserStrategy;
       return this;
     }
 
@@ -356,13 +366,13 @@ public class ExplorativePatternMatching extends PatternMatching
     public ExplorativePatternMatching build() {
       Objects.requireNonNull(query, "Missing GDL query");
       Objects.requireNonNull(matchStrategy, "Missing match strategy");
-      Objects.requireNonNull(iterationStrategy, "Missing iteration strategy");
+      Objects.requireNonNull(traverserStrategy, "Missing iteration strategy");
       Objects.requireNonNull(traverser, "Missing traverser");
       Objects.requireNonNull(edgeStepJoinStrategy, "Missing join strategy");
       Objects.requireNonNull(vertexStepJoinStrategy, "Missing join strategy");
 
       return new ExplorativePatternMatching(query, attachData,
-        matchStrategy, iterationStrategy, traverser, edgeStepJoinStrategy,
+        matchStrategy, traverserStrategy, traverser, edgeStepJoinStrategy,
         vertexStepJoinStrategy);
     }
 

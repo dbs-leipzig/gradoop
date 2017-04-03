@@ -18,7 +18,7 @@
 package org.gradoop.common.storage.api;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 import java.io.Serializable;
 
@@ -39,5 +39,5 @@ public interface PersistentGraphHeadFactory<G extends EPGMGraphHead>
    * @return graph data
    */
   PersistentGraphHead createGraphHead(G inputGraphData,
-    GradoopIdSet vertices, GradoopIdSet edges);
+    GradoopIdList vertices, GradoopIdList edges);
 }

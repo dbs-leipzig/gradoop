@@ -24,8 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Aggregator that takes {@link PropertyValue} as input for aggregation.
  */
-public abstract class PropertyValueAggregator
-  extends BaseAggregator<PropertyValue> {
+public abstract class PropertyValueAggregator extends BaseAggregator<PropertyValue> {
 
   /**
    * Creates a new aggregator

@@ -25,7 +25,10 @@ import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.Arrays;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation
@@ -97,8 +100,7 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
-    JSONDataSource dataSource = new JSONDataSource(
-      graphHeadFile, vertexFile, edgeFile, config);
+    JSONDataSource dataSource = new JSONDataSource(graphHeadFile, vertexFile, edgeFile, config);
 
     // read graph collection from DataSource
     GraphCollection graphCollection = dataSource.getGraphCollection();
@@ -106,7 +108,7 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     // do some analytics
     LogicalGraph schema = graphCollection
       .reduce(new ReduceCombination())
-      .groupByVertexAndEdgeLabel();
+      .groupBy(Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(Grouping.LABEL_SYMBOL));
 
     // write resulting graph to DataSink
     schema.writeTo(new JSONDataSink(

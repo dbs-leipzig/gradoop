@@ -22,6 +22,9 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
+import org.gradoop.flink.model.impl.operators.count.functions.Tuple1With1L;
+import org.gradoop.flink.model.impl.operators.count.functions.Tuple2FromTupleWithObjectAnd1L;
+import org.gradoop.flink.model.impl.operators.count.functions.Tuple2WithObjectAnd1L;
 
 /**
  * Utility methods to count the number of elements in a dataset without
@@ -42,7 +45,7 @@ public class Count {
       .map(new Tuple1With1L<T>())
       .union(dataSet.getExecutionEnvironment().fromElements(new Tuple1<>(0L)))
       .sum(0)
-      .map(new ValueOf1<Long>());
+      .map(new ValueOf1<>());
   }
 
   /**
@@ -61,16 +64,32 @@ public class Count {
 
   /**
    * Groups the input dataset by the contained elements and counts the elements
-   * per group. Returns a {@code Tuple2} containing the group element and the
+   * per group. Returns a {@link Tuple2} containing the group element and the
    * corresponding count value.
    *
    * @param dataSet input dataset
    * @param <T>     element type in input dataset
-   * @return {@code Tuple2} with group value and group count
+   * @return {@link Tuple2} with group value and group count
    */
   public static <T> DataSet<Tuple2<T, Long>> groupBy(DataSet<T> dataSet) {
     return dataSet
-      .map(new Tuple2WithObjectAnd1L<T>())
+      .map(new Tuple2WithObjectAnd1L<>())
+      .groupBy(0)
+      .sum(1);
+  }
+
+  /**
+   * Groups the input dataset by the contained elements and counts the elements
+   * per group. Returns a {@link Tuple2} containing the group element and the corresponding
+   * count value.
+   *
+   * @param dataSet input dataset containing tuples
+   * @param <T> element type in input dataset
+   * @return {@link Tuple2} with group value and group count
+   */
+  public static <T> DataSet<Tuple2<T, Long>> groupByFromTuple(DataSet<Tuple1<T>> dataSet) {
+    return dataSet
+      .map(new Tuple2FromTupleWithObjectAnd1L<>())
       .groupBy(0)
       .sum(1);
   }

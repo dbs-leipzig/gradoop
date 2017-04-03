@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.impl.GraphCollection;
 
@@ -71,7 +71,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @param identifiers graph identifiers
    * @return collection containing requested logical graphs
    */
-  GraphCollection getGraphs(GradoopIdSet identifiers);
+  GraphCollection getGraphs(GradoopIdList identifiers);
 
   //----------------------------------------------------------------------------
   // Unary operators

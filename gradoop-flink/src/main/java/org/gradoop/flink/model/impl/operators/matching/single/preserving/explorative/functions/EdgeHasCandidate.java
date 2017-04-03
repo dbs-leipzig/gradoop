@@ -37,8 +37,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  * @param <K> key type
  */
 @FunctionAnnotation.ReadFields("f3")
-public class EdgeHasCandidate<K>
-  extends RichFilterFunction<TripleWithCandidates<K>> {
+public class EdgeHasCandidate<K> extends RichFilterFunction<TripleWithCandidates<K>> {
 
   /**
    * Traversal code

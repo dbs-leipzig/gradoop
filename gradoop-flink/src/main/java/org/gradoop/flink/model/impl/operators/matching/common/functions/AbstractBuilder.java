@@ -30,8 +30,7 @@ import java.util.List;
  * @param <EL> EPGM element type
  * @param <OUT> output type
  */
-public abstract class AbstractBuilder<EL extends Element, OUT>
-  extends RichMapFunction<EL, OUT> {
+public abstract class AbstractBuilder<EL extends Element, OUT> extends RichMapFunction<EL, OUT> {
 
   /**
    * GDL query

@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Reduces groups of tuples 4 consisting of 4 gradoop ids
@@ -36,15 +36,15 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 public class MergeEdgeGraphs implements
   GroupReduceFunction<
     Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>,
-    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> {
+    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdList>> {
 
   @Override
   public void reduce(
     Iterable<Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>> iterable,
     Collector<
-      Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> collector) {
+      Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdList>> collector) {
 
-    GradoopIdSet set = new GradoopIdSet();
+    GradoopIdList set = new GradoopIdList();
 
     boolean empty = true;
     GradoopId f0 = null;

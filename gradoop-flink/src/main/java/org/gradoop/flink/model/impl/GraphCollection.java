@@ -27,7 +27,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
@@ -72,7 +72,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -237,7 +237,7 @@ public class GraphCollection extends GraphBase implements
   @Override
   public GraphCollection getGraphs(final GradoopId... identifiers) {
 
-    GradoopIdSet graphIds = new GradoopIdSet();
+    GradoopIdList graphIds = new GradoopIdList();
 
     for (GradoopId id : identifiers) {
       graphIds.add(id);
@@ -250,7 +250,7 @@ public class GraphCollection extends GraphBase implements
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection getGraphs(final GradoopIdSet identifiers) {
+  public GraphCollection getGraphs(final GradoopIdList identifiers) {
 
     DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
       .filter(new FilterFunction<GraphHead>() {

@@ -17,16 +17,13 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .CombineEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
@@ -35,10 +32,9 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
-
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 /**
  * The grouping operator determines a structural grouping of vertices and edges
@@ -79,7 +75,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * properties, vertex- and edge labels as well as combinations of those.
  */
 public abstract class Grouping implements UnaryGraphToGraphOperator {
-
+  /**
+   * Used as property key to declare a label based grouping.
+   *
+   * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
+   */
+  public static final String LABEL_SYMBOL = ":label";
   /**
    * Gradoop Flink configuration.
    */
@@ -120,16 +121,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param edgeAggregators     aggregate functions for grouped edges
    */
   Grouping(
-    List<String> vertexGroupingKeys,
-    boolean useVertexLabels,
+    List<String> vertexGroupingKeys, boolean useVertexLabels,
     List<PropertyValueAggregator> vertexAggregators,
-    List<String> edgeGroupingKeys,
-    boolean useEdgeLabels,
+    List<String> edgeGroupingKeys, boolean useEdgeLabels,
     List<PropertyValueAggregator> edgeAggregators) {
-    this.vertexGroupingKeys = checkNotNull(vertexGroupingKeys);
+    this.vertexGroupingKeys = vertexGroupingKeys;
     this.useVertexLabels    = useVertexLabels;
     this.vertexAggregators  = vertexAggregators;
-    this.edgeGroupingKeys   = checkNotNull(edgeGroupingKeys);
+    this.edgeGroupingKeys   = edgeGroupingKeys;
     this.useEdgeLabels      = useEdgeLabels;
     this.edgeAggregators    = edgeAggregators;
   }
@@ -251,8 +250,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param edges input graph edges
    * @return grouped edges
    */
-  protected UnsortedGrouping<EdgeGroupItem> groupEdges(
-    DataSet<EdgeGroupItem> edges) {
+  protected UnsortedGrouping<EdgeGroupItem> groupEdges(DataSet<EdgeGroupItem> edges) {
     UnsortedGrouping<EdgeGroupItem> groupedEdges;
     if (useEdgeProperties() && useEdgeLabels()) {
       groupedEdges = edges.groupBy(0, 1, 2, 3);
@@ -314,8 +312,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param graph input graph
    * @return grouped output graph
    */
-  protected abstract LogicalGraph groupInternal(
-    LogicalGraph graph);
+  protected abstract LogicalGraph groupInternal(LogicalGraph graph);
 
   /**
    * Used for building a grouping operator instance.
@@ -361,22 +358,22 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
-      this.vertexGroupingKeys     = Lists.newArrayList();
-      this.edgeGroupingKeys       = Lists.newArrayList();
+      this.vertexGroupingKeys     = new ArrayList<>();
+      this.edgeGroupingKeys       = new ArrayList<>();
       this.useVertexLabel         = false;
       this.useEdgeLabel           = false;
-      this.vertexValueAggregators = Lists.newArrayList();
-      this.edgeValueAggregators   = Lists.newArrayList();
+      this.vertexValueAggregators = new ArrayList<>();
+      this.edgeValueAggregators   = new ArrayList<>();
     }
 
     /**
-     * Set the grouping strategy.
+     * Set the grouping strategy. See {@link GroupingStrategy}.
      *
      * @param strategy grouping strategy
-     * @see {@link GroupingStrategy}
      * @return this builder
      */
     public GroupingBuilder setStrategy(GroupingStrategy strategy) {
+      Objects.requireNonNull(strategy);
       this.strategy = strategy;
       return this;
     }
@@ -388,8 +385,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexGroupingKey(String key) {
-      checkNotNull(key);
-      this.vertexGroupingKeys.add(key);
+      Objects.requireNonNull(key);
+      if (key.equals(Grouping.LABEL_SYMBOL)) {
+        useVertexLabel(true);
+      } else {
+        this.vertexGroupingKeys.add(key);
+      }
       return this;
     }
 
@@ -399,10 +400,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param keys property keys
      * @return this builder
      */
-    public GroupingBuilder addVertexGroupingKeys(
-      List<String> keys) {
-      checkNotNull(keys);
-      this.vertexGroupingKeys.addAll(keys);
+    public GroupingBuilder addVertexGroupingKeys(List<String> keys) {
+      Objects.requireNonNull(keys);
+      for (String key : keys) {
+        this.addVertexGroupingKey(key);
+      }
       return this;
     }
 
@@ -413,8 +415,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addEdgeGroupingKey(String key) {
-      checkNotNull(key);
-      this.edgeGroupingKeys.add(key);
+      Objects.requireNonNull(key);
+      if (key.equals(Grouping.LABEL_SYMBOL)) {
+        useEdgeLabel(true);
+      } else {
+        this.edgeGroupingKeys.add(key);
+      }
       return this;
     }
 
@@ -424,10 +430,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param keys property keys
      * @return this builder
      */
-    public GroupingBuilder addEdgeGroupingKeys(
-      List<String> keys) {
-      checkNotNull(keys);
-      this.edgeGroupingKeys.addAll(keys);
+    public GroupingBuilder addEdgeGroupingKeys(List<String> keys) {
+      Objects.requireNonNull(keys);
+      for (String key : keys) {
+        this.addEdgeGroupingKey(key);
+      }
       return this;
     }
 
@@ -437,8 +444,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param useVertexLabel true, iff vertex label shall be used for grouping
      * @return this builder
      */
-    public GroupingBuilder useVertexLabel(
-      boolean useVertexLabel) {
+    public GroupingBuilder useVertexLabel(boolean useVertexLabel) {
       this.useVertexLabel = useVertexLabel;
       return this;
     }
@@ -449,8 +455,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param useEdgeLabel true, iff edge label shall be used for grouping
      * @return this builder
      */
-    public GroupingBuilder useEdgeLabel(
-      boolean useEdgeLabel) {
+    public GroupingBuilder useEdgeLabel(boolean useEdgeLabel) {
       this.useEdgeLabel = useEdgeLabel;
       return this;
     }
@@ -462,9 +467,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator vertex aggregator
      * @return this builder
      */
-    public GroupingBuilder addVertexAggregator(
-      PropertyValueAggregator aggregator) {
-      checkNotNull(aggregator, "Aggregator must not be null");
+    public GroupingBuilder addVertexAggregator(PropertyValueAggregator aggregator) {
+      Objects.requireNonNull(aggregator, "Aggregator must not be null");
       this.vertexValueAggregators.add(aggregator);
       return this;
     }
@@ -476,9 +480,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator edge aggregator
      * @return this builder
      */
-    public GroupingBuilder addEdgeAggregator(
-      PropertyValueAggregator aggregator) {
-      checkNotNull(aggregator, "Aggregator must not be null");
+    public GroupingBuilder addEdgeAggregator(PropertyValueAggregator aggregator) {
+      Objects.requireNonNull(aggregator, "Aggregator must not be null");
       this.edgeValueAggregators.add(aggregator);
       return this;
     }

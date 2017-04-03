@@ -1,8 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.impl.operators.matching.common.query
-  .QueryHandler;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.GDLHandler.Builder;
@@ -10,9 +9,10 @@ import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -29,8 +29,25 @@ public class QueryHandlerTest {
     "(v2)-[e3:a]->(v1)" +
     "(v3)-[e4:c]->(v3)";
 
-  static GDLHandler GDL_HANDLER = new Builder().buildFromString(TEST_QUERY);
+  private static GDLHandler GDL_HANDLER = new Builder().buildFromString(TEST_QUERY);
   static QueryHandler QUERY_HANDLER = new QueryHandler(TEST_QUERY);
+
+  @Test
+  public void testGetTriples() throws Exception {
+    Set<Triple> expected = Sets.newHashSet(
+      new Triple(GDL_HANDLER.getVertexCache().get("v1"), GDL_HANDLER.getEdgeCache().get("e1"),
+        GDL_HANDLER.getVertexCache().get("v2")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v2"), GDL_HANDLER.getEdgeCache().get("e2"),
+        GDL_HANDLER.getVertexCache().get("v3")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v2"), GDL_HANDLER.getEdgeCache().get("e3"),
+        GDL_HANDLER.getVertexCache().get("v1")),
+      new Triple(GDL_HANDLER.getVertexCache().get("v3"), GDL_HANDLER.getEdgeCache().get("e4"),
+        GDL_HANDLER.getVertexCache().get("v3")));
+
+    Collection<Triple> triples = QUERY_HANDLER.getTriples();
+    assertEquals(expected.size(), triples.size());
+    assertTrue(triples.stream().allMatch(expected::contains));
+  }
 
   @Test
   public void testGetVertexCount() {
@@ -61,6 +78,18 @@ public class QueryHandlerTest {
   }
 
   @Test
+  public void testIsVertex() {
+    assertTrue(QUERY_HANDLER.isVertex("v1"));
+    assertFalse(QUERY_HANDLER.isVertex("e1"));
+  }
+
+  @Test
+  public void testIsEdge() {
+    assertTrue(QUERY_HANDLER.isEdge("e1"));
+    assertFalse(QUERY_HANDLER.isEdge("v1"));
+  }
+
+  @Test
   public void testGetVertexById() throws Exception {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
     assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
@@ -70,6 +99,20 @@ public class QueryHandlerTest {
   public void testGetEdgeById() throws Exception {
     Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
     assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
+  }
+
+  @Test
+  public void testGetVertexByVariable() throws Exception {
+    Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
+    assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
+    assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
+  }
+
+  @Test
+  public void testGetEdgeByVariable() throws Exception {
+    Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
+    assertEquals(QUERY_HANDLER.getEdgeByVariable("e1"), expected);
+    assertNotEquals(QUERY_HANDLER.getEdgeByVariable("e2"), expected);
   }
 
   @Test
@@ -183,13 +226,12 @@ public class QueryHandlerTest {
     assertTrue(elementsEqual(centerVertices, expected));
   }
 
-  private static <EL extends Element>
-  boolean elementsEqual(List<EL> list, List<EL> expected) {
+  private static <EL extends Element> boolean elementsEqual(List<EL> list, List<EL> expected) {
     boolean equal = list.size() == expected.size();
 
     if (equal) {
-      Collections.sort(list, new ElementComparator<>());
-      Collections.sort(expected, new ElementComparator<>());
+      list.sort(Comparator.comparingLong(Element::getId));
+      expected.sort(Comparator.comparingLong(Element::getId));
       for (int i = 0; i < list.size(); i++) {
         if (!list.get(i).equals(expected.get(i))) {
           equal = false;
@@ -198,13 +240,5 @@ public class QueryHandlerTest {
       }
     }
     return equal;
-  }
-
-  private static class ElementComparator<EL extends Element>
-    implements Comparator<EL> {
-    @Override
-    public int compare(EL o1, EL o2) {
-      return Long.compare(o1.getId(), o2.getId());
-    }
   }
 }

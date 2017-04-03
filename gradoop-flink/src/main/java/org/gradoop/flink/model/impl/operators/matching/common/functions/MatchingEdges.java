@@ -33,17 +33,14 @@ import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
  */
 @FunctionAnnotation.ReadFields("label;properties")
 public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * Query edges to match against.
    */
   private transient Collection<org.s1ck.gdl.model.Edge> queryEdges;
-
   /**
    * Constructor
    *

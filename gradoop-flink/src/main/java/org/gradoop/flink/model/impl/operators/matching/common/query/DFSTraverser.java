@@ -28,7 +28,6 @@ import java.util.Set;
  * Implementation of a {@link Traverser}, using a depth-first search.
  */
 public class DFSTraverser implements RootedTraverser {
-
   /**
    * Query handler to access the query graph.
    */

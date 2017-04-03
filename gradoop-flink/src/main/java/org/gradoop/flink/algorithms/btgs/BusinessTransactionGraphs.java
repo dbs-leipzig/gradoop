@@ -46,7 +46,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.tuple.SwitchPair;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Part of the BIIIG approach.
@@ -80,10 +80,10 @@ public class BusinessTransactionGraphs implements
   public GraphCollection execute(LogicalGraph iig) {
 
     DataSet<Vertex> masterVertices = iig.getVertices()
-      .filter(new MasterData<Vertex>());
+      .filter(new MasterData<>());
 
     LogicalGraph transGraph = iig
-      .vertexInducedSubgraph(new TransactionalData<Vertex>());
+      .vertexInducedSubgraph(new TransactionalData<>());
 
     DataSet<Vertex> transVertices = transGraph
       .getVertices();
@@ -102,49 +102,49 @@ public class BusinessTransactionGraphs implements
       .runScatterGatherIteration(new BtgMessenger(), new BtgUpdater() , 100);
 
 
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> btgVerticesMap = gellyTransGraph
+    DataSet<Tuple2<GradoopId, GradoopIdList>> btgVerticesMap = gellyTransGraph
       .getVerticesAsTuple2()
-      .map(new SwitchPair<GradoopId, GradoopId>())
+      .map(new SwitchPair<>())
       .groupBy(0)
       .reduceGroup(new CollectGradoopIds())
       .map(new ComponentToNewBtgId());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertexBtgMap = btgVerticesMap
-      .flatMap(new ExpandGradoopIds<GradoopId>())
-      .map(new SwitchPair<GradoopId, GradoopId>());
+      .flatMap(new ExpandGradoopIds<>())
+      .map(new SwitchPair<>());
 
     DataSet<GraphHead> graphHeads = btgVerticesMap
-      .map(new Value0Of2<GradoopId, GradoopIdSet>())
+      .map(new Value0Of2<>())
       .map(new NewBtgGraphHead<>(iig.getConfig().getGraphHeadFactory()));
 
     // filter and update edges
     DataSet<Edge> btgEdges = iig.getEdges()
       .join(vertexBtgMap)
       .where(new SourceId<>()).equalTo(0)
-      .with(new SetBtgId<Edge>());
+      .with(new SetBtgId<>());
 
     // update transactional vertices
     transVertices = transVertices
       .join(vertexBtgMap)
-      .where(new Id<Vertex>()).equalTo(0)
-      .with(new SetBtgId<Vertex>());
+      .where(new Id<>()).equalTo(0)
+      .with(new SetBtgId<>());
 
     // create master data BTG map
     vertexBtgMap = btgEdges
-      .map(new TargetIdBtgId<Edge>())
+      .map(new TargetIdBtgId<>())
       .join(masterVertices)
-      .where(0).equalTo(new Id<Vertex>())
-      .with(new LeftSide<Tuple2<GradoopId, GradoopId>, Vertex>())
+      .where(0).equalTo(new Id<>())
+      .with(new LeftSide<>())
       .distinct();
 
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexBtgsMap = vertexBtgMap
+    DataSet<Tuple2<GradoopId, GradoopIdList>> vertexBtgsMap = vertexBtgMap
       .groupBy(0)
       //.combineGroup(new CollectGradoopIds())
       .reduceGroup(new CollectGradoopIds());
 
     masterVertices = masterVertices.join(vertexBtgsMap)
-      .where(new Id<Vertex>()).equalTo(0)
-      .with(new SetBtgIds<Vertex>());
+      .where(new Id<>()).equalTo(0)
+      .with(new SetBtgIds<>());
 
     return GraphCollection.fromDataSets(
       graphHeads,

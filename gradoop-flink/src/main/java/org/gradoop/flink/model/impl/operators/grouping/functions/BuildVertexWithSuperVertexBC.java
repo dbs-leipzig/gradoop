@@ -73,8 +73,7 @@ public class BuildVertexWithSuperVertexBC
   @Override
   public VertexWithSuperVertex map(VertexGroupItem item) throws Exception {
     reuseTuple.setVertexId(item.getVertexId());
-    reuseTuple.setSuperVertexId(getFinalGroupRepresentative(
-      item.getSuperVertexId()));
+    reuseTuple.setSuperVertexId(getFinalGroupRepresentative(item.getSuperVertexId()));
     return reuseTuple;
   }
 
