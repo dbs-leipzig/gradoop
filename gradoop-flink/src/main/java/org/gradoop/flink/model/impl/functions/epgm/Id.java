@@ -20,8 +20,8 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Element;
 
 /**
  * element => elementId
@@ -41,4 +41,5 @@ public class Id<EL extends Element>
   public GradoopId getKey(EL element) throws Exception {
     return element.getId();
   }
+
 }

@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Reduce each group of vertices into a single vertex, whose graphId set
@@ -31,16 +31,16 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 @FunctionAnnotation.ForwardedFields("f0")
 public class MultipleGraphIdsGroupReducer
   implements GroupReduceFunction<Tuple2<GradoopId, GradoopId>,
-  Tuple2<GradoopId, GradoopIdSet>> {
+  Tuple2<GradoopId, GradoopIdList>> {
 
   @Override
   public void reduce(
     Iterable<Tuple2<GradoopId, GradoopId>> iterable,
-    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) {
+    Collector<Tuple2<GradoopId, GradoopIdList>> collector) {
 
     boolean first = true;
     GradoopId vertexId = null;
-    GradoopIdSet idSet = new GradoopIdSet();
+    GradoopIdList idSet = new GradoopIdList();
 
     for (Tuple2<GradoopId, GradoopId> vertexGraphPair : iterable) {
       if (first) {

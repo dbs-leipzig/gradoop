@@ -213,7 +213,7 @@ public class GroupingBenchmark extends AbstractRunner
     readCMDArguments(cmd);
 
     // initialize EPGM database
-    LogicalGraph graphDatabase = readLogicalGraph(INPUT_PATH, false);
+    LogicalGraph graphDatabase = readLogicalGraph(INPUT_PATH);
 
     // initialize grouping keys
     List<String> vertexKeys = Lists.newArrayList();

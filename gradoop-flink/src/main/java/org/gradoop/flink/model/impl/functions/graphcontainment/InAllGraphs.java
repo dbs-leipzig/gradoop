@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * True, if an element is contained in all of a set of given graphs.
@@ -34,14 +34,14 @@ public class InAllGraphs<GE extends GraphElement>
   /**
    * graph ids
    */
-  private final GradoopIdSet graphIds;
+  private final GradoopIdList graphIds;
 
   /**
    * constructor
    *
    * @param graphIds graph ids
    */
-  public InAllGraphs(GradoopIdSet graphIds) {
+  public InAllGraphs(GradoopIdList graphIds) {
     this.graphIds = graphIds;
   }
 

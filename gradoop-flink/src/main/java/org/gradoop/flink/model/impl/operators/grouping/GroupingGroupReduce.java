@@ -20,12 +20,9 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildSuperVertex;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildVertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildVertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
@@ -94,12 +91,10 @@ public class GroupingGroupReduce extends Grouping {
       .map(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators()));
 
-    DataSet<VertexGroupItem> vertexGroupItems =
-      // group vertices by label / properties / both
-      groupVertices(verticesForGrouping)
-        // apply aggregate function
-        .reduceGroup(new ReduceVertexGroupItems(
-          useVertexLabels(), getVertexAggregators()));
+    // group vertices by label / properties / both
+    DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
+      // apply aggregate function
+      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregators()));
 
     DataSet<Vertex> superVertices = vertexGroupItems
       // filter group representative tuples
@@ -108,19 +103,16 @@ public class GroupingGroupReduce extends Grouping {
       .map(new BuildSuperVertex(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
 
-    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap =
-      vertexGroupItems
-        // filter group element tuples
-        .filter(new FilterRegularVertices())
-        // build vertex to group representative tuple
-        .map(new BuildVertexWithSuperVertex());
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
+      // filter group element tuples
+      .filter(new FilterRegularVertices())
+      // build vertex to group representative tuple
+      .map(new BuildVertexWithSuperVertex());
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph,
-      vertexToRepresentativeMap);
+    DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges,
-      graph.getConfig());
+    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
   /**

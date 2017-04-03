@@ -24,16 +24,13 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildVertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions
-  .BuildVertexWithSuperVertexBC;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertexBC;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
@@ -95,46 +92,39 @@ public class GroupingGroupCombine extends Grouping {
       .map(new BuildVertexGroupItem(getVertexGroupingKeys(),
         useVertexLabels(), getVertexAggregators()));
 
-    DataSet<VertexGroupItem> combinedVertexGroupItems =
-      // group vertices by label / properties / both
-      groupVertices(verticesForGrouping)
-        // apply aggregate function per combined partition
-        .combineGroup(new CombineVertexGroupItems(
-          useVertexLabels(), getVertexAggregators()));
+    // group vertices by label / properties / both
+    DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
+      // apply aggregate function per combined partition
+      .combineGroup(new CombineVertexGroupItems(useVertexLabels(), getVertexAggregators()));
 
     // filter super vertex tuples (1..n per partition/group)
     // group  super vertex tuples
     // create super vertex tuple (1 per group) + previous super vertex ids
-    DataSet<Tuple2<VertexGroupItem, IdWithIdSet>>
-      superVertexTuples = groupVertices(
-        combinedVertexGroupItems.filter(new FilterSuperVertices()))
-        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(),
-          getVertexAggregators()));
+    DataSet<Tuple2<VertexGroupItem, IdWithIdSet>> superVertexTuples =
+      groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))
+        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(), getVertexAggregators()));
 
     // build super vertices from super vertex tuples
     DataSet<Vertex> superVertices = superVertexTuples
-      .map(new Value0Of2<VertexGroupItem, IdWithIdSet>())
+      .map(new Value0Of2<>())
       .map(new BuildSuperVertex(getVertexGroupingKeys(), useVertexLabels(),
         getVertexAggregators(), config.getVertexFactory()));
 
     // extract mapping
     DataSet<IdWithIdSet> mapping = superVertexTuples
-      .map(new Value1Of2<VertexGroupItem, IdWithIdSet>());
+      .map(new Value1Of2<>());
 
     // filter non-candidates from combiner output
     // update their vertex representative according to the mapping
-    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap =
-      combinedVertexGroupItems
-        .filter(new FilterRegularVertices())
-        .map(new BuildVertexWithSuperVertexBC())
-        .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = combinedVertexGroupItems
+      .filter(new FilterRegularVertices())
+      .map(new BuildVertexWithSuperVertexBC())
+      .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph,
-      vertexToRepresentativeMap);
+    DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(
-      superVertices, superEdges, graph.getConfig());
+    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
   @Override

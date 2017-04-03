@@ -23,7 +23,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Adds new graph id's to the edge if source and target vertex are part of
@@ -34,15 +34,15 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 @FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
   "f0.targetId->targetId;f0.label->label;f0.properties->properties")
 public class AddNewGraphsToEdge<E extends Edge>
-  implements FlatMapFunction<Tuple3<E, GradoopIdSet, GradoopIdSet>, E> {
+  implements FlatMapFunction<Tuple3<E, GradoopIdList, GradoopIdList>, E> {
 
   @Override
   public void flatMap(
-    Tuple3<E, GradoopIdSet, GradoopIdSet> triple,
+    Tuple3<E, GradoopIdList, GradoopIdList> triple,
     Collector<E> collector) {
-    GradoopIdSet sourceGraphs = triple.f1;
-    GradoopIdSet targetGraphs = triple.f2;
-    GradoopIdSet graphsToBeAdded = new GradoopIdSet();
+    GradoopIdList sourceGraphs = triple.f1;
+    GradoopIdList targetGraphs = triple.f2;
+    GradoopIdList graphsToBeAdded = new GradoopIdList();
 
     boolean filter = false;
     for (GradoopId id : sourceGraphs) {

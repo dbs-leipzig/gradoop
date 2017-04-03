@@ -5,7 +5,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -87,8 +87,8 @@ public class GradoopHBaseTestUtils {
     for(G graphHead : loader.getGraphHeads()) {
 
       GradoopId graphId = graphHead.getId();
-      GradoopIdSet vertexIds = new GradoopIdSet();
-      GradoopIdSet edgeIds = new GradoopIdSet();
+      GradoopIdList vertexIds = new GradoopIdList();
+      GradoopIdList edgeIds = new GradoopIdList();
 
       for (EPGMVertex vertex : loader.getVertices()) {
         if (vertex.getGraphIds().contains(graphId)) {

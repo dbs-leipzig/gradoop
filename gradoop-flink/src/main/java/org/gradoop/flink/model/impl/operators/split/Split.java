@@ -37,7 +37,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
 import org.gradoop.flink.model.impl.operators.split.functions.MultipleGraphIdsGroupReducer;
@@ -96,7 +96,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .map(new PairTupleWithNewId<>());
 
     // build a dataset of the vertex ids and the new associated graph ids
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdWithGraphIds =
+    DataSet<Tuple2<GradoopId, GradoopIdList>> vertexIdWithGraphIds =
       vertexIdWithSplitValues
         .join(splitValuesWithGraphIds)
         .where(1).equalTo(0)
@@ -127,7 +127,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     //--------------------------------------------------------------------------
 
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<Edge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
+    DataSet<Tuple3<Edge, GradoopIdList, GradoopIdList>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
         .where(new SourceId<>()).equalTo(0)

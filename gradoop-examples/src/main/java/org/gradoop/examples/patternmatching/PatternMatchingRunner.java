@@ -21,13 +21,18 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
+import org.apache.hadoop.conf.Configuration;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulation;
 
 import java.util.concurrent.TimeUnit;
@@ -35,10 +40,9 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.BROADCAST_HASH_FIRST;
 
 /**
- * Performs graph pattern matching on an arbitrary input graph.
+ * This program can be used to run the different pattern matching engines implemented in Gradoop.
  */
-public class PatternMatchingRunner extends AbstractRunner
-  implements ProgramDescription {
+public class PatternMatchingRunner extends AbstractRunner implements ProgramDescription {
   /**
    * Refers to {@link DualSimulation} using bulk iteration
    */
@@ -57,24 +61,33 @@ public class PatternMatchingRunner extends AbstractRunner
    */
   private static final String ALGO_ISO_EXP_BC_HASH_FIRST = "iso-exp-bc-hf";
   /**
+   * Refers to {@link CypherPatternMatching}.
+   */
+  private static final String ALGO_CYPHER = "cypher";
+  /**
    * Used for console output
    */
   private static final String[] AVAILABLE_ALGORITHMS = new String[] {
       ALGO_DUAL_BULK,
       ALGO_DUAL_DELTA,
       ALGO_ISO_EXP,
-      ALGO_ISO_EXP_BC_HASH_FIRST
+      ALGO_ISO_EXP_BC_HASH_FIRST,
+      ALGO_CYPHER
   };
   /**
    * Option to declare path to input graph
    */
   private static final String OPTION_INPUT_PATH  = "i";
   /**
+   * Option to declare the format of the input path (csv,json)
+   */
+  private static final String OPTION_INPUT_FORMAT = "f";
+  /**
    *Option to declare path to output graph
     */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
-   * GDL query string
+   * GDL/Cypher query string
    */
   private static final String OPTION_QUERY_GRAPH = "q";
   /**
@@ -85,29 +98,39 @@ public class PatternMatchingRunner extends AbstractRunner
    * Attach original data true/false
    */
   private static final String OPTION_ATTACH_DATA = "d";
+  /**
+   * Option to declare path to graph statistics
+   */
+  private static final String OPTION_STATISTICS = "s";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
-      "Input graph directory (EPGM json format)");
+      "Input graph directory");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "input-format", true,
+      "Format of the input graph [csv,json]");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Output graph directory");
     OPTIONS.addOption(OPTION_QUERY_GRAPH, "query", true,
-      "GDL based query graph");
+      "GDL/Cypher based query graph");
     OPTIONS.addOption(OPTION_ALGORITHM, "algorithm", true,
       String.format("Algorithm to execute the matching [%s]",
         StringUtils.join(AVAILABLE_ALGORITHMS, ',')));
     OPTIONS.addOption(OPTION_ATTACH_DATA, "attach-data", false,
       "Attach original vertex and edge data to the match graph");
+    OPTIONS.addOption(OPTION_STATISTICS, "statistics", true,
+      "Path to graph statistics used for Cypher engine");
   }
 
   /**
    * Runs the simulation using the given arguments.
    * <p>
-   * -i, --input-path (path to json formatted graph)<br />
+   * -i, --input-path (path to data graph)<br />
+   * -f, --input-format (format of data graph [json,csv])<br />
    * -o, --output-path (path to output directory)<br />
-   * -q, --query (GDL query string)<br />
-   * -a, --algorithm [dual-bulk,dual-delta,iso-exp,iso-exp-bc-hf]<br />
-   * -d, --attach original data (default: false)<br />
+   * -q, --query (GDL/Cypher query string)<br />
+   * -a, --algorithm [dual-bulk,dual-delta,iso-exp,iso-exp-bc-hf,cypher]<br />
+   * -d, --attach-data (default: false)<br />
+   * -s, --statistics (path to input graph statistics, used for cypher engine)<br />
    *
    * @param args option line
    */
@@ -120,16 +143,27 @@ public class PatternMatchingRunner extends AbstractRunner
     }
     performSanityCheck(cmd);
 
-    String inputDir     = cmd.getOptionValue(OPTION_INPUT_PATH);
-    String outputDir    = cmd.getOptionValue(OPTION_OUTPUT_PATH);
-    String query        = cmd.getOptionValue(OPTION_QUERY_GRAPH);
-    String algorithm    = cmd.getOptionValue(OPTION_ALGORITHM);
-    boolean attachData  = cmd.hasOption(OPTION_ATTACH_DATA);
+    String inputDir       = cmd.getOptionValue(OPTION_INPUT_PATH);
+    String inputFormat    = cmd.getOptionValue(OPTION_INPUT_FORMAT).toLowerCase();
+    String outputDir      = cmd.getOptionValue(OPTION_OUTPUT_PATH);
+    String query          = cmd.getOptionValue(OPTION_QUERY_GRAPH);
+    String algorithm      = cmd.getOptionValue(OPTION_ALGORITHM);
+    boolean attachData    = cmd.hasOption(OPTION_ATTACH_DATA);
+    boolean hasStatistics = cmd.hasOption(OPTION_STATISTICS);
 
-    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
+    GraphStatistics statistics = null;
+    if (hasStatistics) {
+      String statisticsPath = cmd.getOptionValue(OPTION_STATISTICS);
+      if (statisticsPath.startsWith("hdfs://")) {
+        statistics = GraphStatisticsHDFSReader.read(statisticsPath, new Configuration());
+      } else {
+        statistics = GraphStatisticsLocalFSReader.read(statisticsPath);
+      }
+    }
 
-    GraphCollection result = execute(
-      epgmDatabase, query, attachData, algorithm);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir, inputFormat);
+
+    GraphCollection result = execute(epgmDatabase, query, attachData, algorithm, statistics);
 
     writeGraphCollection(result, outputDir);
 
@@ -148,6 +182,9 @@ public class PatternMatchingRunner extends AbstractRunner
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph input directory.");
     }
+    if (!cmd.hasOption(OPTION_INPUT_FORMAT)) {
+      throw new IllegalArgumentException("Define an input format");
+    }
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define an graph output directory.");
     }
@@ -156,6 +193,11 @@ public class PatternMatchingRunner extends AbstractRunner
     }
     if (!cmd.hasOption(OPTION_ALGORITHM)) {
       throw new IllegalArgumentException("Chose an algorithm.");
+    }
+    if (cmd.getOptionValue(OPTION_ALGORITHM).equals(ALGO_CYPHER)) {
+      if (!cmd.hasOption(OPTION_STATISTICS)) {
+        throw new IllegalArgumentException("Provide graph statistics when using Cypher engine");
+      }
     }
   }
 
@@ -166,11 +208,12 @@ public class PatternMatchingRunner extends AbstractRunner
    * @param query         query graph
    * @param attachData    attach vertex and edge data to the match graph
    * @param algorithm     algorithm to use for pattern matching
-   * @return result match graph
+   * @param statistics    statistics about the input graph (needed for cypher)
+   * @return matching subgraphs
    */
   private static GraphCollection execute(
     LogicalGraph databaseGraph,
-    String query, boolean attachData, String algorithm) {
+    String query, boolean attachData, String algorithm, GraphStatistics statistics) {
 
     PatternMatching op;
 
@@ -193,10 +236,15 @@ public class PatternMatchingRunner extends AbstractRunner
         .setQuery(query)
         .setAttachData(attachData)
         .setMatchStrategy(MatchStrategy.ISOMORPHISM)
-        .setIterationStrategy(IterationStrategy.BULK_ITERATION)
+        .setTraverserStrategy(TraverserStrategy.SET_PAIR_BULK_ITERATION)
         .setEdgeStepJoinStrategy(BROADCAST_HASH_FIRST)
         .setVertexStepJoinStrategy(BROADCAST_HASH_FIRST)
         .build();
+      break;
+    case ALGO_CYPHER:
+      op = new CypherPatternMatching(query, attachData,
+        MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM,
+        statistics);
       break;
     default :
       throw new IllegalArgumentException(algorithm + " not supported");

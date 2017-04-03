@@ -1,7 +1,7 @@
 package org.gradoop.flink.model.impl.id;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class GradoopIdSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGradoopIdSetSerialization() throws Exception {
-    GradoopIdSet idsIn = GradoopIdSet.fromExisting(
+    GradoopIdList idsIn = GradoopIdList.fromExisting(
       GradoopId.get(), GradoopId.get());
     assertEquals("GradoopIdSets were not equal", idsIn,
       GradoopFlinkTestUtils.writeAndRead(idsIn));

@@ -23,7 +23,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -55,8 +55,7 @@ import java.util.Set;
 )
 public class TransposeVertexGroupItems
   extends ReduceVertexGroupItemBase
-  implements GroupReduceFunction
-  <VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {
+  implements GroupReduceFunction<VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {
   /**
    * Reduce object instantiation
    */
@@ -108,7 +107,7 @@ public class TransposeVertexGroupItems
     }
 
     reuseInnerTuple.setId(superVertexId);
-    reuseInnerTuple.setIdSet(GradoopIdSet.fromExisting(superVertexIds));
+    reuseInnerTuple.setIdSet(GradoopIdList.fromExisting(superVertexIds));
 
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
       groupPropertyValues);

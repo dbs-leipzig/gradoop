@@ -36,7 +36,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
@@ -95,7 +95,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
   }
 
   /**
-   * Returns one subgraph for each of the given supergraphs.
+   * Returns one subgraph for each of the given super graphs.
    * The subgraphs are defined by the vertices that fulfil the vertex filter
    * function.
    *
@@ -110,8 +110,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
-      .map(new PairElementWithNewId<GradoopId>());
+      .map(new Id<>())
+      .map(new PairElementWithNewId<>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
@@ -121,7 +121,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
-      .map(new Project2To1<GradoopId, GradoopId>())
+      .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
@@ -130,10 +130,10 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdList>> vertexIdsWithNewGraphs =
       collection.getVertices()
         .filter(vertexFilterFunction)
-        .flatMap(new ElementIdGraphIdTuple<Vertex>())
+        .flatMap(new ElementIdGraphIdTuple<>())
         .join(graphIdDictionary)
         .where(1)
         .equalTo(0)
@@ -148,21 +148,21 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     DataSet<Vertex> newVertices = vertexIdsWithNewGraphs
         .join(collection.getVertices())
         .where(0)
-        .equalTo(new Id<Vertex>())
-        .with(new AddGraphsToElements<Vertex>());
+        .equalTo(new Id<>())
+        .with(new AddGraphsToElements<>());
 
     //--------------------------------------------------------------------------
     // build tuples4 for each edge, containing
     // edge id, source id, target id, set of new graph ids
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> edgeTuple =
+    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdList>> edgeTuple =
       collection.getEdges()
-        .flatMap(new IdSourceTargetGraphTuple<Edge>())
+        .flatMap(new IdSourceTargetGraphTuple<>())
         .join(graphIdDictionary)
         .where(3).equalTo(0)
         .with(new EdgesWithNewGraphsTuple())
-        .groupBy(new Value0Of4<GradoopId, GradoopId, GradoopId, GradoopId>())
+        .groupBy(new Value0Of4<>())
         .reduceGroup(new MergeEdgeGraphs());
 
     //--------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // edge id, new edge graphs
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgeIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdList>> edgeIdsWithNewGraphs =
       edgeTuple
         .join(vertexIdsWithNewGraphs)
         .where(1).equalTo(0)
@@ -191,8 +191,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     DataSet<Edge> newEdges = edgeIdsWithNewGraphs
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<Edge>())
-      .with(new AddGraphsToElements<Edge>());
+      .equalTo(new Id<>())
+      .with(new AddGraphsToElements<>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());
@@ -214,8 +214,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
-      .map(new PairElementWithNewId<GradoopId>());
+      .map(new Id<>())
+      .map(new PairElementWithNewId<>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
@@ -225,7 +225,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
-      .map(new Project2To1<GradoopId, GradoopId>())
+      .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
@@ -237,7 +237,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     DataSet<Edge> newEdges = collection
       .getEdges()
       .filter(edgeFilterFunction)
-      .flatMap(new ElementIdGraphIdTuple<Edge>())
+      .flatMap(new ElementIdGraphIdTuple<>())
       .join(graphIdDictionary)
       .where(1)
       .equalTo(0)
@@ -246,8 +246,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .reduceGroup(new MergeTupleGraphs())
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<Edge>())
-      .with(new AddGraphsToElements<Edge>());
+      .equalTo(new Id<>())
+      .with(new AddGraphsToElements<>());
 
     //--------------------------------------------------------------------------
     // compute the new vertices
@@ -258,12 +258,12 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     //--------------------------------------------------------------------------
 
     DataSet<Vertex> newVertices = newEdges
-      .flatMap(new SourceTargetIdGraphsTuple<Edge>())
+      .flatMap(new SourceTargetIdGraphsTuple<>())
       .distinct(0)
       .coGroup(collection.getVertices())
       .where(0)
-      .equalTo(new Id<Vertex>())
-      .with(new AddGraphsToElementsCoGroup<Vertex>());
+      .equalTo(new Id<>())
+      .with(new AddGraphsToElementsCoGroup<>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());
@@ -289,8 +289,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdDictionary = collection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
-      .map(new PairElementWithNewId<GradoopId>());
+      .map(new Id<>())
+      .map(new PairElementWithNewId<>());
 
     //--------------------------------------------------------------------------
     // compute new graphs
@@ -300,7 +300,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
-      .map(new Project2To1<GradoopId, GradoopId>())
+      .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
     //--------------------------------------------------------------------------
@@ -312,7 +312,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     DataSet<Vertex> newVertices =
       collection.getVertices()
         .filter(vertexFilterFunction)
-        .flatMap(new ElementIdGraphIdTuple<Vertex>())
+        .flatMap(new ElementIdGraphIdTuple<>())
         .join(graphIdDictionary)
         .where(1).equalTo(0)
         .with(new JoinTuplesWithNewGraphs())
@@ -320,8 +320,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
         .reduceGroup(new MergeTupleGraphs())
         .join(collection.getVertices())
         .where(0)
-        .equalTo(new Id<Vertex>())
-        .with(new AddGraphsToElements<Vertex>());
+        .equalTo(new Id<>())
+        .with(new AddGraphsToElements<>());
 
     //--------------------------------------------------------------------------
     // compute pairs of an edge and the set of new graphs this edge is
@@ -331,7 +331,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
 
     DataSet<Edge> newEdges = collection.getEdges()
       .filter(edgeFilterFunction)
-      .flatMap(new ElementIdGraphIdTuple<Edge>())
+      .flatMap(new ElementIdGraphIdTuple<>())
       .join(graphIdDictionary)
       .where(1)
       .equalTo(0)
@@ -340,8 +340,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .reduceGroup(new MergeTupleGraphs())
       .join(collection.getEdges())
       .where(0)
-      .equalTo(new Id<Edge>())
-      .with(new AddGraphsToElements<Edge>());
+      .equalTo(new Id<>())
+      .with(new AddGraphsToElements<>());
 
     return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
       collection.getConfig());

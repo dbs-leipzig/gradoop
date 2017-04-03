@@ -37,8 +37,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
  */
 @FunctionAnnotation.ForwardedFields("f0")
 @FunctionAnnotation.ReadFields("f0")
-public class BuildVertexStep<K>
-  implements MapFunction<IdWithCandidates<K>, VertexStep<K>> {
+public class BuildVertexStep<K> implements MapFunction<IdWithCandidates<K>, VertexStep<K>> {
   /**
    * Reduce instantiations
    */

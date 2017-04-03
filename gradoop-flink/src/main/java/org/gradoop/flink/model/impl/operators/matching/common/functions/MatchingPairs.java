@@ -42,17 +42,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithS
 public class MatchingPairs extends RichFlatJoinFunction
   <IdWithCandidates<GradoopId>, TripleWithCandidates<GradoopId>,
     TripleWithSourceEdgeCandidates<GradoopId>> {
-
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 42L;
-
   /**
    * GDL query
    */
   private final String query;
-
   /**
    * Query handler
    */
@@ -85,8 +82,8 @@ public class MatchingPairs extends RichFlatJoinFunction
     Collector<TripleWithSourceEdgeCandidates<GradoopId>> collector)
       throws Exception {
 
-    boolean[] sourceCandidates  = sourceVertex.getCandidates();
-    boolean[] edgeCandidates    = edge.getCandidates();
+    boolean[] sourceCandidates = sourceVertex.getCandidates();
+    boolean[] edgeCandidates   = edge.getCandidates();
 
     boolean[] newSourceCandidates = new boolean[sourceCandidates.length];
     boolean[] newEdgeCandidates   = new boolean[edgeCandidates.length];

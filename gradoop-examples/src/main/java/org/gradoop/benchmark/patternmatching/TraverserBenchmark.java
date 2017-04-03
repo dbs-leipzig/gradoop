@@ -18,9 +18,9 @@
 package org.gradoop.benchmark.patternmatching;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.examples.AbstractRunner;
@@ -30,25 +30,16 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCod
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.BulkTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.DistributedTraverser;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.ForLoopTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 
-import java.util.concurrent.TimeUnit;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
- * Used to benchmark different {@link DistributedTraverser} implementations.
- *
- * The benchmarks expects the graph to be stored in two different directories:
- *
- * [inputDir]/vertices -> [unique vertex-id]
- * [inputDir]/edges    -> [unique edge-id,source-vertex-id,target-vertex-id]
- *
- * All identifiers must be of type {@link Long}.
+ * Base class for traverser benchmarks
  */
-public class TraverserBenchmark extends AbstractRunner {
+abstract class TraverserBenchmark extends AbstractRunner {
   /**
    * Option to declare path to input graph
    */
@@ -61,94 +52,191 @@ public class TraverserBenchmark extends AbstractRunner {
    * Option to set the traverser
    */
   private static final String OPTION_TRAVERSER = "t";
+  /**
+   * Path to CSV log file
+   */
+  private static final String OPTION_CSV_PATH = "csv";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph directory");
     OPTIONS.addOption(OPTION_QUERY, "query", true, "Pattern or fixed query");
-    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true, "[loop|bulk]");
+    OPTIONS.addOption(OPTION_TRAVERSER, "traverser", true,
+      "[set-pair-for|set-pair-bulk|triple-for]");
+    OPTIONS.addOption(OPTION_CSV_PATH, "csv-path", true, "Path to output CSV file");
   }
 
   /**
-   * Given a query pattern, the benchmark computes the number of matching
-   * subgraphs in the given data graph.
-   *
-   * This benchmark currently supports structure only pattern. For semantic
-   * patterns use {@link PatternMatching}.
-   *
-   * usage: org.gradoop.benchmark.patternmatching.TraverserBenchmark
-   * [-i <arg>] [-q <arg>] [-t <arg>]
-   * -i,--input <arg>       Graph directory
-   * -q,--query <arg>       Pattern or fixed query (e.g. q2 or "(a)-->(b)")
-   * -t,--traverser <arg>   [loop|bulk]
-   *
-   * @param args program arguments
+   * Path to input graph data
    */
-  public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, TraverserBenchmark.class.getName());
-    if (cmd == null) {
-      System.exit(1);
+  private final String inputPath;
+  /**
+   * Query to execute.
+   */
+  private final String query;
+  /**
+   * Traverser strategy
+   */
+  private final TraverserStrategy traverserStrategy;
+  /**
+   * Path to CSV output
+   */
+  private String csvPath;
+
+  /**
+   * Number of query vertices
+   */
+  private int vertexCount;
+  /**
+   * Number of query edges
+   */
+  private int edgeCount;
+  /**
+   * Number of embeddings found by the traverser
+   */
+  private long embeddingCount;
+  /**
+   * Traversal code to process the query.
+   */
+  private TraversalCode tc;
+
+  /**
+   * Constructor
+   *
+   * @param cmd commandline
+   */
+  TraverserBenchmark(CommandLine cmd) {
+    this.inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
+    this.query = cmd.getOptionValue(OPTION_QUERY);
+
+    String traverserStrategyString = cmd.getOptionValue(OPTION_TRAVERSER).toLowerCase();
+
+    switch (traverserStrategyString) {
+    case "set-pair-bulk":
+      this.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
+      break;
+    case "set-pair-for":
+      this.traverserStrategy = TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION;
+      break;
+    case "triple-for":
+      this.traverserStrategy = TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION;
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown traverser strategy: " + traverserStrategyString);
     }
-    String inputPath   = cmd.getOptionValue(OPTION_INPUT_PATH);
-    String queryString = cmd.getOptionValue(OPTION_QUERY);
-    String itStrategy  = cmd.getOptionValue(OPTION_TRAVERSER);
 
-    IterationStrategy iterationStrategy = (itStrategy.equals("bulk")) ?
-      IterationStrategy.BULK_ITERATION : IterationStrategy.LOOP_UNROLLING;
+    if (cmd.hasOption(OPTION_CSV_PATH)) {
+      csvPath = cmd.getOptionValue(OPTION_CSV_PATH);
+    }
+    initialize();
+  }
 
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-    int vertexCount;
-    int edgeCount;
-    TraversalCode tc;
-
-    if (queryString.toLowerCase().startsWith("q")) {
+  /**
+   * Initialize the benchmark using a given query. The query can be a predefined one (e.g. q0) or
+   * a GDL pattern (e.g. (a)-->(b)).
+   */
+  private void initialize() {
+    if (query.toLowerCase().startsWith("q")) {
       // fixed query
-      Queries.Query query = getQuery(queryString.toLowerCase());
-      vertexCount = query.getVertexCount();
-      edgeCount = query.getEdgeCount();
-      tc = query.getTraversalCode();
+      Queries.Query q = getQuery(query.toLowerCase());
+      vertexCount = q.getVertexCount();
+      edgeCount = q.getEdgeCount();
+      tc = q.getTraversalCode();
     } else {
       // GDL query pattern
-      QueryHandler queryHandler = new QueryHandler(queryString);
+      QueryHandler queryHandler = new QueryHandler(query);
       vertexCount = queryHandler.getVertexCount();
       edgeCount = queryHandler.getEdgeCount();
       Traverser traverser = new DFSTraverser();
       traverser.setQueryHandler(queryHandler);
       tc = traverser.traverse();
     }
+  }
 
-    // read graph
-    DataSet<IdWithCandidates<Long>> vertices = env
-      .readCsvFile(inputPath + "vertices/")
-      .types(Long.class)
-      .map(new GetIdWithCandidates(vertexCount));
+  /**
+   * Returns a string containing information about the benchmark run.
+   *
+   * @return benchmark result string
+   */
+  private String getResultString() {
+    return String.format("%s|%s|%s|%s|%s|%s",
+      inputPath,
+      getExecutionEnvironment().getParallelism(),
+      traverserStrategy.name(),
+      query,
+      embeddingCount,
+      getExecutionEnvironment().getLastJobExecutionResult().getNetRuntime());
+  }
 
-    DataSet<TripleWithCandidates<Long>> edges = env
-      .readCsvFile(inputPath + "edges/")
-      .fieldDelimiter(",")
-      .types(Long.class, Long.class, Long.class)
-      .map(new GetTriplesWithCandidates(edgeCount));
+  /**
+   * Writes the results of the benchmark into the given csv file. If the file already exists,
+   * the results are appended.
+   *
+   * @param csvFile path to csv file
+   * @throws IOException
+   */
+  private void writeResults(String csvFile) throws IOException {
+    String header = "Input|Parallelism|Strategy|Query|Embeddings|Runtime[ms]";
+    String line = getResultString();
 
-    // create distributed traverser
-    DistributedTraverser<Long> distributedTraverser;
-    if (iterationStrategy == IterationStrategy.BULK_ITERATION) {
-      distributedTraverser = new BulkTraverser<>(tc,
-        vertexCount, edgeCount, Long.class);
+    File f = new File(csvFile);
+    if (f.exists() && !f.isDirectory()) {
+      FileUtils.writeStringToFile(f, String.format("%s%n", line), true);
     } else {
-      distributedTraverser = new ForLoopTraverser<>(tc,
-        vertexCount, edgeCount, Long.class);
+      PrintWriter writer = new PrintWriter(csvFile, "UTF-8");
+      writer.println(header);
+      writer.println(line);
+      writer.close();
     }
+  }
 
-    // print embedding count
-    long embeddingCount = distributedTraverser
-      .traverse(vertices, edges).count();
+  /**
+   * Prints the results of the benchmark to system out.
+   */
+  private void printResults() {
+    System.out.println(getResultString());
+  }
 
-    System.out.println("embeddingCount = " + embeddingCount);
+  int getVertexCount() {
+    return vertexCount;
+  }
 
-    long duration = env.getLastJobExecutionResult()
-      .getNetRuntime(TimeUnit.SECONDS);
+  int getEdgeCount() {
+    return edgeCount;
+  }
 
-    System.out.println("duration = " + duration);
+  TraversalCode getTraversalCode() {
+    return tc;
+  }
+
+  String getInputPath() {
+    return inputPath;
+  }
+
+  void setEmbeddingCount(long embeddingCount) {
+    this.embeddingCount = embeddingCount;
+  }
+
+  TraverserStrategy getTraverserStrategy() {
+    return traverserStrategy;
+  }
+
+
+  /**
+   * Run the benchmark.
+   */
+  abstract void run() throws Exception;
+
+  /**
+   * Writes the results to file or prints it.
+   *
+   * @throws IOException
+   */
+  void close() throws IOException {
+    if (csvPath != null) {
+      writeResults(csvPath);
+    } else {
+      printResults();
+    }
   }
 
   /**
@@ -199,6 +287,7 @@ public class TraverserBenchmark extends AbstractRunner {
   /**
    * Initializes {@link IdWithCandidates}
    */
+  @FunctionAnnotation.ForwardedFields("f0")
   public static class GetIdWithCandidates
     implements MapFunction<Tuple1<Long>, IdWithCandidates<Long>> {
     /**
@@ -230,6 +319,7 @@ public class TraverserBenchmark extends AbstractRunner {
   /**
    * Initializes {@link IdWithCandidates}
    */
+  @FunctionAnnotation.ForwardedFields("f0;f1;f2")
   public static class GetTriplesWithCandidates implements
     MapFunction<Tuple3<Long, Long, Long>, TripleWithCandidates<Long>> {
     /**

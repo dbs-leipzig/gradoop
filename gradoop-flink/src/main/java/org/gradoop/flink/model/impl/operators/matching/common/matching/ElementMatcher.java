@@ -42,8 +42,7 @@ public class ElementMatcher {
    * @return true, iff the data graph element matches at least one query element
    */
   public static <EL1 extends Element, EL2 extends GraphElement>
-  boolean matchAll(EL1 dbElement, Collection<EL2> queryElements,
-    String defaultLabel) {
+  boolean matchAll(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
 
     boolean match = false;
 
@@ -68,8 +67,8 @@ public class ElementMatcher {
    * @return all candidate ids for {@code dbElement}
    */
   public static <EL1 extends Element, EL2 extends GraphElement>
-  List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements,
-    String defaultLabel) {
+  List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
+
     List<Long> matches = Lists.newArrayListWithCapacity(queryElements.size());
 
     for (GraphElement queryElement : queryElements) {

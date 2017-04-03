@@ -20,9 +20,8 @@ package org.gradoop.common.storage.impl.hbase;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.storage.api.GraphElementHandler;
 import org.gradoop.common.util.GConstants;
 
@@ -48,8 +47,7 @@ public abstract class HBaseGraphElementHandler extends
     IOException {
 
     if (graphElement.getGraphCount() > 0) {
-      byte[] graphsBytes = Writables.getBytes(graphElement.getGraphIds());
-      put = put.add(CF_META_BYTES, COL_GRAPHS_BYTES, graphsBytes);
+      put = put.add(CF_META_BYTES, COL_GRAPHS_BYTES, graphElement.getGraphIds().toByteArray());
     }
 
     return put;
@@ -59,13 +57,15 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdSet readGraphIds(Result res) throws IOException {
+  public GradoopIdList readGraphIds(Result res) throws IOException {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
 
-    GradoopIdSet graphIds = new GradoopIdSet();
+    GradoopIdList graphIds;
 
     if (graphBytes != null) {
-      Writables.getWritable(graphBytes, graphIds);
+      graphIds = GradoopIdList.fromByteArray(graphBytes);
+    } else {
+      graphIds = new GradoopIdList();
     }
 
     return graphIds;

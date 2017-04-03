@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.io.impl.dot;
 
+import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -53,22 +54,42 @@ public class DOTDataSink implements DataSink {
     this.graphInformation = graphInformation;
   }
 
-
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph).toTransactions());
+    write(logicalGraph, false);
   }
 
   @Override
   public void write(GraphCollection graphCollection) throws
     IOException {
-    write(graphCollection.toTransactions());
+    write(graphCollection, false);
   }
 
   @Override
   public void write(GraphTransactions graphTransactions) throws
     IOException {
+
+    write(graphTransactions, false);
+  }
+
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
+    write(GraphCollection.fromGraph(logicalGraph).toTransactions(), overWrite);
+  }
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+    write(graphCollection.toTransactions(), overWrite);
+  }
+
+  @Override
+  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
+
+    FileSystem.WriteMode writeMode =
+      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+
     graphTransactions.getTransactions()
-      .writeAsFormattedText(path, new DOTFileFormat(graphInformation));
+      .writeAsFormattedText(path, writeMode, new DOTFileFormat(graphInformation));
   }
 }

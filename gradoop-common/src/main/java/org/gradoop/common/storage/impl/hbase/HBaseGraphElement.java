@@ -19,15 +19,15 @@ package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 /**
  * Wraps an EPGM graph element data entity.
  *
  * @param <T> entity type
  */
-public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
-  HBaseElement<T> implements EPGMGraphElement {
+public abstract class HBaseGraphElement<T extends EPGMGraphElement>
+  extends HBaseElement<T> implements EPGMGraphElement {
 
   /**
    * Creates an EPGM graph element.
@@ -38,12 +38,11 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
     super(epgmGraphElement);
   }
 
-
   /**
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdSet getGraphIds() {
+  public GradoopIdList getGraphIds() {
     return getEpgmElement().getGraphIds();
   }
 
@@ -59,7 +58,7 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement> extends
    * {@inheritDoc}
    */
   @Override
-  public void setGraphIds(GradoopIdSet graphIds) {
+  public void setGraphIds(GradoopIdList graphIds) {
     getEpgmElement().setGraphIds(graphIds);
   }
 

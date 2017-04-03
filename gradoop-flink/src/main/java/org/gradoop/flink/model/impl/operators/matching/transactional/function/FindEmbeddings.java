@@ -21,7 +21,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
@@ -36,7 +36,7 @@ import java.util.List;
 public class FindEmbeddings
   implements FlatMapFunction<
   GraphWithCandidates,
-  Tuple4<GradoopId, GradoopId, GradoopIdSet, GradoopIdSet>> {
+  Tuple4<GradoopId, GradoopId, GradoopIdList, GradoopIdList>> {
 
   /**
    * The pattern matching algorithm.
@@ -61,7 +61,7 @@ public class FindEmbeddings
 
   @Override
   public void flatMap(GraphWithCandidates graphWithCandidates,
-    Collector<Tuple4<GradoopId, GradoopId, GradoopIdSet, GradoopIdSet>> collector) throws
+    Collector<Tuple4<GradoopId, GradoopId, GradoopIdList, GradoopIdList>> collector) throws
     Exception {
     List<Embedding<GradoopId>> embeddings =
       this.algo.findEmbeddings(graphWithCandidates, this.query);
@@ -70,8 +70,8 @@ public class FindEmbeddings
       GradoopId newGraphId = GradoopId.get();
       collector.collect(new Tuple4<>(newGraphId,
         graphWithCandidates.f0,
-        GradoopIdSet.fromExisting(embedding.getVertexMappings()),
-        GradoopIdSet.fromExisting(embedding.getEdgeMappings())));
+        GradoopIdList.fromExisting(embedding.getVertexMapping()),
+        GradoopIdList.fromExisting(embedding.getEdgeMapping())));
     }
   }
 }

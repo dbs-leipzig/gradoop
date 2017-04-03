@@ -39,7 +39,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -66,23 +65,23 @@ public class Exclusion implements BinaryGraphToGraphOperator {
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
     DataSet<GradoopId> graphId = secondGraph.getGraphHead()
-      .map(new Id<GraphHead>());
+      .map(new Id<>());
 
     DataSet<Vertex> newVertexSet = firstGraph.getVertices()
-      .filter(new NotInGraphBroadcast<Vertex>())
+      .filter(new NotInGraphBroadcast<>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID);
 
     DataSet<Edge> newEdgeSet = firstGraph.getEdges()
-      .filter(new NotInGraphBroadcast<Edge>())
+      .filter(new NotInGraphBroadcast<>())
       .withBroadcastSet(graphId, NotInGraphBroadcast.GRAPH_ID)
       .join(newVertexSet)
       .where(new SourceId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
       .join(newVertexSet)
       .where(new TargetId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>());
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
 
     return LogicalGraph.fromDataSets(
       newVertexSet, newEdgeSet, firstGraph.getConfig());

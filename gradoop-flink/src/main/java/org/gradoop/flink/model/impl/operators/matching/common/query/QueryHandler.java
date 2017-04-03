@@ -18,9 +18,10 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.GraphElement;
@@ -28,22 +29,21 @@ import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Wraps a {@link GDLHandler} and adds functionality needed for query
  * processing during graph pattern matching.
  */
 public class QueryHandler {
-
   /**
    * GDL handler
    */
   private final GDLHandler gdlHandler;
-
   /**
    * Graph diameter
    */
@@ -52,6 +52,10 @@ public class QueryHandler {
    * Graph radius
    */
   private Integer radius;
+  /**
+   * Graph components
+   */
+  private Map<Integer, Set<String>> components;
   /**
    * Cache: vId --> Vertex with Id == vId
    */
@@ -109,6 +113,31 @@ public class QueryHandler {
   }
 
   /**
+   * Returns the query graph as a collection of triples.
+   *
+   * @return triples
+   */
+  public Collection<Triple> getTriples() {
+    return getEdges().stream()
+      .map(e -> new Triple(
+        getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))
+      .collect(Collectors.toList());
+  }
+  /**
+   * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
+   * predicated defined in the query, a CNF containing zero predicates is returned.
+   *
+   * @return predicates
+   */
+  public CNF getPredicates() {
+    if (gdlHandler.getPredicates().isPresent()) {
+      return QueryPredicate.createFrom(gdlHandler.getPredicates().get()).asCNF();
+    } else {
+      return new CNF();
+    }
+  }
+
+  /**
    * Returns the number of vertices in the query graph.
    *
    * @return vertex count
@@ -160,6 +189,38 @@ public class QueryHandler {
   }
 
   /**
+   * Returns the mapping of vertices to connected graph components
+   *
+   * @return connected components
+   */
+  public Map<Integer, Set<String>> getComponents() {
+    if (components == null) {
+      components = GraphMetrics.getComponents(this);
+    }
+    return components;
+  }
+
+  /**
+   * Checks if the given variable points to a vertex.
+   *
+   * @param variable the elements variable
+   * @return True if the variable points to a vertex
+   */
+  public boolean isVertex(String variable) {
+    return gdlHandler.getVertexCache().containsKey(variable);
+  }
+
+  /**
+   * Checks if the given variable points to an edge.
+   *
+   * @param variable the elements variable
+   * @return True if the variable points to an edge
+   */
+  public boolean isEdge(String variable) {
+    return gdlHandler.getEdgeCache().containsKey(variable);
+  }
+
+  /**
    * Returns the vertex associated with the given id or {@code null} if the
    * vertex does not exist.
    *
@@ -168,7 +229,7 @@ public class QueryHandler {
    */
   public Vertex getVertexById(Long id) {
     if (idToVertexCache == null) {
-      idToVertexCache = initIdToElementCache(gdlHandler.getVertices());
+      idToVertexCache = initCache(getVertices(), Vertex::getId, Function.identity());
     }
     return idToVertexCache.get(id);
   }
@@ -182,9 +243,32 @@ public class QueryHandler {
    */
   public Edge getEdgeById(Long id) {
     if (idToEdgeCache == null) {
-      idToEdgeCache = initIdToElementCache(gdlHandler.getEdges());
+      idToEdgeCache = initCache(getEdges(), Edge::getId, Function.identity());
     }
     return idToEdgeCache.get(id);
+  }
+
+  /**
+   * Returns the vertex associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
+   *
+   * @param variable query vertex variable
+   * @return vertex or {@code null}
+   */
+  public Vertex getVertexByVariable(String variable) {
+    return gdlHandler.getVertexCache(true, true).get(variable);
+  }
+
+
+  /**
+   * Returns the Edge associated with the given variable or {@code null} if the variable does
+   * not exist. The variable can be either user-defined or auto-generated.
+   *
+   * @param variable query edge variable
+   * @return edge or {@code null}
+   */
+  public Edge getEdgeByVariable(String variable) {
+    return gdlHandler.getEdgeCache(true, true).get(variable);
   }
 
   /**
@@ -196,7 +280,7 @@ public class QueryHandler {
    */
   public Collection<Vertex> getVerticesByLabel(String label) {
     if (labelToVertexCache == null) {
-      initLabelToVertexCache();
+      labelToVertexCache = initSetCache(getVertices(), Vertex::getLabel, Function.identity());
     }
     return labelToVertexCache.get(label);
   }
@@ -210,7 +294,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesByLabel(String label) {
     if (labelToEdgeCache == null) {
-      initLabelToEdgeCache();
+      labelToEdgeCache = initSetCache(getEdges(), Edge::getLabel, Function.identity());
     }
     return labelToEdgeCache.get(label);
   }
@@ -242,7 +326,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesBySourceVertexId(Long vertexId) {
     if (sourceIdToEdgeCache == null) {
-      initSourceIdToEdgeCache();
+      sourceIdToEdgeCache = initSetCache(getEdges(), Edge::getSourceVertexId, Function.identity());
     }
     return sourceIdToEdgeCache.get(vertexId);
   }
@@ -267,7 +351,7 @@ public class QueryHandler {
    */
   public Collection<Edge> getEdgesByTargetVertexId(Long vertexId) {
     if (targetIdToEdgeCache == null) {
-      initTargetIdToEdgeCache();
+      targetIdToEdgeCache = initSetCache(getEdges(), Edge::getTargetVertexId, Function.identity());
     }
     return targetIdToEdgeCache.get(vertexId);
   }
@@ -431,90 +515,49 @@ public class QueryHandler {
   }
 
   /**
-   * Initializes the identifier to graph element (vertex/edge) cache.
+   * Initializes a cache for the given data where every key maps to exactly one element (injective).
+   * Key selector will be called on every element to extract the caches key.
+   * Value selector will be called on every element to extract the value.
+   * Returns a cache of type
+   * KT -> VT
    *
-   * @param elements graph elements
-   * @param <EL> element type
-   * @return id to element cache
+   * @param elements elements the cache will be build from
+   * @param keySelector key selector function extraction cache keys from elements
+   * @param valueSelector value selector function extraction cache values from elements
+   * @param <EL> the element type
+   * @param <KT> the cache key type
+   * @param <VT> the cache value type
+   * @return cache KT -> VT
    */
-  private <EL extends GraphElement> Map<Long, EL>
-  initIdToElementCache(Collection<EL> elements) {
-    Map<Long, EL> cache = Maps.newHashMap();
-    for (EL el : elements) {
-      cache.put(el.getId(), el);
-    }
-    return cache;
+  private <EL, KT, VT> Map<KT, VT> initCache(Collection<EL> elements,
+    Function<EL, KT> keySelector, Function<EL, VT> valueSelector) {
+
+    return elements.stream().collect(Collectors.toMap(keySelector, valueSelector));
   }
 
   /**
-   * Initializes {@link QueryHandler#labelToVertexCache}.
-   */
-  private void initLabelToVertexCache() {
-    labelToVertexCache = initLabelToGraphElementCache(getVertices());
-  }
-
-  /**
-   * Initializes {@link QueryHandler#labelToEdgeCache}.
-   */
-  private void initLabelToEdgeCache() {
-    labelToEdgeCache = initLabelToGraphElementCache(getEdges());
-  }
-
-  /**
-   * Initializes {@link QueryHandler#sourceIdToEdgeCache}.
-   */
-  private void initSourceIdToEdgeCache() {
-    sourceIdToEdgeCache = initVertexToEdgeCache(gdlHandler.getEdges(), true);
-  }
-
-  /**
-   * Initializes {@link QueryHandler#targetIdToEdgeCache}.
-   */
-  private void initTargetIdToEdgeCache() {
-    targetIdToEdgeCache = initVertexToEdgeCache(gdlHandler.getEdges(), false);
-  }
-
-  /**
-   * Initializes vertex id to edge cache.
+   * Initializes a cache for the given elements where every key maps to multiple elements.
+   * Key selector will be called on every element to extract the caches key.
+   * Value selector will be called on every element to extract the value.
+   * Returns a cache of the form
+   * KT -> Set<VT>
    *
-   * @param edges query edges
-   * @param useSource use source (true) or target (false) vertex for caching
-   * @return vertex id to edge cache
+   * @param elements elements the cache will be build from
+   * @param keySelector key selector function extraction cache keys from elements
+   * @param valueSelector value selector function extraction cache values from elements
+   * @param <EL> the element type
+   * @param <KT> the cache key type
+   * @param <VT> the cache value type
+   * @return cache KT -> Set<VT>
    */
-  private Map<Long, Set<Edge>>
-  initVertexToEdgeCache(Collection<Edge> edges, boolean useSource) {
-    Map<Long, Set<Edge>> cache = Maps.newHashMap();
-    for (Edge e : edges) {
-      Long vId = useSource ? e.getSourceVertexId() : e.getTargetVertexId();
+  private <EL, KT, VT> Map<KT, Set<VT>> initSetCache(Collection<EL> elements,
+    Function<EL, KT> keySelector, Function<EL, VT> valueSelector) {
 
-      if (cache.containsKey(vId)) {
-        cache.get(vId).add(e);
-      } else {
-        cache.put(vId, Sets.newHashSet(e));
-      }
-    }
-    return cache;
-  }
-
-  /**
-   * Initializes label to graph element (vertex/edge) cache.
-   *
-   * @param elements graph elements
-   * @param <EL> element type
-   * @return label to element cache
-   */
-  private <EL extends GraphElement> Map<String, Set<EL>>
-  initLabelToGraphElementCache(Collection<EL> elements) {
-    Map<String, Set<EL>> cache = Maps.newHashMap();
-    for (EL el : elements) {
-      if (cache.containsKey(el.getLabel())) {
-        cache.get(el.getLabel()).add(el);
-      } else {
-        Set<EL> set = new HashSet<>();
-        set.add(el);
-        cache.put(el.getLabel(), set);
-      }
-    }
-    return cache;
+    return elements.stream()
+      .collect(
+        Collectors.groupingBy(
+          keySelector,
+          Collectors.mapping(valueSelector, Collectors.toSet())
+      ));
   }
 }

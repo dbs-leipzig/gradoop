@@ -2,21 +2,20 @@ package org.gradoop.flink.representation;
 
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
-import org.gradoop.flink.representation.pojos.AdjacencyListNullValueFactory;
-import org.gradoop.flink.representation.tuples.AdjacencyList;
-import org.gradoop.flink.representation.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.representation.transactional.RepresentationConverters;
+import org.gradoop.flink.representation.transactional.AdjacencyList;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 
 import java.util.Set;
-
-import static org.junit.Assert.assertTrue;
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
@@ -26,14 +25,15 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
     GraphTransaction transaction = getGraphTransaction();
 
-    AdjacencyList<Object> adjacencyList = RepresentationConverters
-      .getAdjacencyList(transaction, new AdjacencyListNullValueFactory());
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> adjacencyList =
+      RepresentationConverters.getAdjacencyList(transaction, new Id<>(), new Id<>());
 
-    GraphTransaction convertedTransaction = RepresentationConverters
-      .getGraphTransaction(adjacencyList);
+    GraphTransaction convertedTransaction =
+      RepresentationConverters.getGraphTransaction(adjacencyList);
 
-    AdjacencyList<Object> convertedAdjacencyList = RepresentationConverters
-      .getAdjacencyList(convertedTransaction, new AdjacencyListNullValueFactory());
+    AdjacencyList<GradoopId, String, GradoopId, GradoopId> convertedAdjacencyList =
+      RepresentationConverters
+        .getAdjacencyList(convertedTransaction, new Id<>(), new Id<>());
 
     GradoopFlinkTestUtils.assertEquals(transaction, convertedTransaction);
     GradoopFlinkTestUtils.assertEquals(adjacencyList, convertedAdjacencyList);
@@ -42,7 +42,7 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
   private GraphTransaction getGraphTransaction() {
     GraphHead graphHead = new GraphHead(GradoopId.get(), "Test", null);
 
-    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+    GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 

@@ -42,11 +42,13 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.IterationStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.flink.model.impl.operators.split.Split;
@@ -64,6 +66,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -145,8 +148,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new AddToGraph<>(graphHead));
-    edges = edges.map(new AddToGraph<>(graphHead));
+    vertices = vertices
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+    edges = edges
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return new LogicalGraph(graphHeadSet, vertices, edges, config);
   }
@@ -206,10 +213,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
     DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
 
     DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return fromDataSets(
       createGraphHeadDataSet(new ArrayList<>(0), config),
@@ -250,6 +259,25 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public GraphCollection match(String pattern) {
     return match(pattern, true);
   }
@@ -260,7 +288,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public GraphCollection match(String pattern, boolean attachData) {
     return match(pattern, attachData, MatchStrategy.ISOMORPHISM,
-      IterationStrategy.BULK_ITERATION);
+      TraverserStrategy.SET_PAIR_BULK_ITERATION);
   }
 
   /**
@@ -268,13 +296,13 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, IterationStrategy iterationStrategy) {
+    MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
 
     ExplorativePatternMatching op = new ExplorativePatternMatching.Builder()
       .setQuery(pattern)
       .setAttachData(attachData)
       .setMatchStrategy(matchStrategy)
-      .setIterationStrategy(iterationStrategy)
+      .setTraverserStrategy(traverserStrategy)
       .setTraverser(new DFSTraverser()).build();
 
     return callForCollection(op);
@@ -285,8 +313,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public LogicalGraph copy() {
-    return callForGraph(
-      new Cloning());
+    return callForGraph(new Cloning());
   }
 
   /**
@@ -365,7 +392,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph sampleRandomNodes(Float sampleSize) {
+  public LogicalGraph sampleRandomNodes(float sampleSize) {
     return callForGraph(new RandomNodeSampling(sampleSize));
   }
 
@@ -381,122 +408,37 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph groupBy(List<String> vertexGroupingKeys,
-    List<String> edgeGroupingKeys) {
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy) {
+
+    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
+    Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
+
     GroupingBuilder builder = new GroupingBuilder();
 
-    if (vertexGroupingKeys != null) {
-      builder.addVertexGroupingKeys(vertexGroupingKeys);
-    }
+    builder.addVertexGroupingKeys(vertexGroupingKeys);
+    builder.setStrategy(groupingStrategy);
+
     if (edgeGroupingKeys != null) {
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
-
-    return callForGraph(builder
-        .setStrategy(GroupingStrategy.GROUP_REDUCE)
-        .useVertexLabel(false)
-        .useEdgeLabel(false)
-        .addVertexAggregator(new CountAggregator())
-        .addEdgeAggregator(new CountAggregator())
-        .build());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexLabel() {
-    return groupByVertexLabel(null, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexLabelAndVertexProperties(
-    List<String> vertexGroupingKeys) {
-    return groupByVertexLabel(vertexGroupingKeys, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexLabelAndEdgeProperties(
-    List<String> edgeGroupingKeys) {
-    return groupByVertexLabel(null, edgeGroupingKeys);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexLabel(List<String> vertexGroupingKeys,
-    List<String> edgeGroupingKeys) {
-    GroupingBuilder builder = new GroupingBuilder();
-
-    if (vertexGroupingKeys != null) {
-      builder.addVertexGroupingKeys(vertexGroupingKeys);
+    if (vertexAggregateFunctions != null) {
+      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
     }
-    if (edgeGroupingKeys != null) {
-      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    if (edgeAggregateFunctions != null) {
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
     }
-    return callForGraph(builder
-        .setStrategy(GroupingStrategy.GROUP_REDUCE)
-        .useVertexLabel(true)
-        .useEdgeLabel(false)
-        .addVertexAggregator(new CountAggregator())
-        .addEdgeAggregator(new CountAggregator())
-        .build());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexAndEdgeLabel() {
-    return groupByVertexAndEdgeLabel(null, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexAndEdgeLabelAndVertexProperties(
-    List<String> vertexGroupingKeys) {
-    return groupByVertexAndEdgeLabel(vertexGroupingKeys, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexAndEdgeLabelAndEdgeProperties(
-    List<String> edgeGroupingKeys) {
-    return groupByVertexAndEdgeLabel(null, edgeGroupingKeys);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupByVertexAndEdgeLabel(
-    List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    GroupingBuilder builder = new GroupingBuilder();
-
-    if (vertexGroupingKeys != null) {
-      builder.addVertexGroupingKeys(vertexGroupingKeys);
-    }
-    if (edgeGroupingKeys != null) {
-      builder.addEdgeGroupingKeys(edgeGroupingKeys);
-    }
-    return callForGraph(builder
-        .setStrategy(GroupingStrategy.GROUP_REDUCE)
-        .useVertexLabel(true)
-        .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator())
-        .addEdgeAggregator(new CountAggregator())
-        .build());
+    return callForGraph(builder.build());
   }
 
   //----------------------------------------------------------------------------
@@ -576,8 +518,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator,
-    LogicalGraph otherGraph) {
+  public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -585,8 +526,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection callForCollection(
-    UnaryGraphToCollectionOperator operator) {
+  public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
   }
 
@@ -595,8 +535,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public GraphCollection splitBy(String propertyKey) {
-    return callForCollection(
-      new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
+    return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
   }
 
   //----------------------------------------------------------------------------

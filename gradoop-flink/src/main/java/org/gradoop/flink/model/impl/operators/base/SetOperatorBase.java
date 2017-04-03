@@ -63,10 +63,10 @@ public abstract class SetOperatorBase extends
     return verticesWithGraphs
       .join(newGraphHeads)
       .where(1)
-      .equalTo(new Id<GraphHead>())
-      .with(new LeftJoin0OfTuple2<Vertex, GraphHead>())
+      .equalTo(new Id<>())
+      .with(new LeftJoin0OfTuple2<>())
       .withForwardedFieldsFirst("f0->*")
-      .distinct(new Id<Vertex>());
+      .distinct(new Id<>());
   }
 
   /**
@@ -82,12 +82,12 @@ public abstract class SetOperatorBase extends
   protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges().join(newVertices)
       .where(new SourceId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
       .join(newVertices)
       .where(new TargetId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
-      .distinct(new Id<Edge>());
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
+      .distinct(new Id<>());
   }
 }

@@ -18,16 +18,9 @@
 package org.gradoop.examples.io;
 
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.DataSetUtils;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.graph.GraphDataSource;
-import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.io.impl.edgelist.EdgeListDataSource;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -51,7 +44,7 @@ public class EdgeListExample implements ProgramDescription {
   /**
    * Default token separator if none is defined by the user.
    */
-  private static final String TOKEN_SEPARATOR = " ";
+  private static final String TOKEN_SEPARATOR = "\t";
 
   /**
    * Reads the edge list from the given file and transforms it into an
@@ -73,75 +66,23 @@ public class EdgeListExample implements ProgramDescription {
     // init Flink execution environment
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    //--------------------------------------------------------------------------
-    // Read edges
-    //--------------------------------------------------------------------------
-
-    // read edges from file
-    // each edge is represented by a Tuple2 (source-id, target-id)
-    DataSet<Tuple2<Long, Long>> edges = env.readCsvFile(edgeListPath)
-      .fieldDelimiter(tokenSeparator)
-      .types(Long.class, Long.class);
-
-    // assign a unique long id to each edge tuple
-    DataSet<Tuple2<Long, Tuple2<Long, Long>>> edgesWithId = DataSetUtils
-      .zipWithUniqueId(edges);
-
-    // transform to ImportEdge
-    DataSet<ImportEdge<Long>> importEdges = edgesWithId
-      .map(new MapFunction
-        <Tuple2<Long, Tuple2<Long, Long>>, ImportEdge<Long>>() {
-
-        private static final String EDGE_LABEL = "link";
-
-        @Override
-        public ImportEdge<Long> map(
-          Tuple2<Long, Tuple2<Long, Long>> edgeTriple) throws Exception {
-          return new ImportEdge<>(
-            edgeTriple.f0,      // edge id
-            edgeTriple.f1.f0,   // source vertex id
-            edgeTriple.f1.f1,  // target vertex id
-            EDGE_LABEL);
-        }
-      }).withForwardedFields("f0;f1.f0->f1;f1.f1->f2");
-
-    //--------------------------------------------------------------------------
-    // Read vertices
-    //--------------------------------------------------------------------------
-
-    // extract vertex identifiers from edge tuples
-    DataSet<Tuple1<Long>> vertices = edges
-      .<Tuple1<Long>>project(0)
-      .union(edges.<Tuple1<Long>>project(1))
-      .distinct();
-
-    // transform to ImportVertex
-    DataSet<ImportVertex<Long>> importVertices = vertices
-      .map(new MapFunction<Tuple1<Long>, ImportVertex<Long>>() {
-
-        private static final String VERTEX_LABEL = "Node";
-
-        @Override
-        public ImportVertex<Long> map(Tuple1<Long> vertex) throws Exception {
-          return new ImportVertex<>(
-            vertex.f0, // vertex id
-            VERTEX_LABEL);
-        }
-      }).withForwardedFields("f0");
-
-    //--------------------------------------------------------------------------
-    // Create logical graph
-    //--------------------------------------------------------------------------
-
-    // create default Gradoop config
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
-
-    // create datasource
-    DataSource dataSource = new GraphDataSource<>(
-      importVertices, importEdges, config);
+    // load graph from edge list
+    DataSource dataSource = new EdgeListDataSource(edgeListPath, tokenSeparator,
+      GradoopFlinkConfig.createConfig(env));
 
     // read logical graph
     LogicalGraph logicalGraph = dataSource.getLogicalGraph();
+
+    // transform labels on vertices ...
+    logicalGraph = logicalGraph.transformVertices((current, transformed) -> {
+        transformed.setLabel("Node");
+        return transformed;
+      });
+    // ... and edges
+    logicalGraph = logicalGraph.transformEdges((current, transformed) -> {
+        transformed.setLabel("link");
+        return transformed;
+      });
 
     // do some analytics (e.g. match two-node cycles)
     GraphCollection matches = logicalGraph

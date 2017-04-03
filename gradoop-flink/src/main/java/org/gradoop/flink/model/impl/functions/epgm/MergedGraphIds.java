@@ -22,7 +22,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 
 import java.util.Iterator;
 
@@ -48,7 +48,7 @@ public class MergedGraphIds<GE extends GraphElement>
   public void reduce(Iterable<GE> values, Collector<GE> out) throws Exception {
     Iterator<GE> iterator = values.iterator();
     GE result = iterator.next();
-    GradoopIdSet graphIds = result.getGraphIds();
+    GradoopIdList graphIds = result.getGraphIds();
     while (iterator.hasNext()) {
       graphIds.addAll(iterator.next().getGraphIds());
     }

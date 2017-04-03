@@ -24,7 +24,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -199,7 +198,7 @@ public class HBaseEPGMStore
     G graphData = null;
     try {
       GraphHeadHandler<G> graphHeadHandler = config.getGraphHeadHandler();
-      Result res = graphHeadTable.get(new Get(Writables.getBytes(graphId)));
+      Result res = graphHeadTable.get(new Get(graphId.toByteArray()));
       if (!res.isEmpty()) {
         graphData = graphHeadHandler.readGraphHead(res);
       }

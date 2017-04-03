@@ -1,6 +1,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -14,15 +15,15 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
 
-  private final String testName;
+  protected final String testName;
 
-  private final String dataGraph;
+  protected final String dataGraph;
 
-  private final String queryGraph;
+  protected final String queryGraph;
 
-  private final String[] expectedGraphVariables;
+  protected final String[] expectedGraphVariables;
 
-  private final String expectedCollection;
+  protected final String expectedCollection;
 
   public PatternMatchingTest(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
@@ -40,16 +41,15 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
 
     // initialize with data graph
-    LogicalGraph db = loader
-      .getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
+    LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
     // append the expected result
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    collectAndAssertTrue(getImplementation(queryGraph, false).execute(db)
-      .equalsByGraphElementIds(loader
-        .getGraphCollectionByVariables(expectedGraphVariables)));
+    GraphCollection result = getImplementation(queryGraph, false).execute(db);
+    GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+    collectAndAssertTrue(result.equalsByGraphElementIds(expected));
   }
 
   @Test
@@ -57,15 +57,14 @@ public abstract class PatternMatchingTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
 
     // initialize with data graph
-    LogicalGraph db = loader
-      .getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
+    LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
     // append the expected result
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    collectAndAssertTrue(getImplementation(queryGraph, true).execute(db)
-      .equalsByGraphElementData(loader
-        .getGraphCollectionByVariables(expectedGraphVariables)));
+    GraphCollection result = getImplementation(queryGraph, true).execute(db);
+    GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+    collectAndAssertTrue(result.equalsByGraphElementData(expected));
   }
 }

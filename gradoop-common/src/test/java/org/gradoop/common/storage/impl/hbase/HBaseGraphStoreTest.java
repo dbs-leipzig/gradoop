@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -180,8 +180,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       new HBaseVertexFactory<>();
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
-    // list is not supported by
-    final List<String> value = Lists.newArrayList();
+    // Set is not supported by
+    final Set<String> value = Sets.newHashSet();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
@@ -190,7 +190,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final GradoopIdSet graphs = new GradoopIdSet();
+    final GradoopIdList graphs = new GradoopIdList();
     PersistentVertex<Edge> v = persistentVertexFactory.createVertex(
         vertexFactory.initVertex(vertexID, label, props, graphs),
         outEdges, inEdges);
@@ -216,7 +216,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
     final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);
-    final GradoopIdSet graphs = new GradoopIdSet();
+    final GradoopIdList graphs = new GradoopIdList();
 
     // write to store
     graphStore.writeVertex(persistentVertexFactory.createVertex(
@@ -280,8 +280,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     HBaseEPGMStore<GraphHead, Vertex, Edge> graphStore, GraphHead graphHead,
     Vertex vertex, Edge edge) {
     graphStore.writeGraphHead(new HBaseGraphHeadFactory<>().createGraphHead(
-      graphHead, GradoopIdSet.fromExisting(vertex.getId()),
-      GradoopIdSet.fromExisting(edge.getId())
+      graphHead, GradoopIdList.fromExisting(vertex.getId()),
+      GradoopIdList.fromExisting(edge.getId())
       )
     );
   }

@@ -1,0 +1,14 @@
+expected[
+(a{lan:"EN"})-->(b{lan:"ZH"})
+(c{lan:"EN"})-->(d{lan:"JA"})
+(e{lan:"EN"})-->(f{lan:"SV"})
+(e{lan:"EN"})-->(g{lan:"SV"})
+(h{lan:"EN"})-->(i{lan:"JA"})
+(j{lan:"EN"})-->(i{lan:"JA"})
+(k{lan:"EN"})-->(l{lan:"FO"})
+(m{lan:"AR"})-->(n{lan:"DE"})
+(m{lan:"AR"})-->(o{lan:"DE"})
+(p{lan:"EN"})-->(q{lan:"HU"})
+(r{lan:"EN"})-->(s{lan:"BN"})
+(r{lan:"EN"})-->(t{lan:"BO"})
+]
