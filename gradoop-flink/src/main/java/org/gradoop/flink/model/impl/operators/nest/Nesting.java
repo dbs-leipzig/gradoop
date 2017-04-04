@@ -120,8 +120,7 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
     }
 
     // Suppose that both operands must share the same execution environment
-    NestingWithNestedModel
-      operator = new NestingWithNestedModel(n, left.getConfig().getExecutionEnvironment());
+    NestingWithNestedModel operator = new NestingWithNestedModel();
 
     // Extracting the indexing structures for both graphs
     leftIdx = EPGMToNestedIndexingTransformation.fromLogicalGraph(left);

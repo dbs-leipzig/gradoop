@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -28,26 +27,11 @@ import java.util.Iterator;
 /**
  * Maps a quad into a <newgraph,vertex> paid to be used within the IdGraphDatabase
  */
-public class CollectVertices extends RichGroupReduceFunction<Hexaplet, Tuple2<GradoopId, GradoopId>> {
-
-  /**
-   * Reusable element
-   */
-  private final Tuple2<GradoopId, GradoopId> reusable;
-
-
-  /**
-   * Default constructor
-   * @param newGraphId  New Graph Id to be associated to the new graph
-   */
-  public CollectVertices(GradoopId newGraphId) {
-    reusable = new Tuple2<>();
-    reusable.f0 = newGraphId;
-  }
+public class CollectVertices extends RichGroupReduceFunction<Hexaplet, GradoopId> {
 
   @Override
   public void reduce(Iterable<Hexaplet> values,
-    Collector<Tuple2<GradoopId, GradoopId>> out) throws Exception {
+    Collector<GradoopId> out) throws Exception {
     Iterator<Hexaplet> it = values.iterator();
     if (it.hasNext()) {
       Hexaplet x;
@@ -60,12 +44,10 @@ public class CollectVertices extends RichGroupReduceFunction<Hexaplet, Tuple2<Gr
         }
         if (!y.equals(GradoopId.NULL_VALUE)) {
           // If the vertices are summarized into a graph collection id, return it just once
-          reusable.f1 = y;
-          out.collect(reusable);
+          out.collect(y);
           break;
         } else {
-          reusable.f1 = x.f1;
-          out.collect(reusable);
+          out.collect(x.f1);
         }
       } while (it.hasNext() && (x.f4.equals(GradoopId.NULL_VALUE)));
     }

@@ -17,19 +17,17 @@
 package org.gradoop.flink.model.impl.operators.nest.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
 import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest.functions.SetEdgesToNewGraph;
 
 /**
  * Performs the vertex nesting operation. With this result the sole vertices are grouped.
@@ -38,31 +36,11 @@ import org.gradoop.flink.model.impl.operators.nest.functions.SetEdgesToNewGraph;
  */
 public class NestingWithNestedModel extends BinaryOp<NestedIndexing, NestedIndexing, IndexingBeforeNesting> {
 
-  /**
-   * GraphId to be associated to the graph that is going to be returned by this operator
-   */
-  private final GradoopId newGraphId;
-
-  /**
-   * the ExecutionEnvironment used to create the new GraphHead
-   */
-  private final ExecutionEnvironment ee;
-
-  /**
-   * Constructor for specifying the to-be-returned graph's head
-   * @param newGraphId                  the aforementioned id
-   * @param ee                          the ExecutionEnvironment used to create the new GraphHead
-   */
-  public NestingWithNestedModel(GradoopId newGraphId, ExecutionEnvironment ee) {
-    this.newGraphId = newGraphId;
-    this.ee = ee;
-  }
-
   @Override
   protected IndexingBeforeNesting runWithArgAndLake(NormalizedGraph dataLake, NestedIndexing gU,
     NestedIndexing hypervertices) {
 
-    DataSet<GradoopId> gh = ee.fromElements(newGraphId);
+    DataSet<GradoopId> gh = gU.getGraphHeads();
     // Associate each gid in hypervertices.H to the merged vertices
     //DataSet<GradoopId> subgraphIds = hypervertices.getGraphHeads();
 
@@ -77,13 +55,16 @@ public class NestingWithNestedModel extends BinaryOp<NestedIndexing, NestedIndex
       .with(new AssociateAndMark());
 
     // Vertices to be returend within the NestedIndexing
-    DataSet<Tuple2<GradoopId, GradoopId>> vertices = hexas
+    DataSet<GradoopId> tmpVert = hexas
       .groupBy(new Hex4())
-      .reduceGroup(new CollectVertices(newGraphId));
-    vertices.union(gh.cross(gh));
+      .reduceGroup(new CollectVertices());
+    DataSet<Tuple2<GradoopId, GradoopId>> vertices = gh.crossWithHuge(tmpVert);
 
-    DataSet<Tuple2<GradoopId, GradoopId>> edges = gU.getGraphHeadToEdge()
-      .map(new SetEdgesToNewGraph(newGraphId));
+    DataSet<GradoopId> tmpEdges = gU
+      .getGraphHeadToEdge()
+      .map(new Value1Of2<>());
+    DataSet<Tuple2<GradoopId, GradoopId>> edges = gh
+      .crossWithHuge(tmpEdges);
 
     return new IndexingBeforeNesting(gh, vertices, edges, hexas);
   }

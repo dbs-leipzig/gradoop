@@ -20,14 +20,6 @@ package org.gradoop.flink.model.impl.operators.nest.model.indices;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 
 /**
  * A NestedIndexing defines a graph collection only by using the graph id elements (and hence,
@@ -71,30 +63,6 @@ public class NestedIndexing {
    */
   public DataSet<GradoopId> getGraphHeads() {
     return graphHeads;
-  }
-
-  /**
-   * Instantiates the GraphHeads using the NormalizedGraph as a primary source
-   * @param dataLake  primary source
-   * @return          GraphHeads
-   */
-  public DataSet<GraphHead> getActualGraphHeads(NormalizedGraph dataLake) {
-    return graphHeads
-      .leftOuterJoin(dataLake.getVertices())
-      .where(new SelfId()).equalTo(new Id<>())
-      .with(new VertexToGraphHead());
-  }
-
-  /**
-   * Converts the GraphHeads to vertices
-   * @param dataLake  primary source
-   * @return          GraphHeads
-   */
-  public DataSet<Vertex> getActualGraphHeadsAsVertices(LogicalGraph dataLake) {
-    return graphHeads
-      .join(dataLake.getVertices())
-      .where(new SelfId()).equalTo(new Id<>())
-      .with(new RightSide<>());
   }
 
   /**

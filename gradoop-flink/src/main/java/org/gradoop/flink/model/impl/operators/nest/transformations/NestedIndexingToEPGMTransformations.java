@@ -25,13 +25,13 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadAsVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadAsVertex;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
 import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
 
 /**
  * Created by vasistas on 29/03/17.

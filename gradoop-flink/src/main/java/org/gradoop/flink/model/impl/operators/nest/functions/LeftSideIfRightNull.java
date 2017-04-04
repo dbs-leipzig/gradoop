@@ -42,13 +42,14 @@ import org.apache.flink.util.Collector;
 /**
  * left, right => left
  *
- * @param <L> left and right type
+ * @param <L> left type
+ * @param <R> right type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSideIfRightNull<L> implements FlatJoinFunction<L, L, L> {
+public class LeftSideIfRightNull<L, R> implements FlatJoinFunction<L, R, L> {
 
   @Override
-  public void join(L l, L l2, Collector<L> collector) throws Exception {
+  public void join(L l, R l2, Collector<L> collector) throws Exception {
     if (l2 == null) {
       collector.collect(l);
     }
