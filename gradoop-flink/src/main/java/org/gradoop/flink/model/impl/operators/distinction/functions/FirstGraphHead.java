@@ -14,45 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.tostring.tuples;
+
+package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 /**
- * (graphId, label)
+ * Distinction function that just selects the first graph head of an isomorphic group.
  */
-public class GraphHeadString extends Tuple2<GradoopId, String>
-  implements EPGMLabeled {
-
-  /**
-   * default constructor
-   */
-  public GraphHeadString() {
-  }
-
-  /**
-   * constructor with field values
-   * @param id graph id
-   * @param label graph head label
-   */
-  public GraphHeadString(GradoopId id, String label) {
-    this.f0 = id;
-    this.f1 = label;
-  }
+public class FirstGraphHead implements GraphHeadReduceFunction {
 
   @Override
-  public String getLabel() {
-    return this.f1;
-  }
-
-  @Override
-  public void setLabel(String label) {
-    this.f1 = label;
-  }
-
-  public GradoopId getId() {
-    return this.f0;
+  public void reduce(Iterable<Tuple2<String, GraphHead>> iterable,
+    Collector<GraphHead> collector) throws Exception {
+    collector.collect(iterable.iterator().next().f1);
   }
 }
