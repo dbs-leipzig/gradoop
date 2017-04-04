@@ -14,45 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.flink.model.impl.operators.tostring.tuples;
 
+package org.gradoop.flink.model.impl.operators.distinction.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * (graphId, label)
+ * (label, graphId) |><| graphHead => (label, graphHead)
  */
-public class GraphHeadString extends Tuple2<GradoopId, String>
-  implements EPGMLabeled {
-
-  /**
-   * default constructor
-   */
-  public GraphHeadString() {
-  }
-
-  /**
-   * constructor with field values
-   * @param id graph id
-   * @param label graph head label
-   */
-  public GraphHeadString(GradoopId id, String label) {
-    this.f0 = id;
-    this.f1 = label;
-  }
+@FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
+public class GraphHeadGroup
+  implements JoinFunction<GraphHeadString, GraphHead, Tuple2<String, GraphHead>> {
 
   @Override
-  public String getLabel() {
-    return this.f1;
-  }
-
-  @Override
-  public void setLabel(String label) {
-    this.f1 = label;
-  }
-
-  public GradoopId getId() {
-    return this.f0;
+  public Tuple2<String, GraphHead> join(GraphHeadString graphHeadString,
+    GraphHead graphHead) throws Exception {
+    return new Tuple2<>(graphHeadString.getLabel(), graphHead);
   }
 }

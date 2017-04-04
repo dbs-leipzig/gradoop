@@ -1,11 +1,11 @@
-package org.gradoop.flink.model.impl.operators.distinct;
+package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class DistinctTest extends GradoopFlinkTestBase {
+public class DistinctByIdTest extends GradoopFlinkTestBase {
 
   @Test
   public void testNonDistinctCollection() throws Exception {
@@ -17,7 +17,7 @@ public class DistinctTest extends GradoopFlinkTestBase {
     GraphCollection expectedCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
 
-    GraphCollection outputCollection = inputCollection.distinct();
+    GraphCollection outputCollection = inputCollection.distinctById();
 
     collectAndAssertTrue(outputCollection
       .equalsByGraphElementIds(expectedCollection));
@@ -33,7 +33,7 @@ public class DistinctTest extends GradoopFlinkTestBase {
     GraphCollection expectedCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
 
-    GraphCollection outputCollection = inputCollection.distinct();
+    GraphCollection outputCollection = inputCollection.distinctById();
 
     collectAndAssertTrue(outputCollection
       .equalsByGraphElementIds(expectedCollection));
