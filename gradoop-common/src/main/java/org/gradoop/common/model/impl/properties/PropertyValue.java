@@ -800,16 +800,17 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   }
 
   public LocalDate getDate() {
-    return date;
+    return DateTimeSerializer.deserializeDate(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
   }
 
   public LocalDate getTime() {
-    return time;
-  }
+    return DateTimeSerializer.deserializeTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));  }
 
   public LocalDateTime getDateTime() {
-    return dateTime;
-  }
+    return DateTimeSerializer.deserializeDateTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));  }
 
   public void setDate(LocalDate date) {
     byte[] valueBytes = DateTimeSerializer.serializeDate(date);
