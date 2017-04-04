@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
 
 /**
- * Created by vasistas on 29/03/17.
+ * Utility functions transforming NestedIndexing into EPGM model
  */
 public class NestedIndexingToEPGMTransformations {
 
