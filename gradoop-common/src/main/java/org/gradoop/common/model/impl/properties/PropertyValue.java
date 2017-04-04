@@ -306,7 +306,10 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
                   isGradoopId() ? getGradoopId() :
                     isMap() ? getMap() :
                       isList() ? getList() :
-                        null;
+                        isDate() ? getDate() :
+                          isTime() ? getTime() :
+                            isDateTime() ? getDateTime() :
+                              null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
