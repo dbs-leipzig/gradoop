@@ -118,7 +118,7 @@ public class PropertyValueTest {
     //Time
     p = create(TIME_VAL_c);
     assertTrue(p.isTime());
-    assertEquals(DATE_VAL_b, p.getTime());
+    assertEquals(TIME_VAL_c, p.getTime());
     //DateTime
     p = create(DATETIME_VAL_d);
     assertTrue(p.isDateTime());

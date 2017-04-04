@@ -781,6 +781,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       length = Bytes.SIZEOF_DOUBLE;
     } else if (type == TYPE_GRADOOP_ID) {
       length = GradoopId.ID_SIZE;
+    } else if (type == TYPE_DATE) {
+      length = DateTimeSerializer.SIZEOF_DATE;
+    } else if (type == TYPE_TIME) {
+      length = DateTimeSerializer.SIZEOF_TIME;
+    } else if (type == TYPE_DATETIME) {
+      length = DateTimeSerializer.SIZEOF_DATETIME;
     }
     // init new array
     rawBytes = new byte[OFFSET + length];
@@ -804,7 +810,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
   }
 
-  public LocalDate getTime() {
+  public LocalTime getTime() {
     return DateTimeSerializer.deserializeTime(
       Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));  }
 
