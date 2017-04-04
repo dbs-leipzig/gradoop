@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.common.model.impl.properties;
 
 import org.apache.hadoop.hbase.util.Bytes;
@@ -8,40 +25,63 @@ import java.time.LocalTime;
 
 import static org.apache.hadoop.hbase.util.Bytes.SIZEOF_INT;
 
+/**
+ * Serializer for Java 8 {@code LocalDate, LocalTime, LocalDateTime}.
+ */
 public class DateTimeSerializer {
-  
+
+  /**
+   * byte-array length for {@code LocalDate} value
+   */
   public static final int SIZEOF_DATE = 3 * SIZEOF_INT;
+  /**
+   * byte-array length for {@code LocalTime} value
+   */
   public static final int SIZEOF_TIME = 4 * SIZEOF_INT;
+
+  /**
+   * byte-array length for {@code LocalDateTime} value
+   */
   public static final int SIZEOF_DATETIME = 7 * SIZEOF_INT;
 
+  /**
+   * Serializes a {@code LocalDate} value.
+   *
+   * @param date {@code LocalDate} value
+   *
+   * @return serialized value
+   */
   public static byte[] serializeDate(LocalDate date) {
     int year = date.getYear();
     int month = date.getMonth().getValue();
     int day = date.getDayOfMonth();
     
-    return getBytes(new int[] {year, month, day});
+    return serialize(new int[] {year, month, day});
   }
 
-  private static byte[] getBytes(int[] ints) {
-    byte[] bytes = new byte[ints.length * SIZEOF_INT];
-    
-    for (int i = 0; i < ints.length; i++) {
-      int offset = i * SIZEOF_INT;
-      Bytes.putInt(bytes, offset, ints[i]);
-    }
-    
-    return bytes;
-  }
-
+  /**
+   * Serializes a {@code LocalTime} value.
+   *
+   * @param time {@code LocalTime} value
+   *
+   * @return serialized value
+   */
   public static byte[] serializeTime(LocalTime time) {
     int hour = time.getHour();
     int minute = time.getMinute();
     int second = time.getSecond();
     int nano = time.getNano();
 
-    return getBytes(new int[] {hour, minute, second, nano});
+    return serialize(new int[] {hour, minute, second, nano});
   }
 
+  /**
+   * Serializes a {@code LocalDateTime} value.
+   *
+   * @param dateTime {@code LocalDateTime} value
+   *
+   * @return serialized value
+   */
   public static byte[] serializeDateTime(LocalDateTime dateTime) {
     int year = dateTime.getYear();
     int month = dateTime.getMonth().getValue();
@@ -51,9 +91,34 @@ public class DateTimeSerializer {
     int second = dateTime.getSecond();
     int nano = dateTime.getNano();
 
-    return getBytes(new int[] {year, month, day, hour, minute, second, nano});
+    return serialize(new int[] {year, month, day, hour, minute, second, nano});
   }
 
+  /**
+   * Generalization of serialization methods.
+   *
+   * @param ints int array representation of {@code LocalDate, LocalTime, LocalDateTime}
+   *
+   * @return serialized value
+   */
+  private static byte[] serialize(int[] ints) {
+    byte[] bytes = new byte[ints.length * SIZEOF_INT];
+
+    for (int i = 0; i < ints.length; i++) {
+      int offset = i * SIZEOF_INT;
+      Bytes.putInt(bytes, offset, ints[i]);
+    }
+
+    return bytes;
+  }
+
+  /**
+   * Deserializes a {@code LocalDate} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalDate} value
+   */
   public static LocalDate deserializeDate(byte[] bytes) {
     int year = Bytes.toInt(bytes, 0, SIZEOF_INT);
     int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
@@ -62,6 +127,13 @@ public class DateTimeSerializer {
     return LocalDate.of(year, month, day);
   }
 
+  /**
+   * Deserializes a {@code LocalTime} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalTime} value
+   */
   public static LocalTime deserializeTime(byte[] bytes) {
     int hour = Bytes.toInt(bytes, 0, SIZEOF_INT);
     int minute = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
@@ -71,6 +143,13 @@ public class DateTimeSerializer {
     return LocalTime.of(hour, minute, second, nano);
   }
 
+  /**
+   * Deserializes a {@code LocalDateTime} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalDateTime} value
+   */
   public static LocalDateTime deserializeDateTime(byte[] bytes) {
     int year = Bytes.toInt(bytes, 0, SIZEOF_INT);
     int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);

@@ -461,6 +461,33 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     return list;
   }
+  /**
+   * Returns the wrapped List as {@code LocalDate}.
+   *
+   * @return {@code LocalDate} value
+   */
+  public LocalDate getDate() {
+    return DateTimeSerializer.deserializeDate(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalTime}.
+   *
+   * @return {@code LocalTime} value
+   */
+  public LocalTime getTime() {
+    return DateTimeSerializer.deserializeTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalDateTime}.
+   *
+   * @return {@code LocalDateTime} value
+   */
+  public LocalDateTime getDateTime() {
+    return DateTimeSerializer.deserializeDateTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));
+  }
 
   //----------------------------------------------------------------------------
   // Setter
@@ -639,6 +666,39 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     this.rawBytes = byteStream.toByteArray();
   }
+  /**
+   * Sets the wrapped value as {@code LocalDate} value.
+   *
+   * @param date value
+   */
+  public void setDate(LocalDate date) {
+    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
+    rawBytes[0] = TYPE_DATE;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalTime} value.
+   *
+   * @param time value
+   */
+  public void setTime(LocalTime time) {
+    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
+    rawBytes[0] = TYPE_TIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalDateTime} value.
+   *
+   * @param dateTime value
+   */
+  public void setDateTime(LocalDateTime dateTime) {
+    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
+    rawBytes[0] = TYPE_DATETIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
 
   //----------------------------------------------------------------------------
   // Util
@@ -806,39 +866,5 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     return getObject() != null ?
       getObject().toString() :
       GConstants.NULL_STRING;
-  }
-
-  public LocalDate getDate() {
-    return DateTimeSerializer.deserializeDate(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
-  }
-
-  public LocalTime getTime() {
-    return DateTimeSerializer.deserializeTime(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));  }
-
-  public LocalDateTime getDateTime() {
-    return DateTimeSerializer.deserializeDateTime(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));  }
-
-  public void setDate(LocalDate date) {
-    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
-    rawBytes[0] = TYPE_DATE;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
-  }
-
-  public void setTime(LocalTime time) {
-    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
-    rawBytes[0] = TYPE_TIME;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
-  }
-
-  public void setDateTime(LocalDateTime dateTime) {
-    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
-    rawBytes[0] = TYPE_DATETIME;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 }
