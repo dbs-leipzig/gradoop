@@ -45,6 +45,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +79,9 @@ public class GradoopTestUtils {
   public static final String KEY_8 = "key8";
   public static final String KEY_9 = "key9";
   public static final String KEY_a = "keya";
+  public static final String KEY_b = "keyb";
+  public static final String KEY_c = "keyc";
+  public static final String KEY_d = "keyd";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;
@@ -86,8 +92,11 @@ public class GradoopTestUtils {
   public static final String      STRING_VAL_6                      = "23";
   public static final BigDecimal  BIG_DECIMAL_VAL_7                 = new BigDecimal(23);
   public static final GradoopId   GRADOOP_ID_VAL_8                  = GradoopId.get();
-  public static final Map<PropertyValue, PropertyValue>  MAP_VAL_9  = new HashMap<>();
-  public static final List<PropertyValue> LIST_VAL_A                = new ArrayList<>();
+  public static final Map<PropertyValue, PropertyValue> MAP_VAL_9   = new HashMap<>();
+  public static final List<PropertyValue> LIST_VAL_a                = new ArrayList<>();
+  public static final LocalDate           DATE_VAL_b                = LocalDate.now();
+  public static final LocalTime           TIME_VAL_c                = LocalTime.now();
+  public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
@@ -101,16 +110,22 @@ public class GradoopTestUtils {
     MAP_VAL_9.put(PropertyValue.create(KEY_6), PropertyValue.create(STRING_VAL_6));
     MAP_VAL_9.put(PropertyValue.create(KEY_7), PropertyValue.create(BIG_DECIMAL_VAL_7));
     MAP_VAL_9.put(PropertyValue.create(KEY_8), PropertyValue.create(GRADOOP_ID_VAL_8));
+    MAP_VAL_9.put(PropertyValue.create(KEY_b), PropertyValue.create(DATE_VAL_b));
+    MAP_VAL_9.put(PropertyValue.create(KEY_c), PropertyValue.create(TIME_VAL_c));
+    MAP_VAL_9.put(PropertyValue.create(KEY_d), PropertyValue.create(DATETIME_VAL_d));
 
-    LIST_VAL_A.add(PropertyValue.create(NULL_VAL_0));
-    LIST_VAL_A.add(PropertyValue.create(BOOL_VAL_1));
-    LIST_VAL_A.add(PropertyValue.create(INT_VAL_2));
-    LIST_VAL_A.add(PropertyValue.create(LONG_VAL_3));
-    LIST_VAL_A.add(PropertyValue.create(FLOAT_VAL_4));
-    LIST_VAL_A.add(PropertyValue.create(DOUBLE_VAL_5));
-    LIST_VAL_A.add(PropertyValue.create(STRING_VAL_6));
-    LIST_VAL_A.add(PropertyValue.create(BIG_DECIMAL_VAL_7));
-    LIST_VAL_A.add(PropertyValue.create(GRADOOP_ID_VAL_8));
+    LIST_VAL_a.add(PropertyValue.create(NULL_VAL_0));
+    LIST_VAL_a.add(PropertyValue.create(BOOL_VAL_1));
+    LIST_VAL_a.add(PropertyValue.create(INT_VAL_2));
+    LIST_VAL_a.add(PropertyValue.create(LONG_VAL_3));
+    LIST_VAL_a.add(PropertyValue.create(FLOAT_VAL_4));
+    LIST_VAL_a.add(PropertyValue.create(DOUBLE_VAL_5));
+    LIST_VAL_a.add(PropertyValue.create(STRING_VAL_6));
+    LIST_VAL_a.add(PropertyValue.create(BIG_DECIMAL_VAL_7));
+    LIST_VAL_a.add(PropertyValue.create(GRADOOP_ID_VAL_8));
+    LIST_VAL_a.add(PropertyValue.create(DATE_VAL_b));
+    LIST_VAL_a.add(PropertyValue.create(TIME_VAL_c));
+    LIST_VAL_a.add(PropertyValue.create(DATETIME_VAL_d));
 
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
     SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
@@ -123,6 +138,10 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_7, BIG_DECIMAL_VAL_7);
     SUPPORTED_PROPERTIES.put(KEY_8, GRADOOP_ID_VAL_8);
     SUPPORTED_PROPERTIES.put(KEY_9, MAP_VAL_9);
+    SUPPORTED_PROPERTIES.put(KEY_b, DATE_VAL_b);
+    SUPPORTED_PROPERTIES.put(KEY_b, TIME_VAL_c);
+    SUPPORTED_PROPERTIES.put(KEY_d, DATETIME_VAL_d);
+
   }
 
   /**

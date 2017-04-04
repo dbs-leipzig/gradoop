@@ -33,6 +33,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -100,6 +104,19 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
    * {@code <property-type>} for {@link java.util.List}
    */
   private static final transient byte TYPE_LIST         = 0x0a;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_DATE         = 0x0b;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_TIME         = 0x0c;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_DATETIME     = 0x0d;
+
 
   /**
    * Value offset in byte
@@ -243,6 +260,30 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
    */
   public boolean isList() {
     return rawBytes[0] == TYPE_LIST;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalDate}.
+   *
+   * @return true, if {@code LocalDate} value
+   */
+  public boolean isDate() {
+    return rawBytes[0] == TYPE_DATE;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalTime}.
+   *
+   * @return true, if {@code LocalTime} value
+   */
+  public boolean isTime() {
+    return rawBytes[0] == TYPE_TIME;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalDateTime}.
+   *
+   * @return true, if {@code LocalDateTime} value
+   */
+  public boolean isDateTime() {
+    return rawBytes[0] == TYPE_DATETIME;
   }
 
   //----------------------------------------------------------------------------
@@ -451,6 +492,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       setMap((Map) value);
     } else if (value instanceof List) {
       setList((List) value);
+    } else if (value instanceof LocalDate) {
+      setDate((LocalDate) value);
+    } else if (value instanceof LocalTime) {
+      setTime((LocalTime) value);
+    } else if (value instanceof LocalDateTime) {
+      setDateTime((LocalDateTime) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -750,5 +797,38 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     return getObject() != null ?
       getObject().toString() :
       GConstants.NULL_STRING;
+  }
+
+  public LocalDate getDate() {
+    return date;
+  }
+
+  public LocalDate getTime() {
+    return time;
+  }
+
+  public LocalDateTime getDateTime() {
+    return dateTime;
+  }
+
+  public void setDate(LocalDate date) {
+    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
+    rawBytes[0] = TYPE_DATE;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+
+  public void setTime(LocalTime time) {
+    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
+    rawBytes[0] = TYPE_TIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+
+  public void setDateTime(LocalDateTime dateTime) {
+    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
+    rawBytes[0] = TYPE_DATETIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 }

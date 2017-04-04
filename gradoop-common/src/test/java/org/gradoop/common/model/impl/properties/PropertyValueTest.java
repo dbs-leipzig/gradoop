@@ -9,7 +9,6 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,9 +108,21 @@ public class PropertyValueTest {
     assertTrue(p.isMap());
     assertEquals(MAP_VAL_9, p.getMap());
     //List
-    p = create(LIST_VAL_A);
+    p = create(LIST_VAL_a);
     assertTrue(p.isList());
-    assertEquals(LIST_VAL_A, p.getList());
+    assertEquals(LIST_VAL_a, p.getList());
+    //Date
+    p = create(DATE_VAL_b);
+    assertTrue(p.isDate());
+    assertEquals(DATE_VAL_b, p.getDate());
+    //Time
+    p = create(TIME_VAL_c);
+    assertTrue(p.isTime());
+    assertEquals(DATE_VAL_b, p.getTime());
+    //DateTime
+    p = create(DATETIME_VAL_d);
+    assertTrue(p.isDateTime());
+    assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
   @Test
@@ -158,9 +169,9 @@ public class PropertyValueTest {
     assertTrue(p.isMap());
     assertEquals(MAP_VAL_9, p.getObject());
     // List
-    p.setObject(LIST_VAL_A);
+    p.setObject(LIST_VAL_a);
     assertTrue(p.isList());
-    assertEquals(LIST_VAL_A, p.getObject());
+    assertEquals(LIST_VAL_a, p.getObject());
   }
 
   @Test(expected = UnsupportedTypeException.class)
@@ -448,7 +459,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsList() throws Exception {
-    PropertyValue p = PropertyValue.create(LIST_VAL_A);
+    PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -464,15 +475,15 @@ public class PropertyValueTest {
 
   @Test
   public void testGetList() throws Exception {
-    PropertyValue p = PropertyValue.create(LIST_VAL_A);
-    assertEquals(LIST_VAL_A, p.getList());
+    PropertyValue p = PropertyValue.create(LIST_VAL_a);
+    assertEquals(LIST_VAL_a, p.getList());
   }
 
   @Test
   public void testSetList() throws Exception {
     PropertyValue p = new PropertyValue();
-    p.setList(LIST_VAL_A);
-    assertEquals(LIST_VAL_A, p.getList());
+    p.setList(LIST_VAL_a);
+    assertEquals(LIST_VAL_a, p.getList());
   }
 
   @Test
@@ -582,7 +593,7 @@ public class PropertyValueTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testCompareToWithList() {
-    create(LIST_VAL_A).compareTo(create(LIST_VAL_A));
+    create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
 
 
@@ -618,7 +629,7 @@ public class PropertyValueTest {
     p = create(MAP_VAL_9);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = create(LIST_VAL_A);
+    p = create(LIST_VAL_a);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
   /**
