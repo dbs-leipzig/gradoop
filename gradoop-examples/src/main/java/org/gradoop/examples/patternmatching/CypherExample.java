@@ -35,7 +35,7 @@ public class CypherExample {
   /**
    * Path to the data graph.
    */
-  static final String DATA_PATH = CypherExample.class.getResource("/data/json/sna").getPath();
+  static final String DATA_PATH = CypherExample.class.getResource("/data/json/sna").getFile();
   /**
    * Path to the data graph statistics (computed using {@link org.gradoop.utils.statistics.StatisticsRunner}
    */

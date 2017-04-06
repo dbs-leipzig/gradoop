@@ -45,7 +45,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       .getResource("/data/tlf/io_test.tlf").getFile();
 
     String tlfFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
+      .getResource("/data/tlf").getFile() + "/io_test_output";
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, config);
@@ -75,11 +75,11 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
 
     String tlfFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
+      .getResource("/data/tlf").getFile()+"/io_test_output";
 
     String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath()
-      .concat("/dictionaries/io_test_output_vertex_dictionary");
+      .getResource("/data/tlf").getFile()
+      + "/dictionaries/io_test_output_vertex_dictionary";
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, 
@@ -128,15 +128,15 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
 
     String tlfFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath().concat("/io_test_output");
+      .getResource("/data/tlf").getFile() + "/io_test_output";
 
     String tlfVertexDictionaryFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath()
-      .concat("/dictionaries/io_test_output_vertex_dictionary");
+      .getResource("/data/tlf").getFile()
+      + "/dictionaries/io_test_output_vertex_dictionary";
 
     String tlfEdgeDictionaryFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").toURI().getPath()
-      .concat("/dictionaries/io_test_output_edge_dictionary");
+      .getResource("/data/tlf").getFile() 
+      + "/dictionaries/io_test_output_edge_dictionary";
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport,

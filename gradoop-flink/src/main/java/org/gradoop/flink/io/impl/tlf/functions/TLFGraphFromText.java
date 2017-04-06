@@ -61,7 +61,7 @@ public class TLFGraphFromText
     do {
       currChar = graph.charAt(cursor);
       if (currChar == '\n') {
-        String[] fields = stringBuilder.toString().split(" ");
+        String[] fields = stringBuilder.toString().trim().split(" ");
         if (firstLine) {
           graphHead = new TLFGraphHead(Long.valueOf(fields[2]));
           firstLine = false;
