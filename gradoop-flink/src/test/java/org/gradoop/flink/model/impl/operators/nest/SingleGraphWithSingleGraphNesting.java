@@ -15,13 +15,12 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nesting;
+package org.gradoop.flink.model.impl.operators.nest;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctive;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("empty");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("empty")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("empty");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -46,7 +45,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("emptyVertex");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("empty")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("empty");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -58,7 +57,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("empty");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyVertex")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("emptyVertex");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -71,7 +70,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("graphWithA");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("emptyVertex")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("emptyVertex");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -84,7 +83,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("emptyVertex");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("singleInside")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("singleInside");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -97,7 +96,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("graphWithA");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("aGraphLabels")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("aGraphLabels");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -109,7 +108,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("empty");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("graphWithA")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("graphWithA");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -122,7 +121,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("emptyVertex");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("graphWithA")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("graphWithA");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -142,7 +141,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("graphWithA");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("aggregatedASource")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("aggregatedASource");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -158,7 +157,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("empty");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("ab_edgeWithAlpha");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -174,7 +173,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("emptyVertex");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithAlpha")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("ab_edgeWithAlpha");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -194,7 +193,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("ab_edgeWithAlpha2");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("fused_edgeWithAlpha")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("fused_edgeWithAlpha");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -211,7 +210,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("ab_edgeWithAlpha");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("fused_edgeWithAlpha")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("fused_edgeWithAlpha");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -237,7 +236,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("ab_edgeWithBeta");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("ab_edgeWithBeta_loop");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -253,7 +252,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("empty");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("ab_edgeWithBeta");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -270,7 +269,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("emptyVertex");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("ab_edgeWithBeta")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("ab_edgeWithBeta");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -285,7 +284,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("ab_edgeWithBeta");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("fused_edgeWithBeta")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("fused_edgeWithBeta");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -300,7 +299,7 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("abcdGraph");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("abdGraph")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("abdGraph");
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -337,9 +336,8 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("looplessPattern");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("firstmatch")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("firstmatch");
     collectAndAssertTrue(output.equalsByData(expected));
-    
   }
 
   @Test
@@ -375,9 +373,8 @@ public class SingleGraphWithSingleGraphNesting extends GradoopFlinkTestBase {
     GraphCollection patternGraph = loader.getGraphCollectionByVariables("looplessPattern");
     NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
     LogicalGraph output = f.execute(searchGraph, patternGraph);
-    LogicalGraph expected = ((loader.getLogicalGraphByVariable("thirdmatch")));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("thirdmatch");
     collectAndAssertTrue(output.equalsByData(expected));
-    
   }
 
   @Test

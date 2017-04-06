@@ -17,15 +17,19 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
+import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.Property;
 
 /**
  * Converts the vertex into a GraphHead
  */
-public class VertexToGraphHead implements JoinFunction<GradoopId, Vertex, GraphHead> {
+public class VertexToGraphHead implements CoGroupFunction<GradoopId, Vertex, GraphHead> {
 
   /**
    * Reusable element
@@ -39,7 +43,7 @@ public class VertexToGraphHead implements JoinFunction<GradoopId, Vertex, GraphH
     reusable = new GraphHead();
   }
 
-  @Override
+  /*@Override
   public GraphHead join(GradoopId first, Vertex second) throws Exception {
     reusable.setId(first);
     if (second != null) {
@@ -47,5 +51,24 @@ public class VertexToGraphHead implements JoinFunction<GradoopId, Vertex, GraphH
       reusable.setProperties(second.getProperties());
     }
     return reusable;
+  }*/
+
+  @Override
+  public void coGroup(Iterable<GradoopId> iterable, Iterable<Vertex> iterable1,
+    Collector<GraphHead> collector) throws Exception {
+    for (GradoopId first : iterable) {
+      reusable.setId(first);
+      for (Vertex v : iterable1) {
+        reusable.setLabel(v.getLabel());
+        Properties props = v.getProperties();
+        if (props != null) {
+          for (Property p : props) {
+            reusable.setProperty(p);
+          }
+        }
+      }
+      collector.collect(reusable);
+      break;
+    }
   }
 }

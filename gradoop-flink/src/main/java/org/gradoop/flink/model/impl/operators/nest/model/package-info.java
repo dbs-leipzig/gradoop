@@ -16,6 +16,6 @@
  */
 
 /**
- * Defining the nesting operator for the nested model
+ * Defining the nest operator for the nested model
  */
 package org.gradoop.flink.model.impl.operators.nest.model;

@@ -160,7 +160,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
 
   /**
    * If the current Exaplet represents a vertex, it returns…
-   * @return  if the vertex appears in a Graph Collection that is involved in the nesting operation
+   * @return  if the vertex appears in a Graph Collection that is involved in the nest operation
    */
   public boolean appearsInGraphCollection() {
     return !f2.equals(GradoopId.NULL_VALUE);

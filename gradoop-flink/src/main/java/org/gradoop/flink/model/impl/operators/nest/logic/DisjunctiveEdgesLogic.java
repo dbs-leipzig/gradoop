@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.operators;
+package org.gradoop.flink.model.impl.operators.nest.logic;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -119,9 +119,7 @@ public class DisjunctiveEdgesLogic extends BinaryOp<NestedResult, NestingIndex, 
    * @param ian       indexed information
    * @return          updated ground truth information
    */
-  public LogicalGraph updateFlatModel(LogicalGraph dataLake, NestedResult ian) {
-    DataSet<GradoopId> gh = ian.getGraphHeads();
-
+  public LogicalGraph updateFlattenedGraph(LogicalGraph dataLake, NestedResult ian) {
     // Create new edges in the dataLake
     DataSet<Edge> newlyCreatedEdges = dataLake.getEdges()
       // Associate each edge to each new edge where he has generated from
@@ -131,7 +129,7 @@ public class DisjunctiveEdgesLogic extends BinaryOp<NestedResult, NestingIndex, 
 
     // Updates the data lake with a new model
     return LogicalGraph.fromDataSets(dataLake.getGraphHead(),
-      dataLake.getVertices().union(gh.map(new MapGradoopIdAsVertex())),
+      dataLake.getVertices(),
       dataLake.getEdges().union(newlyCreatedEdges),
       dataLake.getConfig());
   }

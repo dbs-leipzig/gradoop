@@ -16,7 +16,7 @@
  */
 
 /**
- * An nesting operator is a binary operator: taking as a first input the graph that has to be
+ * An nest operator is a binary operator: taking as a first input the graph that has to be
  * nested and the graph collection containing the elements that will be nested, returns a graph
  * summarizing as a single vertex each set of vertices appearing in each element of the graph
  * collection

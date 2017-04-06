@@ -22,10 +22,10 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
-import org.gradoop.flink.model.impl.operators.nest.operators.DisjunctiveEdgesLogic;
+import org.gradoop.flink.model.impl.operators.nest.logic.DisjunctiveEdgesLogic;
 
 /**
- * Extends the nesting operation by adding the edges as in the Join Disjunctive Semantics
+ * Extends the nest operation by adding the edges as in the Join Disjunctive Semantics
  *
  * @see Nesting
  */
@@ -52,12 +52,26 @@ public class NestingWithDisjunctive extends Nesting {
     initialize(graph, collection);
 
     DisjunctiveEdgesLogic de = new DisjunctiveEdgesLogic(getGraphId());
-
-    de.setDataLake(getNormalizedRepresentation());
+    de.setFlattenedGraph(getNormalizedRepresentation());
 
     NestedResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
 
-    LogicalGraph updated = de.updateFlatModel(getNormalizedRepresentation(), iaf);
+    try {
+      if (!getNormalizedRepresentation().equalsByData(getNormalizedRepresentation()).collect().stream().min(Boolean::compareTo).get()) {
+        System.err.println("FAIL");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    LogicalGraph updated = de.updateFlattenedGraph(getNormalizedRepresentation(), iaf);
+    try {
+      if (!updated.equalsByData(updated).collect().stream().min(Boolean::compareTo).get()) {
+        System.err.println("FAIL");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     return toLogicalGraph(iaf, updated);
   }

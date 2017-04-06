@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the definition of the tuples required for the computation of the nesting operator
+ * Contains the definition of the tuples required for the computation of the nest operator
  */
 package org.gradoop.flink.model.impl.operators.nest.tuples;

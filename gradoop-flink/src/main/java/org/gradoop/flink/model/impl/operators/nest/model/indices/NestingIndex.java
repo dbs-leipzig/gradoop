@@ -43,7 +43,32 @@ public class NestingIndex {
   private DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge;
 
   /**
+   * Remembers each association between the current actual graph and its original one
+   */
+  private DataSet<Tuple2<GradoopId, GradoopId>> graphStack;
+
+  /**
    * Creating an instance of the graph database by just using the elements' ids
+   * @param graphHeads          The heads defining the component at the first level of annidation
+   * @param graphHeadToVertex   The vertices defining the components at the intermediately down
+   *                            level
+   * @param graphHeadToEdge     The edges appearing between each possible level
+   * @param graphStack          The association between each nested graph and the graph where it
+   *                            belongs
+   */
+  public NestingIndex(DataSet<GradoopId> graphHeads,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphStack) {
+    this.graphHeads = graphHeads;
+    this.graphHeadToVertex = graphHeadToVertex;
+    this.graphHeadToEdge = graphHeadToEdge;
+    this.graphStack = graphStack;
+  }
+
+  /**
+   * Creating an instance of the graph database by just using the elements' ids.
+   * The graph stack is empty (that is, a null element)
    * @param graphHeads          The heads defining the component at the first level of annidation
    * @param graphHeadToVertex   The vertices defining the components at the intermediately down
    *                            level
@@ -52,9 +77,7 @@ public class NestingIndex {
   public NestingIndex(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge) {
-    this.graphHeads = graphHeads;
-    this.graphHeadToVertex = graphHeadToVertex;
-    this.graphHeadToEdge = graphHeadToEdge;
+    this(graphHeads,graphHeadToVertex,graphHeadToEdge,null);
   }
 
   /**
@@ -79,6 +102,14 @@ public class NestingIndex {
    */
   public DataSet<Tuple2<GradoopId, GradoopId>> getGraphHeadToEdge() {
     return graphHeadToEdge;
+  }
+
+  /**
+   * Returns…
+   * @return  the association between a nested graph and the graph where it comes from
+   */
+  public DataSet<Tuple2<GradoopId, GradoopId>> getGraphStack() {
+    return graphStack;
   }
 
   /**

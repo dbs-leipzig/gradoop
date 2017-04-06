@@ -50,7 +50,7 @@ public abstract class Op<Left extends NestingIndex,
    * @return        The called object (this)
    * @param <X>     Returns this
    */
-  public <X extends Op> X setDataLake(LogicalGraph toSet) {
+  public <X extends Op> X setFlattenedGraph(LogicalGraph toSet) {
     this.mother = toSet;
     return (X) this;
   }

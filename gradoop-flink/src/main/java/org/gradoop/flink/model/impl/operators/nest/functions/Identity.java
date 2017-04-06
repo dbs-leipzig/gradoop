@@ -15,10 +15,17 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.operators.nest.functions;
+
+import org.apache.flink.api.java.functions.KeySelector;
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * An nesting operator is a binary operator: taking as a first input the graph that has to be
- * nested and the graph collection containing the elements that will be nested, returns a graph
- * summarizing as a single vertex each set of vertices appearing in each element of the graph
- * collection
+ * Uses the GradoopId element itself as a selection criterion
  */
-package org.gradoop.flink.model.impl.operators.nest.operators;
+public class Identity<K> implements KeySelector<K, K> {
+  @Override
+  public K getKey(K value) throws Exception {
+    return value;
+  }
+}

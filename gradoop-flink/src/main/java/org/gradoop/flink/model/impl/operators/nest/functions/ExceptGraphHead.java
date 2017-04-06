@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Filtering out all the pairs where the vertex is the one representing the
  * graph head, that is do not admit representation overlappings on the same
- * nesting level
+ * nest level
  */
 public class ExceptGraphHead implements FilterFunction<Tuple2<GradoopId, GradoopId>> {
   @Override
