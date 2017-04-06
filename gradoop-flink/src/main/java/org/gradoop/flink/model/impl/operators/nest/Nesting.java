@@ -44,7 +44,7 @@ public class Nesting extends NestingBase {
   /**
    * Defines the model where the elements are set
    */
-  private NestedModel model;
+  protected NestedModel model;
 
   /**
    * Left index mapping

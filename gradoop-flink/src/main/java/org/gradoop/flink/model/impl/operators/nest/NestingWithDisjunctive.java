@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
-import org.gradoop.flink.model.impl.operators.nest.logic.DisjunctiveEdgesLogic;
 
 /**
  * Extends the nest operation by adding the edges as in the Join Disjunctive Semantics
@@ -49,16 +48,14 @@ public class NestingWithDisjunctive extends Nesting {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph, GraphCollection collection) {
+    // Performs the base nesting operation
     initialize(graph, collection);
 
-    DisjunctiveEdgesLogic de = new DisjunctiveEdgesLogic(getGraphId());
-    de.setFlattenedGraph(getFlattenedGraph());
+    // Evaluates the disjunctive semantics
+    NestingResult iaf = model.disjunctiveSemantics(getIntermediateResult(),getCollectionIndex());
 
-    NestingResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
-
-    LogicalGraph updated = de.updateFlattenedGraph(getFlattenedGraph(), iaf);
-
-    return toLogicalGraph(iaf, updated);
+    // Returns the expected graph, which is the nested graph with the new edges
+    return toLogicalGraph(iaf, model.getFlattenedGraph());
   }
 
 }

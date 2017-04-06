@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.nest.model;
 
 import org.apache.flink.api.java.DataSet;
@@ -123,6 +140,13 @@ public class NestedModel {
     return previousResult;
   }
 
+  /**
+   * Implements the nesting operation for the nested model
+   * @param graphIndex        index for the search graph
+   * @param collectionIndex   index for the graph collection
+   * @param nestedGraphId     id to be associated to the new graph in the EPGM model
+   * @return                  The updated results associated to the new graph
+   */
   public NestingResult nesting(NestingIndex graphIndex, NestingIndex collectionIndex,
     GradoopId nestedGraphId) {
     // Associate each gid in hypervertices.H to the merged vertices
@@ -164,6 +188,12 @@ public class NestedModel {
     return previousResult;
   }
 
+  /**
+   * Determines the actual graph id in the EPGM model for the graph, here expressed as a
+   * computational result
+   * @param nestedGraph   Nested graph representation
+   * @return              GradoopId on the EPGM model
+   */
   public static DataSet<GradoopId> inferEPGMGraphHeadIdFromNestingResult(NestingResult
     nestedGraph) {
     return nestedGraph.getGraphStack()
@@ -173,7 +203,13 @@ public class NestedModel {
       .map(new Value0Of2<>());
   }
 
-  public NestingResult disjunctiveSemantics(NestingResult nested, NestingIndex hypervertices) {
+  /**
+   * Implements the disjunctive semantics fot the nested model
+   * @param nested          Nested graph
+   * @param collection      Collection over which evaluate the semantics
+   * @return                The updated indices for the resulting nested graph
+   */
+  public NestingResult disjunctiveSemantics(NestingResult nested, NestingIndex collection) {
 
     DataSet<Hexaplet> hexas = nested.getPreviousComputation();
     DataSet<GradoopId> gh = nested.getGraphHeads();
@@ -182,7 +218,7 @@ public class NestedModel {
     DataSet<Hexaplet> verticesPromotingEdgeUpdate = hexas.filter(new GetVerticesToBeNested());
 
     DataSet<Tuple2<GradoopId, GradoopId>> gids = nested.getGraphHeadToEdge()
-      .leftOuterJoin(hypervertices.getGraphHeadToEdge())
+      .leftOuterJoin(collection.getGraphHeadToEdge())
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new LeftSideIfRightNull<>());
 
@@ -197,7 +233,7 @@ public class NestedModel {
       .with(new CombineGraphBelongingInformation())
       .distinct(0)
       // (2) Mimicking the NotInGraphBroadcast
-      .leftOuterJoin(hypervertices.getGraphHeadToEdge())
+      .leftOuterJoin(collection.getGraphHeadToEdge())
       .where(new Hex4()).equalTo(new Value1Of2<>())
       .with(new QuadEdgeDifference());
 

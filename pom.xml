@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
     <version>0.3.0-SNAPSHOT</version>
-
+    
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
     <inceptionYear>2014</inceptionYear>
-
+    
     <licenses>
         <license>
             <name>GNU General Public License, Version 3</name>
             <url>https://www.gnu.org/licenses/gpl.txt</url>
         </license>
     </licenses>
-
+    
     <modules>
         <module>gradoop-common</module>
         <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
     </modules>
-
+    
     <developers>
         <developer>
-            <id>mjunghanns</resultGraphId>
+            <id>mjunghanns</id>
             <name>Martin Junghanns</name>
             <email>junghanns@informatik.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -36,7 +36,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>apetermann</resultGraphId>
+            <id>apetermann</id>
             <name>Andre Petermann</name>
             <email>petermann@informatik.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -44,7 +44,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>kgomez</resultGraphId>
+            <id>kgomez</id>
             <name>Kevin Gomez</name>
             <email>gomez@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -52,7 +52,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>nteichmann</resultGraphId>
+            <id>nteichmann</id>
             <name>Niklas Teichmann</name>
             <email>teichmann@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -60,7 +60,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>skemper</resultGraphId>
+            <id>skemper</id>
             <name>Stephan Kemper</name>
             <email>mai12byw@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -68,28 +68,28 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
     </developers>
-
+    
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
         <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
-
+        <tag>HEAD</tag>
+    </scm>
+    
     <distributionManagement>
         <repository>
-            <id>dbleipzig</resultGraphId>
+            <id>dbleipzig</id>
             <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
         </repository>
     </distributionManagement>
-
+    
     <properties>
         <top.dir>${project.basedir}</top.dir>
-
+        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.8</project.build.targetJdk>
-
+        
         <dep.flink.version>1.1.2</dep.flink.version>
         <dep.gdl.version>0.3.0-SNAPSHOT</dep.gdl.version>
         <dep.hbase.version>0.98.11-hadoop2</dep.hbase.version>
@@ -99,9 +99,9 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mongodb.version>3.3.0</dep.mongodb.version>
-
+        
         <log4j.properties>log4j-test.properties</log4j.properties>
-
+        
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.16</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
@@ -110,10 +110,10 @@
         <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
         <plugin.maven-shade.version>2.4.3</plugin.maven-shade.version>
     </properties>
-
+    
     <repositories>
         <repository>
-            <id>apache.snapshots</resultGraphId>
+            <id>apache.snapshots</id>
             <name>Apache Development Snapshot Repository</name>
             <url>https://repository.apache.org/content/repositories/snapshots/</url>
             <releases>
@@ -124,7 +124,7 @@
             </snapshots>
         </repository>
         <repository>
-            <id>dbleipzig</resultGraphId>
+            <id>dbleipzig</id>
             <name>Database Group Leipzig University</name>
             <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
             <releases>
@@ -135,7 +135,7 @@
             </snapshots>
         </repository>
     </repositories>
-
+    
     <build>
         <pluginManagement>
             <plugins>
@@ -234,30 +234,30 @@
             </plugins>
         </pluginManagement>
     </build>
-
+    
     <dependencyManagement>
         <dependencies>
             <!-- Compile dependencies -->
-
+            
             <!-- Gradoop -->
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-flink</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-examples</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -265,67 +265,67 @@
                 <version>${dep.flink.version}</version>
                 <scope>provided</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients_2.11</artifactId>
                 <version>${dep.flink.version}</version>
                 <scope>provided</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-gelly_2.11</artifactId>
                 <version>${dep.flink.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-hbase_2.11</artifactId>
                 <version>${dep.flink.version}</version>
             </dependency>
-
+            
             <!-- HBase -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-server</artifactId>
                 <version>${dep.hbase.version}</version>
             </dependency>
-
+            
             <!-- Others -->
             <dependency>
                 <groupId>org.s1ck</groupId>
                 <artifactId>gdl</artifactId>
                 <version>${dep.gdl.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>me.lemire.integercompression</groupId>
                 <artifactId>JavaFastPFOR</artifactId>
                 <version>${dep.javafastpfor.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
                 <version>${dep.jettison.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
                 <scope>provided</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${dep.mongodb.version}</version>
             </dependency>
-
+            
             <!-- Test dependencies -->
-
+            
             <!-- Gradoop -->
             <dependency>
                 <groupId>org.gradoop</groupId>
@@ -334,7 +334,7 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-flink</artifactId>
@@ -342,7 +342,7 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-examples</artifactId>
@@ -350,7 +350,7 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -358,7 +358,7 @@
                 <version>${dep.flink.version}</version>
                 <scope>test</scope>
             </dependency>
-
+            
             <!-- HBase -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -367,7 +367,7 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-server</artifactId>
@@ -375,7 +375,7 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            
             <!-- Others -->
             <dependency>
                 <groupId>junit</groupId>

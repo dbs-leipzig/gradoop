@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
@@ -27,7 +44,7 @@ import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Created by vasistas on 06/04/17.
+ * Basic operations
  */
 public abstract class NestingBase implements GraphGraphCollectionToGraphOperator,
   WithNestedResult<DataSet<Hexaplet>> {
@@ -160,15 +177,6 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
       .coGroup(flattenedGraph.getEdges())
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
-
-    /*try {
-      System.err.println("|IV| = " + self.getGraphHeadToVertex().count());
-      System.err.println("|FGV| = " + flattenedGraph.getVertices().count());
-      System.err.println("|FV| = " + vertices.count());
-      System.err.println("|H| = " + heads.count());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }*/
 
     return LogicalGraph.fromDataSets(heads, vertices, edges, flattenedGraph.getConfig());
   }
