@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -29,7 +31,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields("f0 -> f1")
 public class CollectEdges implements
-  FlatMapFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>> {
+  FlatMapFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>>,
+  FlatJoinFunction<Tuple2<GradoopId, GradoopId>, GradoopId, Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Reusable tuple to be returned
@@ -54,6 +57,15 @@ public class CollectEdges implements
     this.includeNotUpdatedEdges = includeNotUpdatedEdges;
   }
 
+  /**
+   * Default constructor
+   * @param includeNotUpdatedEdges  Checks if even the edges that are still the same have to
+   *                                be included or not
+   */
+  public CollectEdges(boolean includeNotUpdatedEdges) {
+    this(GradoopId.NULL_VALUE,includeNotUpdatedEdges);
+  }
+
   @Override
   public void flatMap(Tuple2<GradoopId, GradoopId> x,
     Collector<Tuple2<GradoopId, GradoopId>> out) throws Exception {
@@ -67,6 +79,14 @@ public class CollectEdges implements
     if (includeNotUpdatedEdges || (!x.f0.equals(GradoopId.NULL_VALUE))) {
       out.collect(reusable);
     }
+  }
+
+
+  @Override
+  public void join(Tuple2<GradoopId, GradoopId> gradoopIdGradoopIdTuple2, GradoopId gradoopId,
+    Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
+    reusable.f0 = gradoopId;
+    flatMap(gradoopIdGradoopIdTuple2,collector);
   }
 }
 

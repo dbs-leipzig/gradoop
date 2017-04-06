@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.logic.DisjunctiveEdgesLogic;
 
 /**
@@ -54,7 +54,7 @@ public class NestingWithDisjunctive extends Nesting {
     DisjunctiveEdgesLogic de = new DisjunctiveEdgesLogic(getGraphId());
     de.setFlattenedGraph(getFlattenedGraph());
 
-    NestedResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
+    NestingResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
 
     LogicalGraph updated = de.updateFlattenedGraph(getFlattenedGraph(), iaf);
 

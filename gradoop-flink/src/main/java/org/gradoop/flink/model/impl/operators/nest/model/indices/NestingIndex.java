@@ -133,7 +133,7 @@ public class NestingIndex {
 
   /**
    * Updates the existing stack with the information about the new graph
-   * @param stacks
+   * @param stacks new stack element to be added
    */
   public void updateStackWith(DataSet<Tuple2<GradoopId, GradoopId>> stacks) {
     if (graphStack == null) {
@@ -141,5 +141,13 @@ public class NestingIndex {
     } else {
       graphStack = graphStack.union(stacks);
     }
+  }
+
+  /**
+   * Updates the current edges with the new elements
+   * @param edges New edges to be added
+   */
+  public void incrementallyUpdateEdges(DataSet<Tuple2<GradoopId, GradoopId>> edges) {
+    graphHeadToEdge = graphHeadToEdge.union(edges);
   }
 }

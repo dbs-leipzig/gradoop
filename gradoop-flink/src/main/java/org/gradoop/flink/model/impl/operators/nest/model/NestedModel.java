@@ -9,14 +9,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
-import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
-import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
-import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
+import org.gradoop.flink.model.impl.operators.nest.functions.*;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
@@ -34,6 +32,11 @@ public class NestedModel {
    * Nested representation induced by the nesting functions
    */
   private NestingIndex nestedRepresentation;
+
+  /**
+   * Nesting result of the previous nest operation
+   */
+  private NestingResult previousResult;
 
   /**
    * Implements the nested model using the most generic components
@@ -112,7 +115,15 @@ public class NestedModel {
     return generateNestedModelFromOperands(graph, collection, graphIndex, collectionIndex);
   }
 
-  public NestedResult nesting(NestingIndex graphIndex, NestingIndex collectionIndex,
+  /**
+   * Returns…
+   * @return the previous nesting operation result
+   */
+  public NestingResult getPreviousResult() {
+    return previousResult;
+  }
+
+  public NestingResult nesting(NestingIndex graphIndex, NestingIndex collectionIndex,
     GradoopId nestedGraphId) {
     // Associate each gid in hypervertices.H to the merged vertices
     DataSet<GradoopId> heads = graphIndex.getGraphHeads();
@@ -148,7 +159,85 @@ public class NestedModel {
     DataSet<Tuple2<GradoopId, GradoopId>> edges = heads
       .crossWithHuge(tmpEdges);
 
-    return new NestedResult(heads, vertices, edges, nestedResult, newStackElement);
+    previousResult = new NestingResult(heads, vertices, edges, nestedResult, newStackElement);
+
+    return previousResult;
+  }
+
+  public static DataSet<GradoopId> inferEPGMGraphHeadIdFromNestingResult(NestingResult
+    nestedGraph) {
+    return nestedGraph.getGraphStack()
+      .joinWithTiny(nestedGraph.getGraphHeads())
+      .where(new Value1Of2<>()).equalTo(new Identity<>())
+      .with(new LeftSide<>())
+      .map(new Value0Of2<>());
+  }
+
+  public NestingResult disjunctiveSemantics(NestingResult nested, NestingIndex hypervertices) {
+
+    DataSet<Hexaplet> hexas = nested.getPreviousComputation();
+    DataSet<GradoopId> gh = nested.getGraphHeads();
+
+    // The vertices appearing in a nested graph are the ones that induce the to-be-updated edges.
+    DataSet<Hexaplet> verticesPromotingEdgeUpdate = hexas.filter(new GetVerticesToBeNested());
+
+    DataSet<Tuple2<GradoopId, GradoopId>> gids = nested.getGraphHeadToEdge()
+      .leftOuterJoin(hypervertices.getGraphHeadToEdge())
+      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
+      .with(new LeftSideIfRightNull<>());
+
+    // Edges to return and update are the ones that do not appear in the collection
+    // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)
+    DataSet<Hexaplet> edgesToUpdateOrReturn = flattenedGraph.getEdges()
+      // Each edge is associated to each possible graph
+      .map(new AsQuadsMatchingSource())
+      // (1) Now, we want to select the edge information only for the graphs in gU
+      .joinWithTiny(gids)
+      .where(new Hex0()).equalTo(new Value1Of2<>())
+      .with(new CombineGraphBelongingInformation())
+      .distinct(0)
+      // (2) Mimicking the NotInGraphBroadcast
+      .leftOuterJoin(hypervertices.getGraphHeadToEdge())
+      .where(new Hex4()).equalTo(new Value1Of2<>())
+      .with(new QuadEdgeDifference());
+
+    // I have to only add the edges that are matched and updated
+    // TODO       JOIN COUNT: (2)
+    DataSet<Hexaplet> updatedEdges = edgesToUpdateOrReturn
+      // Update the vertices' source
+      .leftOuterJoin(verticesPromotingEdgeUpdate)
+      .where(new HexMatch()).equalTo(new HexMatch())
+      .with(new UpdateEdgeSource(true))
+      // Now start the match with the targets
+      .map(new DoQuadMatchTarget())
+      .leftOuterJoin(verticesPromotingEdgeUpdate)
+      .where(new HexMatch()).equalTo(new HexMatch())
+      .with(new UpdateEdgeSource(false));
+
+    // Edges to be set within the NestedIndexing
+    DataSet<Tuple2<GradoopId, GradoopId>> edges = updatedEdges
+      .map(new CollectEdgesPreliminary())
+      .joinWithTiny(inferEPGMGraphHeadIdFromNestingResult(nested))
+      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
+      .with(new CollectEdges(true));
+
+    nestedRepresentation.incrementallyUpdateEdges(edges);
+    previousResult = new NestingResult(gh, nested.getGraphHeadToVertex(), edges, updatedEdges,
+      nested.getGraphStack());
+
+    DataSet<Edge> newlyCreatedEdges = flattenedGraph.getEdges()
+      // Associate each edge to each new edge where he has generated from
+      .coGroup(previousResult.getPreviousComputation())
+      .where(new Id<>()).equalTo(new Hex0())
+      .with(new DuplicateEdgeInformations());
+
+    // Updates the data lake with a new model
+    flattenedGraph = LogicalGraph.fromDataSets(flattenedGraph.getGraphHead(),
+      flattenedGraph.getVertices(),
+      flattenedGraph.getEdges().union(newlyCreatedEdges),
+      flattenedGraph.getConfig());
+
+    return previousResult;
   }
 
 }
