@@ -39,15 +39,14 @@ import org.gradoop.flink.model.impl.operators.nest.functions.Hex0;
 import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
 import org.gradoop.flink.model.impl.operators.nest.functions.HexMatch;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingAfterNesting;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 
 /**
  * Establishing the edges using the operands
  */
-public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestingIndex, IndexingAfterNesting> {
+public class DisjunctiveEdgesLogic extends BinaryOp<NestedResult, NestingIndex, NestedResult> {
 
   /**
    * GraphId to be associated to the graph that is going to be returned by this operator
@@ -58,13 +57,13 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestingInd
    * Constructor for specifying the to-be-returned graph's head
    * @param newGraphId                  the aforementioned id
    */
-  public DisjunctiveEdges(GradoopId newGraphId) {
+  public DisjunctiveEdgesLogic(GradoopId newGraphId) {
     this.newGraphId = newGraphId;
   }
 
   @Override
-  protected IndexingAfterNesting runWithArgAndLake(LogicalGraph dataLake,
-    IndexingBeforeNesting nested,
+  protected NestedResult runWithArgAndLake(LogicalGraph dataLake,
+    NestedResult nested,
     NestingIndex hypervertices) {
 
     DataSet<Hexaplet> hexas = nested.getPreviousComputation();
@@ -111,7 +110,7 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestingInd
       .map(new CollectEdgesPreliminary())
       .flatMap(new CollectEdges(newGraphId, true));
 
-    return new IndexingAfterNesting(gh, nested.getGraphHeadToVertex(), edges, updatedEdges);
+    return new NestedResult(gh, nested.getGraphHeadToVertex(), edges, updatedEdges);
   }
 
   /**
@@ -120,7 +119,7 @@ public class DisjunctiveEdges extends BinaryOp<IndexingBeforeNesting, NestingInd
    * @param ian       indexed information
    * @return          updated ground truth information
    */
-  public LogicalGraph updateFlatModel(LogicalGraph dataLake, IndexingAfterNesting ian) {
+  public LogicalGraph updateFlatModel(LogicalGraph dataLake, NestedResult ian) {
     DataSet<GradoopId> gh = ian.getGraphHeads();
 
     // Create new edges in the dataLake

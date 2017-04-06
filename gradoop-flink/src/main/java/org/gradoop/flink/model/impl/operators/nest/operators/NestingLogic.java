@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -34,10 +34,10 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  * Different edge semantics could be adopted later on. Those semantics must support the
  * IndexingForNesting format.
  */
-public class NestingLogic extends BinaryOp<NestingIndex, NestingIndex, IndexingBeforeNesting> {
+public class NestingLogic extends BinaryOp<NestingIndex, NestingIndex, NestedResult> {
 
   @Override
-  protected IndexingBeforeNesting runWithArgAndLake(LogicalGraph dataLake, NestingIndex gU,
+  protected NestedResult runWithArgAndLake(LogicalGraph dataLake, NestingIndex gU,
     NestingIndex hypervertices) {
 
     DataSet<GradoopId> gh = gU.getGraphHeads();
@@ -66,7 +66,7 @@ public class NestingLogic extends BinaryOp<NestingIndex, NestingIndex, IndexingB
     DataSet<Tuple2<GradoopId, GradoopId>> edges = gh
       .crossWithHuge(tmpEdges);
 
-    return new IndexingBeforeNesting(gh, vertices, edges, hexas);
+    return new NestedResult(gh, vertices, edges, hexas);
   }
 
   @Override

@@ -27,10 +27,9 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.operators.NestingLogic;
-import org.gradoop.flink.model.impl.operators.nest.transformations.NestedIndexingToEPGMTransformations;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
@@ -65,7 +64,7 @@ public class Nesting extends NestingBase {
   /**
    * Intermediate indexing result
    */
-  private IndexingBeforeNesting intermediateResult;
+  private NestedResult intermediateResult;
 
   /**
    * Setting the outcome of the previous computation
@@ -107,7 +106,7 @@ public class Nesting extends NestingBase {
     collectionIndex = createIndex(collection);
 
     // At this step the FlatModel is never used, since I only change the index representation
-    intermediateResult = nesting.with(graphIndex, collectionIndex);
+    intermediateResult = nesting.execute(graphIndex, collectionIndex);
     previousComputation = intermediateResult.getPreviousComputation();
   }
 
@@ -137,7 +136,7 @@ public class Nesting extends NestingBase {
    * @return the intermediate indexing result, that could be used a next time for
    * updating the edges
    */
-  public IndexingBeforeNesting getIntermediateResult() {
+  public NestedResult getIntermediateResult() {
     return intermediateResult;
   }
 
@@ -171,7 +170,7 @@ public class Nesting extends NestingBase {
     initialize(graph, collection);
 
     // Converting the result to the standard EPGM model
-    return NestedIndexingToEPGMTransformations.toLogicalGraph(intermediateResult, flattenedGraph);
+    return toLogicalGraph(intermediateResult, flattenedGraph);
   }
 
   @Override

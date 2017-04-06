@@ -4,16 +4,21 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateElementToIdAndGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.ExceptGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
+import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -71,6 +76,70 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
       .filter(new ExceptGraphHead());
 
     return new NestingIndex(h, graphHeadToVertex, graphHeadToEdge);
+  }
+
+  /**
+   * Converts the NestedIndexing information into a GraphCollection by using the ground truth
+   * information
+   * @param self            Indexed representation of the data
+   * @param flattenedGraph  ground truth containing all the informations
+   * @return                EPGM representation
+   */
+  public static GraphCollection toGraphCollection(NestingIndex self,
+    LogicalGraph flattenedGraph) {
+
+    DataSet<Vertex> vertices = self.getGraphHeadToVertex()
+      .coGroup(flattenedGraph.getVertices())
+      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .with(new UpdateVertices());
+
+    DataSet<Edge> edges = self.getGraphHeadToEdge()
+      .coGroup(flattenedGraph.getEdges())
+      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .with(new UpdateEdges());
+
+    DataSet<GraphHead> heads = getActualGraphHeads(self, flattenedGraph);
+
+    return GraphCollection.fromDataSets(heads, vertices, edges, flattenedGraph.getConfig());
+  }
+
+  /**
+   * Converts the NestedIndexing information into a LogicalGraph by using the ground truth
+   * information
+   * @param self      Indexed representation of the data
+   * @param flattenedGraph  ground truth containing all the informations
+   * @return          EPGM representation
+   */
+  public static LogicalGraph toLogicalGraph(NestingIndex self,
+    LogicalGraph flattenedGraph) {
+
+    DataSet<Vertex> vertices = self.getGraphHeadToVertex()
+      .coGroup(flattenedGraph.getVertices())
+      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .with(new UpdateVertices());
+
+    DataSet<Edge> edges = self.getGraphHeadToEdge()
+      .coGroup(flattenedGraph.getEdges())
+      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .with(new UpdateEdges());
+
+    DataSet<GraphHead> heads = getActualGraphHeads(self, flattenedGraph);
+
+    return LogicalGraph.fromDataSets(heads, vertices, edges, flattenedGraph.getConfig());
+  }
+
+  /**
+   * Instantiates the GraphHeads using the LogicalGraph as a primary source
+   * @param self      ground truth for elements
+   * @param flattenedGraph  primary source
+   * @return          GraphHeads
+   */
+  private static DataSet<GraphHead> getActualGraphHeads(NestingIndex self,
+    LogicalGraph flattenedGraph) {
+    return self.getGraphHeads()
+      .join(flattenedGraph.getVertices())
+      .where(new SelfId()).equalTo(new Id<>())
+      .with(new VertexToGraphHead());
   }
 
   @Override

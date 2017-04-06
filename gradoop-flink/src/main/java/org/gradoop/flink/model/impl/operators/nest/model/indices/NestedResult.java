@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
  * reused in further operations. This information is preserved as Hexaplets, that is the
  * matching between the vertices.
  */
-public class IndexingAfterNesting extends NestingIndex implements
+public class NestedResult extends NestingIndex implements
   WithNestedResult<DataSet<Hexaplet>> {
 
   /**
@@ -42,9 +42,9 @@ public class IndexingAfterNesting extends NestingIndex implements
    * @param graphHeadToVertex The vertices defining the components at the intermediately down
    *                          level
    * @param graphHeadToEdge   The edges appearing between each possible level
-   * @param state             Providing the previous computation state.
+   * @param state             Describing the previous computation step
    */
-  public IndexingAfterNesting(DataSet<GradoopId> graphHeads,
+  public NestedResult(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge,
     DataSet<Hexaplet> state) {

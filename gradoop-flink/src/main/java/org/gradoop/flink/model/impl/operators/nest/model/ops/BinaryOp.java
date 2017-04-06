@@ -40,7 +40,7 @@ public abstract class BinaryOp<Left extends NestingIndex,
    * @return        Result as a graph with just ids. The DataLake, representing the computation
    *                state, is updated with either new vertices or new edges
    */
-  public Res with(Left left, Right right) {
+  public Res execute(Left left, Right right) {
     return runWithArgAndLake(mother, left, right);
   }
 

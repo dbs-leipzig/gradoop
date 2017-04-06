@@ -21,10 +21,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingAfterNesting;
-import org.gradoop.flink.model.impl.operators.nest.operators.DisjunctiveEdges;
-import org.gradoop.flink.model.impl.operators.nest.transformations
-  .NestedIndexingToEPGMTransformations;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
+import org.gradoop.flink.model.impl.operators.nest.operators.DisjunctiveEdgesLogic;
 
 /**
  * Extends the nesting operation by adding the edges as in the Join Disjunctive Semantics
@@ -53,15 +51,15 @@ public class NestingWithDisjunctive extends Nesting {
   public LogicalGraph execute(LogicalGraph graph, GraphCollection collection) {
     initialize(graph, collection);
 
-    DisjunctiveEdges de = new DisjunctiveEdges(getGraphId());
+    DisjunctiveEdgesLogic de = new DisjunctiveEdgesLogic(getGraphId());
 
     de.setDataLake(getNormalizedRepresentation());
 
-    IndexingAfterNesting iaf = de.with(getIntermediateResult(), getCollectionIndex());
+    NestedResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
 
     LogicalGraph updated = de.updateFlatModel(getNormalizedRepresentation(), iaf);
 
-    return NestedIndexingToEPGMTransformations.toLogicalGraph(iaf, updated);
+    return toLogicalGraph(iaf, updated);
   }
 
 }
