@@ -47,8 +47,9 @@ public class NestedResult extends NestingIndex implements
   public NestedResult(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge,
-    DataSet<Hexaplet> state) {
-    super(graphHeads, graphHeadToVertex, graphHeadToEdge);
+    DataSet<Hexaplet> state,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphStack) {
+    super(graphHeads, graphHeadToVertex, graphHeadToEdge, graphStack);
     this.state = state;
   }
 

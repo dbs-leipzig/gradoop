@@ -14,9 +14,11 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateElementToIdAndGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.ExceptGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.Identity;
+import org.gradoop.flink.model.impl.operators.nest.functions.ReplaceHeadId;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
@@ -145,17 +147,19 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
    * @return          EPGM representation
    */
   public static LogicalGraph toLogicalGraph(NestingIndex self, LogicalGraph flattenedGraph) {
+    DataSet<GraphHead> heads = getActualGraphHeads(self, flattenedGraph);
+
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
       .coGroup(flattenedGraph.getVertices())
       .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new UpdateVertices());
+      .with(new UpdateVertices())
+      .crossWithTiny(self.getGraphStack())
+      .with(new AddElementToGraph<>());
 
     DataSet<Edge> edges = self.getGraphHeadToEdge()
       .coGroup(flattenedGraph.getEdges())
       .where(new Value1Of2<>()).equalTo(new Id<>())
       .with(new UpdateEdges());
-
-    DataSet<GraphHead> heads = getActualGraphHeads(self, flattenedGraph);
 
     /*try {
       System.err.println("|IV| = " + self.getGraphHeadToVertex().count());
@@ -180,7 +184,10 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     return self.getGraphHeads()
       .coGroup(flattenedGraph.getVertices())
       .where(new Identity<>()).equalTo(new Id<>())
-      .with(new VertexToGraphHead());
+      .with(new VertexToGraphHead())
+      .join(self.getGraphStack())
+      .where(new Id<>()).equalTo(new Value1Of2<>())
+      .with(new ReplaceHeadId());
   }
 
   @Override

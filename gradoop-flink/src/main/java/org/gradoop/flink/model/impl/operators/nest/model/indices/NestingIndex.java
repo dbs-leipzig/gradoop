@@ -133,16 +133,13 @@ public class NestingIndex {
 
   /**
    * Updates the existing stack with the information about the new graph
-   * @param heads
-   * @param nestedGraphId
+   * @param stacks
    */
-  public void updateStackWith(DataSet<GradoopId> heads, GradoopId nestedGraphId) {
-    DataSet<Tuple2<GradoopId, GradoopId>> newStackElement = heads
-      .map(new ToTuple2WithF0(nestedGraphId));
+  public void updateStackWith(DataSet<Tuple2<GradoopId, GradoopId>> stacks) {
     if (graphStack == null) {
-      graphStack = newStackElement;
+      graphStack = stacks;
     } else {
-      graphStack = graphStack.union(newStackElement);
+      graphStack = graphStack.union(stacks);
     }
   }
 }

@@ -110,7 +110,7 @@ public class DisjunctiveEdgesLogic extends BinaryOp<NestedResult, NestingIndex, 
       .map(new CollectEdgesPreliminary())
       .flatMap(new CollectEdges(newGraphId, true));
 
-    return new NestedResult(gh, nested.getGraphHeadToVertex(), edges, updatedEdges);
+    return new NestedResult(gh, nested.getGraphHeadToVertex(), edges, updatedEdges, nested.getGraphStack());
   }
 
   /**

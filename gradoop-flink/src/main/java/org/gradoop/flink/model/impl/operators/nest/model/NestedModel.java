@@ -15,6 +15,7 @@ import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
+import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -116,8 +117,11 @@ public class NestedModel {
     // Associate each gid in hypervertices.H to the merged vertices
     DataSet<GradoopId> heads = graphIndex.getGraphHeads();
 
+    DataSet<Tuple2<GradoopId, GradoopId>> newStackElement = heads
+      .map(new ToTuple2WithF0(nestedGraphId));
+
     // Creates a new element to the stack
-    nestedRepresentation.updateStackWith(heads, nestedGraphId);
+    nestedRepresentation.updateStackWith(newStackElement);
 
     // Mark each vertex if either it's present or not in the final match
     // TODO       JOIN COUNT: (1)
@@ -144,7 +148,7 @@ public class NestedModel {
     DataSet<Tuple2<GradoopId, GradoopId>> edges = heads
       .crossWithHuge(tmpEdges);
 
-    return new NestedResult(heads, vertices, edges, nestedResult);
+    return new NestedResult(heads, vertices, edges, nestedResult, newStackElement);
   }
 
 }
