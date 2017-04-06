@@ -19,15 +19,10 @@ package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.logic.NestedModelOperations;
+import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -47,9 +42,9 @@ public class Nesting extends NestingBase {
   private final GradoopId graphId;
 
   /**
-   * Using the FlatModel if we have a chain of different operations to be optimized
+   * Defines the model where the elements are set
    */
-  private LogicalGraph flattenedGraph;
+  private NestedModel model;
 
   /**
    * Left index mapping
@@ -75,12 +70,22 @@ public class Nesting extends NestingBase {
   }
 
   /**
-   * A default id is associated to the graph
+   * A default id is associated to the graph. No Graph Nestedmodel is set
    * @param graphId Id to be associated to the new graph
    */
   public Nesting(GradoopId graphId) {
     this.graphId = graphId;
-    this.flattenedGraph = null;
+    this.model = null;
+  }
+
+  /**
+   * A default id is associated to the graph. No Graph Nestedmodel is set
+   * @param graphId Id to be associated to the new graph
+   * @param model   Model representing the nesting information
+   */
+  public Nesting(GradoopId graphId, NestedModel model) {
+    this.graphId = graphId;
+    this.model = model;
   }
 
   /**
@@ -93,32 +98,17 @@ public class Nesting extends NestingBase {
      * Creating the flat model containing the information of everything that happens, from the
      * graph operand to the graph collection
      */
-    if (flattenedGraph == null) {
-      DataSet<GraphHead> heads = graph.getGraphHead()
-        .union(collection.getGraphHeads())
-        .distinct(new Id<>());
+    if (model == null) {
+      // Extracting the indexing structures for both graphs
+      graphIndex = createIndex(graph);
+      collectionIndex = createIndex(collection);
 
-      DataSet<Vertex> nestedVertices = heads
-        .map(new GraphHeadToVertex());
-
-      DataSet<Vertex> vertices = graph.getVertices()
-        .union(collection.getVertices())
-        .union(nestedVertices)
-        .distinct(new Id<>());
-
-      DataSet<Edge> edges = graph.getEdges()
-        .union(collection.getEdges())
-        .distinct(new Id<>());
-
-      // Getting the model for defining the associated model
-      flattenedGraph = LogicalGraph.fromDataSets(heads, vertices, edges, graph.getConfig());
+      model = NestedModel.generateNestedModelFromOperands
+        (graph, collection, graphIndex, collectionIndex);
     }
-    // Extracting the indexing structures for both graphs
-    graphIndex = createIndex(graph);
-    collectionIndex = createIndex(collection);
 
     // At this step the FlatModel is never used, since I only change the index representation
-    intermediateResult = NestedModelOperations.nesting(graphIndex, collectionIndex);
+    intermediateResult = model.nesting(graphIndex, collectionIndex, graphId);
   }
 
 
@@ -153,8 +143,8 @@ public class Nesting extends NestingBase {
    * @return the normalized graph containing the information for the whole graphs
    * within the graph
    */
-  public LogicalGraph getNormalizedRepresentation() {
-    return flattenedGraph;
+  public LogicalGraph getFlattenedGraph() {
+    return model.getFlattenedGraph();
   }
 
   @Override
@@ -162,7 +152,7 @@ public class Nesting extends NestingBase {
     initialize(graph, collection);
 
     // Converting the result to the standard EPGM model
-    return toLogicalGraph(intermediateResult, flattenedGraph);
+    return toLogicalGraph(intermediateResult, model.getFlattenedGraph());
   }
 
   @Override

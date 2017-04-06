@@ -52,26 +52,11 @@ public class NestingWithDisjunctive extends Nesting {
     initialize(graph, collection);
 
     DisjunctiveEdgesLogic de = new DisjunctiveEdgesLogic(getGraphId());
-    de.setFlattenedGraph(getNormalizedRepresentation());
+    de.setFlattenedGraph(getFlattenedGraph());
 
     NestedResult iaf = de.execute(getIntermediateResult(), getCollectionIndex());
 
-    try {
-      if (!getNormalizedRepresentation().equalsByData(getNormalizedRepresentation()).collect().stream().min(Boolean::compareTo).get()) {
-        System.err.println("FAIL");
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    LogicalGraph updated = de.updateFlattenedGraph(getNormalizedRepresentation(), iaf);
-    try {
-      if (!updated.equalsByData(updated).collect().stream().min(Boolean::compareTo).get()) {
-        System.err.println("FAIL");
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    LogicalGraph updated = de.updateFlattenedGraph(getFlattenedGraph(), iaf);
 
     return toLogicalGraph(iaf, updated);
   }
