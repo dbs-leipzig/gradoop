@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * A NestedIndexing defines a graph collection only by using the graph id elements (and hence,
  * reducing the exchanged data volume)
  */
-public class NestedIndexing {
+public class NestingIndex {
 
   /**
    * Ids corresponding to the graph heads
@@ -49,7 +49,7 @@ public class NestedIndexing {
    *                            level
    * @param graphHeadToEdge     The edges appearing between each possible level
    */
-  public NestedIndexing(DataSet<GradoopId> graphHeads,
+  public NestingIndex(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge) {
     this.graphHeads = graphHeads;

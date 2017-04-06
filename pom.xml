@@ -28,7 +28,7 @@
 
     <developers>
         <developer>
-            <id>mjunghanns</id>
+            <id>mjunghanns</resultGraphId>
             <name>Martin Junghanns</name>
             <email>junghanns@informatik.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -36,7 +36,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>apetermann</id>
+            <id>apetermann</resultGraphId>
             <name>Andre Petermann</name>
             <email>petermann@informatik.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -44,7 +44,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>kgomez</id>
+            <id>kgomez</resultGraphId>
             <name>Kevin Gomez</name>
             <email>gomez@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -52,7 +52,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>nteichmann</id>
+            <id>nteichmann</resultGraphId>
             <name>Niklas Teichmann</name>
             <email>teichmann@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -60,7 +60,7 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>skemper</id>
+            <id>skemper</resultGraphId>
             <name>Stephan Kemper</name>
             <email>mai12byw@studserv.uni-leipzig.de</email>
             <timezone>+1</timezone>
@@ -78,7 +78,7 @@
 
     <distributionManagement>
         <repository>
-            <id>dbleipzig</id>
+            <id>dbleipzig</resultGraphId>
             <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
         </repository>
     </distributionManagement>
@@ -113,7 +113,7 @@
 
     <repositories>
         <repository>
-            <id>apache.snapshots</id>
+            <id>apache.snapshots</resultGraphId>
             <name>Apache Development Snapshot Repository</name>
             <url>https://repository.apache.org/content/repositories/snapshots/</url>
             <releases>
@@ -124,7 +124,7 @@
             </snapshots>
         </repository>
         <repository>
-            <id>dbleipzig</id>
+            <id>dbleipzig</resultGraphId>
             <name>Database Group Leipzig University</name>
             <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
             <releases>

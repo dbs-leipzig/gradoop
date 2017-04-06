@@ -19,13 +19,13 @@ package org.gradoop.flink.model.impl.operators.nest.operators;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.ops.BinaryOp;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
@@ -34,11 +34,11 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  * Different edge semantics could be adopted later on. Those semantics must support the
  * IndexingForNesting format.
  */
-public class NestingWithNestedModel extends BinaryOp<NestedIndexing, NestedIndexing, IndexingBeforeNesting> {
+public class NestingLogic extends BinaryOp<NestingIndex, NestingIndex, IndexingBeforeNesting> {
 
   @Override
-  protected IndexingBeforeNesting runWithArgAndLake(NormalizedGraph dataLake, NestedIndexing gU,
-    NestedIndexing hypervertices) {
+  protected IndexingBeforeNesting runWithArgAndLake(LogicalGraph dataLake, NestingIndex gU,
+    NestingIndex hypervertices) {
 
     DataSet<GradoopId> gh = gU.getGraphHeads();
     // Associate each gid in hypervertices.H to the merged vertices

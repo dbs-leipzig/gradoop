@@ -22,7 +22,7 @@ package org.gradoop.flink.model.impl.operators.nest.model;
  *
  * @param <T> Representation of the previous state
  */
-public interface VertexCentricResult<T> {
+public interface WithNestedResult<T> {
 
   /**
    * Retrieves…

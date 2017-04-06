@@ -25,13 +25,12 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadAsVertex;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.SelfId;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 
 /**
  * Utility functions transforming NestedIndexing into EPGM model
@@ -45,8 +44,8 @@ public class NestedIndexingToEPGMTransformations {
    * @param dataLake  ground truth containing all the informations
    * @return          EPGM representation
    */
-  public static GraphCollection toGraphCollection(NestedIndexing self,
-    NormalizedGraph dataLake) {
+  public static GraphCollection toGraphCollection(NestingIndex self,
+    LogicalGraph dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
       .coGroup(dataLake.getVertices())
@@ -70,8 +69,8 @@ public class NestedIndexingToEPGMTransformations {
    * @param dataLake  ground truth containing all the informations
    * @return          EPGM representation
    */
-  public static LogicalGraph toLogicalGraph(NestedIndexing self,
-    NormalizedGraph dataLake) {
+  public static LogicalGraph toLogicalGraph(NestingIndex self,
+    LogicalGraph dataLake) {
 
     DataSet<Vertex> vertices = self.getGraphHeadToVertex()
       .coGroup(dataLake.getVertices())
@@ -94,7 +93,8 @@ public class NestedIndexingToEPGMTransformations {
    * @param dataLake  primary source
    * @return          GraphHeads
    */
-  public DataSet<GraphHead> getActualGraphHeads(NestedIndexing self, LogicalGraph dataLake) {
+  public static DataSet<GraphHead> getActualGraphHeads(NestingIndex self,
+                                                       LogicalGraph dataLake) {
     return self.getGraphHeads()
       .join(dataLake.getVertices())
       .where(new SelfId()).equalTo(new Id<>())
@@ -102,28 +102,14 @@ public class NestedIndexingToEPGMTransformations {
   }
 
   /**
-   * Instantiates the GraphHeads using the LogicalGraph as a primary source
-   * @param self      ground truth for elements
-   * @param dataLake  primary source
-   * @return          GraphHeads
-   */
-  public static DataSet<GraphHead> getActualGraphHeads(NestedIndexing self,
-                                                       NormalizedGraph dataLake) {
-    return self.getGraphHeads()
-      .join(dataLake.getVertices())
-      .where(new SelfId()).equalTo(new Id<>())
-      .with(new VertexToGraphHead());
-  }
-
-  /**
-   * Recreates the NormalizedGraph of the informations stored within
+   * Recreates the LogicalGraph of the informations stored within
    * the NestedIndexing through the DataLake
    * @param ni        Element to be transformed
    * @param dataLake  Element containing all the required and necessary
    *                  informations
    * @return          Actual values
    */
-  public static NormalizedGraph asNormalizedGraph(NestedIndexing ni, NormalizedGraph dataLake) {
+  public static LogicalGraph asLogicalGraph(NestingIndex ni, LogicalGraph dataLake) {
     DataSet<Vertex> vertices = ni.getGraphHeadToVertex()
       .coGroup(dataLake.getVertices())
       .where(new Value1Of2<>()).equalTo(new Id<>())
@@ -137,10 +123,10 @@ public class NestedIndexingToEPGMTransformations {
     DataSet<GraphHead> heads = getActualGraphHeads(ni, dataLake);
 
     vertices = vertices
-      .union(heads.map(new MapGraphHeadAsVertex()))
+      .union(heads.map(new GraphHeadToVertex()))
       .distinct(new Id<>());
 
-    return new NormalizedGraph(heads, vertices, edges, dataLake.getConfig());
+    return LogicalGraph.fromDataSets(heads, vertices, edges, dataLake.getConfig());
   }
 
 }

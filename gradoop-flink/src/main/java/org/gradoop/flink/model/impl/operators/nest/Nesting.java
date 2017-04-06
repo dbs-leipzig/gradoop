@@ -19,20 +19,19 @@ package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraph;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.operators.NestingWithNestedModel;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.VertexCentricResult;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.IndexingBeforeNesting;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
-import org.gradoop.flink.model.impl.operators.nest.transformations
-  .EPGMToNestedIndexingTransformation;
-import org.gradoop.flink.model.impl.operators.nest.transformations
-  .NestedIndexingToEPGMTransformations;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
+import org.gradoop.flink.model.impl.operators.nest.operators.NestingLogic;
+import org.gradoop.flink.model.impl.operators.nest.transformations.NestedIndexingToEPGMTransformations;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
  * Implements the nesting operator for the EPGM data model. Given a graph describing the groundtruth
@@ -41,27 +40,27 @@ import org.gradoop.flink.model.impl.operators.nest.transformations
  * at least one match with the ground truth or a non-matcher vertex. The edges from the former
  * graph are also inherited.
  */
-public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult<DataSet<Hexaplet>> {
+public class Nesting extends NestingBase {
 
   /**
    * The actual id to be associated to the returned graph
    */
-  private final GradoopId n;
+  private final GradoopId graphId;
 
   /**
    * Using the FlatModel if we have a chain of different operations to be optimized
    */
-  private NormalizedGraph fm;
+  private LogicalGraph flattenedGraph;
 
   /**
    * Left index mapping
    */
-  private NestedIndexing leftIdx;
+  private NestingIndex graphIndex;
 
   /**
    * Right index mapping
    */
-  private NestedIndexing rightIdx;
+  private NestingIndex collectionIndex;
 
   /**
    * Intermediate indexing result
@@ -83,52 +82,53 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
 
   /**
    * A default id is associated to the graph
-   * @param id Id to be associated to the new graph
+   * @param graphId Id to be associated to the new graph
    */
-  public Nesting(GradoopId id) {
-    this.n = id;
-    this.fm = null;
+  public Nesting(GradoopId graphId) {
+    this.graphId = graphId;
+    this.flattenedGraph = null;
     this.previousComputation = null;
-  }
-
-  @Override
-  public String getName() {
-    return getClass().getName();
   }
 
   /**
    * Default internal initialization for the operator
-   * @param left        Graph to be nested
+   * @param graph        Graph to be nested
    * @param collection  Nesting information
    */
-  protected void initialize(LogicalGraph left, GraphCollection collection) {
-
+  protected void initialize(LogicalGraph graph, GraphCollection collection) {
     // Generating the model only if it is required
-    if (fm == null) {
-      /*
-     * Creating the flat model containing the information of everything that happens, from the
-     * left operand to the graph collection
-     */
-      GraphCollection groundTruth = GraphCollection.fromDataSets(
-        left.getGraphHead().union(collection.getGraphHeads()),
-        left.getVertices().union(collection.getVertices()),
-        left.getEdges().union(collection.getEdges()),
-        left.getConfig());
-
-      // Getting the model for defining the associated model
-      fm = new NormalizedGraph(groundTruth);
-    }
+    flatten(graph, collection);
 
     // Suppose that both operands must share the same execution environment
-    NestingWithNestedModel operator = new NestingWithNestedModel();
+    NestingLogic nesting = new NestingLogic();
 
     // Extracting the indexing structures for both graphs
-    leftIdx = EPGMToNestedIndexingTransformation.fromLogicalGraph(left);
-    rightIdx = EPGMToNestedIndexingTransformation.fromGraphCollection(collection);
+    graphIndex = createIndex(graph);
+    collectionIndex = createIndex(collection);
 
     // At this step the FlatModel is never used, since I only change the index representation
-    intermediateResult = operator.with(leftIdx, rightIdx);
+    intermediateResult = nesting.with(graphIndex, collectionIndex);
     previousComputation = intermediateResult.getPreviousComputation();
+  }
+
+  private void flatten(LogicalGraph graph, GraphCollection collection) {
+  /*
+ * Creating the flat model containing the information of everything that happens, from the
+ * left operand to the graph collection
+ */
+    if (flattenedGraph == null) {
+      DataSet<GraphHead> heads = graph.getGraphHead().union(collection.getGraphHeads()).distinct(new Id<>());
+
+      DataSet<Vertex> nestedVertices = heads.map(new GraphHeadToVertex());
+
+      DataSet<Vertex> vertices =
+        graph.getVertices().union(collection.getVertices()).distinct(new Id<>()).union(nestedVertices);
+
+      DataSet<Edge> edges = graph.getEdges().union(collection.getEdges()).distinct(new Id<>());
+
+      // Getting the model for defining the associated model
+      flattenedGraph = flattenedGraph.fromDataSets(heads, vertices, edges, graph.getConfig());
+    }
   }
 
   /**
@@ -145,16 +145,16 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
    * Returns…
    * @return  the indexing for the nesting interface
    */
-  public NestedIndexing getRightIdx() {
-    return rightIdx;
+  public NestingIndex getCollectionIndex() {
+    return collectionIndex;
   }
 
   /**
    * Returns…
    * @return  the id to be associated to the resulting graph
    */
-  public GradoopId getId() {
-    return n;
+  public GradoopId getGraphId() {
+    return graphId;
   }
 
   /**
@@ -162,20 +162,26 @@ public class Nesting implements GraphGraphCollectionToGraph, VertexCentricResult
    * @return the normalized graph containing the information for the whole graphs
    * within the graph
    */
-  public NormalizedGraph getNormalizedRepresentation() {
-    return fm;
+  public LogicalGraph getNormalizedRepresentation() {
+    return flattenedGraph;
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph left, GraphCollection collection) {
-    initialize(left, collection);
+  public LogicalGraph execute(LogicalGraph graph, GraphCollection collection) {
+    initialize(graph, collection);
 
     // Converting the result to the standard EPGM model
-    return NestedIndexingToEPGMTransformations.toLogicalGraph(intermediateResult, fm);
+    return NestedIndexingToEPGMTransformations.toLogicalGraph(intermediateResult, flattenedGraph);
   }
 
   @Override
   public DataSet<Hexaplet> getPreviousComputation() {
     return previousComputation;
   }
+
+  @Override
+  public String getName() {
+    return getClass().getName();
+  }
+
 }

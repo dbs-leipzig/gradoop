@@ -17,8 +17,8 @@
 
 package org.gradoop.flink.model.impl.operators.nest.model.ops;
 
-import org.gradoop.flink.model.impl.operators.nest.model.NormalizedGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 
 /**
  * Defines a generic operator.
@@ -34,15 +34,15 @@ import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
  * @param <Res> Elements extending the NestedIndexing and supporting the previous state of the
  *            computation for the result
  */
-public abstract class Op<Left extends NestedIndexing,
-  Right extends NestedIndexing,
-  Res extends NestedIndexing> {
+public abstract class Op<Left extends NestingIndex,
+  Right extends NestingIndex,
+  Res extends NestingIndex> {
 
 
   /**
    * DataLake that undergoes the updates
    */
-  protected NormalizedGraph mother;
+  protected LogicalGraph mother;
 
   /**
    * Setting the mother. This method is accessible only to the main interface
@@ -50,7 +50,7 @@ public abstract class Op<Left extends NestedIndexing,
    * @return        The called object (this)
    * @param <X>     Returns this
    */
-  public <X extends Op> X setDataLake(NormalizedGraph toSet) {
+  public <X extends Op> X setDataLake(LogicalGraph toSet) {
     this.mother = toSet;
     return (X) this;
   }
@@ -64,7 +64,7 @@ public abstract class Op<Left extends NestedIndexing,
    * @return          Result as a graph with just ids. The Data Lake is updated either with
    *                  new edges or new vertices
    */
-  protected abstract Res runWithArgAndLake(NormalizedGraph flat, Left left, Right right);
+  protected abstract Res runWithArgAndLake(LogicalGraph flat, Left left, Right right);
 
   /**
    * Defines the operation's name

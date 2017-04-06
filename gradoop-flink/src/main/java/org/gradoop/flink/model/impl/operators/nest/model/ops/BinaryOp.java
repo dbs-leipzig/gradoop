@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.nest.model.ops;
 
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 
 /**
  * Defines a binary operator
@@ -29,9 +29,9 @@ import org.gradoop.flink.model.impl.operators.nest.model.indices.NestedIndexing;
  * @param <Res> Elements extending the NestedIndexing and supporting the previous state of the
  *            computation for the result
  */
-public abstract class BinaryOp<Left extends NestedIndexing,
-  Right extends NestedIndexing,
-  Res extends NestedIndexing> extends Op<Left, Right, Res> {
+public abstract class BinaryOp<Left extends NestingIndex,
+  Right extends NestingIndex,
+  Res extends NestingIndex> extends Op<Left, Right, Res> {
 
   /**
    * Public access to the inxternal operation. The data lake is not exposed

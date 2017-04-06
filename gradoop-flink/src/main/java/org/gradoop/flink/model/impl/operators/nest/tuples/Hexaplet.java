@@ -37,22 +37,22 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
 
   /**
    * Defines the quad from the joining of the vertices
-   * @param fromDataLake          Vertex appearing in the data lake (if present)
+   * @param fromGraph          Vertex appearing in the data lake (if present)
    * @param fromGraphCollection   Vertex appearing in the graph collection (if present)
    */
-  public void update(Tuple2<GradoopId, GradoopId> fromDataLake,
+  public void update(Tuple2<GradoopId, GradoopId> fromGraph,
                      Tuple2<GradoopId, GradoopId> fromGraphCollection)  {
     f3 = GradoopId.NULL_VALUE;
     f4 = GradoopId.NULL_VALUE;
     f5 = GradoopId.NULL_VALUE;
-    if (fromDataLake != null) {
-      f0 = fromDataLake.f0;
-      f1 = fromDataLake.f1;
+    if (fromGraph != null) {
+      f0 = fromGraph.f0;
+      f1 = fromGraph.f1;
     } else {
       f0 = GradoopId.NULL_VALUE;
     }
     if (fromGraphCollection != null) {
-      if (fromDataLake != null && fromDataLake.f1.equals(fromGraphCollection.f1)) {
+      if (fromGraph != null && fromGraph.f1.equals(fromGraphCollection.f1)) {
         f2 = fromGraphCollection.f0;
       } else {
         f2 = GradoopId.NULL_VALUE;

@@ -15,23 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.benchmark.nesting.parsers;
 
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.apache.flink.api.common.io.DelimitedInputFormat;
+
+import java.io.IOException;
 
 /**
- * Creates a {@link LogicalGraph} based on two input graphs and a {@link GraphCollection}
+ * Reading the file, delimiter by delimiter
  */
-public interface GraphGraphCollectionToGraph extends Operator {
+public class ParametricInputFormat extends DelimitedInputFormat<String> {
 
-  /**
-   * Combining a logical graph into a collection
-   *
-   * @param left           Single Graph
-   * @param collection     Graph collection
-   * @return               Single graph
-   */
-  LogicalGraph execute(LogicalGraph left, GraphCollection collection);
+  @Override
+  public String readRecord(String reuse, byte[] bytes, int offset, int numBytes)
+    throws IOException {
+    return new String(bytes, offset, numBytes, "UTF-8");
+  }
 
 }

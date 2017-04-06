@@ -102,7 +102,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 ```
 <repositories>
   <repository>
-    <id>dbleipzig</id>
+    <id>dbleipzig</resultGraphId>
     <name>Database Group Leipzig University</name>
     <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
     <releases>

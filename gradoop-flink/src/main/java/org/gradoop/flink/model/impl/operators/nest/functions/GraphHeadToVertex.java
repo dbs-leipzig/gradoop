@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Defines a new vertex from a GraphHead
  */
-public class MapGraphHeadAsVertex implements MapFunction<GraphHead, Vertex>,
+public class GraphHeadToVertex implements MapFunction<GraphHead, Vertex>,
   FlatJoinFunction<GraphHead, Vertex, Vertex> {
 
   /**
@@ -43,7 +43,7 @@ public class MapGraphHeadAsVertex implements MapFunction<GraphHead, Vertex>,
   /**
    * Default constructor
    */
-  public MapGraphHeadAsVertex() {
+  public GraphHeadToVertex() {
     reusable = new Vertex();
     list = new GradoopIdList();
   }

@@ -20,15 +20,15 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest.model.VertexCentricResult;
+import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
 
 /**
  * Representing a NestingIndexing preserving part of the previous computation that could be
  * reused in further operations. This information is preserved as Hexaplets, that is the
  * matching between the vertices.
  */
-public class IndexingAfterNesting extends NestedIndexing implements
-  VertexCentricResult<DataSet<Hexaplet>> {
+public class IndexingAfterNesting extends NestingIndex implements
+  WithNestedResult<DataSet<Hexaplet>> {
 
   /**
    * Representation of the intermediate state of the previous computation
