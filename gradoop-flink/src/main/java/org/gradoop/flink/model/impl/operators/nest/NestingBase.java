@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.DistinctOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -64,15 +63,15 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
       .union(right.getGraphHeadToVertex())
       .distinct(0, 1);
 
-    DataSet<Tuple2<GradoopId,GradoopId>> edgesIndex = left.getGraphHeadToEdge()
+    DataSet<Tuple2<GradoopId, GradoopId>> edgesIndex = left.getGraphHeadToEdge()
       .union(right.getGraphHeadToEdge())
-      .distinct(0,1);
+      .distinct(0, 1);
 
-    DataSet<Tuple2<GradoopId,GradoopId>> graphStack = left.getGraphStack();
+    DataSet<Tuple2<GradoopId, GradoopId>> graphStack = left.getGraphStack();
     if (graphStack == null) {
       graphStack = right.getGraphStack();
     } else {
-      DataSet<Tuple2<GradoopId,GradoopId>> rightStack = right.getGraphStack();
+      DataSet<Tuple2<GradoopId, GradoopId>> rightStack = right.getGraphStack();
       if (rightStack != null) {
         graphStack = graphStack.union(rightStack);
       }

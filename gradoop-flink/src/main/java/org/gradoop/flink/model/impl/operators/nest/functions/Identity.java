@@ -18,10 +18,10 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Uses the GradoopId element itself as a selection criterion
+ * @param <K> any type
  */
 public class Identity<K> implements KeySelector<K, K> {
   @Override

@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -63,7 +62,7 @@ public class CollectEdges implements
    *                                be included or not
    */
   public CollectEdges(boolean includeNotUpdatedEdges) {
-    this(GradoopId.NULL_VALUE,includeNotUpdatedEdges);
+    this(GradoopId.NULL_VALUE, includeNotUpdatedEdges);
   }
 
   @Override
@@ -86,7 +85,7 @@ public class CollectEdges implements
   public void join(Tuple2<GradoopId, GradoopId> gradoopIdGradoopIdTuple2, GradoopId gradoopId,
     Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
     reusable.f0 = gradoopId;
-    flatMap(gradoopIdGradoopIdTuple2,collector);
+    flatMap(gradoopIdGradoopIdTuple2, collector);
   }
 }
 

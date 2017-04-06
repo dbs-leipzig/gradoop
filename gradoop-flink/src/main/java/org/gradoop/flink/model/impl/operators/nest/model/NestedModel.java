@@ -30,10 +30,28 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
-import org.gradoop.flink.model.impl.operators.nest.functions.*;
+import org.gradoop.flink.model.impl.operators.nest.functions.AsQuadsMatchingSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
+import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
+import org.gradoop.flink.model.impl.operators.nest.functions.Hex4;
+import org.gradoop.flink.model.impl.operators.nest.functions.QuadEdgeDifference;
+import org.gradoop.flink.model.impl.operators.nest.functions.Identity;
+import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
+import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
+import org.gradoop.flink.model.impl.operators.nest.functions.Hex0;
+import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
+import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
+import org.gradoop.flink.model.impl.operators.nest.functions.HexMatch;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
+import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.DoQuadMatchTarget;
 
 /**
  * Defines the nested model where the operations are actually carried out

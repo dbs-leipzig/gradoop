@@ -17,13 +17,12 @@
 
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
@@ -55,7 +54,8 @@ public class InGraph<EL extends GraphElement>
 
   @Override
   public void join(EL el, GraphHead graphHead, Collector<EL> collector) throws Exception {
-    if (el.getGraphIds().contains(graphHead.getId()))
+    if (el.getGraphIds().contains(graphHead.getId())) {
       collector.collect(el);
+    }
   }
 }

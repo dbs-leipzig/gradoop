@@ -43,6 +43,8 @@ public class NestingResult extends NestingIndex implements
    *                          level
    * @param graphHeadToEdge   The edges appearing between each possible level
    * @param state             Describing the previous computation step
+   * @param graphStack          The association between each nested graph and the graph where it
+   *                            belongs
    */
   public NestingResult(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,

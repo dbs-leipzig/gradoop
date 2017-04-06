@@ -18,11 +18,8 @@
 package org.gradoop.flink.model.impl.operators.nest.model.indices;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A NestedIndexing defines a graph collection only by using the graph id elements (and hence,
@@ -80,7 +77,7 @@ public class NestingIndex {
   public NestingIndex(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge) {
-    this(graphHeads,graphHeadToVertex,graphHeadToEdge,null);
+    this(graphHeads, graphHeadToVertex, graphHeadToEdge, null);
   }
 
   /**

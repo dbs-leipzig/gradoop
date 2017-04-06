@@ -52,7 +52,7 @@ public class NestingWithDisjunctive extends Nesting {
     initialize(graph, collection);
 
     // Evaluates the disjunctive semantics
-    NestingResult iaf = model.disjunctiveSemantics(getIntermediateResult(),getCollectionIndex());
+    NestingResult iaf = model.disjunctiveSemantics(getIntermediateResult(), getCollectionIndex());
 
     // Returns the expected graph, which is the nested graph with the new edges
     return toLogicalGraph(iaf, model.getFlattenedGraph());

@@ -37,14 +37,14 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 public class Nesting extends NestingBase {
 
   /**
-   * The actual id to be associated to the returned graph
-   */
-  private final GradoopId graphId;
-
-  /**
    * Defines the model where the elements are set
    */
   protected NestedModel model;
+
+  /**
+   * The actual id to be associated to the returned graph
+   */
+  private final GradoopId graphId;
 
   /**
    * Left index mapping
