@@ -33,6 +33,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -100,6 +104,19 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
    * {@code <property-type>} for {@link java.util.List}
    */
   private static final transient byte TYPE_LIST         = 0x0a;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_DATE         = 0x0b;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_TIME         = 0x0c;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  private static final transient byte TYPE_DATETIME     = 0x0d;
+
 
   /**
    * Value offset in byte
@@ -244,6 +261,30 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   public boolean isList() {
     return rawBytes[0] == TYPE_LIST;
   }
+  /**
+   * True, if the wrapped value is of type {@code LocalDate}.
+   *
+   * @return true, if {@code LocalDate} value
+   */
+  public boolean isDate() {
+    return rawBytes[0] == TYPE_DATE;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalTime}.
+   *
+   * @return true, if {@code LocalTime} value
+   */
+  public boolean isTime() {
+    return rawBytes[0] == TYPE_TIME;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalDateTime}.
+   *
+   * @return true, if {@code LocalDateTime} value
+   */
+  public boolean isDateTime() {
+    return rawBytes[0] == TYPE_DATETIME;
+  }
 
   //----------------------------------------------------------------------------
   // Getter
@@ -265,7 +306,10 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
                   isGradoopId() ? getGradoopId() :
                     isMap() ? getMap() :
                       isList() ? getList() :
-                        null;
+                        isDate() ? getDate() :
+                          isTime() ? getTime() :
+                            isDateTime() ? getDateTime() :
+                              null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -417,6 +461,33 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     return list;
   }
+  /**
+   * Returns the wrapped List as {@code LocalDate}.
+   *
+   * @return {@code LocalDate} value
+   */
+  public LocalDate getDate() {
+    return DateTimeSerializer.deserializeDate(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalTime}.
+   *
+   * @return {@code LocalTime} value
+   */
+  public LocalTime getTime() {
+    return DateTimeSerializer.deserializeTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalDateTime}.
+   *
+   * @return {@code LocalDateTime} value
+   */
+  public LocalDateTime getDateTime() {
+    return DateTimeSerializer.deserializeDateTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));
+  }
 
   //----------------------------------------------------------------------------
   // Setter
@@ -451,6 +522,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       setMap((Map) value);
     } else if (value instanceof List) {
       setList((List) value);
+    } else if (value instanceof LocalDate) {
+      setDate((LocalDate) value);
+    } else if (value instanceof LocalTime) {
+      setTime((LocalTime) value);
+    } else if (value instanceof LocalDateTime) {
+      setDateTime((LocalDateTime) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -588,6 +665,39 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     }
 
     this.rawBytes = byteStream.toByteArray();
+  }
+  /**
+   * Sets the wrapped value as {@code LocalDate} value.
+   *
+   * @param date value
+   */
+  public void setDate(LocalDate date) {
+    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
+    rawBytes[0] = TYPE_DATE;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalTime} value.
+   *
+   * @param time value
+   */
+  public void setTime(LocalTime time) {
+    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
+    rawBytes[0] = TYPE_TIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalDateTime} value.
+   *
+   * @param dateTime value
+   */
+  public void setDateTime(LocalDateTime dateTime) {
+    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
+    rawBytes[0] = TYPE_DATETIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 
   //----------------------------------------------------------------------------
@@ -734,6 +844,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       length = Bytes.SIZEOF_DOUBLE;
     } else if (type == TYPE_GRADOOP_ID) {
       length = GradoopId.ID_SIZE;
+    } else if (type == TYPE_DATE) {
+      length = DateTimeSerializer.SIZEOF_DATE;
+    } else if (type == TYPE_TIME) {
+      length = DateTimeSerializer.SIZEOF_TIME;
+    } else if (type == TYPE_DATETIME) {
+      length = DateTimeSerializer.SIZEOF_DATETIME;
     }
     // init new array
     rawBytes = new byte[OFFSET + length];
