@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -404,27 +405,45 @@ public class FoodBrokerConfig implements Serializable {
    * @param startValue the start value
    * @return aggregated start value
    */
-  private Float getValue(List<Float> influencingMasterDataQuality, boolean higherIsBetter,
+  protected Float getValue(List<Float> influencingMasterDataQuality, boolean higherIsBetter,
     Float influence, Float startValue) {
     Float value = startValue;
 
+    BigDecimal influenceCount = BigDecimal.ZERO;
+
     for (float quality : influencingMasterDataQuality) {
       // check quality value of the masterdata and adjust the result value
-      if (quality >= getQualityGood()) {
-        if (higherIsBetter) {
-          value += influence;
-        } else {
-          value -= influence;
-        }
-      } else if (quality <= getQualityBad()) {
-        if (higherIsBetter) {
-          value -= influence;
-        } else {
-          value += influence;
-        }
-      }
+      influenceCount = influenceCount.add(BigDecimal.valueOf(quality));
     }
+    System.out.println("influenceCount = " + influenceCount);
+    influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
+    System.out.println("influenceCount round = " + influenceCount);
+    influenceCount = influenceCount.divide(
+      BigDecimal.valueOf(influencingMasterDataQuality.size()), 8, RoundingMode.HALF_UP);
+    System.out.println("influenceCount/size = " + influenceCount);
+
+    influenceCount = influenceCount.subtract(getAvgNormal());
+    System.out.println("influenceCount-avg = " + influenceCount);
+    influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
+    System.out.println("influenceCount round = " + influenceCount);
+    influenceCount = influenceCount.divide(getAvgNormal().divide(BigDecimal.valueOf(10)));
+    System.out.println("avg/10 = " + getAvgNormal().divide(BigDecimal.valueOf(10)));
+    System.out.println("influenceCount/avg/10 = " + influenceCount);
+
+        if (higherIsBetter) {
+          value += (influenceCount.intValue() * influence);
+        } else {
+          value -= (influenceCount.intValue() * influence);
+        }
+    System.out.println("influenceCount.intValue() = " + influenceCount.intValue());
+    System.out.println("influenceCount.intValue() * influence = " + influenceCount.intValue() * influence);
+
     return value;
+  }
+
+  private BigDecimal getAvgNormal() {
+    return BigDecimal.valueOf((getQualityBad() + getQualityNormal() + getQualityGood()) / 2)
+      .setScale(2, BigDecimal.ROUND_HALF_UP);
   }
 
   /**
