@@ -29,7 +29,7 @@ public class QueryEngineITTests extends GradoopFlinkTestBase {
   @Before
   public void setUp() throws Exception {
     socialNetwork = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
-    String path = QueryEngineITTests.class.getResource("/data/json/sna/statistics").getPath();
+    String path = QueryEngineITTests.class.getResource("/data/json/sna/statistics").getFile();
     socialNetworkStatistics = GraphStatisticsLocalFSReader.read(path);
   }
 

@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -132,7 +133,8 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   private GraphCollection generateCollection()
     throws IOException, JSONException, URISyntaxException {
     String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    		new File(FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile()).getAbsolutePath())
+    		.toFile().getPath();
 
     FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 

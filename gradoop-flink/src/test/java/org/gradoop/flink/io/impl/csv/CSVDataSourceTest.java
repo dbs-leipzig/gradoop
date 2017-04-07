@@ -12,11 +12,11 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
   public void testRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
       .getResource("/data/csv/input")
-      .getPath();
+      .getFile();
 
     String gdlPath = CSVDataSourceTest.class
       .getResource("/data/csv/expected/expected.gdl")
-      .getPath();
+      .getFile();
 
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
     LogicalGraph input = dataSource.getLogicalGraph();

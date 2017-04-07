@@ -39,11 +39,11 @@ public class CSVDataSinkTest extends GradoopFlinkTestBase {
 
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
       .getResource("/data/csv/input")
-      .getPath();
+      .getFile();
 
     String gdlPath = CSVDataSourceTest.class
       .getResource("/data/csv/expected/expected.gdl")
-      .getPath();
+      .getFile();
 
     LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
 

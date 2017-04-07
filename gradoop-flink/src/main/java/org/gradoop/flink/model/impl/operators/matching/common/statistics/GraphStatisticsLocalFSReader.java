@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -40,7 +41,7 @@ public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {
    */
   public static GraphStatistics read(String inputPath) throws IOException {
 
-    Path statisticsDir = Paths.get(inputPath);
+    Path statisticsDir = Paths.get(new File(inputPath).getAbsolutePath());
     Charset charset = Charset.forName("UTF-8");
 
     Path p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_VERTEX_COUNT));
