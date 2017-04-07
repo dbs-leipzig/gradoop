@@ -36,8 +36,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class UpdateEdgeEdgeIdPreserving<E extends Edge, K extends Comparable<K>>
   implements JoinFunction<Tuple3<K, K, E>, Tuple2<K, GradoopId>, Tuple2<K, E>> {
 
+  /**
+   * Reusable element
+   */
   private final Tuple2<K, E> reusable;
 
+  /**
+   * Default constructor
+   */
   public UpdateEdgeEdgeIdPreserving() {
     reusable = new Tuple2<K, E>();
   }

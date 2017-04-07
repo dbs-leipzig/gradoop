@@ -53,12 +53,12 @@ public class GraphModelConstructor {
   /**
    * Associating each vertex to the graph id
    */
-  private DataSet<Tuple2<ImportVertex<String>,GradoopId>> allVertices;
+  private DataSet<Tuple2<ImportVertex<String>, GradoopId>> allVertices;
 
   /**
    * Associating each edge to the graph id
    */
-  private DataSet<Tuple2<ImportEdge<String>,GradoopId>> allEdges;
+  private DataSet<Tuple2<ImportEdge<String>, GradoopId>> allEdges;
 
   /**
    * Default constructor
@@ -110,7 +110,7 @@ public class GraphModelConstructor {
     // Definition of the head associated to the graph that will be the search graph
     DataSet<Tuple3<String, Boolean, GraphHead>> graphHead =
       getExecutionEnvironment().fromElements(edgePath)
-        .map(new AssociateNewGraphHead(hFac,false));
+        .map(new AssociateNewGraphHead(hFac, false));
 
     // Mapping the graph as a graph index
     DataSet<GradoopId> graphId = graphHead
@@ -119,7 +119,7 @@ public class GraphModelConstructor {
 
     // Associating each edge to a graph
     DataSet<Tuple2<ImportEdge<String>, GradoopId>> edgesBelongToGraph =
-      getExecutionEnvironment().readFile(pif,edgePath)
+      getExecutionEnvironment().readFile(pif, edgePath)
         .flatMap(new TripleSplit())
         .crossWithTiny(graphId);
 

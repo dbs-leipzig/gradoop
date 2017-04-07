@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.benchmark.nesting.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -9,15 +26,17 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * Created by vasistas on 05/04/17.
+ * Maps each edge to a vertex, both source and destination
+ *
+ * @param <K> Types identifying the key
  */
 @FunctionAnnotation.ForwardedFieldsSecond("* -> f0")
 public class ExtractVerticesFromEdges<K extends Comparable<K>>
   implements FlatMapFunction<Tuple2<ImportEdge<K>, GradoopId>,
                              Tuple2<ImportVertex<K>, GradoopId>> {
 
-  private final Tuple2<ImportVertex<K>,GradoopId> src;
-  private final Tuple2<ImportVertex<K>,GradoopId> dst;
+  private final Tuple2<ImportVertex<K>, GradoopId> src;
+  private final Tuple2<ImportVertex<K>, GradoopId> dst;
 
   public ExtractVerticesFromEdges() {
     src = new Tuple2<>();

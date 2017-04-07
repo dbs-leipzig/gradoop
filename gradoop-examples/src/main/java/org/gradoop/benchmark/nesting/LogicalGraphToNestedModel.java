@@ -23,7 +23,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.Path;
-import org.gradoop.benchmark.nesting.functions.ExtractIdFromLest;
+import org.gradoop.benchmark.nesting.functions.ExtractIdFromLeft;
 import org.gradoop.benchmark.nesting.functions.ImportVertexId;
 import org.gradoop.benchmark.nesting.functions.InitEdgeForCollection;
 import org.gradoop.benchmark.nesting.functions.InitVertexForCollection;
@@ -46,7 +46,7 @@ import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
-import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph2;
+import org.gradoop.benchmark.nesting.functions.AddElementToGraph2;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -216,7 +216,7 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
       .map(new Project3To0And1<>());
 
     DataSet<Tuple2<String,GradoopId>> edgeKeyToGraphId = constructor.getAllEdges()
-      .map(new ExtractIdFromLest());
+      .map(new ExtractIdFromLeft());
 
     DataSet<Edge> epgmEdges = constructor.getAllEdges()
       .map(new Value0Of2<>())
