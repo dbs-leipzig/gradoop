@@ -15,4 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Contains the functions for executing the benchmarks
+ */
 package org.gradoop.benchmark.nesting.functions;

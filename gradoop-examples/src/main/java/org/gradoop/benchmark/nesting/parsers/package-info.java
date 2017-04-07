@@ -15,4 +15,8 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/**
+ * Contains the classes to read the files
+ */
 package org.gradoop.benchmark.nesting.parsers;

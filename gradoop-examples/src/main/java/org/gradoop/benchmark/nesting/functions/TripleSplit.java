@@ -44,7 +44,7 @@ public class TripleSplit implements ConvertStringToEdge<String, String> {
 
   @Override
   public ImportEdge<String> map(String s) throws Exception {
-    String array[] = s.split(" ");
+    String[] array = s.split(" ");
     reusable.setLabel(array[1]);
     reusable.setSourceId(array[0]);
     reusable.setTargetId(array[2]);

@@ -41,13 +41,16 @@ public class DataSourceGradoopId extends FileInputFormat<GradoopId> {
 
   @Override
   public boolean reachedEnd() throws IOException {
-    return stream.available()>0;
+    return stream.available() > 0;
   }
 
   @Override
   public GradoopId nextRecord(GradoopId gradoopId) throws IOException {
-    stream.read(bytes);
-    return GradoopId.fromByteArray(bytes);
+    if (stream.read(bytes) > 0) {
+      return GradoopId.fromByteArray(bytes);
+    } else {
+      return null;
+    }
   }
 
 }

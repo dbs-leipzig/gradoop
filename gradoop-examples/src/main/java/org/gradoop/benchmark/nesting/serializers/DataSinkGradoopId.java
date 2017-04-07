@@ -28,6 +28,10 @@ import java.io.IOException;
  */
 public class DataSinkGradoopId extends FileOutputFormat<GradoopId> {
 
+  /**
+   * Default constructor
+   * @param outputPath  file where to write the values
+   */
   public DataSinkGradoopId(Path outputPath) {
     super(outputPath);
   }

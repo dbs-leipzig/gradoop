@@ -35,9 +35,19 @@ public class ExtractVerticesFromEdges<K extends Comparable<K>>
   implements FlatMapFunction<Tuple2<ImportEdge<K>, GradoopId>,
                              Tuple2<ImportVertex<K>, GradoopId>> {
 
+  /**
+   * Reusable source element
+   */
   private final Tuple2<ImportVertex<K>, GradoopId> src;
+
+  /**
+   * Reusable destination element
+   */
   private final Tuple2<ImportVertex<K>, GradoopId> dst;
 
+  /**
+   * Default constructor
+   */
   public ExtractVerticesFromEdges() {
     src = new Tuple2<>();
     src.f0 = new ImportVertex<>();

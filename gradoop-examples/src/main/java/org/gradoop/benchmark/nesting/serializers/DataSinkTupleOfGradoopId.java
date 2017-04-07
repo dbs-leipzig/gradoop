@@ -27,14 +27,18 @@ import java.io.IOException;
 /**
  * Writes <GradoopId,GradoopId> pairs to bytes
  */
-public class DataSinkTupleOfGradoopId extends FileOutputFormat<Tuple2<GradoopId,GradoopId>> {
+public class DataSinkTupleOfGradoopId extends FileOutputFormat<Tuple2<GradoopId, GradoopId>> {
 
+  /**
+   * Default constructor
+   * @param outputPath  File where to write the values
+   */
   public DataSinkTupleOfGradoopId(Path outputPath) {
     super(outputPath);
   }
 
   @Override
-  public void writeRecord(Tuple2<GradoopId,GradoopId> gradoopId) throws IOException {
+  public void writeRecord(Tuple2<GradoopId, GradoopId> gradoopId) throws IOException {
     stream.write(gradoopId.f0.toByteArray());
     stream.write(gradoopId.f1.toByteArray());
   }

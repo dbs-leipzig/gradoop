@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
-public class DataSourceTupleOfGradoopId extends FileInputFormat<Tuple2<GradoopId,GradoopId>> {
+public class DataSourceTupleOfGradoopId extends FileInputFormat<Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Reusable array
@@ -36,7 +36,7 @@ public class DataSourceTupleOfGradoopId extends FileInputFormat<Tuple2<GradoopId
   /**
    * Reusable Pair
    */
-  private final Tuple2<GradoopId,GradoopId> reusable;
+  private final Tuple2<GradoopId, GradoopId> reusable;
 
   /**
    * Default constructor
@@ -48,15 +48,18 @@ public class DataSourceTupleOfGradoopId extends FileInputFormat<Tuple2<GradoopId
 
   @Override
   public boolean reachedEnd() throws IOException {
-    return stream.available()>0;
+    return stream.available() > 0;
   }
 
   @Override
-  public Tuple2<GradoopId,GradoopId> nextRecord(Tuple2<GradoopId,GradoopId> gradoopId) throws IOException {
-    stream.read(bytes);
-    reusable.f0 = GradoopId.fromByteArray(bytes);
-    stream.read(bytes);
-    reusable.f1 = GradoopId.fromByteArray(bytes);
+  public Tuple2<GradoopId, GradoopId> nextRecord(Tuple2<GradoopId, GradoopId> gradoopId)
+    throws IOException {
+    if (stream.read(bytes) > 0) {
+      reusable.f0 = GradoopId.fromByteArray(bytes);
+    }
+    if (stream.read(bytes) > 0) {
+      reusable.f1 = GradoopId.fromByteArray(bytes);
+    }
     return reusable;
   }
 

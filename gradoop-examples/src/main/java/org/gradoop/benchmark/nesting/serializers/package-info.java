@@ -15,4 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Sink and sources for reading the nested data structures
+ */
 package org.gradoop.benchmark.nesting.serializers;

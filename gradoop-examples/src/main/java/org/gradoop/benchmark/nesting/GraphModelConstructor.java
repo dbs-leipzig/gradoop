@@ -92,7 +92,8 @@ public class GraphModelConstructor {
    * @param hFac      Default GraphHead factory
    * @return          Loaded graph information
    */
-  public static GraphModelConstructor createGraphInformation(String edgeFile, GraphHeadFactory hFac) {
+  public static GraphModelConstructor createGraphInformation(String edgeFile,
+    GraphHeadFactory hFac) {
     return createGraphInformationWithVertices(edgeFile, null, hFac);
   }
 
@@ -132,7 +133,7 @@ public class GraphModelConstructor {
     }
 
     // Associating each vertex to a graph
-    DataSet<Tuple2<ImportVertex<String>,GradoopId>> verticesBelongToGraph = edgesBelongToGraph
+    DataSet<Tuple2<ImportVertex<String>, GradoopId>> verticesBelongToGraph = edgesBelongToGraph
       .flatMap(new ExtractVerticesFromEdges<>())
       .distinct(new ImportVertexId<>());
 

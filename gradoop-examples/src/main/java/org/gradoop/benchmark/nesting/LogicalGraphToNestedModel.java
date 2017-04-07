@@ -47,6 +47,7 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 import org.gradoop.benchmark.nesting.functions.AddElementToGraph2;
+import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -85,20 +86,20 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
   /**
    * Path to input graph data
    */
-  private static String inputPath;
+  private static String INPUT_PATH;
   /**
    * Query to execute.
    */
-  private static String subgraphs;
+  private static String SUBGRAPHS;
   /**
    * Path to output
    */
-  private static String outPath;
+  private static String OUTPATH;
 
   /**
-   *
+   * Constructing the model
    */
-  private GraphModelConstructor constructor;
+  private GraphModelConstructor model;
 
   /**
    * Default vertex factory
@@ -120,105 +121,132 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
    */
   private final InGraph<Edge> edgeInGraphNULL;
 
-
+  /**
+   * Default configuration
+   */
   private final GradoopFlinkConfig conf;
 
   /**
    * Initializes the main class using the main graph implementing the flattened graph
-   * @param conf  Path to the graph containing all the possible information
+   * @param conf    Path to the graph containing all the possible information
+   * @param model   Definition of the model
    */
-  public LogicalGraphToNestedModel(GradoopFlinkConfig conf, GraphModelConstructor constructor) {
+  public LogicalGraphToNestedModel(GradoopFlinkConfig conf, GraphModelConstructor model) {
     // Defining the basic configurations for the elements' generators
     this.conf = conf;
     vFac = conf.getVertexFactory();
     eFac = conf.getEdgeFactory();
     // Defining the standard way to write an element to a file
-    this.constructor = constructor;
+    this.model = model;
 
     vertexInGraphNULL = new InGraph<>(GradoopId.NULL_VALUE);
     edgeInGraphNULL = new InGraph<>(GradoopId.NULL_VALUE);
   }
 
+  /**
+   * Extract the search graph for the nesting operator
+   * @param selfie  GraphCollection representation of the operands for the nesting
+   * @return        EPGM representation of the left operand
+   */
   private LogicalGraph extractLeftOperand(GraphCollection selfie) {
-    DataSet<GraphHead> head = constructor.getAllHeadInfos()
+    DataSet<GraphHead> head = model.getAllHeadInfos()
       .filter(new IsLeftOperand(true))
       .map(new Value2Of3<>());
 
     DataSet<Vertex> vertices = selfie.getVertices()
       .joinWithTiny(head)
-      .where((Vertex v) -> 0).equalTo((GraphHead x)-> 0)
+      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(vertexInGraphNULL);
 
     DataSet<Edge> edges = selfie.getEdges()
       .joinWithTiny(head)
-      .where((Edge v) -> 0).equalTo((GraphHead x)-> 0)
+      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(edgeInGraphNULL);
 
-    return LogicalGraph.fromDataSets(head,vertices,edges,conf);
+    return LogicalGraph.fromDataSets(head, vertices, edges, conf);
   }
 
+  /**
+   * Extract the pattern graph for the nesting operator
+   * @param selfie  GraphCollection representation of the operands for the nesting
+   * @return        EPGM representation of the right operand
+   */
   private GraphCollection extractRightOperand(GraphCollection selfie) {
-    DataSet<GraphHead> head = constructor.getAllHeadInfos()
+    DataSet<GraphHead> head = model.getAllHeadInfos()
       .filter(new IsLeftOperand(false))
       .map(new Value2Of3<>());
 
     DataSet<Vertex> vertices = selfie.getVertices()
       .joinWithTiny(head)
-      .where((Vertex v) -> 0).equalTo((GraphHead x)-> 0)
+      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(vertexInGraphNULL);
 
     DataSet<Edge> edges = selfie.getEdges()
       .joinWithTiny(head)
-      .where((Edge v) -> 0).equalTo((GraphHead x)-> 0)
+      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(edgeInGraphNULL);
 
-    return GraphCollection.fromDataSets(head,vertices,edges,conf);
+    return GraphCollection.fromDataSets(head, vertices, edges, conf);
   }
 
+  /**
+   * Serialize the outcome of the operation to disk
+   * @param toPath      Destination folder
+   * @throws Exception  Exception
+   */
   public void serializeOperandsWithData(String toPath) throws Exception {
     GraphCollection coll = collectSourcesAsCollection();
 
     // Writing the ground truth over which extract the informations for the edge semantics
-    writeGraphCollection(coll,toPath);
+    writeGraphCollection(coll, toPath);
 
     // Operand representing the graph for the search graph
     NestingIndex left =
       NestingBase.createIndex(extractLeftOperand(coll));
-    writeIndex(left,toPath+(toPath.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR)
-      +"left");
+    writeIndex(left, toPath + (toPath.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR) +
+      "left");
 
     // Operand representing the collection of the elements that we want to use for the nesting
     NestingIndex right =
       NestingBase.createIndex(extractRightOperand(coll));
-    writeIndex(right,toPath+(toPath.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR)
-      +"left");
-  }
-
-  private void writeIndex(NestingIndex left, String s) {
-    left.getGraphHeads().output(new DataSinkGradoopId(new Path(s+"-heads.bin")));
-    left.getGraphHeadToVertex().output(new DataSinkTupleOfGradoopId(new Path(s+"-vertex.bin")));
-    left.getGraphHeadToEdge().output(new DataSinkTupleOfGradoopId(new Path(s+"-edges.bin")));
+    writeIndex(right, toPath + (toPath.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR) +
+      "left");
   }
 
   /**
-   * Returns a collection that is going to be used to read it as a GraphCollection
-   * @return
+   * Writes an index
+   * @param left  Graph index
+   * @param s     File path
+   */
+  private void writeIndex(NestingIndex left, String s) {
+    left.getGraphHeads().output(new DataSinkGradoopId(new Path(s + "-heads.bin")));
+    left.getGraphHeadToVertex().output(
+      new DataSinkTupleOfGradoopId(new Path(s + "-vertex.bin"))
+    );
+    left.getGraphHeadToEdge().output(
+      new DataSinkTupleOfGradoopId(new Path(s + "-edges.bin"))
+    );
+  }
+
+  /**
+   * Returns…
+   * @return a collection that is going to be used to read it as a GraphCollection
    */
   public GraphCollection collectSourcesAsCollection() {
     InitVertexForCollection<String> vertexMapper =
       new InitVertexForCollection<>(vFac, null, TypeInformation.of(String.class));
 
-    DataSet<Tuple3<String, GradoopId, Vertex>> tripleVertices = constructor.getAllVertices()
+    DataSet<Tuple3<String, GradoopId, Vertex>> tripleVertices = model.getAllVertices()
       .groupBy(new ImportVertexId<>())
       .combineGroup(vertexMapper);
 
     DataSet<Tuple2<String, GradoopId>> vertexIdPair = tripleVertices
       .map(new Project3To0And1<>());
 
-    DataSet<Tuple2<String,GradoopId>> edgeKeyToGraphId = constructor.getAllEdges()
+    DataSet<Tuple2<String, GradoopId>> edgeKeyToGraphId = model.getAllEdges()
       .map(new ExtractIdFromLeft());
 
-    DataSet<Edge> epgmEdges = constructor.getAllEdges()
+    DataSet<Edge> epgmEdges = model.getAllEdges()
       .map(new Value0Of2<>())
       .distinct(0)
       .join(vertexIdPair)
@@ -234,21 +262,26 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
     DataSet<Vertex> epgmVertices = tripleVertices
       .map(new Value2Of3<>());
 
-    DataSet<GraphHead> heads = constructor.getAllHeadInfos()
+    DataSet<GraphHead> heads = model.getAllHeadInfos()
       .map(new Value2Of3<>());
 
-    return GraphCollection.fromDataSets(heads,epgmVertices,epgmEdges,conf);
+    return GraphCollection.fromDataSets(heads, epgmVertices, epgmEdges, conf);
   }
 
+  /**
+   * Program entrance
+   * @param args        Program arguments
+   * @throws Exception  Any exception
+   */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, LogicalGraphToNestedModel.class.getName());
     if (cmd == null) {
       System.exit(1);
     }
 
-    inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
-    subgraphs = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
-    outPath = cmd.getOptionValue(OUTPUT_MODEL);
+    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
+    SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
+    OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
 
     // Reading the informations from the files
     GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
@@ -256,23 +289,22 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
 
     // Initializes the model with the left graph
     GraphModelConstructor modelData =
-      GraphModelConstructor.createGraphInformation(inputPath,headFactory);
+      GraphModelConstructor.createGraphInformation(INPUT_PATH, headFactory);
 
     // Loading the graphs appearing in the graph collection
     // 1. Returning each vertex and edge files association
-    File[] filesInDirectory = new File(subgraphs).listFiles();
+    File[] filesInDirectory = new File(SUBGRAPHS).listFiles();
     Map<String, List<String>> l = filesInDirectory != null ?
       Arrays.stream(filesInDirectory)
         .map(File::getAbsolutePath)
         .collect(Collectors.groupingBy(x -> x
           .replaceAll("-edges\\.txt$", "")
-          .replaceAll("-vertices\\.txt$", "")))
-      :
+          .replaceAll("-vertices\\.txt$", ""))) :
       new HashMap<>();
 
     // 2. Scanning all the files pertaining to the same graph, throught the previous aggregation
     for (List<String> files : l.values()) {
-      if (files.size()==2) {
+      if (files.size() == 2) {
         String edgeFile = null;
         String vertexFile = null;
         for (String s : files) {
@@ -294,7 +326,7 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
     LogicalGraphToNestedModel model = new LogicalGraphToNestedModel(conf, modelData);
 
     // Writing the data information with the id information to be fast loaded in memory
-    model.serializeOperandsWithData(outPath);
+    model.serializeOperandsWithData(OUTPATH);
     getExecutionEnvironment().execute("Serializing job");
   }
 

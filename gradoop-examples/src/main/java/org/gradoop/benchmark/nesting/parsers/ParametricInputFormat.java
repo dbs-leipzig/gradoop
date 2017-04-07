@@ -29,7 +29,7 @@ public class ParametricInputFormat extends DelimitedInputFormat<String> {
   /**
    * Instance of the singleton
    */
-  private static ParametricInputFormat self;
+  private static ParametricInputFormat SINGLETON;
 
   /**
    * Private constructor
@@ -50,10 +50,10 @@ public class ParametricInputFormat extends DelimitedInputFormat<String> {
    * @return  the unique instance of the singleton
    */
   public static ParametricInputFormat getInstance() {
-    if (self == null) {
-      self = new ParametricInputFormat();
+    if (SINGLETON == null) {
+      SINGLETON = new ParametricInputFormat();
     }
-    return self;
+    return SINGLETON;
   }
 
 }
