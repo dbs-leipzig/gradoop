@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  *
  * <p> Used by RepresentationUtils </p>
  */
-@FunctionAnnotation.ForwardedFields("id -> f0")
+@FunctionAnnotation.ForwardedFields("id -> f0; sourceId -> f1; targetId -> f3")
 public class AsQuadsMatchingSource implements MapFunction<Edge, Hexaplet> {
 
   /**

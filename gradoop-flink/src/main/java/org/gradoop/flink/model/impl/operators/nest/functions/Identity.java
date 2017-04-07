@@ -17,12 +17,14 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 
 /**
  * Uses the GradoopId element itself as a selection criterion
  * @param <K> any type
  */
+@FunctionAnnotation.ForwardedFields("* -> *")
 public class Identity<K> implements KeySelector<K, K> {
   @Override
   public K getKey(K value) throws Exception {

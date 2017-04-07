@@ -30,7 +30,8 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  * Warning: it assumes that the fromDataLake element is always present (leftJoin) and
  * that there could not be a right element match.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1")
+@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1; f1 -> f2")
+@FunctionAnnotation.ForwardedFieldsSecond("f0 -> f4")
 public class AssociateAndMark implements
   JoinFunction<Tuple2<GradoopId, GradoopId>,
                Tuple2<GradoopId, GradoopId>, Hexaplet

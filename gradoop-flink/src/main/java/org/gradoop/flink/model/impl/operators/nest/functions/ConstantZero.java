@@ -17,12 +17,14 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 
 /**
  * Bogus function mapping everything to zero
  * @param <K> Any type
  */
+@FunctionAnnotation.ForwardedFields("* -> 0")
 public class ConstantZero<K> implements KeySelector<K, Integer> {
   @Override
   public Integer getKey(K k) throws Exception {
