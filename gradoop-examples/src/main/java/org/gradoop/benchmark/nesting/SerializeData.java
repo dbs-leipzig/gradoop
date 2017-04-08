@@ -1,3 +1,23 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Contains the programs to execute the benchmarks.
+ */
 package org.gradoop.benchmark.nesting;
 
 import org.apache.flink.api.java.DataSet;
@@ -10,6 +30,7 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggerRepository;
 import org.gradoop.benchmark.nesting.functions.*;
+import org.gradoop.benchmark.nesting.model.GraphCollectionDelta;
 import org.gradoop.benchmark.nesting.serializers.DataSinkGradoopId;
 import org.gradoop.benchmark.nesting.serializers.DataSinkTupleOfGradoopId;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -39,10 +60,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Initializing the model by writing it down for some further and subsequent tests
  */
 public class SerializeData extends AbstractRunner {
 
@@ -183,6 +205,8 @@ public class SerializeData extends AbstractRunner {
 
     GraphCollection lg = GraphCollection.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
     writeGraphCollection(lg, path);
+    System.out.println("\t\t\tWriting GraphCollection MSECONDS =(" + ENVIRONMENT
+      .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
   }
 
   /**
@@ -257,6 +281,8 @@ public class SerializeData extends AbstractRunner {
       .output(new DataSinkTupleOfGradoopId(new Path(s + "-edges.bin")));
 
     ENVIRONMENT.execute();
+    System.out.println("\t\t\tWriting Index " + s + " MSECONDS =(" + ENVIRONMENT
+      .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
   }
 
 
