@@ -4,6 +4,11 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.client.CliFrontend;
+import org.apache.flink.runtime.jobmanager.JobManager;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggerRepository;
 import org.gradoop.benchmark.nesting.functions.*;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -13,9 +18,16 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.Log4jLoggerAdapter;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by vasistas on 08/04/17.
@@ -30,8 +42,24 @@ public class SerializeData extends AbstractRunner {
     CONFIGURATION = GradoopFlinkConfig.createConfig(ENVIRONMENT);
   }
 
+  public static void disableLogging() throws NoSuchFieldException, IllegalAccessException {
+    Log4jLoggerAdapter logger = (Log4jLoggerAdapter)LoggerFactory
+      .getLogger(JobManager.class);
+    Field loggerField = Log4jLoggerAdapter.class.getDeclaredField("logger");
+    loggerField.setAccessible(true);
+    Logger loggerObject = (Logger)loggerField.get(logger);
+
+
+    Field repoField = Category.class.getDeclaredField("repository");
+    repoField.setAccessible(true);
+    LoggerRepository repoObject = (LoggerRepository)repoField.get(loggerObject);
+
+    repoObject.setThreshold(Level.OFF);
+  }
+
   public static void main(String[] args) throws Exception {
 
+    //disableLogging();
     final String edges_global_file = "/Volumes/Untitled/Data/gMarkGen/OSN/100.txt";
     final String vertices_global_file = null;
 
@@ -59,9 +87,19 @@ public class SerializeData extends AbstractRunner {
 
     DataSet<Vertex> vertices = intermediateVertex.map(new Value1Of2<>());
 
-    GraphCollection lg = GraphCollection.fromDataSets(heads, vertices, edges, CONFIGURATION);
-    writeGraphCollection(lg, "/Users/vasistas/test");
+    writeFlattenedGraph(heads, vertices, edges, "/Users/vasistas/test");
+  }
 
+  private static void writeFlattenedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices,
+    DataSet<Edge> edges, String path) throws Exception {
+
+    DataSet<Vertex> flattenedVertices = heads
+      .map(new GraphHeadToVertex())
+      .union(vertices)
+      .distinct(new Id<>());
+
+    GraphCollection lg = GraphCollection.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
+    writeGraphCollection(lg, path);
   }
 
   private static DataSet<Tuple2<String, Vertex>> createGraphVertices
