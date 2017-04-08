@@ -25,7 +25,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 /**
  * Returns the head belonging to the main graph
  */
-@FunctionAnnotation.ForwardedFields("f1 -> *")
 public class IsLeftOperand implements FilterFunction<Tuple3<String, Boolean, GraphHead>> {
 
   /**

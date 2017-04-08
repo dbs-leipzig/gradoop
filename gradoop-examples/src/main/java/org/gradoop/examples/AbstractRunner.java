@@ -53,7 +53,7 @@ public abstract class AbstractRunner {
    * @throws ParseException
    */
   protected static CommandLine parseArguments(String[] args, String className)
-      throws ParseException {
+    throws ParseException {
     if (args.length == 0) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp(className, OPTIONS, true);
@@ -97,17 +97,6 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Writes a logical graph into the specified directory using a {@link JSONDataSink}.
-   *
-   * @param graph     logical graph
-   * @param directory output path
-   * @throws Exception
-   */
-  protected static void writeLogicalGraph(LogicalGraph graph, String directory) throws Exception {
-    writeLogicalGraph(graph, directory, "json");
-  }
-
-  /**
    * Reads a GraphCollection from a given directory.
    *
    * @param directory       path to EPGM database
@@ -129,6 +118,17 @@ public abstract class AbstractRunner {
     } else {
       throw new IllegalArgumentException("Unsupported format: " + format);
     }
+  }
+
+  /**
+   * Writes a logical graph into the specified directory using a {@link JSONDataSink}.
+   *
+   * @param graph     logical graph
+   * @param directory output path
+   * @throws Exception
+   */
+  protected static void writeLogicalGraph(LogicalGraph graph, String directory) throws Exception {
+    writeLogicalGraph(graph, directory, "json");
   }
 
   /**

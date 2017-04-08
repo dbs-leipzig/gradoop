@@ -23,29 +23,29 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
+import sun.jvm.hotspot.memory.EdenSpace;
 
 /**
  * Updates an EPGM edge with the given target vertex identifier.
  *
- * @param <E> EPGM edge type
  * @param <K> Import Edge/Vertex identifier type
  */
 @FunctionAnnotation.ReadFieldsFirst("f2")
 @FunctionAnnotation.ForwardedFields("f1 -> f0")
-@FunctionAnnotation.ForwardedFieldsSecond("f2->targetId")
-public class UpdateEdgeEdgeIdPreserving<E extends Edge, K extends Comparable<K>>
-  implements JoinFunction<Tuple3<K, K, E>, Tuple2<K, GradoopId>, Tuple2<K, E>> {
+@FunctionAnnotation.ForwardedFieldsSecond("f1->f1.targetId")
+public class UpdateEdgeEdgeIdPreserving<K extends Comparable<K>>
+  implements JoinFunction<Tuple3<K, K, Edge>, Tuple2<K, GradoopId>, Tuple2<K, Edge>> {
 
   /**
    * Reusable element
    */
-  private final Tuple2<K, E> reusable;
+  private final Tuple2<K, Edge> reusable;
 
   /**
    * Default constructor
    */
   public UpdateEdgeEdgeIdPreserving() {
-    reusable = new Tuple2<K, E>();
+    reusable = new Tuple2<K, Edge>();
   }
 
   /**
@@ -57,7 +57,7 @@ public class UpdateEdgeEdgeIdPreserving<E extends Edge, K extends Comparable<K>>
    * @throws Exception
    */
   @Override
-  public Tuple2<K, E> join(Tuple3<K, K, E> targetIdEdgePair,
+  public Tuple2<K, Edge> join(Tuple3<K, K, Edge> targetIdEdgePair,
     Tuple2<K, GradoopId> vertexIdPair) throws Exception {
     reusable.f0 = targetIdEdgePair.f1;
     reusable.f1 = targetIdEdgePair.f2;

@@ -18,6 +18,8 @@
 package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.FileOutputFormat;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -26,7 +28,10 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
+@FunctionAnnotation.SkipCodeAnalysis
 public class DataSinkGradoopId extends FileOutputFormat<GradoopId> {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * Default constructor
@@ -34,10 +39,18 @@ public class DataSinkGradoopId extends FileOutputFormat<GradoopId> {
    */
   public DataSinkGradoopId(Path outputPath) {
     super(outputPath);
+    setWriteMode(FileSystem.WriteMode.OVERWRITE);
   }
 
   @Override
   public void writeRecord(GradoopId gradoopId) throws IOException {
     stream.write(gradoopId.toByteArray());
   }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    this.getRuntimeContext().getLongCounter("bogus").add(1);
+  }
+
 }

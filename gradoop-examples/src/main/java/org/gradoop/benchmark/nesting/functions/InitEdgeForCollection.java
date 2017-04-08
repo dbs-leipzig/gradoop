@@ -70,7 +70,7 @@ public class InitEdgeForCollection<K extends Comparable<K>>
    */
   @Override
   public TypeInformation<Tuple3<K, K, Edge>> getProducedType() {
-    return new TupleTypeInfo<>(getKeyTypeInfo(),
+    return new TupleTypeInfo<>(getKeyTypeInfo(), getKeyTypeInfo(),
       TypeExtractor.createTypeInfo(edgeFactory.getType()));
   }
 

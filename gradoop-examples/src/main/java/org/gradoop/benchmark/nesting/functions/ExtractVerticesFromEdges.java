@@ -22,6 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
@@ -51,14 +52,17 @@ public class ExtractVerticesFromEdges<K extends Comparable<K>>
   public ExtractVerticesFromEdges() {
     src = new Tuple2<>();
     src.f0 = new ImportVertex<>();
+    src.f0.setLabel("");
+    src.f0.setProperties(new Properties());
     dst = new Tuple2<>();
     dst.f0 = new ImportVertex<>();
+    dst.f0.setLabel("");
+    dst.f0.setProperties(new Properties());
   }
 
   @Override
   public void flatMap(Tuple2<ImportEdge<K>, GradoopId> kImportEdge,
-                      Collector<Tuple2<ImportVertex<K>, GradoopId>>
-    collector) throws
+                      Collector<Tuple2<ImportVertex<K>, GradoopId>> collector) throws
     Exception {
     src.f1 = kImportEdge.f1;
     dst.f1 = kImportEdge.f1;

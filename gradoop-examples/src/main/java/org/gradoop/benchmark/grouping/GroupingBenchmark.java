@@ -41,8 +41,7 @@ import java.util.regex.Pattern;
 /**
  * A dedicated program for parametrized graph grouping benchmark.
  */
-public class GroupingBenchmark extends AbstractRunner
-  implements ProgramDescription {
+public class GroupingBenchmark extends AbstractRunner {
 
   /**
    * Option to declare path to input graph
@@ -474,11 +473,4 @@ public class GroupingBenchmark extends AbstractRunner
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getDescription() {
-    return GroupingBenchmark.class.getName();
-  }
 }

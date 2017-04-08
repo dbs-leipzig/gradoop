@@ -18,6 +18,7 @@
 package org.gradoop.benchmark.nesting.functions;
 
 import org.gradoop.benchmark.nesting.parsers.ConvertStringToEdge;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
 /**
@@ -35,6 +36,7 @@ public class TripleSplit implements ConvertStringToEdge<String, String> {
    */
   public TripleSplit() {
     this.reusable = new ImportEdge<>();
+    this.reusable.setProperties(new Properties());
   }
 
   @Override

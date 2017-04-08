@@ -18,15 +18,12 @@
 package org.gradoop.benchmark.nesting;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.io.FileUtils;
-import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.Utils;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.Path;
-import org.apache.flink.util.AbstractID;
+import org.gradoop.benchmark.nesting.functions.AddElementToGraph2;
 import org.gradoop.benchmark.nesting.functions.ExtractIdFromLeft;
 import org.gradoop.benchmark.nesting.functions.ImportVertexId;
 import org.gradoop.benchmark.nesting.functions.InitEdgeForCollection;
@@ -43,6 +40,7 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
@@ -50,14 +48,12 @@ import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
-import org.gradoop.benchmark.nesting.functions.AddElementToGraph2;
 import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +64,7 @@ import java.util.stream.Collectors;
 /**
  * Base class for traverser benchmarks
  */
-public class LogicalGraphToNestedModel extends AbstractRunner {
+public class LogicalGraphToNestedModel2 extends AbstractRunner {
   /**
    * Option to declare path to input graph
    */
@@ -138,7 +134,7 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
    * @param conf    Path to the graph containing all the possible information
    * @param model   Definition of the model
    */
-  public LogicalGraphToNestedModel(GradoopFlinkConfig conf, GraphModelConstructor model) {
+  public LogicalGraphToNestedModel2(GradoopFlinkConfig conf, GraphModelConstructor model) {
     // Defining the basic configurations for the elements' generators
     this.conf = conf;
     vFac = conf.getVertexFactory();
@@ -290,7 +286,7 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
    * @throws Exception  Any exception
    */
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, LogicalGraphToNestedModel.class.getName());
+    CommandLine cmd = parseArguments(args, LogicalGraphToNestedModel2.class.getName());
     if (cmd == null) {
       System.exit(1);
     }
@@ -306,46 +302,11 @@ public class LogicalGraphToNestedModel extends AbstractRunner {
     // Initializes the model with the left graph
     GraphModelConstructor modelData =
       GraphModelConstructor.createGraphInformation(INPUT_PATH, headFactory);
-
-    if (false) {
-      // Loading the graphs appearing in the graph collection
-      // 1. Returning each vertex and edge files association
-      File[] filesInDirectory = new File(SUBGRAPHS).listFiles();
-      Map<String, List<String>> l = filesInDirectory != null ?
-        Arrays.stream(filesInDirectory)
-          .map(File::getAbsolutePath)
-          .collect(Collectors.groupingBy(x -> x
-            .replaceAll("-edges\\.txt$", "")
-            .replaceAll("-vertices\\.txt$", ""))) :
-        new HashMap<>();
-
-      // 2. Scanning all the files pertaining to the same graph, throught the previous aggregation
-      for (List<String> files : l.values()) {
-        if (files.size() == 2) {
-          String edgeFile = null;
-          String vertexFile = null;
-          for (String s : files) {
-            if (s.endsWith("-edges.txt")) {
-              edgeFile = s;
-            } else if (s.endsWith("-vertices.txt")) {
-              vertexFile = s;
-            }
-          }
-          if (edgeFile != null && vertexFile != null) {
-            GraphModelConstructor leftOperandDelta = GraphModelConstructor
-              .createGraphInformationWithVertices(edgeFile, vertexFile, headFactory);
-            modelData.incrementalUpdateWith(leftOperandDelta);
-          }
-        }
-      }
-    }
-
     // Initializing the model with the data
-    LogicalGraphToNestedModel model = new LogicalGraphToNestedModel(conf, modelData);
+    LogicalGraphToNestedModel2 model = new LogicalGraphToNestedModel2(conf, modelData);
 
-    // Writing the data information with the id information to be fast loaded in memory
-    model.serializeOperandsWithData(OUTPATH);
-
+    new DOTDataSink("/Volumes/Untitled/test", true).write(model.collectSourcesAsCollection(), true);
+    getExecutionEnvironment().execute();
   }
 
   /**

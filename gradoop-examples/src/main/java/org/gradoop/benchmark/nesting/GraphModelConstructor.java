@@ -19,6 +19,7 @@ package org.gradoop.benchmark.nesting;
 
 import com.sun.istack.Nullable;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.benchmark.nesting.functions.AssociateNewGraphHead;
@@ -59,6 +60,11 @@ public class GraphModelConstructor {
    * Associating each edge to the graph id
    */
   private DataSet<Tuple2<ImportEdge<String>, GradoopId>> allEdges;
+
+  /**
+   * Execution Environment
+   */
+  private static ExecutionEnvironment EE = getExecutionEnvironment();
 
   /**
    * Default constructor
@@ -106,12 +112,10 @@ public class GraphModelConstructor {
    */
   public static GraphModelConstructor createGraphInformationWithVertices(String edgePath,
     @Nullable String vertexPath, GraphHeadFactory hFac) {
-    ParametricInputFormat pif = ParametricInputFormat.getInstance();
 
     // Definition of the head associated to the graph that will be the search graph
-    DataSet<Tuple3<String, Boolean, GraphHead>> graphHead =
-      getExecutionEnvironment().fromElements(edgePath)
-        .map(new AssociateNewGraphHead(hFac, false));
+    DataSet<Tuple3<String, Boolean, GraphHead>> graphHead = EE.fromElements(edgePath)
+      .map(new AssociateNewGraphHead(hFac, false));
 
     // Mapping the graph as a graph index
     DataSet<GradoopId> graphId = graphHead
@@ -119,17 +123,17 @@ public class GraphModelConstructor {
       .map(new Id<>());
 
     // Associating each edge to a graph
-    DataSet<Tuple2<ImportEdge<String>, GradoopId>> edgesBelongToGraph =
-      getExecutionEnvironment().readFile(pif, edgePath)
-        .flatMap(new TripleSplit())
-        .crossWithTiny(graphId);
+    DataSet<Tuple2<ImportEdge<String>, GradoopId>> edgesBelongToGraph = EE
+      .readFile(new ParametricInputFormat(), edgePath)
+      .flatMap(new TripleSplit())
+      .crossWithTiny(graphId);
 
     // Loading the vertices optionally from a separate file (vertices not having an edge)
     DataSet<Tuple2<ImportVertex<String>, GradoopId>> allVertices = null;
     if (vertexPath != null) {
-      allVertices = getExecutionEnvironment().readFile(pif, vertexPath)
-          .map(new ImportVertexId<>())
-          .cross(graphId);
+      allVertices = EE.readFile(new ParametricInputFormat(), vertexPath)
+        .map(new ImportVertexId<>())
+        .cross(graphId);
     }
 
     // Associating each vertex to a graph

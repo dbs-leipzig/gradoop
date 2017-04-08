@@ -19,6 +19,7 @@ package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -35,6 +36,7 @@ public class DataSinkTupleOfGradoopId extends FileOutputFormat<Tuple2<GradoopId,
    */
   public DataSinkTupleOfGradoopId(Path outputPath) {
     super(outputPath);
+    setWriteMode(FileSystem.WriteMode.OVERWRITE);
   }
 
   @Override
@@ -42,4 +44,11 @@ public class DataSinkTupleOfGradoopId extends FileOutputFormat<Tuple2<GradoopId,
     stream.write(gradoopId.f0.toByteArray());
     stream.write(gradoopId.f1.toByteArray());
   }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    this.getRuntimeContext().getLongCounter("bogus").add(1);
+  }
+
 }

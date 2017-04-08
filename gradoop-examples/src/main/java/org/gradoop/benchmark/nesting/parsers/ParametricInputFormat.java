@@ -27,14 +27,9 @@ import java.io.IOException;
 public class ParametricInputFormat extends DelimitedInputFormat<String> {
 
   /**
-   * Instance of the singleton
-   */
-  private static ParametricInputFormat SINGLETON;
-
-  /**
    * Private constructor
    */
-  private ParametricInputFormat() {
+  public ParametricInputFormat() {
     super();
   }
 
@@ -42,18 +37,6 @@ public class ParametricInputFormat extends DelimitedInputFormat<String> {
   public String readRecord(String reuse, byte[] bytes, int offset, int numBytes)
     throws IOException {
     return new String(bytes, offset, numBytes, "UTF-8");
-  }
-
-  /**
-   * Initializes the singleton if required, and returns it.
-   *
-   * @return  the unique instance of the singleton
-   */
-  public static ParametricInputFormat getInstance() {
-    if (SINGLETON == null) {
-      SINGLETON = new ParametricInputFormat();
-    }
-    return SINGLETON;
   }
 
 }
