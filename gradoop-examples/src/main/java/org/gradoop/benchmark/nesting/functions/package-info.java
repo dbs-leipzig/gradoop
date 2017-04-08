@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the functions for executing the benchmarks
+ * Contains the programs to execute the benchmarks.
  */
 package org.gradoop.benchmark.nesting.functions;

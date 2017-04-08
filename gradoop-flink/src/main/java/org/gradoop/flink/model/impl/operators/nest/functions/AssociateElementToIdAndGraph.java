@@ -31,8 +31,8 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  *
  * @param <X> GraphElement type
  */
-public class AssociateElementToIdAndGraph<X extends GraphElement> implements
-  FlatMapFunction<X, Tuple2<GradoopId, GradoopId>> {
+public class AssociateElementToIdAndGraph<X extends GraphElement>
+  implements FlatMapFunction<X, Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Reusable lement
