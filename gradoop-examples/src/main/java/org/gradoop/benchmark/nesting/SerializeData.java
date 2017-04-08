@@ -4,11 +4,14 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.core.fs.Path;
 import org.apache.flink.runtime.jobmanager.JobManager;
 import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggerRepository;
 import org.gradoop.benchmark.nesting.functions.*;
+import org.gradoop.benchmark.nesting.serializers.DataSinkGradoopId;
+import org.gradoop.benchmark.nesting.serializers.DataSinkTupleOfGradoopId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -72,7 +75,7 @@ public class SerializeData extends AbstractRunner {
     final String edges_global_file = "/Volumes/Untitled/Data/gMarkGen/OSN/100.txt";
     final String vertices_global_file = null;
     final String subgraphs = "/Volumes/Untitled/Data/gMarkGen/operands/100/";
-    final String flattenedOutput = "/Users/vasistas/test";
+    final String flattenedOutput = "/Users/vasistas/test/";
 
     GraphCollectionDelta start = extractGraphFromFiles(edges_global_file, vertices_global_file,
       true);
@@ -128,24 +131,38 @@ public class SerializeData extends AbstractRunner {
     DataSet<Vertex> vertices = intermediateVertex.map(new Value1Of2<>());
 
     writeFlattenedGraph(heads, vertices, edges, flattenedOutput);
+    writeIndexFromSource(true, start, vertices, edges, flattenedOutput);
+    writeIndexFromSource(false, start, vertices, edges, flattenedOutput);
+  }
 
-    DataSet<GraphHead> leftOperandHeads = start.getHeads()
-      .filter(new Value1Of3AsFilter())
+  public static void writeIndexFromSource(boolean isLeftOperand, GraphCollectionDelta start,
+    DataSet<Vertex> vertices, DataSet<Edge> edges, String file) throws Exception {
+    DataSet<GraphHead> operandHeads = start.getHeads()
+      .filter(new Value1Of3AsFilter(isLeftOperand))
       .map(new Value2Of3<>());
 
-    DataSet<Vertex> leftOperandVertices = vertices
-      .joinWithTiny(leftOperandHeads)
+    DataSet<Vertex> operandVertices = vertices
+      .joinWithTiny(operandHeads)
       .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(new SelectElementsInHeads<>());
 
-    DataSet<Edge> leftOperandEdges = edges
-      .joinWithTiny(leftOperandHeads)
+    DataSet<Edge> operandEdges = edges
+      .joinWithTiny(operandHeads)
       .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(new SelectElementsInHeads<>());
 
-    NestingIndex leftIndex = NestingBase.createIndex(LogicalGraph.fromDataSets(leftOperandHeads,
-      leftOperandVertices,
-      leftOperandEdges, CONFIGURATION));
+    NestingIndex leftIndex;
+
+    if (isLeftOperand) {
+      leftIndex = NestingBase.createIndex(LogicalGraph.fromDataSets(operandHeads,
+        operandVertices,
+        operandEdges, CONFIGURATION));
+    } else {
+      leftIndex = NestingBase.createIndex(GraphCollection.fromDataSets(operandHeads,
+        operandVertices,
+        operandEdges, CONFIGURATION));
+    }
+    writeIndex(leftIndex, file + (isLeftOperand ? "left": "right"));
   }
 
   /**
@@ -166,7 +183,6 @@ public class SerializeData extends AbstractRunner {
 
     GraphCollection lg = GraphCollection.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
     writeGraphCollection(lg, path);
-    System.out.println(ExecutionEnvironment.getExecutionEnvironment().getExecutionPlan());
   }
 
   /**
@@ -223,6 +239,24 @@ public class SerializeData extends AbstractRunner {
     return new GraphCollectionDelta(delta.getHeads().union(deltaPlus.getHeads()),
       delta.getVertices().union(deltaPlus.getVertices()),
       delta.getEdges().union(deltaPlus.getEdges()));
+  }
+
+  /**
+   * Writes an index
+   * @param left  Graph index
+   * @param s     File path
+   */
+  private static void writeIndex(NestingIndex left, String s) throws Exception {
+    left.getGraphHeads()
+      .output(new DataSinkGradoopId(new Path(s + "-heads.bin")));
+
+    left.getGraphHeadToVertex()
+      .output(new DataSinkTupleOfGradoopId(new Path(s + "-vertex.bin")));
+
+    left.getGraphHeadToEdge()
+      .output(new DataSinkTupleOfGradoopId(new Path(s + "-edges.bin")));
+
+    ENVIRONMENT.execute();
   }
 
 
