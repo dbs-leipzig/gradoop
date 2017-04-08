@@ -35,9 +35,15 @@ public class SerializeData extends AbstractRunner {
     final String edges_global_file = "/Volumes/Untitled/Data/gMarkGen/OSN/100.txt";
     final String vertices_global_file = null;
 
-    GraphCollectionDelta s = extractGraphFromFiles(edges_global_file, vertices_global_file);
-    DataSet<Tuple2<String, Vertex>> intermediateVertex = createGraphVertices(s.getVertices());
+    GraphCollectionDelta start = extractGraphFromFiles(edges_global_file, vertices_global_file);
 
+    // TODO: Loop for each file within the folder
+    GraphCollectionDelta s = deltaUpdateGraphCollection(start,
+      "/Volumes/Untitled/Data/gMarkGen/operands/100/100.txt-10-1-4-0-0.400000-edges.txt",
+      "/Volumes/Untitled/Data/gMarkGen/operands/100/100.txt-10-1-4-0-0.400000-vertices.txt");
+
+
+    DataSet<Tuple2<String, Vertex>> intermediateVertex = createGraphVertices(s.getVertices());
     DataSet<GraphHead> heads = s.getHeads().map(new Value2Of3<>());
 
     DataSet<Edge> edges = s.getEdges()
@@ -94,7 +100,17 @@ public class SerializeData extends AbstractRunner {
     return new GraphCollectionDelta(heads, vertices, edges);
   }
 
-  
+  private static GraphCollectionDelta deltaUpdateGraphCollection(GraphCollectionDelta delta,
+    String edges_global_file, String vertices_global_file) {
+
+    GraphCollectionDelta deltaPlus = extractGraphFromFiles(edges_global_file, vertices_global_file);
+
+    return new GraphCollectionDelta(delta.getHeads().union(deltaPlus.getHeads()),
+      delta.getVertices().union(deltaPlus.getVertices()),
+      delta.getEdges().union(deltaPlus.getEdges()));
+  }
+
+
 
 
 }

@@ -8,7 +8,7 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 /**
  * Created by vasistas on 08/04/17.
  */
-@FunctionAnnotation.ForwardedFields("* -> id")
+@FunctionAnnotation.ForwardedFields("* -> f0")
 public class StringAsVertex implements MapFunction<String, ImportVertex<String>> {
 
   private final ImportVertex<String> reusable;
