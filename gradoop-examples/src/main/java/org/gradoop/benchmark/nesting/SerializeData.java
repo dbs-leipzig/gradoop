@@ -20,6 +20,7 @@
  */
 package org.gradoop.benchmark.nesting;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -68,43 +69,71 @@ import java.util.stream.Collectors;
  */
 public class SerializeData extends AbstractRunner {
 
-  public final static ExecutionEnvironment ENVIRONMENT;
-  public final static GradoopFlinkConfig CONFIGURATION;
+  /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option to declare path to input graph
+   */
+  private static final String OPTION_SUBGRAPHS_FOLDER = "s";
+  /**
+   * Path to CSV log file
+   */
+  private static final String OUTPUT_MODEL = "o";
+
+  static {
+    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in gMark format");
+    OPTIONS.addOption(OPTION_SUBGRAPHS_FOLDER, "sub", true, "Graph Folder containing subgraphs" +
+      " of the main input in gMark format. Each file could be either a vertex file (*-edges.txt) " +
+      "or an edge one (*-vertices.txt)");
+    OPTIONS.addOption(OUTPUT_MODEL, "out", true, "Path to output in nested format");
+  }
+
+  /**
+   * Path to input graph data
+   */
+  private static String INPUT_PATH;
+  /**
+   * Query to execute.
+   */
+  private static String SUBGRAPHS;
+  /**
+   * Path to output
+   */
+  private static String OUTPATH;
+
+  /**
+   * Global environment
+   */
+  private final static ExecutionEnvironment ENVIRONMENT;
+
+  /**
+   * GradoopFlink configuration
+   */
+  private final static GradoopFlinkConfig CONFIGURATION;
 
   static {
     ENVIRONMENT = getExecutionEnvironment();
     CONFIGURATION = GradoopFlinkConfig.createConfig(ENVIRONMENT);
   }
 
-  public static void disableLogging() throws NoSuchFieldException, IllegalAccessException {
-    Log4jLoggerAdapter logger = (Log4jLoggerAdapter)LoggerFactory
-      .getLogger(JobManager.class);
-    Field loggerField = Log4jLoggerAdapter.class.getDeclaredField("logger");
-    loggerField.setAccessible(true);
-    Logger loggerObject = (Logger)loggerField.get(logger);
-
-
-    Field repoField = Category.class.getDeclaredField("repository");
-    repoField.setAccessible(true);
-    LoggerRepository repoObject = (LoggerRepository)repoField.get(loggerObject);
-
-    repoObject.setThreshold(Level.OFF);
-  }
-
   public static void main(String[] args) throws Exception {
+    CommandLine cmd = parseArguments(args, SerializeData.class.getName());
+    if (cmd == null) {
+      System.exit(1);
+    }
 
-    //disableLogging();
-    final String edges_global_file = "/Volumes/Untitled/Data/gMarkGen/OSN/100.txt";
-    final String vertices_global_file = null;
-    final String subgraphs = "/Volumes/Untitled/Data/gMarkGen/operands/100/";
-    final String flattenedOutput = "/Users/vasistas/test/";
+    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
+    SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
+    OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
 
-    GraphCollectionDelta start = extractGraphFromFiles(edges_global_file, vertices_global_file,
-      true);
+    GraphCollectionDelta start =
+      extractGraphFromFiles(INPUT_PATH, null, true);
 
     // Loading the graphs appearing in the graph collection
     // 1. Returning each vertex and edge files association
-    File[] filesInDirectory = new File(subgraphs).listFiles();
+    File[] filesInDirectory = new File(SUBGRAPHS).listFiles();
     Map<String, List<String>> l = filesInDirectory != null ?
       Arrays.stream(filesInDirectory)
         .map(File::getAbsolutePath)
@@ -152,9 +181,9 @@ public class SerializeData extends AbstractRunner {
 
     DataSet<Vertex> vertices = intermediateVertex.map(new Value1Of2<>());
 
-    writeFlattenedGraph(heads, vertices, edges, flattenedOutput);
-    writeIndexFromSource(true, start, vertices, edges, flattenedOutput);
-    writeIndexFromSource(false, start, vertices, edges, flattenedOutput);
+    writeFlattenedGraph(heads, vertices, edges, OUTPATH);
+    writeIndexFromSource(true, start, vertices, edges, OUTPATH);
+    writeIndexFromSource(false, start, vertices, edges, OUTPATH);
   }
 
   public static void writeIndexFromSource(boolean isLeftOperand, GraphCollectionDelta start,
