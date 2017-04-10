@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -30,11 +30,11 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  * belongs-to-graph information is kept in the distributed
  * indexing structure, that is the IdGraphDatabase
  *
- * @param <X> GraphElement type
+ * @param <EL> GraphElement type
  */
 @FunctionAnnotation.ForwardedFields("id -> f1")
-public class AssociateElementToIdAndGraph<X extends GraphElement> implements
-  FlatMapFunction<X, Tuple2<GradoopId, GradoopId>> {
+public class ToIdElementPair<EL extends GraphElement>
+  implements FlatMapFunction<EL, Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Reusable lement
@@ -44,12 +44,12 @@ public class AssociateElementToIdAndGraph<X extends GraphElement> implements
   /**
    * Default constructor
    */
-  public AssociateElementToIdAndGraph() {
+  public ToIdElementPair() {
     reusable = new Tuple2<>();
   }
 
   @Override
-  public void flatMap(X value, Collector<Tuple2<GradoopId, GradoopId>> out) throws Exception {
+  public void flatMap(EL value, Collector<Tuple2<GradoopId, GradoopId>> out) throws Exception {
     reusable.f1 = value.getId();
     for (GradoopId gid : value.getGraphIds()) {
       reusable.f0 = gid;

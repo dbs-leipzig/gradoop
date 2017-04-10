@@ -35,12 +35,12 @@ public class NestingIndex {
   /**
    * Pairs of graph heads' ids and vertices' ids belonging to a specific graph head
    */
-  private DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex;
+  private DataSet<Tuple2<GradoopId, GradoopId>> graphVertexMap;
 
   /**
    * Pairs of graph heads' ids and edges' ids belonging to a specific graph head
    */
-  private DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge;
+  private DataSet<Tuple2<GradoopId, GradoopId>> graphEdgeMap;
 
   /**
    * Remembers each association between the current actual graph and its original one
@@ -50,19 +50,19 @@ public class NestingIndex {
   /**
    * Creating an instance of the graph database by just using the elements' ids
    * @param graphHeads          The heads defining the component at the first level of annidation
-   * @param graphHeadToVertex   The vertices defining the components at the intermediately down
+   * @param graphVertexMap   The vertices defining the components at the intermediately down
    *                            level
-   * @param graphHeadToEdge     The edges appearing between each possible level
+   * @param graphEdgeMap     The edges appearing between each possible level
    * @param graphStack          The association between each nested graph and the graph where it
    *                            belongs
    */
   public NestingIndex(DataSet<GradoopId> graphHeads,
-    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
-    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphVertexMap,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphEdgeMap,
     DataSet<Tuple2<GradoopId, GradoopId>> graphStack) {
     this.graphHeads = graphHeads;
-    this.graphHeadToVertex = graphHeadToVertex;
-    this.graphHeadToEdge = graphHeadToEdge;
+    this.graphVertexMap = graphVertexMap;
+    this.graphEdgeMap = graphEdgeMap;
     this.graphStack = graphStack;
   }
 
@@ -70,14 +70,14 @@ public class NestingIndex {
    * Creating an instance of the graph database by just using the elements' ids.
    * The graph stack is empty (that is, a null element)
    * @param graphHeads          The heads defining the component at the first level of annidation
-   * @param graphHeadToVertex   The vertices defining the components at the intermediately down
+   * @param graphVertexMap   The vertices defining the components at the intermediately down
    *                            level
-   * @param graphHeadToEdge     The edges appearing between each possible level
+   * @param graphEdgeMap     The edges appearing between each possible level
    */
   public NestingIndex(DataSet<GradoopId> graphHeads,
-    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
-    DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge) {
-    this(graphHeads, graphHeadToVertex, graphHeadToEdge, null);
+    DataSet<Tuple2<GradoopId, GradoopId>> graphVertexMap,
+    DataSet<Tuple2<GradoopId, GradoopId>> graphEdgeMap) {
+    this(graphHeads, graphVertexMap, graphEdgeMap, null);
   }
 
   /**
@@ -92,16 +92,16 @@ public class NestingIndex {
    * Retuns…
    * @return  the association between the graph heads and the vertices
    */
-  public DataSet<Tuple2<GradoopId, GradoopId>> getGraphHeadToVertex() {
-    return graphHeadToVertex;
+  public DataSet<Tuple2<GradoopId, GradoopId>> getGraphVertexMap() {
+    return graphVertexMap;
   }
 
   /**
    * Returns…
    * @return  the association between the graph heads and the edges
    */
-  public DataSet<Tuple2<GradoopId, GradoopId>> getGraphHeadToEdge() {
-    return graphHeadToEdge;
+  public DataSet<Tuple2<GradoopId, GradoopId>> getGraphEdgeMap() {
+    return graphEdgeMap;
   }
 
   /**
@@ -117,7 +117,7 @@ public class NestingIndex {
    * @param tuple2DataSet Elements to be added
    */
   public void addNewEdges(DataSet<Tuple2<GradoopId, GradoopId>> tuple2DataSet) {
-    graphHeadToEdge = graphHeadToEdge.union(tuple2DataSet);
+    graphEdgeMap = graphEdgeMap.union(tuple2DataSet);
   }
 
   /**
@@ -125,14 +125,14 @@ public class NestingIndex {
    * @param cross Elements to be added
    */
   public void addNewVertices(DataSet<Tuple2<GradoopId, GradoopId>> cross) {
-    graphHeadToVertex = graphHeadToVertex.union(cross);
+    graphVertexMap = graphVertexMap.union(cross);
   }
 
   /**
    * Updates the existing stack with the information about the new graph
    * @param stacks new stack element to be added
    */
-  public void updateStackWith(DataSet<Tuple2<GradoopId, GradoopId>> stacks) {
+  public void addToStack(DataSet<Tuple2<GradoopId, GradoopId>> stacks) {
     if (graphStack == null) {
       graphStack = stacks;
     } else {
@@ -145,6 +145,6 @@ public class NestingIndex {
    * @param edges New edges to be added
    */
   public void incrementallyUpdateEdges(DataSet<Tuple2<GradoopId, GradoopId>> edges) {
-    graphHeadToEdge = graphHeadToEdge.union(edges);
+    graphEdgeMap = graphEdgeMap.union(edges);
   }
 }

@@ -23,20 +23,45 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
- * f0 = Edge => (Old) Edge Id     |  Vertex => Data Lake id
+ * This class describes the state of the matching at different computation phase, either for
+ * vertices or edges.
+ *
+ * 1) VERTICES
+ *
+ *     a. Initializing a match [1st round] between vertices (graph vs. graph collection).
+ *        The match is OK (that is, the same vertex id are matched)
+ *
+ *        f0 = graph head id from the search graph id
+ *        f1 = vertex id from the search graph id and the graph collection
+ *        f2 = graph head id from the graph collection
+ *
+ *     b. Initializing a match [2nd round] between vertices (graph vs. graph collection).
+ *        The match is OK (that is, the same vertex id are matched)
+ *
+ *        f0 = graph head id from the search graph id
+ *        f1 = vertex id from the search graph id and the graph collection
+ *        f2 = vertex id from the search graph id and the graph collection
+ *        f4 = the value of the match is f2 from [1a], that is "graph head id from the graph
+ *        collection". This will become a vertex of the nested graph.
+ *
+ *
+ * 2) EDGES
+ *
+ *
+ * f0 = Edge => (Old) Edge Id     |  Vertex => search graph id
  * f1 = Edge =>       Edge Source |  Vertex => Vertex Id
  * f2 = Matching space.
  *      Edge => E. Source or Dst  |  Vertex => Graph Collection id
  *                                             At a later step, to be changed with its id
  * f3 = Edge Target (only if this represents an edge)
  * f4 = Edge: If the edge has been updated, contains the new edge's id. Otherwise, it is NULL_ID
- *      Vertex: the gc id
+ *      Vertex: the graph collection id
  * 45 = Edge: Data Lake id        |  Vertex => Null
  */
 public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId, GradoopId, GradoopId> {
 
   /**
-   * Defines the quad from the joining of the vertices
+   * Defines the quad from the joining of the vertices [Phase 1a]
    * @param fromGraph          Vertex appearing in the data lake (if present)
    * @param fromGraphCollection   Vertex appearing in the graph collection (if present)
    */
@@ -167,7 +192,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * If the Exaplet represents a vertex, then this method is called when the fe f4 field
+   * If the Exaplet represents a vertex, then this method is called when the f4 field
    * representing the GraphCollection where it appears is set. So this vertex will be marked as
    * one to be replaced by an aggregated vertex.
    *

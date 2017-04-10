@@ -17,17 +17,18 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Uses the GradoopId element itself as a selection criterion
- * @param <K> any type
+ * Filtering out all the pairs where the vertex is the one representing the
+ * graph head, that is do not admit representation overlappings on the same
+ * nest level
  */
-@FunctionAnnotation.ForwardedFields("* -> *")
-public class Identity<K> implements KeySelector<K, K> {
+public class NotGraphHead implements FilterFunction<Tuple2<GradoopId, GradoopId>> {
   @Override
-  public K getKey(K value) throws Exception {
-    return value;
+  public boolean filter(Tuple2<GradoopId, GradoopId> value) throws Exception {
+    return !value.f1.equals(value.f0);
   }
 }
