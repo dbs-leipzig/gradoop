@@ -17,10 +17,12 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
+import org.apache.flink.api.common.io.BinaryOutputFormat;
 import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -29,27 +31,9 @@ import java.io.IOException;
  * Writes GradoopIds to bytes
  */
 @FunctionAnnotation.SkipCodeAnalysis
-public class SerializeGradoopIdToFile extends FileOutputFormat<GradoopId> {
-
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Default constructor
-   * @param outputPath  file where to write the values
-   */
-  public SerializeGradoopIdToFile(Path outputPath) {
-    super(outputPath);
-    setWriteMode(FileSystem.WriteMode.OVERWRITE);
-  }
-
+public class SerializeGradoopIdToFile extends BinaryOutputFormat<GradoopId> {
   @Override
-  public void writeRecord(GradoopId gradoopId) throws IOException {
-    stream.write(gradoopId.toByteArray());
+  protected void serialize(GradoopId record, DataOutputView dataOutput) throws IOException {
+    dataOutput.write(record.toByteArray());
   }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-  }
-
 }

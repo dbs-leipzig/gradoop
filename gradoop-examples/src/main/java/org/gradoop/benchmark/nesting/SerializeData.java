@@ -304,16 +304,9 @@ public class SerializeData extends NestingFilenameConvention {
    * @param s     File path
    */
   private static void writeIndex(NestingIndex left, String s) throws Exception {
-    SerializeGradoopIdToFile headFormat =
-      new SerializeGradoopIdToFile(new Path(s + INDEX_HEADERS_SUFFIX));
-    SerializePairOfIdsToFile vertexFormat =
-      new SerializePairOfIdsToFile(new Path(s + INDEX_VERTEX_SUFFIX));
-    SerializePairOfIdsToFile edgeFormat =
-      new SerializePairOfIdsToFile(new Path(s + INDEX_EDGE_SUFFIX));
-
-    left.getGraphHeads().output(headFormat);
-    left.getGraphHeadToVertex().output(vertexFormat);
-    left.getGraphHeadToEdge().output(edgeFormat);
+    left.getGraphHeads().write(new SerializeGradoopIdToFile(), s + INDEX_HEADERS_SUFFIX);
+    left.getGraphHeadToVertex().write(new SerializePairOfIdsToFile(), s + INDEX_VERTEX_SUFFIX);
+    left.getGraphHeadToEdge().write(new SerializePairOfIdsToFile(), s + INDEX_EDGE_SUFFIX);
 
     ENVIRONMENT.execute();
     LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
@@ -323,10 +316,6 @@ public class SerializeData extends NestingFilenameConvention {
       .getGraphHeadToVertex().count() +" indexEdges:" + left.getGraphHeadToEdge().count());
     LOGGER.newLine();
     LOGGER.newLine();
-
-    headFormat.close();
-    vertexFormat.close();
-    edgeFormat.close();
   }
 
 

@@ -17,9 +17,11 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
+import org.apache.flink.api.common.io.BinaryInputFormat;
 import org.apache.flink.api.common.io.FileInputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.memory.DataInputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -27,59 +29,19 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
-public class DeserializePairOfIdsFromFile extends FileInputFormat<Tuple2<GradoopId, GradoopId>> {
-
-  /**
-   * Reusable array
-   */
-  private final byte[] bytes;
-
-  /**
-   * Reusable Pair
-   */
-  private final Tuple2<GradoopId, GradoopId> reusable;
-
-  /**
-   * Default constructor
-   * @param file  file to be read
-   */
-  public DeserializePairOfIdsFromFile(Path file) {
-    super(file);
-    bytes = new byte[GradoopId.ID_SIZE];
-    reusable = new Tuple2<>();
-    reusable.f0 = GradoopId.NULL_VALUE;
-    reusable.f1 = GradoopId.NULL_VALUE;
-  }
-
-  public DeserializePairOfIdsFromFile(String file) {
-    this(new Path(file));
-  }
-
-  /**
-   * Default constructor
-   */
-  public DeserializePairOfIdsFromFile() {
-    bytes = new byte[GradoopId.ID_SIZE];
-    reusable = new Tuple2<>();
-    reusable.f0 = GradoopId.NULL_VALUE;
-    reusable.f1 = GradoopId.NULL_VALUE;
-  }
+public class DeserializePairOfIdsFromFile extends BinaryInputFormat<Tuple2<GradoopId, GradoopId>> {
 
   @Override
-  public boolean reachedEnd() throws IOException {
-    return stream.available() > 0;
-  }
-
-  @Override
-  public Tuple2<GradoopId, GradoopId> nextRecord(Tuple2<GradoopId, GradoopId> gradoopId)
-    throws IOException {
-    if (stream.read(bytes) > 0) {
-      reusable.f0 = GradoopId.fromByteArray(bytes);
+  protected Tuple2<GradoopId, GradoopId> deserialize(Tuple2<GradoopId, GradoopId> reuse,
+    DataInputView dataInput) throws IOException {
+    if (reuse == null) {
+      reuse = new Tuple2<>();
+      reuse.f0 = GradoopId.NULL_VALUE;
+      reuse.f1 = GradoopId.NULL_VALUE;
     }
-    if (stream.read(bytes) > 0) {
-      reusable.f1 = GradoopId.fromByteArray(bytes);
-    }
-    return reusable;
+    reuse.f0.read(dataInput);
+    reuse.f1.read(dataInput);
+    return reuse;
   }
 
 }

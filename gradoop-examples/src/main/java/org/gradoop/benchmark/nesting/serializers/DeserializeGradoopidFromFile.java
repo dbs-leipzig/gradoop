@@ -17,8 +17,10 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
+import org.apache.flink.api.common.io.BinaryInputFormat;
 import org.apache.flink.api.common.io.FileInputFormat;
 import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.memory.DataInputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -26,45 +28,15 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
-public class DeserializeGradoopidFromFile extends FileInputFormat<GradoopId> {
-
-  /**
-   * Reusable array
-   */
-  private final byte[] bytes;
-
-  /**
-   * Default constructor
-   * @param filename File name to be read
-   */
-  public DeserializeGradoopidFromFile(Path filename) {
-    super(filename);
-    bytes = new byte[GradoopId.ID_SIZE];
-  }
-
-  public DeserializeGradoopidFromFile(String filename) {
-    this(new Path(filename));
-  }
-
-  /**
-   * Default constructor: no file name associated
-   */
-  public DeserializeGradoopidFromFile() {
-    bytes = new byte[GradoopId.ID_SIZE];
-  }
+public class DeserializeGradoopidFromFile extends BinaryInputFormat<GradoopId> {
 
   @Override
-  public boolean reachedEnd() throws IOException {
-    return stream.available() > 0;
-  }
-
-  @Override
-  public GradoopId nextRecord(GradoopId gradoopId) throws IOException {
-    if (stream.read(bytes) > 0) {
-      return GradoopId.fromByteArray(bytes);
-    } else {
-      return null;
+  protected GradoopId deserialize(GradoopId reuse, DataInputView dataInput) throws IOException {
+    if (reuse == null) {
+      reuse = GradoopId.NULL_VALUE;
     }
+    reuse.read(dataInput);
+    return reuse;
   }
 
 }

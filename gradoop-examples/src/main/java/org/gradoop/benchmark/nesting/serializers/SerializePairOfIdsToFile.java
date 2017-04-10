@@ -17,10 +17,12 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
+import org.apache.flink.api.common.io.BinaryOutputFormat;
 import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -28,26 +30,11 @@ import java.io.IOException;
 /**
  * Writes <GradoopId,GradoopId> pairs to bytes
  */
-public class SerializePairOfIdsToFile extends FileOutputFormat<Tuple2<GradoopId, GradoopId>> {
-
-  /**
-   * Default constructor
-   * @param outputPath  File where to write the values
-   */
-  public SerializePairOfIdsToFile(Path outputPath) {
-    super(outputPath);
-    setWriteMode(FileSystem.WriteMode.OVERWRITE);
-  }
-
+public class SerializePairOfIdsToFile extends BinaryOutputFormat<Tuple2<GradoopId, GradoopId>> {
   @Override
-  public void writeRecord(Tuple2<GradoopId, GradoopId> gradoopId) throws IOException {
-    stream.write(gradoopId.f0.toByteArray());
-    stream.write(gradoopId.f1.toByteArray());
+  protected void serialize(Tuple2<GradoopId, GradoopId> record, DataOutputView dataOutput) throws
+    IOException {
+    dataOutput.write(record.f0.toByteArray());
+    dataOutput.write(record.f1.toByteArray());
   }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-  }
-
 }
