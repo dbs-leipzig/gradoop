@@ -26,19 +26,15 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.Path;
-import org.apache.flink.runtime.jobmanager.JobManager;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggerRepository;
+import org.apache.log4j.varia.NullAppender;
 import org.gradoop.benchmark.nesting.functions.*;
 import org.gradoop.benchmark.nesting.model.GraphCollectionDelta;
-import org.gradoop.benchmark.nesting.serializers.DataSinkGradoopId;
-import org.gradoop.benchmark.nesting.serializers.DataSinkTupleOfGradoopId;
+import org.gradoop.benchmark.nesting.serializers.SerializeGradoopIdToFile;
+import org.gradoop.benchmark.nesting.serializers.SerializePairOfIdsToFile;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
@@ -51,12 +47,11 @@ import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.apache.log4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.Log4jLoggerAdapter;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.lang.reflect.Field;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +62,7 @@ import java.util.stream.Collectors;
 /**
  * Initializing the model by writing it down for some further and subsequent tests
  */
-public class SerializeData extends AbstractRunner {
+public class SerializeData extends NestingFilenameConvention {
 
   /**
    * Option to declare path to input graph
@@ -111,7 +106,9 @@ public class SerializeData extends AbstractRunner {
   /**
    * GradoopFlink configuration
    */
-  private final static GradoopFlinkConfig CONFIGURATION;
+  private static GradoopFlinkConfig CONFIGURATION;
+
+  private static BufferedWriter LOGGER;
 
   static {
     ENVIRONMENT = getExecutionEnvironment();
@@ -127,6 +124,10 @@ public class SerializeData extends AbstractRunner {
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
     OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
+    LOGGER =
+      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPATH
+        +"LOGGING.txt")
+      )));
 
     GraphCollectionDelta start =
       extractGraphFromFiles(INPUT_PATH, null, true);
@@ -155,8 +156,7 @@ public class SerializeData extends AbstractRunner {
           }
         }
         if (edgeFile != null && vertexFile != null) {
-          GraphCollectionDelta s = deltaUpdateGraphCollection(start, edgeFile, vertexFile, false);
-          start = s;
+          start = deltaUpdateGraphCollection(start, edgeFile, vertexFile);
         }
       }
     }
@@ -184,6 +184,7 @@ public class SerializeData extends AbstractRunner {
     writeFlattenedGraph(heads, vertices, edges, OUTPATH);
     writeIndexFromSource(true, start, vertices, edges, OUTPATH);
     writeIndexFromSource(false, start, vertices, edges, OUTPATH);
+    LOGGER.close();
   }
 
   public static void writeIndexFromSource(boolean isLeftOperand, GraphCollectionDelta start,
@@ -202,6 +203,7 @@ public class SerializeData extends AbstractRunner {
       .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(new SelectElementsInHeads<>());
 
+    LOGGER.newLine();
     NestingIndex leftIndex;
 
     if (isLeftOperand) {
@@ -213,7 +215,7 @@ public class SerializeData extends AbstractRunner {
         operandVertices,
         operandEdges, CONFIGURATION));
     }
-    writeIndex(leftIndex, file + (isLeftOperand ? "left": "right"));
+    writeIndex(leftIndex, generateOperandBasePath(file, isLeftOperand));
   }
 
   /**
@@ -232,10 +234,13 @@ public class SerializeData extends AbstractRunner {
       .union(vertices)
       .distinct(new Id<>());
 
-    GraphCollection lg = GraphCollection.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
-    writeGraphCollection(lg, path);
-    System.out.println("\t\t\tWriting GraphCollection MSECONDS =(" + ENVIRONMENT
+    LogicalGraph lg = LogicalGraph.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
+    writeLogicalGraph(lg, path);
+    LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
+    LOGGER.write("vertices: "+ lg.getVertices().count() + " edges: "+ lg.getEdges().count() + " " +
+      "heads: "+ lg.getGraphHead().count());
+    LOGGER.newLine();
   }
 
   /**
@@ -280,14 +285,13 @@ public class SerializeData extends AbstractRunner {
    * @param delta                 Previous updated version
    * @param edges_global_file     File defining the edges
    * @param vertices_global_file  File defining the vertices
-   * @param isLeftOperand         If the element is part of the left operand
    * @return                      Updates the graph definition
    */
   private static GraphCollectionDelta deltaUpdateGraphCollection(GraphCollectionDelta delta,
-    String edges_global_file, String vertices_global_file, boolean isLeftOperand) {
+    String edges_global_file, String vertices_global_file) {
 
     GraphCollectionDelta deltaPlus = extractGraphFromFiles(edges_global_file,
-      vertices_global_file, isLeftOperand);
+      vertices_global_file, false);
 
     return new GraphCollectionDelta(delta.getHeads().union(deltaPlus.getHeads()),
       delta.getVertices().union(deltaPlus.getVertices()),
@@ -300,18 +304,29 @@ public class SerializeData extends AbstractRunner {
    * @param s     File path
    */
   private static void writeIndex(NestingIndex left, String s) throws Exception {
-    left.getGraphHeads()
-      .output(new DataSinkGradoopId(new Path(s + "-heads.bin")));
+    SerializeGradoopIdToFile headFormat =
+      new SerializeGradoopIdToFile(new Path(s + INDEX_HEADERS_SUFFIX));
+    SerializePairOfIdsToFile vertexFormat =
+      new SerializePairOfIdsToFile(new Path(s + INDEX_VERTEX_SUFFIX));
+    SerializePairOfIdsToFile edgeFormat =
+      new SerializePairOfIdsToFile(new Path(s + INDEX_EDGE_SUFFIX));
 
-    left.getGraphHeadToVertex()
-      .output(new DataSinkTupleOfGradoopId(new Path(s + "-vertex.bin")));
-
-    left.getGraphHeadToEdge()
-      .output(new DataSinkTupleOfGradoopId(new Path(s + "-edges.bin")));
+    left.getGraphHeads().output(headFormat);
+    left.getGraphHeadToVertex().output(vertexFormat);
+    left.getGraphHeadToEdge().output(edgeFormat);
 
     ENVIRONMENT.execute();
-    System.out.println("\t\t\tWriting Index " + s + " MSECONDS =(" + ENVIRONMENT
+    LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
+    LOGGER.newLine();
+    LOGGER.write("indexHeads: "+ left.getGraphHeads().count()+" indexVertices: "+ left
+      .getGraphHeadToVertex().count() +" indexEdges:" + left.getGraphHeadToEdge().count());
+    LOGGER.newLine();
+    LOGGER.newLine();
+
+    headFormat.close();
+    vertexFormat.close();
+    edgeFormat.close();
   }
 
 

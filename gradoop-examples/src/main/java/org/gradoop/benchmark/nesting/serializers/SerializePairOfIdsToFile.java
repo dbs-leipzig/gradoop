@@ -18,7 +18,7 @@
 package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.FileOutputFormat;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -26,31 +26,28 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import java.io.IOException;
 
 /**
- * Writes GradoopIds to bytes
+ * Writes <GradoopId,GradoopId> pairs to bytes
  */
-@FunctionAnnotation.SkipCodeAnalysis
-public class DataSinkGradoopId extends FileOutputFormat<GradoopId> {
-
-  private static final long serialVersionUID = 1L;
+public class SerializePairOfIdsToFile extends FileOutputFormat<Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Default constructor
-   * @param outputPath  file where to write the values
+   * @param outputPath  File where to write the values
    */
-  public DataSinkGradoopId(Path outputPath) {
+  public SerializePairOfIdsToFile(Path outputPath) {
     super(outputPath);
     setWriteMode(FileSystem.WriteMode.OVERWRITE);
   }
 
   @Override
-  public void writeRecord(GradoopId gradoopId) throws IOException {
-    stream.write(gradoopId.toByteArray());
+  public void writeRecord(Tuple2<GradoopId, GradoopId> gradoopId) throws IOException {
+    stream.write(gradoopId.f0.toByteArray());
+    stream.write(gradoopId.f1.toByteArray());
   }
 
   @Override
   public void close() throws IOException {
     super.close();
-    this.getRuntimeContext().getLongCounter("bogus").add(1);
   }
 
 }

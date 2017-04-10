@@ -17,8 +17,10 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
-import org.apache.flink.api.common.io.FileInputFormat;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.io.FileOutputFormat;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -26,41 +28,28 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
-public class DataSourceTupleOfGradoopId extends FileInputFormat<Tuple2<GradoopId, GradoopId>> {
+@FunctionAnnotation.SkipCodeAnalysis
+public class SerializeGradoopIdToFile extends FileOutputFormat<GradoopId> {
 
-  /**
-   * Reusable array
-   */
-  private final byte[] bytes;
-
-  /**
-   * Reusable Pair
-   */
-  private final Tuple2<GradoopId, GradoopId> reusable;
+  private static final long serialVersionUID = 1L;
 
   /**
    * Default constructor
+   * @param outputPath  file where to write the values
    */
-  public DataSourceTupleOfGradoopId() {
-    bytes = new byte[GradoopId.ID_SIZE];
-    reusable = new Tuple2<>();
+  public SerializeGradoopIdToFile(Path outputPath) {
+    super(outputPath);
+    setWriteMode(FileSystem.WriteMode.OVERWRITE);
   }
 
   @Override
-  public boolean reachedEnd() throws IOException {
-    return stream.available() > 0;
+  public void writeRecord(GradoopId gradoopId) throws IOException {
+    stream.write(gradoopId.toByteArray());
   }
 
   @Override
-  public Tuple2<GradoopId, GradoopId> nextRecord(Tuple2<GradoopId, GradoopId> gradoopId)
-    throws IOException {
-    if (stream.read(bytes) > 0) {
-      reusable.f0 = GradoopId.fromByteArray(bytes);
-    }
-    if (stream.read(bytes) > 0) {
-      reusable.f1 = GradoopId.fromByteArray(bytes);
-    }
-    return reusable;
+  public void close() throws IOException {
+    super.close();
   }
 
 }

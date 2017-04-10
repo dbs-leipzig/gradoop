@@ -17,38 +17,54 @@
 
 package org.gradoop.benchmark.nesting.serializers;
 
-import org.apache.flink.api.common.io.FileOutputFormat;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.api.common.io.FileInputFormat;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
 
 /**
- * Writes <GradoopId,GradoopId> pairs to bytes
+ * Writes GradoopIds to bytes
  */
-public class DataSinkTupleOfGradoopId extends FileOutputFormat<Tuple2<GradoopId, GradoopId>> {
+public class DeserializeGradoopidFromFile extends FileInputFormat<GradoopId> {
+
+  /**
+   * Reusable array
+   */
+  private final byte[] bytes;
 
   /**
    * Default constructor
-   * @param outputPath  File where to write the values
+   * @param filename File name to be read
    */
-  public DataSinkTupleOfGradoopId(Path outputPath) {
-    super(outputPath);
-    setWriteMode(FileSystem.WriteMode.OVERWRITE);
+  public DeserializeGradoopidFromFile(Path filename) {
+    super(filename);
+    bytes = new byte[GradoopId.ID_SIZE];
+  }
+
+  public DeserializeGradoopidFromFile(String filename) {
+    this(new Path(filename));
+  }
+
+  /**
+   * Default constructor: no file name associated
+   */
+  public DeserializeGradoopidFromFile() {
+    bytes = new byte[GradoopId.ID_SIZE];
   }
 
   @Override
-  public void writeRecord(Tuple2<GradoopId, GradoopId> gradoopId) throws IOException {
-    stream.write(gradoopId.f0.toByteArray());
-    stream.write(gradoopId.f1.toByteArray());
+  public boolean reachedEnd() throws IOException {
+    return stream.available() > 0;
   }
 
   @Override
-  public void close() throws IOException {
-    super.close();
-    this.getRuntimeContext().getLongCounter("bogus").add(1);
+  public GradoopId nextRecord(GradoopId gradoopId) throws IOException {
+    if (stream.read(bytes) > 0) {
+      return GradoopId.fromByteArray(bytes);
+    } else {
+      return null;
+    }
   }
 
 }

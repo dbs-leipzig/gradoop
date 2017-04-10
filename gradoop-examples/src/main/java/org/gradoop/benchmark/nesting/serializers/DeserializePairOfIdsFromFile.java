@@ -18,6 +18,8 @@
 package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.FileInputFormat;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.core.fs.Path;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.IOException;
@@ -25,7 +27,7 @@ import java.io.IOException;
 /**
  * Writes GradoopIds to bytes
  */
-public class DataSourceGradoopId extends FileInputFormat<GradoopId> {
+public class DeserializePairOfIdsFromFile extends FileInputFormat<Tuple2<GradoopId, GradoopId>> {
 
   /**
    * Reusable array
@@ -33,10 +35,34 @@ public class DataSourceGradoopId extends FileInputFormat<GradoopId> {
   private final byte[] bytes;
 
   /**
+   * Reusable Pair
+   */
+  private final Tuple2<GradoopId, GradoopId> reusable;
+
+  /**
+   * Default constructor
+   * @param file  file to be read
+   */
+  public DeserializePairOfIdsFromFile(Path file) {
+    super(file);
+    bytes = new byte[GradoopId.ID_SIZE];
+    reusable = new Tuple2<>();
+    reusable.f0 = GradoopId.NULL_VALUE;
+    reusable.f1 = GradoopId.NULL_VALUE;
+  }
+
+  public DeserializePairOfIdsFromFile(String file) {
+    this(new Path(file));
+  }
+
+  /**
    * Default constructor
    */
-  public DataSourceGradoopId() {
+  public DeserializePairOfIdsFromFile() {
     bytes = new byte[GradoopId.ID_SIZE];
+    reusable = new Tuple2<>();
+    reusable.f0 = GradoopId.NULL_VALUE;
+    reusable.f1 = GradoopId.NULL_VALUE;
   }
 
   @Override
@@ -45,12 +71,15 @@ public class DataSourceGradoopId extends FileInputFormat<GradoopId> {
   }
 
   @Override
-  public GradoopId nextRecord(GradoopId gradoopId) throws IOException {
+  public Tuple2<GradoopId, GradoopId> nextRecord(Tuple2<GradoopId, GradoopId> gradoopId)
+    throws IOException {
     if (stream.read(bytes) > 0) {
-      return GradoopId.fromByteArray(bytes);
-    } else {
-      return null;
+      reusable.f0 = GradoopId.fromByteArray(bytes);
     }
+    if (stream.read(bytes) > 0) {
+      reusable.f1 = GradoopId.fromByteArray(bytes);
+    }
+    return reusable;
   }
 
 }

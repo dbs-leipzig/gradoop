@@ -1,7 +1,6 @@
 package org.gradoop.benchmark.nesting.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
@@ -18,6 +17,6 @@ public class Value1Of3AsFilter implements FilterFunction<Tuple3<String, Boolean,
 
   @Override
   public boolean filter(Tuple3<String, Boolean, GraphHead> value) throws Exception {
-    return value.f1 && isLeftOperand;
+    return value.f1 == isLeftOperand;
   }
 }

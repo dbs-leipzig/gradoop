@@ -159,7 +159,9 @@ public class NestedModel {
   }
 
   /**
-   * Implements the nesting operation for the nested model
+   * Implements the nesting operation for the nested model. The returned graph is just a view
+   * on top of the flattened graph
+   *
    * @param graphIndex        index for the search graph
    * @param collectionIndex   index for the graph collection
    * @param nestedGraphId     id to be associated to the new graph in the EPGM model
@@ -222,7 +224,9 @@ public class NestedModel {
   }
 
   /**
-   * Implements the disjunctive semantics fot the nested model
+   * Implements the disjunctive semantics fot the nested model. This is a partially materialized
+   * view, where only the components pertaining to the edges are materialized in the flattened graph
+   *
    * @param nested          Nested graph
    * @param collection      Collection over which evaluate the semantics
    * @return                The updated indices for the resulting nested graph
