@@ -19,12 +19,11 @@ package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
@@ -36,6 +35,9 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  */
 public class Nesting extends NestingBase {
 
+  /**
+   * Nesting default constructor
+   */
   public Nesting() {
     this(GradoopId.get());
   }

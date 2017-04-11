@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.nest;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
