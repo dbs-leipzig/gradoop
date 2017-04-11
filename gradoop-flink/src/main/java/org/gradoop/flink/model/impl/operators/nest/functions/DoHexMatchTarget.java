@@ -19,24 +19,16 @@ package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Fith projection of the Exaplet
+ * Maps an edge into a quad
  */
-@FunctionAnnotation.ForwardedFields("f4->*")
-public class Hex4
-  implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
-
+@FunctionAnnotation.ForwardedFields("f0 -> f0; f1 -> f1; f3 -> f3; f3 -> f2")
+public class DoHexMatchTarget implements MapFunction<Hexaplet, Hexaplet> {
   @Override
-  public GradoopId map(Hexaplet triple) throws Exception {
-    return triple.f4;
-  }
-
-  @Override
-  public GradoopId getKey(Hexaplet triple) throws Exception {
-    return triple.f4;
+  public Hexaplet map(Hexaplet r) throws Exception {
+    r.updateToMatchWithTarget();
+    return r;
   }
 }

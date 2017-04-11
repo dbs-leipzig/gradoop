@@ -292,18 +292,16 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
 
     // Vertices to be returend within the NestedIndexing
     DataSet<GradoopId> tmpVert = nestedResult
-      .groupBy(new Hex4())
+      .groupBy(new Value4OfHexaplet())
       .reduceGroup(new CollectVertices());
 
-    DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads
-      .crossWithHuge(tmpVert);
+    DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads.crossWithHuge(tmpVert);
 
     DataSet<GradoopId> tmpEdges = graphIndex
       .getGraphEdgeMap()
       .map(new Value1Of2<>());
 
-    DataSet<Tuple2<GradoopId, GradoopId>> edges = heads
-      .crossWithHuge(tmpEdges);
+    DataSet<Tuple2<GradoopId, GradoopId>> edges = heads.crossWithHuge(tmpEdges);
 
     NestingResult previousResult =
       new NestingResult(heads, vertices, edges, nestedResult, newStackElement);
