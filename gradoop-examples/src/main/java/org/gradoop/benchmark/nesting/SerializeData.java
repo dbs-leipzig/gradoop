@@ -60,7 +60,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Initializing the model by writing it down for some further and subsequent tests
+ * Initializing the model by writing it down for some further and subsequent tests.
+ * This is just an utility class for performing computations and operations
  */
 public class SerializeData extends NestingFilenameConvention {
 
