@@ -278,7 +278,7 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
    * @param nestedGraphId     id to be associated to the new graph in the EPGM model
    * @return                  The updated results associated to the new graph
    */
-  public NestingResult nest(NestedModel model, NestingIndex graphIndex,
+  public static NestingResult nest(NestedModel model, NestingIndex graphIndex,
     NestingIndex collectionIndex, GradoopId nestedGraphId) {
 
     // Associate each gid in collection's heads to the merged vertices
