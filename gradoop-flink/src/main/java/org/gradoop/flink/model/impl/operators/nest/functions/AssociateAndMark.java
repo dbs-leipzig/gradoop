@@ -27,10 +27,11 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  * Uses the join for two different semantic purposes, bot returning the new vertices and
  * updating the old edges.
  *
- * Warning: it assumes that the fromDataLake element is always present (leftJoin) and
+ * Warning: it assumes that the search graph element is always present (leftJoin) and
  * that there could not be a right element match.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1")
+@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1; f1 -> f2")
+@FunctionAnnotation.ForwardedFieldsSecond("f0 -> f4")
 public class AssociateAndMark implements
   JoinFunction<Tuple2<GradoopId, GradoopId>,
                Tuple2<GradoopId, GradoopId>, Hexaplet
@@ -49,9 +50,9 @@ public class AssociateAndMark implements
   }
 
   @Override
-  public Hexaplet join(Tuple2<GradoopId, GradoopId> fromDataLake,
-                   Tuple2<GradoopId, GradoopId> fromGraphCollection) throws Exception {
-    q.update(fromDataLake, fromGraphCollection);
+  public Hexaplet join(Tuple2<GradoopId, GradoopId> graphIndexEntry,
+                       Tuple2<GradoopId, GradoopId> collectionIndexEntry) throws Exception {
+    q.update(graphIndexEntry, collectionIndexEntry);
     q.setGCAsVertexIdAndStoreGCInf4();
     return q;
   }

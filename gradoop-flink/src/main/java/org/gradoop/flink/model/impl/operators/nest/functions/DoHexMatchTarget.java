@@ -18,39 +18,17 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Creates an empty vertex from a GradoopId
+ * Maps an edge into a quad
  */
-public class MapGradoopIdAsVertex implements MapFunction<GradoopId, Vertex>  {
-
-  /**
-   * Reusable element
-   */
-  private final Vertex reusable;
-
-  /**
-   * Reusable list
-   */
-  private final GradoopIdList list;
-
-  /**
-   * Default constructor
-   */
-  public MapGradoopIdAsVertex() {
-    reusable = new Vertex();
-    list = new GradoopIdList();
-  }
-
+@FunctionAnnotation.ForwardedFields("f0 -> f0; f1 -> f1; f3 -> f3; f3 -> f2")
+public class DoHexMatchTarget implements MapFunction<Hexaplet, Hexaplet> {
   @Override
-  public Vertex map(GradoopId value) throws Exception {
-    reusable.setId(value);
-    list.clear();
-    list.add(value);
-    reusable.setGraphIds(list);
-    return reusable;
+  public Hexaplet map(Hexaplet r) throws Exception {
+    r.updateToMatchWithTarget();
+    return r;
   }
 }

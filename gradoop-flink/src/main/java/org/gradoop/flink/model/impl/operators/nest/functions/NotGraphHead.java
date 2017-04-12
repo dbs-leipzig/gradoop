@@ -17,26 +17,18 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * First projection of the Exaplet
+ * Filtering out all the pairs where the vertex is the one representing the
+ * graph head, that is do not admit representation overlappings on the same
+ * nest level
  */
-@FunctionAnnotation.ForwardedFields("f0->*")
-public class Hex0
-  implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
-
+public class NotGraphHead implements FilterFunction<Tuple2<GradoopId, GradoopId>> {
   @Override
-  public GradoopId map(Hexaplet triple) throws Exception {
-    return triple.f0;
-  }
-
-  @Override
-  public GradoopId getKey(Hexaplet triple) throws Exception {
-    return triple.f0;
+  public boolean filter(Tuple2<GradoopId, GradoopId> value) throws Exception {
+    return !value.f1.equals(value.f0);
   }
 }

@@ -129,7 +129,7 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
    * Phase 2: evaluating the operator
    */
   private void runOperator() {
-    model.nesting(leftOperand, rightOperand, GradoopId.get());
+    NestingBase.nest(model, leftOperand, rightOperand, GradoopId.get());
     model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);
   }
 
@@ -157,8 +157,8 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
    */
   private void indexCount(NestingIndex index) {
     index.getGraphHeads().output(new Bogus<>());
-    index.getGraphHeadToEdge().output(new Bogus<>());
-    index.getGraphHeadToVertex().output(new Bogus<>());
+    index.getGraphEdgeMap().output(new Bogus<>());
+    index.getGraphVertexMap().output(new Bogus<>());
   }
 
   /**

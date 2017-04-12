@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -27,8 +28,11 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Defines a new vertex from a GraphHead
  */
-public class GraphHeadToVertex implements MapFunction<GraphHead, Vertex>,
-  FlatJoinFunction<GraphHead, Vertex, Vertex> {
+@FunctionAnnotation.ForwardedFields("id -> id; label -> label; properties -> properties")
+@FunctionAnnotation.ForwardedFieldsFirst("id -> id; label -> label; properties -> properties")
+public class GraphHeadToVertex
+  implements MapFunction<GraphHead, Vertex>,
+             FlatJoinFunction<GraphHead, Vertex, Vertex> {
 
   /**
    * Reusable vertex

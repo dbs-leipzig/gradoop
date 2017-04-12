@@ -30,8 +30,7 @@ import java.util.Iterator;
 public class CollectVertices extends RichGroupReduceFunction<Hexaplet, GradoopId> {
 
   @Override
-  public void reduce(Iterable<Hexaplet> values,
-    Collector<GradoopId> out) throws Exception {
+  public void reduce(Iterable<Hexaplet> values, Collector<GradoopId> out) throws Exception {
     Iterator<Hexaplet> it = values.iterator();
     if (it.hasNext()) {
       Hexaplet x;

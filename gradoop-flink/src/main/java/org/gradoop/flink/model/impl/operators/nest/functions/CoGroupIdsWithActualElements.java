@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -30,6 +31,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  *
  * @param <X> the GraphElement
  */
+@FunctionAnnotation.ForwardedFieldsSecond("id -> id; properties -> properties; label -> label")
 public class CoGroupIdsWithActualElements<X extends GraphElement> implements
   CoGroupFunction<Tuple2<GradoopId, GradoopId>, X, X> {
 

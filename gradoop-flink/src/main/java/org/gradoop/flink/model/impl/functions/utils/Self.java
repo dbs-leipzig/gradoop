@@ -15,20 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions;
+package org.gradoop.flink.model.impl.functions.utils;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
 
 /**
- * Filtering out all the pairs where the vertex is the one representing the
- * graph head, that is do not admit representation overlappings on the same
- * nest level
+ * Uses the GradoopId element itself as a selection criterion
+ * @param <K> any type
  */
-public class ExceptGraphHead implements FilterFunction<Tuple2<GradoopId, GradoopId>> {
+@FunctionAnnotation.ForwardedFields("* -> *")
+public class Self<K> implements KeySelector<K, K> {
   @Override
-  public boolean filter(Tuple2<GradoopId, GradoopId> value) throws Exception {
-    return !value.f1.equals(value.f0);
+  public K getKey(K value) throws Exception {
+    return value;
   }
 }

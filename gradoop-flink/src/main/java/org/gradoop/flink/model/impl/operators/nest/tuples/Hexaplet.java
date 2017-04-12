@@ -21,22 +21,87 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
+import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
+import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
 
 /**
- * f0 = Edge => (Old) Edge Id     |  Vertex => Data Lake id
+ * This class describes the state of the matching at different computation phase, either for
+ * vertices or edges. Either for vertices and edges, the field f2 corresponds to the value
+ * we want to match within the join operations.
+ *
+ * 1) VERTICES
+ *     a. Initializing a match [1st round] between vertices (graph vs. graph collection).
+ *        The match is OK (that is, the same vertex id are matched)
+ *        {@link AssociateAndMark}
+ *
+ *        f0 = graph head id from the search graph id
+ *        f1 = vertex id from the search graph id and the graph collection
+ *        f2 = graph head id from the graph collection. The value is null if the vertex
+ *             does not appear within the collection
+ *
+ *     b. Initializing a match [2nd round] between vertices (graph vs. graph collection).
+ *        The match is OK (that is, the same vertex id are matched)
+ *
+ *        f0 = graph head id from the search graph id
+ *        f1 = vertex id from the search graph id and the graph collection
+ *        f2 = vertex id from the search graph id and the graph collection. The value is null
+ *             if it does not appear within the collection.
+ *        f4 = the value of the match is f2 from [1a], that is "graph head id from the graph
+ *        collection". This will become a vertex of the nested graph.
+ *
+ * 2) EDGES
+ *     a. Initializing the edge match on the edges appearing in the flattened graph.
+ *        {@link AsEdgesMatchingSource}. f2 is the field where the join match is performed,
+ *        so within the initialization phase we want to check if the current edge has a
+ *        source vertex that is going to be summarized by the nesting operation.
+ *
+ *        In this phase we want to remember the old edge id {@code f0} that carries out the
+ *        information inherited by the new edge {@code f4}. The reason is that we do not want to
+ *        duplicate data information, and that we want to associate the data to the edge only at
+ *        a later step, thus reducing the size of the exchanged messages within the nodes.
+ *
+ *        f0 = edge id from the flattened graph. This information keeps stable throughout the whole
+ *             computation.
+ *        f1 = vertex source id
+ *        f2 = becomes the vertex id from the search graph that we want to match with the
+ *
+ *        f3 = vertex target id
+ *
+ *     b. {@link CombineGraphBelongingInformation}
+ *
+ *        f5 = graph where the edge appears in the flattened graph
+ *
+ *     c. {@link UpdateEdgeSource} In this phase we create the new edges: this operation is
+ *        carried out by matching either the source (true) or the target (false) vertex for
+ *        each search graph vertex appearing in the graph collection.
+ *
+ *        f0 = updated each time the edge belongs to a new edge. Consequently, it defines
+ *             the new id for the new edge
+ *        f1 = eventually updated to the new vertex source (
+ *        f3 = eventually updated to the new vertex target
+ *        f4 = new edge id
+ *
+ *     d. {@link DoHexMatchTarget} The match is now set between the target id and the
+ *        summarized vertex. Then Phase 2c is repeated again, but now with the target vertex.
+ *
+ *
+ * f0 = Edge => (Old) Edge Id     |  Vertex => search graph id
  * f1 = Edge =>       Edge Source |  Vertex => Vertex Id
  * f2 = Matching space.
  *      Edge => E. Source or Dst  |  Vertex => Graph Collection id
  *                                             At a later step, to be changed with its id
  * f3 = Edge Target (only if this represents an edge)
  * f4 = Edge: If the edge has been updated, contains the new edge's id. Otherwise, it is NULL_ID
- *      Vertex: the gc id
- * 45 = Edge: Data Lake id        |  Vertex => Null
+ *      Vertex: the graph collection id
+ * f5 = Edge: flattened graph id  |  Vertex => Null
  */
 public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId, GradoopId, GradoopId> {
 
   /**
-   * Defines the quad from the joining of the vertices
+   * Defines the quad from the joining of the vertices [Phase 1a]
    * @param fromGraph          Vertex appearing in the data lake (if present)
    * @param fromGraphCollection   Vertex appearing in the graph collection (if present)
    */
@@ -80,15 +145,15 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * Defines a Exaplet from the edge.
+   * Defines a Exaplet from the edge. [Phase 2a]
    * @param pojo              Elements that has to be extracted
    * @param matchWithSource   If the matching element is the source or the target
    */
   public void update(Edge pojo, boolean matchWithSource) {
     f0 = pojo.getId();
     f1 = pojo.getSourceId();
-    f3 = pojo.getTargetId();
     f2 = matchWithSource ? f1 : f3;
+    f3 = pojo.getTargetId();
     f4 = GradoopId.NULL_VALUE;
     f5 = GradoopId.NULL_VALUE;
   }
@@ -124,7 +189,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * Sets the match field (f2) with the target element
+   * Sets the match field (f2) with the target element [Phase 2d]
    */
   public void updateToMatchWithTarget() {
     if (isEdge()) {
@@ -167,7 +232,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * If the Exaplet represents a vertex, then this method is called when the fe f4 field
+   * If the Exaplet represents a vertex, then this method is called when the f4 field
    * representing the GraphCollection where it appears is set. So this vertex will be marked as
    * one to be replaced by an aggregated vertex.
    *
@@ -190,7 +255,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * Updates the edge's source
+   * Updates the edge's source [Phase 2c]
    * @param source  New source id (summarized vertex)
    */
   public void setSource(GradoopId source) {
@@ -200,7 +265,7 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   }
 
   /**
-   * Updates the edge's target
+   * Updates the edge's target [Phase 2c]
    * @param source  New target id (summarized vertex)
    */
   public void setTarget(GradoopId source) {

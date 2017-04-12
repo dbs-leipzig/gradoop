@@ -17,34 +17,25 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Maps an edge into a Hex.
- *
- * <p> Used by RepresentationUtils </p>
+ * Implements the edge difference for quads using the join as a primitive function
  */
-@FunctionAnnotation.ForwardedFields("id -> f0")
-public class AsQuadsMatchingSource implements MapFunction<Edge, Hexaplet> {
-
-  /**
-   * Reusable element
-   */
-  private Hexaplet r;
-
-  /**
-   * Default constructor
-   */
-  public AsQuadsMatchingSource() {
-    r = new Hexaplet();
-  }
-
+@FunctionAnnotation.ForwardedFieldsFirst("* -> *")
+public class HexapletEdgeDifference implements
+  FlatJoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet> {
   @Override
-  public Hexaplet map(Edge value) throws Exception {
-    r.update(value, true);
-    return r;
+  public void join(Hexaplet first,
+                   Tuple2<GradoopId, GradoopId> second,
+                   Collector<Hexaplet> out) throws Exception {
+    if (second == null) {
+      out.collect(first);
+    }
   }
 }

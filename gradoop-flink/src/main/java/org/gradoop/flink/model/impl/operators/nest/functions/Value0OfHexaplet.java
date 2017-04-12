@@ -24,19 +24,19 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Fith projection of the Exaplet
+ * First projection of the Exaplet
  */
-@FunctionAnnotation.ForwardedFields("f4->*")
-public class Hex4
+@FunctionAnnotation.ForwardedFields("f0->*")
+public class Value0OfHexaplet
   implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
 
   @Override
   public GradoopId map(Hexaplet triple) throws Exception {
-    return triple.f4;
+    return triple.f0;
   }
 
   @Override
   public GradoopId getKey(Hexaplet triple) throws Exception {
-    return triple.f4;
+    return triple.f0;
   }
 }

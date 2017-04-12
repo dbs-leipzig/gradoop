@@ -29,6 +29,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * IdGraphDatabase representation.
  */
 @FunctionAnnotation.ForwardedFields("f0 -> f1")
+@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f1")
+@FunctionAnnotation.ForwardedFieldsSecond("* -> f0")
 public class CollectEdges implements
   FlatMapFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>>,
   FlatJoinFunction<Tuple2<GradoopId, GradoopId>, GradoopId, Tuple2<GradoopId, GradoopId>> {
@@ -82,10 +84,10 @@ public class CollectEdges implements
 
 
   @Override
-  public void join(Tuple2<GradoopId, GradoopId> gradoopIdGradoopIdTuple2, GradoopId gradoopId,
+  public void join(Tuple2<GradoopId, GradoopId> left, GradoopId right,
     Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
-    reusable.f0 = gradoopId;
-    flatMap(gradoopIdGradoopIdTuple2, collector);
+    reusable.f0 = right;
+    flatMap(left, collector);
   }
 }
 

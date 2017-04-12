@@ -334,15 +334,15 @@ public class SerializeData extends NestingFilenameConvention {
    */
   private static void writeIndex(NestingIndex left, String s) throws Exception {
     left.getGraphHeads().write(new SerializeGradoopIdToFile(), s + INDEX_HEADERS_SUFFIX);
-    left.getGraphHeadToVertex().write(new SerializePairOfIdsToFile(), s + INDEX_VERTEX_SUFFIX);
-    left.getGraphHeadToEdge().write(new SerializePairOfIdsToFile(), s + INDEX_EDGE_SUFFIX);
+    left.getGraphVertexMap().write(new SerializePairOfIdsToFile(), s + INDEX_VERTEX_SUFFIX);
+    left.getGraphEdgeMap().write(new SerializePairOfIdsToFile(), s + INDEX_EDGE_SUFFIX);
 
     ENVIRONMENT.execute();
     LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
     LOGGER.newLine();
     LOGGER.write("indexHeads: " + left.getGraphHeads().count() + " indexVertices: " + left
-      .getGraphHeadToVertex().count() + " indexEdges:" + left.getGraphHeadToEdge().count());
+      .getGraphVertexMap().count() + " indexEdges:" + left.getGraphEdgeMap().count());
     LOGGER.newLine();
     LOGGER.newLine();
   }

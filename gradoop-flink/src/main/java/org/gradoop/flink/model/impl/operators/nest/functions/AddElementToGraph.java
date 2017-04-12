@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
@@ -26,6 +27,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  * Adds a GraphElement to a graph
  * @param <E> GraphElement
  */
+@FunctionAnnotation.ForwardedFields("id -> id; properties -> properties; label -> label")
 public class AddElementToGraph<E extends GraphElement>
   implements CrossFunction<E, Tuple2<GradoopId, GradoopId>, E> {
   @Override
