@@ -21,6 +21,10 @@ import org.apache.flink.api.common.io.RichOutputFormat;
 
 import java.io.IOException;
 
+/**
+ * Bogus class, doing nothing at all, except by consuming the data
+ * @param <T> Any data type will do
+ */
 public  class Bogus<T> extends RichOutputFormat<T> {
   @Override
   public void configure(org.apache.flink.configuration.Configuration parameters) {

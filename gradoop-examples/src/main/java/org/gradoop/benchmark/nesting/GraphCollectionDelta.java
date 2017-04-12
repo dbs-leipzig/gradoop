@@ -18,7 +18,7 @@
 /**
  * Contains the programs to execute the benchmarks.
  */
-package org.gradoop.benchmark.nesting.model;
+package org.gradoop.benchmark.nesting;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;

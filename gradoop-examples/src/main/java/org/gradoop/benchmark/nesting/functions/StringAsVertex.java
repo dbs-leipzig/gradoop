@@ -22,13 +22,19 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Maps a string into a vertex
  */
 @FunctionAnnotation.ForwardedFields("* -> f0")
 public class StringAsVertex implements MapFunction<String, ImportVertex<String>> {
 
+  /**
+   * Reusable element
+   */
   private final ImportVertex<String> reusable;
 
+  /**
+   * Default constructor
+   */
   public StringAsVertex() {
     reusable = new ImportVertex<>();
     reusable.setProperties(new Properties());

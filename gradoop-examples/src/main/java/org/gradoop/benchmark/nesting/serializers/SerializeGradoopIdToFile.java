@@ -18,10 +18,7 @@
 package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.BinaryOutputFormat;
-import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.Path;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 

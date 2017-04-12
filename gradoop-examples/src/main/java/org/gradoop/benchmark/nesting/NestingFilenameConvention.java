@@ -24,16 +24,39 @@ import org.gradoop.examples.AbstractRunner;
  */
 public class NestingFilenameConvention extends AbstractRunner {
 
-  protected final static String INDEX_HEADERS_SUFFIX = "-heads.bin";
+  /**
+   * Represents the path suffix describing the files for the headers
+   */
+  protected static final String INDEX_HEADERS_SUFFIX = "-heads.bin";
 
-  protected final static String INDEX_VERTEX_SUFFIX = "-vertex.bin";
+  /**
+   * Represents the path suffix describing the files for the vertices
+   */
+  protected static final String INDEX_VERTEX_SUFFIX = "-vertex.bin";
 
-  protected final static String INDEX_EDGE_SUFFIX = "-edges.bin";
+  /**
+   * Represents the path suffix describing the edges
+   */
+  protected static final String INDEX_EDGE_SUFFIX = "-edges.bin";
 
-  protected final static String LEFT_OPERAND = "left";
+  /**
+   * Represents the file prefix for the files describing pieces of information for the
+   * left operand
+   */
+  protected static final String LEFT_OPERAND = "left";
 
-  protected final static String RIGHT_OPERAND = "right";
+  /**
+   * Represents the file prefix for the files describing pieces of informations for the
+   * right operand
+   */
+  protected static final String RIGHT_OPERAND = "right";
 
+  /**
+   * Generating the base path for the strings
+   * @param path            Base path
+   * @param isLeftOperand   Checks if it is a left operand
+   * @return                Initialized and finalized string
+   */
   public static String generateOperandBasePath(String path, boolean isLeftOperand) {
     return path +
             (path.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR) +

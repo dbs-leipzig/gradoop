@@ -26,15 +26,23 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * Created by vasistas on 08/04/17.
+ * It flattens each edge and generates vertices from the source and the target description
+ *
+ * @param <K> user-defined Id representation
  */
 @FunctionAnnotation.ForwardedFields("f1 -> f1")
-public class ImportEdgeToVertex
-  implements FlatMapFunction<Tuple2<ImportEdge<String>, GradoopId>,
-             Tuple2<ImportVertex<String>, GradoopId>> {
+public class ImportEdgeToVertex<K extends Comparable<K>>
+  implements FlatMapFunction<Tuple2<ImportEdge<K>, GradoopId>,
+             Tuple2<ImportVertex<K>, GradoopId>> {
 
-  private final Tuple2<ImportVertex<String>,GradoopId> reusable;
+  /**
+   * Reusable element
+   */
+  private final Tuple2<ImportVertex<K>, GradoopId> reusable;
 
+  /**
+   * Default constructor
+   */
   public ImportEdgeToVertex() {
     reusable = new Tuple2<>();
     reusable.f0 = new ImportVertex<>();
@@ -43,8 +51,8 @@ public class ImportEdgeToVertex
   }
 
   @Override
-  public void flatMap(Tuple2<ImportEdge<String>, GradoopId>              value,
-                      Collector<Tuple2<ImportVertex<String>, GradoopId>> out)
+  public void flatMap(Tuple2<ImportEdge<K>, GradoopId>              value,
+                      Collector<Tuple2<ImportVertex<K>, GradoopId>> out)
     throws Exception {
     reusable.f0.setId(value.f0.getSourceId());
     reusable.f1 = value.f1;

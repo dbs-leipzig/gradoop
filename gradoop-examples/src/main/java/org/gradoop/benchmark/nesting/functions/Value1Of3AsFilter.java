@@ -21,12 +21,21 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Returns either the elements pertaining to the left operand or the ones for the right
+ * operand by using a default parameter.
  */
 public class Value1Of3AsFilter implements FilterFunction<Tuple3<String, Boolean, GraphHead>> {
 
+  /**
+   * When the parameter is set to true, it defines if the mapping function will return
+   * the left operand, the left one is returned otherwise.
+   */
   private final boolean isLeftOperand;
 
+  /**
+   * Default parameter
+   * @param isLeftOperand see {@code isLeftOperand}
+   */
   public Value1Of3AsFilter(boolean isLeftOperand) {
     this.isLeftOperand = isLeftOperand;
   }

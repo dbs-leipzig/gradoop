@@ -31,6 +31,7 @@ import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -62,19 +63,6 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
   }
 
   /**
-   * Path to input graph data
-   */
-  private static String INPUT_PATH;
-  /**
-   * Query to execute.
-   */
-  private static String SUBGRAPHS;
-  /**
-   * Path to output
-   */
-  private static String OUTPATH;
-
-  /**
    * Global environment
    */
   private final ExecutionEnvironment environment;
@@ -99,17 +87,39 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
    */
   private NestedModel model;
 
+  /**
+   * Default constructor for running the tests
+   * @param basePath    Path where to obtain all the data
+   */
   public PerformBenchmarkOverSerializedData(String basePath) {
     environment = getExecutionEnvironment();
     this.basePath = basePath;
   }
 
   /**
+   * Main program entrance
+   * @param args        System arguments
+   * @throws Exception
+   */
+  public static void main(String[] args) throws Exception {
+    CommandLine cmd = parseArguments(args, SerializeData.class.getName());
+    if (cmd == null) {
+      System.exit(1);
+    }
+
+    Integer phase = Integer.valueOf(cmd.getOptionValue(PHASE_TO_BENCHMARK));
+    PerformBenchmarkOverSerializedData benchmark = new PerformBenchmarkOverSerializedData
+    (cmd.getOptionValue(OPTION_INPUT_PATH));
+
+    benchmark.run(phase);
+  }
+
+  /**
    * Phase 1: Loads the operands from secondary memory
    */
   private void loadIndicesWithFlattenedGraph() {
-    leftOperand = loadNestingIndex(generateOperandBasePath(basePath,true));
-    rightOperand = loadNestingIndex(generateOperandBasePath(basePath,false));
+    leftOperand = loadNestingIndex(generateOperandBasePath(basePath, true));
+    rightOperand = loadNestingIndex(generateOperandBasePath(basePath, false));
     NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
     LogicalGraph flat = readLogicalGraph(basePath);
     model = new NestedModel(flat, nestedRepresentation);
@@ -123,6 +133,11 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
     model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);
   }
 
+  /**
+   * Run the benchmarks over the bare nested model
+   * @param maxPhase    Maximum phase to reach. 1) Loading data 2) Executing nesting + semantics
+   * @throws Exception
+   */
   public void run(int maxPhase) throws Exception {
     int countPhase = 0;
     // Phase 1: Loading the operands
@@ -136,12 +151,21 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
     checkPhaseAndEvantuallyExit(countPhase, countPhase);
   }
 
+  /**
+   * Counting the indices for benchmarking. No other operation beside consuming data is done
+   * @param index   Index containing the data
+   */
   private void indexCount(NestingIndex index) {
     index.getGraphHeads().output(new Bogus<>());
     index.getGraphHeadToEdge().output(new Bogus<>());
     index.getGraphHeadToVertex().output(new Bogus<>());
   }
 
+  /**
+   * Terminates the phase, performing the last operations before quitting the program
+   * @param toFinalize     Reached phase
+   * @throws IOException
+   */
   private void finalizePhase(int toFinalize) throws IOException {
     if (toFinalize == 1) {
       // Counting each element for the loaded index, alongside with the values of the flattened
@@ -170,29 +194,17 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
     if (countPhase == maxPhase) {
       finalizePhase(countPhase);
       // Writing the result of the benchmark to the file
-      Files.write(Paths.get(OUTPUT_EXPERIMENT), (countPhase+","+environment.execute()
-        .getNetRuntime()).getBytes(), StandardOpenOption.APPEND);
+      Files.write(Paths.get(OUTPUT_EXPERIMENT), (countPhase + "," + environment.execute()
+        .getNetRuntime()).getBytes(Charset.forName("UTF-8")), StandardOpenOption.APPEND);
       // Exit the whole program, providing the phase no as a return number
       System.exit(countPhase);
     }
   }
 
-  public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, SerializeData.class.getName());
-    int phase = Integer.valueOf(cmd.getOptionValue(PHASE_TO_BENCHMARK));
-    if (cmd == null) {
-      System.exit(1);
-    }
-
-    PerformBenchmarkOverSerializedData benchmark = new PerformBenchmarkOverSerializedData
-      (cmd.getOptionValue(OPTION_INPUT_PATH));
-    benchmark.run(phase);
-  }
-
   /**
    * Loads an index located in a given specific folder + operand prefix
    * @param filename  Foder
-   * @return
+   * @return          Loaded index
    */
   private NestingIndex loadNestingIndex(String filename) {
     DataSet<GradoopId> headers = environment

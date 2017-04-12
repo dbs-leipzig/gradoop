@@ -25,10 +25,20 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.core.fs.Path;
-import org.apache.log4j.varia.NullAppender;
-import org.gradoop.benchmark.nesting.functions.*;
-import org.gradoop.benchmark.nesting.model.GraphCollectionDelta;
+import org.gradoop.benchmark.nesting.functions.AggregateTheSameEdgeWithinDifferentGraphs;
+import org.gradoop.benchmark.nesting.functions.AssociateFileToGraph;
+import org.gradoop.benchmark.nesting.functions.AssociateSourceId;
+import org.gradoop.benchmark.nesting.functions.CreateEdge;
+import org.gradoop.benchmark.nesting.functions.CreateVertex;
+import org.gradoop.benchmark.nesting.functions.ExtractLeftId;
+import org.gradoop.benchmark.nesting.functions.ImportEdgeToVertex;
+import org.gradoop.benchmark.nesting.functions.SelectElementsInHeads;
+import org.gradoop.benchmark.nesting.functions.SelectImportVertexId;
+import org.gradoop.benchmark.nesting.functions.StringAsEdge;
+import org.gradoop.benchmark.nesting.functions.StringAsVertex;
+import org.gradoop.benchmark.nesting.functions.TripleWithGraphHeadToId;
+import org.gradoop.benchmark.nesting.functions.Tuple2StringKeySelector;
+import org.gradoop.benchmark.nesting.functions.Value1Of3AsFilter;
 import org.gradoop.benchmark.nesting.serializers.SerializeGradoopIdToFile;
 import org.gradoop.benchmark.nesting.serializers.SerializePairOfIdsToFile;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -52,6 +62,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -102,13 +113,16 @@ public class SerializeData extends NestingFilenameConvention {
   /**
    * Global environment
    */
-  private final static ExecutionEnvironment ENVIRONMENT;
+  private static final ExecutionEnvironment ENVIRONMENT;
 
   /**
    * GradoopFlink configuration
    */
   private static GradoopFlinkConfig CONFIGURATION;
 
+  /**
+   * Logger writing the timing informations to a file.
+   */
   private static BufferedWriter LOGGER;
 
   static {
@@ -116,6 +130,11 @@ public class SerializeData extends NestingFilenameConvention {
     CONFIGURATION = GradoopFlinkConfig.createConfig(ENVIRONMENT);
   }
 
+  /**
+   * Main program entry point
+   * @param args        Program arguments
+   * @throws Exception
+   */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SerializeData.class.getName());
     if (cmd == null) {
@@ -126,9 +145,9 @@ public class SerializeData extends NestingFilenameConvention {
     SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
     OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
     LOGGER =
-      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPATH
-        +"LOGGING.txt")
-      )));
+      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPATH +
+        "LOGGING.txt")
+      ), Charset.forName("UTF-8")));
 
     GraphCollectionDelta start =
       extractGraphFromFiles(INPUT_PATH, null, true);
@@ -170,7 +189,7 @@ public class SerializeData extends NestingFilenameConvention {
       .map(new Value2Of3<>());
 
     DataSet<Edge> edges = start.getEdges()
-      .distinct(new ExtractLeftId())
+      .distinct(new ExtractLeftId<>())
       .join(intermediateVertex)
       .where(new Tuple2StringKeySelector()).equalTo(0)
       .with(new AssociateSourceId<>())
@@ -188,6 +207,15 @@ public class SerializeData extends NestingFilenameConvention {
     LOGGER.close();
   }
 
+  /**
+   *
+   * @param isLeftOperand   Check if that is a left operand
+   * @param start           Where to extract both the left and right operands information
+   * @param vertices        Complete vertices information
+   * @param edges           Complete edge information
+   * @param file            Path where to write the indices
+   * @throws Exception
+   */
   public static void writeIndexFromSource(boolean isLeftOperand, GraphCollectionDelta start,
     DataSet<Vertex> vertices, DataSet<Edge> edges, String file) throws Exception {
     DataSet<GraphHead> operandHeads = start.getHeads()
@@ -221,10 +249,10 @@ public class SerializeData extends NestingFilenameConvention {
 
   /**
    * Writes the flattened version of the graph model
-   * @param heads
-   * @param vertices
-   * @param edges
-   * @param path
+   * @param heads       Heads belonging to the graph
+   * @param vertices    Vertices belonging to the graph
+   * @param edges       Edges belonging to the graph
+   * @param path        Path where to write the file
    * @throws Exception
    */
   private static void writeFlattenedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices,
@@ -239,23 +267,23 @@ public class SerializeData extends NestingFilenameConvention {
     writeLogicalGraph(lg, path);
     LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
-    LOGGER.write("vertices: "+ lg.getVertices().count() + " edges: "+ lg.getEdges().count() + " " +
-      "heads: "+ lg.getGraphHead().count());
+    LOGGER.write("vertices: " + lg.getVertices().count() + " edges: " + lg.getEdges().count() +
+      " heads: " + lg.getGraphHead().count());
     LOGGER.newLine();
   }
 
   /**
    * Extracts the partial graph definition form files
-   * @param edges_global_file       Edges file
-   * @param vertices_global_file    Vertices file
+   * @param edgesGlobalFile       Edges file
+   * @param verticesGlobalFile    Vertices file
    * @param isLeftOperand           If the operand represented is the left one
    * @return  Instance of the operand
    */
   private static GraphCollectionDelta extractGraphFromFiles
-    (String edges_global_file, String vertices_global_file, boolean isLeftOperand) {
+  (String edgesGlobalFile, String verticesGlobalFile, boolean isLeftOperand) {
     // This information is going to be used when serializing the operands
     DataSet<Tuple3<String, Boolean, GraphHead>> heads =
-      ENVIRONMENT.fromElements(edges_global_file)
+      ENVIRONMENT.fromElements(edgesGlobalFile)
         .map(new AssociateFileToGraph(isLeftOperand, CONFIGURATION.getGraphHeadFactory()));
 
     // Extracting the head id. Required to create a LogicalGraph
@@ -263,17 +291,17 @@ public class SerializeData extends NestingFilenameConvention {
 
     // Edges with graph association
     DataSet<Tuple2<ImportEdge<String>, GradoopId>> edges =
-      ENVIRONMENT.readTextFile(edges_global_file)
+      ENVIRONMENT.readTextFile(edgesGlobalFile)
         .flatMap(new StringAsEdge())
         .cross(head);
 
     // Vertices with graph association
     DataSet<Tuple2<ImportVertex<String>, GradoopId>> vertices =
       edges
-        .flatMap(new ImportEdgeToVertex());
+        .flatMap(new ImportEdgeToVertex<>());
 
-    if (vertices_global_file != null) {
-      vertices = ENVIRONMENT.readTextFile(vertices_global_file)
+    if (verticesGlobalFile != null) {
+      vertices = ENVIRONMENT.readTextFile(verticesGlobalFile)
         .map(new StringAsVertex())
         .cross(head)
         .union(vertices);
@@ -284,15 +312,15 @@ public class SerializeData extends NestingFilenameConvention {
   /**
    * Updates the graph definition
    * @param delta                 Previous updated version
-   * @param edges_global_file     File defining the edges
-   * @param vertices_global_file  File defining the vertices
+   * @param edgesGlobalFile     File defining the edges
+   * @param verticesGlobalFile  File defining the vertices
    * @return                      Updates the graph definition
    */
   private static GraphCollectionDelta deltaUpdateGraphCollection(GraphCollectionDelta delta,
-    String edges_global_file, String vertices_global_file) {
+    String edgesGlobalFile, String verticesGlobalFile) {
 
-    GraphCollectionDelta deltaPlus = extractGraphFromFiles(edges_global_file,
-      vertices_global_file, false);
+    GraphCollectionDelta deltaPlus = extractGraphFromFiles(edgesGlobalFile,
+      verticesGlobalFile, false);
 
     return new GraphCollectionDelta(delta.getHeads().union(deltaPlus.getHeads()),
       delta.getVertices().union(deltaPlus.getVertices()),
@@ -313,8 +341,8 @@ public class SerializeData extends NestingFilenameConvention {
     LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
     LOGGER.newLine();
-    LOGGER.write("indexHeads: "+ left.getGraphHeads().count()+" indexVertices: "+ left
-      .getGraphHeadToVertex().count() +" indexEdges:" + left.getGraphHeadToEdge().count());
+    LOGGER.write("indexHeads: " + left.getGraphHeads().count() + " indexVertices: " + left
+      .getGraphHeadToVertex().count() + " indexEdges:" + left.getGraphHeadToEdge().count());
     LOGGER.newLine();
     LOGGER.newLine();
   }

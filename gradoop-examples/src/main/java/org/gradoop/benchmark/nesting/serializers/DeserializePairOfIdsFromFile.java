@@ -18,9 +18,7 @@
 package org.gradoop.benchmark.nesting.serializers;
 
 import org.apache.flink.api.common.io.BinaryInputFormat;
-import org.apache.flink.api.common.io.FileInputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.core.fs.Path;
 import org.apache.flink.core.memory.DataInputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 

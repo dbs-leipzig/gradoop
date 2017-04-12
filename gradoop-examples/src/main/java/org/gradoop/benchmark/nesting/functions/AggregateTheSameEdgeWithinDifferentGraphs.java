@@ -24,7 +24,10 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Aggregates the description of multiple to-be edges into one final edge description, creating
+ * a new edge
+ *
+ * @param <K> Key used to describe an id
  */
 public class AggregateTheSameEdgeWithinDifferentGraphs<K extends Comparable<K>> implements
   GroupCombineFunction<Tuple6<K, GradoopId, K, String, Properties, GradoopId>,

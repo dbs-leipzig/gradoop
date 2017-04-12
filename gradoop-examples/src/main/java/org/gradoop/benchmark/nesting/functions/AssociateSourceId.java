@@ -25,23 +25,25 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
 /**
- * Created by vasistas on 08/04/17.
+ * By using the newly created EPGM vertices associated to the old Id represented by a K value, we
+ * partially update the edges by replacing the old K value with the newly generated Id
+ *
+ * @param <K> user-defined id
  */
-//@FunctionAnnotation.ForwardedFieldsFirst("f0.f0 -> f0; f1 -> f5; f0.f2 -> f2; f0.f3 -> f3;
-// f0.f4 -> f4")
-//@FunctionAnnotation.ForwardedFieldsSecond("f1.id -> f1")
-public class AssociateSourceId<K extends Comparable<K>> implements JoinFunction<Tuple2<ImportEdge<K>,
-GradoopId>, Tuple2<K, Vertex>, Tuple6<K, GradoopId, K,
-    String,
-    Properties, GradoopId>> {
+public class AssociateSourceId<K extends Comparable<K>>
+  implements JoinFunction<Tuple2<ImportEdge<K>, GradoopId>,
+                          Tuple2<K, Vertex>,
+                          Tuple6<K, GradoopId, K, String, Properties, GradoopId>> {
 
+  /**
+   * Reusable element
+   */
   private final Tuple6<K, GradoopId, K, String, Properties, GradoopId> reusable = new
     Tuple6<>();
 
   @Override
-  public Tuple6<K, GradoopId, K, String, Properties, GradoopId> join(Tuple2<ImportEdge<K>, GradoopId>
-    first,
-    Tuple2<K, Vertex> second) throws Exception {
+  public Tuple6<K, GradoopId, K, String, Properties, GradoopId> join
+  (Tuple2<ImportEdge<K>, GradoopId> first, Tuple2<K, Vertex> second) throws Exception {
     reusable.f0 = first.f0.f0;
     reusable.f1 = second.f1.getId();
     reusable.f2 = first.f0.f2;

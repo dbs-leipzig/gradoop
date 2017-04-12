@@ -18,12 +18,13 @@ package org.gradoop.benchmark.nesting.functions;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Collects the graph elements having among the graph ids the one appearing in the head
+ *
+ * @param <K> user-defined id representation
  */
 public class SelectElementsInHeads<K extends GraphElement>
   implements FlatJoinFunction<K, GraphHead, K> {

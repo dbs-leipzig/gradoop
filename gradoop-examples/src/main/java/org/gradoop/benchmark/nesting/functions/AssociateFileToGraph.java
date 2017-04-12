@@ -23,26 +23,43 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Associates to each file name a new graph head, carriying also the information of which operand
+ * it belongs to.
+ *
+ * f0: file name
+ * f1: if it belongs to the left operand or not
+ * f2: Head associated to the new file
  */
 @FunctionAnnotation.ForwardedFields("* -> f0")
 public class AssociateFileToGraph
   implements MapFunction<String, Tuple3<String, Boolean, GraphHead>> {
 
+  /**
+   * Generating a new graph head for each file that has to be mapped
+   */
   private final GraphHeadFactory ghf;
-  private final Tuple3<String, Boolean, GraphHead> id;
 
+  /**
+   * Reusable element
+   */
+  private final Tuple3<String, Boolean, GraphHead> reusable;
+
+  /**
+   * Default constructor
+   * @param isLeftOperand   Which operand to these file define
+   * @param factory         Factory creating new graph heads
+   */
   public AssociateFileToGraph(boolean isLeftOperand, GraphHeadFactory factory) {
-    id = new Tuple3<>();
+    reusable = new Tuple3<>();
     ghf = factory;
-    id.f1 = isLeftOperand;
+    reusable.f1 = isLeftOperand;
   }
 
   @Override
   public Tuple3<String, Boolean, GraphHead> map(String value) throws Exception {
-    id.f0 = value;
-    id.f2 = ghf.createGraphHead();
-    return id;
+    reusable.f0 = value;
+    reusable.f2 = ghf.createGraphHead();
+    return reusable;
   }
 
 

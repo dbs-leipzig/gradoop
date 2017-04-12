@@ -22,12 +22,18 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
 /**
- * Created by vasistas on 08/04/17.
+ * Imports an edge from a string
  */
 public class StringAsEdge implements FlatMapFunction<String, ImportEdge<String>> {
 
+  /**
+   * Reusable element
+   */
   private final ImportEdge<String> reusable;
 
+  /**
+   * Default constructor
+   */
   public StringAsEdge() {
     reusable = new ImportEdge<>();
     reusable.setProperties(new Properties());
