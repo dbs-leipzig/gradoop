@@ -164,6 +164,7 @@ public class NestedModel {
     // Edges to be set within the NestedIndexing
     DataSet<Tuple2<GradoopId, GradoopId>> edges = edgesToUpdateOrReturn
       .map(new CollectEdgesPreliminary())
+      // I use a join creating a “very big key” because there are no FlatFunctions for Crosses
       .joinWithTiny(inferEPGMGraphHeadIdFromNestingResult(nested))
       .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(new CollectEdges(true));
