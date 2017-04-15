@@ -26,22 +26,21 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.nest.NestingBase;
+import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
+import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
+import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
+import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
+import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
 import org.gradoop.flink.model.impl.operators.nest.functions.HexapletEdgeDifference;
-import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
-import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
-import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
-import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
-import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
  * Defines the nested model where the operations are actually carried out.
@@ -142,18 +141,16 @@ public class NestedModel {
       // Each edge is associated to each possible graph
       .map(new AsEdgesMatchingSource())
       // (1) Now, we want to select the edge information only for the graphs in the graph collection
-      .joinWithTiny(nestedGraphEdgeMap)
+      .coGroup(nestedGraphEdgeMap)
       .where(0).equalTo(1)
       .with(new CombineGraphBelongingInformation())
-      .distinct(0)
+      //.distinct(0)
       // (2) Mimicking the NotInGraphBroadcast
       .leftOuterJoin(collection.getGraphEdgeMap())
       .where(4).equalTo(1)
-      .with(new HexapletEdgeDifference());
-
+      .with(new HexapletEdgeDifference())
     // I have to only add the edges that are matched and updated
     // TODO       JOIN COUNT: (2)
-    DataSet<Hexaplet> updatedEdges = edgesToUpdateOrReturn
       // Update the vertices' source
       .leftOuterJoin(verticesToSummarize)
       .where(2).equalTo(2)
@@ -165,14 +162,14 @@ public class NestedModel {
       .with(new UpdateEdgeSource(false));
 
     // Edges to be set within the NestedIndexing
-    DataSet<Tuple2<GradoopId, GradoopId>> edges = updatedEdges
+    DataSet<Tuple2<GradoopId, GradoopId>> edges = edgesToUpdateOrReturn
       .map(new CollectEdgesPreliminary())
       .joinWithTiny(inferEPGMGraphHeadIdFromNestingResult(nested))
       .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
       .with(new CollectEdges(true));
 
     nestingIndex.incrementallyUpdateEdges(edges);
-    previousResult = new NestingResult(gh, nested.getGraphVertexMap(), edges, updatedEdges,
+    previousResult = new NestingResult(gh, nested.getGraphVertexMap(), edges, edgesToUpdateOrReturn,
       nested.getGraphStack());
 
     DataSet<Edge> newlyCreatedEdges = flattenedGraph.getEdges()
