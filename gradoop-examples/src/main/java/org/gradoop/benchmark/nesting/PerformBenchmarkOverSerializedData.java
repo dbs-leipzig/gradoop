@@ -39,38 +39,7 @@ import java.nio.file.StandardOpenOption;
 /**
  * Class implementing the serialization methods
  */
-public class PerformBenchmarkOverSerializedData extends NestingFilenameConvention {
-
-  /**
-   * Option to declare path to input graph
-   */
-  private static final String OPTION_INPUT_PATH = "i";
-  /**
-   * Option to declare path to input graph
-   */
-  private static final String PHASE_TO_BENCHMARK = "p";
-  /**
-   * Path to CSV log file
-   */
-  private static final String OUTPUT_EXPERIMENT = "o";
-
-  static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in the serialized format");
-    OPTIONS.addOption(PHASE_TO_BENCHMARK, "phase", true, "Phase to benchmark.\n\t 1: only " +
-      "loads the data.\n\t 2: loads the data and perform the computation");
-    OPTIONS.addOption(OUTPUT_EXPERIMENT, "csv", true, "Where to append the experiment for the " +
-      "benchmark");
-  }
-
-  /**
-   * Global environment
-   */
-  private final ExecutionEnvironment environment;
-
-  /**
-   * Defines the base path where the informations are stored (operands + flattened graph)
-   */
-  private final String basePath;
+public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
 
   /**
    * Indices for the left operand
@@ -91,9 +60,8 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
    * Default constructor for running the tests
    * @param basePath    Path where to obtain all the data
    */
-  public PerformBenchmarkOverSerializedData(String basePath) {
-    environment = getExecutionEnvironment();
-    this.basePath = basePath;
+  public PerformBenchmarkOverSerializedData(String basePath, String benchmarkPath) {
+    super(basePath, benchmarkPath);
   }
 
   /**
@@ -102,53 +70,45 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, SerializeData.class.getName());
-    if (cmd == null) {
-      System.exit(1);
-    }
-
-    Integer phase = Integer.valueOf(cmd.getOptionValue(PHASE_TO_BENCHMARK));
-    PerformBenchmarkOverSerializedData benchmark = new PerformBenchmarkOverSerializedData
-    (cmd.getOptionValue(OPTION_INPUT_PATH));
-
-    benchmark.run(phase);
+    runBenchmark(PerformBenchmarkOverSerializedData.class, args);
   }
 
-  /**
-   * Phase 1: Loads the operands from secondary memory
-   */
-  private void loadIndicesWithFlattenedGraph() {
-    leftOperand = loadNestingIndex(generateOperandBasePath(basePath, true));
-    rightOperand = loadNestingIndex(generateOperandBasePath(basePath, false));
+  @Override
+  public void loadOperands() {
+    String path = getBasePath();
+    leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
+    rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
     NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
-    LogicalGraph flat = readLogicalGraph(basePath);
+    LogicalGraph flat = readLogicalGraph(path);
     model = new NestedModel(flat, nestedRepresentation);
   }
 
-  /**
-   * Phase 2: evaluating the operator
-   */
-  private void runOperator() {
+  @Override
+  public void performOperation() {
     NestingBase.nest(model, leftOperand, rightOperand, GradoopId.get());
     model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);
   }
 
-  /**
-   * Run the benchmarks over the bare nested model
-   * @param maxPhase    Maximum phase to reach. 1) Loading data 2) Executing nesting + semantics
-   * @throws Exception
-   */
-  public void run(int maxPhase) throws Exception {
-    int countPhase = 0;
-    // Phase 1: Loading the operands
-    loadIndicesWithFlattenedGraph();
-    countPhase++;
-    checkPhaseAndEvantuallyExit(countPhase, maxPhase);
+  @Override
+  public void finalizeLoadOperand() {
+    // Counting each element for the loaded index, alongside with the values of the flattened
+    // graph
+    indexCount(leftOperand);
+    indexCount(rightOperand);
+    model.getFlattenedGraph().getGraphHead().output(new Bogus<>());
+    model.getFlattenedGraph().getVertices().output(new Bogus<>());
+    model.getFlattenedGraph().getEdges().output(new Bogus<>());
+  }
 
-    // Phase 2: Executing the actual operator
-    runOperator();
-    countPhase++;
-    checkPhaseAndEvantuallyExit(countPhase, countPhase);
+  @Override
+  public void finalizeOperation() {
+    // Counting the computation actually required to produce the result, that is the graph stack
+    // Alongside with the resulting indices
+    NestingResult result = model.getPreviousResult();
+    LogicalGraph counter = NestingBase.toLogicalGraph(result, model.getFlattenedGraph());
+    counter.getGraphHead().output(new Bogus<>());
+    counter.getVertices().output(new Bogus<>());
+    counter.getEdges().output(new Bogus<>());
   }
 
   /**
@@ -159,62 +119,6 @@ public class PerformBenchmarkOverSerializedData extends NestingFilenameConventio
     index.getGraphHeads().output(new Bogus<>());
     index.getGraphEdgeMap().output(new Bogus<>());
     index.getGraphVertexMap().output(new Bogus<>());
-  }
-
-  /**
-   * Terminates the phase, performing the last operations before quitting the program
-   * @param toFinalize     Reached phase
-   * @throws IOException
-   */
-  private void finalizePhase(int toFinalize) throws IOException {
-    if (toFinalize == 1) {
-      // Counting each element for the loaded index, alongside with the values of the flattened
-      // graph
-      indexCount(leftOperand);
-      indexCount(rightOperand);
-      model.getFlattenedGraph().getGraphHead().output(new Bogus<>());
-      model.getFlattenedGraph().getVertices().output(new Bogus<>());
-      model.getFlattenedGraph().getEdges().output(new Bogus<>());
-    } else if (toFinalize == 2)  {
-      // Counting the computation actually required to produce the result, that is the graph stack
-      // Alongside with the resulting indices
-      NestingResult result = model.getPreviousResult();
-      result.getGraphStack().output(new Bogus<>());
-      indexCount(result);
-    }
-  }
-
-  /**
-   * Checks if we have now to stop and, eventually, stops the computation
-   * @param countPhase    current phase
-   * @param maxPhase      Maximum to be reached.
-   * @throws Exception
-   */
-  private void checkPhaseAndEvantuallyExit(int countPhase, int maxPhase) throws Exception {
-    if (countPhase == maxPhase) {
-      finalizePhase(countPhase);
-      // Writing the result of the benchmark to the file
-      Files.write(Paths.get(OUTPUT_EXPERIMENT), (countPhase + "," + environment.execute()
-        .getNetRuntime()).getBytes(Charset.forName("UTF-8")), StandardOpenOption.APPEND);
-      // Exit the whole program, providing the phase no as a return number
-      System.exit(countPhase);
-    }
-  }
-
-  /**
-   * Loads an index located in a given specific folder + operand prefix
-   * @param filename  Foder
-   * @return          Loaded index
-   */
-  private NestingIndex loadNestingIndex(String filename) {
-    DataSet<GradoopId> headers = environment
-      .readFile(new DeserializeGradoopidFromFile(), filename + INDEX_HEADERS_SUFFIX);
-    DataSet<Tuple2<GradoopId, GradoopId>> vertexIndex = environment
-      .readFile(new DeserializePairOfIdsFromFile(), filename + INDEX_VERTEX_SUFFIX);
-    DataSet<Tuple2<GradoopId, GradoopId>> edgeIndex = environment
-      .readFile(new DeserializePairOfIdsFromFile(), filename + INDEX_EDGE_SUFFIX);
-
-    return new NestingIndex(headers, vertexIndex, edgeIndex);
   }
 
 }

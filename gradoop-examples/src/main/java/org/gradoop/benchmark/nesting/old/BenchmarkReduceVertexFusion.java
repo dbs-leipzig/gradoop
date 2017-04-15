@@ -14,15 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/**
- * Contains the programs to execute the benchmarks.
- */
-package org.gradoop.benchmark.nesting;
+package org.gradoop.benchmark.nesting.old;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.benchmark.nesting.SerializeData;
 import org.gradoop.benchmark.nesting.data.GraphCollectionDelta;
 import org.gradoop.benchmark.nesting.functions.AggregateTheSameEdgeWithinDifferentGraphs;
 import org.gradoop.benchmark.nesting.functions.AssociateSourceId;
@@ -31,18 +28,17 @@ import org.gradoop.benchmark.nesting.functions.CreateVertex;
 import org.gradoop.benchmark.nesting.functions.ExtractLeftId;
 import org.gradoop.benchmark.nesting.functions.SelectImportVertexId;
 import org.gradoop.benchmark.nesting.functions.Tuple2StringKeySelector;
-import org.gradoop.benchmark.nesting.old.GMarkDataReader;
+import org.gradoop.flink.model.impl.operators.nest.ReduceVertexFusion;
+import org.gradoop.benchmark.nesting.serializers.Bogus;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -50,10 +46,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Initializing the model by writing it down for some further and subsequent tests.
- * This is just an utility class for performing computations and operations
+ * Class implementing the serialization methods
  */
-public class SerializeData extends GMarkDataReader {
+public class BenchmarkReduceVertexFusion extends GMarkDataReader {
 
   /**
    * Option to declare path to input graph
@@ -66,43 +61,54 @@ public class SerializeData extends GMarkDataReader {
   /**
    * Path to CSV log file
    */
-  private static final String OUTPUT_MODEL = "o";
+  private static final String OUTPUT_EXPERIMENT = "o";
+
+  /**
+   * Path to input graph data
+   */
+  private static String INPUT_PATH;
+
+  /**
+   * Query to execute.
+   */
+  private static String SUBGRAPHS;
+
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in gMark format");
     OPTIONS.addOption(OPTION_SUBGRAPHS_FOLDER, "sub", true, "Graph Folder containing subgraphs" +
       " of the main input in gMark format. Each file could be either a vertex file (*-edges.txt) " +
       "or an edge one (*-vertices.txt)");
-    OPTIONS.addOption(OUTPUT_MODEL, "out", true, "Path to output in nested format");
+    OPTIONS.addOption(OUTPUT_EXPERIMENT, "csv", true, "Where to append the experiment for the " +
+      "benchmark");
   }
 
   /**
-   * Path to input graph data
+   * Indices for the left operand
    */
-  private static String INPUT_PATH;
+  private LogicalGraph leftOperand;
+
   /**
-   * Query to execute.
+   * Indices for the right operand
    */
-  private static String SUBGRAPHS;
+  private GraphCollection rightOperand;
+
   /**
-   * Path to output
+   * Pointer to the Nesting result
    */
-  private static String OUTPATH;
+  private LogicalGraph result;
 
   /**
    * Default constructor for running the tests
-   *
-   * @param csvPath  File where to store the intermediate results
-   * @param basePath Base path where the indexed data is loaded
+   * @param benchmarkPath
    */
-  @Deprecated
-  public SerializeData(String csvPath, String basePath) {
-    super(csvPath, basePath);
+  public BenchmarkReduceVertexFusion(String basePath, String benchmarkPath) {
+    super(basePath, benchmarkPath);
   }
 
   /**
-   * Main program entry point
-   * @param args        Program arguments
+   * Main program entrance
+   * @param args        System arguments
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
@@ -113,13 +119,22 @@ public class SerializeData extends GMarkDataReader {
 
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
-    OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
-    LOGGER =
-      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPATH +
-        "LOGGING.txt")
-      ), Charset.forName("UTF-8")));
 
-    GraphCollectionDelta start = extractGraphFromFiles(INPUT_PATH, null, true);
+    BenchmarkReduceVertexFusion
+      benchmark = new BenchmarkReduceVertexFusion
+      (INPUT_PATH, cmd.getOptionValue(OUTPUT_EXPERIMENT));
+
+    benchmark.registerNextPhase(benchmark::loadOperands, benchmark::finalizeOne);
+    benchmark.registerNextPhase(benchmark::runOperator, benchmark::finalizeTwo);
+    benchmark.run();
+  }
+
+  /**
+   * Phase 1: Loads the operands from secondary memory
+   */
+  private void loadOperands() throws Exception {
+    GraphCollectionDelta start =
+      extractGraphFromFiles(INPUT_PATH, null, true);
 
     // Loading the graphs appearing in the graph collection
     // 1. Returning each vertex and edge files association
@@ -170,10 +185,34 @@ public class SerializeData extends GMarkDataReader {
 
     DataSet<Vertex> vertices = intermediateVertex.map(new Value1Of2<>());
 
-    writeFlattenedGraph(heads, vertices, edges, OUTPATH);
-    writeIndexFromSource(true, start, vertices, edges, OUTPATH);
-    writeIndexFromSource(false, start, vertices, edges, OUTPATH);
-    LOGGER.close();
+    leftOperand = loadLeftOperand(start, vertices, edges);
+    rightOperand = loadRightOperand(start, vertices, edges);
+  }
+
+  /**
+   * Phase 2: evaluating the operator
+   */
+  private void runOperator() {
+    result = new ReduceVertexFusion().execute(leftOperand, rightOperand);
+  }
+
+  protected void finalizeOne() {
+    // Counting each element for the loaded index, alongside with the values of the flattened
+    // graph
+    leftOperand.getGraphHead().output(new Bogus<>());
+    leftOperand.getVertices().output(new Bogus<>());
+    leftOperand.getEdges().output(new Bogus<>());
+    rightOperand.getGraphHeads().output(new Bogus<>());
+    rightOperand.getVertices().output(new Bogus<>());
+    rightOperand.getEdges().output(new Bogus<>());
+  }
+
+  protected void finalizeTwo() {
+    // Counting the computation actually required to produce the result, that is the graph stack
+    // Alongside with the resulting indices
+    result.getGraphHead().output(new Bogus<>());
+    result.getVertices().output(new Bogus<>());
+    result.getEdges().output(new Bogus<>());
   }
 
 }

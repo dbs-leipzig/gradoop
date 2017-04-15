@@ -12,25 +12,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.benchmark.nesting.plainoperator.functions;
+package org.gradoop.flink.model.impl.operators.nest.nestingwithdisjunctive;
 
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.operators.nest.GraphToGraphTests;
+import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctive;
 
-/**
- * Left projection with id obtained.
- * @param <K> Element where the id is extracted
- *
- */
-public class LeftElementId<K extends EPGMElement> implements KeySelector<Tuple2<K, GradoopId>,
-  GradoopId> {
+public class SingleGraphWithSingleGraphNesting extends GraphToGraphTests {
+
   @Override
-  public GradoopId getKey(Tuple2<K, GradoopId> value) throws Exception {
-    return value.f0.getId();
+  protected GraphGraphCollectionToGraphOperator op() {
+    return new NestingWithDisjunctive(GradoopId.get());
   }
+
 }

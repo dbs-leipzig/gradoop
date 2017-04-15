@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
 import org.gradoop.flink.model.impl.operators.nest.functions.HexapletEdgeDifference;

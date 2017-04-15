@@ -15,8 +15,9 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.benchmark.nesting.plainoperator;
+package org.gradoop.flink.model.impl.operators.nest;
 
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -33,14 +34,15 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.benchmark.nesting.plainoperator.functions.CoGroupAssociateOldVerticesWithNewIds;
-import org.gradoop.benchmark.nesting.plainoperator.functions.CoGroupGraphHeadToVertex;
-import org.gradoop.benchmark.nesting.plainoperator.functions.FlatJoinSourceEdgeReference;
-import org.gradoop.benchmark.nesting.plainoperator.functions.LeftElementId;
-import org.gradoop.benchmark.nesting.plainoperator.functions.MapFunctionAddGraphElementToGraph2;
-import org.gradoop.benchmark.nesting.plainoperator.functions.MapGraphHeadForNewGraph;
-import org.gradoop.benchmark.nesting.plainoperator.functions.MapVertexToPairWithGraphId;
-import org.gradoop.benchmark.nesting.plainoperator.functions.MapVerticesAsTuplesWithNullId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.nest.functions.CoGroupAssociateOldVerticesWithNewIds;
+import org.gradoop.flink.model.impl.operators.nest.functions.CoGroupGraphHeadToVertex;
+import org.gradoop.flink.model.impl.operators.nest.functions.FlatJoinSourceEdgeReference;
+import org.gradoop.flink.model.impl.operators.nest.functions.LeftElementId;
+import org.gradoop.flink.model.impl.operators.nest.functions.MapFunctionAddGraphElementToGraph2;
+import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadForNewGraph;
+import org.gradoop.flink.model.impl.operators.nest.functions.MapVertexToPairWithGraphId;
+import org.gradoop.flink.model.impl.operators.nest.functions.MapVerticesAsTuplesWithNullId;
 
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentFilterBroadcast.GRAPH_ID;
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
@@ -50,47 +52,44 @@ import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsCont
  * vertex.
  *
  */
-public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionToGraphOperator {
+public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
 
   /**
    * Fusing the already-combined sources
    *
-   * @param gU            Logical Graph defining the data lake
-   * @param hypervertices Collection of elements representing which vertices will be merged into
+   * @param searchGraph            Logical Graph defining the data lake
+   * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph
    */
   @Override
-  public LogicalGraph execute(LogicalGraph gU,
-    GraphCollection hypervertices) {
+  public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
 
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
-    DataSet<GraphHead> gh = gU.getGraphHead()
+
+    DataSet<GraphHead> gh = searchGraph.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
-    DataSet<GradoopId> subgraphIds = hypervertices.getGraphHeads().map(new Id<>());
+    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHeads()
+      .map(new Id<>());
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
-    DataSet<Tuple2<Vertex, GradoopId>> vWithGid = hypervertices.getVertices()
-      .filter(new InGraphBroadcast<>())
-      .withBroadcastSet(gU.getGraphHead().map(new Id<>()), GRAPH_ID)
+    DataSet<Tuple2<Vertex, GradoopId>> vWithGid = graphPatterns.getVertices()
+      .coGroup(searchGraph.getVertices())
+      .where(new Id<>()).equalTo(new Id<>())
+      .with(new LeftSide<>())
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = hypervertices.getGraphHeads()
+    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHeads()
       .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
-    DataSet<Vertex> vi = gU.getVertices()
+    DataSet<Vertex> vi = searchGraph.getVertices()
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(subgraphIds, GRAPH_IDS);
-
-    DataSet<Vertex> vToRet = nuWithGid
-      .map(new Value0Of2<>())
-      .union(vi)
-      .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
     // PHASE 3: Recreating the edges
     DataSet<Tuple2<Vertex, GradoopId>> idJoin = vWithGid
@@ -99,7 +98,15 @@ public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionT
       .with(new CoGroupAssociateOldVerticesWithNewIds())
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
-    DataSet<Edge> edges = gU.getEdges()
+    DataSet<Vertex> vToRet = nuWithGid
+      .coGroup(vWithGid)
+      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
+      .with(new LeftSide<>())
+      .map(new Value0Of2<>())
+      .union(vi)
+      .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
+
+    DataSet<Edge> edges = searchGraph.getEdges()
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(subgraphIds, GRAPH_IDS)
       .leftOuterJoin(idJoin)
@@ -110,12 +117,12 @@ public class ReduceVertexFusionOverBinaryGraphs implements GraphGraphCollectionT
       .with(new FlatJoinSourceEdgeReference(false))
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
-    return LogicalGraph.fromDataSets(gh, vToRet, edges, gU.getConfig());
+    return LogicalGraph.fromDataSets(gh, vToRet, edges, searchGraph.getConfig());
 
   }
 
   @Override
   public String getName() {
-    return ReduceVertexFusionOverBinaryGraphs.class.getName();
+    return ReduceVertexFusion.class.getName();
   }
 }

@@ -16,6 +16,6 @@
  */
 
 /**
- * Package implementing the reduce version of the fuse operator… NOT!
+ * Contains the Data Structures relevant for loading the data and performing the benchmarks
  */
-package org.gradoop.benchmark.nesting.plainoperator;
+package org.gradoop.benchmark.nesting.data;

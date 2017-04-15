@@ -2,16 +2,18 @@ package org.gradoop.flink.model.impl.operators.nest;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctive;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
+public abstract class AbstractPaperTest extends GradoopFlinkTestBase {
 
   /**
    * Defining the hashing functions required to break down the join function
@@ -22,9 +24,11 @@ public class ReduceVertexFusionPaperTest extends GradoopFlinkTestBase {
     return getLoaderFromStream(inputStream);
   }
 
+  protected abstract GraphGraphCollectionToGraphOperator op();
+
   protected void testGraphGraphGraphCollection(LogicalGraph right,
     GraphCollection gcl, LogicalGraph expected) throws Exception {
-    NestingWithDisjunctive f = new NestingWithDisjunctive(GradoopId.get());
+    GraphGraphCollectionToGraphOperator f = op();
     LogicalGraph output = f.execute(right, gcl);
     collectAndAssertTrue(output.equalsByData(expected));
   }

@@ -12,15 +12,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Provides an implementation for the join operand in different possible ways. A join is a binary
- * operand arbitrarly combining the two operands by using different semantics for both the
- * vertices and the edges.
- *
- * This subpackage provides the join with joins definition, that is the formal definition with
- * some enhancements (hashing function). Plus, it implements the R-join definition.
- */
-package org.gradoop.benchmark.nesting.plainoperator.functions;
+package org.gradoop.flink.model.impl.operators.nest.reducevertex;
+
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.operators.nest.GraphToGraphTests;
+import org.gradoop.flink.model.impl.operators.nest.ReduceVertexFusion;
+
+public class SingleGraphWithSingleGraphNesting extends GraphToGraphTests {
+
+  @Override
+  protected GraphGraphCollectionToGraphOperator op() {
+    return new ReduceVertexFusion();
+  }
+
+}

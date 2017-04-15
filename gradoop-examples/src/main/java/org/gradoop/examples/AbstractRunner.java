@@ -70,7 +70,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory) {
-    return readLogicalGraph(directory, "json");
+    return readLogicalGraph(directory, "csv");
   }
 
   /**

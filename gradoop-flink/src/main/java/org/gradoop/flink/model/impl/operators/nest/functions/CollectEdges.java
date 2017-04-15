@@ -28,7 +28,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Convert an edge coming from "ColelctEdgesPreliminary" into a final
  * IdGraphDatabase representation.
  */
-@FunctionAnnotation.ForwardedFields("f0 -> f1")
 @FunctionAnnotation.ForwardedFieldsFirst("f0 -> f1")
 @FunctionAnnotation.ForwardedFieldsSecond("* -> f0")
 public class CollectEdges implements
