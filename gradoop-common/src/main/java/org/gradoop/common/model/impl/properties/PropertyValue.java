@@ -64,65 +64,65 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
    */
-  private static final transient byte TYPE_NULL         = 0x00;
+  public static final transient byte TYPE_NULL         = 0x00;
   /**
    * {@code <property-type>} for {@link java.lang.Boolean}
    */
-  private static final transient byte TYPE_BOOLEAN      = 0x01;
+  public static final transient byte TYPE_BOOLEAN      = 0x01;
   /**
    * {@code <property-type>} for {@link java.lang.Integer}
    */
-  private static final transient byte TYPE_INTEGER      = 0x02;
+  public static final transient byte TYPE_INTEGER      = 0x02;
   /**
    * {@code <property-type>} for {@link java.lang.Long}
    */
-  private static final transient byte TYPE_LONG         = 0x03;
+  public static final transient byte TYPE_LONG         = 0x03;
   /**
    * {@code <property-type>} for {@link java.lang.Float}
    */
-  private static final transient byte TYPE_FLOAT        = 0x04;
+  public static final transient byte TYPE_FLOAT        = 0x04;
   /**
    * {@code <property-type>} for {@link java.lang.Double}
    */
-  private static final transient byte TYPE_DOUBLE       = 0x05;
+  public static final transient byte TYPE_DOUBLE       = 0x05;
   /**
    * {@code <property-type>} for {@link java.lang.String}
    */
-  private static final transient byte TYPE_STRING       = 0x06;
+  public static final transient byte TYPE_STRING       = 0x06;
   /**
    * {@code <property-type>} for {@link java.lang.String}
    */
-  private static final transient byte TYPE_BIG_DECIMAL  = 0x07;
+  public static final transient byte TYPE_BIG_DECIMAL  = 0x07;
   /**
    * {@code <property-type>} for {@link org.gradoop.common.model.impl.id.GradoopId}
    */
-  private static final transient byte TYPE_GRADOOP_ID   = 0x08;
+  public static final transient byte TYPE_GRADOOP_ID   = 0x08;
   /**
    * {@code <property-type>} for {@link java.util.HashMap}
    */
-  private static final transient byte TYPE_MAP          = 0x09;
+  public static final transient byte TYPE_MAP          = 0x09;
   /**
    * {@code <property-type>} for {@link java.util.List}
    */
-  private static final transient byte TYPE_LIST         = 0x0a;
+  public static final transient byte TYPE_LIST         = 0x0a;
   /**
    * {@code <property-type>} for {@link java.util.List}
    */
-  private static final transient byte TYPE_DATE         = 0x0b;
+  public static final transient byte TYPE_DATE         = 0x0b;
   /**
    * {@code <property-type>} for {@link java.util.List}
    */
-  private static final transient byte TYPE_TIME         = 0x0c;
+  public static final transient byte TYPE_TIME         = 0x0c;
   /**
    * {@code <property-type>} for {@link java.util.List}
    */
-  private static final transient byte TYPE_DATETIME     = 0x0d;
+  public static final transient byte TYPE_DATETIME     = 0x0d;
 
 
   /**
    * Value offset in byte
    */
-  private static final transient byte OFFSET            = 0x01;
+  public static final transient byte OFFSET            = 0x01;
 
   /**
    * Stores the type and the value
@@ -735,6 +735,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return this.rawBytes;
   }
 
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public void setBytes(byte[] bytes) {
+    this.rawBytes = bytes;
+  }
+
   public static PropertyValue fromRawBytes(byte[] rawBytes) {
     return new PropertyValue(rawBytes);
   }
@@ -834,8 +839,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     // type
     byte type = inputView.readByte();
     // dynamic type?
-    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL ||
-      type == TYPE_MAP || type == TYPE_LIST) {
+    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP || type == TYPE_LIST) {
       // read length
       length = inputView.readShort();
     } else if (type == TYPE_NULL) {
