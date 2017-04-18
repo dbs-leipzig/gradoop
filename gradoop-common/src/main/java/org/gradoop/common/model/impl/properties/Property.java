@@ -17,10 +17,10 @@
 
 package org.gradoop.common.model.impl.properties;
 
-import org.apache.hadoop.io.WritableComparable;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * and a property value, whereas a given property key does not enforce specific
  * value type.
  */
-public class Property implements WritableComparable<Property>, Serializable {
+public class Property implements Value, Serializable, Comparable<Property> {
 
   /**
    * Property key
@@ -152,16 +152,16 @@ public class Property implements WritableComparable<Property>, Serializable {
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeUTF(key);
-    value.write(dataOutput);
+  public void write(DataOutputView outputView) throws IOException {
+    outputView.writeUTF(key);
+    value.write(outputView);
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
-    key = dataInput.readUTF();
+  public void read(DataInputView inputView) throws IOException {
+    key = inputView.readUTF();
     value = new PropertyValue();
-    value.readFields(dataInput);
+    value.read(inputView);
   }
 
   @Override
