@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.nest;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -28,22 +27,21 @@ import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.ToIdElementPair;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.functions.epgm.ToIdElementPair;
 import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
+import org.gradoop.flink.model.impl.operators.nest.functions.CoGroupIdsWithActualElements;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.NotGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.ReplaceHeadId;
-import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdges;
-import org.gradoop.flink.model.impl.operators.nest.functions.UpdateVertices;
+import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.functions.Value4OfHexaplet;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
-import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
@@ -55,12 +53,6 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  */
 public abstract class NestingBase implements GraphGraphCollectionToGraphOperator,
   WithNestedResult<DataSet<Hexaplet>> {
-
-  public static String extractForwardedFieldsFirstAnnotation(Class<?> withAnnotation) {
-    return withAnnotation
-      .getAnnotation(FunctionAnnotation.ForwardedFieldsFirst.class)
-      .value()[0];
-  }
 
   /**
    * The actual id to be associated to the returned graph
@@ -186,12 +178,12 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     DataSet<Vertex> vertices = self.getGraphVertexMap()
       .coGroup(flattenedGraph.getVertices())
       .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new UpdateVertices());
+      .with(new CoGroupIdsWithActualElements<>());
 
     DataSet<Edge> edges = self.getGraphEdgeMap()
       .coGroup(flattenedGraph.getEdges())
       .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new UpdateEdges());
+      .with(new CoGroupIdsWithActualElements<>());
 
     DataSet<GraphHead> heads = getActualGraphHeads(self, flattenedGraph);
 
@@ -211,18 +203,22 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     DataSet<Vertex> vertices = self.getGraphVertexMap()
       .coGroup(flattenedGraph.getVertices())
       .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new UpdateVertices());
+      .with(new CoGroupIdsWithActualElements<>());
+
+    DataSet<Edge> edges = self.getGraphEdgeMap()
+      .coGroup(flattenedGraph.getEdges())
+      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .with(new CoGroupIdsWithActualElements<>());
 
     if (self.getGraphStack() != null) {
       vertices = vertices
         .crossWithTiny(self.getGraphStack())
         .with(new AddElementToGraph<>());
-    }
 
-    DataSet<Edge> edges = self.getGraphEdgeMap()
-      .coGroup(flattenedGraph.getEdges())
-      .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new UpdateEdges());
+      edges = edges
+        .crossWithTiny(self.getGraphStack())
+        .with(new AddElementToGraph<>());
+    }
 
     return LogicalGraph.fromDataSets(heads, vertices, edges, flattenedGraph.getConfig());
   }
@@ -337,9 +333,12 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     return previousResult;
   }
 
+
+
   @Override
   public abstract LogicalGraph execute(LogicalGraph graph, GraphCollection collection);
 
   @Override
   public abstract DataSet<Hexaplet> getPreviousComputation();
+
 }

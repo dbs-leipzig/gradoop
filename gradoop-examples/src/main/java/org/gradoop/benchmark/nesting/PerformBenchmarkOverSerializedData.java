@@ -16,25 +16,14 @@
  */
 package org.gradoop.benchmark.nesting;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.benchmark.nesting.data.AbstractBenchmark;
 import org.gradoop.benchmark.nesting.serializers.Bogus;
-import org.gradoop.benchmark.nesting.serializers.DeserializeGradoopidFromFile;
-import org.gradoop.benchmark.nesting.serializers.DeserializePairOfIdsFromFile;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 /**
  * Class implementing the serialization methods
@@ -58,7 +47,8 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
 
   /**
    * Default constructor for running the tests
-   * @param basePath    Path where to obtain all the data
+   * @param basePath        Path where to obtain all the data
+   * @param benchmarkPath   Path where to append the benchmarks
    */
   public PerformBenchmarkOverSerializedData(String basePath, String benchmarkPath) {
     super(basePath, benchmarkPath);
@@ -90,7 +80,7 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
   }
 
   @Override
-  public void finalizeLoadOperand() {
+  public void benchmarkOperandLoad() {
     // Counting each element for the loaded index, alongside with the values of the flattened
     // graph
     indexCount(leftOperand);
@@ -101,7 +91,7 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
   }
 
   @Override
-  public void finalizeOperation() {
+  public void benchmarkOperation() {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
     NestingResult result = model.getPreviousResult();

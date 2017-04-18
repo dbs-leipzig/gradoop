@@ -17,26 +17,31 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
- * Adds a GraphElement to a graph
- * @param <E> GraphElement
+ * Changes the target of the edge with a nested vertex
  */
-@FunctionAnnotation.ForwardedFields("id -> id; properties -> properties; label -> label")
-public class AddElementToGraph<E extends GraphElement>
-  implements CrossFunction<E, Tuple2<GradoopId, GradoopId>, E> {
+@FunctionAnnotation.ForwardedFieldsFirst(
+  "sourceId -> sourceId; label -> label; graphIds -> graphIds; properties -> properties")
+@FunctionAnnotation.ForwardedFieldsSecond("f1 -> targetId")
+public class UpdateEdgeWithTarget implements
+  JoinFunction<Edge, Tuple3<GradoopId, GradoopId, GradoopId>, Edge> {
   @Override
-  public E cross(E e, Tuple2<GradoopId, GradoopId> gradoopIdGradoopIdTuple2) throws Exception {
-    GradoopIdList ls = e.getGraphIds();
-    if (ls.contains(gradoopIdGradoopIdTuple2.f1) && (!ls.contains(gradoopIdGradoopIdTuple2.f0))) {
-      e.addGraphId(gradoopIdGradoopIdTuple2.f0);
+  public Edge join(Edge edge, Tuple3<GradoopId, GradoopId, GradoopId> patternMatched) throws
+    Exception {
+    if (patternMatched != null) {
+      edge.setId(GradoopId.get());
+      GradoopId id = patternMatched.f1;
+      if (id.equals(GradoopId.NULL_VALUE)) {
+        id = patternMatched.f2;
+      }
+      edge.setTargetId(id);
     }
-    return e;
+    return edge;
   }
 }

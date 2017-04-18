@@ -34,7 +34,7 @@ import java.util.Iterator;
 @FunctionAnnotation.ForwardedFieldsSecond("f0 -> f5")
 public class CombineGraphBelongingInformation
   implements JoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet>,
-  CoGroupFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet>{
+             CoGroupFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet> {
 
   @Override
   public Hexaplet join(Hexaplet first, Tuple2<GradoopId, GradoopId> second) throws Exception {

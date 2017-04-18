@@ -22,8 +22,10 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.GraphElement;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Used for both updating vertices and edges. Sets the vertices to be
@@ -38,13 +40,13 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
   /**
    * reusable element
    */
-  private GradoopIdList appearing;
+  private Set<GradoopId> appearing;
 
   /**
    * Default constructor
    */
   public CoGroupIdsWithActualElements() {
-    appearing = new GradoopIdList();
+    appearing = new HashSet<>();
   }
 
   @Override

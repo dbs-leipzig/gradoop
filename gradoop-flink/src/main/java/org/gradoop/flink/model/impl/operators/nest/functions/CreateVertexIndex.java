@@ -17,26 +17,39 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
- * Adds a GraphElement to a graph
- * @param <E> GraphElement
+ * Uses the tuple as a basis for creating the graphMapToVertex
  */
-@FunctionAnnotation.ForwardedFields("id -> id; properties -> properties; label -> label")
-public class AddElementToGraph<E extends GraphElement>
-  implements CrossFunction<E, Tuple2<GradoopId, GradoopId>, E> {
+public class CreateVertexIndex
+  implements MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>>  {
+
+  /**
+   * Reusable element
+   */
+  private Tuple2<GradoopId, GradoopId> reusable;
+
+  /**
+   * Default constructor
+   * @param nestedGraphId The id to be associated to the graph
+   */
+  public CreateVertexIndex(GradoopId nestedGraphId) {
+    reusable = new Tuple2<>();
+    reusable.f0 = nestedGraphId;
+  }
+
   @Override
-  public E cross(E e, Tuple2<GradoopId, GradoopId> gradoopIdGradoopIdTuple2) throws Exception {
-    GradoopIdList ls = e.getGraphIds();
-    if (ls.contains(gradoopIdGradoopIdTuple2.f1) && (!ls.contains(gradoopIdGradoopIdTuple2.f0))) {
-      e.addGraphId(gradoopIdGradoopIdTuple2.f0);
+  public Tuple2<GradoopId, GradoopId> map(Tuple3<GradoopId, GradoopId, GradoopId> value) throws
+    Exception {
+    if (value.f1.equals(GradoopId.NULL_VALUE)) {
+      reusable.f1 = value.f2;
+    } else {
+      reusable.f1 = value.f1;
     }
-    return e;
+    return reusable;
   }
 }

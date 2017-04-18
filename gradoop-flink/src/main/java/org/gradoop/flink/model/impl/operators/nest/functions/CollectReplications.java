@@ -17,10 +17,24 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.util.Iterator;
 
 /**
- * Specific instance for the edges
+ * Created by vasistas on 17/04/17.
  */
-public class UpdateEdges extends CoGroupIdsWithActualElements<Edge> {
+public class CollectReplications implements
+  GroupCombineFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>> {
+  @Override
+  public void combine(Iterable<Tuple2<GradoopId, GradoopId>> values,
+    Collector<Tuple2<GradoopId, GradoopId>> out) throws Exception {
+    Iterator<Tuple2<GradoopId, GradoopId>> it = values.iterator();
+    if (it.hasNext()) {
+      out.collect(it.next());
+    }
+  }
 }

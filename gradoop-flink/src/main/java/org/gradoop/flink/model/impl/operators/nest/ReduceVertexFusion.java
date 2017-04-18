@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.nest;
 
-import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -30,7 +29,6 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
@@ -44,7 +42,6 @@ import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadForNewG
 import org.gradoop.flink.model.impl.operators.nest.functions.MapVertexToPairWithGraphId;
 import org.gradoop.flink.model.impl.operators.nest.functions.MapVerticesAsTuplesWithNullId;
 
-import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphContainmentFilterBroadcast.GRAPH_ID;
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 
 /**

@@ -17,37 +17,33 @@
 package org.gradoop.benchmark.nesting;
 
 import org.gradoop.benchmark.nesting.data.AbstractBenchmark;
-import org.gradoop.flink.model.impl.functions.utils.Self;
-import org.gradoop.flink.model.impl.operators.nest.ReduceVertexFusion;
 import org.gradoop.benchmark.nesting.serializers.Bogus;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
+import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 
 /**
  * Class implementing the serialization methods
  */
-public class RVFOverSerializedData extends AbstractBenchmark {
+public class PerformBenchmarkOverSecondImplementation extends AbstractBenchmark {
 
   /**
    * Indices for the left operand
    */
-  private LogicalGraph leftOperand;
+  private NestingIndex leftOperand;
 
   /**
    * Indices for the right operand
    */
-  private GraphCollection rightOperand;
+  private NestingIndex rightOperand;
 
   /**
    * Defines the data model where the operations are performed
    */
-  private ReduceVertexFusion model;
-
-  /**
-   * Storing the final result
-   */
-  private LogicalGraph result;
+  private NestedModel model;
 
   /**
    * Default constructor for running the tests
@@ -55,7 +51,7 @@ public class RVFOverSerializedData extends AbstractBenchmark {
    * @param basePath        Base path where the indexed data is loaded
    * @param benchmarkPath   File where to store the intermediate results
    */
-  public RVFOverSerializedData(String basePath, String benchmarkPath) {
+  public PerformBenchmarkOverSecondImplementation(String basePath, String benchmarkPath) {
     super(basePath, benchmarkPath);
   }
 
@@ -65,43 +61,53 @@ public class RVFOverSerializedData extends AbstractBenchmark {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    runBenchmark(RVFOverSerializedData.class, args);
+    runBenchmark(PerformBenchmarkOverSecondImplementation.class, args);
   }
 
   @Override
   public void loadOperands() {
     String path = getBasePath();
+    leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
+    rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
+    NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
     LogicalGraph flat = readLogicalGraph(path);
-    leftOperand = NestingBase.toLogicalGraph(loadNestingIndex(generateOperandBasePath(path,
-      true)), flat);
-    rightOperand = NestingBase.toGraphCollection(loadNestingIndex(generateOperandBasePath(path,
-      false)), flat);
-    model = new ReduceVertexFusion();
+    model = new NestedModel(flat, nestedRepresentation);
   }
 
   @Override
   public void performOperation() {
-    result = model.execute(leftOperand, rightOperand);
+    model.nestWithDisjoint(leftOperand, rightOperand, GradoopId.get());
   }
 
   @Override
   public void benchmarkOperandLoad() {
     // Counting each element for the loaded index, alongside with the values of the flattened
     // graph
-    leftOperand.getGraphHead().output(new Bogus<>());
-    leftOperand.getVertices().output(new Bogus<>());
-    leftOperand.getEdges().output(new Bogus<>());
-    rightOperand.getGraphHeads().output(new Bogus<>());
-    rightOperand.getVertices().output(new Bogus<>());
-    rightOperand.getEdges().output(new Bogus<>());
+    indexCount(leftOperand);
+    indexCount(rightOperand);
+    model.getFlattenedGraph().getGraphHead().output(new Bogus<>());
+    model.getFlattenedGraph().getVertices().output(new Bogus<>());
+    model.getFlattenedGraph().getEdges().output(new Bogus<>());
   }
 
   @Override
   public void benchmarkOperation() {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
-    result.getGraphHead().map(new Self<>()).output(new Bogus<>());
-    result.getVertices().map(new Self<>()).output(new Bogus<>());
-    result.getEdges().map(new Self<>()).output(new Bogus<>());
+    LogicalGraph counter = NestingBase.toLogicalGraph(model.getPreviousResult(), model.getFlattenedGraph());
+    counter.getGraphHead().output(new Bogus<>());
+    counter.getVertices().output(new Bogus<>());
+    counter.getEdges().output(new Bogus<>());
   }
+
+  /**
+   * Counting the indices for benchmarking. No other operation beside consuming data is done
+   * @param index   Index containing the data
+   */
+  private void indexCount(NestingIndex index) {
+    index.getGraphHeads().output(new Bogus<>());
+    index.getGraphEdgeMap().output(new Bogus<>());
+    index.getGraphVertexMap().output(new Bogus<>());
+  }
+
 }

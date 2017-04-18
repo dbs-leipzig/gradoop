@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gradoop.benchmark.nesting;
+package org.gradoop.benchmark.nesting.data;
 
 import org.apache.commons.cli.CommandLine;
-import org.gradoop.benchmark.nesting.data.PhaseDoer;
+import org.gradoop.benchmark.nesting.SerializeData;
 
 /**
- * Abstracting the
+ * Abstracting the benchmark operation over all the possible implementations
  */
 public abstract class AbstractBenchmark extends NestingFilenameConvention implements PhaseDoer {
 
@@ -50,6 +50,13 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
     super(basePath, csvPath);
   }
 
+  /**
+   * Starts running the benchmarks from the classes extending this one.
+   * @param clazz       Class to initialize and where to parse the information.
+   * @param args        Arguments
+   * @param <T>         Class extending AbstractBenchmark
+   * @throws Exception
+   */
   public static <T extends AbstractBenchmark> void runBenchmark(Class<T> clazz, String[] args)
     throws Exception {
     CommandLine cmd = parseArguments(args, SerializeData.class.getName());
@@ -59,8 +66,8 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
     T runner = clazz.getConstructor(String.class, String.class)
                     .newInstance(cmd.getOptionValue(OPTION_INPUT_PATH),
                                  cmd.getOptionValue(OUTPUT_EXPERIMENT));
-    runner.registerNextPhase(runner::loadOperands, runner::finalizeLoadOperand);
-    runner.registerNextPhase(runner::performOperation, runner::finalizeLoadOperand);
+    runner.registerNextPhase(runner::loadOperands, runner::benchmarkOperandLoad);
+    runner.registerNextPhase(runner::performOperation, runner::benchmarkOperation);
     runner.run();
   }
 

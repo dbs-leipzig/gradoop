@@ -1,14 +1,44 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gradoop.benchmark.nesting.data;
 
 /**
- * Created by vasistas on 14/04/17.
+ * Defines
  */
 public interface PhaseDoer {
 
+  /**
+   * Loads the operands from secondary memory
+   */
   void loadOperands();
+
+  /**
+   * Performs the actual operation form the loaded operands
+   */
   void performOperation();
 
-  void finalizeLoadOperand();
-  void finalizeOperation();
+  /**
+   * Performs the benchmark over the operand load
+   */
+  void benchmarkOperandLoad();
+
+  /**
+   * Performs the benchmark over the operation
+   */
+  void benchmarkOperation();
 
 }

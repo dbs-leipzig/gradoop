@@ -24,6 +24,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.benchmark.nesting.data.GraphCollectionDelta;
+import org.gradoop.benchmark.nesting.data.NestingFilenameConvention;
 import org.gradoop.benchmark.nesting.functions.AggregateTheSameEdgeWithinDifferentGraphs;
 import org.gradoop.benchmark.nesting.functions.AssociateSourceId;
 import org.gradoop.benchmark.nesting.functions.CreateEdge;
@@ -31,12 +32,18 @@ import org.gradoop.benchmark.nesting.functions.CreateVertex;
 import org.gradoop.benchmark.nesting.functions.ExtractLeftId;
 import org.gradoop.benchmark.nesting.functions.SelectImportVertexId;
 import org.gradoop.benchmark.nesting.functions.Tuple2StringKeySelector;
-import org.gradoop.benchmark.nesting.old.GMarkDataReader;
+import org.gradoop.benchmark.nesting.serializers.SerializeGradoopIdToFile;
+import org.gradoop.benchmark.nesting.serializers.SerializePairOfIdsToFile;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.model.impl.operators.nest.NestingBase;
+import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,13 +54,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * Initializing the model by writing it down for some further and subsequent tests.
  * This is just an utility class for performing computations and operations
  */
-public class SerializeData extends GMarkDataReader {
+public class SerializeData extends NestingFilenameConvention {
 
   /**
    * Option to declare path to input graph
@@ -67,6 +75,11 @@ public class SerializeData extends GMarkDataReader {
    * Path to CSV log file
    */
   private static final String OUTPUT_MODEL = "o";
+
+  /**
+   * Logger writing the timing informations to a file.
+   */
+  private static BufferedWriter LOGGER;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in gMark format");
@@ -174,6 +187,75 @@ public class SerializeData extends GMarkDataReader {
     writeIndexFromSource(true, start, vertices, edges, OUTPATH);
     writeIndexFromSource(false, start, vertices, edges, OUTPATH);
     LOGGER.close();
+  }
+
+  /**
+   *
+   * @param isLeftOperand   Check if that is a left operand
+   * @param start           Where to extract both the left and right operands information
+   * @param vertices        Complete vertices information
+   * @param edges           Complete edge information
+   * @param file            Path where to write the indices
+   * @throws Exception
+   */
+  public static void writeIndexFromSource(boolean isLeftOperand, GraphCollectionDelta start,
+    DataSet<Vertex> vertices, DataSet<Edge> edges, String file) throws Exception {
+
+    LOGGER.newLine();
+    NestingIndex generateOperandIndex;
+
+    if (isLeftOperand) {
+      generateOperandIndex = NestingBase.createIndex(loadLeftOperand(start, vertices, edges));
+    } else {
+      generateOperandIndex = NestingBase.createIndex(loadRightOperand(start, vertices, edges));
+    }
+    writeIndex(generateOperandIndex, generateOperandBasePath(file, isLeftOperand));
+  }
+
+  /**
+   * Writes an index
+   * @param left  Graph index
+   * @param s     File path
+   */
+  private static void writeIndex(NestingIndex left, String s) throws Exception {
+    left.getGraphHeads().write(new SerializeGradoopIdToFile(), s + INDEX_HEADERS_SUFFIX);
+    left.getGraphVertexMap().write(new SerializePairOfIdsToFile(), s + INDEX_VERTEX_SUFFIX);
+    left.getGraphEdgeMap().write(new SerializePairOfIdsToFile(), s + INDEX_EDGE_SUFFIX);
+
+    ENVIRONMENT.execute();
+    LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
+      .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
+    LOGGER.newLine();
+    LOGGER.write("indexHeads: " + left.getGraphHeads().count() + " indexVertices: " + left
+      .getGraphVertexMap().count() + " indexEdges:" + left.getGraphEdgeMap().count());
+    LOGGER.newLine();
+    LOGGER.newLine();
+  }
+
+  /**
+   * Writes the flattened version of the graph model
+   * @param heads       Heads belonging to the graph
+   * @param vertices    Vertices belonging to the graph
+   * @param edges       Edges belonging to the graph
+   * @param path        Path where to write the file
+   * @throws Exception
+   */
+  protected static void writeFlattenedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices,
+    DataSet<Edge> edges, String path) throws Exception {
+
+    DataSet<Vertex> flattenedVertices = heads
+      .map(new GraphHeadToVertex())
+      .union(vertices)
+      .distinct(new Id<>());
+
+    LogicalGraph
+      lg = LogicalGraph.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
+    writeLogicalGraph(lg, path, "csv");
+    SerializeData.LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
+      .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
+    SerializeData.LOGGER.write("vertices: " + lg.getVertices().count() + " edges: " +
+      lg.getEdges().count() + " heads: " + lg.getGraphHead().count());
+    SerializeData.LOGGER.newLine();
   }
 
 }

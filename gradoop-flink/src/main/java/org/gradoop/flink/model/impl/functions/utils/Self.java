@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.functions.utils;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 
@@ -25,9 +26,14 @@ import org.apache.flink.api.java.functions.KeySelector;
  * @param <K> any type
  */
 @FunctionAnnotation.ForwardedFields("* -> *")
-public class Self<K> implements KeySelector<K, K> {
+public class Self<K> implements KeySelector<K, K>, MapFunction<K, K> {
   @Override
   public K getKey(K value) throws Exception {
+    return value;
+  }
+
+  @Override
+  public K map(K value) throws Exception {
     return value;
   }
 }

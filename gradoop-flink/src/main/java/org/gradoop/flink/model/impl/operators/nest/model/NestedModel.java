@@ -19,28 +19,38 @@ package org.gradoop.flink.model.impl.operators.nest.model;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark2;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
 import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
 import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
+import org.gradoop.flink.model.impl.operators.nest.functions.CreateVertexIndex;
 import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
 import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
 import org.gradoop.flink.model.impl.operators.nest.functions.HexapletEdgeDifference;
 import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
+import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeWithTarget;
+import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgesOnSource;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
+
+import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 
 /**
  * Defines the nested model where the operations are actually carried out.
@@ -113,6 +123,67 @@ public class NestedModel {
       .with(new LeftSide<>())
       .map(new Value0Of2<>());
   }
+
+  /**
+   * Implements the nesting operation for the nested model alongside with the disjoint semantics
+   *
+   * @param graphIndex        index for the search graph
+   * @param collectionIndex   index for the graph collection
+   * @param nestedGraphId     id to be associated to the new graph in the EPGM model
+   * @return                  The updated results associated to the new graph
+   */
+  public NestingResult nestWithDisjoint(NestingIndex graphIndex,
+    NestingIndex collectionIndex, GradoopId nestedGraphId) {
+
+    DataSet<Tuple2<GradoopId, GradoopId>> newStackElement = graphIndex.getGraphHeads()
+      .map(new ToTuple2WithF0(nestedGraphId));
+
+    // Creates a new element to the stack
+    nestingIndex.addToStack(newStackElement);
+
+    // Mark each vertex if either it's present or not in the final match
+    // TODO       JOIN COUNT: (1)
+    // * f0 -> graph id
+    // * f1 -> graph collection id
+    // * f2 -> vertex id
+    DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> nestedVertices =
+      graphIndex.getGraphVertexMap()
+        .leftOuterJoin(collectionIndex.getGraphVertexMap())
+        .where(1).equalTo(1)
+        // If the vertex does not appear in the graph collection, the f2 element will be null.
+        // These vertices are the ones to be returned as vertices alongside with the new
+        // graph heads
+        .with(new AssociateAndMark2());
+
+    DataSet<Tuple2<GradoopId, GradoopId>> vertices = nestedVertices
+      .map(new CreateVertexIndex(nestedGraphId));
+
+    DataSet<Edge> promotedEdges = getFlattenedGraph().getEdges()
+      .filter(new NotInGraphsBroadcast<>())
+      .withBroadcastSet(collectionIndex.getGraphHeads(), GRAPH_IDS)
+      .leftOuterJoin(nestedVertices)
+      .where("sourceId").equalTo(2)
+      .with(new UpdateEdgesOnSource())
+      .leftOuterJoin(nestedVertices)
+      .where("targetId").equalTo(2)
+      .with(new UpdateEdgeWithTarget())
+      .map(new AddToGraph<>(nestedGraphId));
+
+    flattenedGraph = LogicalGraph.fromDataSets(flattenedGraph.getGraphHead(),
+      flattenedGraph.getVertices(),
+      flattenedGraph.getEdges().union(promotedEdges),
+      flattenedGraph.getConfig());
+
+    DataSet<Tuple2<GradoopId, GradoopId>> resultingEdges =
+      promotedEdges.getExecutionEnvironment().fromElements(nestedGraphId)
+        .cross(promotedEdges.map(new Id<>()));
+
+    previousResult = new NestingResult(graphIndex.getGraphHeads(), vertices, resultingEdges,
+      null, newStackElement);
+
+    return previousResult;
+  }
+
 
   /**
    * Implements the disjunctive semantics fot the nested model. This is a partially materialized
@@ -191,4 +262,5 @@ public class NestedModel {
   public void setPreviousResult(NestingResult previousResult) {
     this.previousResult = previousResult;
   }
+
 }
