@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -29,24 +30,16 @@ import java.util.Iterator;
  * This method is used to create new edges and copy old edges
  * in order to create new ones
  */
-public class DuplicateEdgeInformations implements CoGroupFunction<Edge, Hexaplet, Edge> {
+public class DuplicateEdgeInformations implements JoinFunction<Edge, Hexaplet, Edge> {
 
   @Override
-  public void coGroup(Iterable<Edge> first, Iterable<Hexaplet> second, Collector<Edge> out) throws
+  public Edge join(Edge e, Hexaplet y) throws
     Exception {
     // There should be just one edge with the same id
-    Iterator<Edge> it = first.iterator();
-    if (it.hasNext()) {
-      Edge e = it.next();
-      for (Hexaplet y : second) {
-        if (!y.f4.equals(GradoopId.NULL_VALUE)) {
-          e.setId(y.f4);
-          e.setSourceId(y.getSource());
-          e.setTargetId(y.getTarget());
-          out.collect(e);
-        }
-      }
-    }
+    e.setId(y.f4);
+    e.setSourceId(y.getSource());
+    e.setTargetId(y.getTarget());
+    return e;
   }
 
 }

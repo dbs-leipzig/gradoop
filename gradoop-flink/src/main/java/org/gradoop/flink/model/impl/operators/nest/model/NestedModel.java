@@ -40,8 +40,8 @@ import org.gradoop.flink.model.impl.operators.nest.functions.CreateVertexIndex;
 import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
 import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
-import org.gradoop.flink.model.impl.operators.nest.functions.HexapletEdgeDifference;
 import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
+import org.gradoop.flink.model.impl.operators.nest.functions.NotAppearingInGraphCollection;
 import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeWithTarget;
@@ -209,17 +209,14 @@ public class NestedModel {
     // Edges to return and update are the ones that do not appear in the collection
     // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)
     DataSet<Hexaplet> edgesToUpdateOrReturn = flattenedGraph.getEdges()
+      .filter(new NotInGraphsBroadcast<>())
+      .withBroadcastSet(collection.getGraphHeads(), NotInGraphsBroadcast.GRAPH_IDS)
       // Each edge is associated to each possible graph
       .map(new AsEdgesMatchingSource())
       // (1) Now, we want to select the edge information only for the graphs in the graph collection
-      .coGroup(nestedGraphEdgeMap)
+      .join(nestedGraphEdgeMap)
       .where(0).equalTo(1)
       .with(new CombineGraphBelongingInformation())
-      //.distinct(0)
-      // (2) Mimicking the NotInGraphBroadcast
-      .leftOuterJoin(collection.getGraphEdgeMap())
-      .where(4).equalTo(1)
-      .with(new HexapletEdgeDifference())
     // I have to only add the edges that are matched and updated
     // TODO       JOIN COUNT: (2)
       // Update the vertices' source
@@ -246,7 +243,7 @@ public class NestedModel {
 
     DataSet<Edge> newlyCreatedEdges = flattenedGraph.getEdges()
       // Associate each edge to each new edge where he has generated from
-      .coGroup(previousResult.getPreviousComputation())
+      .join(previousResult.getPreviousComputation().filter(new NotAppearingInGraphCollection()))
       .where(new Id<>()).equalTo(0)
       .with(new DuplicateEdgeInformations());
 
