@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains functions to transform EPGM entities into CSV and vice versa.
+ * Contains functions to transform CSV into EPGM entities.
  */
 package org.gradoop.flink.io.impl.xmlbasedcsv.functions;

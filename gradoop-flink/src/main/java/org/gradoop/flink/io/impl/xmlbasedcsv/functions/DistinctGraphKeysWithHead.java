@@ -48,7 +48,7 @@ public class DistinctGraphKeysWithHead
   public void reduce(Iterable<Tuple2<String, GraphHead>> iterable,
     Collector<Tuple2<String, GraphHead>> collector) throws Exception {
     Tuple2<String, GraphHead> result = null;
-    //if possible select the key which already has a mapped graphhead
+    // if possible select the key which already has a mapped graphhead
     for (Tuple2<String, GraphHead> tuple : iterable) {
       if (result == null) {
         result = tuple;
@@ -57,7 +57,7 @@ public class DistinctGraphKeysWithHead
         result = tuple;
       }
     }
-    //if the graph key does not have a mapped graphhead, one is created
+    // if the graph key does not have a mapped graphhead, one is created
     if (result.f1 == null) {
       GraphHead graphHead = graphHeadFactory.createGraphHead();
       graphHead.setProperty(XMLBasedCSVConstants.PROPERTY_KEY_KEY, result.f0);

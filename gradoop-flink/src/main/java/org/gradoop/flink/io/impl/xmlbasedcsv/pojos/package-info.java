@@ -16,7 +16,7 @@
  */
 
 /**
- * Contains all generated pojos related to xmlbasedcsv input and output to Flink.
+ * Contains all generated pojos related to xmlbasedcsv input to Flink.
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.gradoop.org/flink/io/impl/xmlbasedcsv/pojo", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.gradoop.flink.io.impl.xmlbasedcsv.pojos;

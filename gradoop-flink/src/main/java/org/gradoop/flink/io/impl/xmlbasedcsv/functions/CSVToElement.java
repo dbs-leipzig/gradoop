@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * Creates EPGMElements from a xmlbasedcsv object which contains the meta information
+ * Creates EPGMElements from a csv object which contains the meta information
  * to the corresponding content.
  */
 public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String>, EPGMElement> {
@@ -107,7 +107,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   }
 
   /**
-   * Creates a graph head from the given fields by using the xmlbasedcsv meta information.
+   * Creates a graph head from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -117,7 +117,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields) {
     String label = "";
     List<Property> propertiesCsv = null;
-    //if the label is set in the meta file it is read from xmlbasedcsv line
+    //if the label is set in the meta file it is read from csv line
     if (csv.getGraphhead().getLabel() != null) {
       label = createLabel(csv.getGraphhead().getLabel(), fields);
     }
@@ -128,13 +128,13 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       //meta information about the properties
       propertiesCsv = csv.getGraphhead().getProperties().getProperty();
     }
-    //if there are properties set in the meta file they are read from the xmlbasedcsv line
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
   }
 
   /**
-   * Creates a vertex from the given fields by using the xmlbasedcsv meta information.
+   * Creates a vertex from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -144,7 +144,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields) {
     String label = "";
     List<Property> propertiesCsv = null;
-    //if the label is set in the meta file it is read from xmlbasedcsv line
+    //if the label is set in the meta file it is read from csv line
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
@@ -162,7 +162,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     //List containing the keys of graphs the vertex is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-    //if there are properties set in the meta file they are read from the xmlbasedcsv line
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
@@ -170,7 +170,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   }
 
   /**
-   * Creates an edge from the given fields by using the xmlbasedcsv meta information.
+   * Creates an edge from the given fields by using the csv meta information.
    *
    * @param csv contains meta information
    * @param fields contains the data
@@ -183,7 +183,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   }
 
   /**
-   * Creates an edge from the given fields by using the xmlbasedcsv meta information.
+   * Creates an edge from the given fields by using the csv meta information.
    * May be called to create an edge directly from an vertex.
    *
    * @param csv contains meta information
@@ -200,7 +200,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     if (edge == null) {
       edge = csv.getEdge();
     }
-    //if the label is set in the meta file it is read from xmlbasedcsv line
+    //if the label is set in the meta file it is read from csv line
     if (edge.getLabel() != null) {
       label = createLabel(edge.getLabel(), fields);
     }
@@ -218,7 +218,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     //List containing the keys of graphs the edge is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-    //if there are properties set in the meta file they are read from the xmlbasedcsv line
+    //if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
     //tuple used to create the source and the target key
@@ -306,7 +306,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
           domainName = reference.getDomainName();
         }
         className = reference.getKey().getClazz();
-        //append the id from the xmlbasedcsv line
+        //append the id from the csv line
         contentString.append(this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
           fields, XMLBasedCSVConstants.SEPARATOR_ID));
       }
@@ -423,7 +423,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    *
    * @param csv contains the meta information
    * @param properties list of properties from the xmlbasedcsv
-   * @param key the key from the xmlbasedcsv for the current object
+   * @param key the key from the csv for the current object
    * @param fields contains the data
    * @return epgm property list
    */

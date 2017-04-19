@@ -41,7 +41,7 @@ public class XmlMetaParser {
    *
    * @param xsdSchema path to the xml schema
    * @param xmlDatei path to the xml file
-   * @return datasource which has a name and contains xmlbasedcsv objects
+   * @return datasource which has a name and contains csv objects
    *
    * @throws SAXException schema loading failed
    * @throws JAXBException jaxb context failed
@@ -69,5 +69,4 @@ public class XmlMetaParser {
     }
     return source;
   }
-
 }

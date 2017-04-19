@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.CsvExtension;
 
 /**
- * Maps the xmlbasedcsv meta object to each line from the xmlbasedcsv file.
+ * Maps the csv meta object to each line from the csv file.
  */
 public class CSVToContent implements MapFunction<String, Tuple2<CsvExtension, String>> {
   /**

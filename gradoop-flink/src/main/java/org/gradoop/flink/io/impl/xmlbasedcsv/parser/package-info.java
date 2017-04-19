@@ -16,7 +16,6 @@
  */
 
 /**
- * Contains all classes used to parse xml files related to xmlbasedcsv input and output
- * to Flink.
+ * Contains all classes used to parse xml files related to xmlbasedcsv input to Flink.
  */
 package org.gradoop.flink.io.impl.xmlbasedcsv.parser;

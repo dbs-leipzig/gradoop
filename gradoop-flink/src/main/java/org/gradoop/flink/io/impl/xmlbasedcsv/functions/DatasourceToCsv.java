@@ -24,13 +24,13 @@ import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Datasource;
 import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Domain;
 
 /**
- * Collects all xmlbasedcsv objects from a datasource.
+ * Collects all csv objects from a datasource.
  */
 public class DatasourceToCsv implements FlatMapFunction<Datasource, CsvExtension> {
 
   @Override
   public void flatMap(Datasource datasource, Collector<CsvExtension> collector) throws Exception {
-    //add the datasource name and the domain name to each xmlbasedcsv
+    // add the datasource name and the domain name to each xmlbasedcsv
     for (Domain domain : datasource.getDomain()) {
       for (CsvExtension csv : domain.getCsv()) {
         csv.setDatasourceName(datasource.getName());

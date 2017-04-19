@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains all tuples related to xmlbasedcsv input and output to Flink.
+ * Contains all tuples related to xmlbasedcsv input to Flink.
  */
 package org.gradoop.flink.io.impl.xmlbasedcsv.tuples;

@@ -34,7 +34,7 @@ public class ElementToElementGraphKey<T extends EPGMGraphElement>
   @Override
   public void flatMap(T element, Collector<Tuple2<T, String>> collector) throws Exception {
     String graphs = element.getPropertyValue(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS).getString();
-    //get all graph keys which are stored in a property
+    // get all graph keys which are stored in a property
     for (String graph : graphs.split(XMLBasedCSVConstants.SEPARATOR_GRAPHS)) {
       graph = graph.replaceAll(
         XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS, XMLBasedCSVConstants.SEPARATOR_GRAPHS);

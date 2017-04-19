@@ -20,15 +20,15 @@ package org.gradoop.flink.io.impl.xmlbasedcsv.pojos;
 /**
  * This class is not part of the auto generated jaxb pojos so if needed modify with care.
  * The extension to the generated class is needed because the datasource name and the domain name
- * have to be saved together with the xmlbasedcsv meta information.
+ * have to be saved together with the csv meta information.
  */
 public class CsvExtension extends Csv {
     /**
-     * Name of the datasource where the, in xmlbasedcsv described, object is located in.
+     * Name of the datasource where the, in csv described, object is located in.
      */
     private String datasourceName;
     /**
-     * Name of the domain where the, in xmlbasedcsv described, object is located in.
+     * Name of the domain where the, in csv described, object is located in.
      */
     private String domainName;
 

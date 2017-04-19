@@ -83,7 +83,7 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
    *
    * @param metaXmlPath xml file
-   * @param csvDir xmlbasedcsv directory
+   * @param csvDir csv directory
    * @param config Gradoop Flink configuration
    */
   public XMLBasedCSVDataSource(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
@@ -106,7 +106,7 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
     DataSet<Vertex> vertices;
     DataSet<Edge> edges;
 
-    // parse the xml file to a datasource and select each xmlbasedcsv object
+    // parse the xml file to a datasource and select each csv object
     Datasource datasource = null;
     try {
       datasource = XmlMetaParser.parse(getXsdPath(), getMetaXmlPath());
@@ -124,7 +124,7 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
       }
     }
 
-    // load the content for each xmlbasedcsv file described in the xml file
+    // load the content for each csv file described in the xml file
     CsvExtension first = csvList.remove(0);
     DataSet<Tuple2<CsvExtension, String>> csvContent = env
       .readTextFile(getCsvDir() + first.getName())

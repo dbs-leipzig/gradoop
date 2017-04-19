@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.xmlbasedcsv;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Base class for CSV data source and sink.
+ * Base class for CSV data source.
  */
 abstract class XMLBasedCSVBase {
   /**
@@ -37,15 +37,15 @@ abstract class XMLBasedCSVBase {
    */
   private final String metaXmlPath;
   /**
-   * Path to the directory containing the xmlbasedcsv files.
+   * Path to the directory containing the csv files.
    */
   private String csvDir;
 
   /**
-   * Creates a new data source/sink. Paths can be local (file://) or HDFS (hdfs://).
+   * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
    *
    * @param metaXmlPath xml file
-   * @param csvDir xmlbasedcsv directory
+   * @param csvDir csv directory
    * @param config Gradoop Flink configuration
    */
   XMLBasedCSVBase(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
