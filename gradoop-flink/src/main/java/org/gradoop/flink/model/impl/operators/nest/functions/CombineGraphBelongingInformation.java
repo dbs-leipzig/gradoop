@@ -17,15 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-
-import java.util.Iterator;
 
 /**
  * Associates each exaplet to the nested graph where it appears
@@ -33,7 +29,7 @@ import java.util.Iterator;
 @FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1; f2 -> f2; f3 -> f3; f4 -> f4")
 @FunctionAnnotation.ForwardedFieldsSecond("f0 -> f5")
 public class CombineGraphBelongingInformation
-  implements JoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet>{
+  implements JoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet> {
 
   @Override
   public Hexaplet join(Hexaplet first, Tuple2<GradoopId, GradoopId> second) throws Exception {

@@ -17,14 +17,9 @@
 
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
-
-import java.util.Iterator;
 
 /**
  * This method is used to create new edges and copy old edges

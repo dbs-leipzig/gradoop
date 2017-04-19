@@ -315,7 +315,8 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads.crossWithHuge(tmpVert);
 
     NestingResult previousResult =
-      new NestingResult(heads, vertices, graphIndex.getGraphEdgeMap(), nestedResult, newStackElement);
+      new NestingResult(heads, vertices, graphIndex.getGraphEdgeMap(), nestedResult,
+        newStackElement);
 
     model.setPreviousResult(previousResult);
 
