@@ -61,7 +61,11 @@
                 </properties>
                 <graphs>
                     <graph>
-                        <static name="1"/>
+                        <reference domain_name="GraphDomain">
+                            <key class="GraphHead">
+                                <static name="2"/>
+                            </key>
+                        </reference>
                     </graph>
                 </graphs>
                 <target>
