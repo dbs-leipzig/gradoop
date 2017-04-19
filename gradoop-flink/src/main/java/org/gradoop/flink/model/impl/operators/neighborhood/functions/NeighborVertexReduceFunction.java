@@ -20,22 +20,37 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
-public class NeighborVertexReduceFunction implements
-  GroupReduceFunction<Tuple2<Tuple2<Edge, Vertex>, Vertex>, Vertex> {
+ /**
+  * Sets the aggregation result as property for each vertex. All edges together with the
+  * relevant vertex and the opposite vertex of the edge were grouped.
+  */
+public class NeighborVertexReduceFunction
+//  extends NeighborVertexFunction
+  implements GroupReduceFunction<Tuple2<Vertex,Vertex>, Vertex> {
 
-  private VertexAggregateFunction function;
-
+  /**
+   * Valued constructor.
+   *
+   * @param function vertex aggregation function
+   */
   public NeighborVertexReduceFunction(VertexAggregateFunction function) {
+//    super(function);
     this.function = function;
   }
+  private VertexAggregateFunction function;
+  public VertexAggregateFunction getFunction() {
+    return function;
+  }
 
+   /**
+    * {@inheritDoc}
+    */
   @Override
-  public void reduce(Iterable<Tuple2<Tuple2<Edge, Vertex>, Vertex>> tuples,
+  public void reduce(Iterable<Tuple2<Vertex, Vertex>> tuples,
     Collector<Vertex> collector) throws Exception {
 
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
@@ -43,20 +58,73 @@ public class NeighborVertexReduceFunction implements
     Vertex edgeVertex;
     boolean isFirst = true;
 
-    for (Tuple2<Tuple2<Edge, Vertex>, Vertex> tuple : tuples) {
-      edgeVertex = tuple.f1;
+    // aggregates the value of each opposite vertex of an edge
+    for (Tuple2<Vertex, Vertex> tuple : tuples) {
+      edgeVertex = tuple.f0;
       if (isFirst) {
-        vertex = tuple.f0.f1;
+        // the current vertex is the same for each tuple
+        vertex = tuple.f1;
         isFirst = false;
-        propertyValue = function.getVertexIncrement(edgeVertex);
+        propertyValue = getFunction().getVertexIncrement(edgeVertex);
       } else {
-        propertyValue = function.aggregate(propertyValue, function.getVertexIncrement(edgeVertex));
+        propertyValue = getFunction()
+          .aggregate(propertyValue, getFunction().getVertexIncrement(edgeVertex));
       }
     }
-    vertex.setProperty(function.getAggregatePropertyKey(), propertyValue);
+    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
     collector.collect(vertex);
   }
 }
+
+
+///**
+// * Sets the aggregation result as property for each vertex. All edges together with the
+// * relevant vertex and the opposite vertex of the edge were grouped.
+// */
+//public class NeighborVertexReduceFunction
+////  extends NeighborVertexFunction
+//  implements GroupReduceFunction<Tuple2<Tuple2<GradoopId,Vertex>,Vertex>, Vertex> {
+//
+//  /**
+//   * Valued constructor.
+//   *
+//   * @param function vertex aggregation function
+//   */
+//  public NeighborVertexReduceFunction(VertexAggregateFunction function) {
+////    super(function);
+//    this.function = function;
+//  }
+//  private VertexAggregateFunction function;
+//  public VertexAggregateFunction getFunction() {
+//    return function;
+//  }
+//
+//  @Override
+//  public void reduce(Iterable<Tuple2<Tuple2<GradoopId, Vertex>, Vertex>> tuples,
+//    Collector<Vertex> collector) throws Exception {
+//
+//    PropertyValue propertyValue = PropertyValue.NULL_VALUE;
+//    Vertex vertex = null;
+//    Vertex edgeVertex;
+//    boolean isFirst = true;
+//
+//    // aggregates the value of each opposite vertex of an edge
+//    for (Tuple2<Tuple2<GradoopId, Vertex>, Vertex> tuple : tuples) {
+//      edgeVertex = tuple.f1;
+//      if (isFirst) {
+//        // the current vertex is the same for each tuple
+//        vertex = tuple.f0.f1;
+//        isFirst = false;
+//        propertyValue = getFunction().getVertexIncrement(edgeVertex);
+//      } else {
+//        propertyValue = getFunction()
+//          .aggregate(propertyValue, getFunction().getVertexIncrement(edgeVertex));
+//      }
+//    }
+//    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
+//    collector.collect(vertex);
+//  }
+//}
 
 
 

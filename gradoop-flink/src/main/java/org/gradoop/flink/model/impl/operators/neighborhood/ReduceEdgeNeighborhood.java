@@ -17,8 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
@@ -26,43 +29,67 @@ import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.tuple.SwitchPair;
 import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborEdgeReduceFunction;
-import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.GradoopIdInTuple;
+import org.gradoop.flink.model.impl.operators.neighborhood.functions.VertexIdsWithEdge;
+import org.gradoop.flink.model.impl.operators.neighborhood.functions.VertexToFieldOne;
+import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple;
 
-public class ReduceEdgesFunction extends EdgesFunction {
+/**
+ * Reduce edge neighborhood operator.
+ */
+public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
 
-  public ReduceEdgesFunction(EdgeAggregateFunction function, EdgeDirection direction) {
+
+  /**
+   * Valued constructor.
+   *
+   * @param function  edge aggregate function
+   * @param direction considered edge direction
+   */
+  public ReduceEdgeNeighborhood(EdgeAggregateFunction function, EdgeDirection direction) {
     super(function, direction);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Vertex> vertices;
     switch (getDirection()) {
     case IN:
+      // takes edges which target to the vertex and applies the aggregate function
       vertices = graph.getEdges()
         .join(graph.getVertices())
         .where(new TargetId<>()).equalTo(new Id<>())
-        .groupBy(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     case OUT:
+      // takes edges which start at the vertex and applies the aggregate function
       vertices = graph.getEdges()
         .join(graph.getVertices())
         .where(new SourceId<>()).equalTo(new Id<>())
-        .groupBy(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     case BOTH:
+      // takes edges which start at and target to the vertex and applies the aggregate function
       vertices = graph.getEdges()
+        // maps the source id to the edge and the target id to the edge
+        .flatMap(new VertexIdsWithEdge())
+        .map(new SwitchPair<GradoopId, Edge>())
         .join(graph.getVertices())
-        .where(new TargetId<>()).equalTo(new Id<>())
-//        .groupBy(0)
-//        .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()))
-        .union(graph.getEdges()
-          .join(graph.getVertices())
-          .where(new SourceId<>()).equalTo(new Id<>()))
-        .groupBy(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(1))
+        .where(1).equalTo(new Id<>())
+        // replace id with the vertex
+        .with(new VertexToFieldOne<Edge, GradoopId>())
+//        .where(new TargetId<>()).equalTo(new Id<>())
+//        .union(graph.getEdges()
+//          .join(graph.getVertices())
+//          .where(new SourceId<>()).equalTo(new Id<>()))
+        // group by the vertex id
+        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     default:
@@ -72,8 +99,11 @@ public class ReduceEdgesFunction extends EdgesFunction {
       graph.getGraphHead(), vertices, graph.getEdges(), graph.getConfig());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return ReduceEdgesFunction.class.getName();
+    return ReduceEdgeNeighborhood.class.getName();
   }
 }

@@ -26,14 +26,31 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
-public class NeighborEdgesCoGroupFunction implements CoGroupFunction<Vertex, Tuple2<GradoopId, Edge>, Vertex> {
+/**
+ * Sets the aggregation result as property for each vertex. All edges where the vertex is
+ * relevant are cogrouped. Used to aggregate in- and outgoing edges.
+ */
+public class NeighborEdgesCoGroupFunction
+//  extends NeighborEdgeFunction
+  implements CoGroupFunction<Vertex, Tuple2<GradoopId, Edge>, Vertex> {
 
-  private EdgeAggregateFunction function;
-
+  /**
+   * Valued constructor.
+   *
+   * @param function edge aggregation function
+   */
   public NeighborEdgesCoGroupFunction(EdgeAggregateFunction function) {
+//        super(function);
     this.function = function;
   }
+  private EdgeAggregateFunction function;
+  public EdgeAggregateFunction getFunction() {
+    return function;
+  }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void coGroup(Iterable<Vertex> vertices, Iterable<Tuple2<GradoopId, Edge>> tuples,
     Collector<Vertex> collector) throws Exception {
@@ -41,16 +58,18 @@ public class NeighborEdgesCoGroupFunction implements CoGroupFunction<Vertex, Tup
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
     boolean isFirst = true;
 
+    // aggregates the value of each edge
     for (Tuple2<GradoopId, Edge> tuple : tuples) {
       Edge edge = tuple.f1;
       if (isFirst) {
         isFirst = false;
-        propertyValue = function.getEdgeIncrement(edge);
+        propertyValue = getFunction().getEdgeIncrement(edge);
       } else {
-        propertyValue = function.aggregate(propertyValue, function.getEdgeIncrement(edge));
+        propertyValue = getFunction()
+          .aggregate(propertyValue, getFunction().getEdgeIncrement(edge));
       }
     }
-    vertex.setProperty(function.getAggregatePropertyKey(), propertyValue);
+    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
     collector.collect(vertex);
   }
 }

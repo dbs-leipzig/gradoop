@@ -17,12 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -31,49 +26,52 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborEdgeCoGroupFunction;
 import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborEdgesCoGroupFunction;
+import org.gradoop.flink.model.impl.operators.neighborhood.functions.VertexIdsWithEdge;
 
-public class GroupReduceEdgesFunction extends EdgesFunction {
+/**
+ * Group reduce edge neighborhood operator.
+ */
+public class GroupReduceEdgeNeighborhood extends EdgeNeighborhood {
 
-  public GroupReduceEdgesFunction(EdgeAggregateFunction function, EdgeDirection direction) {
+  /**
+   * Valued constructor.
+   *
+   * @param function  edge aggregate function
+   * @param direction considered edge direction
+   */
+  public GroupReduceEdgeNeighborhood(EdgeAggregateFunction function, EdgeDirection direction) {
     super(function, direction);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Vertex> vertices;
     switch (getDirection()) {
     case IN:
+      // takes edges which target to the vertex and applies the aggregate function
       vertices = graph.getVertices()
         .coGroup(graph.getEdges())
         .where(new Id<>()).equalTo(new TargetId<>())
         .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction()));
       break;
     case OUT:
+      // takes edges which start at the vertex and applies the aggregate function
       vertices = graph.getVertices()
         .coGroup(graph.getEdges())
-        .where(new Id<>()).equalTo(new TargetId<>())
+        .where(new Id<>()).equalTo(new SourceId<>())
         .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction()));
       break;
     case BOTH:
+      // takes edges which start at and target to the vertex and applies the aggregate function
       vertices = graph.getVertices()
         .coGroup(graph.getEdges()
-          .flatMap(new FlatMapFunction<Edge, Tuple2<GradoopId, Edge>>() {
-            Tuple2<GradoopId, Edge> reuseTuple = new Tuple2<GradoopId, Edge>();
-            @Override
-            public void flatMap(Edge edge, Collector<Tuple2<GradoopId, Edge>> collector) throws
-              Exception {
-              reuseTuple.setFields(edge.getSourceId(), edge);
-              collector.collect(reuseTuple);
-              reuseTuple.setFields(edge.getTargetId(), edge);
-              collector.collect(reuseTuple);
-            }
-          }))
+          // maps source id to edge and target id to edge
+          .flatMap(new VertexIdsWithEdge()))
         .where(new Id<>()).equalTo(0)
         .with(new NeighborEdgesCoGroupFunction((EdgeAggregateFunction) getFunction()));
-//        .union(graph.getEdges()
-//          .coGroup(graph.getVertices())
-//          .where(new SourceId<>()).equalTo(new Id<>())
-//          .with(new NeighborEdgeCoGroupFunction((EdgeAggregateFunction) getFunction())));
       break;
     default:
       vertices = null;
@@ -82,8 +80,11 @@ public class GroupReduceEdgesFunction extends EdgesFunction {
       graph.getGraphHead(), vertices, graph.getEdges(), graph.getConfig());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return GroupReduceEdgesFunction.class.getName();
+    return GroupReduceEdgeNeighborhood.class.getName();
   }
 }

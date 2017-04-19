@@ -15,24 +15,27 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.neighborhood;
+package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
-public class GroupReduceNeighborsFunction extends NeighborsFunction {
+/**
+ * Puts the vertex to the second field of the tuple.
+ *
+ * @param <K> type of the first field of the tuple
+ * @param <V> type of the second field of the tuple
+ */
+public class VertexToFieldOne<K, V>
+  implements JoinFunction<Tuple2<K, V>, Vertex, Tuple2<K, Vertex>> {
 
-  public GroupReduceNeighborsFunction(VertexAggregateFunction function, EdgeDirection direction) {
-    super(function, direction);
-  }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    return null;
-  }
-
-  @Override
-  public String getName() {
-    return GroupReduceNeighborsFunction.class.getName();
+  public Tuple2<K, Vertex> join(Tuple2<K, V> tuple,
+    Vertex vertex) throws Exception {
+    return new Tuple2<K, Vertex>(tuple.f0, vertex);
   }
 }

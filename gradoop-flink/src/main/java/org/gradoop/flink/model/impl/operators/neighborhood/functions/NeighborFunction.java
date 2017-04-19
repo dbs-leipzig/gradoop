@@ -15,13 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.neighborhood;
+package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
-public abstract class NeighborsFunction extends Neighborhood {
+/**
+ * Interface for all neighbor functions.
+ */
+public interface NeighborFunction {
 
-  NeighborsFunction(VertexAggregateFunction function, EdgeDirection direction) {
-    super(function, direction);
-  }
+  /**
+   * Returns the aggregate function.
+   *
+   * @return aggregate function
+   */
+  AggregateFunction getFunction();
 }

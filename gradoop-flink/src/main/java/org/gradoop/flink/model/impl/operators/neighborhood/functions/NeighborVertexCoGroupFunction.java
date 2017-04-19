@@ -18,30 +18,60 @@
 package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
-public class NeighborVertexCoGroupFunction implements CoGroupFunction<Vertex, Edge, Vertex> {
+/**
+ * Sets the aggregation result as property for each vertex. All vertices which are relevant for a
+ * vertex are cogrouped. Used to aggregate vertices of either in- or outgoing edges.
+ */
+public class NeighborVertexCoGroupFunction
+//  extends NeighborVertexFunction
+  implements CoGroupFunction<Vertex, Tuple2<GradoopId, Vertex>, Vertex> {
 
-  private EdgeAggregateFunction function;
-
-  public NeighborVertexCoGroupFunction(EdgeAggregateFunction function) {
+  /**
+   * Valued constructor.
+   *
+   * @param function vertex aggregation function
+   */
+  public NeighborVertexCoGroupFunction(VertexAggregateFunction function) {
+//    super(function);
     this.function = function;
   }
+  private VertexAggregateFunction function;
+  public VertexAggregateFunction getFunction() {
+    return function;
+  }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void coGroup(Iterable<Vertex> vertices, Iterable<Edge> edges,
+  public void coGroup(Iterable<Vertex> vertices, Iterable<Tuple2<GradoopId, Vertex>> tuples,
     Collector<Vertex> collector) throws Exception {
-    Vertex vertex = vertices.iterator().next();
+
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
-    for (Edge edge : edges) {
-      propertyValue = function
-        .aggregate(propertyValue, function.getEdgeIncrement(edge));
+    Vertex vertex = vertices.iterator().next();
+    Vertex edgeVertex;
+    boolean isFirst = true;
+
+    // aggregates the value of each opposite vertex of an edge
+    for (Tuple2<GradoopId, Vertex> tuple : tuples) {
+      edgeVertex = tuple.f1;
+      if (isFirst) {
+        isFirst = false;
+        propertyValue = getFunction().getVertexIncrement(edgeVertex);
+      } else {
+        propertyValue = getFunction()
+          .aggregate(propertyValue, getFunction().getVertexIncrement(edgeVertex));
+      }
     }
-    vertex.setProperty(function.getAggregatePropertyKey(), propertyValue);
+    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
     collector.collect(vertex);
   }
 }

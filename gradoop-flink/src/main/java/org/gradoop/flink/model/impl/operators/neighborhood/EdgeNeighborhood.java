@@ -19,9 +19,18 @@ package org.gradoop.flink.model.impl.operators.neighborhood;
 
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
-public abstract class EdgesFunction extends Neighborhood {
+/**
+ * Super class for all edge neighborhood operators.
+ */
+public abstract class EdgeNeighborhood extends Neighborhood {
 
-  public EdgesFunction(EdgeAggregateFunction function, EdgeDirection direction) {
+  /**
+   * Valued constructor.
+   *
+   * @param function  edge aggregate function
+   * @param direction considered edge direction
+   */
+  public EdgeNeighborhood(EdgeAggregateFunction function, EdgeDirection direction) {
     super(function, direction);
   }
 }
