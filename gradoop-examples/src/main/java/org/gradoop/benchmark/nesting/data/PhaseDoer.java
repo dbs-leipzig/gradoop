@@ -21,10 +21,6 @@ package org.gradoop.benchmark.nesting.data;
  */
 public interface PhaseDoer {
 
-  /**
-   * Loads the operands from secondary memory
-   */
-  void loadOperands();
 
   /**
    * Performs the actual operation form the loaded operands
@@ -32,13 +28,8 @@ public interface PhaseDoer {
   void performOperation();
 
   /**
-   * Performs the benchmark over the operand load
-   */
-  void benchmarkOperandLoad();
-
-  /**
    * Performs the benchmark over the operation
    */
-  void benchmarkOperation();
+  void benchmarkOperation() throws Exception;
 
 }

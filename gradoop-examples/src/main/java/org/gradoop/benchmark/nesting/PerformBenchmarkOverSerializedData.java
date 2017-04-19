@@ -16,6 +16,7 @@
  */
 package org.gradoop.benchmark.nesting;
 
+import org.apache.flink.api.common.JobExecutionResult;
 import org.gradoop.benchmark.nesting.data.AbstractBenchmark;
 import org.gradoop.benchmark.nesting.serializers.Bogus;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -64,51 +65,24 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
   }
 
   @Override
-  public void loadOperands() {
+  public void performOperation() {
     String path = getBasePath();
     leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
     rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
     NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
     LogicalGraph flat = readLogicalGraph(path);
     model = new NestedModel(flat, nestedRepresentation);
-  }
-
-  @Override
-  public void performOperation() {
     NestingBase.nest(model, leftOperand, rightOperand, GradoopId.get());
     model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);
   }
 
   @Override
-  public void benchmarkOperandLoad() {
-    // Counting each element for the loaded index, alongside with the values of the flattened
-    // graph
-    indexCount(leftOperand);
-    indexCount(rightOperand);
-    model.getFlattenedGraph().getGraphHead().output(new Bogus<>());
-    model.getFlattenedGraph().getVertices().output(new Bogus<>());
-    model.getFlattenedGraph().getEdges().output(new Bogus<>());
-  }
-
-  @Override
-  public void benchmarkOperation() {
+  public void benchmarkOperation() throws Exception {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
     NestingResult result = model.getPreviousResult();
     LogicalGraph counter = NestingBase.toLogicalGraph(result, model.getFlattenedGraph());
-    counter.getGraphHead().output(new Bogus<>());
-    counter.getVertices().output(new Bogus<>());
-    counter.getEdges().output(new Bogus<>());
-  }
-
-  /**
-   * Counting the indices for benchmarking. No other operation beside consuming data is done
-   * @param index   Index containing the data
-   */
-  private void indexCount(NestingIndex index) {
-    index.getGraphHeads().output(new Bogus<>());
-    index.getGraphEdgeMap().output(new Bogus<>());
-    index.getGraphVertexMap().output(new Bogus<>());
+    registerLogicalGraph(counter);
   }
 
 }

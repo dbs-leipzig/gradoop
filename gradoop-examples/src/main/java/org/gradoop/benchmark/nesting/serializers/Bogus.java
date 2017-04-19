@@ -26,6 +26,23 @@ import java.io.IOException;
  * @param <T> Any data type will do
  */
 public  class Bogus<T> extends RichOutputFormat<T> {
+
+  /**
+   * Element to be printed
+   */
+  private final String x;
+
+  /**
+   * Checks if it is the first run, then it prints…
+   */
+  private boolean firstRun;
+
+  public Bogus(String override) {
+    super();
+    x = override;
+    firstRun = true;
+  }
+
   @Override
   public void configure(org.apache.flink.configuration.Configuration parameters) {
   }
@@ -37,7 +54,10 @@ public  class Bogus<T> extends RichOutputFormat<T> {
 
   @Override
   public void writeRecord(T record) throws IOException {
-
+    if (firstRun) {
+      System.out.println(x);
+      firstRun = false;
+    }
   }
 
   @Override

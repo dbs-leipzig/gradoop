@@ -69,7 +69,7 @@ public class RVFOverSerializedData extends AbstractBenchmark {
   }
 
   @Override
-  public void loadOperands() {
+  public void performOperation() {
     String path = getBasePath();
     LogicalGraph flat = readLogicalGraph(path);
     leftOperand = NestingBase.toLogicalGraph(loadNestingIndex(generateOperandBasePath(path,
@@ -77,31 +77,13 @@ public class RVFOverSerializedData extends AbstractBenchmark {
     rightOperand = NestingBase.toGraphCollection(loadNestingIndex(generateOperandBasePath(path,
       false)), flat);
     model = new ReduceVertexFusion();
-  }
-
-  @Override
-  public void performOperation() {
     result = model.execute(leftOperand, rightOperand);
   }
 
   @Override
-  public void benchmarkOperandLoad() {
-    // Counting each element for the loaded index, alongside with the values of the flattened
-    // graph
-    leftOperand.getGraphHead().output(new Bogus<>());
-    leftOperand.getVertices().output(new Bogus<>());
-    leftOperand.getEdges().output(new Bogus<>());
-    rightOperand.getGraphHeads().output(new Bogus<>());
-    rightOperand.getVertices().output(new Bogus<>());
-    rightOperand.getEdges().output(new Bogus<>());
-  }
-
-  @Override
-  public void benchmarkOperation() {
+  public void benchmarkOperation() throws Exception {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
-    result.getGraphHead().map(new Self<>()).output(new Bogus<>());
-    result.getVertices().map(new Self<>()).output(new Bogus<>());
-    result.getEdges().map(new Self<>()).output(new Bogus<>());
+    registerLogicalGraph(result);
   }
 }

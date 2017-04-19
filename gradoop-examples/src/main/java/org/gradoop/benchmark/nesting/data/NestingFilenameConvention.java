@@ -28,6 +28,7 @@ import org.gradoop.benchmark.nesting.functions.StringAsEdge;
 import org.gradoop.benchmark.nesting.functions.StringAsVertex;
 import org.gradoop.benchmark.nesting.functions.TripleWithGraphHeadToId;
 import org.gradoop.benchmark.nesting.functions.Value1Of3AsFilter;
+import org.gradoop.benchmark.nesting.serializers.Bogus;
 import org.gradoop.benchmark.nesting.serializers.DeserializeGradoopidFromFile;
 import org.gradoop.benchmark.nesting.serializers.DeserializePairOfIdsFromFile;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -40,10 +41,12 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -108,16 +111,6 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
   private final String basePath;
 
   /**
-   * Mapping each phase (position id) to the execution itself
-   */
-  private final ArrayList<Operation> phaseMapper;
-
-  /**
-   * Mapping each finalization (position id) to the execution itself
-   */
-  private final ArrayList<Operation> finalizeMapper;
-
-  /**
    * Default constructor for running the tests
    * @param csvPath   File where to store the intermediate results
    * @param basePath  Base path where the indexed data is loaded
@@ -125,8 +118,6 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
   public NestingFilenameConvention(String basePath, String csvPath) {
     this.csvPath = csvPath;
     this.basePath = basePath;
-    phaseMapper = new ArrayList<>(2);
-    finalizeMapper = new ArrayList<>(2);
   }
 
   /**
@@ -165,58 +156,31 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     return basePath;
   }
 
-  /**
-   * Provides the commands to be used within a program.
-   * @param phase         Phase to be run
-   * @param benchmarker   Benchmarker of the provided phase
-   */
-  public void registerNextPhase(Operation phase, Operation benchmarker) {
-    phaseMapper.add(phase);
-    finalizeMapper.add(benchmarker);
+
+  public <T> void register(DataSet<T> toRegister, String registerAs, int phaseNo) throws Exception {
+    String name = getClass().getName()+": "+registerAs+"-"+phaseNo;
+    toRegister.map(new Self<T>()).output(new Bogus<T>(name)).name(name);
   }
 
-  /**
-   * Starts the planned execution of the program alongside with the benchmark
-   * @throws Exception
-   */
-  @SuppressWarnings("uncheked")
-  public void run() throws Exception {
-    for (int phaseNo = 0; phaseNo < phaseMapper.size(); phaseNo++) {
-      phaseMapper.get(phaseNo).method();
-      finalizeMapper.get(phaseNo).method();
+  public void benchmark(int phaseNo) throws Exception {
+    //String plan = ENVIRONMENT.getExecutionPlan();
+    ENVIRONMENT.execute(getClass().getSimpleName());
 
-      String plan = ENVIRONMENT.getExecutionPlan();
+    /*String planFile = System.getProperty("user.home");
+    planFile += planFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
+    planFile += getClass().getSimpleName() +"_plan.json";
+    Files.write(Paths.get(planFile), plan.getBytes(Charset.forName("UTF-8")), StandardOpenOption
+      .TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+*/
+    // Writing the result of the benchmark to the file
+    String line = getClass().getSimpleName() + "," +
+      "Benchmark," +
+      phaseNo + "," +
+      this.basePath + "," +
+      ENVIRONMENT.getLastJobExecutionResult().getNetRuntime() + "\n";
 
-      // Determining the final file path for the queryPlan
-      String[] ns = this.basePath.split("/");
-      java.nio.file.Path file = Paths.get(this.csvPath);
-      String headFile = System.getProperty("user.home");
-      if (file != null) {
-        file = file.getParent();
-        if (file != null) {
-          headFile = file.toString();
-        }
-      }
-      String pathToGet = headFile + (!headFile.endsWith(Path.SEPARATOR) ? Path.SEPARATOR : "") +
-                          getClass().getName() + "_" +
-                          phaseNo + ns[ns.length - 1] + ".json";
-
-      // Writing the query plan
-      Files.write(
-        Paths.get(pathToGet),
-        plan.getBytes(Charset.forName("UTF-8")),
-        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-
-      // Writing the result of the benchmark to the file
-      String line = getClass().getName() + "," +
-        "Benchmark," +
-        phaseNo + "," +
-        this.basePath + "," +
-        ENVIRONMENT.execute().getNetRuntime() + "\n";
-
-      Files.write(Paths.get(this.csvPath), line.getBytes(Charset.forName("UTF-8")),
-        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-    }
+    Files.write(Paths.get(this.csvPath), line.getBytes(Charset.forName("UTF-8")),
+      StandardOpenOption.CREATE, StandardOpenOption.APPEND);
   }
 
   /**

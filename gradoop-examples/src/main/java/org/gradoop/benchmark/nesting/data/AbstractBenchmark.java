@@ -17,7 +17,11 @@
 package org.gradoop.benchmark.nesting.data;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.benchmark.nesting.SerializeData;
+import org.gradoop.benchmark.nesting.serializers.Bogus;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 
 /**
  * Abstracting the benchmark operation over all the possible implementations
@@ -66,9 +70,15 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
     T runner = clazz.getConstructor(String.class, String.class)
                     .newInstance(cmd.getOptionValue(OPTION_INPUT_PATH),
                                  cmd.getOptionValue(OUTPUT_EXPERIMENT));
-    runner.registerNextPhase(runner::loadOperands, runner::benchmarkOperandLoad);
-    runner.registerNextPhase(runner::performOperation, runner::benchmarkOperation);
-    runner.run();
+    runner.performOperation();
+    runner.benchmarkOperation();
+    runner.benchmark(0);
+  }
+
+  public void registerLogicalGraph(LogicalGraph counter) throws Exception {
+    register(counter.getGraphHead(), "HEAD", 0);
+    register(counter.getVertices(), "VERTICES", 1);
+    register(counter.getEdges(), "EDGES", 2);
   }
 
 }

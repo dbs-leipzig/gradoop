@@ -128,8 +128,8 @@ public class SerializeData extends NestingFilenameConvention {
     SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
     OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
     LOGGER =
-      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPATH +
-        "LOGGING.txt")
+      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
+        System.getProperty("user.home") + "/LOGGING.txt")
       ), Charset.forName("UTF-8")));
 
     GraphCollectionDelta start = extractGraphFromFiles(INPUT_PATH, null, true);
@@ -186,6 +186,7 @@ public class SerializeData extends NestingFilenameConvention {
     writeFlattenedGraph(heads, vertices, edges, OUTPATH);
     writeIndexFromSource(true, start, vertices, edges, OUTPATH);
     writeIndexFromSource(false, start, vertices, edges, OUTPATH);
+    ENVIRONMENT.execute("DIALER");
     LOGGER.close();
   }
 
@@ -222,14 +223,13 @@ public class SerializeData extends NestingFilenameConvention {
     left.getGraphVertexMap().write(new SerializePairOfIdsToFile(), s + INDEX_VERTEX_SUFFIX);
     left.getGraphEdgeMap().write(new SerializePairOfIdsToFile(), s + INDEX_EDGE_SUFFIX);
 
-    ENVIRONMENT.execute();
-    LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
+    /*LOGGER.write("Writing Index " + s + " MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
     LOGGER.newLine();
     LOGGER.write("indexHeads: " + left.getGraphHeads().count() + " indexVertices: " + left
       .getGraphVertexMap().count() + " indexEdges:" + left.getGraphEdgeMap().count());
     LOGGER.newLine();
-    LOGGER.newLine();
+    LOGGER.newLine();*/
   }
 
   /**
@@ -251,11 +251,11 @@ public class SerializeData extends NestingFilenameConvention {
     LogicalGraph
       lg = LogicalGraph.fromDataSets(heads, flattenedVertices, edges, CONFIGURATION);
     writeLogicalGraph(lg, path, "csv");
-    SerializeData.LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
+    /*SerializeData.LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
       .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
     SerializeData.LOGGER.write("vertices: " + lg.getVertices().count() + " edges: " +
       lg.getEdges().count() + " heads: " + lg.getGraphHead().count());
-    SerializeData.LOGGER.newLine();
+    SerializeData.LOGGER.newLine();*/
   }
 
 }
