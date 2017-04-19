@@ -28,7 +28,6 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.ToIdElementPair;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.Self;
@@ -40,7 +39,6 @@ import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.NotGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.ReplaceHeadId;
 import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
-import org.gradoop.flink.model.impl.operators.nest.functions.Value4OfHexaplet;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
@@ -99,15 +97,12 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
   public static NestingIndex mergeIndices(NestingIndex left, NestingIndex right) {
     DataSet<GradoopId> heads = left.getGraphHeads()
       .union(right.getGraphHeads());
-      //.distinct(new Self<>());
 
     DataSet<Tuple2<GradoopId, GradoopId>> verticesIndex = left.getGraphVertexMap()
       .union(right.getGraphVertexMap());
-      //.distinct(0, 1);
 
     DataSet<Tuple2<GradoopId, GradoopId>> edgesIndex = left.getGraphEdgeMap()
       .union(right.getGraphEdgeMap());
-      //.distinct(0, 1);
 
     DataSet<Tuple2<GradoopId, GradoopId>> graphStack = left.getGraphStack();
 
@@ -150,7 +145,7 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     DataSet<Tuple2<GradoopId, GradoopId>> graphVertexMap = vertices
       .flatMap(new ToIdElementPair<>())
       .joinWithTiny(heads)
-      .where(new Value0Of2<>()).equalTo(new Self<>())
+      .where(0).equalTo(new Self<>())
       .with(new LeftSide<>())
       .filter(new NotGraphHead());
 
@@ -158,7 +153,7 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     DataSet<Tuple2<GradoopId, GradoopId>> graphEdgeMap = edges
       .flatMap(new ToIdElementPair<>())
       .joinWithTiny(heads)
-      .where(new Value0Of2<>()).equalTo(new Self<>())
+      .where(0).equalTo(new Self<>())
       .with(new LeftSide<>())
       .filter(new NotGraphHead());
 
@@ -265,8 +260,8 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
 
     DataSet<Vertex> vertices = graph.getVertices()
       .union(collection.getVertices())
-      .union(nestedVertices)
-      .distinct(new Id<>());
+      .union(nestedVertices);
+      //.distinct(new Id<>())
 
     DataSet<Edge> edges = graph.getEdges()
       .union(collection.getEdges())
@@ -314,19 +309,13 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
 
     // Vertices to be returend within the NestedIndexing
     DataSet<GradoopId> tmpVert = nestedResult
-      .groupBy(new Value4OfHexaplet())
+      .groupBy(4)
       .reduceGroup(new CollectVertices());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads.crossWithHuge(tmpVert);
 
-    DataSet<GradoopId> tmpEdges = graphIndex
-      .getGraphEdgeMap()
-      .map(new Value1Of2<>());
-
-    DataSet<Tuple2<GradoopId, GradoopId>> edges = heads.crossWithHuge(tmpEdges);
-
     NestingResult previousResult =
-      new NestingResult(heads, vertices, edges, nestedResult, newStackElement);
+      new NestingResult(heads, vertices, graphIndex.getGraphEdgeMap(), nestedResult, newStackElement);
 
     model.setPreviousResult(previousResult);
 
