@@ -87,9 +87,12 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public Put writeProperty(final Put put, Property property) throws IOException {
+    PropertyValue value = property.getValue();
+    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(value);
+
     put.add(CF_PROPERTIES_BYTES,
       Bytes.toBytes(property.getKey()),
-      Writables.getBytes(property.getValue()));
+      Writables.getBytes(wrapper));
     return put;
   }
 
@@ -161,9 +164,10 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * @return property value
    */
   protected PropertyValue readPropertyValue(final byte[] encValue) throws IOException {
-    PropertyValue p = new PropertyValue();
-    Writables.getWritable(encValue, p);
-    return p;
+    PropertyValue value = new PropertyValue();
+    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(value);
+    Writables.getWritable(encValue, wrapper);
+    return value;
   }
 
   /**

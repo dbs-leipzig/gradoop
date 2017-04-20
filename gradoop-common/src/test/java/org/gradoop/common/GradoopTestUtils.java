@@ -25,7 +25,7 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.apache.hadoop.io.Writable;
+import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
@@ -36,11 +36,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
-import org.gradoop.common.config.GradoopConfig;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -321,12 +318,12 @@ public class GradoopTestUtils {
     );
   }
 
-  public static <T extends Writable> T writeAndReadFields(Class<T> clazz, T in) throws IOException {
+  public static <T extends Value> T writeAndReadFields(Class<T> clazz, T in) throws IOException {
     // write to byte[]
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(outputStream);
-    in.write(dataOut);
-    dataOut.flush();
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+    in.write(outputView);
+    outputStream.flush();
 
     T out;
     try {
@@ -338,8 +335,8 @@ public class GradoopTestUtils {
 
     // read from byte[]
     ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-    DataInputStream dataIn = new DataInputStream(inputStream);
-    out.readFields(dataIn);
+    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+    out.read(inputView);
 
     return out;
   }
