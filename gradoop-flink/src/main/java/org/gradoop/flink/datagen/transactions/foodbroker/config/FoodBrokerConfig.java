@@ -415,29 +415,41 @@ public class FoodBrokerConfig implements Serializable {
       // check quality value of the masterdata and adjust the result value
       influenceCount = influenceCount.add(BigDecimal.valueOf(quality));
     }
-    System.out.println("influenceCount = " + influenceCount);
-    influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
-    System.out.println("influenceCount round = " + influenceCount);
-    influenceCount = influenceCount.divide(
-      BigDecimal.valueOf(influencingMasterDataQuality.size()), 8, RoundingMode.HALF_UP);
-    System.out.println("influenceCount/size = " + influenceCount);
 
-    influenceCount = influenceCount.subtract(getAvgNormal());
-    System.out.println("influenceCount-avg = " + influenceCount);
-    influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
-    System.out.println("influenceCount round = " + influenceCount);
-    influenceCount = influenceCount.divide(getAvgNormal().divide(BigDecimal.valueOf(10)));
-    System.out.println("avg/10 = " + getAvgNormal().divide(BigDecimal.valueOf(10)));
-    System.out.println("influenceCount/avg/10 = " + influenceCount);
+    if (influenceCount.compareTo(BigDecimal.ZERO) > 0) {
+      influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        if (higherIsBetter) {
-          value += (influenceCount.intValue() * influence);
-        } else {
-          value -= (influenceCount.intValue() * influence);
-        }
-    System.out.println("influenceCount.intValue() = " + influenceCount.intValue());
-    System.out.println("influenceCount.intValue() * influence = " + influenceCount.intValue() * influence);
+      // normalize the quality value
+      influenceCount = influenceCount
+        .divide(BigDecimal.valueOf(influencingMasterDataQuality.size()), 8, RoundingMode.HALF_UP);
+      // subtract the avg normal, for standard config it is 0.5
+      influenceCount = influenceCount.subtract(getAvgNormal());
 
+      // if the normalized value is greater than the avg
+      if (influenceCount.compareTo(BigDecimal.ZERO) == 1) {
+        // calculate how much times the value is greater than the difference
+        // between the avg normal value and the lowest good value
+        influenceCount = influenceCount
+          .divide(BigDecimal.valueOf(getQualityGood())
+            .subtract(getAvgNormal())
+            .abs(), 0, BigDecimal.ROUND_HALF_UP);
+      // if the normalized value is LOWER than the avg
+      } else if (influenceCount.compareTo(BigDecimal.ZERO) == -1) {
+        // calculate how much times the value is smaller than the difference
+        // between the avg normal value and the lowest normal value
+        influenceCount = influenceCount
+          .divide(BigDecimal.valueOf(getQualityNormal())
+            .subtract(getAvgNormal())
+            .abs(), 0, BigDecimal.ROUND_HALF_UP);
+      }
+    }
+    influence *= influenceCount.intValue();
+
+    if (higherIsBetter) {
+      value += influence;
+    } else {
+      value -= influence;
+    }
     return value;
   }
 
@@ -501,7 +513,7 @@ public class FoodBrokerConfig implements Serializable {
    */
   public BigDecimal getDecimalVariationConfigurationValue(List<Float> influencingMasterDataQuality,
     String node, String key, boolean higherIsBetterDefault) {
-    Float baseValue = null;
+    Float baseValue = 0.0f;
     Float value;
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
@@ -531,7 +543,7 @@ public class FoodBrokerConfig implements Serializable {
    */
   public boolean happensTransitionConfiguration(List<Float> influencingMasterDataQuality,
     String node, String key, boolean higherIsBetterDefault) {
-    Float baseValue = null;
+    Float baseValue = 0.0f;
     Float value;
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
