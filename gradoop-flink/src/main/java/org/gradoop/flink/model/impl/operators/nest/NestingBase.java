@@ -28,29 +28,18 @@ import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.ToIdElementPair;
-import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph;
-import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
-import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
-import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectVerticesFromHex;
 import org.gradoop.flink.model.impl.operators.nest.functions.DemultiplexIdsWithActualElements;
-import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
-import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
-import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
-import org.gradoop.flink.model.impl.operators.nest.functions.NotAppearingInGraphCollection;
 import org.gradoop.flink.model.impl.operators.nest.functions.NotGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.ReplaceHeadId;
 import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
-import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
 import org.gradoop.flink.model.impl.operators.nest.functions.VertexToGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
@@ -323,7 +312,7 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     // Vertices to be returend within the NestedIndexing
     DataSet<GradoopId> tmpVert = nestedResult
       .groupBy(4)
-      .reduceGroup(new CollectVertices());
+      .reduceGroup(new CollectVerticesFromHex());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads.crossWithHuge(tmpVert);
 

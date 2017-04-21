@@ -34,13 +34,12 @@ import org.gradoop.flink.model.impl.operators.nest.functions.AsEdgesMatchingSour
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark2;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdges;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectEdgesPreliminary;
-import org.gradoop.flink.model.impl.operators.nest.functions.CombineGraphBelongingInformation;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectVertices;
+import org.gradoop.flink.model.impl.operators.nest.functions.CollectVerticesFromHex;
 import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
-import org.gradoop.flink.model.impl.operators.nest.functions.CreateVertexIndex;
 import org.gradoop.flink.model.impl.operators.nest.functions.DoHexMatchTarget;
 import org.gradoop.flink.model.impl.operators.nest.functions.DuplicateEdgeInformations;
 import org.gradoop.flink.model.impl.operators.nest.functions.GetVerticesToBeNested;
-import org.gradoop.flink.model.impl.operators.nest.functions.LeftSideIfRightNull;
 import org.gradoop.flink.model.impl.operators.nest.functions.NotAppearingInGraphCollection;
 import org.gradoop.flink.model.impl.operators.nest.functions.ToTuple2WithF0;
 import org.gradoop.flink.model.impl.operators.nest.functions.UpdateEdgeSource;
@@ -135,7 +134,10 @@ public class NestedModel {
   public NestingResult nestWithDisjoint(NestingIndex graphIndex,
     NestingIndex collectionIndex, GradoopId nestedGraphId) {
 
-    DataSet<Tuple2<GradoopId, GradoopId>> newStackElement = graphIndex.getGraphHeads()
+    // Associate each gid in collection's heads to the merged vertices
+    DataSet<GradoopId> heads = graphIndex.getGraphHeads();
+
+    DataSet<Tuple2<GradoopId, GradoopId>> newStackElement = heads
       .map(new ToTuple2WithF0(nestedGraphId));
 
     // Creates a new element to the stack
@@ -143,28 +145,28 @@ public class NestedModel {
 
     // Mark each vertex if either it's present or not in the final match
     // TODO       JOIN COUNT: (1)
-    // * f0 -> graph id
-    // * f1 -> graph collection id
-    // * f2 -> vertex id
-    DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> nestedVertices =
-      graphIndex.getGraphVertexMap()
-        .leftOuterJoin(collectionIndex.getGraphVertexMap())
-        .where(1).equalTo(1)
-        // If the vertex does not appear in the graph collection, the f2 element will be null.
-        // These vertices are the ones to be returned as vertices alongside with the new
-        // graph heads
-        .with(new AssociateAndMark2());
+    DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> nestedResult = graphIndex.getGraphVertexMap()
+      .leftOuterJoin(collectionIndex.getGraphVertexMap())
+      .where(new Value1Of2<>()).equalTo(1)
+      // If the vertex does not appear in the graph collection, the f2 element will be null.
+      // These vertices are the ones to be returned as vertices alongside with the new
+      // graph heads
+      .with(new AssociateAndMark2());
 
-    DataSet<Tuple2<GradoopId, GradoopId>> vertices = nestedVertices
-      .map(new CreateVertexIndex(nestedGraphId));
+    // Vertices to be returend within the NestedIndexing
+    DataSet<GradoopId> tmpVert = nestedResult
+      .groupBy(4)
+      .reduceGroup(new CollectVertices());
+
+    DataSet<Tuple2<GradoopId, GradoopId>> vertices = heads.crossWithHuge(tmpVert);
 
     DataSet<Edge> promotedEdges = getFlattenedGraph().getEdges()
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(collectionIndex.getGraphHeads(), GRAPH_IDS)
-      .leftOuterJoin(nestedVertices)
+      .leftOuterJoin(nestedResult)
       .where("sourceId").equalTo(2)
       .with(new UpdateEdgesOnSource())
-      .leftOuterJoin(nestedVertices)
+      .leftOuterJoin(nestedResult)
       .where("targetId").equalTo(2)
       .with(new UpdateEdgeWithTarget())
       .map(new AddToGraph<>(nestedGraphId));
@@ -200,11 +202,6 @@ public class NestedModel {
 
     // The vertices appearing in a nested graph are the ones that induce the to-be-updated edges.
     DataSet<Hexaplet> verticesToSummarize = hexas.filter(new GetVerticesToBeNested());
-
-    DataSet<Tuple2<GradoopId, GradoopId>> nestedGraphEdgeMap = nested.getGraphEdgeMap()
-      .leftOuterJoin(collection.getGraphEdgeMap())
-      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
-      .with(new LeftSideIfRightNull<>());
 
     // Edges to return and update are the ones that do not appear in the collection
     // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)

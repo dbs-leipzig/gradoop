@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.nest.functions;
 
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
@@ -28,19 +27,19 @@ import java.util.Iterator;
 /**
  * Maps a quad into a <newgraph,vertex> paid to be used within the IdGraphDatabase
  */
-public class CollectVertices extends RichGroupReduceFunction<Tuple3<GradoopId, GradoopId, GradoopId>, GradoopId> {
+public class CollectVerticesFromHex extends RichGroupReduceFunction<Hexaplet, GradoopId> {
 
   @Override
-  public void reduce(Iterable<Tuple3<GradoopId, GradoopId, GradoopId>> values, Collector<GradoopId> out) throws Exception {
-    Iterator<Tuple3<GradoopId, GradoopId, GradoopId>> it = values.iterator();
+  public void reduce(Iterable<Hexaplet> values, Collector<GradoopId> out) throws Exception {
+    Iterator<Hexaplet> it = values.iterator();
     if (it.hasNext()) {
-      Tuple3<GradoopId, GradoopId, GradoopId> x;
+      Hexaplet x;
       GradoopId y = null;
       do {
         x = it.next();
         // First iteration
         if (y == null) {
-          y = x.f1;
+          y = x.f4;
         }
         if (!y.equals(GradoopId.NULL_VALUE)) {
           // If the vertices are summarized into a graph collection id, return it just once
@@ -49,7 +48,7 @@ public class CollectVertices extends RichGroupReduceFunction<Tuple3<GradoopId, G
         } else {
           out.collect(x.f1);
         }
-      } while (it.hasNext() && (x.f1.equals(GradoopId.NULL_VALUE)));
+      } while (it.hasNext() && (x.f4.equals(GradoopId.NULL_VALUE)));
     }
   }
 }
