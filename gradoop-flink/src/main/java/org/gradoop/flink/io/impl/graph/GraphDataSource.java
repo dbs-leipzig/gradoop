@@ -119,7 +119,7 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
       .getType()).getTypeAt(0);
 
     DataSet<Tuple3<K, GradoopId, Vertex>> vertexTriples = importVertices
-      .map(new InitVertex<>(
+      .map(new InitVertex<K>(
         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 
     DataSet<Vertex> epgmVertices = vertexTriples
@@ -131,7 +131,7 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
     DataSet<Edge> epgmEdges = importEdges
       .join(vertexIdPair)
       .where(1).equalTo(0)
-      .with(new InitEdge<>(
+      .with(new InitEdge<K>(
         config.getEdgeFactory(), lineagePropertyKey, externalIdType))
       .join(vertexIdPair)
       .where(0).equalTo(0)

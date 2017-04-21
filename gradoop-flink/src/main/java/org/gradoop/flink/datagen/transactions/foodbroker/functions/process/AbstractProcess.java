@@ -22,13 +22,14 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.AbstractRichFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
@@ -48,15 +49,15 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * EPGM graph head factory.
    */
-  protected GraphHeadFactory graphHeadFactory;
+  protected EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * EPGM vertex factory.
    */
-  protected VertexFactory vertexFactory;
+  protected EPGMVertexFactory<Vertex> vertexFactory;
   /**
    * EPGM edge factory.
    */
-  protected EdgeFactory edgeFactory;
+  protected EPGMEdgeFactory<Edge> edgeFactory;
   /**
    * Foodbroker configuration.
    */
@@ -138,16 +139,17 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Valued constructor.
    *
-   * @param graphHeadFactory EPGM graph head factory
-   * @param vertexFactory EPGM vertex factory
-   * @param edgeFactory EPGM edge Factory
+   * @param graphHeadFactory2 EPGM graph head factory
+   * @param vertexFactory2 EPGM vertex factory
+   * @param edgeFactory2 EPGM edge Factory
    * @param config FoodBroker configuration
    */
-  public AbstractProcess(GraphHeadFactory graphHeadFactory, VertexFactory vertexFactory,
-    EdgeFactory edgeFactory, FoodBrokerConfig config) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.vertexFactory = vertexFactory;
-    this.edgeFactory = edgeFactory;
+  public AbstractProcess(EPGMGraphHeadFactory<GraphHead> graphHeadFactory2,
+    EPGMVertexFactory<Vertex> vertexFactory2,
+    EPGMEdgeFactory<Edge> edgeFactory2, FoodBrokerConfig config) {
+    this.graphHeadFactory = graphHeadFactory2;
+    this.vertexFactory = vertexFactory2;
+    this.edgeFactory = edgeFactory2;
     this.config = config;
 
     vertexMap = Maps.newHashMap();

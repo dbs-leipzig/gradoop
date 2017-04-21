@@ -102,7 +102,7 @@ public abstract class GradoopFlinkTestBase {
    * @throws Exception
    */
   @BeforeClass
-  public static void setup() throws Exception {
+  public static void setupFlink() throws Exception {
     File logDir = File.createTempFile("TestBaseUtils-logdir", null);
     Assert.assertTrue("Unable to delete temp file", logDir.delete());
     Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
@@ -128,7 +128,7 @@ public abstract class GradoopFlinkTestBase {
   }
 
   @AfterClass
-  public static void tearDown() throws Exception {
+  public static void tearDownFlink() throws Exception {
     TestBaseUtils.stopCluster(CLUSTER, new FiniteDuration(1000, TimeUnit.SECONDS));
   }
 

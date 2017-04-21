@@ -24,14 +24,14 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
@@ -78,16 +78,16 @@ public class ComplaintHandling
   /**
    * Valued constructor.
    *
-   * @param graphHeadFactory EPGM graph head factory
-   * @param vertexFactory EPGM vertex factory
-   * @param edgeFactory EPGM edge factory
+   * @param epgmGraphHeadFactory EPGM graph head factory
+   * @param epgmVertexFactory EPGM vertex factory
+   * @param epgmEdgeFactory EPGM edge factory
    * @param config FoodBroker configuration
    * @param globalSeed global seed
    */
-  public ComplaintHandling(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory,
+  public ComplaintHandling(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory, EPGMEdgeFactory<Edge> epgmEdgeFactory,
     FoodBrokerConfig config, long globalSeed) {
-    super(graphHeadFactory, vertexFactory, edgeFactory, config);
+    super(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, config);
     this.globalSeed = globalSeed;
   }
 

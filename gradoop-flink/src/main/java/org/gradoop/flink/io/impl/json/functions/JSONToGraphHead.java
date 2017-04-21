@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
@@ -45,15 +45,15 @@ public class JSONToGraphHead extends JSONToEntity
   /**
    * Creates graph data objects
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
 
   /**
    * Creates map function
    *
-   * @param graphHeadFactory graph data factory
+   * @param epgmGraphHeadFactory graph data factory
    */
-  public JSONToGraphHead(GraphHeadFactory graphHeadFactory) {
-    this.graphHeadFactory = graphHeadFactory;
+  public JSONToGraphHead(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+    this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
   /**

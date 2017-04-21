@@ -24,12 +24,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -129,8 +129,8 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
-    VertexFactory vertexFactory = config.getVertexFactory();
+    EPGMGraphHeadFactory<GraphHead> graphHeadFactory = config.getGraphHeadFactory();
+    EPGMVertexFactory<Vertex> vertexFactory = config.getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<Vertex> matchingVertices = graph.getVertices()

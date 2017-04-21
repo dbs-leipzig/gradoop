@@ -21,14 +21,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
@@ -56,8 +56,8 @@ public class Brokerage
    * @param edgeFactory EPGM edge factory
    * @param config Foodbroker configuration
    */
-  public Brokerage(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory,
+  public Brokerage(EPGMGraphHeadFactory<GraphHead> graphHeadFactory,
+    EPGMVertexFactory<Vertex> vertexFactory, EPGMEdgeFactory<Edge> edgeFactory,
     FoodBrokerConfig config) {
     super(graphHeadFactory, vertexFactory, edgeFactory, config);
   }
