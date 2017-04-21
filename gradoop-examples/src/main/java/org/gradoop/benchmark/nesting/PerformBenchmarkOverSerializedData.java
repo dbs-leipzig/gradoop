@@ -16,9 +16,7 @@
  */
 package org.gradoop.benchmark.nesting;
 
-import org.apache.flink.api.common.JobExecutionResult;
 import org.gradoop.benchmark.nesting.data.AbstractBenchmark;
-import org.gradoop.benchmark.nesting.serializers.Bogus;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
@@ -70,7 +68,7 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
     leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
     rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
     NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
-    LogicalGraph flat = readLogicalGraph(path);
+    LogicalGraph flat = readGraphInMyCSVFormat(path);
     model = new NestedModel(flat, nestedRepresentation);
     NestingBase.nest(model, leftOperand, rightOperand, GradoopId.get());
     model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);

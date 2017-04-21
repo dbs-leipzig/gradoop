@@ -56,8 +56,10 @@ public class ImportEdgeToVertex<K extends Comparable<K>>
     throws Exception {
     reusable.f0.setId(value.f0.getSourceId());
     reusable.f1 = value.f1;
+    reusable.f0.setLabel(value.f0.getSourceId().toString());
     out.collect(reusable);
     reusable.f0.setId(value.f0.getTargetId());
+    reusable.f0.setLabel(value.f0.getTargetId().toString());
     reusable.f1 = value.f1;
     out.collect(reusable);
   }

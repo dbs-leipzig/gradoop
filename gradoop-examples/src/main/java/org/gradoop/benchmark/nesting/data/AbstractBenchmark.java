@@ -17,11 +17,7 @@
 package org.gradoop.benchmark.nesting.data;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.benchmark.nesting.SerializeData;
-import org.gradoop.benchmark.nesting.serializers.Bogus;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 
 /**
  * Abstracting the benchmark operation over all the possible implementations
@@ -34,6 +30,16 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
   private static final String OPTION_INPUT_PATH = "i";
 
   /**
+   * Option to declare slaves used
+   */
+  private static final String OPTION_SLAVES_NO = "s";
+
+  /**
+   * Option to declare parallelizzation used
+   */
+  private static final String OPTION_PARALL_NO = "p";
+
+  /**
    * Path to CSV log file
    */
   private static final String OUTPUT_EXPERIMENT = "o";
@@ -41,7 +47,11 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in the serialized format");
     OPTIONS.addOption(OUTPUT_EXPERIMENT, "csv", true,
-      "Where to append the experiment for the " + "benchmark");
+      "Where to append the experiment for the benchmark");
+    OPTIONS.addOption(OPTION_SLAVES_NO, "slaves", true,
+      "Number of slaves used for benchmark");
+    OPTIONS.addOption(OPTION_PARALL_NO, "par", true,
+      "Number of slaves used for benchmark");
   }
 
   /**
@@ -63,7 +73,7 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
    */
   public static <T extends AbstractBenchmark> void runBenchmark(Class<T> clazz, String[] args)
     throws Exception {
-    CommandLine cmd = parseArguments(args, SerializeData.class.getName());
+    CommandLine cmd = parseArguments(args, clazz.getName());
     if (cmd == null) {
       System.exit(1);
     }
@@ -72,7 +82,8 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
                                  cmd.getOptionValue(OUTPUT_EXPERIMENT));
     runner.performOperation();
     runner.benchmarkOperation();
-    runner.benchmark(0);
+    runner.benchmark(Integer.parseInt(cmd.getOptionValue(OPTION_SLAVES_NO)), Integer.parseInt(cmd
+      .getOptionValue(OPTION_PARALL_NO)));
   }
 
   public void registerLogicalGraph(LogicalGraph counter) throws Exception {

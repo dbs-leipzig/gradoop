@@ -213,10 +213,6 @@ public class NestedModel {
       .withBroadcastSet(collection.getGraphHeads(), NotInGraphsBroadcast.GRAPH_IDS)
       // Each edge is associated to each possible graph
       .map(new AsEdgesMatchingSource())
-      // (1) Now, we want to select the edge information only for the graphs in the graph collection
-      .join(nestedGraphEdgeMap)
-      .where(0).equalTo(1)
-      .with(new CombineGraphBelongingInformation())
     // I have to only add the edges that are matched and updated
     // TODO       JOIN COUNT: (2)
       // Update the vertices' source

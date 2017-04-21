@@ -15,26 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions;
+package org.gradoop.benchmark.nesting.serializers.indices;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
+import org.apache.flink.api.common.io.BinaryOutputFormat;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.core.memory.DataOutputView;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.io.IOException;
 
 /**
- * This method is used to create new edges and copy old edges
- * in order to create new ones
+ * Writes <GradoopId,GradoopId> pairs to bytes
  */
-public class DuplicateEdgeInformations implements JoinFunction<Edge, Hexaplet, Edge> {
-
+public class SerializePairOfIdsToFile extends BinaryOutputFormat<Tuple2<GradoopId, GradoopId>> {
   @Override
-  public Edge join(Edge e, Hexaplet y) throws
-    Exception {
-    // There should be just one edge with the same id
-    e.setId(y.f4);
-    e.setSourceId(y.getSource());
-    e.setTargetId(y.getTarget());
-    return e;
+  protected void serialize(Tuple2<GradoopId, GradoopId> record, DataOutputView dataOutput) throws
+    IOException {
+    dataOutput.write(record.f0.toByteArray());
+    dataOutput.write(record.f1.toByteArray());
   }
-
 }

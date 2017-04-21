@@ -17,43 +17,42 @@
 package org.gradoop.benchmark.nesting;
 
 import org.gradoop.benchmark.nesting.data.AbstractBenchmark;
-import org.gradoop.flink.model.impl.operators.nest.ReduceVertexFusion;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
+import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
+import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResultOpt;
 
 /**
  * Class implementing the serialization methods
  */
-public class RVFOverSerializedData extends AbstractBenchmark {
+public class PerformBenchmarkOverSerializedDataOpt extends AbstractBenchmark {
 
   /**
    * Indices for the left operand
    */
-  private LogicalGraph leftOperand;
+  private NestingIndex leftOperand;
 
   /**
    * Indices for the right operand
    */
-  private GraphCollection rightOperand;
+  private NestingIndex rightOperand;
 
   /**
    * Defines the data model where the operations are performed
    */
-  private ReduceVertexFusion model;
+  private NestedModel model;
 
-  /**
-   * Storing the final result
-   */
-  private LogicalGraph result;
+  private NestingResultOpt previous;
 
   /**
    * Default constructor for running the tests
-   *
-   * @param basePath        Base path where the indexed data is loaded
-   * @param benchmarkPath   File where to store the intermediate results
+   * @param basePath        Path where to obtain all the data
+   * @param benchmarkPath   Path where to append the benchmarks
    */
-  public RVFOverSerializedData(String basePath, String benchmarkPath) {
+  public PerformBenchmarkOverSerializedDataOpt(String basePath, String benchmarkPath) {
     super(basePath, benchmarkPath);
   }
 
@@ -63,26 +62,27 @@ public class RVFOverSerializedData extends AbstractBenchmark {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    ENVIRONMENT.setParallelism(1);
-    runBenchmark(RVFOverSerializedData.class, args);
+    runBenchmark(PerformBenchmarkOverSerializedDataOpt.class, args);
   }
 
   @Override
   public void performOperation() {
     String path = getBasePath();
+    leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
+    rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
+    NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
     LogicalGraph flat = readGraphInMyCSVFormat(path);
-    leftOperand = NestingBase.toLogicalGraph(loadNestingIndex(generateOperandBasePath(path,
-      true)), flat);
-    rightOperand = NestingBase.toGraphCollection(loadNestingIndex(generateOperandBasePath(path,
-      false)), flat);
-    model = new ReduceVertexFusion();
-    result = model.execute(leftOperand, rightOperand);
+    model = new NestedModel(flat, nestedRepresentation);
+    previous = model.nestWithDisjoint(leftOperand, rightOperand, GradoopId.get());
   }
 
   @Override
   public void benchmarkOperation() throws Exception {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
-    registerLogicalGraph(result);
+    NestingResult result = model.getPreviousResult();
+    LogicalGraph counter = NestingBase.toLogicalGraph(result, model.getFlattenedGraph());
+    registerLogicalGraph(counter);
   }
+
 }

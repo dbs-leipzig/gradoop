@@ -34,7 +34,7 @@ import java.util.Set;
  * @param <X> the GraphElement
  */
 @FunctionAnnotation.ForwardedFieldsSecond("id -> id; properties -> properties; label -> label")
-public class CoGroupIdsWithActualElements<X extends GraphElement> implements
+public class DemultiplexIdsWithActualElements<X extends GraphElement> implements
   CoGroupFunction<Tuple2<GradoopId, GradoopId>, X, X> {
 
   /**
@@ -45,7 +45,7 @@ public class CoGroupIdsWithActualElements<X extends GraphElement> implements
   /**
    * Default constructor
    */
-  public CoGroupIdsWithActualElements() {
+  public DemultiplexIdsWithActualElements() {
     appearing = new HashSet<>();
   }
 

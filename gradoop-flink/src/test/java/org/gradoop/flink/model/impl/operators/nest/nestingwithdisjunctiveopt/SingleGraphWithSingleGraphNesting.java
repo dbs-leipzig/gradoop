@@ -12,21 +12,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest.functions;
+package org.gradoop.flink.model.impl.operators.nest.nestingwithdisjunctiveopt;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.operators.nest.GraphToGraphTests;
+import org.gradoop.flink.model.impl.operators.nest.NestingWithDisjunctiveOpt;
 
-/**
- * Checks if it doesn't appear in the graph collection
- */
-public class NotAppearingInGraphCollection implements FilterFunction<Hexaplet> {
+public class SingleGraphWithSingleGraphNesting extends GraphToGraphTests {
+
   @Override
-  public boolean filter(Hexaplet y) throws Exception {
-    return !y.f4.equals(GradoopId.NULL_VALUE);
+  protected GraphGraphCollectionToGraphOperator op() {
+    return new NestingWithDisjunctiveOpt(GradoopId.get());
   }
+
 }

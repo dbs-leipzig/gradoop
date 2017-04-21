@@ -15,26 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.benchmark.nesting.serializers;
-
-import org.apache.flink.api.common.io.BinaryInputFormat;
-import org.apache.flink.core.memory.DataInputView;
-import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.io.IOException;
-
 /**
- * Writes GradoopIds to bytes
+ * Creating and reading indices
  */
-public class DeserializeGradoopidFromFile extends BinaryInputFormat<GradoopId> {
-
-  @Override
-  protected GradoopId deserialize(GradoopId reuse, DataInputView dataInput) throws IOException {
-    if (reuse == null) {
-      reuse = GradoopId.NULL_VALUE;
-    }
-    reuse.read(dataInput);
-    return reuse;
-  }
-
-}
+package org.gradoop.benchmark.nesting.serializers.indices;

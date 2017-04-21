@@ -39,6 +39,8 @@ public class AssociateFileToGraph
    */
   private final GraphHeadFactory ghf;
 
+  private int i;
+
   /**
    * Reusable element
    */
@@ -49,16 +51,18 @@ public class AssociateFileToGraph
    * @param isLeftOperand   Which operand to these file define
    * @param factory         Factory creating new graph heads
    */
-  public AssociateFileToGraph(boolean isLeftOperand, GraphHeadFactory factory) {
+  public AssociateFileToGraph(boolean isLeftOperand, int i, GraphHeadFactory factory) {
     reusable = new Tuple3<>();
     ghf = factory;
     reusable.f1 = isLeftOperand;
+    this.i = i;
   }
 
   @Override
   public Tuple3<String, Boolean, GraphHead> map(String value) throws Exception {
     reusable.f0 = value;
     reusable.f2 = ghf.createGraphHead();
+    reusable.f2.setLabel(i + " ");
     return reusable;
   }
 

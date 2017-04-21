@@ -44,6 +44,7 @@ public class StringAsVertex implements MapFunction<String, ImportVertex<String>>
   @Override
   public ImportVertex<String> map(String value) throws Exception {
     reusable.setId(value);
+    reusable.setLabel(value);
     return reusable;
   }
 }

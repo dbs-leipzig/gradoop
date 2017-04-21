@@ -16,22 +16,32 @@
  */
 package org.gradoop.benchmark.nesting.data;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.Path;
+import org.gradoop.benchmark.nesting.functions.AssociateEdgeToGraphIds;
 import org.gradoop.benchmark.nesting.functions.AssociateFileToGraph;
+import org.gradoop.benchmark.nesting.functions.AssociateVertexToGraphIds;
 import org.gradoop.benchmark.nesting.functions.ImportEdgeToVertex;
 import org.gradoop.benchmark.nesting.functions.SelectElementsInHeads;
 import org.gradoop.benchmark.nesting.functions.StringAsEdge;
 import org.gradoop.benchmark.nesting.functions.StringAsVertex;
 import org.gradoop.benchmark.nesting.functions.TripleWithGraphHeadToId;
 import org.gradoop.benchmark.nesting.functions.Value1Of3AsFilter;
-import org.gradoop.benchmark.nesting.serializers.Bogus;
-import org.gradoop.benchmark.nesting.serializers.DeserializeGradoopidFromFile;
-import org.gradoop.benchmark.nesting.serializers.DeserializePairOfIdsFromFile;
+import org.gradoop.benchmark.nesting.serializers.counters.Bogus;
+import org.gradoop.benchmark.nesting.serializers.data.DeserializeEdgeInformation;
+import org.gradoop.benchmark.nesting.serializers.data.DeserializeInGraphInformation;
+import org.gradoop.benchmark.nesting.serializers.data.DeserializeVertexInformation;
+import org.gradoop.benchmark.nesting.serializers.data.SerializeEdgeInformation;
+import org.gradoop.benchmark.nesting.serializers.data.SerializeInGraphInformation;
+import org.gradoop.benchmark.nesting.serializers.data.SerializeVertexInformation;
+import org.gradoop.benchmark.nesting.serializers.indices.DeserializeGradoopidFromFile;
+import org.gradoop.benchmark.nesting.serializers.indices.DeserializePairOfIdsFromFile;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -40,12 +50,15 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraphsBroadcast;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
-import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.ConstantZero;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -110,6 +123,8 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    */
   private final String basePath;
 
+  private final ArrayList<Record> recorList;
+
   /**
    * Default constructor for running the tests
    * @param csvPath   File where to store the intermediate results
@@ -118,6 +133,7 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
   public NestingFilenameConvention(String basePath, String csvPath) {
     this.csvPath = csvPath;
     this.basePath = basePath;
+    recorList = new ArrayList<>();
   }
 
   /**
@@ -156,27 +172,121 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     return basePath;
   }
 
+  private static class Record {
+    private final DataSet<?> toRegister;
+    private final String registerAs;
+    private final int phaseNo;
 
-  public <T> void register(DataSet<T> toRegister, String registerAs, int phaseNo) throws Exception {
-    String name = getClass().getName()+": "+registerAs+"-"+phaseNo;
-    toRegister.map(new Self<T>()).output(new Bogus<T>(name)).name(name);
+    public Record(DataSet<?> toRegister, String registerAs, int phaseNo) {
+      this.toRegister = toRegister;
+      this.registerAs = registerAs;
+      this.phaseNo = phaseNo;
+    }
+
+    public void record() {
+      String name = getClass().getName()+": "+registerAs+"-"+phaseNo;
+      toRegister.output(new Bogus<>(name)).name(name);
+    }
   }
 
-  public void benchmark(int phaseNo) throws Exception {
-    //String plan = ENVIRONMENT.getExecutionPlan();
+  public <T> void register(DataSet<T> toRegister, String registerAs, int phaseNo) throws Exception {
+    recorList.add(new Record(toRegister, registerAs, phaseNo));
+  }
+
+  public void record() {
+    for (Record rec : recorList) {
+      rec.record();
+    }
+  }
+
+  public static void writeGraphInMyCSVFormat(LogicalGraph log, String path) throws IOException {
+    File f = new File(path);
+    if (f.exists()) {
+      if (f.isDirectory()) {
+        FileUtils.deleteDirectory(f);
+      } else {
+        boolean value = f.delete();
+        if (value) {
+          System.out.println();
+        }
+      }
+    }
+    f.mkdir();
+    path = path.endsWith(Path.SEPARATOR) ? path : path + Path.SEPARATOR;
+    log.getGraphHead()
+      .map(new SerializeVertexInformation<>())
+      .writeAsText(path + "heads.csv");
+    log.getVertices()
+      .map(new SerializeVertexInformation<>())
+      .writeAsText(path + "vertices.csv");
+    log.getEdges()
+      .map(new SerializeEdgeInformation())
+      .writeAsText(path + "edges.csv");
+    log.getVertices()
+      .map(new SerializeInGraphInformation<>())
+      .writeAsText(path + "vertices_ingraph.csv");
+    log.getEdges()
+      .map(new SerializeInGraphInformation<>())
+      .writeAsText(path + "edges_ingraph.csv");
+  }
+
+  public static LogicalGraph readGraphInMyCSVFormat(String path) {
+    path = path.endsWith(Path.SEPARATOR) ? path : path + Path.SEPARATOR;
+
+    // HEADS
+    DataSet<GraphHead> heads =
+      ENVIRONMENT.readTextFile(path + "heads.csv")
+        .map(new DeserializeVertexInformation<>(new GraphHead()))
+        .returns(GraphHead.class);
+
+    // VERTICES
+    DataSet<Vertex> vertices =
+      ENVIRONMENT.readTextFile(path + "vertices.csv")
+        .map(new DeserializeVertexInformation<>(new Vertex()))
+        .returns(Vertex.class);
+    DataSet<Tuple2<GradoopId, GradoopIdList>> verticesInGraph =
+      ENVIRONMENT.readTextFile(path + "vertices_ingraph.csv")
+        .map(new DeserializeInGraphInformation());
+    vertices = vertices.join(verticesInGraph)
+      .where(new Id<>()).equalTo(new Value0Of2<>())
+      .with(new AssociateVertexToGraphIds());
+
+    // EDGES
+    DataSet<Edge> edges =
+      ENVIRONMENT.readTextFile(path + "edges.csv")
+        .map(new DeserializeEdgeInformation());
+    DataSet<Tuple2<GradoopId, GradoopIdList>> edgesInGraph =
+      ENVIRONMENT.readTextFile(path + "edges_ingraph.csv")
+        .map(new DeserializeInGraphInformation());
+    edges = edges.join(edgesInGraph)
+      .where(new Id<>()).equalTo(new Value0Of2<>())
+      .with(new AssociateEdgeToGraphIds());
+
+    return LogicalGraph.fromDataSets(heads, vertices, edges, CONFIGURATION);
+  }
+
+  public void benchmark(int slaves, int parallNo) throws Exception {
+    record();
+    String plan = ENVIRONMENT.getExecutionPlan();
+
+    record();
     ENVIRONMENT.execute(getClass().getSimpleName());
 
-    /*String planFile = System.getProperty("user.home");
+    String planFile = System.getProperty("user.home");
     planFile += planFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
-    planFile += getClass().getSimpleName() +"_plan.json";
+    planFile += getClass().getSimpleName() + "_slaves=" + slaves + "_parall=" + parallNo + "_plan" +
+      ".json";
     Files.write(Paths.get(planFile), plan.getBytes(Charset.forName("UTF-8")), StandardOpenOption
       .TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-*/
+
+    String[] no = this.basePath.split(Path.SEPARATOR);
+
     // Writing the result of the benchmark to the file
     String line = getClass().getSimpleName() + "," +
       "Benchmark," +
-      phaseNo + "," +
-      this.basePath + "," +
+      slaves + "," +
+      parallNo + "," +
+      no[no.length - 1] + "," +
       ENVIRONMENT.getLastJobExecutionResult().getNetRuntime() + "\n";
 
     Files.write(Paths.get(this.csvPath), line.getBytes(Charset.forName("UTF-8")),
@@ -221,18 +331,16 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
   public static GraphCollection loadRightOperand(GraphCollectionDelta start,
     DataSet<Vertex> vertices, DataSet<Edge> edges) throws Exception {
     DataSet<GraphHead> operandHeads = start.getHeads()
-      .filter(new Value1Of3AsFilter(true))
+      .filter(new Value1Of3AsFilter(false))
       .map(new Value2Of3<>());
 
     DataSet<Vertex> operandVertices = vertices
-      .joinWithTiny(operandHeads)
-      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
-      .with(new SelectElementsInHeads<>());
+      .filter(new InGraphsBroadcast<>())
+      .withBroadcastSet(operandHeads.map(new Id<>()), InGraphsBroadcast.GRAPH_IDS);
 
     DataSet<Edge> operandEdges = edges
-      .joinWithTiny(operandHeads)
-      .where(new ConstantZero<>()).equalTo(new ConstantZero<>())
-      .with(new SelectElementsInHeads<>());
+      .filter(new InGraphsBroadcast<>())
+      .withBroadcastSet(operandHeads.map(new Id<>()), InGraphsBroadcast.GRAPH_IDS);
 
     return GraphCollection.fromDataSets(operandHeads, operandVertices, operandEdges, CONFIGURATION);
   }
@@ -245,10 +353,10 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    * @return                      Updates the graph definition
    */
   protected static GraphCollectionDelta deltaUpdateGraphCollection(GraphCollectionDelta delta,
-    String edgesGlobalFile, String verticesGlobalFile) {
+    String edgesGlobalFile, String verticesGlobalFile, int i) {
 
     GraphCollectionDelta deltaPlus = extractGraphFromFiles(edgesGlobalFile,
-      verticesGlobalFile, false);
+      verticesGlobalFile, false, i);
 
     return new GraphCollectionDelta(delta.getHeads().union(deltaPlus.getHeads()),
       delta.getVertices().union(deltaPlus.getVertices()),
@@ -263,11 +371,11 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    * @return  Instance of the operand
    */
   protected static GraphCollectionDelta extractGraphFromFiles(String edgesGlobalFile,
-    String verticesGlobalFile, boolean isLeftOperand) {
+    String verticesGlobalFile, boolean isLeftOperand, int i) {
     // This information is going to be used when serializing the operands
     DataSet<Tuple3<String, Boolean, GraphHead>> heads =
       ENVIRONMENT.fromElements(edgesGlobalFile)
-        .map(new AssociateFileToGraph(isLeftOperand, CONFIGURATION.getGraphHeadFactory()));
+        .map(new AssociateFileToGraph(isLeftOperand, i, CONFIGURATION.getGraphHeadFactory()));
 
     // Extracting the head id. Required to create a LogicalGraph
     DataSet<GradoopId> head = heads.map(new TripleWithGraphHeadToId());
