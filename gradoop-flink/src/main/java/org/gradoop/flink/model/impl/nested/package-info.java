@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Defining the nested graph model
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.nested;

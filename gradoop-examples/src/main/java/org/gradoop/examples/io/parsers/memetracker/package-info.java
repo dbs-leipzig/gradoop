@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Specific implementation for the Meme Tracker Dataset
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.examples.io.parsers.memetracker;

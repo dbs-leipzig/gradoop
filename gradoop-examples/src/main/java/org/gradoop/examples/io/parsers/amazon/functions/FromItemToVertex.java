@@ -15,7 +15,13 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.amazon.functions;
+
+import org.gradoop.examples.io.parsers.amazon.vertices.Item;
+import org.gradoop.examples.io.parsers.functions.FromEVertexableToVertex;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Providing a concrete instantiation of the type parameters
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class FromItemToVertex extends FromEVertexableToVertex<String, Item> {
+}

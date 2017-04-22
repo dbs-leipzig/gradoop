@@ -15,7 +15,19 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;
+
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Adds the elements to a graph head
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class AddVerticesToNewGraph implements CrossFunction<Vertex, GraphHead, Vertex> {
+  @Override
+  public Vertex cross(Vertex val1, GraphHead val2) throws Exception {
+    val1.addGraphId(val2.getId());
+    return val1;
+  }
+}

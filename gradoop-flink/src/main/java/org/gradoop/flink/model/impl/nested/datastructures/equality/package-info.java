@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Contains the elements required for defining the dataequality over
+ * NormalizedGraphs
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.nested.datastructures.equality;

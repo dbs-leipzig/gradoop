@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Contains the functions for the random graph selector
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.nested.operators.random.functions;

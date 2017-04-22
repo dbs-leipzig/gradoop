@@ -15,7 +15,17 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.functions;
+
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.functions.Function;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Mapping a GradoopId to a String
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class GradoopIdToString implements Function<GradoopId, String> {
+  @Override
+  public String apply(GradoopId entity) {
+    return entity.toString();
+  }
+}

@@ -15,43 +15,36 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.utils;
+package org.gradoop.flink.model.impl.nested.datastructures.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * left, right => left
- *
- * @param <L> left type
- * @param <R> right type
+ * Swaps the position within the tuple
+ * @param <X> left type
+ * @param <Y> right type
  */
-@FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
-  MapFunction<Tuple2<L, R>, L>, CrossFunction<L, R, L> {
+@FunctionAnnotation.ForwardedFields("f0 -> f1; f1 -> f0")
+public class Swap<X, Y> implements MapFunction<Tuple2<X, Y>, Tuple2<Y, X>> {
 
-  @Override
-  public L cross(L left, R right) throws Exception {
-    return left;
+  /**
+   * Reusable element
+   */
+  private final Tuple2<Y, X> reusable;
+
+  /**
+   * Defaulct constructor
+   */
+  public Swap() {
+    reusable = new Tuple2<>();
   }
 
   @Override
-  public L getKey(Tuple2<L, R> value) throws Exception {
-    return value.f0;
+  public Tuple2<Y, X> map(Tuple2<X, Y> value) throws Exception {
+    reusable.f0 = value.f1;
+    reusable.f1 = value.f0;
+    return reusable;
   }
-
-  @Override
-  public L map(Tuple2<L, R> value) throws Exception {
-    return value.f0;
-  }
-
-  @Override
-  public L join(L left, R right) throws Exception {
-    return left;
-  }
-
 }

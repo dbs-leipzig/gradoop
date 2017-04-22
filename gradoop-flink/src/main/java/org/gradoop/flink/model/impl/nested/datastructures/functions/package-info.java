@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Functions used inside the definition of data structures using
+ * DataSet-s
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.nested.datastructures.functions;

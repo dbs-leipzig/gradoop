@@ -15,7 +15,22 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.operators.random.functions;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Specific instance for (GradoopId,GradoopId)
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class RandomFilterOfGidTuple extends RandomFilter<Tuple2<GradoopId, GradoopId>> {
+  /**
+   * Creates a new filter instance.
+   *
+   * @param sampleSize relative sample size
+   * @param randomSeed random seed (can be {@code} null)
+   */
+  public RandomFilterOfGidTuple(float sampleSize, long randomSeed) {
+    super(sampleSize, randomSeed);
+  }
+}

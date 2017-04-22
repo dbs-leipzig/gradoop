@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Functions used inside the definition of data representations of
+ * graphs in secondary memory
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.examples.nestedmodel.datarepresentation.functions;

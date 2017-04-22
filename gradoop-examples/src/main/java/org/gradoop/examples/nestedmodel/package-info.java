@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Contains example Gradoop programs that can be executed on a Flink cluster.
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.examples.nestedmodel;

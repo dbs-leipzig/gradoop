@@ -16,6 +16,11 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Provides an implementation for the join operand in different possible ways. A join is a binary
+ * operand arbitrarly combining the two operands by using different semantics for both the
+ * vertices and the edges.
+ *
+ * This subpackage provides the join with joins definition, that is the formal definition with
+ * some enhancements (hashing function). Plus, it implements the R-join definition.
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;

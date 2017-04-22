@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Contains the definition for the RandomSample operator for the nested model
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.flink.model.impl.nested.operators.collect;

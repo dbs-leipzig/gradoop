@@ -15,43 +15,38 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.utils;
+package org.gradoop.flink.model.impl.operators.fusion.reduce.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * left, right => left
- *
- * @param <L> left type
- * @param <R> right type
+ * Maps vertices that are not associated to a graph id
+ * to a null id.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
-  MapFunction<Tuple2<L, R>, L>, CrossFunction<L, R, L> {
+@FunctionAnnotation.ForwardedFields("*->f0")
+public class MapVerticesAsTuplesWithNullId implements
+  MapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
 
-  @Override
-  public L cross(L left, R right) throws Exception {
-    return left;
+  /**
+   * Reusable returned element
+   */
+  private final Tuple2<Vertex, GradoopId> reusable;
+
+  /**
+   * Default constructor
+   */
+  public MapVerticesAsTuplesWithNullId() {
+    reusable = new Tuple2<>();
+    reusable.f1 = GradoopId.NULL_VALUE;
   }
 
   @Override
-  public L getKey(Tuple2<L, R> value) throws Exception {
-    return value.f0;
+  public Tuple2<Vertex, GradoopId> map(Vertex value) throws Exception {
+    reusable.f0 = value;
+    return reusable;
   }
-
-  @Override
-  public L map(Tuple2<L, R> value) throws Exception {
-    return value.f0;
-  }
-
-  @Override
-  public L join(L left, R right) throws Exception {
-    return left;
-  }
-
 }

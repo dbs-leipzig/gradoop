@@ -15,7 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.operators.nesting.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Maps an edge into a quad
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+@FunctionAnnotation.ForwardedFields("f0 -> f0; f1 -> f1; f3 -> f3; f3 -> f2")
+public class DoQuadMatchTarget implements MapFunction<Hexaplet, Hexaplet> {
+  @Override
+  public Hexaplet map(Hexaplet r) throws Exception {
+    r.updateToMatchWithTarget();
+    return r;
+  }
+}

@@ -15,7 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.amazon.functions;
+
+import org.gradoop.examples.io.parsers.amazon.edges.Reviews;
+import org.gradoop.examples.io.parsers.functions.GradoopIdToString;
+import org.gradoop.examples.io.parsers.functions.ToEdge;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Providing a concrete instantiation of the type parameters
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class FromReviewsToEdge extends ToEdge<String, Reviews> {
+  /**
+   * Default constructor
+   */
+  public FromReviewsToEdge() {
+    super(new GradoopIdToString());
+  }
+}

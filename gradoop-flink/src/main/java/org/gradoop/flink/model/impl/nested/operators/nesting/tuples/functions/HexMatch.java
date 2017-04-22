@@ -15,43 +15,26 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.utils;
+package org.gradoop.flink.model.impl.nested.operators.nesting.tuples.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
 
 /**
- * left, right => left
- *
- * @param <L> left type
- * @param <R> right type
+ * Third projection of the exaplet
  */
-@FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
-  MapFunction<Tuple2<L, R>, L>, CrossFunction<L, R, L> {
-
+@FunctionAnnotation.ForwardedFields("f2->*")
+public class HexMatch implements MapFunction<Hexaplet, GradoopId>, KeySelector<Hexaplet, GradoopId> {
   @Override
-  public L cross(L left, R right) throws Exception {
-    return left;
+  public GradoopId map(Hexaplet triple) throws Exception {
+    return triple.f2;
   }
 
   @Override
-  public L getKey(Tuple2<L, R> value) throws Exception {
-    return value.f0;
+  public GradoopId getKey(Hexaplet triple) throws Exception {
+    return triple.f2;
   }
-
-  @Override
-  public L map(Tuple2<L, R> value) throws Exception {
-    return value.f0;
-  }
-
-  @Override
-  public L join(L left, R right) throws Exception {
-    return left;
-  }
-
 }

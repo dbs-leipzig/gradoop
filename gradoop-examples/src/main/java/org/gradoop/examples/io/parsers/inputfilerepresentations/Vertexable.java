@@ -15,7 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.inputfilerepresentations;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Defines a vertex that could be rendered as a vertex through the ImportVertex utility function
+ *
+ * @param <Id> element defining the id
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public abstract class Vertexable<Id extends Comparable<Id>> extends Parsable {
+  /**
+   * Returning…
+   * @return the vertex's id
+   */
+  public abstract Id getId();
+
+  /**
+   * Returning…
+   * @return  the vertex's label
+   */
+  public abstract String getLabel();
+}

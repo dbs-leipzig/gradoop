@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Functions used for the parsing operation
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.examples.io.parsers.memetracker.functions;

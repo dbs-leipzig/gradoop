@@ -15,7 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.operators.nesting.functions;
+
+import org.gradoop.common.model.impl.pojo.Edge;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Specific instance for the edges
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class UpdateEdges extends CoGroupIdsWithActualElements<Edge> {
+}

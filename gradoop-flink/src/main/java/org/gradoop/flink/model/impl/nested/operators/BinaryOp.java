@@ -15,7 +15,24 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.operators;
+
+import org.gradoop.flink.model.impl.nested.datastructures.IdGraphDatabase;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Defines a binary operator
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public abstract class BinaryOp extends Op {
+
+  /**
+   * Public access to the internal operation. The data lake is not exposed
+   * @param left    Left argument
+   * @param right   Right argument
+   * @return        Result as a graph with just ids. The DataLake, representing the computation
+   *                state, is updated with either new vertices or new edges
+   */
+  public IdGraphDatabase with(IdGraphDatabase left, IdGraphDatabase right) {
+    return runWithArgAndLake(mother, left, right);
+  }
+
+}

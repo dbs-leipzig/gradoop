@@ -16,6 +16,6 @@
  */
 
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * General purpose functions to be instantiated with the correct type
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+package org.gradoop.examples.io.parsers.functions;

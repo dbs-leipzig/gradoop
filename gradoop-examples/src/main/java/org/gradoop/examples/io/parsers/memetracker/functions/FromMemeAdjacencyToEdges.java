@@ -15,7 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.memetracker.functions;
+
+import org.gradoop.examples.io.parsers.functions.ToEdgesFromAdjList;
+import org.gradoop.examples.io.parsers.memetracker.MemeTrackerEdge;
+import org.gradoop.examples.io.parsers.memetracker.MemeTrackerRecordParser;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Providing a concrete instantiation of the type parameters
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class FromMemeAdjacencyToEdges extends ToEdgesFromAdjList<String, MemeTrackerEdge, MemeTrackerRecordParser> {
+  /**
+   * Default constructor
+   */
+  public FromMemeAdjacencyToEdges() {
+    super(new MemeEdgeToEdge());
+  }
+}

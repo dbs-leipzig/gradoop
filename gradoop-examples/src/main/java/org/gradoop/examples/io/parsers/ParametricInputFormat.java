@@ -15,7 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers;
+
+import org.apache.flink.api.common.io.DelimitedInputFormat;
+
+import java.io.IOException;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Reading the file, delimiter by delimiter
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class ParametricInputFormat extends DelimitedInputFormat<String> {
+
+  @Override
+  public String readRecord(String reuse, byte[] bytes, int offset, int numBytes)
+    throws IOException {
+    return new String(bytes, offset, numBytes, "UTF-8");
+  }
+
+}

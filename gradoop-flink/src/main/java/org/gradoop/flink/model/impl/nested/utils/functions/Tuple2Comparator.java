@@ -15,7 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.utils.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Used for the data task of defining the data model's equality
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class Tuple2Comparator implements
+  JoinFunction<Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>, Boolean> {
+  @Override
+  public Boolean join(Tuple2<GradoopId, GradoopId> first,
+    Tuple2<GradoopId, GradoopId> second) throws Exception {
+    return (first == null || second == null) ? false : first.equals(second);
+  }
+}

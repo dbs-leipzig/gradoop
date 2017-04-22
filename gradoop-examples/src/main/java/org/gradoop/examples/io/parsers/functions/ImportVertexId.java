@@ -15,7 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.functions;
+
+import org.apache.flink.api.java.functions.KeySelector;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Returning the vertex's id
+ * @param <K> Comparable element
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class ImportVertexId<K extends Comparable<K>> implements KeySelector<ImportVertex<K>, K> {
+  @Override
+  public K getKey(ImportVertex<K> value) throws Exception {
+    return value.getId();
+  }
+}

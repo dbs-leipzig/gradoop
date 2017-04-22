@@ -15,7 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io;
+
+import org.gradoop.examples.io.parsers.amazon.AmazonFileParser;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * This example shows how to read an Amazon Dataset
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class AmazonExample {
+
+  /**
+   * Main program
+   * @param args        Default arguments
+   */
+  public static void main(String[] args) {
+    AmazonFileParser afp = new AmazonFileParser();
+    afp.fromFile("/Volumes/Untitled/Data/Amazon product data/aggressive_dedup.json");
+    afp.asGeneralGraphDataSource(); // clob
+  }
+
+}

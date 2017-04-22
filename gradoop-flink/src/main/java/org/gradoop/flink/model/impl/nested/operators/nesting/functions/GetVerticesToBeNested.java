@@ -15,7 +15,17 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.nested.operators.nesting.functions;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Created by vasistas on 09/03/17.
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class GetVerticesToBeNested implements FilterFunction<Hexaplet> {
+  @Override
+  public boolean filter(Hexaplet value) throws Exception {
+    return !value.isEdge() && value.appearsInGraphCollection();
+  }
+}

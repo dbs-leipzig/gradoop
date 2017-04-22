@@ -15,7 +15,39 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.nestedmodel.benchmarks;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Defines the headeer of the CSV file.
+ * To be extended by each row instance
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public abstract class CsvHeader {
+
+  /**
+   * Header associated to the csv file
+   */
+  private final String[] header;
+
+  /**
+   * Default constructor
+   * @param header  Header of the csv file
+   */
+  public CsvHeader(String... header) {
+    this.header = header;
+  }
+
+  /**
+   * Returns…
+   * @return  the header in a CSV format
+   */
+  public String getHeader() {
+    return String.join(",", header);
+  }
+
+  /**
+   * Converts the object into a csv string
+   * @return  CSV representation
+   */
+  public abstract String valueRowToCSV();
+
+}

@@ -15,43 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.functions.utils;
+package org.gradoop.flink.model.impl.nested.operators.nesting.functions;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.nested.operators.nesting.tuples.Hexaplet;
 
 /**
- * left, right => left
- *
- * @param <L> left type
- * @param <R> right type
+ * Associates each exaplet to the nested graph where it appears
  */
-@FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements JoinFunction<L, R, L>, KeySelector<Tuple2<L, R>, L>,
-  MapFunction<Tuple2<L, R>, L>, CrossFunction<L, R, L> {
+@FunctionAnnotation.ForwardedFieldsFirst("f0 -> f0; f1 -> f1; f2 -> f2; f3 -> f3; f4 -> f4")
+@FunctionAnnotation.ForwardedFieldsSecond("f0 -> f5")
+public class CombineGraphBelongingInformation implements JoinFunction<Hexaplet, Tuple2<GradoopId,
+  GradoopId>, Hexaplet>  {
 
   @Override
-  public L cross(L left, R right) throws Exception {
-    return left;
+  public Hexaplet join(Hexaplet first, Tuple2<GradoopId, GradoopId> second) throws Exception {
+    first.f5 = second.f0;
+    return first;
   }
-
-  @Override
-  public L getKey(Tuple2<L, R> value) throws Exception {
-    return value.f0;
-  }
-
-  @Override
-  public L map(Tuple2<L, R> value) throws Exception {
-    return value.f0;
-  }
-
-  @Override
-  public L join(L left, R right) throws Exception {
-    return left;
-  }
-
 }

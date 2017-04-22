@@ -15,7 +15,12 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.nestedmodel.datarepresentation.functions;
+
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Practical instance of UnnestTupleWithSet
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public class UnnestGidGid extends UnnestTupleWithSet<GradoopId, GradoopId> {
+}

@@ -15,7 +15,18 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.examples.io.parsers.inputfilerepresentations;
+
+import org.gradoop.examples.io.parsers.ResettableIterator;
+
 /**
- * Contains the implementation of the plain vertex fusion operator
+ * Defines an element that could be represented as an adjacency list for a specific vertex, which
+ * the element itself represents
+ *
+ * @param <Id> element defining the id
+ * @param <Edge> element definign the edge
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public abstract class AdjacencyListable<Id extends Comparable<Id>, Edge extends Edgable<Id>> extends
+  Vertexable<Id> implements ResettableIterator<Edge> {
+
+}
