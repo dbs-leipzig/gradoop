@@ -108,6 +108,25 @@ public abstract class AbstractRunner {
   }
 
   /**
+   * Reads a GraphCollection from a given directory.
+   *
+   * @param directory       path to EPGM database
+   * @param readGraphHeads  true, if graph heads are contained
+   * @return EPGM logical graph
+   */
+  @SuppressWarnings("unchecked")
+  protected static GraphCollection readGraphCollection(String directory,
+    boolean readGraphHeads) {
+    directory = appendSeparator(directory);
+    return new JSONDataSource(
+      readGraphHeads ? directory + GRAPHS_JSON : null,
+      directory + VERTICES_JSON,
+      directory + EDGES_JSON,
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment()))
+      .getGraphCollection();
+  }
+
+  /**
    * Writes a logical graph into a given directory.
    *
    * @param graph     logical graph

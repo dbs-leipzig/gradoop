@@ -16,6 +16,7 @@
  */
 
 /**
- * Contains the UDF functions for the fusion operator.
+ * Contains the utility functions providing the conversions between nested and EPGM data
+ * representation
  */
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+package org.gradoop.flink.model.impl.operators.nest.transformations;

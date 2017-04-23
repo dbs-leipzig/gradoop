@@ -15,19 +15,36 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Checks whether the edge contains a given graphId, which means that belongs to a given graph
+ * Maps an edge into a Hex.
+ *
+ * <p> Used by RepresentationUtils </p>
  */
-public class FilterSubgraphEdges implements FilterFunction<Tuple2<GradoopId, Edge>> {
+@FunctionAnnotation.ForwardedFields("id -> f0")
+public class AsQuadsMatchingSource implements MapFunction<Edge, Hexaplet> {
+
+  /**
+   * Reusable element
+   */
+  private Hexaplet r;
+
+  /**
+   * Default constructor
+   */
+  public AsQuadsMatchingSource() {
+    r = new Hexaplet();
+  }
+
   @Override
-  public boolean filter(Tuple2<GradoopId, Edge> value) throws Exception {
-    return value.f1.getGraphIds().contains(value.f0);
+  public Hexaplet map(Edge value) throws Exception {
+    r.update(value, true);
+    return r;
   }
 }
