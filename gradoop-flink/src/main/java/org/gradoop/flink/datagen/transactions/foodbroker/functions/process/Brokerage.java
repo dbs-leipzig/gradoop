@@ -36,6 +36,7 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class Brokerage
     GraphHead graphHead;
     GraphTransaction graphTransaction;
 
-    long startDate = config.getStartDate();
+    LocalDate startDate = config.getStartDate();
 
     // each seed stands for one created sales quotation
 
@@ -150,7 +151,7 @@ public class Brokerage
    * @param startDate of the quotation
    * @return vertex representation of a sales quotation
    */
-  private Vertex newSalesQuotation(long startDate) {
+  private Vertex newSalesQuotation(LocalDate startDate) {
     String label = Constants.SALESQUOTATION_VERTEX_LABEL;
     Properties properties = new Properties();
 
@@ -259,10 +260,10 @@ public class Brokerage
     influencingMasterQuality.add(getEdgeTargetQuality(
       Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
 
-    Long salesQuotationDate = salesQuotation
+    LocalDate salesQuotationDate = salesQuotation
       .getPropertyValue(Constants.DATE_KEY)
-      .getLong();
-    long date = config.delayDelayConfiguration(salesQuotationDate,
+      .getDate();
+    LocalDate date = config.delayDelayConfiguration(salesQuotationDate,
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_CONFIRMATIONDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(
@@ -371,8 +372,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(salesOrderDate,
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality(
         Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
         Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_PURCHASEDELAY_CONFIG_KEY);
@@ -497,7 +498,7 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
     GradoopId operatedBy = getNextLogistic();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
@@ -505,7 +506,7 @@ public class Brokerage
     influencingMasterQuality.add(getEdgeTargetQuality(
       Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
 
-    long date = config.delayDelayConfiguration(
+    LocalDate date = config.delayDelayConfiguration(
       purchOrderDate, influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
       Constants.PO_DELIVERYDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
@@ -578,8 +579,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(purchOrderDate,
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality(
         Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC),
       Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_INVOICEDELAY_CONFIG_KEY);
@@ -611,8 +612,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(salesOrderDate,
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality
         (Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
       Constants.SALESORDER_VERTEX_LABEL, Constants.SO_INVOICEDELAY_CONFIG_KEY);

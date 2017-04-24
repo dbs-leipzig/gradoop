@@ -27,13 +27,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -259,19 +255,19 @@ public class FoodBrokerConfig implements Serializable {
    *
    * @return long representation of the start date
    */
-  public Long getStartDate() {
+  public LocalDate getStartDate() {
     String startDate;
-    DateFormat formatter;
-    Date date = Date.from(Instant.EPOCH);
+    DateTimeFormatter formatter;
+    LocalDate date = LocalDate.MIN;
 
     try {
       startDate = root.getJSONObject("Process").getString("startDate");
-      formatter = new SimpleDateFormat("yyyy-MM-dd");
-      date = formatter.parse(startDate);
-    } catch (JSONException | ParseException e) {
+      formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      date = LocalDate.parse(startDate, formatter);
+    } catch (JSONException e) {
       e.printStackTrace();
     }
-    return date.getTime();
+    return date;
   }
 
   /**
@@ -540,17 +536,11 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date, List<Float> influencingMasterDataQuality,
+  public LocalDate delayDelayConfiguration(LocalDate date, List<Float> influencingMasterDataQuality,
     String node, String key) {
     // get the delay from range
     int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key, false);
-
-    // calculate time with delay
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(date);
-    calendar.add(Calendar.DATE, delay);
-
-    return calendar.getTimeInMillis();
+    return date.plusDays(delay);
   }
 
   /**
@@ -563,7 +553,7 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date, Float influencingMasterDataQuality,
+  public LocalDate delayDelayConfiguration(LocalDate date, Float influencingMasterDataQuality,
     String node, String key) {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
