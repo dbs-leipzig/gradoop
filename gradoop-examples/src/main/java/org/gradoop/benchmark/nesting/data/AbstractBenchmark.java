@@ -44,14 +44,23 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
    */
   private static final String OUTPUT_EXPERIMENT = "o";
 
+  /**
+   * Tells to use the HDFS reading utility
+   */
+  private static final String NON_HDFS_PATH = "l";
+
+
   static {
-    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in the serialized format");
+    OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in " +
+      "the serialized format");
     OPTIONS.addOption(OUTPUT_EXPERIMENT, "csv", true,
       "Where to append the experiment for the benchmark");
     OPTIONS.addOption(OPTION_SLAVES_NO, "slaves", true,
       "Number of slaves used for benchmark");
     OPTIONS.addOption(OPTION_PARALL_NO, "par", true,
       "Number of slaves used for benchmark");
+    OPTIONS.addOption(NON_HDFS_PATH, "flink", false, "Tells to use " +
+      "FLINK explicitely");
   }
 
   /**
@@ -86,6 +95,11 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
       .getOptionValue(OPTION_PARALL_NO)));
   }
 
+  /**
+   * Registers a local graph in order to get registered with the heads
+   * @param counter       Graph to get counted
+   * @throws Exception
+   */
   public void registerLogicalGraph(LogicalGraph counter) throws Exception {
     register(counter.getGraphHead(), "HEAD", 0);
     register(counter.getVertices(), "VERTICES", 1);

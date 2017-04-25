@@ -23,12 +23,13 @@ import org.gradoop.flink.model.impl.operators.nest.NestingBase;
 import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResultOpt;
+
+import java.io.IOException;
 
 /**
  * Class implementing the serialization methods
  */
-public class PerformBenchmarkOverSerializedDataOpt extends AbstractBenchmark {
+public class NestingAndDisjunctionToIndices extends AbstractBenchmark {
 
   /**
    * Indices for the left operand
@@ -45,14 +46,12 @@ public class PerformBenchmarkOverSerializedDataOpt extends AbstractBenchmark {
    */
   private NestedModel model;
 
-  private NestingResultOpt previous;
-
   /**
    * Default constructor for running the tests
    * @param basePath        Path where to obtain all the data
    * @param benchmarkPath   Path where to append the benchmarks
    */
-  public PerformBenchmarkOverSerializedDataOpt(String basePath, String benchmarkPath) {
+  public NestingAndDisjunctionToIndices(String basePath, String benchmarkPath) {
     super(basePath, benchmarkPath);
   }
 
@@ -62,18 +61,19 @@ public class PerformBenchmarkOverSerializedDataOpt extends AbstractBenchmark {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    runBenchmark(PerformBenchmarkOverSerializedDataOpt.class, args);
+    runBenchmark(NestingAndDisjunctionToIndices.class, args);
   }
 
   @Override
-  public void performOperation() {
+  public void performOperation() throws IOException {
     String path = getBasePath();
     leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
     rightOperand = loadNestingIndex(generateOperandBasePath(path, false));
     NestingIndex nestedRepresentation = NestingBase.mergeIndices(leftOperand, rightOperand);
     LogicalGraph flat = readGraphInMyCSVFormat(path);
     model = new NestedModel(flat, nestedRepresentation);
-    previous = model.nestWithDisjoint(leftOperand, rightOperand, GradoopId.get());
+    NestingBase.nest(model, leftOperand, rightOperand, GradoopId.get());
+    model.disjunctiveSemantics(model.getPreviousResult(), rightOperand);
   }
 
   @Override
@@ -81,8 +81,11 @@ public class PerformBenchmarkOverSerializedDataOpt extends AbstractBenchmark {
     // Counting the computation actually required to produce the result, that is the graph stack
     // Alongside with the resulting indices
     NestingResult result = model.getPreviousResult();
-    LogicalGraph counter = NestingBase.toLogicalGraph(result, model.getFlattenedGraph());
-    registerLogicalGraph(counter);
+    register(result.getGraphHeads(), "Heads", 0);
+    register(result.getGraphVertexMap(), "VertexMap", 1);
+    register(result.getGraphEdgeMap(), "EdgeMap", 2);
+    register(result.getGraphStack(), "Stack", 3);
+    register(result.getPreviousComputation(), "HexaEdges", 4);
   }
 
 }

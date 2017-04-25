@@ -17,38 +17,46 @@
 package org.gradoop.benchmark.nesting.serializers.data;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Serializing a vertex in a proper way
+ *
+ * @param <VH> Representing either a Vertex or a GraphHead
  */
-public class DeserializeInGraphInformation
-  implements MapFunction<String, Tuple2<GradoopId, GradoopIdList>> {
-
+public class DeserializeElementInformation<VH extends EPGMElement> implements MapFunction<String, VH> {
 
   /**
-   * Reusable builder
+   * Reusable element
    */
-  private Tuple2<GradoopId, GradoopIdList> sb;
+  private final VH v;
 
   /**
    * Default constructor
+   * @param emptyElement Empty element associated to the VH type
    */
-  public DeserializeInGraphInformation() {
-    sb = new Tuple2<>();
-    sb.f1 = new GradoopIdList();
+  public DeserializeElementInformation(VH emptyElement) {
+    v = emptyElement;
+    v.setProperties(new Properties());
   }
 
   @Override
-  public Tuple2<GradoopId, GradoopIdList> map(String value) throws Exception {
-    sb.f1.clear();
+  public VH map(String value) throws Exception {
     String[] array = value.split(",");
-    sb.f0 = GradoopId.fromString(array[0]);
-    for (int i = 1; i < array.length; i++) {
-      sb.f1.add(GradoopId.fromString(array[i]));
+    v.setId(GradoopId.fromString(array[0]));
+    if (array[1].startsWith("\"") && array[1].endsWith("\"")) {
+      v.setLabel(array[1].substring(1, array[1].length() - 1));
+    } else {
+      v.setLabel(null);
     }
-    return sb;
+    v.getProperties().clear();
+    if (array.length > 2) {
+      for (int i = 2; i < array.length; i += 2) {
+        v.setProperty(array[i], array[i + 1]);
+      }
+    }
+    return v;
   }
 }

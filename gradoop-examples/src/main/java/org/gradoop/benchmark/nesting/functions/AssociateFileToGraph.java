@@ -39,6 +39,9 @@ public class AssociateFileToGraph
    */
   private final GraphHeadFactory ghf;
 
+  /**
+   * Graph Id
+   */
   private int i;
 
   /**
@@ -50,6 +53,7 @@ public class AssociateFileToGraph
    * Default constructor
    * @param isLeftOperand   Which operand to these file define
    * @param factory         Factory creating new graph heads
+   * @param i               Associating to each GraphHead a label describing it (for debugging)
    */
   public AssociateFileToGraph(boolean isLeftOperand, int i, GraphHeadFactory factory) {
     reusable = new Tuple3<>();

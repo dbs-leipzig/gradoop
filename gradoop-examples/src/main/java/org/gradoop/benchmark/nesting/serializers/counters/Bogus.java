@@ -37,6 +37,10 @@ public  class Bogus<T> extends RichOutputFormat<T> {
    */
   private boolean firstRun;
 
+  /**
+   * Sink that only metabolizes data
+   * @param override  Output string to be associated for logging reasons
+   */
   public Bogus(String override) {
     super();
     x = override;

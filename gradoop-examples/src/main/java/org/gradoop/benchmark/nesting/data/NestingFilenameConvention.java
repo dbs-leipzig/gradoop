@@ -31,13 +31,12 @@ import org.gradoop.benchmark.nesting.functions.StringAsEdge;
 import org.gradoop.benchmark.nesting.functions.StringAsVertex;
 import org.gradoop.benchmark.nesting.functions.TripleWithGraphHeadToId;
 import org.gradoop.benchmark.nesting.functions.Value1Of3AsFilter;
-import org.gradoop.benchmark.nesting.serializers.counters.Bogus;
 import org.gradoop.benchmark.nesting.serializers.data.DeserializeEdgeInformation;
 import org.gradoop.benchmark.nesting.serializers.data.DeserializeInGraphInformation;
-import org.gradoop.benchmark.nesting.serializers.data.DeserializeVertexInformation;
+import org.gradoop.benchmark.nesting.serializers.data.DeserializeElementInformation;
 import org.gradoop.benchmark.nesting.serializers.data.SerializeEdgeInformation;
 import org.gradoop.benchmark.nesting.serializers.data.SerializeInGraphInformation;
-import org.gradoop.benchmark.nesting.serializers.data.SerializeVertexInformation;
+import org.gradoop.benchmark.nesting.serializers.data.SerializeElementInformation;
 import org.gradoop.benchmark.nesting.serializers.indices.DeserializeGradoopidFromFile;
 import org.gradoop.benchmark.nesting.serializers.indices.DeserializePairOfIdsFromFile;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -123,6 +122,9 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    */
   private final String basePath;
 
+  /**
+   * List of the elements that have to be recorded
+   */
   private final ArrayList<Record> recorList;
 
   /**
@@ -172,34 +174,34 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     return basePath;
   }
 
-  private static class Record {
-    private final DataSet<?> toRegister;
-    private final String registerAs;
-    private final int phaseNo;
-
-    public Record(DataSet<?> toRegister, String registerAs, int phaseNo) {
-      this.toRegister = toRegister;
-      this.registerAs = registerAs;
-      this.phaseNo = phaseNo;
-    }
-
-    public void record() {
-      String name = getClass().getName()+": "+registerAs+"-"+phaseNo;
-      toRegister.output(new Bogus<>(name)).name(name);
-    }
-  }
-
+  /**
+   * Adds another element to the register
+   * @param toRegister        Dataset that has to be registered
+   * @param registerAs        Name to be associated with the sink, for debugging reasons
+   * @param phaseNo           Eventual phase associated to the sink
+   * @param <T>               Type associated to the dataset
+   * @throws Exception
+   */
   public <T> void register(DataSet<T> toRegister, String registerAs, int phaseNo) throws Exception {
     recorList.add(new Record(toRegister, registerAs, phaseNo));
   }
 
+  /**
+   * Registers each sink previously set, thus allowing to start the execution of the benchmark
+   */
   public void record() {
     for (Record rec : recorList) {
       rec.record();
     }
   }
 
-  public static void writeGraphInMyCSVFormat(LogicalGraph log, String path) throws IOException {
+  /**
+   * Allows to write the graph in parallel alongside with other sinks.
+   * @param graph           Element to be written
+   * @param path            Path where to be stored
+   * @throws IOException
+   */
+  public static void writeGraphInMyCSVFormat(LogicalGraph graph, String path) throws IOException {
     File f = new File(path);
     if (f.exists()) {
       if (f.isDirectory()) {
@@ -211,38 +213,45 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
         }
       }
     }
-    f.mkdir();
+    if (!f.mkdir()) {
+      System.err.println("Warning: the folder has not been created");
+    }
     path = path.endsWith(Path.SEPARATOR) ? path : path + Path.SEPARATOR;
-    log.getGraphHead()
-      .map(new SerializeVertexInformation<>())
+    graph.getGraphHead()
+      .map(new SerializeElementInformation<>())
       .writeAsText(path + "heads.csv");
-    log.getVertices()
-      .map(new SerializeVertexInformation<>())
+    graph.getVertices()
+      .map(new SerializeElementInformation<>())
       .writeAsText(path + "vertices.csv");
-    log.getEdges()
+    graph.getEdges()
       .map(new SerializeEdgeInformation())
       .writeAsText(path + "edges.csv");
-    log.getVertices()
+    graph.getVertices()
       .map(new SerializeInGraphInformation<>())
       .writeAsText(path + "vertices_ingraph.csv");
-    log.getEdges()
+    graph.getEdges()
       .map(new SerializeInGraphInformation<>())
       .writeAsText(path + "edges_ingraph.csv");
   }
 
-  public static LogicalGraph readGraphInMyCSVFormat(String path) {
+  /**
+   * Reads the graph written in the csv format used for the benchmarks
+   * @param path          CSV representation of the file
+   * @return              Loaded graph
+   * @throws IOException
+   */
+  public static LogicalGraph readGraphInMyCSVFormat(String path)
+    throws IOException {
     path = path.endsWith(Path.SEPARATOR) ? path : path + Path.SEPARATOR;
 
     // HEADS
-    DataSet<GraphHead> heads =
-      ENVIRONMENT.readTextFile(path + "heads.csv")
-        .map(new DeserializeVertexInformation<>(new GraphHead()))
+    DataSet<GraphHead> heads = ENVIRONMENT.readTextFile(path + "heads.csv")
+        .map(new DeserializeElementInformation<>(new GraphHead()))
         .returns(GraphHead.class);
 
     // VERTICES
-    DataSet<Vertex> vertices =
-      ENVIRONMENT.readTextFile(path + "vertices.csv")
-        .map(new DeserializeVertexInformation<>(new Vertex()))
+    DataSet<Vertex> vertices = ENVIRONMENT.readTextFile(path + "vertices.csv")
+        .map(new DeserializeElementInformation<>(new Vertex()))
         .returns(Vertex.class);
     DataSet<Tuple2<GradoopId, GradoopIdList>> verticesInGraph =
       ENVIRONMENT.readTextFile(path + "vertices_ingraph.csv")
@@ -265,6 +274,12 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     return LogicalGraph.fromDataSets(heads, vertices, edges, CONFIGURATION);
   }
 
+  /**
+   * Starts the benchmark
+   * @param slaves      Number of the slaves used
+   * @param parallNo    Number of the parallelization used
+   * @throws Exception
+   */
   public void benchmark(int slaves, int parallNo) throws Exception {
     record();
     String plan = ENVIRONMENT.getExecutionPlan();
@@ -272,14 +287,14 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     record();
     ENVIRONMENT.execute(getClass().getSimpleName());
 
+    String[] no = this.basePath.split(Path.SEPARATOR);
+
     String planFile = System.getProperty("user.home");
     planFile += planFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
-    planFile += getClass().getSimpleName() + "_slaves=" + slaves + "_parall=" + parallNo + "_plan" +
-      ".json";
+    planFile += getClass().getSimpleName() + "_slaves=" + slaves + "_parall=" + parallNo +
+      "_size=" + no[no.length - 1] + ".json";
     Files.write(Paths.get(planFile), plan.getBytes(Charset.forName("UTF-8")), StandardOpenOption
       .TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-
-    String[] no = this.basePath.split(Path.SEPARATOR);
 
     // Writing the result of the benchmark to the file
     String line = getClass().getSimpleName() + "," +
@@ -350,6 +365,7 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    * @param delta                 Previous updated version
    * @param edgesGlobalFile     File defining the edges
    * @param verticesGlobalFile  File defining the vertices
+   * @param i                   Graph id
    * @return                      Updates the graph definition
    */
   protected static GraphCollectionDelta deltaUpdateGraphCollection(GraphCollectionDelta delta,
@@ -368,6 +384,7 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    * @param edgesGlobalFile       Edges file
    * @param verticesGlobalFile    Vertices file
    * @param isLeftOperand           If the operand represented is the left one
+   * @param i                     Graph Id
    * @return  Instance of the operand
    */
   protected static GraphCollectionDelta extractGraphFromFiles(String edgesGlobalFile,

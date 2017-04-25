@@ -16,6 +16,8 @@
  */
 package org.gradoop.benchmark.nesting.data;
 
+import java.io.IOException;
+
 /**
  * Defines
  */
@@ -25,7 +27,7 @@ public interface PhaseDoer {
   /**
    * Performs the actual operation form the loaded operands
    */
-  void performOperation();
+  void performOperation() throws IOException;
 
   /**
    * Performs the benchmark over the operation

@@ -19,9 +19,8 @@ package org.gradoop.flink.model.impl.operators.nest.model.indices;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.nest.model.WithNestedResult;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
  * Representing a NestingIndexing preserving part of the previous computation that could be
@@ -29,12 +28,12 @@ import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
  * matching between the vertices.
  */
 public class NestingResultOpt extends NestingIndex implements
-  WithNestedResult<DataSet<Edge>> {
+  WithNestedResult<LogicalGraph> {
 
   /**
    * Representation of the intermediate state of the previous computation
    */
-  private final DataSet<Edge> state;
+  private final LogicalGraph state;
 
   /**
    * Creating an instance of the graph database by just using the elements' ids
@@ -50,14 +49,14 @@ public class NestingResultOpt extends NestingIndex implements
   public NestingResultOpt(DataSet<GradoopId> graphHeads,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToVertex,
     DataSet<Tuple2<GradoopId, GradoopId>> graphHeadToEdge,
-    DataSet<Edge> state,
+    LogicalGraph state,
     DataSet<Tuple2<GradoopId, GradoopId>> graphStack) {
     super(graphHeads, graphHeadToVertex, graphHeadToEdge, graphStack);
     this.state = state;
   }
 
   @Override
-  public DataSet<Edge> getPreviousComputation() {
+  public LogicalGraph getPreviousComputation() {
     return state;
   }
 

@@ -21,17 +21,18 @@ import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 import java.util.Iterator;
 
 /**
  * Maps a quad into a <newgraph,vertex> paid to be used within the IdGraphDatabase
  */
-public class CollectVertices extends RichGroupReduceFunction<Tuple3<GradoopId, GradoopId, GradoopId>, GradoopId> {
+public class CollectVertices extends
+  RichGroupReduceFunction<Tuple3<GradoopId, GradoopId, GradoopId>, GradoopId> {
 
   @Override
-  public void reduce(Iterable<Tuple3<GradoopId, GradoopId, GradoopId>> values, Collector<GradoopId> out) throws Exception {
+  public void reduce(Iterable<Tuple3<GradoopId, GradoopId, GradoopId>> values,
+                     Collector<GradoopId> out) throws Exception {
     Iterator<Tuple3<GradoopId, GradoopId, GradoopId>> it = values.iterator();
     if (it.hasNext()) {
       Tuple3<GradoopId, GradoopId, GradoopId> x;

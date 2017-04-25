@@ -24,10 +24,12 @@ import org.gradoop.flink.model.impl.operators.nest.model.NestedModel;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
 
+import java.io.IOException;
+
 /**
  * Class implementing the serialization methods
  */
-public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
+public class NestingAndDisjunctionToLogicalGraph extends AbstractBenchmark {
 
   /**
    * Indices for the left operand
@@ -49,7 +51,7 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
    * @param basePath        Path where to obtain all the data
    * @param benchmarkPath   Path where to append the benchmarks
    */
-  public PerformBenchmarkOverSerializedData(String basePath, String benchmarkPath) {
+  public NestingAndDisjunctionToLogicalGraph(String basePath, String benchmarkPath) {
     super(basePath, benchmarkPath);
   }
 
@@ -59,11 +61,11 @@ public class PerformBenchmarkOverSerializedData extends AbstractBenchmark {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-    runBenchmark(PerformBenchmarkOverSerializedData.class, args);
+    runBenchmark(NestingAndDisjunctionToLogicalGraph.class, args);
   }
 
   @Override
-  public void performOperation() {
+  public void performOperation() throws IOException {
     String path = getBasePath();
     leftOperand = loadNestingIndex(generateOperandBasePath(path, true));
     rightOperand = loadNestingIndex(generateOperandBasePath(path, false));

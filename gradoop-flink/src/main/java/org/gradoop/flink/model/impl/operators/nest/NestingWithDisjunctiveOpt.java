@@ -20,8 +20,6 @@ package org.gradoop.flink.model.impl.operators.nest;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResult;
-import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingResultOpt;
 
 /**
  * Extends the nest operation by adding the edges as in the Join Disjunctive Semantics
@@ -54,10 +52,7 @@ public class NestingWithDisjunctiveOpt extends Nesting {
     model = generateModel(graph, collection, graphIndex, collectionIndex);
 
     // Evaluates the disjunctive semantics
-    NestingResult iaf = model.nestWithDisjoint(graphIndex, collectionIndex, graphId);
-
-    // Returns the expected graph, which is the nested graph with the new edges
-    return toLogicalGraph(iaf, model.getFlattenedGraph());
+    return model.nestWithDisjoint(graphIndex, collectionIndex, graphId).getPreviousComputation();
   }
 
 }

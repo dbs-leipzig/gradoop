@@ -20,11 +20,13 @@
  */
 package org.gradoop.benchmark.nesting;
 
-import com.sun.tools.javac.util.Assert;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.core.fs.FileStatus;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
 import org.gradoop.benchmark.nesting.data.GraphCollectionDelta;
 import org.gradoop.benchmark.nesting.data.NestingFilenameConvention;
 import org.gradoop.benchmark.nesting.functions.AggregateTheSameEdgeWithinDifferentGraphs;
@@ -35,7 +37,6 @@ import org.gradoop.benchmark.nesting.functions.SelectImportVertexId;
 import org.gradoop.benchmark.nesting.functions.Tuple2StringKeySelector;
 import org.gradoop.benchmark.nesting.serializers.indices.SerializeGradoopIdToFile;
 import org.gradoop.benchmark.nesting.serializers.indices.SerializePairOfIdsToFile;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -48,20 +49,23 @@ import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of6;
 import org.gradoop.flink.model.impl.operators.nest.NestingBase;
-import org.gradoop.flink.model.impl.operators.nest.ReduceVertexFusion;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.model.indices.NestingIndex;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Initializing the model by writing it down for some further and subsequent tests.
@@ -89,6 +93,11 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
   private static final String DEBUG_SERIALIZATION = "d";
 
   /**
+   * If the debug has to be activated
+   */
+  private static final String OPT_LOCAL = "l";
+
+  /**
    * Logger writing the timing informations to a file.
    */
   private static BufferedWriter LOGGER;
@@ -100,6 +109,7 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
       "or an edge one (*-vertices.txt)");
     OPTIONS.addOption(OUTPUT_MODEL, "out", true, "Path to output in nested format");
     OPTIONS.addOption(DEBUG_SERIALIZATION, "debug", false, "If the debug is run");
+    OPTIONS.addOption(OPT_LOCAL, "local", false, "If the debug is run");
   }
 
   /**
@@ -127,21 +137,53 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
   }
 
   /**
+   * Lists all the files in a given directory by either using
+   * @param basePath     Path where the data is read from.
+   * @param isLocal       This parameter has to be set to true if it runs in a local environment,
+   *                     and to false otherwise
+   * @return  Collection of files
+   * @throws URISyntaxException
+   * @throws IOException
+   */
+  public static Collection<List<String>> listFiles(String basePath, boolean isLocal) throws
+    URISyntaxException, IOException {
+    Stream<String> stream = null;
+    if (isLocal) {
+      System.out.println("LOCAL");
+      // Loading the graphs appearing in the graph collection
+      // 1. Returning each vertex and edge files association
+      File[] filesInDirectory = new File(SUBGRAPHS).listFiles();
+      stream = filesInDirectory != null ?
+        Arrays.stream(filesInDirectory).map(File::getAbsolutePath) :
+        Stream.empty();
+    } else {
+      System.out.println("Distributed");
+      FileSystem fs = FileSystem.get(new URI(basePath));
+      FileStatus[] ls = fs.listStatus(new Path(basePath));
+      stream = ls != null ?
+        Arrays.stream(ls).map(x -> x.getPath().toString()) :
+        Stream.empty();
+    }
+    Map<String, List<String>> l = stream
+        .collect(Collectors.groupingBy(x -> x
+          .replaceAll("-edges\\.txt$", "")
+          .replaceAll("-vertices\\.txt$", "")));
+    return l.values();
+  }
+
+  /**
    * Main program entry point
    * @param args        Program arguments
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-
-    //GradoopId id = GradoopId.get();
-    //Assert.check(GradoopId.fromString(id.toString()).equals(id));
-
     ENVIRONMENT.setParallelism(1);
     CommandLine cmd = parseArguments(args, SerializeDataWithDebug.class.getName());
     if (cmd == null) {
       System.exit(1);
     }
 
+    boolean isLocal = cmd.hasOption(OPT_LOCAL);
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     SUBGRAPHS = cmd.getOptionValue(OPTION_SUBGRAPHS_FOLDER);
     OUTPATH = cmd.getOptionValue(OUTPUT_MODEL);
@@ -152,19 +194,16 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
 
     GraphCollectionDelta start = extractGraphFromFiles(INPUT_PATH, null, true, 0);
 
-    // Loading the graphs appearing in the graph collection
-    // 1. Returning each vertex and edge files association
-    File[] filesInDirectory = new File(SUBGRAPHS).listFiles();
-    Map<String, List<String>> l = filesInDirectory != null ?
-      Arrays.stream(filesInDirectory)
-        .map(File::getAbsolutePath)
-        .collect(Collectors.groupingBy(x -> x
-          .replaceAll("-edges\\.txt$", "")
-          .replaceAll("-vertices\\.txt$", ""))) :
-      new HashMap<>();
+    Collection<List<String>> listlistFolders = listFiles(SUBGRAPHS, isLocal);
+    if (listlistFolders.isEmpty()) {
+      System.err.println("Did not manage to find files");
+      System.exit(1);
+    } else {
+      listlistFolders.forEach(System.out::println);
+    }
 
     // 2. Scanning all the files pertaining to the same graph, throught the previous aggregation
-    for (List<String> files : l.values()) {
+    for (List<String> files : listlistFolders) {
       int i = 0;
       if (files.size() == 2) {
         String edgeFile = null;
@@ -180,6 +219,10 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
           GraphCollectionDelta tmp = deltaUpdateGraphCollection(start, edgeFile, vertexFile, i);
           start = tmp;
           i++;
+        } else {
+          System.err.println("Error parsing the following collection: ");
+          files.forEach(System.err::println);
+          System.exit(1);
         }
       }
     }
@@ -215,20 +258,28 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
       // Comparing the serialization
       LogicalGraph flat = readGraphInMyCSVFormat(OUTPATH);
 
-      boolean flatEqualByData = written.equalsByData(flat).collect().get(0);
-      boolean flatEqualByElement = written.equalsByData(flat).collect().get(0);
+      boolean flatEqualByData =
+        written.equalsByData(flat).collect().get(0);
+      boolean flatEqualByElement =
+        written.equalsByData(flat).collect().get(0);
 
       LogicalGraph loadedLeft = NestingBase
-        .toLogicalGraph(loadNestingIndex(generateOperandBasePath(OUTPATH, true)), flat);
+        .toLogicalGraph
+          (loadNestingIndex(generateOperandBasePath(OUTPATH, true)), flat);
 
-      boolean leftEqualByData = loadedLeft.equalsByData(realLeft).collect().get(0);
-      boolean leftEqualByElement = loadedLeft.equalsByElementData(realLeft).collect().get(0);
+      boolean leftEqualByData =
+        loadedLeft.equalsByData(realLeft).collect().get(0);
+      boolean leftEqualByElement =
+        loadedLeft.equalsByElementData(realLeft).collect().get(0);
 
       GraphCollection loadedRight = NestingBase
-        .toGraphCollection(loadNestingIndex(generateOperandBasePath(OUTPATH, false)), flat);
+        .toGraphCollection
+          (loadNestingIndex(generateOperandBasePath(OUTPATH, false)), flat);
 
-      boolean rightEqualByData = loadedRight.equalsByGraphData(realRight).collect().get(0);
-      boolean rightEqualByElement = loadedRight.equalsByGraphElementData(realRight).collect().get(0);
+      boolean rightEqualByData =
+        loadedRight.equalsByGraphData(realRight).collect().get(0);
+      boolean rightEqualByElement =
+        loadedRight.equalsByGraphElementData(realRight).collect().get(0);
 
       System.err.println("Flat: Equal By Data " + flatEqualByData);
       System.err.println("Flat: Equal By Element Data " + flatEqualByElement);
@@ -282,10 +333,11 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
    * @param vertices    Vertices belonging to the graph
    * @param edges       Edges belonging to the graph
    * @param path        Path where to write the file
+   * @return            Returns the logical graph that has been written for debugging purposes
    * @throws Exception
    */
-  protected static LogicalGraph writeFlattenedGraph(DataSet<GraphHead> heads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, String path) throws Exception {
+  protected static LogicalGraph writeFlattenedGraph(DataSet<GraphHead> heads,
+    DataSet<Vertex> vertices, DataSet<Edge> edges, String path) throws Exception {
 
     DataSet<Vertex> flattenedVertices = heads
       .map(new GraphHeadToVertex())
@@ -297,11 +349,6 @@ public class SerializeDataWithDebug extends NestingFilenameConvention {
     writeGraphInMyCSVFormat(lg, path);
 
     return lg;
-    /*SerializeData.LOGGER.write("Writing flattenedGraph MSECONDS =" + ENVIRONMENT
-      .getLastJobExecutionResult().getNetRuntime(TimeUnit.MILLISECONDS));
-    SerializeData.LOGGER.write("vertices: " + lg.getVertices().count() + " edges: " +
-      lg.getEdges().count() + " heads: " + lg.getGraphHead().count());
-    SerializeData.LOGGER.newLine();*/
   }
 
 }
