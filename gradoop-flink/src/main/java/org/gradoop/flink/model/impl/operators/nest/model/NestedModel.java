@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.Self;
 import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph;
@@ -153,7 +154,7 @@ public class NestedModel {
     // TODO       JOIN COUNT: (1)
     DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> nestedResult = graphIndex.getGraphVertexMap()
       .leftOuterJoin(collectionIndex.getGraphVertexMap())
-      .where(new Value1Of2<>()).equalTo(1)
+      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       // If the vertex does not appear in the graph collection, the f2 element will be null.
       // These vertices are the ones to be returned as vertices alongside with the new
       // graph heads
@@ -170,10 +171,10 @@ public class NestedModel {
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(collectionIndex.getGraphHeads(), GRAPH_IDS)
       .leftOuterJoin(nestedResult)
-      .where("sourceId").equalTo(2)
+      .where("sourceId").equalTo(new Value2Of3<>())
       .with(new UpdateEdgesOnSource())
       .leftOuterJoin(nestedResult)
-      .where("targetId").equalTo(2)
+      .where("targetId").equalTo(new Value2Of3<>())
       .with(new UpdateEdgeWithTarget())
       .map(new AddToGraph<>(nestedGraphId));
 

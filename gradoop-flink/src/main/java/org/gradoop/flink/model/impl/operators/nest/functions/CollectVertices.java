@@ -48,7 +48,7 @@ public class CollectVertices extends
           out.collect(y);
           break;
         } else {
-          out.collect(x.f1);
+          out.collect(x.f2);
         }
       } while (it.hasNext() && (x.f1.equals(GradoopId.NULL_VALUE)));
     }
