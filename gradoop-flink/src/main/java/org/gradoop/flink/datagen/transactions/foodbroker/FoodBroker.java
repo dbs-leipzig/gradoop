@@ -171,8 +171,8 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
       .withBroadcastSet(employeesQualityMap, Constants.EMPLOYEE_MAP_BC)
       .withBroadcastSet(productsQualityMap, Constants.PRODUCT_QUALITY_MAP_BC)
-      .withBroadcastSet(employees, Employee.CLASS_NAME)
-      .withBroadcastSet(customers, Customer.CLASS_NAME);
+      .withBroadcastSet(employees, Constants.EMPLOYEE_VERTEX_LABEL)
+      .withBroadcastSet(customers, Constants.CUSTOMER_VERTEX_LABEL);
 
     DataSet<GraphTransaction> complaintHandling = complaintHandlingTuple
       .map(new Value0Of2<GraphTransaction, Set<Vertex>>());

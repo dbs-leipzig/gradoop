@@ -17,7 +17,6 @@
 
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -34,23 +33,7 @@ import java.util.Random;
 /**
  * Creates a product vertex.
  */
-public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
-  /**
-   * Class name of the vertex.
-   */
-  public static final String CLASS_NAME = "Product";
-  /**
-   * Broadcast variable for product names.
-   */
-  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
-  /**
-   * Broadcast variable for the products adjectives.
-   */
-  public static final String ADJECTIVES_BC = "adjectives";
-  /**
-   * Acronym for product.
-   */
-  private static final String ACRONYM = "PRD";
+public class Product extends MasterData {
   /**
    * List of possible product names and the corresponding type.
    */
@@ -91,8 +74,8 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted lists
-    nameGroupPairs = getRuntimeContext().getBroadcastVariable(NAMES_GROUPS_BC);
-    adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
+    nameGroupPairs = getRuntimeContext().getBroadcastVariable(Constants.NAMES_GROUPS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
     //get their sizes
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
@@ -101,7 +84,7 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
     //create standard properties from acronym and seed
-    Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
+    Properties properties = createDefaultProperties(seed, Constants.PRODUCT_ACRONYM);
     Random random = new Random();
     //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
@@ -109,7 +92,7 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
     properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nameGroupPair.f0);
     properties.set(Constants.PRICE_KEY, generatePrice());
-    return vertexFactory.createVertex(Product.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Constants.PRODUCT_VERTEX_LABEL, properties);
   }
 
   /**
@@ -124,5 +107,15 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
     // generate price between min and max value
     return  BigDecimal.valueOf(minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice)))
       .setScale(2, BigDecimal.ROUND_HALF_UP);
+  }
+
+  @Override
+  public String getAcronym() {
+    return Constants.PRODUCT_ACRONYM;
+  }
+
+  @Override
+  public String getClassName() {
+    return Constants.PRODUCT_VERTEX_LABEL;
   }
 }

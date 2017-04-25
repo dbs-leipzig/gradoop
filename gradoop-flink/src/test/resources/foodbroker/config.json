@@ -4,7 +4,12 @@
       "offset" : 50,
       "growth" : 20,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistent" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
     },
     "Employee" : {
       "offset" : 30,
@@ -30,7 +35,18 @@
       "offset" : 10,
       "growth" : 5,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistent" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
+    },
+    "Company" : {
+      "companyCount" : 8,
+      "holdingCount" : 3,
+      "branchesMin" : 1,
+      "branchesMax" : 5
     }
   },
   "Process" : {

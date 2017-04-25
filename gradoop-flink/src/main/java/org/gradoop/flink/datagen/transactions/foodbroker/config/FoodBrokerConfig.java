@@ -20,6 +20,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.config;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import scala.Int;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,9 +111,48 @@ public class FoodBrokerConfig implements Serializable {
    * @return json object of the searched master data
    * @throws JSONException
    */
-  private JSONObject getMasterDataConfigNode(String className) throws
-    JSONException {
+  private JSONObject getMasterDataConfigNode(String className) throws JSONException {
     return root.getJSONObject("MasterData").getJSONObject(className);
+  }
+
+  /**
+   * Loads the number of companies to use.
+   *
+   * @return number of companies to use
+   * @throws JSONException
+   */
+  public Integer getCompanyCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("companyCount");
+  }
+
+  /**
+   * Loads the number of holdings to use.
+   *
+   * @return number of holdings to use
+   * @throws JSONException
+   */
+  public Integer getHoldingCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("holdingCount");
+  }
+
+  /**
+   * Loads the min number of branches for a company.
+   *
+   * @return min number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMinAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMin");
+  }
+
+  /**
+   * Loads the max number of branches for a company.
+   *
+   * @return max number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMaxAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMax");
   }
 
   /**

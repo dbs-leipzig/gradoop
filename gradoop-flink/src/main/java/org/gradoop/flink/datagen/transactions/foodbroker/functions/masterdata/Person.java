@@ -22,35 +22,28 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
 import java.util.Random;
 
 /**
- * Creates a logistic vertex.
+ * Creates a person vertex.
  */
-public class Logistics extends MasterData {
-  /**
-   * List of possible adjectives.
-   */
-  private List<String> adjectives;
-  /**
-   * List of possible nouns.
-   */
-  private List<String> nouns;
+public abstract class Person extends MasterData {
   /**
    * List of possible cities.
    */
   private List<String> cities;
   /**
-   * Amount of possible adjectives.
+   * List of possible companies.
    */
-  private Integer adjectiveCount;
+  private List<String> companies;
   /**
-   * Amount of possible nouns.
+   * List of possible holdings.
    */
-  private Integer nounCount;
+  private List<String> holdings;
   /**
    * Amount of pissible cities.
    */
@@ -59,27 +52,29 @@ public class Logistics extends MasterData {
    * EPGM vertex factory.
    */
   private final VertexFactory vertexFactory;
+  /**
+   * FoodBroker configuration.
+   */
+  private FoodBrokerConfig foodBrokerConfig;
 
   /**
    * Valued constructor.
    *
    * @param vertexFactory EPGM vertex factory
    */
-  public Logistics(VertexFactory vertexFactory) {
+  public Person(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
     this.vertexFactory = vertexFactory;
+    this.foodBrokerConfig = foodBrokerConfig;
   }
-
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    //load broadcast lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
+    //load broadcasted lists
     cities = getRuntimeContext().getBroadcastVariable(Constants.CITIES_BC);
-    //get their sizes
-    nounCount = nouns.size();
-    adjectiveCount = adjectives.size();
+    companies = getRuntimeContext().getBroadcastVariable(Constants.COMPANIES_BC);
+    holdings = getRuntimeContext().getBroadcastVariable(Constants.HOLDINGS_BC);
+    //get the size
     cityCount = cities.size();
   }
 
@@ -88,24 +83,24 @@ public class Logistics extends MasterData {
     //create standard properties from acronym and seed
     Properties properties = createDefaultProperties(seed, getAcronym());
     Random random = new Random();
-    //set rnd city and name
+    //set rnd location
     String[] location = cities.get(random.nextInt(cityCount)).split("-");
     properties.set(Constants.CITY_KEY, location[0]);
     properties.set(Constants.STATE_KEY, location[1]);
     properties.set(Constants.COUNTRY_KEY, location[2]);
 
-    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
-      nouns.get(random.nextInt(nounCount)));
+    //set rnd company
+    Random rand = new Random();
+    int companyNumber = rand.nextInt(foodBrokerConfig.getCompanyCount());
+    String company = companies.get(companyNumber);
+    String holding = holdings.get(companyNumber % foodBrokerConfig.getHoldingCount());
+    int branchNumber = rand.nextInt(
+      (foodBrokerConfig.getBranchMaxAmount() - foodBrokerConfig.getBranchMinAmount()) + 1) +
+      foodBrokerConfig.getBranchMinAmount();
+    properties.set(Constants.BRANCHNUMBER_KEY, branchNumber);
+    properties.set(Constants.COMPANY_KEY, company);
+    properties.set(Constants.HOLDING_KEY, holding);
+
     return vertexFactory.createVertex(getClassName(), properties);
-  }
-
-  @Override
-  public String getAcronym() {
-    return Constants.LOGISTICS_ACRONYM;
-  }
-
-  @Override
-  public String getClassName() {
-    return Constants.LOGISTICS_VERTEX_LABEL;
   }
 }
