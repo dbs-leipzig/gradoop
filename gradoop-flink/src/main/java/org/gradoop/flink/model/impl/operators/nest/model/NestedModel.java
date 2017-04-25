@@ -154,7 +154,7 @@ public class NestedModel {
     // TODO       JOIN COUNT: (1)
     DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> nestedResult = graphIndex.getGraphVertexMap()
       .leftOuterJoin(collectionIndex.getGraphVertexMap())
-      .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
+      .where(new Value1Of2<>()).equalTo(1)
       // If the vertex does not appear in the graph collection, the f2 element will be null.
       // These vertices are the ones to be returned as vertices alongside with the new
       // graph heads
@@ -171,10 +171,10 @@ public class NestedModel {
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(collectionIndex.getGraphHeads(), GRAPH_IDS)
       .leftOuterJoin(nestedResult)
-      .where("sourceId").equalTo(new Value2Of3<>())
+      .where("sourceId").equalTo(2)
       .with(new UpdateEdgesOnSource())
       .leftOuterJoin(nestedResult)
-      .where("targetId").equalTo(new Value2Of3<>())
+      .where("targetId").equalTo(2)
       .with(new UpdateEdgeWithTarget())
       .map(new AddToGraph<>(nestedGraphId));
 
@@ -186,7 +186,7 @@ public class NestedModel {
     // To Logical Graph
     DataSet<Vertex> verticesData = vertices
       .coGroup(flattenedGraph.getVertices())
-      .where(new Value1Of2<>()).equalTo(new Id<>())
+      .where(1).equalTo(new Id<>())
       .with(new DemultiplexIdsWithActualElements<>())
       .crossWithTiny(newStackElement)
       .with(new AddElementToGraph<>());
@@ -196,7 +196,7 @@ public class NestedModel {
       .where(new Self<>()).equalTo(new Id<>())
       .with(new VertexToGraphHead())
       .join(newStackElement)
-      .where(new Id<>()).equalTo(new Value1Of2<>())
+      .where(new Id<>()).equalTo(1)
       .with(new ReplaceHeadId());
 
     DataSet<Tuple2<GradoopId, GradoopId>> resultingEdges =
