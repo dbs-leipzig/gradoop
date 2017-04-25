@@ -156,12 +156,12 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "good" value a master data object.
+   * Loads the "good" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataGoodRatio(String className)  {
+  public Double getMasterDataGoodRatio(String className) {
     Double good = null;
 
     try {
@@ -173,12 +173,12 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "bad" value a master data object.
+   * Loads the "bad" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataBadRatio(String className)  {
+  public Double getMasterDataBadRatio(String className) {
     Double bad = null;
 
     try {
@@ -190,12 +190,62 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "offset" value a master data object.
+   * Loads the "assistant" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeAssistantRatio(String className) {
+    Double ratio = null;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("assistant");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "normal" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeNormalRatio(String className) {
+    Double ratio = null;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("normal");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+  /**
+   * Loads the "supervisor" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeSupervisorRatio(String className) {
+    Double ratio = null;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("supervisor");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "offset" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value
    */
-  private Integer getMasterDataOffset(String className)  {
+  private Integer getMasterDataOffset(String className) {
     Integer offset = null;
 
     try {
@@ -207,7 +257,7 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "growth" value a master data object.
+   * Loads the "growth" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value

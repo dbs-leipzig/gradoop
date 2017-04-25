@@ -47,7 +47,7 @@ public class Constants {
   /**
    * Property key for master data: country.
    */
-  public static final String COUNTRY_KEY = "county";
+  public static final String COUNTRY_KEY = "country";
   /**
    * Property key for master data: branch number.
    */
@@ -60,6 +60,10 @@ public class Constants {
    * Property key for master data: holding.
    */
   public static final String HOLDING_KEY = "holding";
+  /**
+   * Property key for master data: type.
+   */
+  public static final String TYPE_KEY = "type";
   /**
    * Property key for master data: gender.
    */
@@ -148,6 +152,18 @@ public class Constants {
    * Property value start for purch and sales invoice.
    */
   public static final String TEXT_CONTENT = "Refund Ticket ";
+  /**
+   * Property value for type assistant.
+   */
+  public static final String TYPE_ASSISTANT = "assistant";
+  /**
+   * Property value for type normal.
+   */
+  public static final String TYPE_NORMAL = "normal";
+  /**
+   * Property value for type supervisor.
+   */
+  public static final String TYPE_SUPERVISOR = "supervisor";
   /**
    * Edge label.
    */
@@ -468,4 +484,12 @@ public class Constants {
    * Acronym for logistics.
    */
   public static final String LOGISTICS_ACRONYM = "LOG";
+  /**
+   * Percentage influence of the type "assistant" of a person.
+   */
+  public static final Float TYPE_ASSISTANT_INFLUENCE = -0.2f;
+  /**
+   * Percentage influence of the type "supervisor" of a person.
+   */
+  public static final Float TYPE_SUPERVISOR_INFLUENCE = 0.2f;
 }

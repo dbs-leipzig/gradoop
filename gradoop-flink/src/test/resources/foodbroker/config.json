@@ -6,7 +6,7 @@
       "good" : 0.1,
       "bad" : 0.1,
       "type" : {
-        "assistent" : 0.3,
+        "assistant" : 0.3,
         "normal" : 0.6,
         "supervisor" : 0.1
       }
@@ -15,7 +15,12 @@
       "offset" : 30,
       "growth" : 10,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
     },
     "Logistics" : {
       "offset" : 10,
@@ -37,7 +42,7 @@
       "good" : 0.1,
       "bad" : 0.1,
       "type" : {
-        "assistent" : 0.3,
+        "assistant" : 0.3,
         "normal" : 0.6,
         "supervisor" : 0.1
       }

@@ -101,6 +101,26 @@ public abstract class Person extends MasterData {
     properties.set(Constants.COMPANY_KEY, company);
     properties.set(Constants.HOLDING_KEY, holding);
 
+    //update quality
+    Float quality = properties.get(Constants.QUALITY_KEY).getFloat();
+    Double assistantRatio = foodBrokerConfig.getMasterDataTypeAssistantRatio(getClassName());
+    Double normalRatio = foodBrokerConfig.getMasterDataTypeNormalRatio(getClassName());
+    Double supervisorRatio = foodBrokerConfig.getMasterDataTypeSupervisorRatio(getClassName());
+    Double rnd = rand.nextDouble();
+    if (rnd <= assistantRatio) {
+      quality += quality * Constants.TYPE_ASSISTANT_INFLUENCE;
+      properties.set(Constants.TYPE_KEY, Constants.TYPE_ASSISTANT);
+    } else if (rnd >= assistantRatio + normalRatio) {
+      quality += quality * Constants.TYPE_SUPERVISOR_INFLUENCE;
+      if (quality > 1f) {
+        quality = 1f;
+      }
+      properties.set(Constants.TYPE_KEY, Constants.TYPE_SUPERVISOR);
+    } else {
+      properties.set(Constants.TYPE_KEY, Constants.TYPE_NORMAL);
+    }
+    properties.set(Constants.QUALITY_KEY, quality);
+
     return vertexFactory.createVertex(getClassName(), properties);
   }
 }
