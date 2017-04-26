@@ -602,6 +602,11 @@ public class FoodBrokerConfig implements Serializable {
     return value;
   }
 
+  /**
+   * Returns the average normal value, for default config it is 0.5.
+   *
+   * @return big decimal value of the average normal value
+   */
   private BigDecimal getAvgNormal() {
     return BigDecimal.valueOf((getQualityBad() + getQualityNormal() + getQualityGood()) / 2)
       .setScale(2, BigDecimal.ROUND_HALF_UP);
