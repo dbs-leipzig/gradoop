@@ -35,8 +35,6 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.math.BigDecimal;

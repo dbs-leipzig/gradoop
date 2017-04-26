@@ -29,9 +29,10 @@ import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.GraphIdsFromEdges;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.RelevantElementsFromBrokerage;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataMapFromTuple;
+
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata
+  .MasterDataPersonDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataQualityMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.ProductPriceMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.UserClients;
@@ -42,6 +43,7 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.EmployeeGene
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.ProductGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenerator;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.RelevantPersonData;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
@@ -99,11 +101,11 @@ public class FoodBroker implements GraphCollectionGenerator {
   /**
    * Set which contains one map from the gradoop id to the quality of a customer vertex.
    */
-  private DataSet<Map<GradoopId, Float>> customerQualityMap;
+  private DataSet<Map<GradoopId, RelevantPersonData>> customerQualityMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a vendor vertex.
    */
-  private DataSet<Map<GradoopId, Float>> vendorQualityMap;
+  private DataSet<Map<GradoopId, RelevantPersonData>> vendorQualityMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a logistic vertex.
    */
@@ -111,7 +113,7 @@ public class FoodBroker implements GraphCollectionGenerator {
   /**
    * Set which contains one map from the gradoop id to the quality of an employee vertex.
    */
-  private DataSet<Map<GradoopId, Float>> employeesQualityMap;
+  private DataSet<Map<GradoopId, RelevantPersonData>> employeesQualityMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a product vertex.
    */
@@ -234,17 +236,17 @@ public class FoodBroker implements GraphCollectionGenerator {
 
     // reduce all master data objects to their id and their quality value
     customerQualityMap = customers
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
+      .map(new MasterDataPersonDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<RelevantPersonData>());
     vendorQualityMap = vendors
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
+      .map(new MasterDataPersonDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<RelevantPersonData>());
     logisticsQualityMap = logistics
       .map(new MasterDataQualityMapper())
       .reduceGroup(new MasterDataMapFromTuple<Float>());
     employeesQualityMap = employees
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
+      .map(new MasterDataPersonDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<RelevantPersonData>());
     productsQualityMap = products
       .map(new MasterDataQualityMapper())
       .reduceGroup(new MasterDataMapFromTuple<Float>());

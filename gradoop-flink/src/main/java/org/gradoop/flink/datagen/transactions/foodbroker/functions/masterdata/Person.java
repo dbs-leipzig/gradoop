@@ -61,6 +61,7 @@ public abstract class Person extends MasterData {
    * Valued constructor.
    *
    * @param vertexFactory EPGM vertex factory
+   * @param foodBrokerConfig FoodBroker configuration
    */
   public Person(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
     this.vertexFactory = vertexFactory;
@@ -105,13 +106,12 @@ public abstract class Person extends MasterData {
     Float quality = properties.get(Constants.QUALITY_KEY).getFloat();
     Double assistantRatio = foodBrokerConfig.getMasterDataTypeAssistantRatio(getClassName());
     Double normalRatio = foodBrokerConfig.getMasterDataTypeNormalRatio(getClassName());
-    Double supervisorRatio = foodBrokerConfig.getMasterDataTypeSupervisorRatio(getClassName());
     Double rnd = rand.nextDouble();
     if (rnd <= assistantRatio) {
-      quality += quality * foodBrokerConfig.getMasterDataTypeAssistantInfluence(getClassName());
+      quality *= foodBrokerConfig.getMasterDataTypeAssistantInfluence();
       properties.set(Constants.TYPE_KEY, Constants.TYPE_ASSISTANT);
     } else if (rnd >= assistantRatio + normalRatio) {
-      quality += quality * foodBrokerConfig.getMasterDataTypeSupervisorInfluence(getClassName());
+      quality *= foodBrokerConfig.getMasterDataTypeSupervisorInfluence();
       if (quality > 1f) {
         quality = 1f;
       }

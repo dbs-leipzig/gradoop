@@ -8,9 +8,7 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1,
-        "assistantInfluence" : -0.2,
-        "supervisorInfluence" : 0.2
+        "supervisor" : 0.1
       }
     },
     "Employee" : {
@@ -21,9 +19,7 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1,
-        "assistantInfluence" : -0.2,
-        "supervisorInfluence" : 0.2
+        "supervisor" : 0.1
       }
     },
     "Logistics" : {
@@ -48,9 +44,7 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1,
-        "assistantInfluence" : -0.2,
-        "supervisorInfluence" : 0.2
+        "supervisor" : 0.1
       }
     },
     "Company" : {
@@ -58,6 +52,12 @@
       "holdingCount" : 3,
       "branchesMin" : 1,
       "branchesMax" : 5
+    },
+    "Influence" : {
+      "assistantInfluence" : 0.8,
+      "supervisorInfluence" : 1.2,
+      "sameCityInfluence" : 1.1,
+      "sameHoldingInfluence" : 1.25
     }
   },
   "Process" : {

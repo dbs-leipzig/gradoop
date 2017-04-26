@@ -52,6 +52,7 @@ public class Vendor extends Person {
    * Valued constructor.
    *
    * @param vertexFactory EPGM vertex factory
+   * @param foodBrokerConfig FoodBroker configuration
    */
   public Vendor(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
     super(vertexFactory, foodBrokerConfig);

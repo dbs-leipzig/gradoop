@@ -62,8 +62,17 @@ public abstract class MasterData extends RichMapFunction<MasterDataSeed, Vertex>
     return properties;
   }
 
-
+  /**
+   * Returns the acronym of the person.
+   *
+   * @return acronym
+   */
   public abstract String getAcronym();
 
+  /**
+   * Returns the class name of the person.
+   *
+   * @return class name
+   */
   public abstract String getClassName();
 }
