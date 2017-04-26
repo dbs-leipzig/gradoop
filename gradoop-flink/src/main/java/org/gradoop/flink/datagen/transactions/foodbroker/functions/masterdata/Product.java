@@ -39,36 +39,54 @@ public class Product extends MasterData {
    * Enum for the preishableness level from "ONE"(extreme durable) to "SIX"(extreme perishable).
    */
   public enum PerishablenessLevel {
+    /**
+     * Level one, extreme durable.
+     */
     ONE {
       @Override
       public String toString() {
         return "extreme durable";
       }
     },
+    /**
+     * Level two, very durable.
+     */
     TWO {
       @Override
       public String toString() {
         return "very durable";
       }
     },
+    /**
+     * Level three, durable.
+     */
     THREE {
       @Override
       public String toString() {
         return "durable";
       }
     },
+    /**
+     * Level four, perishable.
+     */
     FOUR {
       @Override
       public String toString() {
         return "perishable";
       }
     },
+    /**
+     * Level five, very perishable.
+     */
     FIVE {
       @Override
       public String toString() {
         return "very perishable";
       }
     },
+    /**
+     * Level six, extreme perishable.
+     */
     SIX {
       @Override
       public String toString() {
@@ -139,7 +157,7 @@ public class Product extends MasterData {
 
     int minLevel = 1;
     int maxLevel = 6;
-    switch(nameGroupPair.f1) {
+    switch (nameGroupPair.f1) {
     case Constants.PRODUCT_TYPE_FRUITS :
       minLevel = 2;
       maxLevel = 4;
@@ -157,7 +175,7 @@ public class Product extends MasterData {
     }
     int level = random.nextInt((maxLevel - minLevel) + 1) + minLevel;
     properties.set(
-      Constants.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level-1].toString());
+      Constants.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level - 1].toString());
 
     properties.set(Constants.PRICE_KEY, generatePrice());
     return vertexFactory.createVertex(Constants.PRODUCT_VERTEX_LABEL, properties);
