@@ -34,6 +34,49 @@ import java.util.Random;
  * Creates a product vertex.
  */
 public class Product extends MasterData {
+
+  /**
+   * Enum for the preishableness level from "ONE"(extreme durable) to "SIX"(extreme perishable).
+   */
+  public enum PerishablenessLevel {
+    ONE {
+      @Override
+      public String toString() {
+        return "extreme durable";
+      }
+    },
+    TWO {
+      @Override
+      public String toString() {
+        return "very durable";
+      }
+    },
+    THREE {
+      @Override
+      public String toString() {
+        return "durable";
+      }
+    },
+    FOUR {
+      @Override
+      public String toString() {
+        return "perishable";
+      }
+    },
+    FIVE {
+      @Override
+      public String toString() {
+        return "very perishable";
+      }
+    },
+    SIX {
+      @Override
+      public String toString() {
+        return "extreme perishable";
+      }
+    },
+  }
+
   /**
    * List of possible product names and the corresponding type.
    */
@@ -89,8 +132,33 @@ public class Product extends MasterData {
     //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
     properties.set(Constants.CATEGORY_KEY, nameGroupPair.f1);
-    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
-      nameGroupPair.f0);
+    int randomProduct = random.nextInt(adjectiveCount);
+    properties.set(Constants.NAME_KEY, adjectives.get(randomProduct) + " " +  nameGroupPair.f0);
+
+    properties.set(Constants.TYPE_KEY, nameGroupPair.f1);
+
+    int minLevel = 1;
+    int maxLevel = 6;
+    switch(nameGroupPair.f1) {
+    case Constants.PRODUCT_TYPE_FRUITS :
+      minLevel = 2;
+      maxLevel = 4;
+      break;
+    case Constants.PRODUCT_TYPE_VEGETABLES :
+      minLevel = 4;
+      maxLevel = 6;
+      break;
+    case Constants.PRODUCT_TYPE_NUTS :
+      minLevel = 1;
+      maxLevel = 3;
+      break;
+    default:
+      break;
+    }
+    int level = random.nextInt((maxLevel - minLevel) + 1) + minLevel;
+    properties.set(
+      Constants.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level-1].toString());
+
     properties.set(Constants.PRICE_KEY, generatePrice());
     return vertexFactory.createVertex(Constants.PRODUCT_VERTEX_LABEL, properties);
   }

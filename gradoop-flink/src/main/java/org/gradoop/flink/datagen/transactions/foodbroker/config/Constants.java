@@ -33,6 +33,18 @@ public class Constants {
    */
   public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
   /**
+   * Product type fruits.
+   */
+  public static final String PRODUCT_TYPE_FRUITS = "fruits";
+  /**
+   * Product type vegetables.
+   */
+  public static final String PRODUCT_TYPE_VEGETABLES = "vegetables";
+  /**
+   * Product type nuts.
+   */
+  public static final String PRODUCT_TYPE_NUTS = "nuts";
+  /**
    * Property key for master data: name.
    */
   public static final String NAME_KEY = "name";
@@ -88,6 +100,10 @@ public class Constants {
    * Property key for product: price property.
    */
   public static final String PRICE_KEY = "price";
+  /**
+   * Property key for product: perishableness level.
+   */
+  public static final String PERISHABLENESS_LEVEL = "perishablenessLevel";
   /**
    * Property key for transactional vertices: date.
    */

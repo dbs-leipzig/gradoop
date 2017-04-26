@@ -59,13 +59,13 @@ public class ProductGenerator extends AbstractMasterDataGenerator {
     List<Tuple2<String, String>> nameGroupPairs = new ArrayList<>();
 
     for (String name : fruits) {
-      nameGroupPairs.add(new Tuple2<>(name, "fruits"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_FRUITS));
     }
     for (String name : vegetables) {
-      nameGroupPairs.add(new Tuple2<>(name, "vegetables"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_VEGETABLES));
     }
     for (String name : nuts) {
-      nameGroupPairs.add(new Tuple2<>(name, "nuts"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_NUTS));
     }
 
     return env.fromCollection(seeds)
