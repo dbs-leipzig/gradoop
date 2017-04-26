@@ -644,18 +644,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       switch (strategy) {
       case GROUP_REDUCE:
-        groupingOperator =
-          new GroupingGroupReduce(vertexGroupingKeys, useVertexLabel,
-            vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
-            edgeValueAggregators, vertexLabelGroups, edgeLabelGroups,
-            labelWithAggregatorPropertyKeys);
+        groupingOperator = new GroupingGroupReduce(
+          vertexGroupingKeys, useVertexLabel, vertexValueAggregators, edgeGroupingKeys,
+          useEdgeLabel, edgeValueAggregators, vertexLabelGroups, edgeLabelGroups,
+          labelWithAggregatorPropertyKeys);
         break;
       case GROUP_COMBINE:
-        groupingOperator =
-          new GroupingGroupCombine(vertexGroupingKeys, useVertexLabel,
-            vertexValueAggregators, edgeGroupingKeys, useEdgeLabel,
-            edgeValueAggregators, vertexLabelGroups, edgeLabelGroups,
-            labelWithAggregatorPropertyKeys);
+        groupingOperator = new GroupingGroupCombine(
+          vertexGroupingKeys, useVertexLabel, vertexValueAggregators, edgeGroupingKeys,
+          useEdgeLabel, edgeValueAggregators, vertexLabelGroups, edgeLabelGroups,
+          labelWithAggregatorPropertyKeys);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

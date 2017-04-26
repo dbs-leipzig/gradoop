@@ -33,8 +33,8 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f6: vertex label group
  */
 public class VertexGroupItem
-  extends Tuple7<
-  GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup> {
+  extends Tuple7
+  <GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup> {
 
   public GradoopId getVertexId() {
     return f0;

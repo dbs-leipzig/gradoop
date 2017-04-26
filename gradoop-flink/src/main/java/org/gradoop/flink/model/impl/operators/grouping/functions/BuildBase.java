@@ -21,8 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .CountAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -220,8 +219,7 @@ abstract class BuildBase implements Serializable {
    * @param   element attributed EPGM element
    * @return  property values for aggregation
    */
-  protected PropertyValueList getAggregateValues(EPGMElement element)
-    throws IOException {
+  protected PropertyValueList getAggregateValues(EPGMElement element) throws IOException {
     List<PropertyValue> propertyValues = Lists.newArrayList();
 
     for (PropertyValueAggregator valueAggregator : valueAggregators) {
