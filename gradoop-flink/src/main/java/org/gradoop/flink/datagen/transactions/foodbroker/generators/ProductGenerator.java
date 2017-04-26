@@ -20,6 +20,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Product;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -46,7 +47,7 @@ public class ProductGenerator extends AbstractMasterDataGenerator {
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Product.CLASS_NAME);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.PRODUCT_VERTEX_LABEL);
     List<String> adjectives = foodBrokerConfig
       .getStringValuesFromFile("product.adjectives");
     List<String> fruits = foodBrokerConfig
@@ -58,19 +59,19 @@ public class ProductGenerator extends AbstractMasterDataGenerator {
     List<Tuple2<String, String>> nameGroupPairs = new ArrayList<>();
 
     for (String name : fruits) {
-      nameGroupPairs.add(new Tuple2<>(name, "fruits"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_FRUITS));
     }
     for (String name : vegetables) {
-      nameGroupPairs.add(new Tuple2<>(name, "vegetables"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_VEGETABLES));
     }
     for (String name : nuts) {
-      nameGroupPairs.add(new Tuple2<>(name, "nuts"));
+      nameGroupPairs.add(new Tuple2<>(name, Constants.PRODUCT_TYPE_NUTS));
     }
 
     return env.fromCollection(seeds)
       .map(new Product(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(nameGroupPairs), Product.NAMES_GROUPS_BC)
-      .withBroadcastSet(env.fromCollection(adjectives), Product.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nameGroupPairs), Constants.NAMES_GROUPS_BC)
+      .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
       .returns(vertexFactory.getType());
   }
 }

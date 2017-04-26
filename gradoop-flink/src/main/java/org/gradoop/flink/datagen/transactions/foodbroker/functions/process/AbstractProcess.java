@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.RelevantPersonData;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -66,7 +67,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the employee quality of a given gradoop id.
    */
-  protected Map<GradoopId, Float> employeeMap;
+  protected Map<GradoopId, RelevantPersonData> employeeMap;
   /**
    * Map to get the product quality of a given gradoop id.
    */
@@ -107,11 +108,11 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the customer quality of a given gradoop id.
    */
-  private Map<GradoopId, Float> customerMap;
+  private Map<GradoopId, RelevantPersonData> customerMap;
   /**
    * Map to get the vendor quality of a given gradoop id.
    */
-  private Map<GradoopId, Float> vendorMap;
+  private Map<GradoopId, RelevantPersonData> vendorMap;
   /**
    * List of all customers.
    */
@@ -157,16 +158,16 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted maps
-    customerMap = getRuntimeContext().<Map<GradoopId, Float>>
+    customerMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
       getBroadcastVariable(Constants.CUSTOMER_MAP_BC).get(0);
 
-    vendorMap = getRuntimeContext().<Map<GradoopId, Float>>
+    vendorMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
       getBroadcastVariable(Constants.VENDOR_MAP_BC).get(0);
 
     logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.LOGISTIC_MAP_BC).get(0);
 
-    employeeMap = getRuntimeContext().<Map<GradoopId, Float>>
+    employeeMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
       getBroadcastVariable(Constants.EMPLOYEE_MAP_BC).get(0);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
@@ -275,21 +276,93 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    */
   protected Float getEdgeTargetQuality(String edgeLabel, GradoopId source, String masterDataMap) {
     GradoopId target = getEdgeTargetId(edgeLabel, source);
+    return getEdgeTargetQuality(target, masterDataMap);
+  }
 
+  /**
+   * Returns the quality of the target of the specified edge.
+   *
+   * @param target gradoop id of the target
+   * @param masterDataMap the map where the target id and the vertex are stored in
+   * @return quality of the target of the edge
+   */
+  protected Float getEdgeTargetQuality(GradoopId target, String masterDataMap) {
     switch (masterDataMap) {
     case Constants.CUSTOMER_MAP_BC:
-      return customerMap.get(target);
+      return customerMap.get(target).getQuality();
     case Constants.VENDOR_MAP_BC:
-      return vendorMap.get(target);
+      return vendorMap.get(target).getQuality();
     case Constants.LOGISTIC_MAP_BC:
       return logisticMap.get(target);
     case Constants.EMPLOYEE_MAP_BC:
-      return employeeMap.get(target);
+      return employeeMap.get(target).getQuality();
     case Constants.USER_MAP:
       return userMap.get(target);
     default:
       return null;
     }
+  }
+
+  /**
+   * Calculates additional relative influence for two master data objects. The addition is
+   * increased if the objects share the same location or the same holding. If not 1.0f is returned.
+   *
+   * @param firstMasterDataId gradoop id of the first master data object
+   * @param firstMasterDataMap name of the map of the first master data object
+   * @param secondMasterDataId gradoop id of the second master data object
+   * @param secondMasterDataMap name of the map of the second master data object
+   * @return float value representing relative addition to the master data objects qualities
+   */
+  protected Float getAdditionalInfluence(
+    GradoopId firstMasterDataId, String firstMasterDataMap,
+    GradoopId secondMasterDataId, String secondMasterDataMap) {
+    Float influence = 1.0f;
+    String firstCity = "1";
+    String firstHolding = "1";
+    String secondCity = "2";
+    String secondHolding = "2";
+
+    switch (firstMasterDataMap) {
+    case Constants.CUSTOMER_MAP_BC:
+      firstCity = customerMap.get(firstMasterDataId).getCity();
+      firstHolding = customerMap.get(firstMasterDataId).getHolding();
+      break;
+    case Constants.VENDOR_MAP_BC:
+      firstCity = vendorMap.get(firstMasterDataId).getCity();
+      firstHolding = vendorMap.get(firstMasterDataId).getHolding();
+      break;
+    case Constants.EMPLOYEE_MAP_BC:
+      firstCity = employeeMap.get(firstMasterDataId).getCity();
+      firstHolding = employeeMap.get(firstMasterDataId).getHolding();
+      break;
+    default:
+      break;
+    }
+
+    switch (secondMasterDataMap) {
+    case Constants.CUSTOMER_MAP_BC:
+      secondCity = customerMap.get(secondMasterDataId).getCity();
+      secondHolding = customerMap.get(secondMasterDataId).getHolding();
+      break;
+    case Constants.VENDOR_MAP_BC:
+      secondCity = vendorMap.get(secondMasterDataId).getCity();
+      secondHolding = vendorMap.get(secondMasterDataId).getHolding();
+      break;
+    case Constants.EMPLOYEE_MAP_BC:
+      secondCity = employeeMap.get(secondMasterDataId).getCity();
+      secondHolding = employeeMap.get(secondMasterDataId).getHolding();
+      break;
+    default:
+      break;
+    }
+
+    if (firstCity.equals(secondCity)) {
+      influence *= config.getMasterDataSameCityInfluence();
+    }
+    if (firstHolding.equals(secondHolding)) {
+      influence *= config.getMasterDataSameHoldingInfluence();
+    }
+    return influence;
   }
 
   /**

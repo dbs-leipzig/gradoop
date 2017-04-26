@@ -19,6 +19,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -45,9 +46,13 @@ public class EmployeeGenerator
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Employee.CLASS_NAME);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.EMPLOYEE_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
+    List<String> companies = foodBrokerConfig
+      .getStringValuesFromFile("companies");
+    List<String> holdings = foodBrokerConfig
+      .getStringValuesFromFile("holdings");
     List<String> firstNamesFemale = foodBrokerConfig
       .getStringValuesFromFile("employee.first_names_female");
     List<String> firstNamesMale = foodBrokerConfig
@@ -56,11 +61,13 @@ public class EmployeeGenerator
       .getStringValuesFromFile("employee.last_names");
 
     return env.fromCollection(seeds)
-      .map(new Employee(vertexFactory))
-      .withBroadcastSet(env.fromCollection(firstNamesFemale), Employee.FIRST_NAMES_FEMALE_BC)
-      .withBroadcastSet(env.fromCollection(firstNamesMale), Employee.FIRST_NAMES_MALE_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Employee.LAST_NAMES_BC)
-      .withBroadcastSet(env.fromCollection(cities), Employee.CITIES_BC)
+      .map(new Employee(vertexFactory, foodBrokerConfig))
+      .withBroadcastSet(env.fromCollection(firstNamesFemale), Constants.FIRST_NAMES_FEMALE_BC)
+      .withBroadcastSet(env.fromCollection(firstNamesMale), Constants.FIRST_NAMES_MALE_BC)
+      .withBroadcastSet(env.fromCollection(nouns), Constants.LAST_NAMES_BC)
+      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }

@@ -107,19 +107,58 @@ public class FoodBrokerConfig implements Serializable {
    * @return json object of the searched master data
    * @throws JSONException
    */
-  private JSONObject getMasterDataConfigNode(String className) throws
-    JSONException {
+  private JSONObject getMasterDataConfigNode(String className) throws JSONException {
     return root.getJSONObject("MasterData").getJSONObject(className);
   }
 
   /**
-   * Loads the "good" value a master data object.
+   * Loads the number of companies to use.
+   *
+   * @return number of companies to use
+   * @throws JSONException
+   */
+  public Integer getCompanyCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("companyCount");
+  }
+
+  /**
+   * Loads the number of holdings to use.
+   *
+   * @return number of holdings to use
+   * @throws JSONException
+   */
+  public Integer getHoldingCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("holdingCount");
+  }
+
+  /**
+   * Loads the min number of branches for a company.
+   *
+   * @return min number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMinAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMin");
+  }
+
+  /**
+   * Loads the max number of branches for a company.
+   *
+   * @return max number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMaxAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMax");
+  }
+
+  /**
+   * Loads the "good" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataGoodRatio(String className)  {
-    Double good = null;
+  public Double getMasterDataGoodRatio(String className) {
+    Double good = 0.0d;
 
     try {
       good = getMasterDataConfigNode(className).getDouble("good");
@@ -130,13 +169,13 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "bad" value a master data object.
+   * Loads the "bad" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataBadRatio(String className)  {
-    Double bad = null;
+  public Double getMasterDataBadRatio(String className) {
+    Double bad = 0.0d;
 
     try {
       bad = getMasterDataConfigNode(className).getDouble("bad");
@@ -147,12 +186,94 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "offset" value a master data object.
+   * Loads the "assistant" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeAssistantRatio(String className) {
+    Double ratio = 0.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("assistant");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "normal" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeNormalRatio(String className) {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("normal");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+  /**
+   * Loads the "supervisor" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeSupervisorRatio(String className) {
+    Double ratio = 0.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("supervisor");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataTypeAssistantInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("assistantInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataTypeSupervisorInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("supervisorInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the "offset" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value
    */
-  private Integer getMasterDataOffset(String className)  {
+  private Integer getMasterDataOffset(String className) {
     Integer offset = null;
 
     try {
@@ -164,7 +285,7 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "growth" value a master data object.
+   * Loads the "growth" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value
@@ -178,6 +299,38 @@ public class FoodBrokerConfig implements Serializable {
       e.printStackTrace();
     }
     return growth;
+  }
+
+  /**
+   * Loads the relative influence value if two master data objects are located in the same city.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataSameCityInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("sameCityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the relative influence value if two master data objects belong to the same holding.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataSameHoldingInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("sameCityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
   }
 
   /**

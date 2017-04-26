@@ -135,10 +135,17 @@ public class Brokerage
    */
   private boolean confirmed(Vertex salesQuotation) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     return config.happensTransitionConfiguration(
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
@@ -186,10 +193,17 @@ public class Brokerage
     GradoopId product;
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
@@ -216,10 +230,17 @@ public class Brokerage
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
     influencingMasterQuality.add(productQualityMap.get(product));
 
     // calculate and set the lines properties
@@ -227,8 +248,9 @@ public class Brokerage
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_SALESMARGIN_CONFIG_KEY, true);
 
+    influencingMasterQuality.clear();
     int quantity = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), Constants.SALESQUOTATION_VERTEX_LABEL,
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -255,10 +277,17 @@ public class Brokerage
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     LocalDate salesQuotationDate = salesQuotation
       .getPropertyValue(Constants.DATE_KEY)
@@ -269,11 +298,17 @@ public class Brokerage
     String bid = createBusinessIdentifier(
       currentId++, Constants.SALESORDER_ACRONYM);
     // get random employee and collect all quality values from influencing master data objects
-    GradoopId rndEmployee = getNextEmployee();
     influencingMasterQuality.clear();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
-    influencingMasterQuality.add(employeeMap.get(rndEmployee));
+    employee = getNextEmployee();
+    customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(employeeMap.get(employee).getQuality() * additionalInfluence);
 
     // set calculated properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -288,7 +323,7 @@ public class Brokerage
     // create all relevant edges
     newEdge(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId(), getEdgeTargetId(
       Constants.SENTTO_EDGE_LABEL, salesQuotation.getId()));
-    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), rndEmployee);
+    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), employee);
     newEdge(Constants.BASEDON_EDGE_LABEL, salesOrder.getId(), salesQuotation.getId());
 
     return salesOrder;
@@ -440,10 +475,18 @@ public class Brokerage
     BigDecimal price = productPriceMap.get(salesOrderLine.getTargetId());
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
+
+    GradoopId employee = getEdgeTargetId(Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId());
+    GradoopId vendor = getEdgeTargetId(Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or location
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, vendor, Constants.VENDOR_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(vendor, Constants.VENDOR_MAP_BC) * additionalInfluence);
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(

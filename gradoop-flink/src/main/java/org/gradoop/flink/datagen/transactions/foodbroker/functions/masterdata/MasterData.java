@@ -17,6 +17,8 @@
 
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -24,7 +26,7 @@ import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 /**
  * Provides default properties and a business identifier for master data objects.
  */
-public class MasterData {
+public abstract class MasterData extends RichMapFunction<MasterDataSeed, Vertex> {
   /**
    * Creates a business identifier.
    *
@@ -49,7 +51,7 @@ public class MasterData {
    * @param acronym the master data acronym
    * @return property list with default master data properties
    */
-  public static Properties createDefaultProperties(MasterDataSeed seed, String acronym) {
+  protected Properties createDefaultProperties(MasterDataSeed seed, String acronym) {
     String bid = createBusinessIdentifier(seed, acronym);
     Properties properties = new Properties();
 
@@ -59,4 +61,18 @@ public class MasterData {
 
     return properties;
   }
+
+  /**
+   * Returns the acronym of the person.
+   *
+   * @return acronym
+   */
+  public abstract String getAcronym();
+
+  /**
+   * Returns the class name of the person.
+   *
+   * @return class name
+   */
+  public abstract String getClassName();
 }

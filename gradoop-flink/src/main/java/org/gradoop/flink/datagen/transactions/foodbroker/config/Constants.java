@@ -33,6 +33,18 @@ public class Constants {
    */
   public static final String SUPERCLASS_VALUE_TRANSACTIONAL = "T";
   /**
+   * Product type fruits.
+   */
+  public static final String PRODUCT_TYPE_FRUITS = "fruits";
+  /**
+   * Product type vegetables.
+   */
+  public static final String PRODUCT_TYPE_VEGETABLES = "vegetables";
+  /**
+   * Product type nuts.
+   */
+  public static final String PRODUCT_TYPE_NUTS = "nuts";
+  /**
    * Property key for master data: name.
    */
   public static final String NAME_KEY = "name";
@@ -40,6 +52,30 @@ public class Constants {
    * Property key for master data: city.
    */
   public static final String CITY_KEY = "city";
+  /**
+   * Property key for master data: state.
+   */
+  public static final String STATE_KEY = "state";
+  /**
+   * Property key for master data: country.
+   */
+  public static final String COUNTRY_KEY = "country";
+  /**
+   * Property key for master data: branch number.
+   */
+  public static final String BRANCHNUMBER_KEY = "branchNumber";
+  /**
+   * Property key for master data: company.
+   */
+  public static final String COMPANY_KEY = "company";
+  /**
+   * Property key for master data: holding.
+   */
+  public static final String HOLDING_KEY = "holding";
+  /**
+   * Property key for master data: type.
+   */
+  public static final String TYPE_KEY = "type";
   /**
    * Property key for master data: gender.
    */
@@ -64,6 +100,10 @@ public class Constants {
    * Property key for product: price property.
    */
   public static final String PRICE_KEY = "price";
+  /**
+   * Property key for product: perishableness level.
+   */
+  public static final String PERISHABLENESS_LEVEL = "perishablenessLevel";
   /**
    * Property key for transactional vertices: date.
    */
@@ -128,6 +168,18 @@ public class Constants {
    * Property value start for purch and sales invoice.
    */
   public static final String TEXT_CONTENT = "Refund Ticket ";
+  /**
+   * Property value for type assistant.
+   */
+  public static final String TYPE_ASSISTANT = "assistant";
+  /**
+   * Property value for type normal.
+   */
+  public static final String TYPE_NORMAL = "normal";
+  /**
+   * Property value for type supervisor.
+   */
+  public static final String TYPE_SUPERVISOR = "supervisor";
   /**
    * Edge label.
    */
@@ -235,6 +287,26 @@ public class Constants {
   /**
    * Vertex label.
    */
+  public static final String EMPLOYEE_VERTEX_LABEL = "Employee";
+  /**
+   * Vertex label.
+   */
+  public static final String CUSTOMER_VERTEX_LABEL = "Customer";
+  /**
+   * Vertex label.
+   */
+  public static final String VENDOR_VERTEX_LABEL = "Vendor";
+  /**
+   * Vertex label.
+   */
+  public static final String PRODUCT_VERTEX_LABEL = "Product";
+  /**
+   * Vertex label.
+   */
+  public static final String LOGISTICS_VERTEX_LABEL = "Logistics";
+  /**
+   * Vertex label.
+   */
   public static final String CLIENT_VERTEX_LABEL = "Client";
   /**
    * Key for configuration property.
@@ -305,6 +377,42 @@ public class Constants {
    */
   public static final String LATEDELIVERY_TICKET_PROBLEM = "late delivery";
   /**
+   * Broadcast variable for the customers adjectives.
+   */
+  public static final String ADJECTIVES_BC = "adjectives";
+  /**
+   * Broadcast variable for the customers nouns.
+   */
+  public static final String NOUNS_BC = "nouns";
+  /**
+   * Broadcast variable for the logistics cities.
+   */
+  public static final String CITIES_BC = "cities";
+  /**
+   * Broadcast variable for male employees first name.
+   */
+  public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
+  /**
+   * Broadcast variable for female employees first name.
+   */
+  public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
+  /**
+   * Broadcast variable for employees last name.
+   */
+  public static final String LAST_NAMES_BC = "nouns";
+  /**
+   * Broadcast variable for product names.
+   */
+  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
+  /**
+   * Broadcast variable for the customers companies.
+   */
+  public static final String COMPANIES_BC = "companies";
+  /**
+   * Broadcast variable for the customers companies holdings.
+   */
+  public static final String HOLDINGS_BC = "holdings";
+  /**
    * Broadcast variable which is needed to spread the precalculated customer map.
    */
   public static final String CUSTOMER_MAP_BC = "customerMap";
@@ -372,4 +480,24 @@ public class Constants {
    * Acronym for client.
    */
   public static final String CLIENT_ACRONYM = "CLI";
+  /**
+   * Acronym for employee.
+   */
+  public static final String EMPLOYEE_ACRONYM = "EMP";
+  /**
+   * Acronym for customer.
+   */
+  public static final String CUSTOMER_ACRONYM = "CUS";
+  /**
+   * Acronym for vendor.
+   */
+  public static final String VENDOR_ACRONYM = "VEN";
+  /**
+   * Acronym for product.
+   */
+  public static final String PRODUCT_ACRONYM = "PRD";
+  /**
+   * Acronym for logistics.
+   */
+  public static final String LOGISTICS_ACRONYM = "LOG";
 }

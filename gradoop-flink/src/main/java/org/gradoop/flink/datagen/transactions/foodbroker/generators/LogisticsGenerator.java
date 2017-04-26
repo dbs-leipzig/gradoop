@@ -19,6 +19,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Logistics;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -45,9 +46,13 @@ public class LogisticsGenerator
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Logistics.CLASS_NAME);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.LOGISTICS_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
+    List<String> companies = foodBrokerConfig
+      .getStringValuesFromFile("companies");
+    List<String> holdings = foodBrokerConfig
+      .getStringValuesFromFile("holdings");
     List<String> adjectives = foodBrokerConfig
       .getStringValuesFromFile("logistics.adjectives");
     List<String> nouns = foodBrokerConfig
@@ -55,9 +60,11 @@ public class LogisticsGenerator
 
     return env.fromCollection(seeds)
       .map(new Logistics(vertexFactory))
-      .withBroadcastSet(env.fromCollection(adjectives), Logistics.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Logistics.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(cities), Logistics.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nouns), Constants.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }
