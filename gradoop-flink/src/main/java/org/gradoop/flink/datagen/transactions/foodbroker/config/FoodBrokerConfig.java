@@ -240,6 +240,41 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public float getMasterDataTypeAssistantInfluence(String className) {
+    Double ratio = null;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type")
+        .getDouble("assistantInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+  /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public float getMasterDataTypeSupervisorInfluence(String className) {
+    Double ratio = null;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type")
+        .getDouble("supervisorInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
    * Loads the "offset" value of a master data object.
    *
    * @param className class name of the master data

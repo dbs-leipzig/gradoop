@@ -484,12 +484,4 @@ public class Constants {
    * Acronym for logistics.
    */
   public static final String LOGISTICS_ACRONYM = "LOG";
-  /**
-   * Percentage influence of the type "assistant" of a person.
-   */
-  public static final Float TYPE_ASSISTANT_INFLUENCE = -0.2f;
-  /**
-   * Percentage influence of the type "supervisor" of a person.
-   */
-  public static final Float TYPE_SUPERVISOR_INFLUENCE = 0.2f;
 }

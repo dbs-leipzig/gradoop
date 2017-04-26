@@ -108,10 +108,10 @@ public abstract class Person extends MasterData {
     Double supervisorRatio = foodBrokerConfig.getMasterDataTypeSupervisorRatio(getClassName());
     Double rnd = rand.nextDouble();
     if (rnd <= assistantRatio) {
-      quality += quality * Constants.TYPE_ASSISTANT_INFLUENCE;
+      quality += quality * foodBrokerConfig.getMasterDataTypeAssistantInfluence(getClassName());
       properties.set(Constants.TYPE_KEY, Constants.TYPE_ASSISTANT);
     } else if (rnd >= assistantRatio + normalRatio) {
-      quality += quality * Constants.TYPE_SUPERVISOR_INFLUENCE;
+      quality += quality * foodBrokerConfig.getMasterDataTypeSupervisorInfluence(getClassName());
       if (quality > 1f) {
         quality = 1f;
       }

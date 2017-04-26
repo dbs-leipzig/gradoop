@@ -8,7 +8,9 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1
+        "supervisor" : 0.1,
+        "assistantInfluence" : -0.2,
+        "supervisorInfluence" : 0.2
       }
     },
     "Employee" : {
@@ -19,7 +21,9 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1
+        "supervisor" : 0.1,
+        "assistantInfluence" : -0.2,
+        "supervisorInfluence" : 0.2
       }
     },
     "Logistics" : {
@@ -44,7 +48,9 @@
       "type" : {
         "assistant" : 0.3,
         "normal" : 0.6,
-        "supervisor" : 0.1
+        "supervisor" : 0.1,
+        "assistantInfluence" : -0.2,
+        "supervisorInfluence" : 0.2
       }
     },
     "Company" : {
