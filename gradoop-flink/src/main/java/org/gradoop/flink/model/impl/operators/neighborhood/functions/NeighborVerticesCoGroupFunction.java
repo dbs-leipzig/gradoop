@@ -30,7 +30,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  * vertex are cogrouped. Used to aggregate vertices of in- and outgoing edges.
  */
 public class NeighborVerticesCoGroupFunction
-//  extends NeighborVertexFunction
+  extends NeighborVertexFunction
   implements CoGroupFunction<Vertex, Tuple2<GradoopId, Vertex>, Vertex> {
 
   /**
@@ -39,12 +39,7 @@ public class NeighborVerticesCoGroupFunction
    * @param function vertex aggregation function
    */
   public NeighborVerticesCoGroupFunction(VertexAggregateFunction function) {
-//    super(function);
-    this.function = function;
-  }
-  private VertexAggregateFunction function;
-  public VertexAggregateFunction getFunction() {
-    return function;
+    super(function);
   }
 
   /**

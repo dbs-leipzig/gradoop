@@ -39,12 +39,7 @@ public class NeighborEdgeCoGroupFunction
    */
   public NeighborEdgeCoGroupFunction(EdgeAggregateFunction function) {
     super(function);
-//    this.function = function;
   }
-//  private EdgeAggregateFunction function;
-//  public EdgeAggregateFunction getFunction() {
-//    return function;
-//  }
 
   /**
    * {@inheritDoc}

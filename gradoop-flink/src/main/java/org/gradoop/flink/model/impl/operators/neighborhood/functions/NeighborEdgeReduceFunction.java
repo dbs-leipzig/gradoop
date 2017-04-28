@@ -30,7 +30,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  * relevant vertex were grouped.
  */
 public class NeighborEdgeReduceFunction
-//  extends NeighborEdgeFunction
+  extends NeighborEdgeFunction
   implements GroupReduceFunction<Tuple2<Edge, Vertex>, Vertex> {
 
   /**
@@ -38,15 +38,8 @@ public class NeighborEdgeReduceFunction
    *
    * @param function edge aggregation function
    */
-//  public NeighborEdgeReduceFunction(EdgeAggregateFunction function) {
-//    super(function);
-//  }
   public NeighborEdgeReduceFunction(EdgeAggregateFunction function) {
-    this.function = function;
-  }
-  private EdgeAggregateFunction function;
-  public EdgeAggregateFunction getFunction() {
-    return function;
+    super(function);
   }
 
   /**

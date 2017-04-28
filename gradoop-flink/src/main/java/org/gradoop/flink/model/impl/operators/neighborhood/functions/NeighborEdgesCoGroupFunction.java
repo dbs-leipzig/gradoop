@@ -31,7 +31,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  * relevant are cogrouped. Used to aggregate in- and outgoing edges.
  */
 public class NeighborEdgesCoGroupFunction
-//  extends NeighborEdgeFunction
+  extends NeighborEdgeFunction
   implements CoGroupFunction<Vertex, Tuple2<GradoopId, Edge>, Vertex> {
 
   /**
@@ -40,12 +40,7 @@ public class NeighborEdgesCoGroupFunction
    * @param function edge aggregation function
    */
   public NeighborEdgesCoGroupFunction(EdgeAggregateFunction function) {
-//        super(function);
-    this.function = function;
-  }
-  private EdgeAggregateFunction function;
-  public EdgeAggregateFunction getFunction() {
-    return function;
+        super(function);
   }
 
   /**
