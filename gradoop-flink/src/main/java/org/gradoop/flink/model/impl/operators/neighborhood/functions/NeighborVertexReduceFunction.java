@@ -30,7 +30,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
   */
 public class NeighborVertexReduceFunction
   extends NeighborVertexFunction
-  implements GroupReduceFunction<Tuple2<Vertex,Vertex>, Vertex> {
+  implements GroupReduceFunction<Tuple2<Vertex, Vertex>, Vertex> {
 
   /**
    * Valued constructor.

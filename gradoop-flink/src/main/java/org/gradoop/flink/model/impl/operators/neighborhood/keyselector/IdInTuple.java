@@ -48,6 +48,6 @@ public class IdInTuple<T extends Tuple> implements KeySelector<T, GradoopId> {
    */
   @Override
   public GradoopId getKey(T tuple) throws Exception {
-    return ((EPGMGraphElement)tuple.getField(field)).getId();
+    return ((EPGMGraphElement) tuple.getField(field)).getId();
   }
 }

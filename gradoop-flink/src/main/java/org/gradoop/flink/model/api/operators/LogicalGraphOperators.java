@@ -281,7 +281,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param function aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return
+   *
+   * @return logical graph where vertices store aggregated information about connected edges
    */
   LogicalGraph reduceOnEdges(
     EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
@@ -293,7 +294,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param function aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return
+   *
+   * @return logical graph where vertices store aggregated information about connected vertices
    */
   LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
@@ -305,7 +307,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param function aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return
+   *
+   * @return logical graph where vertices store aggregated information about connected edges
    */
   LogicalGraph groupReduceOnEdges(
     EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
@@ -317,7 +320,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param function aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return
+   *
+   * @return logical graph where vertices store aggregated information about connected vertices
    */
   LogicalGraph groupReduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);

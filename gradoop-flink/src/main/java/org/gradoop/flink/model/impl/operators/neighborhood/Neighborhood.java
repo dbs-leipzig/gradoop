@@ -30,8 +30,17 @@ public abstract class Neighborhood implements UnaryGraphToGraphOperator {
    * edges or both.
    */
   public enum EdgeDirection {
+    /**
+     * Incoming edge.
+     */
     IN,
+    /**
+     * Outgoing edge.
+     */
     OUT,
+    /**
+     * Incoming and outgoing edges.
+     */
     BOTH
   }
 
