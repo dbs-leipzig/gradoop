@@ -17,8 +17,6 @@
 
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -84,10 +82,6 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
         .where(1).equalTo(new Id<>())
         // replace id with the vertex
         .with(new VertexToFieldOne<Edge, GradoopId>())
-//        .where(new TargetId<>()).equalTo(new Id<>())
-//        .union(graph.getEdges()
-//          .join(graph.getVertices())
-//          .where(new SourceId<>()).equalTo(new Id<>()))
         // group by the vertex id
         .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));

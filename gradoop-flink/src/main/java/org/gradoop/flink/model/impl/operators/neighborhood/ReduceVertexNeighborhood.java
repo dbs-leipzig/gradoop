@@ -90,25 +90,6 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
         .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
         // aggregate values
         .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
-
-
-//      vertices = graph.getEdges()
-//        .map(new VertexIdsFromEdge())
-//        .join(graph.getVertices())
-//        .where(1).equalTo(new Id<>())
-//        .with(new VertexToFieldOne<GradoopId, GradoopId>())
-//        .join(graph.getVertices())
-//        .where(0).equalTo(new Id<>())
-//        .groupBy(1)
-//        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
-
-
-
-      //        graph.getEdges()
-//        .join(graph.getVertices())
-//        .where(new SourceId<>()).equalTo(new Id<>())
-//        .groupBy(0)
-//        .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     case BOTH:
       // takes edges and gets the corresponding vertices and applies the aggregate function for
@@ -127,42 +108,6 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
         .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
         // aggregate values
         .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
-
-
-
-//      vertices = graph.getEdges()
-//        .flatMap(new ShuffledVertexIdsFromEdge())
-//        .join(graph.getVertices())
-//        .where(1).equalTo(new Id<>())
-//        .with(new VertexToFieldOne<GradoopId, GradoopId>())
-//        .join(graph.getVertices())
-//        .where(0).equalTo(new Id<>())
-//        .groupBy(1)
-//        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
-
-
-//        .join(graph.getVertices())
-//        .where(new TargetId<>()).equalTo(new Id<>())
-//        .join(graph.getVertices())
-//        .where(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(true, false, 0)).equalTo(new Id<>())
-//        .union(graph.getEdges()
-//          .join(graph.getVertices())
-//          .where(new SourceId<>()).equalTo(new Id<>())
-//          .join(graph.getVertices())
-//          .where(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(false, true, 0)).equalTo(new Id<>()))
-//        .groupBy(new GradoopIdInTuple<Tuple2<Tuple2<Edge, Vertex>, Vertex>>(0, 1))
-//        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
-
-
-//        .groupBy(new GradoopIdInTuple<Tuple2<Tuple2<Edge, Vertex>, Vertex>>(0, 1))
-//        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()))
-//        .union(graph.getEdges()
-//          .join(graph.getVertices())
-//          .where(new SourceId<>()).equalTo(new Id<>())
-//          .join(graph.getVertices())
-//          .where(new GradoopIdInTuple<Tuple2<Edge, Vertex>>(false, true, 0)).equalTo(new Id<>())
-//          .groupBy(new GradoopIdInTuple<Tuple2<Tuple2<Edge, Vertex>, Vertex>>(0, 1))
-//          .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction())));
       break;
     default:
       vertices = null;
