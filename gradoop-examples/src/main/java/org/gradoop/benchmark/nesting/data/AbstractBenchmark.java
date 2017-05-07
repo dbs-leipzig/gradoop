@@ -49,6 +49,11 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
    */
   private static final String NON_HDFS_PATH = "l";
 
+  /**
+   * Tells which is the server where the json benchmark files are stores
+   */
+  private static final String JSON_SERVER = "j";
+
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true, "Graph File in " +
@@ -61,6 +66,8 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
       "Number of slaves used for benchmark");
     OPTIONS.addOption(NON_HDFS_PATH, "flink", false, "Tells to use " +
       "FLINK explicitely");
+    OPTIONS.addOption(JSON_SERVER, "server", true, "Tells which is the " +
+      "server where the json benchmark files are stores");
   }
 
   /**
@@ -89,10 +96,13 @@ public abstract class AbstractBenchmark extends NestingFilenameConvention implem
     T runner = clazz.getConstructor(String.class, String.class)
                     .newInstance(cmd.getOptionValue(OPTION_INPUT_PATH),
                                  cmd.getOptionValue(OUTPUT_EXPERIMENT));
+
     runner.performOperation();
     runner.benchmarkOperation();
-    runner.benchmark(Integer.parseInt(cmd.getOptionValue(OPTION_SLAVES_NO)), Integer.parseInt(cmd
-      .getOptionValue(OPTION_PARALL_NO)));
+
+    runner.benchmark(Integer.parseInt(cmd.getOptionValue(OPTION_SLAVES_NO)),
+                     Integer.parseInt(cmd.getOptionValue(OPTION_PARALL_NO)),
+                     cmd.getOptionValue(JSON_SERVER));
   }
 
   /**

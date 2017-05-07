@@ -36,6 +36,7 @@ import org.gradoop.flink.model.impl.operators.nest.functions.AddElementToGraph;
 import org.gradoop.flink.model.impl.operators.nest.functions.AssociateAndMark;
 import org.gradoop.flink.model.impl.operators.nest.functions.CollectVerticesFromHex;
 import org.gradoop.flink.model.impl.operators.nest.functions.DemultiplexIdsWithActualElements;
+import org.gradoop.flink.model.impl.operators.nest.functions.DemultiplexIdsWithActualElements2;
 import org.gradoop.flink.model.impl.operators.nest.functions.GraphHeadToVertex;
 import org.gradoop.flink.model.impl.operators.nest.functions.NotGraphHead;
 import org.gradoop.flink.model.impl.operators.nest.functions.ReplaceHeadId;
@@ -198,8 +199,8 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
 
     DataSet<Vertex> vertices = self.getGraphVertexMap()
       .coGroup(flattenedGraph.getVertices())
-      .where(new Value1Of2<>()).equalTo(new Id<>())
-      .with(new DemultiplexIdsWithActualElements<>());
+      .where(1).equalTo(new Id<>())
+      .with(new DemultiplexIdsWithActualElements2<>());
 
     DataSet<Edge> edges = self.getGraphEdgeMap()
       .coGroup(flattenedGraph.getEdges())

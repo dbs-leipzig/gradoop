@@ -17,6 +17,7 @@
 package org.gradoop.benchmark.nesting.data;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -32,11 +33,11 @@ import org.gradoop.benchmark.nesting.functions.StringAsVertex;
 import org.gradoop.benchmark.nesting.functions.TripleWithGraphHeadToId;
 import org.gradoop.benchmark.nesting.functions.Value1Of3AsFilter;
 import org.gradoop.benchmark.nesting.serializers.data.DeserializeEdgeInformation;
-import org.gradoop.benchmark.nesting.serializers.data.DeserializeInGraphInformation;
 import org.gradoop.benchmark.nesting.serializers.data.DeserializeElementInformation;
+import org.gradoop.benchmark.nesting.serializers.data.DeserializeInGraphInformation;
 import org.gradoop.benchmark.nesting.serializers.data.SerializeEdgeInformation;
-import org.gradoop.benchmark.nesting.serializers.data.SerializeInGraphInformation;
 import org.gradoop.benchmark.nesting.serializers.data.SerializeElementInformation;
+import org.gradoop.benchmark.nesting.serializers.data.SerializeInGraphInformation;
 import org.gradoop.benchmark.nesting.serializers.indices.DeserializeGradoopidFromFile;
 import org.gradoop.benchmark.nesting.serializers.indices.DeserializePairOfIdsFromFile;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -278,9 +279,10 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
    * Starts the benchmark
    * @param slaves      Number of the slaves used
    * @param parallNo    Number of the parallelization used
+   * @param server      Server where to retrieve the json values
    * @throws Exception
    */
-  public void benchmark(int slaves, int parallNo) throws Exception {
+  public void benchmark(int slaves, int parallNo, String server) throws Exception {
     record();
     String plan = ENVIRONMENT.getExecutionPlan();
 
@@ -289,12 +291,43 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
 
     String[] no = this.basePath.split(Path.SEPARATOR);
 
-    String planFile = System.getProperty("user.home");
-    planFile += planFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
-    planFile += getClass().getSimpleName() + "_slaves=" + slaves + "_parall=" + parallNo +
-      "_size=" + no[no.length - 1] + ".json";
+    ArrayList<String> retrieverArgs = new ArrayList<>();
+    StringBuilder sb = new StringBuilder();
+    sb.append(System.getProperty("user.home"));
+    sb.append(System.getProperty("user.home").endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR);
+    sb.append(getClass().getSimpleName())
+      .append("_slaves=")
+      .append(slaves)
+      .append("_parall=")
+      .append(parallNo)
+      .append("_size=")
+      .append(no[no.length - 1])
+      .append(".json");
+    String planFile = sb.toString();
+
+    // First argument: file where to read the query plan
+    retrieverArgs.add(planFile);
+
     Files.write(Paths.get(planFile), plan.getBytes(Charset.forName("UTF-8")), StandardOpenOption
       .TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+    // Second argument: the server where the operations are carried out
+    retrieverArgs.add(server);
+
+    // Third argument: the job id associated
+    JobExecutionResult result = ENVIRONMENT.getLastJobExecutionResult();
+    retrieverArgs.add(result.getJobID().toString());
+
+    String argumentsFile = System.getProperty("user.home");
+    argumentsFile += argumentsFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
+    argumentsFile += "argument";
+    File f = new File(argumentsFile);
+    if (f.exists()) {
+      if (!f.delete()) {
+        System.err.println("Error while removing the file: " + argumentsFile);
+      }
+    }
+    Files.write(f.toPath(), retrieverArgs, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
 
     // Writing the result of the benchmark to the file
     String line = getClass().getSimpleName() + "," +
@@ -302,7 +335,7 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
       slaves + "," +
       parallNo + "," +
       no[no.length - 1] + "," +
-      ENVIRONMENT.getLastJobExecutionResult().getNetRuntime() + "\n";
+      result.getNetRuntime() + "\n";
 
     Files.write(Paths.get(this.csvPath), line.getBytes(Charset.forName("UTF-8")),
       StandardOpenOption.CREATE, StandardOpenOption.APPEND);

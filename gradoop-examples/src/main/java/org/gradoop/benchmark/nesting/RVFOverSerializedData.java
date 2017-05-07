@@ -72,10 +72,14 @@ public class RVFOverSerializedData extends AbstractBenchmark {
   public void performOperation() throws IOException {
     String path = getBasePath();
     LogicalGraph flat = readGraphInMyCSVFormat(path);
-    leftOperand = NestingBase.toLogicalGraph(loadNestingIndex(generateOperandBasePath(path,
-      true)), flat);
-    rightOperand = NestingBase.toGraphCollection(loadNestingIndex(generateOperandBasePath(path,
-      false)), flat);
+    leftOperand = NestingBase
+      .toLogicalGraph
+        (loadNestingIndex(generateOperandBasePath(path, true)), flat);
+
+    rightOperand = NestingBase
+      .toGraphCollection
+        (loadNestingIndex(generateOperandBasePath(path, false)), flat);
+
     model = new ReduceVertexFusion();
     result = model.execute(leftOperand, rightOperand);
   }

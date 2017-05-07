@@ -152,8 +152,8 @@ public class Hexaplet extends Tuple6<GradoopId, GradoopId, GradoopId, GradoopId,
   public void update(Edge pojo, boolean matchWithSource) {
     f0 = pojo.getId();
     f1 = pojo.getSourceId();
-    f2 = matchWithSource ? f1 : f3;
     f3 = pojo.getTargetId();
+    f2 = matchWithSource ? f1 : f3;
     f4 = GradoopId.NULL_VALUE;
     f5 = GradoopId.NULL_VALUE;
   }
