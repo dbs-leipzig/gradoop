@@ -38,7 +38,6 @@ import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple
  */
 public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
 
-
   /**
    * Valued constructor.
    *

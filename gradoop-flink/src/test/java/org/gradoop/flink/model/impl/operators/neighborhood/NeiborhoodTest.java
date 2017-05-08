@@ -26,7 +26,6 @@ import org.junit.Test;
 
 public class NeiborhoodTest extends GradoopFlinkTestBase {
 
-
   // Reduce on Edge Tests
 
   @Test
@@ -121,7 +120,6 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
-
 
   // Reduce on Neighbor Tests
 
@@ -312,7 +310,6 @@ public class NeiborhoodTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
-
 
   // Group Reduce on Neighbor Tests
 
