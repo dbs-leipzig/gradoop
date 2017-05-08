@@ -81,26 +81,26 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     throws Exception {
     CsvExtension csv = tuple.f0;
     String content = tuple.f1;
-    //the single values of each line
+    // the single values of each line
     String[] fields = content.split(Pattern.quote(csv.getSeparator()));
-    //create the graphhead
+    // create the graphhead
     if (csv.getGraphhead() != null) {
       collector.collect(createGraphHead(csv, fields));
     }
-    //create the vertex
+    // create the vertex
     if (csv.getVertex() != null) {
       EPGMElement vertex = createVertex(csv, fields);
-      //if the vertex also defines outgoing edges they are collected too
+      // if the vertex also defines outgoing edges they are collected too
       if (csv.getVertex().getEdges() != null) {
         for (Vertexedge vertexEdge : csv.getVertex().getEdges().getVertexedge()) {
-          //creates and collects an edge with the current vertex as source
+          // creates and collects an edge with the current vertex as source
           collector.collect(createEdge(csv, fields, vertexEdge, vertex.getPropertyValue(
               XMLBasedCSVConstants.PROPERTY_KEY_KEY).getString()));
         }
       }
       collector.collect(vertex);
     }
-    //create the edge
+    // create the edge
     if (csv.getEdge() != null) {
       collector.collect(createEdge(csv, fields));
     }
@@ -117,18 +117,18 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields) {
     String label = "";
     List<Property> propertiesCsv = null;
-    //if the label is set in the meta file it is read from csv line
+    // if the label is set in the meta file it is read from csv line
     if (csv.getGraphhead().getLabel() != null) {
       label = createLabel(csv.getGraphhead().getLabel(), fields);
     }
-    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    // contains information about the actual class (e.g. tablename) and the actual id (e.g.
     // primary key)
     Key key = csv.getGraphhead().getKey();
     if (csv.getGraphhead().getProperties() != null) {
-      //meta information about the properties
+      // meta information about the properties
       propertiesCsv = csv.getGraphhead().getProperties().getProperty();
     }
-    //if there are properties set in the meta file they are read from the csv line
+    // if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     return graphHeadFactory.createGraphHead(label, properties);
   }
@@ -144,25 +144,25 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields) {
     String label = "";
     List<Property> propertiesCsv = null;
-    //if the label is set in the meta file it is read from csv line
+    // if the label is set in the meta file it is read from csv line
     if (csv.getVertex().getLabel() != null) {
       label = createLabel(csv.getVertex().getLabel(), fields);
     }
-    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
-    //primary key)
+    // contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    // primary key)
     Key key = csv.getVertex().getKey();
     if (csv.getVertex().getProperties() != null) {
-      //meta information about the properties
+      // meta information about the properties
       propertiesCsv = csv.getVertex().getProperties().getProperty();
     }
-    //class name (e.g. tablename)
+    // class name (e.g. tablename)
     String className = key.getClazz();
-    //meta information about the graphs the vertex is contained in
+    // meta information about the graphs the vertex is contained in
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
-    //List containing the keys of graphs the vertex is part of
+    // List containing the keys of graphs the vertex is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-    //if there are properties set in the meta file they are read from the csv line
+    // if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
 
@@ -178,7 +178,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private org.gradoop.common.model.impl.pojo.Edge createEdge(CsvExtension csv,
     String[] fields) {
-    //'null' and "" to create a normal edge and not one initialized by a vertex
+    // 'null' and "" to create a normal edge and not one initialized by a vertex
     return createEdge(csv, fields, null, "");
   }
 
@@ -196,49 +196,49 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     String[] fields, Vertexedge edge, String fullKey) {
     String label = "";
     List<Property> propertiesCsv = null;
-    //in this case it is a normal edge and none initialized by a vertex
+    // in this case it is a normal edge and none initialized by a vertex
     if (edge == null) {
       edge = csv.getEdge();
     }
-    //if the label is set in the meta file it is read from csv line
+    // if the label is set in the meta file it is read from csv line
     if (edge.getLabel() != null) {
       label = createLabel(edge.getLabel(), fields);
     }
-    //contains information about the actual class (e.g. tablename) and the actual id (e.g.
-    //primary key)
+    // contains information about the actual class (e.g. tablename) and the actual id (e.g.
+    // primary key)
     Key key = edge.getKey();
     if (edge.getProperties() != null) {
-      //meta information about the properties
+      // meta information about the properties
       propertiesCsv = edge.getProperties().getProperty();
     }
-    //class name (e.g. tablename)
+    // class name (e.g. tablename)
     String className = edge.getKey().getClazz();
-    //meta information about the graphs the vertex is contained in
+    // meta information about the graphs the vertex is contained in
     List<Graph> graphs = edge.getGraphs().getGraph();
-    //List containing the keys of graphs the edge is part of
+    // List containing the keys of graphs the edge is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
       className, fields);
-    //if there are properties set in the meta file they are read from the csv line
+    // if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
-    //tuple used to create the source and the target key
+    // tuple used to create the source and the target key
     ReferenceTuple referenceTuple;
     // normal edge, so information about the source can be read by the
     // xmlbasedcsv-edge meta information
     if (fullKey.equals("")) {
-      //relevant key information for the source
+      // relevant key information for the source
       referenceTuple = createKeyTupleFromStaticOrRefOrReference(
         csv.getEdge().getSource().getContent(), fields, csv.getDatasourceName(),
         csv.getDomainName(), className);
       fullKey = createKey(referenceTuple);
     }
-    //write the source key content as edge property
+    // write the source key content as edge property
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_SOURCE, fullKey);
-    //relevant key information for the target
+    // relevant key information for the target
     referenceTuple = createKeyTupleFromStaticOrRefOrReference(edge.getTarget().getContent(),
       fields, csv.getDatasourceName(), csv.getDomainName(), className);
     fullKey = createKey(referenceTuple);
-    //write the target key content as edge property
+    // write the target key content as edge property
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_TARGET, fullKey);
 
     return edgeFactory.createEdge(label, GradoopId.get(), GradoopId.get(), properties);
@@ -259,13 +259,13 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     StringBuilder sb = new StringBuilder();
     boolean notFirst = false;
     for (Graph graph : graphs) {
-      //set the separator in front of each graphs key except the first
+      // set the separator in front of each graphs key except the first
       if (!notFirst) {
         notFirst = true;
       } else {
         sb.append(XMLBasedCSVConstants.SEPARATOR_GRAPHS);
       }
-      //adds a key of a graph to the 'list'
+      // adds a key of a graph to the 'list'
       sb.append(createKey(createKeyTupleFromStaticOrRefOrReference(
         graph.getContent(), fields, datasourceName, domainName, className)).replaceAll(
           XMLBasedCSVConstants.SEPARATOR_GRAPHS, XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS));
@@ -285,20 +285,20 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private ReferenceTuple createKeyTupleFromStaticOrRefOrReference(List<Serializable> objects,
     String[] fields, String datasourceName, String domainName, String className) {
-    //this string contains the id
+    // this string contains the id
     StringBuilder contentString = new StringBuilder();
     String ref;
     for (Object object : objects) {
-      //xsd type allows one static element and an optional ref element or no static element and one
-      //ref element or one reference element
+      // xsd type allows one static element and an optional ref element or no static element and one
+      // ref element or one reference element
       ref = getEntryFromStaticOrRef(object, fields, XMLBasedCSVConstants.SEPARATOR_ID);
-      //object is static or ref
+      // object is static or ref
       if (!ref.equals("")) {
         contentString.append(ref);
-      //object is reference
+      // object is reference
       } else if (Reference.class.isInstance(object)) {
         Reference reference = (Reference) object;
-        //set datasource and or domain if set in reference
+        // set datasource and or domain if set in reference
         if (reference.getDatasourceName() != null) {
           datasourceName = reference.getDatasourceName();
         }
@@ -306,7 +306,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
           domainName = reference.getDomainName();
         }
         className = reference.getKey().getClazz();
-        //append the id from the csv line
+        // append the id from the csv line
         contentString.append(this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
           fields, XMLBasedCSVConstants.SEPARATOR_ID));
       }
@@ -329,10 +329,10 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     boolean notFirst = false;
     boolean hasSeparator = !separator.equals("");
     for (Object object : objects) {
-      //xsd type allows one static element and an optional ref element or no static element and one
-      //ref element
+      // xsd type allows one static element and an optional ref element or no static element and one
+      // ref element
       contentString.append(getEntryFromStaticOrRef(object, fields, separator));
-      //add separator in front of each added content except the first one
+      // add separator in front of each added content except the first one
       if (notFirst && hasSeparator) {
         contentString.append(separator);
       } else {
@@ -353,19 +353,19 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private String getEntryFromStaticOrRef(Object object, String[] fields, String separator) {
     StringBuilder contentString = new StringBuilder();
     String fieldContent;
-      //xsd type allows one static element and optional ref elements or no static element and at
-      //least one ref element
+      // xsd type allows one static element and optional ref elements or no static element and at
+      // least one ref element
     if (Static.class.isInstance(object)) {
       contentString.append(((Static) object).getName());
     } else if (Ref.class.isInstance(object)) {
       fieldContent = fields[((Ref) object).getColumnId().intValue()];
-      //used to either replace all label separators in case a labels content is needed
+      // used to either replace all label separators in case a labels content is needed
       switch (separator) {
       case XMLBasedCSVConstants.SEPARATOR_LABEL:
         fieldContent = fieldContent.replaceAll(XMLBasedCSVConstants.SEPARATOR_LABEL,
           XMLBasedCSVConstants.ESCAPE_SEPARATOR_LABEL);
         break;
-      //or replace all id separators in case an ids content is needed
+      // or replace all id separators in case an ids content is needed
       case XMLBasedCSVConstants.SEPARATOR_ID:
         fieldContent = fieldContent.replaceAll(XMLBasedCSVConstants.SEPARATOR_ID,
           XMLBasedCSVConstants.ESCAPE_SEPARATOR_ID);
@@ -400,19 +400,19 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    */
   private String createKey(ReferenceTuple tuple) {
     StringBuilder sb = new StringBuilder();
-    //datasource name
+    // datasource name
     sb.append(tuple.getDatasourceName().replaceAll(XMLBasedCSVConstants.SEPARATOR_KEY,
       XMLBasedCSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(XMLBasedCSVConstants.SEPARATOR_KEY);
-    //domain name
+    // domain name
     sb.append(tuple.getDomainName().replaceAll(
       XMLBasedCSVConstants.SEPARATOR_KEY, XMLBasedCSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(XMLBasedCSVConstants.SEPARATOR_KEY);
-    //class name
+    // class name
     sb.append(tuple.getClassName().replaceAll(
       XMLBasedCSVConstants.SEPARATOR_KEY, XMLBasedCSVConstants.ESCAPE_SEPARATOR_KEY));
     sb.append(XMLBasedCSVConstants.SEPARATOR_ID_START);
-    //ids
+    // ids
     sb.append(tuple.getId().replaceAll(
       XMLBasedCSVConstants.SEPARATOR_ID_START, XMLBasedCSVConstants.ESCAPE_SEPARATOR_ID_START));
     return sb.toString();
@@ -430,7 +430,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
   private Properties createProperties(CsvExtension csv, List<Property> properties,
     Key key, String[] fields) {
     Properties list = Properties.create();
-    //add a property which contains the key defined by datasource name,...
+    // add a property which contains the key defined by datasource name,...
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
         getEntriesFromStaticOrRef(key.getContent(), fields, XMLBasedCSVConstants.SEPARATOR_ID)));
@@ -438,17 +438,18 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     value.setString(resultKey);
     list.set(XMLBasedCSVConstants.PROPERTY_KEY_KEY, value);
 
-    //load all properties and set their type according to the type specified in the meta information
+    // load all properties and set their type according to the type specified in the meta
+    // information
     if (properties != null && !properties.isEmpty()) {
       for (Property p : properties) {
-        //gradoop property and not the one defined by the xsd
+        // gradoop property and not the one defined by the xsd
         org.gradoop.common.model.impl.properties.Property prop
           = new org.gradoop.common.model.impl.properties.Property();
 
         prop.setKey(p.getName());
         value = new PropertyValue();
         String type = csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
-        //set the properties dependent on their type specified in the xsd
+        // set the properties dependent on their type specified in the xsd
         switch (type) {
         case "String":
           value.setString(fields[p.getColumnId()]);

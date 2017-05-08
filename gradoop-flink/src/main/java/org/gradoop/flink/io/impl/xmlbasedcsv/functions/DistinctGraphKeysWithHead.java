@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.io.impl.xmlbasedcsv.XMLBasedCSVConstants;
 
 /**
- * Selects only the tuple where the graphhead is not null or creates a new graphhead if now graph
+ * Selects only the tuple where the graphhead is not null or creates a new graphhead if no graph
  * key has an assigned graphhead. The input is grouped by Tuple.f0.
  */
 public class DistinctGraphKeysWithHead

@@ -49,20 +49,20 @@ public class XmlMetaParser {
    */
   public static Datasource parse(String xsdSchema, String xmlDatei)
     throws SAXException, JAXBException, IOException {
-    //initialize the context with the xsd schema
+    // initialize the context with the xsd schema
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = (xsdSchema == null || xsdSchema.trim().length() == 0) ?
       null : schemaFactory.newSchema(new File(xsdSchema));
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName());
-    //initialize the unmarshaller from the context and the schema
+    // initialize the unmarshaller from the context and the schema
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     unmarshaller.setSchema(schema);
     unmarshaller.setEventHandler(new XmlValidationEventHandler());
-    //load the xml file to unmarshall
+    // load the xml file to unmarshall
     FileInputStream fileInputStream = new FileInputStream(xmlDatei);
     Datasource source;
     try {
-      //load the xml file and cast to the outer xml element
+      // load the xml file and cast to the outer xml element
       source = (Datasource) unmarshaller.unmarshal(fileInputStream);
     } finally {
       fileInputStream.close();

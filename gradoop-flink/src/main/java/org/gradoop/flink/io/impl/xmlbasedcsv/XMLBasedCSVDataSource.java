@@ -136,28 +136,28 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
           .map(new CSVToContent(csvFile)));
     }
 
-    //map each content line to an epgm element
+    // map each content line to an epgm element
     DataSet<EPGMElement> elements = csvContent
       .flatMap(new CSVToElement(graphHeadFactory, vertexFactory, edgeFactory));
 
-    //get all the graph heads
+    // get all the graph heads
     graphHeads = elements
       .filter(new CSVTypeFilter(GraphHead.class))
       .map(new EPGMElementToPojo<GraphHead>())
       .returns(graphHeadFactory.getType());
 
-    //get all vertices
+    // get all vertices
     vertices = elements
       .filter(new CSVTypeFilter(Vertex.class))
       .map(new EPGMElementToPojo<Vertex>())
       .returns(vertexFactory.getType());
 
-    //create map from class key to gradoop id
+    // create map from class key to gradoop id
     DataSet<Map<String, GradoopId>> vertexIds = vertices
       .map(new VertexToVertexIds())
       .reduceGroup(new VertexIdsToMap());
 
-    //get all edges and adjust the vertex keys to their corresponding gradoop id
+    // get all edges and adjust the vertex keys to their corresponding gradoop id
     edges = elements
       .filter(new CSVTypeFilter(Edge.class))
       .map(new EPGMElementToPojo<Edge>())
@@ -165,20 +165,20 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
       .map(new GradoopEdgeIds())
       .withBroadcastSet(vertexIds, XMLBasedCSVConstants.BROADCAST_ID_MAP);
 
-    //get all graph keys from vertex properties
+    // get all graph keys from vertex properties
     DataSet<Tuple2<Vertex, String>> vertexGraphKeys = vertices
       .flatMap(new ElementToElementGraphKey<Vertex>());
 
-    //get all graph keys from edge properties
+    // get all graph keys from edge properties
     DataSet<Tuple2<Edge, String>> edgeGraphKeys = edges
       .flatMap(new ElementToElementGraphKey<Edge>());
 
-    //map each graphhead to its key from xml file
+    // map each graphhead to its key from xml file
     DataSet<Tuple2<String, GraphHead>> keyGraphHead = graphHeads
       .map(new GraphHeadToGraphKeyGraphHead());
 
-    //take all distinct graph keys which were read from or created for a vertex those are not yet
-    //mapped to an existing graphhead
+    // take all distinct graph keys which were read from or created for a vertex those are not yet
+    // mapped to an existing graphhead
     keyGraphHead = keyGraphHead
       .union(vertexGraphKeys
           .map(new Value1Of2<Vertex, String>())
@@ -187,24 +187,24 @@ public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource
         .distinct()
         .map(new GraphKeyToGraphKeyNullGraphHead()));
 
-    //distinct(groupbBy+reduceGroup) with validation that only existing graphhead is used, if
-    //there is one, otherwise a graphhead is created
+    // distinct(groupbBy+reduceGroup) with validation that only existing graphhead is used, if
+    // there is one, otherwise a graphhead is created
     keyGraphHead = keyGraphHead
       .groupBy(0)
       .reduceGroup(new DistinctGraphKeysWithHead(graphHeadFactory));
 
-    //all graphheads
+    // all graphheads
     graphHeads = keyGraphHead.map(new Value1Of2<String, GraphHead>());
-    //contains one map from graph key to gradoop id
+    // contains one map from graph key to gradoop id
     DataSet<Map<String, GradoopId>> graphHeadMap = graphHeads.reduceGroup(new GraphHeadKeyMap());
 
-    //set all graph heads
+    // set all graph heads
     vertices = vertexGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<Vertex>())
       .withBroadcastSet(graphHeadMap, XMLBasedCSVConstants.BROADCAST_GRAPHHEADS);
 
-    //set all graph heads
+    // set all graph heads
     edges = edgeGraphKeys
       .groupBy("f0.id")
       .reduceGroup(new SetElementGraphIds<Edge>())
