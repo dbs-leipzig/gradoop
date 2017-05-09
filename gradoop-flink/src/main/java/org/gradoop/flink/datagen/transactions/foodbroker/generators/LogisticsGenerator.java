@@ -49,10 +49,6 @@ public class LogisticsGenerator
     List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.LOGISTICS_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
-    List<String> companies = foodBrokerConfig
-      .getStringValuesFromFile("companies");
-    List<String> holdings = foodBrokerConfig
-      .getStringValuesFromFile("holdings");
     List<String> adjectives = foodBrokerConfig
       .getStringValuesFromFile("logistics.adjectives");
     List<String> nouns = foodBrokerConfig
@@ -63,8 +59,6 @@ public class LogisticsGenerator
       .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
       .withBroadcastSet(env.fromCollection(nouns), Constants.NOUNS_BC)
       .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
-      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
-      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }

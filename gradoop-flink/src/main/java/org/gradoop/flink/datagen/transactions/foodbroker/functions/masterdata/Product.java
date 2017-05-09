@@ -153,7 +153,7 @@ public class Product extends MasterData {
     int randomProduct = random.nextInt(adjectiveCount);
     properties.set(Constants.NAME_KEY, adjectives.get(randomProduct) + " " +  nameGroupPair.f0);
 
-    properties.set(Constants.TYPE_KEY, nameGroupPair.f1);
+    properties.set(Constants.PRODUCT_TYPE_KEY, nameGroupPair.f1);
 
     int minLevel = 1;
     int maxLevel = 6;

@@ -98,6 +98,26 @@ public class Employee extends Person {
     }
     vertex.setProperty(Constants.NAME_KEY, name);
     vertex.setProperty(Constants.GENDER_KEY, gender);
+
+    //update quality and set type
+    Float quality = vertex.getPropertyValue(Constants.QUALITY_KEY).getFloat();
+    Double assistantRatio = getFoodBrokerConfig().getMasterDataTypeAssistantRatio(getClassName());
+    Double normalRatio = getFoodBrokerConfig().getMasterDataTypeNormalRatio(getClassName());
+    Double rnd = random.nextDouble();
+    if (rnd <= assistantRatio) {
+      quality *= getFoodBrokerConfig().getMasterDataTypeAssistantInfluence();
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_ASSISTANT);
+    } else if (rnd >= assistantRatio + normalRatio) {
+      quality *= getFoodBrokerConfig().getMasterDataTypeSupervisorInfluence();
+      if (quality > 1f) {
+        quality = 1f;
+      }
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_SUPERVISOR);
+    } else {
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_NORMAL);
+    }
+    vertex.setProperty(Constants.QUALITY_KEY, quality);
+
     return vertex;
   }
 

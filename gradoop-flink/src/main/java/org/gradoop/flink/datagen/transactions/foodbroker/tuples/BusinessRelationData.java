@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 /**
  * Tuple which contains relevant person data: quality, city and holding.
  */
-public class RelevantPersonData extends Tuple3<Float, String, String> {
+public class BusinessRelationData extends Tuple3<Float, String, String> implements PersonData {
 
   public Float getQuality() {
     return f0;

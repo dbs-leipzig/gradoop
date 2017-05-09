@@ -49,10 +49,6 @@ public class EmployeeGenerator
     List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.EMPLOYEE_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
-    List<String> companies = foodBrokerConfig
-      .getStringValuesFromFile("companies");
-    List<String> holdings = foodBrokerConfig
-      .getStringValuesFromFile("holdings");
     List<String> firstNamesFemale = foodBrokerConfig
       .getStringValuesFromFile("employee.first_names_female");
     List<String> firstNamesMale = foodBrokerConfig
@@ -66,8 +62,6 @@ public class EmployeeGenerator
       .withBroadcastSet(env.fromCollection(firstNamesMale), Constants.FIRST_NAMES_MALE_BC)
       .withBroadcastSet(env.fromCollection(nouns), Constants.LAST_NAMES_BC)
       .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
-      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
-      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }

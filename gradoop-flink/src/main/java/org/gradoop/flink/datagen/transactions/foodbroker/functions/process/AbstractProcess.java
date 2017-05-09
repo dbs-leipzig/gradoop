@@ -32,7 +32,8 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
-import org.gradoop.flink.datagen.transactions.foodbroker.tuples.RelevantPersonData;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.EmployeeData;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -67,7 +68,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the employee quality of a given gradoop id.
    */
-  protected Map<GradoopId, RelevantPersonData> employeeMap;
+  protected Map<GradoopId, EmployeeData> employeeMap;
   /**
    * Map to get the product quality of a given gradoop id.
    */
@@ -108,11 +109,11 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the customer quality of a given gradoop id.
    */
-  private Map<GradoopId, RelevantPersonData> customerMap;
+  private Map<GradoopId, BusinessRelationData> customerMap;
   /**
    * Map to get the vendor quality of a given gradoop id.
    */
-  private Map<GradoopId, RelevantPersonData> vendorMap;
+  private Map<GradoopId, BusinessRelationData> vendorMap;
   /**
    * List of all customers.
    */
@@ -158,16 +159,16 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted maps
-    customerMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
+    customerMap = getRuntimeContext().<Map<GradoopId, BusinessRelationData>>
       getBroadcastVariable(Constants.CUSTOMER_MAP_BC).get(0);
 
-    vendorMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
+    vendorMap = getRuntimeContext().<Map<GradoopId, BusinessRelationData>>
       getBroadcastVariable(Constants.VENDOR_MAP_BC).get(0);
 
     logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(Constants.LOGISTIC_MAP_BC).get(0);
 
-    employeeMap = getRuntimeContext().<Map<GradoopId, RelevantPersonData>>
+    employeeMap = getRuntimeContext().<Map<GradoopId, EmployeeData>>
       getBroadcastVariable(Constants.EMPLOYEE_MAP_BC).get(0);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
@@ -333,7 +334,6 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       break;
     case Constants.EMPLOYEE_MAP_BC:
       firstCity = employeeMap.get(firstMasterDataId).getCity();
-      firstHolding = employeeMap.get(firstMasterDataId).getHolding();
       break;
     default:
       break;
@@ -350,7 +350,6 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       break;
     case Constants.EMPLOYEE_MAP_BC:
       secondCity = employeeMap.get(secondMasterDataId).getCity();
-      secondHolding = employeeMap.get(secondMasterDataId).getHolding();
       break;
     default:
       break;
@@ -359,7 +358,9 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     if (firstCity.equals(secondCity)) {
       influence *= config.getMasterDataSameCityInfluence();
     }
-    if (firstHolding.equals(secondHolding)) {
+    if (firstHolding.equals(secondHolding) &&
+      !firstHolding.equals(Constants.HOLDING_TYPE_PRIVATE)) {
+
       influence *= config.getMasterDataSameHoldingInfluence();
     }
     return influence;

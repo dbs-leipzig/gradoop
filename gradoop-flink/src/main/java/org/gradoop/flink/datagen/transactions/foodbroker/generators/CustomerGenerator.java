@@ -52,6 +52,7 @@ public class CustomerGenerator extends AbstractMasterDataGenerator {
       .getStringValuesFromFile("companies");
     List<String> holdings = foodBrokerConfig
       .getStringValuesFromFile("holdings");
+    holdings.add(Constants.HOLDING_TYPE_PRIVATE);
     List<String> adjectives = foodBrokerConfig
       .getStringValuesFromFile("customer.adjectives");
     List<String> nouns = foodBrokerConfig

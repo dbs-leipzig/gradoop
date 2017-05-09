@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * Creates a customer vertex.
  */
-public class Customer extends Person {
+public class Customer extends BusinessRelation {
   /**
    * List of possible adjectives.
    */

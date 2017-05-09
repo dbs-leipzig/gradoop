@@ -45,6 +45,10 @@ public class Constants {
    */
   public static final String PRODUCT_TYPE_NUTS = "nuts";
   /**
+   * Holding type private.
+   */
+  public static final String HOLDING_TYPE_PRIVATE = "privateHolding";
+  /**
    * Property key for master data: name.
    */
   public static final String NAME_KEY = "name";
@@ -73,9 +77,13 @@ public class Constants {
    */
   public static final String HOLDING_KEY = "holding";
   /**
-   * Property key for master data: type.
+   * Property key for employee master data: employeeType.
    */
-  public static final String TYPE_KEY = "type";
+  public static final String EMPLOYEE_TYPE_KEY = "employeeType";
+  /**
+   * Property key for product master data: productType.
+   */
+  public static final String PRODUCT_TYPE_KEY = "productType";
   /**
    * Property key for master data: gender.
    */
@@ -171,15 +179,15 @@ public class Constants {
   /**
    * Property value for type assistant.
    */
-  public static final String TYPE_ASSISTANT = "assistant";
+  public static final String EMPLOYEE_TYPE_ASSISTANT = "assistant";
   /**
    * Property value for type normal.
    */
-  public static final String TYPE_NORMAL = "normal";
+  public static final String EMPLOYEE_TYPE_NORMAL = "normal";
   /**
    * Property value for type supervisor.
    */
-  public static final String TYPE_SUPERVISOR = "supervisor";
+  public static final String EMPLOYEE_TYPE_SUPERVISOR = "supervisor";
   /**
    * Edge label.
    */
