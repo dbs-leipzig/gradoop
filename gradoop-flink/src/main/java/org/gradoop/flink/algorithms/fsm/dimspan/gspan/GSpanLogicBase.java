@@ -284,11 +284,11 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
 
             int[] childPattern = dfsCodeUtils.addExtension(parentPattern,
               toTime,
-              graphUtils.getFromLabel(graph, edgeId),
+              graphUtils.getToLabel(graph, edgeId),
               getExtensionIsOutgoing(graph, edgeId, false),
               graphUtils.getEdgeLabel(graph, edgeId),
               fromTime,
-              graphUtils.getToLabel(graph, edgeId)
+              graphUtils.getFromLabel(graph, edgeId)
             );
 
             int[] childVertexIds = parentVertexIds.clone();

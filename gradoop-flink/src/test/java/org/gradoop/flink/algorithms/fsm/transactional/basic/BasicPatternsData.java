@@ -69,4 +69,18 @@ public class BasicPatternsData {
 
     "s9[(:A)-[:a]->(:A)]" +
     "s10[(:A)-[:b]->(:B)]";
+
+  public static final String MULTI_LABELED_CIRCLE =
+    "g1[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
+    "g2[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
+
+    "s1[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
+
+    "s2[(:A)-[:a]->(:B)-[:a]->(:C)]" +
+    "s3[(:B)-[:a]->(:C)-[:a]->(:A)]" +
+    "s4[(:C)-[:a]->(:A)-[:a]->(:B)]" +
+
+    "s5[(:A)-[:a]->(:B)]" +
+    "s6[(:B)-[:a]->(:C)]" +
+    "s7[(:C)-[:a]->(:A)]";
 }
