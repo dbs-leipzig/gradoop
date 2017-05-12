@@ -1,9 +1,10 @@
 package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
-import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +74,12 @@ public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlink
         BasicPatternsData.FSM_CIRCLE_WITH_BRANCH,
         "g1,g2,g3",
         "s1,s2,s3,s4,s5,s6,s7,s8,s9,s10"
+      },
+      new String[] {
+        "Colored Circle",
+        BasicPatternsData.MULTI_LABELED_CIRCLE,
+        "g1,g2",
+        "s1,s2,s3,s4,s5,s6,s7"
       }
     );
   }
