@@ -4,13 +4,23 @@
       "offset" : 50,
       "growth" : 20,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
     },
     "Employee" : {
       "offset" : 30,
       "growth" : 10,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
     },
     "Logistics" : {
       "offset" : 10,
@@ -30,7 +40,24 @@
       "offset" : 10,
       "growth" : 5,
       "good" : 0.1,
-      "bad" : 0.1
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
+    },
+    "Company" : {
+      "companyCount" : 8,
+      "holdingCount" : 3,
+      "branchesMin" : 1,
+      "branchesMax" : 5
+    },
+    "Influence" : {
+      "assistantInfluence" : 0.8,
+      "supervisorInfluence" : 1.2,
+      "sameCityInfluence" : 1.1,
+      "sameHoldingInfluence" : 1.25
     }
   },
   "Process" : {

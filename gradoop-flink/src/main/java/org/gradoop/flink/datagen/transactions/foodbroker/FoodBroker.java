@@ -29,9 +29,9 @@ import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.GraphIdsFromEdges;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.RelevantElementsFromBrokerage;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.EmployeeDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataMapFromTuple;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.BusinessRelationDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataQualityMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.ProductPriceMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.UserClients;
@@ -42,6 +42,8 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.EmployeeGene
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.ProductGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenerator;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
+import org.gradoop.flink.datagen.transactions.foodbroker.tuples.EmployeeData;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
@@ -99,11 +101,11 @@ public class FoodBroker implements GraphCollectionGenerator {
   /**
    * Set which contains one map from the gradoop id to the quality of a customer vertex.
    */
-  private DataSet<Map<GradoopId, Float>> customerQualityMap;
+  private DataSet<Map<GradoopId, BusinessRelationData>> customerMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a vendor vertex.
    */
-  private DataSet<Map<GradoopId, Float>> vendorQualityMap;
+  private DataSet<Map<GradoopId, BusinessRelationData>> vendorMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a logistic vertex.
    */
@@ -111,7 +113,7 @@ public class FoodBroker implements GraphCollectionGenerator {
   /**
    * Set which contains one map from the gradoop id to the quality of an employee vertex.
    */
-  private DataSet<Map<GradoopId, Float>> employeesQualityMap;
+  private DataSet<Map<GradoopId, EmployeeData>> employeeMap;
   /**
    * Set which contains one map from the gradoop id to the quality of a product vertex.
    */
@@ -150,10 +152,10 @@ public class FoodBroker implements GraphCollectionGenerator {
     DataSet<GraphTransaction> brokerage = caseSeeds
       .map(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
         .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
-      .withBroadcastSet(customerQualityMap, Constants.CUSTOMER_MAP_BC)
-      .withBroadcastSet(vendorQualityMap, Constants.VENDOR_MAP_BC)
+      .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
+      .withBroadcastSet(vendorMap, Constants.VENDOR_MAP_BC)
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
-      .withBroadcastSet(employeesQualityMap, Constants.EMPLOYEE_MAP_BC)
+      .withBroadcastSet(employeeMap, Constants.EMPLOYEE_MAP_BC)
       .withBroadcastSet(productsQualityMap, Constants.PRODUCT_QUALITY_MAP_BC)
       .withBroadcastSet(productsPriceMap, Constants.PRODUCT_PRICE_MAP_BC);
 
@@ -166,13 +168,13 @@ public class FoodBroker implements GraphCollectionGenerator {
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig, complaintSeed))
-      .withBroadcastSet(customerQualityMap, Constants.CUSTOMER_MAP_BC)
-      .withBroadcastSet(vendorQualityMap, Constants.VENDOR_MAP_BC)
+      .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
+      .withBroadcastSet(vendorMap, Constants.VENDOR_MAP_BC)
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
-      .withBroadcastSet(employeesQualityMap, Constants.EMPLOYEE_MAP_BC)
+      .withBroadcastSet(employeeMap, Constants.EMPLOYEE_MAP_BC)
       .withBroadcastSet(productsQualityMap, Constants.PRODUCT_QUALITY_MAP_BC)
-      .withBroadcastSet(employees, Employee.CLASS_NAME)
-      .withBroadcastSet(customers, Customer.CLASS_NAME);
+      .withBroadcastSet(employees, Constants.EMPLOYEE_VERTEX_LABEL)
+      .withBroadcastSet(customers, Constants.CUSTOMER_VERTEX_LABEL);
 
     DataSet<GraphTransaction> complaintHandling = complaintHandlingTuple
       .map(new Value0Of2<GraphTransaction, Set<Vertex>>());
@@ -233,18 +235,18 @@ public class FoodBroker implements GraphCollectionGenerator {
     products = new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
 
     // reduce all master data objects to their id and their quality value
-    customerQualityMap = customers
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
-    vendorQualityMap = vendors
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
+    customerMap = customers
+      .map(new BusinessRelationDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<BusinessRelationData>());
+    vendorMap = vendors
+      .map(new BusinessRelationDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<BusinessRelationData>());
     logisticsQualityMap = logistics
       .map(new MasterDataQualityMapper())
       .reduceGroup(new MasterDataMapFromTuple<Float>());
-    employeesQualityMap = employees
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
+    employeeMap = employees
+      .map(new EmployeeDataMapper())
+      .reduceGroup(new MasterDataMapFromTuple<EmployeeData>());
     productsQualityMap = products
       .map(new MasterDataQualityMapper())
       .reduceGroup(new MasterDataMapFromTuple<Float>());

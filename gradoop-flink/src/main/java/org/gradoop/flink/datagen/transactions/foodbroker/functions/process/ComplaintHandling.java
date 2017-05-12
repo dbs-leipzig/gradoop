@@ -35,8 +35,6 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.math.BigDecimal;
@@ -96,8 +94,8 @@ public class ComplaintHandling
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
-    customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
+    employees = getRuntimeContext().getBroadcastVariable(Constants.EMPLOYEE_VERTEX_LABEL);
+    customers = getRuntimeContext().getBroadcastVariable(Constants.CUSTOMER_VERTEX_LABEL);
   }
 
   @Override
@@ -489,7 +487,7 @@ public class ComplaintHandling
       Vertex employee = getEmployeeById(employeeId);
       properties = employee.getProperties();
       String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Employee.ACRONYM, Constants.USER_ACRONYM);
+      sourceIdKey = sourceIdKey.replace(Constants.EMPLOYEE_ACRONYM, Constants.USER_ACRONYM);
       sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, sourceIdKey);
       properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
@@ -523,7 +521,7 @@ public class ComplaintHandling
       Vertex customer = getCustomerById(customerId);
       properties = customer.getProperties();
       String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Customer.ACRONYM, Constants.CLIENT_ACRONYM);
+      sourceIdKey = sourceIdKey.replace(Constants.CUSTOMER_ACRONYM, Constants.CLIENT_ACRONYM);
       sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
       properties.set(Constants.SOURCEID_KEY, sourceIdKey);
       properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());

@@ -20,6 +20,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -28,25 +29,25 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Creates a vendor vertex.
+ * Creates a person vertex.
  */
-public class Vendor extends BusinessRelation {
+public abstract class Person extends MasterData {
   /**
-   * List of possible adjectives.
+   * List of possible cities.
    */
-  private List<String> adjectives;
+  private List<String> cities;
   /**
-   * List of possible nouns.
+   * Amount of pissible cities.
    */
-  private List<String> nouns;
+  private Integer cityCount;
   /**
-   * Amount of possible adjectives.
+   * EPGM vertex factory.
    */
-  private Integer adjectiveCount;
+  private final VertexFactory vertexFactory;
   /**
-   * Amount of possible nouns.
+   * FoodBroker configuration.
    */
-  private Integer nounCount;
+  private FoodBrokerConfig foodBrokerConfig;
 
   /**
    * Valued constructor.
@@ -54,38 +55,40 @@ public class Vendor extends BusinessRelation {
    * @param vertexFactory EPGM vertex factory
    * @param foodBrokerConfig FoodBroker configuration
    */
-  public Vendor(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
-    super(vertexFactory, foodBrokerConfig);
+  public Person(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
+    this.vertexFactory = vertexFactory;
+    this.foodBrokerConfig = foodBrokerConfig;
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
-    //get their sizes
-    nounCount = nouns.size();
-    adjectiveCount = adjectives.size();
+    cities = getRuntimeContext().getBroadcastVariable(Constants.CITIES_BC);
+    //get the size
+    cityCount = cities.size();
   }
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    //set rnd name
+    //create standard properties from acronym and seed
+    Properties properties = createDefaultProperties(seed, getAcronym());
     Random random = new Random();
-    Vertex vertex = super.map(seed);
-    vertex.setProperty(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
-      nouns.get(random.nextInt(nounCount)));
-    return vertex;
+    //set rnd location
+    String[] location = cities.get(random.nextInt(cityCount)).split("-");
+    properties.set(Constants.CITY_KEY, location[0]);
+    properties.set(Constants.STATE_KEY, location[1]);
+    properties.set(Constants.COUNTRY_KEY, location[2]);
+
+    return vertexFactory.createVertex(getClassName(), properties);
   }
 
-  @Override
-  public String getAcronym() {
-    return Constants.VENDOR_ACRONYM;
-  }
-
-  @Override
-  public String getClassName() {
-    return Constants.VENDOR_VERTEX_LABEL;
+  /**
+   * Returns the FoodBroker configuration.
+   *
+   * @return FoodBroker configuration
+   */
+  public FoodBrokerConfig getFoodBrokerConfig() {
+    return foodBrokerConfig;
   }
 }

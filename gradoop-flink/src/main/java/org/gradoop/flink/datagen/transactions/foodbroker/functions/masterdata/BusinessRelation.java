@@ -28,64 +28,55 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Creates a vendor vertex.
+ * Creates a person vertex.
  */
-public class Vendor extends BusinessRelation {
+public abstract class BusinessRelation extends Person {
+
   /**
-   * List of possible adjectives.
+   * List of possible companies.
    */
-  private List<String> adjectives;
+  private List<String> companies;
   /**
-   * List of possible nouns.
+   * List of possible holdings.
    */
-  private List<String> nouns;
-  /**
-   * Amount of possible adjectives.
-   */
-  private Integer adjectiveCount;
-  /**
-   * Amount of possible nouns.
-   */
-  private Integer nounCount;
+  private List<String> holdings;
 
   /**
    * Valued constructor.
    *
-   * @param vertexFactory EPGM vertex factory
+   * @param vertexFactory    EPGM vertex factory
    * @param foodBrokerConfig FoodBroker configuration
    */
-  public Vendor(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
+  public BusinessRelation(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
     super(vertexFactory, foodBrokerConfig);
   }
+
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
-    //get their sizes
-    nounCount = nouns.size();
-    adjectiveCount = adjectives.size();
+    // load broadcasted lists
+    companies = getRuntimeContext().getBroadcastVariable(Constants.COMPANIES_BC);
+    holdings = getRuntimeContext().getBroadcastVariable(Constants.HOLDINGS_BC);
   }
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    //set rnd name
-    Random random = new Random();
     Vertex vertex = super.map(seed);
-    vertex.setProperty(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
-      nouns.get(random.nextInt(nounCount)));
+
+    // set rnd company
+    Random rand = new Random();
+    int companyNumber = rand.nextInt(getFoodBrokerConfig().getCompanyCount());
+    String company = companies.get(companyNumber);
+    String holding = holdings.get(companyNumber % getFoodBrokerConfig().getHoldingCount());
+    int branchNumber = rand.nextInt(
+      (getFoodBrokerConfig().getBranchMaxAmount() -
+        getFoodBrokerConfig().getBranchMinAmount()) +
+      1) + getFoodBrokerConfig().getBranchMinAmount();
+    vertex.setProperty(Constants.BRANCHNUMBER_KEY, branchNumber);
+    vertex.setProperty(Constants.COMPANY_KEY, company);
+    vertex.setProperty(Constants.HOLDING_KEY, holding);
+
     return vertex;
-  }
-
-  @Override
-  public String getAcronym() {
-    return Constants.VENDOR_ACRONYM;
-  }
-
-  @Override
-  public String getClassName() {
-    return Constants.VENDOR_VERTEX_LABEL;
   }
 }

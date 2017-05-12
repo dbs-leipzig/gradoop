@@ -19,6 +19,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Vendor;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -44,19 +45,26 @@ public class VendorGenerator extends AbstractMasterDataGenerator {
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Vendor.CLASS_NAME);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.VENDOR_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
+    List<String> companies = foodBrokerConfig
+      .getStringValuesFromFile("companies");
+    List<String> holdings = foodBrokerConfig
+      .getStringValuesFromFile("holdings");
+    holdings.add(Constants.HOLDING_TYPE_PRIVATE);
     List<String> adjectives = foodBrokerConfig
       .getStringValuesFromFile("vendor.adjectives");
     List<String> nouns = foodBrokerConfig
       .getStringValuesFromFile("vendor.nouns");
 
     return env.fromCollection(seeds)
-      .map(new Vendor(vertexFactory))
-      .withBroadcastSet(env.fromCollection(adjectives), Vendor.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Vendor.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(cities), Vendor.CITIES_BC)
+      .map(new Vendor(vertexFactory, foodBrokerConfig))
+      .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nouns), Constants.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }
