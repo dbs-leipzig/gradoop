@@ -223,7 +223,6 @@ public class NestedModel {
     DataSet<GradoopId> gh = nested.getGraphHeads();
 
     // The vertices appearing in a nested graph are the ones that induce the to-be-updated edges.
-    DataSet<Hexaplet> verticesToSummarize = hexas.filter(new GetVerticesToBeNested());
 
     // Edges to return and update are the ones that do not appear in the collection
     // TODO       JOIN COUNT: (2) -> NotInGraphBroadcast (a)
@@ -235,12 +234,12 @@ public class NestedModel {
     // I have to only add the edges that are matched and updated
     // TODO       JOIN COUNT: (2)
       // Update the vertices' source
-      .leftOuterJoin(verticesToSummarize)
+      .leftOuterJoin(hexas)
       .where(2).equalTo(2)
       .with(new UpdateEdgeSource(true))
       // Now start the match with the targets
       .map(new DoHexMatchTarget())
-      .leftOuterJoin(verticesToSummarize)
+      .leftOuterJoin(hexas)
       .where(2).equalTo(2)
       .with(new UpdateEdgeSource(false));
 

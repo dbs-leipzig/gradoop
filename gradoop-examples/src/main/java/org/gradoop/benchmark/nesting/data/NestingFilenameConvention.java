@@ -293,8 +293,6 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
 
     ArrayList<String> retrieverArgs = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
-    sb.append(System.getProperty("user.home"));
-    sb.append(System.getProperty("user.home").endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR);
     sb.append(getClass().getSimpleName())
       .append("_slaves=")
       .append(slaves)
@@ -318,9 +316,7 @@ public abstract class NestingFilenameConvention extends AbstractRunner {
     JobExecutionResult result = ENVIRONMENT.getLastJobExecutionResult();
     retrieverArgs.add(result.getJobID().toString());
 
-    String argumentsFile = System.getProperty("user.home");
-    argumentsFile += argumentsFile.endsWith(Path.SEPARATOR) ? "" : Path.SEPARATOR;
-    argumentsFile += "argument";
+    String argumentsFile = "argument";
     File f = new File(argumentsFile);
     if (f.exists()) {
       if (!f.delete()) {
