@@ -28,7 +28,7 @@ public class FlinkHBaseTestBase extends GradoopFlinkTestBase {
    */
   @AfterClass
   public static void tearDown() throws Exception {
-	GradoopHBaseTestBase.tearDownHBase();
+    GradoopHBaseTestBase.tearDownHBase();
     GradoopFlinkTestBase.tearDownFlink();
   }
 }

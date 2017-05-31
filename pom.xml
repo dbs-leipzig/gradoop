@@ -24,7 +24,7 @@
         <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
-		<module>gradoop-hbase</module>
+        <module>gradoop-hbase</module>
     </modules>
 
     <developers>
@@ -69,11 +69,11 @@
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
 		</developer>
 		<developer>
-			<id>sdiest</id>
-			<name>Steffen Dienst</name>
-			<timezone>+1</timezone>
-			<organization>University of Leipzig</organization>
-		</developer>
+            <id>sdienst</id>
+            <name>Steffen Dienst</name>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+        </developer>
     </developers>
 
     <scm>

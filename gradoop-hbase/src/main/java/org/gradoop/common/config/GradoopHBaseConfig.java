@@ -52,7 +52,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GradoopHBaseConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GradoopStoreConfig<G,V,E>{
+  extends GradoopStoreConfig<G, V, E>{
 
   /**
    * Graph table name.

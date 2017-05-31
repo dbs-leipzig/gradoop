@@ -139,17 +139,17 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Valued constructor.
    *
-   * @param graphHeadFactory2 EPGM graph head factory
-   * @param vertexFactory2 EPGM vertex factory
-   * @param edgeFactory2 EPGM edge Factory
+   * @param graphHeadFactory EPGM graph head factory
+   * @param vertexFactory EPGM vertex factory
+   * @param edgeFactory EPGM edge Factory
    * @param config FoodBroker configuration
    */
-  public AbstractProcess(EPGMGraphHeadFactory<GraphHead> graphHeadFactory2,
-    EPGMVertexFactory<Vertex> vertexFactory2,
-    EPGMEdgeFactory<Edge> edgeFactory2, FoodBrokerConfig config) {
-    this.graphHeadFactory = graphHeadFactory2;
-    this.vertexFactory = vertexFactory2;
-    this.edgeFactory = edgeFactory2;
+  public AbstractProcess(EPGMGraphHeadFactory<GraphHead> graphHeadFactory,
+    EPGMVertexFactory<Vertex> vertexFactory,
+    EPGMEdgeFactory<Edge> edgeFactory, FoodBrokerConfig config) {
+    this.graphHeadFactory = graphHeadFactory;
+    this.vertexFactory = vertexFactory;
+    this.edgeFactory = edgeFactory;
     this.config = config;
 
     vertexMap = Maps.newHashMap();
