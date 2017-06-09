@@ -25,11 +25,6 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
@@ -49,18 +44,11 @@ public class BuildSuperVertex
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys               vertex property key for grouping
    * @param useLabel                        true, if vertex label shall be considered
-   * @param valueAggregators                aggregate functions for vertex values
    * @param epgmVertexFactory               vertex factory
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
-  public BuildSuperVertex(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    EPGMVertexFactory<Vertex> epgmVertexFactory,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
+  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    super(useLabel);
     this.vertexFactory = epgmVertexFactory;
   }
 
@@ -78,8 +66,11 @@ public class BuildSuperVertex
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     setLabel(supVertex, groupItem.getGroupLabel());
-    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getVertexLabelGroup());
-    setAggregateValues(supVertex, groupItem.getGroupLabel(), groupItem.getAggregateValues());
+    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
+    setAggregateValues(
+      supVertex,
+      groupItem.getAggregateValues(),
+      groupItem.getLabelGroup().getAggregators());
 
     return supVertex;
   }

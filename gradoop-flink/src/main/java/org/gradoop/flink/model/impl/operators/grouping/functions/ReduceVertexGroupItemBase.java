@@ -39,15 +39,10 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
   /**
    * Creates build base.
    *
-   * @param groupPropertyKeys               property keys used for grouping
    * @param useLabel                        true, if element label shall be used for grouping
-   * @param valueAggregators                aggregate functions for super elements
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
-  protected ReduceVertexGroupItemBase(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> valueAggregators,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
+  protected ReduceVertexGroupItemBase(boolean useLabel) {
+    super(useLabel);
     this.reuseVertexGroupItem = new VertexGroupItem();
   }
 
@@ -64,13 +59,14 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
    * @param groupPropertyValues group property values
    * @return vertex group item representing the super vertex
    */
-  protected VertexGroupItem createSuperVertexTuple(GradoopId superVertexId,
-    String groupLabel, PropertyValueList groupPropertyValues)
-      throws IOException {
+  protected VertexGroupItem createSuperVertexTuple(
+    GradoopId superVertexId, String groupLabel,
+    PropertyValueList groupPropertyValues,
+    List<PropertyValueAggregator> valueAggregators) throws IOException {
     reuseVertexGroupItem.setVertexId(superVertexId);
     reuseVertexGroupItem.setGroupLabel(groupLabel);
     reuseVertexGroupItem.setGroupingValues(groupPropertyValues);
-    reuseVertexGroupItem.setAggregateValues(getAggregateValues());
+    reuseVertexGroupItem.setAggregateValues(getAggregateValues(valueAggregators));
     reuseVertexGroupItem.setSuperVertex(true);
     return reuseVertexGroupItem;
   }

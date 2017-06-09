@@ -49,13 +49,11 @@ public class CombineVertexGroupItems
    * Creates group reduce function.
    *
    * @param useLabel                        true, iff labels are used for grouping
-   * @param vertexAggregators               aggregate functions for super vertices
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+//   * @param vertexAggregators               aggregate functions for super vertices
+//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
-  public CombineVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(useLabel, vertexAggregators, labelWithAggregatorPropertyKeys);
+  public CombineVertexGroupItems(boolean useLabel) {
+    super(useLabel);
   }
 
   @Override

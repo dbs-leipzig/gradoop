@@ -20,10 +20,9 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,18 +32,20 @@ import java.util.Set;
 public class CombineEdgeGroupItems
   extends BuildSuperEdge
   implements GroupCombineFunction<EdgeGroupItem, EdgeGroupItem> {
+
+  /**
+   * Avoid object instantiation.
+   */
+  private EdgeGroupItem reuseEdgeGroupItem;
+
   /**
    * Creates group reducer
    *
-   * @param groupPropertyKeys               edge property keys
-   * @param useLabel                        use edge label
-   * @param valueAggregators                aggregate functions for edge values
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+   * @param useLabel    use edge label
+//   * @param labelGroups aggregate functions for edge values
    */
-  public CombineEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
+  public CombineEdgeGroupItems(boolean useLabel) {
+    super(useLabel);
   }
 
   /**
@@ -57,7 +58,8 @@ public class CombineEdgeGroupItems
   @Override
   public void combine(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<EdgeGroupItem> collector) throws Exception {
-    collector.collect(reduceInternal(edgeGroupItems));
-    resetAggregators();
+    reuseEdgeGroupItem = reduceInternal(edgeGroupItems);
+    resetAggregators(reuseEdgeGroupItem.getLabelGroup().getAggregators());
+    collector.collect(reuseEdgeGroupItem);
   }
 }

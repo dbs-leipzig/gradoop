@@ -70,13 +70,11 @@ public class TransposeVertexGroupItems
    * Creates group reduce function.
    *
    * @param useLabel                        true, iff labels are used for grouping
-   * @param vertexAggregators               aggregate functions for super vertices
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+//   * @param vertexAggregators               aggregate functions for super vertices
+//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
-  public TransposeVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(null, useLabel, vertexAggregators, labelWithAggregatorPropertyKeys);
+  public TransposeVertexGroupItems(boolean useLabel) {
+    super(useLabel);
     this.reuseOuterTuple = new Tuple2<>();
     this.reuseInnerTuple = new IdWithIdSet();
   }
@@ -100,15 +98,16 @@ public class TransposeVertexGroupItems
         superVertexId = GradoopId.get();
         groupLabel            = groupItem.getGroupLabel();
         groupPropertyValues   = groupItem.getGroupingValues();
-        vertexLabelGroup      = groupItem.getVertexLabelGroup();
+        vertexLabelGroup      = groupItem.getLabelGroup();
 
         isFirst = false;
       }
       // store the super vertex id created in the previous combiner
       superVertexIds.add(groupItem.getSuperVertexId());
 
-      if (doAggregate()) {
-        aggregate(groupLabel, groupItem.getAggregateValues());
+      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
+        aggregate(groupItem.getAggregateValues(), vertexLabelGroup.getAggregators());
+//        aggregate(groupItem.getAggregateValues(), groupItem.getLabelGroup().getAggregators());
       }
     }
 
@@ -116,14 +115,15 @@ public class TransposeVertexGroupItems
     reuseInnerTuple.setIdSet(GradoopIdList.fromExisting(superVertexIds));
 
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
-      groupPropertyValues);
+      groupPropertyValues, vertexLabelGroup.getAggregators());
     reuseOuterTuple.f0.setSuperVertexId(superVertexId);
-    reuseOuterTuple.f0.setVertexLabelGroup(vertexLabelGroup);
+    reuseOuterTuple.f0.setLabelGroup(vertexLabelGroup);
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group
+    resetAggregators(reuseOuterTuple.f0.getLabelGroup().getAggregators());
     out.collect(reuseOuterTuple);
 
-    resetAggregators();
+//    resetAggregators(vertexLabelGroup.getAggregators());
   }
 }

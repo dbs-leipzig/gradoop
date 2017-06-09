@@ -51,16 +51,14 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param groupPropertyKeys               edge property keys
+//   * @param groupPropertyKeys               edge property keys
    * @param useLabel                        use edge label
-   * @param valueAggregators                aggregate functions for edge values
-   * @param epgmEdgeFactory                 edge factory
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+//   * @param valueAggregators                aggregate functions for edge values
+   * @param edgeFactory                     edge factory
+//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
-  public ReduceEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators, EPGMEdgeFactory<Edge> epgmEdgeFactory,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
+  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+    super(useLabel);
     this.edgeFactory = epgmEdgeFactory;
   }
 
@@ -91,9 +89,9 @@ public class ReduceEdgeGroupItems
       edgeGroupItem.getTargetId());
 
     setGroupProperties(
-      superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getEdgeLabelGroup());
-    setAggregateValues(superEdge, edgeGroupItem.getGroupLabel());
-    resetAggregators();
+      superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
+    setAggregateValues(superEdge, edgeGroupItem.getLabelGroup().getAggregators());
+    resetAggregators(edgeGroupItem.getLabelGroup().getAggregators());
 
     collector.collect(superEdge);
   }

@@ -17,8 +17,10 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import com.google.common.collect.Lists;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,16 +38,11 @@ abstract class BuildSuperEdge extends BuildBase {
   /**
    * Creates group reducer / combiner
    *
-   * @param groupPropertyKeys               edge property keys
-   * @param useLabel                        use edge label
-   * @param valueAggregators                aggregate functions for edge values
-   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+   * @param useLabel    use edge label
+//   * @param labelGroups aggregate functions for edge values
    */
-  public BuildSuperEdge(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-    super(groupPropertyKeys, useLabel, valueAggregators, labelWithAggregatorPropertyKeys);
+  public BuildSuperEdge(boolean useLabel) {
+    super(useLabel);
   }
 
   /**
@@ -57,7 +54,8 @@ abstract class BuildSuperEdge extends BuildBase {
   protected EdgeGroupItem reduceInternal(
     Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {
 
-    EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
+    EdgeGroupItem edgeGroupItem                     = new EdgeGroupItem();
+//    List<PropertyValueAggregator> valueAggregators  = Lists.newArrayList();
 
     boolean firstElement = true;
 
@@ -67,20 +65,27 @@ abstract class BuildSuperEdge extends BuildBase {
         edgeGroupItem.setTargetId(edge.getTargetId());
         edgeGroupItem.setGroupLabel(edge.getGroupLabel());
         edgeGroupItem.setGroupingValues(edge.getGroupingValues());
-        edgeGroupItem.setEdgeLabelGroup(edge.getEdgeLabelGroup());
+        edgeGroupItem.setLabelGroup(edge.getLabelGroup());
         firstElement = false;
       }
 
-      if (doAggregate()) {
-        aggregate(edgeGroupItem.getGroupLabel(), edge.getAggregateValues());
+      if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
+//      if (doAggregate(edge.getLabelGroup().getAggregators())) {
+//        valueAggregators.addAll(edge.getLabelGroup().getAggregators());
+        aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
       } else {
         // no need to iterate further
         break;
       }
     }
 
-    edgeGroupItem.setAggregateValues(getAggregateValues());
+    edgeGroupItem.setAggregateValues(
+      getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
 
+    // TODO CHECK if aggregators can be reset before collecting the vertices or if the values of
+    // the collected edge become zero
+//    resetAggregators(valueAggregators);
+//    edgeGroupItem.getLabelGroup().setAggregators(valueAggregators);
     return edgeGroupItem;
   }
 }

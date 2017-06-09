@@ -17,51 +17,89 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import com.google.common.collect.Lists;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
+  .PropertyValueAggregator;
+
+import java.util.List;
 
 /**
  * Stores grouping keys for a specific label.
  */
-public class LabelGroup extends Tuple2<String, String[]> {
+public class LabelGroup
+  extends Tuple4<String, String, List<String>, List<PropertyValueAggregator>> {
 
   /**
    * Default constructor.
    */
   public LabelGroup() {
+    this(null, null);
+  }
+
+  /**
+   * Constructor to only define the label.
+   *
+   * @param groupLabel    label used after grouping
+   * @param groupingLabel label used for grouping
+   */
+  public LabelGroup(String groupLabel, String groupingLabel) {
+    this(groupLabel, groupingLabel, Lists.newArrayList(), Lists.newArrayList());
   }
 
   /**
    * Constructor with varargs.
    *
-   * @param label label used for grouping
+   * @param groupLabel    label used after grouping
+   * @param groupingLabel label used for grouping
    * @param propertyKeys variable amount of grouping keys for the label
+   * @param aggregators  aggregate functions
    */
-  public LabelGroup(String label, String... propertyKeys) {
-    super(label, propertyKeys);
+  public LabelGroup(
+    String groupLabel, String groupingLabel,
+    List<String> propertyKeys,
+    List<PropertyValueAggregator> aggregators) {
+    super(groupLabel, groupingLabel, propertyKeys, aggregators);
   }
 
-  public String getLabel() {
+  public String getGroupLabel() {
     return f0;
   }
 
-  public void setLabel(String label) {
+  public void setGroupLabel(String label) {
     f0 = label;
   }
 
-  public String[] getPropertyKeys() {
+  public String getGroupingLabel() {
     return f1;
   }
 
-  public void setPropertyKeys(String[] propertyKeys) {
-    f1 = propertyKeys;
+  public void setGroupingLabel(String label) {
+    f1 = label;
   }
 
-  /**
-   * Creates an empty label group.
-   *
-   * @return label group
-   */
-  public static LabelGroup createEmptyLabelGroup() {
-    return new LabelGroup("");
+  public List<String> getPropertyKeys() {
+    return f2;
+  }
+
+  public void setPropertyKeys(List<String> propertyKeys) {
+    f2 = propertyKeys;
+  }
+
+  public void addPropertyKey(String propertyKey) {
+    f2.add(propertyKey);
+  }
+
+
+  public List<PropertyValueAggregator> getAggregators() {
+    return f3;
+  }
+
+  public void setAggregators(List<PropertyValueAggregator> aggregators) {
+    f3 = aggregators;
+  }
+
+  public void addAggregator(PropertyValueAggregator aggregator) {
+    f3.add(aggregator);
   }
 }

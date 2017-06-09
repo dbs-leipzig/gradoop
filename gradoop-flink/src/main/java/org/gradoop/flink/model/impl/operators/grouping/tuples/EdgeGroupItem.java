@@ -32,7 +32,8 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f5: edge label group
  */
 public class EdgeGroupItem
-  extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup> {
+  extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup>
+  implements GroupItem {
 
   public GradoopId getSourceId() {
     return f0;
@@ -74,11 +75,11 @@ public class EdgeGroupItem
     this.f4 = value;
   }
 
-  public LabelGroup getEdgeLabelGroup() {
+  public LabelGroup getLabelGroup() {
     return f5;
   }
 
-  public void setEdgeLabelGroup(LabelGroup edgeLabelGroup) {
+  public void setLabelGroup(LabelGroup edgeLabelGroup) {
     f5 = edgeLabelGroup;
   }
 }
