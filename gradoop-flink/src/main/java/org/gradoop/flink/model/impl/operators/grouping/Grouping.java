@@ -38,7 +38,6 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * The grouping operator determines a structural grouping of vertices and edges
@@ -355,7 +354,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useVertexLabel(true);
       } else {
-       getOrCreateDefaultVertexLabelGroup().addPropertyKey(key);
+        getOrCreateDefaultVertexLabelGroup().addPropertyKey(key);
       }
       return this;
     }
@@ -382,11 +381,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public GroupingBuilder addEdgeGroupingKey(String key) {
       Objects.requireNonNull(key);
-        if (key.equals(Grouping.LABEL_SYMBOL)) {
-          useEdgeLabel(true);
-        } else {
-          getOrCreateDefaultEdgeLabelGroup().addPropertyKey(key);
-        }
+      if (key.equals(Grouping.LABEL_SYMBOL)) {
+        useEdgeLabel(true);
+      } else {
+        getOrCreateDefaultEdgeLabelGroup().addPropertyKey(key);
+      }
       return this;
     }
 
@@ -408,6 +407,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
+     * @param groupLabel label of the group and therefor of the new super vertex
      * @param vertexLabel vertex label
      * @param groupingKeys keys used for grouping
      * @return this builder
@@ -422,6 +422,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
+     * @param groupLabel label of the group and therefor of the new super vertex
      * @param vertexLabel vertex label
      * @param groupingKeys keys used for grouping
      * @param aggregators vertex aggregators
@@ -436,12 +437,28 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
+     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Note that a label may be used multiple times.
+     *
+     * @param groupLabel label of the group and therefor of the new super vertex
+     * @param vertexLabel vertex label
+     * @param groupingKeys keys used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder addEdgeLabelGroup(
+      String groupLabel, String vertexLabel,
+      List<String> groupingKeys) {
+      return addEdgeLabelGroup(groupLabel, vertexLabel, groupingKeys, Arrays.asList());
+    }
+
+    /**
      * Adds a vertex label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
+     * @param groupLabel label of the group and therefor of the new super vertex
      * @param vertexLabel vertex label
      * @param groupingKeys keys used for grouping
-     * @param aggregators vertex aggregators
+     * @param aggregators edge aggregators
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
@@ -567,7 +584,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           return edgeLabelGroup;
         }
       }
-      defaultEdgeLabelGroup = new LabelGroup(GConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
+      defaultEdgeLabelGroup = new LabelGroup(GConstants.DEFAULT_EDGE_LABEL,
+        Grouping.DEFAULT_EDGE_LABEL_GROUP);
       edgeLabelGroups.add(defaultEdgeLabelGroup);
       return defaultEdgeLabelGroup;
     }

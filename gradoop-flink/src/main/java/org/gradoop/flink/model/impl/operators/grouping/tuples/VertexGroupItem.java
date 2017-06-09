@@ -35,7 +35,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 public class VertexGroupItem
   extends Tuple7
   <GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup>
-  implements GroupItem{
+  implements GroupItem {
 
   public GradoopId getVertexId() {
     return f0;

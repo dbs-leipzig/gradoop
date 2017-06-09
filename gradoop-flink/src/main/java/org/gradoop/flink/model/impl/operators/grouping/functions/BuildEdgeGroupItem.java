@@ -48,7 +48,7 @@ public class BuildEdgeGroupItem
    * @param useLabel                        true, if vertex label shall be used
    * @param edgeLabelGroups                 stores grouping properties for edge labels
    */
-  public BuildEdgeGroupItem( boolean useLabel, List<LabelGroup> edgeLabelGroups) {
+  public BuildEdgeGroupItem(boolean useLabel, List<LabelGroup> edgeLabelGroups) {
     super(useLabel, edgeLabelGroups);
     this.reuseEdgeGroupItem = new EdgeGroupItem();
   }
@@ -64,7 +64,7 @@ public class BuildEdgeGroupItem
 
     // check if edge shall be grouped by a special set of keys
     for (LabelGroup edgeLabelGroup : getLabelGroups()) {
-      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel()) ) {
+      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {
         usedEdgeLabelGroup = true;
         setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);
         collector.collect(reuseEdgeGroupItem);

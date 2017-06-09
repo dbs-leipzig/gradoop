@@ -55,6 +55,7 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
    * @param superVertexId       super vertex id
    * @param groupLabel          group label
    * @param groupPropertyValues group property values
+   * @param valueAggregators    vertex aggregators
    * @return vertex group item representing the super vertex
    */
   protected VertexGroupItem createSuperVertexTuple(

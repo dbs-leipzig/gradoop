@@ -64,6 +64,8 @@ abstract class BuildBase implements Serializable {
 
   /**
    * Resets the underlying aggregators
+   *
+   * @param valueAggregators aggregate functions to be reset
    */
   protected void resetAggregators(List<PropertyValueAggregator> valueAggregators) {
     for (PropertyValueAggregator valueAggregator : valueAggregators) {
@@ -174,6 +176,7 @@ abstract class BuildBase implements Serializable {
    * Add the given values to the corresponding aggregate.
    *
    * @param values property values
+   * @param valueAggregators aggregate functions
    */
   protected void aggregate(
     PropertyValueList values, List<PropertyValueAggregator> valueAggregators) {
@@ -189,6 +192,7 @@ abstract class BuildBase implements Serializable {
   /**
    * Returns the current aggregate values from the aggregators.
    *
+   * @param valueAggregators aggregate functions
    * @return aggregate values
    */
   protected PropertyValueList getAggregateValues(List<PropertyValueAggregator> valueAggregators)
@@ -212,6 +216,7 @@ abstract class BuildBase implements Serializable {
    * values are fetched from the internal aggregators.
    *
    * @param element attributed element
+   * @param valueAggregators aggregate functions
    */
   protected void setAggregateValues(
     EPGMAttributed element, List<PropertyValueAggregator> valueAggregators) {
@@ -229,6 +234,7 @@ abstract class BuildBase implements Serializable {
    *
    * @param element attributed element
    * @param values aggregate values
+   * @param valueAggregators aggregate functions
    */
   protected void setAggregateValues(
     EPGMAttributed element,

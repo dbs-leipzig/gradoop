@@ -86,10 +86,14 @@ public class LabelGroup
     f2 = propertyKeys;
   }
 
+  /**
+   * Adds a property key to the current list of keys.
+   *
+   * @param propertyKey property key as string
+   */
   public void addPropertyKey(String propertyKey) {
     f2.add(propertyKey);
   }
-
 
   public List<PropertyValueAggregator> getAggregators() {
     return f3;
@@ -99,6 +103,11 @@ public class LabelGroup
     f3 = aggregators;
   }
 
+  /**
+   * Adds an aggregator to the current list of aggregators.
+   *
+   * @param aggregator property value aggregator
+   */
   public void addAggregator(PropertyValueAggregator aggregator) {
     f3.add(aggregator);
   }

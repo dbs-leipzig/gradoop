@@ -28,6 +28,9 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Base class for vertex and edge item building.
+ */
 public class BuildGroupItemBase extends BuildBase {
 
   /**
@@ -40,8 +43,17 @@ public class BuildGroupItemBase extends BuildBase {
    */
   private final LabelGroup defaultLabelGroup;
 
+  /**
+   * Stores the grouping values. Used to avoid object instantiation.
+   */
   private List<PropertyValue> groupingValues;
 
+  /**
+   * Valued constructor.
+   *
+   * @param useLabel    true if label shall be used for grouping
+   * @param labelGroups all vertex or edge label groups
+   */
   public BuildGroupItemBase(
     boolean useLabel, List<LabelGroup> labelGroups) {
     super(useLabel);
@@ -59,7 +71,14 @@ public class BuildGroupItemBase extends BuildBase {
     defaultLabelGroup = standardLabelGroup;
   }
 
-  protected void setGroupItem (GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
+  /**
+   * Sets the basic values for either a vertex or an edge group item.
+   *
+   * @param groupItem the group item to be set
+   * @param element the epgm element
+   * @param labelGroup label group to be assigned
+   */
+  protected void setGroupItem(GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
     throws IOException {
     for (String groupPropertyKey : labelGroup.getPropertyKeys()) {
       if (element.hasProperty(groupPropertyKey)) {
