@@ -70,11 +70,6 @@ abstract class BuildSuperEdge extends BuildBase {
 
     edgeGroupItem.setAggregateValues(
       getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
-
-    // TODO CHECK if aggregators can be reset before collecting the vertices or if the values of
-    // the collected edge become zero
-//    resetAggregators(valueAggregators);
-//    edgeGroupItem.getLabelGroup().setAggregators(valueAggregators);
     return edgeGroupItem;
   }
 }
