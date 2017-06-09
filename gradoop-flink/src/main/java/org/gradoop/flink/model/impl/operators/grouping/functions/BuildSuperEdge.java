@@ -17,15 +17,9 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Lists;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Creates a single {@link EdgeGroupItem} from a set of group items.
@@ -39,7 +33,6 @@ abstract class BuildSuperEdge extends BuildBase {
    * Creates group reducer / combiner
    *
    * @param useLabel    use edge label
-//   * @param labelGroups aggregate functions for edge values
    */
   public BuildSuperEdge(boolean useLabel) {
     super(useLabel);
@@ -54,10 +47,8 @@ abstract class BuildSuperEdge extends BuildBase {
   protected EdgeGroupItem reduceInternal(
     Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {
 
-    EdgeGroupItem edgeGroupItem                     = new EdgeGroupItem();
-//    List<PropertyValueAggregator> valueAggregators  = Lists.newArrayList();
-
-    boolean firstElement = true;
+    EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
+    boolean firstElement        = true;
 
     for (EdgeGroupItem edge : edgeGroupItems) {
       if (firstElement) {
@@ -70,8 +61,6 @@ abstract class BuildSuperEdge extends BuildBase {
       }
 
       if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
-//      if (doAggregate(edge.getLabelGroup().getAggregators())) {
-//        valueAggregators.addAll(edge.getLabelGroup().getAggregators());
         aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
       } else {
         // no need to iterate further

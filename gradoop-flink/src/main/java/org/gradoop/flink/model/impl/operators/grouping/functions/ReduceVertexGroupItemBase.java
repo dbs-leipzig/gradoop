@@ -24,8 +24,6 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Base class for reducer/combiner implementations on vertices.
@@ -39,7 +37,7 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
   /**
    * Creates build base.
    *
-   * @param useLabel                        true, if element label shall be used for grouping
+   * @param useLabel true, if element label shall be used for grouping
    */
   protected ReduceVertexGroupItemBase(boolean useLabel) {
     super(useLabel);

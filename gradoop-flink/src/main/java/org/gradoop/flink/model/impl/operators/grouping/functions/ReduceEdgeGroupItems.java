@@ -27,12 +27,6 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
@@ -51,11 +45,8 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-//   * @param groupPropertyKeys               edge property keys
-   * @param useLabel                        use edge label
-//   * @param valueAggregators                aggregate functions for edge values
-   * @param edgeFactory                     edge factory
-//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+   * @param useLabel        use edge label
+   * @param epgmEdgeFactory edge factory
    */
   public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
     super(useLabel);

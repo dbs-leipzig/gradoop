@@ -17,16 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
-
-import java.util.List;
 
 /**
  * Reduces a group of {@link VertexGroupItem} instances.
@@ -56,7 +52,6 @@ public class ReduceVertexGroupItems
     GradoopId superVertexId                         = null;
     String groupLabel                               = null;
     PropertyValueList groupPropertyValues           = null;
-//    List<PropertyValueAggregator> valueAggregators  = Lists.newArrayList();
 
     VertexGroupItem reuseTuple = getReuseVertexGroupItem();
 
@@ -83,7 +78,6 @@ public class ReduceVertexGroupItems
       collector.collect(reuseTuple);
 
       if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-//        valueAggregators.addAll(groupItem.getLabelGroup().getAggregators());
         aggregate(groupItem.getAggregateValues(), reuseTuple.getLabelGroup().getAggregators());
       }
     }
@@ -95,14 +89,5 @@ public class ReduceVertexGroupItems
       reuseTuple.getLabelGroup().getAggregators());
     resetAggregators(superVertex.getLabelGroup().getAggregators());
     collector.collect(superVertex);
-
-    // collect single item representing the whole group
-//    collector.collect(createSuperVertexTuple(
-//      superVertexId,
-//      groupLabel,
-//      groupPropertyValues,
-//      reuseTuple.getLabelGroup().getAggregators()));
-//
-//    resetAggregators(reuseTuple.getLabelGroup().getAggregators());
   }
 }

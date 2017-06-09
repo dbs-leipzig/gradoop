@@ -24,14 +24,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -70,8 +67,6 @@ public class TransposeVertexGroupItems
    * Creates group reduce function.
    *
    * @param useLabel                        true, iff labels are used for grouping
-//   * @param vertexAggregators               aggregate functions for super vertices
-//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
    */
   public TransposeVertexGroupItems(boolean useLabel) {
     super(useLabel);
@@ -107,7 +102,6 @@ public class TransposeVertexGroupItems
 
       if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
         aggregate(groupItem.getAggregateValues(), vertexLabelGroup.getAggregators());
-//        aggregate(groupItem.getAggregateValues(), groupItem.getLabelGroup().getAggregators());
       }
     }
 
@@ -123,7 +117,5 @@ public class TransposeVertexGroupItems
     // collect single item representing the whole group
     resetAggregators(reuseOuterTuple.f0.getLabelGroup().getAggregators());
     out.collect(reuseOuterTuple);
-
-//    resetAggregators(vertexLabelGroup.getAggregators());
   }
 }

@@ -35,8 +35,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
-
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -88,17 +86,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   public static final String LABEL_SYMBOL = ":label";
   /**
-   * Used to verify if an aggregator is used for all vertices.
-   */
-  public static final String VERTEX_AGGREGATOR = ":vertexAggregator";
-  /**
    * Used to verify if a grouping key is used for all vertices.
    */
   public static final String DEFAULT_VERTEX_LABEL_GROUP = ":defaultVertexLabelGroup";
-  /**
-   * Used to verify if an aggregator is used for all edges.
-   */
-  public static final String EDGE_AGGREGATOR = ":edgeAggregator";
   /**
    * Used to verify if a grouping key is used for all edges.
    */
@@ -107,31 +97,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * Gradoop Flink configuration.
    */
   protected GradoopFlinkConfig config;
-//  /**
-//   * Used to group vertices.
-//   */
-//  private final List<String> vertexGroupingKeys;
   /**
    * True if vertices shall be grouped using their label.
    */
   private final boolean useVertexLabels;
-//  /**
-//   * Aggregate functions which are applied on super vertices.
-//   */
-//  private final List<PropertyValueAggregator> vertexAggregators;
-//  /**
-//   * Used to group edges.
-//   */
-//  private final List<String> edgeGroupingKeys;
   /**
    * True if edges shall be grouped using their label.
    */
   private final boolean useEdgeLabels;
-//  /**
-//   * Aggregate functions which are applied on super edges.
-//   */
-//  private final List<PropertyValueAggregator> edgeAggregators;
-
   /**
    * Stores grouping properties and aggregators for vertex labels.
    */
@@ -142,46 +115,23 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   private final List<LabelGroup> edgeLabelGroups;
 
-//  /**
-//   * Stores all aggregator property keys for each label.
-//   */
-//  private Map<String, Set<String>> labelWithAggregatorPropertyKeys;
-
   /**
    * Creates grouping operator instance.
    *
-//   * @param vertexGroupingKeys              property keys to group vertices
-   * @param useVertexLabels                 group on vertex label true/false
-//   * @param vertexAggregators               aggregate functions for grouped vertices
-//   * @param edgeGroupingKeys                property keys to group edges
-   * @param useEdgeLabels                   group on edge label true/false
-//   * @param edgeAggregators                 aggregate functions for grouped edges
-   * @param vertexLabelGroups               stores grouping properties for vertex labels
-   * @param edgeLabelGroups                 stores grouping properties for edge labels
-//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label.
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
    */
   Grouping(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups) {
-//  Grouping(
-//    List<String> vertexGroupingKeys, boolean useVertexLabels,
-//    List<PropertyValueAggregator> vertexAggregators,
-//    List<String> edgeGroupingKeys, boolean useEdgeLabels,
-//    List<PropertyValueAggregator> edgeAggregators,
-//    List<LabelGroup> vertexLabelGroups,
-//    List<LabelGroup> edgeLabelGroups,
-//    Map<String, Set<String>> labelWithAggregatorPropertyKeys) {
-//    this.vertexGroupingKeys              = vertexGroupingKeys;
-    this.useVertexLabels                 = useVertexLabels;
-//    this.vertexAggregators               = vertexAggregators;
-//    this.edgeGroupingKeys                = edgeGroupingKeys;
-    this.useEdgeLabels                   = useEdgeLabels;
-//    this.edgeAggregators                 = edgeAggregators;
-    this.vertexLabelGroups               = vertexLabelGroups;
-    this.edgeLabelGroups                 = edgeLabelGroups;
-//    this.labelWithAggregatorPropertyKeys = labelWithAggregatorPropertyKeys;
+    this.useVertexLabels   = useVertexLabels;
+    this.useEdgeLabels     = useEdgeLabels;
+    this.vertexLabelGroups = vertexLabelGroups;
+    this.edgeLabelGroups   = edgeLabelGroups;
   }
 
   /**
@@ -211,17 +161,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   protected boolean useVertexProperties() {
     return !vertexLabelGroups.isEmpty();
-//    return !getVertexGroupingKeys().isEmpty() || !vertexLabelGroups.isEmpty();
   }
-
-//  /**
-//   * Returns vertex property keys which are used for grouping vertices.
-//   *
-//   * @return vertex property keys
-//   */
-//  protected List<String> getVertexGroupingKeys() {
-//    return vertexGroupingKeys;
-//  }
 
   /**
    * True, iff vertex labels shall be used for grouping.
@@ -232,15 +172,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     return useVertexLabels;
   }
 
-//  /**
-//   * Returns the aggregate functions which are applied on super vertices.
-//   *
-//   * @return vertex aggregate functions
-//   */
-//  protected List<PropertyValueAggregator> getVertexAggregators() {
-//    return vertexAggregators;
-//  }
-
   /**
    * Returns true if edge properties shall be used for grouping.
    *
@@ -248,17 +179,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   protected boolean useEdgeProperties() {
     return !edgeLabelGroups.isEmpty();
-//    return !edgeGroupingKeys.isEmpty() || !edgeLabelGroups.isEmpty();
   }
-
-//  /**
-//   * Returns edge property keys which are used for grouping edges.
-//   *
-//   * @return edge property keys
-//   */
-//  protected List<String> getEdgeGroupingKeys() {
-//    return edgeGroupingKeys;
-//  }
 
   /**
    * True, if edge labels shall be used for grouping.
@@ -268,15 +189,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   protected boolean useEdgeLabels() {
     return useEdgeLabels;
   }
-
-//  /**
-//   * Returns the aggregate functions which shall be applied on super edges.
-//   *
-//   * @return edge aggregate functions
-//   */
-//  protected List<PropertyValueAggregator> getEdgeAggregators() {
-//    return edgeAggregators;
-//  }
 
   /**
    * Returns tuple which contains the properties used for a specific vertex label.
@@ -295,15 +207,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   public List<LabelGroup> getEdgeLabelGroups() {
     return edgeLabelGroups;
   }
-
-//  /**
-//   * Returns the aggregator property keys for each label.
-//   *
-//   * @return map from label to set of aggregator property keys
-//   */
-//  protected Map<String, Set<String>> getLabelWithAggregatorPropertyKeys() {
-//    return labelWithAggregatorPropertyKeys;
-//  }
 
   /**
    * Group vertices by either vertex label, vertex property or both.
@@ -359,9 +262,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     DataSet<EdgeGroupItem> edges = graph.getEdges()
       // build edge group items
       .flatMap(new BuildEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()))
-//      .flatMap(new BuildEdgeGroupItem(
-//        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(), getEdgeLabelGroups(),
-//        getLabelWithAggregatorPropertyKeys()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)
       .where(0).equalTo(0)
@@ -378,20 +278,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     // group + combine
     DataSet<EdgeGroupItem> combinedEdges = groupEdges(edges)
       .combineGroup(new CombineEdgeGroupItems(useEdgeLabels()));
-//      .combineGroup(new CombineEdgeGroupItems(
-//        getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
-//        getLabelWithAggregatorPropertyKeys()));
 
     // group + reduce + build final edges
     return groupEdges(combinedEdges)
       .reduceGroup(new ReduceEdgeGroupItems(
         useEdgeLabels(),
         config.getEdgeFactory()));
-//      .reduceGroup(new ReduceEdgeGroupItems(getEdgeGroupingKeys(),
-//        useEdgeLabels(),
-//        getEdgeAggregators(),
-//        config.getEdgeFactory(),
-//        getLabelWithAggregatorPropertyKeys()));
   }
 
   /**
@@ -411,17 +303,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Grouping strategy
      */
     private GroupingStrategy strategy;
-
-//    /**
-//     * Property keys to group vertices.
-//     */
-//    private List<String> vertexGroupingKeys;
-
-//    /**
-//     * Property keys to group edges.
-//     */
-//    private List<String> edgeGroupingKeys;
-
     /**
      * True, iff vertex labels shall be considered.
      */
@@ -431,17 +312,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * True, iff edge labels shall be considered.
      */
     private boolean useEdgeLabel;
-
-//    /**
-//     * Aggregate functions which will be applied on vertex properties.
-//     */
-//    private List<PropertyValueAggregator> vertexValueAggregators;
-
-//    /**
-//     * Aggregate functions which will be applied on edge properties.
-//     */
-//    private List<PropertyValueAggregator> edgeValueAggregators;
-
     /**
      * Stores grouping keys for a specific vertex label.
      */
@@ -452,24 +322,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     private List<LabelGroup> edgeLabelGroups;
 
-//    /**
-//     * Stores all aggregator property keys for each label.
-//     */
-//    private Map<String, Set<String>> labelWithAggregatorPropertyKeys;
-
     /**
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
-//      this.vertexGroupingKeys     = new ArrayList<>();
-//      this.edgeGroupingKeys       = new ArrayList<>();
       this.useVertexLabel         = false;
       this.useEdgeLabel           = false;
-//      this.vertexValueAggregators = new ArrayList<>();
-//      this.edgeValueAggregators   = new ArrayList<>();
       this.vertexLabelGroups      = Lists.newArrayList();
       this.edgeLabelGroups        = Lists.newArrayList();
-//      this.labelWithAggregatorPropertyKeys = new HashMap<>();
     }
 
     /**
@@ -492,8 +352,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public GroupingBuilder addVertexGroupingKey(String key) {
       Objects.requireNonNull(key);
-      Set<LabelGroup> vertexLabelGroupSet;
-      LabelGroup vertexLabelGroup;
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useVertexLabel(true);
       } else {
@@ -524,7 +382,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public GroupingBuilder addEdgeGroupingKey(String key) {
       Objects.requireNonNull(key);
-      LabelGroup edgeLabelGroup;
         if (key.equals(Grouping.LABEL_SYMBOL)) {
           useEdgeLabel(true);
         } else {
@@ -651,7 +508,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public Grouping build() {
       if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
-//      if (vertexGroupingKeys.isEmpty() && !useVertexLabel) {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
@@ -669,10 +525,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       case GROUP_REDUCE:
         groupingOperator = new GroupingGroupReduce(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
-//        groupingOperator = new GroupingGroupReduce(
-//          vertexGroupingKeys, useVertexLabel, vertexValueAggregators, edgeGroupingKeys,
-//          useEdgeLabel, edgeValueAggregators, vertexLabelGroups, edgeLabelGroups,
-//          labelWithAggregatorPropertyKeys);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine(
@@ -697,8 +549,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           return vertexLabelGroup;
         }
       }
-      defaultVertexLabelGroup = new LabelGroup(GConstants.DEFAULT_VERTEX_LABEL, Grouping
-        .DEFAULT_VERTEX_LABEL_GROUP);
+      defaultVertexLabelGroup = new LabelGroup(GConstants.DEFAULT_VERTEX_LABEL,
+        Grouping.DEFAULT_VERTEX_LABEL_GROUP);
       vertexLabelGroups.add(defaultVertexLabelGroup);
       return defaultVertexLabelGroup;
     }

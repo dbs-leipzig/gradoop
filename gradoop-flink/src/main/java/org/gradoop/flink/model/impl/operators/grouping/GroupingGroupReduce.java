@@ -30,12 +30,9 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Grouping implementation that uses group + groupReduce for building super
@@ -63,15 +60,10 @@ public class GroupingGroupReduce extends Grouping {
   /**
    * Creates grouping operator instance.
    *
-//   * @param vertexGroupingKeys              property key to group vertices
-   * @param useVertexLabels                 group on vertex label true/false
-//   * @param vertexAggregators               aggregate functions for grouped vertices
-//   * @param edgeGroupingKeys                property key to group edges
-   * @param useEdgeLabels                   group on edge label true/false
-//   * @param edgeAggregators                 aggregate functions for grouped edges
-   * @param vertexLabelGroups               stores grouping properties for vertex labels
-   * @param edgeLabelGroups                 stores grouping properties for edge labels
-//   * @param labelWithAggregatorPropertyKeys stores all aggregator property keys for each label
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
    */
   GroupingGroupReduce(
     boolean useVertexLabels,

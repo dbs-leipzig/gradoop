@@ -20,11 +20,6 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Combines a group of {@link EdgeGroupItem} to a single {@link EdgeGroupItem}.
@@ -41,8 +36,7 @@ public class CombineEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param useLabel    use edge label
-//   * @param labelGroups aggregate functions for edge values
+   * @param useLabel use edge label
    */
   public CombineEdgeGroupItems(boolean useLabel) {
     super(useLabel);

@@ -1347,6 +1347,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
+  //----------------------------------------------------------------------------
+  // Tests for label specific grouping
+  //----------------------------------------------------------------------------
+
   @Test
   public void testVertexLabelSpecific() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
@@ -1371,8 +1375,38 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count")))
-//      .addVertexGroupingKey("User", "gender")
       .addVertexAggregator(new CountAggregator("count"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testVertexLabelSpecificNewLabel() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {topic : \"rdf\"})" +
+      "(v01:Forum {topic : \"graph\"})" +
+      "(v02:UserGender {gender : \"male\"})" +
+      "(v03:UserGender {gender : \"female\"})" +
+      "(v02)-->(v00)" +
+      "(v02)-->(v01)" +
+      "(v02)-->(v02)" +
+      "(v02)-->(v03)" +
+      "(v03)-->(v01)" +
+      "(v03)-->(v02)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("topic")
+      .addVertexLabelGroup("UserGender","User", Arrays.asList("gender"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1416,8 +1450,6 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
-//      .addVertexGroupingKey("User", "age")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count")))
       .addVertexLabelGroup("User","User", Arrays.asList("age"),
@@ -1454,10 +1486,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count")))
-//      .addEdgeGroupingKey("knows", "since")
       .addEdgeLabelGroup("knows","knows", Arrays.asList("since"),
         Arrays.asList(new CountAggregator("count")))
       .addVertexAggregator(new CountAggregator("count"))
@@ -1493,11 +1523,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count")))
-//      .addEdgeGroupingKey("knows", "since")
-//      .addEdgeGroupingKey("member", "until")
       .addEdgeLabelGroup("knows","knows", Arrays.asList("since"),
         Arrays.asList(new CountAggregator("count")))
       .addEdgeLabelGroup("member","member", Arrays.asList("until"),
@@ -1533,11 +1560,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count"), new SumAggregator("age", "sum")))
-//      .addVertexAggregator(new CountAggregator("count"), "User")
-//      .addVertexAggregator(new SumAggregator("age", "sum"), "User")
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1580,14 +1604,11 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
-//      .addVertexGroupingKey("User", "age")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"),
         Arrays.asList(new CountAggregator("count"), new SumAggregator("age", "sum")))
       .addVertexLabelGroup("User","User", Arrays.asList("age"),
         Arrays.asList(new CountAggregator("count"), new SumAggregator("age", "sum")))
       .addVertexAggregator(new CountAggregator("count"))
-//      .addVertexAggregator(new SumAggregator("age", "sum"), "User")
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1619,13 +1640,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"))
-//      .addEdgeGroupingKey("knows", "since")
       .addEdgeLabelGroup("knows","knows", Arrays.asList("since"),
         Arrays.asList(new CountAggregator("count"), new SumAggregator("since", "sum")))
       .addEdgeAggregator(new CountAggregator("count"))
-//      .addEdgeAggregator(new SumAggregator("since", "sum"), "knows")
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1657,16 +1675,12 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-//      .addVertexGroupingKey("User", "gender")
       .addVertexLabelGroup("User","User", Arrays.asList("gender"))
-//      .addEdgeGroupingKey("knows", "since")
       .addEdgeLabelGroup("knows","knows", Arrays.asList("since"),
         Arrays.asList(new CountAggregator("count"), new SumAggregator("since", "sum")))
-//      .addEdgeGroupingKey("member", "until")
       .addEdgeLabelGroup("member","member", Arrays.asList("until"),
         Arrays.asList(new CountAggregator("count")))
       .addEdgeAggregator(new CountAggregator("count"))
-//      .addEdgeAggregator(new SumAggregator("since", "sum"), "knows")
       .setStrategy(getStrategy())
       .build()
       .execute(input);

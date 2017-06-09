@@ -47,8 +47,8 @@ public class BuildGroupItemBase extends BuildBase {
     super(useLabel);
     this.labelGroups = labelGroups;
     groupingValues = Lists.newArrayList();
-
     LabelGroup standardLabelGroup = null;
+
     for (LabelGroup labelGroup : labelGroups) {
       if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
         standardLabelGroup = labelGroup;
@@ -56,9 +56,7 @@ public class BuildGroupItemBase extends BuildBase {
         standardLabelGroup = labelGroup;
       }
     }
-
     defaultLabelGroup = standardLabelGroup;
-
   }
 
   protected void setGroupItem (GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
@@ -72,12 +70,10 @@ public class BuildGroupItemBase extends BuildBase {
     }
     if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
       labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
-//      groupItem.setGroupLabel(element.getLabel());
       labelGroup.setGroupLabel(element.getLabel());
     }
-//    } else {
-      groupItem.setGroupLabel(labelGroup.getGroupLabel());
-//    }
+    groupItem.setGroupLabel(labelGroup.getGroupLabel());
+
     if (doAggregate(labelGroup.getAggregators())) {
       groupItem.setAggregateValues(
         getAggregateValues(element, labelGroup.getAggregators()));
@@ -88,8 +84,6 @@ public class BuildGroupItemBase extends BuildBase {
     groupItem.setGroupingValues(PropertyValueList.fromPropertyValues(groupingValues));
     groupingValues.clear();
   }
-
-
 
   protected List<LabelGroup> getLabelGroups() {
     return labelGroups;

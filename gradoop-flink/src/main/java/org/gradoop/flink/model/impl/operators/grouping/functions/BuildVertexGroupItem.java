@@ -17,15 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
@@ -48,31 +44,19 @@ public class BuildVertexGroupItem
    * Reduce object instantiations.
    */
   private final VertexGroupItem reuseVertexGroupItem;
-//  /**
-//   * Stores grouping properties and aggregators for vertex labels.
-//   */
-//  private final List<LabelGroup> labelGroups;
-//  /**
-//   * Stores the information about the default label group, this is either the vertex or the
-//   * edge default label group.
-//   */
-//  private final String defaultLabelGroup;
 
   /**
    * Creates map function
    *
-   * @param useLabel                        true, if label shall be considered
-   * @param vertexLabelGroups               stores grouping properties for vertex labels
+   * @param useLabel          true, if label shall be considered
+   * @param vertexLabelGroups stores grouping properties for vertex labels
    */
   public BuildVertexGroupItem(boolean useLabel, List<LabelGroup> vertexLabelGroups) {
     super(useLabel, vertexLabelGroups);
-//    this.labelGroups = vertexLabelGroups;
 
     this.reuseVertexGroupItem = new VertexGroupItem();
     this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
     this.reuseVertexGroupItem.setSuperVertex(false);
-
-
   }
 
   /**
@@ -80,7 +64,6 @@ public class BuildVertexGroupItem
    */
   @Override
   public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
-//    List<PropertyValue> values = Lists.newArrayList();
     boolean usedVertexLabelGroup = false;
 
     reuseVertexGroupItem.setVertexId(vertex.getId());
@@ -89,41 +72,14 @@ public class BuildVertexGroupItem
     for (LabelGroup vertexLabelGroup : getLabelGroups()) {
       if (vertexLabelGroup.getGroupingLabel().equals(vertex.getLabel())) {
         usedVertexLabelGroup = true;
-        // add value for grouping if exist
-//        for (String groupPropertyKey : vertexLabelGroup.getPropertyKeys()) {
-//          if (vertex.hasProperty(groupPropertyKey)) {
-//            values.add(vertex.getPropertyValue(groupPropertyKey));
-//          } else {
-//            values.add(PropertyValue.NULL_VALUE);
-//          }
-//        }
-//        reuseVertexGroupItem.setGroupLabel(vertexLabelGroup.getGroupLabel());
-//        if (doAggregate(vertexLabelGroup.getAggregators())) {
-//          reuseVertexGroupItem.setAggregateValues(
-//            getAggregateValues(vertex, vertexLabelGroup.getAggregators()));
-//        } else {
-//          this.reuseVertexGroupItem.setAggregateValues(PropertyValueList.createEmptyList());
-//        }
-//        reuseVertexGroupItem.setLabelGroup(vertexLabelGroup);
-//        reuseVertexGroupItem.setGroupingValues(PropertyValueList.fromPropertyValues(values));
-
         setGroupItem(reuseVertexGroupItem, vertex, vertexLabelGroup);
-
-
-
         collector.collect(reuseVertexGroupItem);
-//        values.clear();
       }
     }
     // standard grouping case
-    // TODO check if even needed
     if (!usedVertexLabelGroup) {
       setGroupItem(reuseVertexGroupItem, vertex, getDefaultLabelGroup());
       collector.collect(reuseVertexGroupItem);
-//      reuseVertexGroupItem.setLabelGroup(new LabelGroup(vertex.getLabel(), vertex.getLabel(),
-//        getGroupPropertyKeys(), ));
-//      reuseVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
-//      collector.collect(reuseVertexGroupItem);
     }
   }
 }
