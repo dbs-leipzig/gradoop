@@ -322,13 +322,42 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     private List<LabelGroup> edgeLabelGroups;
 
     /**
+     * Default vertex label group.
+     */
+    private LabelGroup defaultVertexLabelGroup;
+
+    /**
+     * Default edge label group.
+     */
+    private LabelGroup defaultEdgeLabelGroup;
+
+    /**
+     * List of all global vertex aggregate functions.
+     */
+    private List<PropertyValueAggregator> globalVertexAggregators;
+
+    /**
+     * List of all global edge aggregate functions.
+     */
+    private List<PropertyValueAggregator> globalEdgeAggregators;
+
+    /**
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
-      this.useVertexLabel         = false;
-      this.useEdgeLabel           = false;
-      this.vertexLabelGroups      = Lists.newArrayList();
-      this.edgeLabelGroups        = Lists.newArrayList();
+      this.useVertexLabel           = false;
+      this.useEdgeLabel             = false;
+      this.vertexLabelGroups        = Lists.newArrayList();
+      this.edgeLabelGroups          = Lists.newArrayList();
+      this.globalVertexAggregators  = Lists.newArrayList();
+      this.globalEdgeAggregators    = Lists.newArrayList();
+      this.defaultVertexLabelGroup  = new LabelGroup(
+        GConstants.DEFAULT_VERTEX_LABEL, Grouping.DEFAULT_VERTEX_LABEL_GROUP);
+      this.defaultEdgeLabelGroup    = new LabelGroup(
+        GConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
+
+      vertexLabelGroups.add(defaultVertexLabelGroup);
+      edgeLabelGroups.add(defaultEdgeLabelGroup);
     }
 
     /**
@@ -344,7 +373,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a property key to the vertex grouping keys.
+     * Adds a property key to the vertex grouping keys for vertices which do not have a specific
+     * label group.
      *
      * @param key property key
      * @return this builder
@@ -354,13 +384,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useVertexLabel(true);
       } else {
-        getOrCreateDefaultVertexLabelGroup().addPropertyKey(key);
+        defaultVertexLabelGroup.addPropertyKey(key);
       }
       return this;
     }
 
     /**
-     * Adds a list of property keys to the vertex grouping keys.
+     * Adds a list of property keys to the vertex grouping keys for vertices which do not have a
+     * specific label group.
      *
      * @param keys property keys
      * @return this builder
@@ -374,7 +405,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a property key to the edge grouping keys.
+     * Adds a property key to the edge grouping keys for edges which do not have a specific
+     * label group.
      *
      * @param key property key
      * @return this builder
@@ -384,13 +416,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useEdgeLabel(true);
       } else {
-        getOrCreateDefaultEdgeLabelGroup().addPropertyKey(key);
+        defaultEdgeLabelGroup.addPropertyKey(key);
       }
       return this;
     }
 
     /**
-     * Adds a list of property keys to the edge grouping keys.
+     * Adds a list of property keys to the edge grouping keys for edges  which do not have a
+     * specific label group.
      *
      * @param keys property keys
      * @return this builder
@@ -415,7 +448,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addVertexLabelGroup(
       String groupLabel, String vertexLabel,
       List<String> groupingKeys) {
-      return addVertexLabelGroup(groupLabel, vertexLabel, groupingKeys, Arrays.asList());
+      return addVertexLabelGroup(groupLabel, vertexLabel, groupingKeys, Lists.newArrayList());
     }
 
     /**
@@ -433,6 +466,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       vertexLabelGroups.add(new LabelGroup(groupLabel, vertexLabel, groupingKeys, aggregators));
+      if (groupLabel != null && !groupLabel.equals("")) {
+        useVertexLabel = true;
+      }
       return this;
     }
 
@@ -448,7 +484,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addEdgeLabelGroup(
       String groupLabel, String vertexLabel,
       List<String> groupingKeys) {
-      return addEdgeLabelGroup(groupLabel, vertexLabel, groupingKeys, Arrays.asList());
+      return addEdgeLabelGroup(groupLabel, vertexLabel, groupingKeys, Lists.newArrayList());
     }
 
     /**
@@ -466,6 +502,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       edgeLabelGroups.add(new LabelGroup(groupLabel, vertexLabel, groupingKeys, aggregators));
+      if (groupLabel != null && !groupLabel.equals("")) {
+        useEdgeLabel = true;
+      }
       return this;
     }
 
@@ -492,28 +531,53 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Add an aggregate function which is applied on a group of vertices
-     * represented by a single super vertex.
+     * Add an aggregate function which is applied on all vertices represented by a single super
+     * vertex which do not have a specific label group.
      *
      * @param aggregator vertex aggregator
      * @return this builder
      */
     public GroupingBuilder addVertexAggregator(PropertyValueAggregator aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      getOrCreateDefaultVertexLabelGroup().addAggregator(aggregator);
+      defaultVertexLabelGroup.addAggregator(aggregator);
       return this;
     }
 
     /**
-     * Add an aggregate function which is applied on a group of edges
-     * represented by a single super edge.
+     * Add an aggregate function which is applied on all vertices represented by a single super
+     * vertex.
+     *
+     * @param aggregator vertex aggregator
+     * @return this builder
+     */
+    public GroupingBuilder addGlobalVertexAggregator(PropertyValueAggregator aggregator) {
+      Objects.requireNonNull(aggregator, "Aggregator must not be null");
+      globalVertexAggregators.add(aggregator);
+      return this;
+    }
+
+    /**
+     * Add an aggregate function which is applied on all edges represented by a single super edge.
+     *
+     * @param aggregator edge aggregator
+     * @return this builder
+     */
+    public GroupingBuilder addGlobalEdgeAggregator(PropertyValueAggregator aggregator) {
+      Objects.requireNonNull(aggregator, "Aggregator must not be null");
+      globalEdgeAggregators.add(aggregator);
+      return this;
+    }
+
+    /**
+     * Add an aggregate function which is applied on all edges represented by a single super edge
+     * which do not have a specific label group.
      *
      * @param aggregator edge aggregator
      * @return this builder
      */
     public GroupingBuilder addEdgeAggregator(PropertyValueAggregator aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      getOrCreateDefaultEdgeLabelGroup().addAggregator(aggregator);
+      defaultEdgeLabelGroup.addAggregator(aggregator);
       return this;
     }
 
@@ -529,11 +593,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
 
-      if (vertexLabelGroups.isEmpty()) {
-        getOrCreateDefaultVertexLabelGroup();
+      for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
+        for (PropertyValueAggregator vertexAggregator : globalVertexAggregators) {
+          vertexLabelGroup.addAggregator(vertexAggregator);
+        }
       }
-      if (edgeLabelGroups.isEmpty()) {
-        getOrCreateDefaultEdgeLabelGroup();
+
+      for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
+        for (PropertyValueAggregator edgeAggregator : globalEdgeAggregators) {
+          edgeLabelGroup.addAggregator(edgeAggregator);
+        }
       }
 
       Grouping groupingOperator;
@@ -560,15 +629,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return default label group
      */
     private LabelGroup getOrCreateDefaultVertexLabelGroup() {
-      LabelGroup defaultVertexLabelGroup;
-      for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
-        if (vertexLabelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
-          return vertexLabelGroup;
-        }
-      }
-      defaultVertexLabelGroup = new LabelGroup(GConstants.DEFAULT_VERTEX_LABEL,
-        Grouping.DEFAULT_VERTEX_LABEL_GROUP);
-      vertexLabelGroups.add(defaultVertexLabelGroup);
       return defaultVertexLabelGroup;
     }
 
@@ -578,16 +638,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return default label group
      */
     private LabelGroup getOrCreateDefaultEdgeLabelGroup() {
-      LabelGroup defaultEdgeLabelGroup;
-      for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
-        if (edgeLabelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
-          return edgeLabelGroup;
-        }
-      }
-      defaultEdgeLabelGroup = new LabelGroup(GConstants.DEFAULT_EDGE_LABEL,
-        Grouping.DEFAULT_EDGE_LABEL_GROUP);
-      edgeLabelGroups.add(defaultEdgeLabelGroup);
       return defaultEdgeLabelGroup;
+
     }
   }
 }
