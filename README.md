@@ -143,6 +143,10 @@ The main contents of that module are the EPGM data model and a corresponding POJ
 implementation which is used in Flink&trade;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
+### gradoop-hbase
+
+Input and output formats for reading and writing graph collections from Apache HBase.
+
 ### gradoop-flink
 
 This module contains reference implementations of the EPGM operators. The 
