@@ -19,14 +19,15 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
@@ -48,15 +49,15 @@ public abstract class SubgraphDecoder implements Serializable {
   /**
    * graph Head Factory
    */
-  protected final GraphHeadFactory graphHeadFactory;
+  protected final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * vertex Factory
    */
-  protected final VertexFactory vertexFactory;
+  protected final EPGMVertexFactory<Vertex> vertexFactory;
   /**
    * edge Factory
    */
-  protected final EdgeFactory edgeFactory;
+  protected final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Constructor.

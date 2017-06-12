@@ -22,19 +22,6 @@ package org.gradoop.common.util;
  */
 public final class GConstants {
   /**
-   * Default HBase table name for graph heads.
-   */
-  public static final String DEFAULT_TABLE_GRAPHS = "graph_heads";
-  /**
-   * Default HBase table name for vertices.
-   */
-  public static final String DEFAULT_TABLE_VERTICES = "vertices";
-  /**
-   * Default HBase table name for edges.
-   */
-  public static final String DEFAULT_TABLE_EDGES = "edges";
-
-  /**
    * Default label for unlabeled vertices.
    */
   public static final String DEFAULT_VERTEX_LABEL = "";
@@ -52,51 +39,6 @@ public final class GConstants {
    */
   public static final String NULL_STRING = "NULL";
 
-  /**
-   * Column family name for label.
-   */
-  public static final String CF_META = "m";
-  /**
-   * Column identifier for label.
-   */
-  public static final String COL_LABEL = "l";
-  /**
-   * Column identifier for graphs.
-   */
-  public static final String COL_GRAPHS = "g";
-  /**
-   * Column family name for properties.
-   */
-  public static final String CF_PROPERTIES = "p";
-  /**
-   * Column family name for vertices.
-   */
-  public static final String CF_VERTICES = "v";
-  /**
-   * Column family for edges.
-   */
-  public static final String CF_EDGES = "e";
-  /**
-   * Column family name for outgoing edges.
-   */
-  public static final String CF_OUT_EDGES = "oe";
-  /**
-   * Column family name for incoming edges.
-   */
-  public static final String CF_IN_EDGES = "ie";
-  /**
-   * Column identifier for source vertex identifier.
-   */
-  public static final String COL_SOURCE = "s";
-  /**
-   * Column identifier for target vertex identifier.s
-   */
-  public static final String COL_TARGET = "t";
-
-  /**
-   * Default cache size for scans in HBase.
-   */
-  public static final int HBASE_DEFAULT_SCAN_CACHE_SIZE = 500;
   /**
    * Default label of an EPGM database graph.
    */

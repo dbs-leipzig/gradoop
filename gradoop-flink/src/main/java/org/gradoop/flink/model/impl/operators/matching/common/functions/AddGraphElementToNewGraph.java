@@ -20,9 +20,9 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
@@ -43,7 +43,7 @@ public class AddGraphElementToNewGraph<GE extends GraphElement>
   /**
    * EPGM graph head factory
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * Variable assigned to the query vertex
    */
@@ -63,7 +63,8 @@ public class AddGraphElementToNewGraph<GE extends GraphElement>
    * @param graphHeadFactory EPGM graph head factory
    * @param variable Variable assigned to the only query vertex
    */
-  public AddGraphElementToNewGraph(GraphHeadFactory graphHeadFactory, String variable) {
+  public AddGraphElementToNewGraph(EPGMGraphHeadFactory<GraphHead> graphHeadFactory,
+    String variable) {
     this.graphHeadFactory = graphHeadFactory;
     this.variable = variable;
     reuseTuple = new Tuple2<>();

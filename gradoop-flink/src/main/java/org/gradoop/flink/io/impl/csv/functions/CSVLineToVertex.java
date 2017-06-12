@@ -17,9 +17,9 @@
 
 package org.gradoop.flink.io.impl.csv.functions;
 
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
@@ -35,15 +35,15 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
   /**
    * Used to instantiate the vertex.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Constructor
    *
-   * @param vertexFactory EPGM vertex factory
+   * @param epgmVertexFactory EPGM vertex factory
    */
-  public CSVLineToVertex(VertexFactory vertexFactory) {
-    this.vertexFactory = vertexFactory;
+  public CSVLineToVertex(EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    this.vertexFactory = epgmVertexFactory;
   }
 
   @Override

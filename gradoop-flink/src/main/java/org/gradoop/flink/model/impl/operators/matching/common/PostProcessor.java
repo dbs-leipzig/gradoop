@@ -31,12 +31,12 @@ import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
@@ -156,12 +156,12 @@ public class PostProcessor {
    * Initializes EPGM vertices from the given pattern matching result.
    *
    * @param result        pattern matching result
-   * @param vertexFactory EPGM vertex factory
+   * @param epgmVertexFactory EPGM vertex factory
    * @return EPGM vertices
    */
   public static DataSet<Vertex> extractVertices(DataSet<FatVertex> result,
-    VertexFactory vertexFactory) {
-    return extractVertexIds(result).map(new VertexFromId(vertexFactory));
+    EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    return extractVertexIds(result).map(new VertexFromId(epgmVertexFactory));
   }
 
   /**
@@ -189,12 +189,12 @@ public class PostProcessor {
    * Initializes EPGM edges from the given pattern matching result.
    *
    * @param result      pattern matching result
-   * @param edgeFactory EPGM edge factory
+   * @param epgmEdgeFactory EPGM edge factory
    * @return EPGM edges
    */
   public static DataSet<Edge> extractEdges(DataSet<FatVertex> result,
-    EdgeFactory edgeFactory) {
-    return extractEdgeIds(result).map(new EdgeFromIds(edgeFactory));
+    EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+    return extractEdgeIds(result).map(new EdgeFromIds(epgmEdgeFactory));
   }
 
   /**
