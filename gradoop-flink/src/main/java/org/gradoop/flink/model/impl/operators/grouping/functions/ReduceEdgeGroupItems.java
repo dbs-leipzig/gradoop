@@ -25,7 +25,6 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
@@ -66,13 +65,7 @@ public class ReduceEdgeGroupItems
     Collector<Edge> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
-    String groupLabel;
-
-    if (useLabel()) {
-      groupLabel = edgeGroupItem.getGroupLabel();
-    } else {
-      groupLabel = GConstants.DEFAULT_EDGE_LABEL;
-    }
+    String groupLabel = edgeGroupItem.getGroupLabel();
 
     Edge superEdge = edgeFactory.createEdge(
       groupLabel,

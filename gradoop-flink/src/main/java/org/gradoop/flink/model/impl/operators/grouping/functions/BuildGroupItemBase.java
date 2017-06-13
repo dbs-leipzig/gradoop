@@ -87,11 +87,12 @@ public class BuildGroupItemBase extends BuildBase {
         groupingValues.add(PropertyValue.NULL_VALUE);
       }
     }
-    if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
-      labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
-      labelGroup.setGroupLabel(element.getLabel());
+    if ((labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
+      labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) && useLabel()) {
+      groupItem.setGroupLabel(element.getLabel());
+    } else {
+      groupItem.setGroupLabel(labelGroup.getGroupLabel());
     }
-    groupItem.setGroupLabel(labelGroup.getGroupLabel());
 
     if (doAggregate(labelGroup.getAggregators())) {
       groupItem.setAggregateValues(

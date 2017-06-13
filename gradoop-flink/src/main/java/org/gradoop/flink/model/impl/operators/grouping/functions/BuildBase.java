@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -85,28 +84,6 @@ abstract class BuildBase implements Serializable {
    */
   protected boolean useLabel() {
     return useLabel;
-  }
-
-  /**
-   * Returns the label or {@code null} if {@link #useLabel()} is {@code false}.
-   *
-   * @param labeled labeled element
-   * @return label or {@code null}
-   */
-  protected String getLabel(EPGMLabeled labeled) {
-    return useLabel() ? labeled.getLabel() : null;
-  }
-
-  /**
-   * Sets the given label if {@link #useLabel()} returns {@code true}.
-   *
-   * @param labeled labeled element
-   * @param label   group label
-   */
-  protected void setLabel(EPGMLabeled labeled, String label) {
-    if (useLabel()) {
-      labeled.setLabel(label);
-    }
   }
 
   //----------------------------------------------------------------------------

@@ -65,7 +65,7 @@ public class BuildSuperVertex
     Exception {
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
-    setLabel(supVertex, groupItem.getGroupLabel());
+    supVertex.setLabel(groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
     setAggregateValues(
       supVertex,

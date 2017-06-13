@@ -439,35 +439,62 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param groupLabel label of the group and therefor of the new super vertex
-     * @param vertexLabel vertex label
+     * @param label vertex label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String groupLabel, String vertexLabel,
+      String label,
       List<String> groupingKeys) {
-      return addVertexLabelGroup(groupLabel, vertexLabel, groupingKeys, Lists.newArrayList());
+      return addVertexLabelGroup(label, label, groupingKeys, Lists.newArrayList());
     }
 
     /**
      * Adds a vertex label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param groupLabel label of the group and therefor of the new super vertex
-     * @param vertexLabel vertex label
+     * @param label vertex label
      * @param groupingKeys keys used for grouping
      * @param aggregators vertex aggregators
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String groupLabel, String vertexLabel,
+      String label,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
-      vertexLabelGroups.add(new LabelGroup(groupLabel, vertexLabel, groupingKeys, aggregators));
-      if (groupLabel != null && !groupLabel.equals("")) {
-        useVertexLabel = true;
-      }
+      return addVertexLabelGroup(label, label, groupingKeys, aggregators);
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Note that a label may be used multiple times.
+     *
+     * @param label vertex label
+     * @param superVertexLabel label of the group and therefore of the new super vertex
+     * @param groupingKeys keys used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder addVertexLabelGroup(
+      String label, String superVertexLabel,
+      List<String> groupingKeys) {
+      return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * specific label. Note that a label may be used multiple times.
+     *
+     * @param label vertex label
+     * @param superVertexLabel label of the group and therefore of the new super vertex
+     * @param groupingKeys keys used for grouping
+     * @param aggregators vertex aggregators
+     * @return this builder
+     */
+    public GroupingBuilder addVertexLabelGroup(
+      String label, String superVertexLabel,
+      List<String> groupingKeys,
+      List<PropertyValueAggregator> aggregators) {
+      vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
       return this;
     }
 
@@ -475,35 +502,62 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param groupLabel label of the group and therefor of the new super vertex
-     * @param vertexLabel vertex label
+     * @param label edge label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String groupLabel, String vertexLabel,
+      String label,
       List<String> groupingKeys) {
-      return addEdgeLabelGroup(groupLabel, vertexLabel, groupingKeys, Lists.newArrayList());
+      return addEdgeLabelGroup(label, label, groupingKeys, Lists.newArrayList());
     }
 
     /**
      * Adds a vertex label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param groupLabel label of the group and therefor of the new super vertex
-     * @param vertexLabel vertex label
+     * @param label edge label
      * @param groupingKeys keys used for grouping
      * @param aggregators edge aggregators
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String groupLabel, String vertexLabel,
+      String label,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
-      edgeLabelGroups.add(new LabelGroup(groupLabel, vertexLabel, groupingKeys, aggregators));
-      if (groupLabel != null && !groupLabel.equals("")) {
-        useEdgeLabel = true;
-      }
+      return addEdgeLabelGroup(label, label, groupingKeys, aggregators);
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Note that a label may be used multiple times.
+     *
+     * @param label edge label
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param groupingKeys keys used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder addEdgeLabelGroup(
+      String label, String superEdgeLabel,
+      List<String> groupingKeys) {
+      return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * specific label. Note that a label may be used multiple times.
+     *
+     * @param label edge label
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param groupingKeys keys used for grouping
+     * @param aggregators edge aggregators
+     * @return this builder
+     */
+    public GroupingBuilder addEdgeLabelGroup(
+      String label, String superEdgeLabel,
+      List<String> groupingKeys,
+      List<PropertyValueAggregator> aggregators) {
+      edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
       return this;
     }
 

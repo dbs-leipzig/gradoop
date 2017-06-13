@@ -1374,7 +1374,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User","User", Lists.newArrayList("gender"))
+      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1405,7 +1405,37 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("UserGender","User", Lists.newArrayList("gender"))
+      .addVertexLabelGroup("UserGender", "User", Lists.newArrayList("gender"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testVertexLabelSpecificUnlabeledGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum {topic : \"rdf\"})" +
+      "(v01:Forum {topic : \"graph\"})" +
+      "(v02 {gender : \"male\"})" +
+      "(v03 {gender : \"female\"})" +
+      "(v02)-->(v00)" +
+      "(v02)-->(v01)" +
+      "(v02)-->(v02)" +
+      "(v02)-->(v03)" +
+      "(v03)-->(v01)" +
+      "(v03)-->(v02)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .addVertexGroupingKey("gender")
+      .addVertexLabelGroup("Forum", Lists.newArrayList("topic"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1434,9 +1464,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
       .addVertexGroupingKey("topic")
       .addVertexAggregator(new CountAggregator("count"))
-      .addVertexLabelGroup("User","User", Lists.newArrayList("gender"),
+      .addVertexLabelGroup("User", Lists.newArrayList("gender"),
         Lists.newArrayList(new SumAggregator("age", "sum")))
       .setStrategy(getStrategy())
       .build()
@@ -1467,9 +1498,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
       .addGlobalVertexAggregator(new CountAggregator("count"))
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User","User", Lists.newArrayList("gender"))
+      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1512,8 +1544,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User","User", Lists.newArrayList("gender"))
-      .addVertexLabelGroup("User","User", Lists.newArrayList("age"))
+      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
+      .addVertexLabelGroup("User", Lists.newArrayList("age"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1531,10 +1563,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Forum {count : 1L,topic : \"rdf\"})" +
       "(v01:Forum {count : 1L,topic : \"graph\"})" +
-      "(v02:User  {count : 3L,gender : \"male\", sum : 70})" +
-      "(v03:User  {count : 1L,gender : \"female\", sum : 20})" +
-      "(v04:User  {count : 3L,age : 20, sum : 60})" +
-      "(v05:User  {count : 1L,age : 30, sum : 30})" +
+      "(v02:User  {count : 3L,gender : \"male\", max : 30})" +
+      "(v03:User  {count : 1L,gender : \"female\", max : 20})" +
+      "(v04:UserAge  {count : 3L,age : 20, sum : 60})" +
+      "(v05:UserAge  {count : 1L,age : 30, sum : 30})" +
       "(v02)-->(v00)" +
       "(v02)-->(v01)" +
       "(v02)-->(v02)" +
@@ -1556,9 +1588,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User","User", Lists.newArrayList("gender"),
-        Lists.newArrayList(new CountAggregator("count"), new SumAggregator("age", "sum")))
-      .addVertexLabelGroup("User","User", Lists.newArrayList("age"),
+      .addVertexLabelGroup("User", Lists.newArrayList("gender"),
+        Lists.newArrayList(new CountAggregator("count"), new MaxAggregator("age", "max")))
+      .addVertexLabelGroup("UserAge", "User", Lists.newArrayList("age"),
         Lists.newArrayList(new CountAggregator("count"), new SumAggregator("age", "sum")))
       .addVertexAggregator(new CountAggregator("count"))
       .setStrategy(getStrategy())
@@ -1586,8 +1618,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
+      .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList("since"))
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1613,8 +1646,36 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
+      .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knowsSince","knows", Lists.newArrayList("since"))
+      .addEdgeLabelGroup("knowsSince", "knows", Lists.newArrayList("since"))
+      .setStrategy(getStrategy())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testEdgeLabelSpecificUnlabeledGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
+
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(v00:Forum)" +
+      "(v01:User)" +
+      "(v01)-[{until : 2014}]->(v00)" +
+      "(v01)-[{until : 2013}]->(v00)" +
+      "(v01)-[:knows {since : 2014}]->(v01)" +
+      "(v01)-[:knows {since : 2013}]->(v01)" +
+      "]");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .useVertexLabel(true)
+      .addEdgeGroupingKey("until")
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1640,9 +1701,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
+      .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
       .addEdgeAggregator(new MinAggregator("until", "min"))
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList("since"),
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumAggregator("since", "sum")))
       .setStrategy(getStrategy())
       .build()
@@ -1670,9 +1732,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .addGlobalEdgeAggregator(new CountAggregator("count"))
       .useVertexLabel(true)
+      .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
       .addEdgeAggregator(new MinAggregator("until", "min"))
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList("since"),
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumAggregator("since", "sum")))
       .setStrategy(getStrategy())
       .build()
@@ -1700,9 +1763,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList("since"))
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList())
-      .addEdgeLabelGroup("member","member", Lists.newArrayList("until"))
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
+      .addEdgeLabelGroup("knows", Lists.newArrayList())
+      .addEdgeLabelGroup("member", Lists.newArrayList("until"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1724,16 +1787,16 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v01)-[:member {until : 2013, min : 2013}]->(v00)" +
       "(v01)-[:knows {since : 2014, sum : 4028}]->(v01)" +
       "(v01)-[:knows {since : 2013, sum : 6039}]->(v01)" +
-      "(v01)-[:knows {max : 2014}]->(v01)" +
+      "(v01)-[:knowsMax {max : 2014}]->(v01)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList("since"),
+      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumAggregator("since", "sum")))
-      .addEdgeLabelGroup("knows","knows", Lists.newArrayList(),
+      .addEdgeLabelGroup("knowsMax", "knows", Lists.newArrayList(),
         Lists.newArrayList(new MaxAggregator("since", "max")))
-      .addEdgeLabelGroup("member","member", Lists.newArrayList("until"),
+      .addEdgeLabelGroup("member", Lists.newArrayList("until"),
         Lists.newArrayList(new MinAggregator("until", "min")))
       .setStrategy(getStrategy())
       .build()

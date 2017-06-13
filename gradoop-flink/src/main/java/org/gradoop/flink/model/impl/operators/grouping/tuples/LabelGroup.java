@@ -40,26 +40,26 @@ public class LabelGroup
   /**
    * Constructor to only define the label.
    *
-   * @param groupLabel    label used after grouping
    * @param groupingLabel label used for grouping
+   * @param groupLabel    label used after grouping
    */
-  public LabelGroup(String groupLabel, String groupingLabel) {
-    this(groupLabel, groupingLabel, Lists.newArrayList(), Lists.newArrayList());
+  public LabelGroup(String groupingLabel, String groupLabel) {
+    this(groupingLabel, groupLabel, Lists.newArrayList(), Lists.newArrayList());
   }
 
   /**
    * Constructor with varargs.
    *
-   * @param groupLabel    label used after grouping
    * @param groupingLabel label used for grouping
+   * @param groupLabel    label used after grouping
    * @param propertyKeys variable amount of grouping keys for the label
    * @param aggregators  aggregate functions
    */
   public LabelGroup(
-    String groupLabel, String groupingLabel,
+    String groupingLabel, String groupLabel,
     List<String> propertyKeys,
     List<PropertyValueAggregator> aggregators) {
-    super(groupLabel, groupingLabel, propertyKeys, aggregators);
+    super(groupingLabel, groupLabel, propertyKeys, aggregators);
   }
 
   public String getGroupLabel() {
