@@ -61,11 +61,14 @@ public class BuildGroupItemBase extends BuildBase {
     groupingValues = Lists.newArrayList();
     LabelGroup standardLabelGroup = null;
 
+    // find and keep the default label group for fast access
     for (LabelGroup labelGroup : labelGroups) {
       if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
         standardLabelGroup = labelGroup;
+        break;
       } else if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
         standardLabelGroup = labelGroup;
+        break;
       }
     }
     defaultLabelGroup = standardLabelGroup;
@@ -80,6 +83,8 @@ public class BuildGroupItemBase extends BuildBase {
    */
   protected void setGroupItem(GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
     throws IOException {
+    // stores all, in the label group specified, grouping values of the element, if the element
+    // does not have a property a null property value is stored
     for (String groupPropertyKey : labelGroup.getPropertyKeys()) {
       if (element.hasProperty(groupPropertyKey)) {
         groupingValues.add(element.getPropertyValue(groupPropertyKey));
@@ -87,8 +92,12 @@ public class BuildGroupItemBase extends BuildBase {
         groupingValues.add(PropertyValue.NULL_VALUE);
       }
     }
-    if ((labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
-      labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) && useLabel()) {
+    // If the label group is the default one and the labels shall be used for grouping the
+    // elements labels are kept, otherwise the label given by the group is taken. The default
+    // label groups label is empty and if the current label group is a manually specified one its
+    // label is also taken.
+    if (labelGroup.getGroupingLabel().equals(getDefaultLabelGroup().getGroupingLabel()) &&
+      useLabel()) {
       groupItem.setGroupLabel(element.getLabel());
     } else {
       groupItem.setGroupLabel(labelGroup.getGroupLabel());

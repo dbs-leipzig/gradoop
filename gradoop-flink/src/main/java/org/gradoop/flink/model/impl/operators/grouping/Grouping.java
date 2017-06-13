@@ -646,6 +646,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
 
+      // adding the global aggregators to the associated label groups
       for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
         for (PropertyValueAggregator vertexAggregator : globalVertexAggregators) {
           vertexLabelGroup.addAggregator(vertexAggregator);
@@ -674,25 +675,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       }
 
       return groupingOperator;
-    }
-
-    /**
-     * Returns the label group which is used for grouping all vertices.
-     *
-     * @return default label group
-     */
-    private LabelGroup getOrCreateDefaultVertexLabelGroup() {
-      return defaultVertexLabelGroup;
-    }
-
-    /**
-     * Returns the label group which is used for grouping all edges.
-     *
-     * @return default label group
-     */
-    private LabelGroup getOrCreateDefaultEdgeLabelGroup() {
-      return defaultEdgeLabelGroup;
-
     }
   }
 }
