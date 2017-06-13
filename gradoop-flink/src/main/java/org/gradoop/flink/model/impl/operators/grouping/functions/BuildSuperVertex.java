@@ -30,8 +30,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
  */
-@FunctionAnnotation.ForwardedFields("f1->id")
-@FunctionAnnotation.ReadFields("f1;f2;f3;f4")
+@FunctionAnnotation.ForwardedFields("f1->id;f2->label")
+@FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
 public class BuildSuperVertex
   extends BuildBase
   implements MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {

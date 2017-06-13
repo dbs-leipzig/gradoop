@@ -31,7 +31,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
  * Creates a new super edge representing an edge group. The edge stores the
  * group label, the group property value and the aggregate values for its group.
  */
-@FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId")
+@FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId;f2->label")
+@FunctionAnnotation.ReadFields("f3;f5")
 public class ReduceEdgeGroupItems
   extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, Edge>, ResultTypeQueryable<Edge> {
@@ -65,10 +66,9 @@ public class ReduceEdgeGroupItems
     Collector<Edge> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
-    String groupLabel = edgeGroupItem.getGroupLabel();
 
     Edge superEdge = edgeFactory.createEdge(
-      groupLabel,
+      edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 

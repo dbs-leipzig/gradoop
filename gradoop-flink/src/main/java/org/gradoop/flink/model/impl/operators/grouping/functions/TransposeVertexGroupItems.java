@@ -49,9 +49,11 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFields(
     "f0->f0.f0;" +  // vertexId
-    "f3->f0.f3;" +  // label
-    "f4->f0.f4"     // properties
+    "f2->f0.f2;" +  // label
+    "f3->f0.f3;" +  // properties
+    "f6->f0.f6"     // label group
 )
+@FunctionAnnotation.ReadFields("f4")
 public class TransposeVertexGroupItems
   extends ReduceVertexGroupItemBase
   implements GroupReduceFunction<VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {

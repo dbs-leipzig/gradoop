@@ -34,7 +34,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 @FunctionAnnotation.ForwardedFields(
     "f0;" + // vertexId
     "f3;" + // label
-    "f4"    // properties
+    "f4;"  + // properties
+    "f6"    // label group
 )
 public class CombineVertexGroupItems
   extends ReduceVertexGroupItems

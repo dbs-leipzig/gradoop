@@ -29,8 +29,10 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  */
 @FunctionAnnotation.ForwardedFields(
     "f0;" + // vertex id
-    "f3;" + // label
-    "f4"    // properties
+    "f2;" + // label
+    "f3;" + // properties
+    "f4;" + // aggregates
+    "f6"    // label group
 )
 public class ReduceVertexGroupItems
   extends ReduceVertexGroupItemBase
