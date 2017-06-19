@@ -44,8 +44,8 @@ public class BuildSuperVertex
   /**
    * Creates map function.
    *
-   * @param useLabel                        true, if vertex label shall be considered
-   * @param epgmVertexFactory               vertex factory
+   * @param useLabel          true, if vertex label shall be considered
+   * @param epgmVertexFactory vertex factory
    */
   public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<Vertex> epgmVertexFactory) {
     super(useLabel);
