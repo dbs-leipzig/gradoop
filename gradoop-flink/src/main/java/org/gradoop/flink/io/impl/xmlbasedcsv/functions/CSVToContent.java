@@ -31,6 +31,11 @@ public class CSVToContent implements MapFunction<String, Tuple2<CsvExtension, St
   private CsvExtension csv;
 
   /**
+   * Avoid object instantiation.
+   */
+  private Tuple2<CsvExtension, String> reuseTuple= new Tuple2<>();
+
+  /**
    * Valued Constructor.
    *
    * @param csv object, containing meta information
@@ -41,6 +46,8 @@ public class CSVToContent implements MapFunction<String, Tuple2<CsvExtension, St
 
   @Override
   public Tuple2<CsvExtension, String> map(String s) throws Exception {
-    return new Tuple2<CsvExtension, String>(csv, s);
+    reuseTuple.f0 = csv;
+    reuseTuple.f1 = s;
+    return reuseTuple;
   }
 }

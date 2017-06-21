@@ -18,6 +18,7 @@
 package org.gradoop.flink.io.impl.xmlbasedcsv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -26,11 +27,18 @@ import org.gradoop.flink.io.impl.xmlbasedcsv.XMLBasedCSVConstants;
 /**
  * Creates a tuple containing the string representation of a vertex key and its id.
  */
+@FunctionAnnotation.ForwardedFields("id->f1")
 public class VertexToVertexIds implements MapFunction<Vertex, Tuple2<String, GradoopId>> {
+
+  /**
+   * Avoid object instantiation.
+   */
+  private Tuple2<String, GradoopId> reuseTuple = new Tuple2<>();
 
   @Override
   public Tuple2<String, GradoopId> map(Vertex vertex) throws Exception {
-    return new Tuple2<String, GradoopId>(
-      vertex.getPropertyValue(XMLBasedCSVConstants.PROPERTY_KEY_KEY).getString(), vertex.getId());
+    reuseTuple.f0 = vertex.getPropertyValue(XMLBasedCSVConstants.PROPERTY_KEY_KEY).getString();
+    reuseTuple.f1 = vertex.getId();
+    return reuseTuple;
   }
 }
