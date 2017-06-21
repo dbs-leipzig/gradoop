@@ -33,7 +33,7 @@ public class CSVToContent implements MapFunction<String, Tuple2<CsvExtension, St
   /**
    * Avoid object instantiation.
    */
-  private Tuple2<CsvExtension, String> reuseTuple= new Tuple2<>();
+  private Tuple2<CsvExtension, String> reuseTuple = new Tuple2<>();
 
   /**
    * Valued Constructor.
