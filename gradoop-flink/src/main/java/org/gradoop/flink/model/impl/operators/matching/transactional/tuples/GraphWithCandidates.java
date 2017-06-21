@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +34,13 @@ import java.util.List;
  */
 public class GraphWithCandidates extends
   Tuple3<GradoopId, List<IdWithCandidates<GradoopId>>, List<TripleWithCandidates<GradoopId>>> {
+
+  /**
+   * Default Constructor
+   */
+  public GraphWithCandidates(){
+
+  }
 
   /**
    * Constructor

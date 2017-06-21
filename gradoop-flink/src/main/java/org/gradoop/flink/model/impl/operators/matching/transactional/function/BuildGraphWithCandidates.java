@@ -40,8 +40,7 @@ public class BuildGraphWithCandidates implements
     Collector<GraphWithCandidates> collector) throws Exception {
 
     GraphWithCandidates graph = null;
-    for (Tuple2<GradoopId, IdWithCandidates<GradoopId>> vertexCandidates :
-      vertices) {
+    for (Tuple2<GradoopId, IdWithCandidates<GradoopId>> vertexCandidates : vertices) {
       if (graph == null) {
         graph = new GraphWithCandidates(vertexCandidates.f0);
         graph.setGraphId(vertexCandidates.f0);
@@ -49,8 +48,7 @@ public class BuildGraphWithCandidates implements
       graph.getVertexCandidates().add(vertexCandidates.f1);
     }
 
-    for (Tuple2<GradoopId, TripleWithCandidates<GradoopId>> edgeCandidates :
-      edges) {
+    for (Tuple2<GradoopId, TripleWithCandidates<GradoopId>> edgeCandidates : edges) {
       if (graph == null) {
         graph = new GraphWithCandidates(edgeCandidates.f0);
         graph.setGraphId(edgeCandidates.f0);
