@@ -99,6 +99,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mongodb.version>3.3.0</dep.mongodb.version>
+        <dep.jaxb.version>2.2.6</dep.jaxb.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
 
@@ -323,6 +324,12 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${dep.mongodb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${dep.jaxb.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

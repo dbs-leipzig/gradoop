@@ -50,14 +50,6 @@
     <dependencies>
         <!-- Compile dependencies -->
 
-        <!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.2.6</version>
-        </dependency>
-
-
         <!-- Gradoop -->
         <dependency>
             <groupId>org.gradoop</groupId>
@@ -80,9 +72,15 @@
             <artifactId>flink-hbase_2.11</artifactId>
         </dependency>
 
+        <!-- Others -->
         <dependency>
             <groupId>me.lemire.integercompression</groupId>
             <artifactId>JavaFastPFOR</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
