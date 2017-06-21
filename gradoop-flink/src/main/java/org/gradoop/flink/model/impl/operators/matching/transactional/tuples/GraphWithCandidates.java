@@ -38,7 +38,7 @@ public class GraphWithCandidates extends
   /**
    * Default Constructor
    */
-  public GraphWithCandidates(){
+  public GraphWithCandidates() {
 
   }
 
