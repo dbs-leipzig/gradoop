@@ -19,6 +19,8 @@ package org.gradoop.flink.io.impl.xmlbasedcsv;
 
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.Objects;
+
 /**
  * Base class for CSV data source.
  */
@@ -30,8 +32,8 @@ abstract class XMLBasedCSVBase {
   /**
    * Complete path to the xsd file.
    */
-  private final String xsdPath = XMLBasedCSVBase.class.getResource("/data/xmlbasedcsv/csv_format" +
-    ".xsd").getFile();
+  private final String xsdPath = XMLBasedCSVBase.class.getResource(
+    "/data/xmlbasedcsv/csv_format.xsd").getFile();
   /**
    * Complete path to the xml file.
    */
@@ -49,15 +51,9 @@ abstract class XMLBasedCSVBase {
    * @param config Gradoop Flink configuration
    */
   XMLBasedCSVBase(String metaXmlPath, String csvDir, GradoopFlinkConfig config) {
-    if (config == null) {
-      throw new IllegalArgumentException("config must not be null");
-    }
-    if (metaXmlPath == null) {
-      throw new IllegalArgumentException("path to xml must not be null");
-    }
-    if (csvDir == null) {
-      throw new IllegalArgumentException("xmlbasedcsv directory must not be null");
-    }
+    Objects.requireNonNull(metaXmlPath, "Path to xml must not be null.");
+    Objects.requireNonNull(csvDir, "Csv directory must not be null.");
+    Objects.requireNonNull(config, "Config must not be null.");
 
     this.config = config;
     this.metaXmlPath = metaXmlPath;
