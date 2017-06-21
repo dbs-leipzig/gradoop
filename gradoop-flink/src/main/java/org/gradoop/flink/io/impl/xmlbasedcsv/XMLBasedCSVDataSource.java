@@ -63,7 +63,7 @@ import java.util.Map;
 /**
  * Creates an EPGM instance from CSV files. Their format has to be defined
  * with a xml file. The schema for the xml is located at
- * 'resources/dara/xmlbasedcsv/csv_format.xsd'.
+ * {@link resources/data/xmlbasedcsv/csv_format.xsd}.
  */
 public class XMLBasedCSVDataSource extends XMLBasedCSVBase implements DataSource {
   /**
