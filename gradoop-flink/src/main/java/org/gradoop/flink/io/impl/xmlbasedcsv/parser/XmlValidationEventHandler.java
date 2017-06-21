@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.io.impl.xmlbasedcsv.parser;
 
+import org.apache.log4j.Logger;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 
@@ -25,9 +26,14 @@ import javax.xml.bind.ValidationEventHandler;
  */
 public class XmlValidationEventHandler implements ValidationEventHandler {
 
+  /**
+   * Logger
+   */
+  private static final Logger LOG = Logger.getLogger(XmlValidationEventHandler.class);
+
   @Override
   public boolean handleEvent(ValidationEvent event) {
-    System.err.println(event.getLinkedException());
+    LOG.error(event);
     return false;
   }
 }
