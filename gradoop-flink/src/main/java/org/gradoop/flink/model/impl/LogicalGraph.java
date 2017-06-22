@@ -49,8 +49,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
-import org.gradoop.flink.model.impl.operators.neighborhood.GroupReduceEdgeNeighborhood;
-import org.gradoop.flink.model.impl.operators.neighborhood.GroupReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
@@ -443,24 +441,6 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   public LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupReduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new GroupReduceEdgeNeighborhood(function, edgeDirection));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public LogicalGraph groupReduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new GroupReduceVertexNeighborhood(function, edgeDirection));
   }
 
   //----------------------------------------------------------------------------

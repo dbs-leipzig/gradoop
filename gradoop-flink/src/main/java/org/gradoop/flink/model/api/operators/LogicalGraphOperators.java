@@ -298,32 +298,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
 
   /**
-   * Sets the aggregation result of the given function as property for each vertex. All edges where
-   * the vertex is relevant get cogrouped. The relevant edges are specified using the direction
-   * which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   *
-   * @return logical graph where vertices store aggregated information about connected edges
-   */
-  LogicalGraph groupReduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
-
-  /**
-   * Sets the aggregation result of the given function as property for each vertex. All vertices
-   * of relevant edges get cogrouped by the vertex. The relevant edges are
-   * specified using the direction which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   *
-   * @return logical graph where vertices store aggregated information about connected vertices
-   */
-  LogicalGraph groupReduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
-
-  /**
    * Checks, if another logical graph contains exactly the same vertices and
    * edges (by id) as this graph.
    *
