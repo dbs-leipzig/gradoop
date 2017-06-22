@@ -31,13 +31,12 @@ import static org.junit.Assert.assertEquals;
 
 public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
 
-// typical values for normal foodbroker config
+// typical values for normal resources.foodbroker config
 
   @Test
   public void testGetIntRangeConfigurationValue()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(0.33f, 0.01f);
@@ -79,8 +78,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetDecimalVariationConfigurationValue()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(0.33f, 0.32f, 0.33f);
@@ -105,11 +103,14 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
     assertEquals(-0.01f, result, 0.00001f);
   }
 
+  private String getConfigPath() throws URISyntaxException {
+    return FoodBroker.class.getResource("/foodbroker/config.json").getFile();
+  }
+
   @Test
   public void testHappensTransitionConfiguration()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(0.50f, 0.82f);
@@ -140,8 +141,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetValueHomogenInfluence()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(
@@ -156,8 +156,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetValueHomogenInfluence2()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(
@@ -172,8 +171,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetValueHomogenInfluence3()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(0.17f, 0.83f);
@@ -188,8 +186,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetValueOnePositivInfluence()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(
@@ -206,8 +203,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   @Test
   public void testGetValueTwoPositivInfluence()
     throws URISyntaxException, IOException, JSONException {
-    String configPath = Paths.get(
-      FoodBrokerTest.class.getResource("/foodbroker/config.json").toURI()).toFile().getPath();
+    String configPath = getConfigPath();
     TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
 
     List<Float> influencingMasterData = Lists.newArrayList(0.01f, 0.99f, 0.99f, 0.99f);

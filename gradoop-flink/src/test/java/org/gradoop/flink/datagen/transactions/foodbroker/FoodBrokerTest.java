@@ -23,6 +23,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InNoGraph;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -30,10 +31,8 @@ import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -130,11 +129,35 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     Assert.assertTrue(actual < max);
   }
 
+  @Test
+  public void testLargeSetStatistics() throws Exception {
+
+    String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
+
+    FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
+
+    config.setScaleFactor(1);
+
+    FoodBroker foodBroker = new FoodBroker(getExecutionEnvironment(), getConfig(), config);
+
+    GraphCollection result10K = foodBroker.execute();
+
+    assertEquals(10000, result10K.getGraphHeads().count());
+
+    assertEquals(0, result10K
+      .getVertices()
+      .filter(new InNoGraph<>())
+      .count());
+
+    assertEquals(0, result10K
+      .getEdges()
+      .filter(new InNoGraph<>())
+      .count());
+  }
+
   private GraphCollection generateCollection()
     throws IOException, JSONException, URISyntaxException {
-    String configPath = Paths.get(
-    		new File(FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile()).getAbsolutePath())
-    		.toFile().getPath();
+    String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
 
     FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 
@@ -150,5 +173,6 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
       return null;
     }
   }
+
 
 }
