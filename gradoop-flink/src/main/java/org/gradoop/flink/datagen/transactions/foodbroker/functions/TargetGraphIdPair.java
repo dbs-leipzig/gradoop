@@ -17,28 +17,18 @@
 
 package org.gradoop.flink.datagen.transactions.foodbroker.functions;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.util.Collector;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Sets all graph ids for master data vertices. The graph ids of each edge of which the vertex is
- * the target of are added to the vertex.
+ * Creates tuples containing the target id of an edge together with the edges graph id.
  */
-public class GraphIdsFromEdges implements CoGroupFunction<Vertex, Edge, Vertex> {
+public class TargetGraphIdPair implements MapFunction<Edge, Tuple2<GradoopId, GradoopId>> {
 
   @Override
-  public void coGroup(Iterable<Vertex> vertices, Iterable<Edge> edges,
-    Collector<Vertex> collector) throws Exception {
-    for (Vertex vertex : vertices) {
-      for (Edge edge : edges) {
-        for (GradoopId gradoopId : edge.getGraphIds()) {
-          vertex.addGraphId(gradoopId);
-        }
-      }
-      collector.collect(vertex);
-    }
+  public Tuple2<GradoopId, GradoopId> map(Edge edge) throws Exception {
+    return new Tuple2<>(edge.getTargetId(), edge.getGraphIds().iterator().next());
   }
 }

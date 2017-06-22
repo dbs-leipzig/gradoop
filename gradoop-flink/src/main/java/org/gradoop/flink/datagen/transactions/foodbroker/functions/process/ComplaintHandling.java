@@ -20,10 +20,9 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.process;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
@@ -47,9 +46,8 @@ import java.util.Set;
  * Returns transactional data created in a complaint handling process together with new created
  * master data (user, clients).
  */
-public class ComplaintHandling
-  extends AbstractProcess
-  implements FlatMapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
+public class ComplaintHandling extends AbstractProcess
+  implements MapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
   /**
    * List of employees. Used to create new user.
    */
@@ -82,13 +80,11 @@ public class ComplaintHandling
    * @param epgmVertexFactory EPGM vertex factory
    * @param epgmEdgeFactory EPGM edge factory
    * @param config FoodBroker configuration
-   * @param globalSeed global seed
    */
   public ComplaintHandling(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
     EPGMVertexFactory<Vertex> epgmVertexFactory, EPGMEdgeFactory<Edge> epgmEdgeFactory,
-    FoodBrokerConfig config, long globalSeed) {
+    FoodBrokerConfig config) {
     super(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, config);
-    this.globalSeed = globalSeed;
   }
 
   @Override
@@ -99,44 +95,52 @@ public class ComplaintHandling
   }
 
   @Override
-  public void flatMap(GraphTransaction transaction,
-    Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
-    GraphHead graphHead;
-    GraphTransaction graphTransaction;
-    Set<Vertex> vertices;
-    Set<Edge> edges;
-    Set<Vertex> deliveryNotes;
+  public Tuple2<GraphTransaction, Set<Vertex>> map(GraphTransaction graph) throws Exception {
+
     //init new maps
     vertexMap = Maps.newHashMap();
     masterDataMap = Maps.newHashMap();
     userMap = Maps.newHashMap();
+    graphIds = GradoopIdList.fromExisting(graph.getGraphHead().getId());
 
-    edgeMap = createEdgeMap(transaction);
-    //get needed transactional objects created during brokerage process
-    deliveryNotes = getVertexByLabel(transaction, Constants.DELIVERYNOTE_VERTEX_LABEL);
-    salesOrderLines = getEdgesByLabel(transaction, Constants.SALESORDERLINE_EDGE_LABEL);
-    purchOrderLines = getEdgesByLabel(transaction, Constants.PURCHORDERLINE_EDGE_LABEL);
-    salesOrder = getVertexByLabel(transaction, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
+    boolean confirmed = false;
 
-    //create new graph head
-    graphHead = graphHeadFactory.createGraphHead();
-    graphIds = new GradoopIdList();
-    graphIds.add(graphHead.getId());
-    graphTransaction = new GraphTransaction();
-    //the complaint handling process
-    badQuality(deliveryNotes);
-    lateDelivery(deliveryNotes);
-    //get all created vertices and edges
-    vertices = getVertices();
-    edges = getEdges();
-    //if one or more tickets were created
-    if ((vertices.size() > 0) && (edges.size() > 0)) {
-      graphTransaction.setGraphHead(graphHead);
-      graphTransaction.setVertices(vertices);
-      graphTransaction.setEdges(edges);
-      collector.collect(new Tuple2<>(graphTransaction, getMasterData()));
-      globalSeed++;
+    for (Vertex vertex : graph.getVertices()) {
+      if (vertex.getLabel().equals(Constants.SALESORDER_VERTEX_LABEL)) {
+        confirmed = true;
+        break;
+      }
     }
+
+    if (confirmed) {
+      edgeMap = createEdgeMap(graph);
+      //get needed transactional objects created during brokerage process
+      Set<Vertex> deliveryNotes = getVertexByLabel(graph, Constants.DELIVERYNOTE_VERTEX_LABEL);
+      salesOrderLines = getEdgesByLabel(graph, Constants.SALESORDERLINE_EDGE_LABEL);
+      purchOrderLines = getEdgesByLabel(graph, Constants.PURCHORDERLINE_EDGE_LABEL);
+      salesOrder = getVertexByLabel(graph, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
+
+      //the complaint handling process
+      badQuality(deliveryNotes);
+      lateDelivery(deliveryNotes);
+      //get all created vertices and edges
+      Set<Vertex> transactionalVertices = getVertices();
+      Set<Edge> transactionalEdges = getEdges();
+      //if one or more tickets were created
+      if ((transactionalVertices.size() > 0) && (transactionalEdges.size() > 0)) {
+        graph.getVertices().addAll(transactionalVertices);
+        graph.getEdges().addAll(transactionalEdges);
+        globalSeed++;
+      }
+    }
+
+    for (Edge edge : graph.getEdges()) {
+      if (edge.getGraphIds() == null) {
+        System.out.println(edge);
+      }
+    }
+
+    return new Tuple2<>(graph, getMasterData());
   }
 
   /**

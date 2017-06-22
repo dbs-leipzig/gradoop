@@ -23,10 +23,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .IncomingAdjacencyList;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .MultiEdgeStringCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.functions.IncomingAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SourceStringUpdater;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SwitchSourceTargetIds;

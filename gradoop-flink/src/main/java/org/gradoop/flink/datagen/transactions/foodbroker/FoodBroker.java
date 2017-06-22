@@ -27,8 +27,9 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.GraphIdsFromEdges;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.RelevantElementsFromBrokerage;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdList;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdPair;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.UpdateGraphIds;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.EmployeeDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataMapFromTuple;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.BusinessRelationDataMapper;
@@ -48,7 +49,6 @@ import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
@@ -149,7 +149,7 @@ public class FoodBroker implements GraphCollectionGenerator {
     DataSet<Long> caseSeeds = env.generateSequence(1, foodBrokerConfig
       .getCaseCount());
 
-    DataSet<GraphTransaction> brokerage = caseSeeds
+    DataSet<GraphTransaction> cases = caseSeeds
       .map(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
         .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
       .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
@@ -159,15 +159,13 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(productsQualityMap, Constants.PRODUCT_QUALITY_MAP_BC)
       .withBroadcastSet(productsPriceMap, Constants.PRODUCT_PRICE_MAP_BC);
 
-    long complaintSeed = foodBrokerConfig.getCaseCount();
 
     // Phase 2.2: Run Complaint Handling
-    DataSet<Tuple2<GraphTransaction, Set<Vertex>>> complaintHandlingTuple = brokerage
-      .flatMap(new RelevantElementsFromBrokerage())
-      .flatMap(new ComplaintHandling(
+    DataSet<Tuple2<GraphTransaction, Set<Vertex>>> casesCITMasterData = cases
+      .map(new ComplaintHandling(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
-        gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig, complaintSeed))
+        gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
       .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
       .withBroadcastSet(vendorMap, Constants.VENDOR_MAP_BC)
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
@@ -176,12 +174,11 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(employees, Constants.EMPLOYEE_VERTEX_LABEL)
       .withBroadcastSet(customers, Constants.CUSTOMER_VERTEX_LABEL);
 
-    DataSet<GraphTransaction> complaintHandling = complaintHandlingTuple
-      .map(new Value0Of2<GraphTransaction, Set<Vertex>>());
+    cases = casesCITMasterData
+      .map(new Value0Of2<>());
 
     // Phase 3: combine all data
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> transactionTriple = brokerage
-      .union(complaintHandling)
+    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> transactionTriple = cases
       .map(new GraphTransactionTriple());
 
     DataSet<Vertex> transactionalVertices = transactionTriple
@@ -194,8 +191,8 @@ public class FoodBroker implements GraphCollectionGenerator {
       .map(new TransactionGraphHead());
 
     // get the new master data which was generated in complaint handling
-    DataSet<Vertex> complaintHandlingMasterData = complaintHandlingTuple
-      .map(new Value1Of2<GraphTransaction, Set<Vertex>>())
+    DataSet<Vertex> complaintHandlingMasterData = casesCITMasterData
+      .map(new Value1Of2<>())
       .flatMap(new UserClients());
 
     // combine all master data and set their graph ids
@@ -206,11 +203,15 @@ public class FoodBroker implements GraphCollectionGenerator {
       .union(products)
       .union(complaintHandlingMasterData);
 
-    masterData = masterData
-      .coGroup(transactionalEdges)
-      .where(new Id<Vertex>())
-      .equalTo(new TargetId<Edge>())
-      .with(new GraphIdsFromEdges());
+    // extract all graph ids from edges and updated those master data graph ids with these where
+    // the master data vertex is the target
+    masterData = transactionalEdges
+      .map(new TargetGraphIdPair())
+      .groupBy(0)
+      .reduceGroup(new TargetGraphIdList())
+      .join(masterData)
+      .where(0).equalTo(new Id<>())
+      .with(new UpdateGraphIds());
 
     DataSet<Vertex> vertices = masterData
       .union(transactionalVertices);
