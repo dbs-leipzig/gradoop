@@ -20,6 +20,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,14 @@ public abstract class CentricalGrouping extends Grouping {
 
   private final GroupingStrategy groupingStrategy;
 
-  CentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
+  CentricalGrouping(
+    boolean useVertexLabels,
+    boolean useEdgeLabels,
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups,
     GroupingStrategy groupingStrategy) {
 
-    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
-      useEdgeLabels, edgeAggregators);
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
     this.groupingStrategy = groupingStrategy;
   }
 

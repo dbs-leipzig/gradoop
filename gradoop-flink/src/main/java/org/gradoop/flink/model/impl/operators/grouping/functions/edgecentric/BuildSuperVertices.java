@@ -49,16 +49,11 @@ public class BuildSuperVertices
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregators  aggregate functions for vertex values
    * @param vertexFactory     vertex factory
    */
-  public BuildSuperVertices(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    VertexFactory vertexFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  public BuildSuperVertices(boolean useLabel, VertexFactory vertexFactory) {
+    super(useLabel);
     this.vertexFactory = vertexFactory;
   }
 
@@ -75,9 +70,9 @@ public class BuildSuperVertices
     Exception {
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
-    setLabel(supVertex, groupItem.getGroupLabel());
-    setGroupProperties(supVertex, groupItem.getGroupingValues());
-    setAggregateValues(supVertex, groupItem.getAggregateValues());
+//    setLabel(supVertex, groupItem.getGroupLabel());
+//    setGroupProperties(supVertex, groupItem.getGroupingValues());
+//    setAggregateValues(supVertex, groupItem.getAggregateValues());
 
     return supVertex;
   }

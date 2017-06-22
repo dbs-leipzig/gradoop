@@ -29,15 +29,13 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.B
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.ReduceEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.UpdateEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.EdgeWithSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

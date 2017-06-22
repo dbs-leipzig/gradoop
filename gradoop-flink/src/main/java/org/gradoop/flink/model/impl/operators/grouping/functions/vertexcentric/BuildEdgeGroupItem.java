@@ -19,6 +19,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildGroupItemBase;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 

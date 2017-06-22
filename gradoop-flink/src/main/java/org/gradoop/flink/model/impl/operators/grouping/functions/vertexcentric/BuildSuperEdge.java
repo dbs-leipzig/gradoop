@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric;
 
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 
 import java.io.IOException;

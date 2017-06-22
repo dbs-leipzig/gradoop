@@ -47,61 +47,59 @@ import java.util.Set;
      * Creates group reduce function.
      *
      * @param useLabel          true, iff labels are used for grouping
-     * @param superEdgeAggregators aggregate functions for super vertices
      */
-    public ReduceSuperEdgeGroupItems(boolean useLabel,
-      List<PropertyValueAggregator> superEdgeAggregators, Boolean
-      sourceSpecificGrouping, Boolean targetSpecificGrouping) {
-      super(null, useLabel, superEdgeAggregators, sourceSpecificGrouping, targetSpecificGrouping);
+    public ReduceSuperEdgeGroupItems(boolean useLabel, boolean sourceSpecificGrouping,
+      boolean targetSpecificGrouping) {
+      super(useLabel, sourceSpecificGrouping, targetSpecificGrouping);
     }
 
     @Override
     public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
       Collector<SuperEdgeGroupItem> collector) throws Exception {
 
-      boolean isFirst                       = true;
-
-      Set<GradoopId> sources = Sets.newHashSet();
-      Set<GradoopId> targets = Sets.newHashSet();
-
-      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
-        // grouped by source and target
-        if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
-          if (isFirst) {
-            sources.add(groupItem.getSourceId());
-            targets.add(groupItem.getTargetId());
-          }
-        // grouped by source, targets may vary
-        } else if (isSourceSpecificGrouping()) {
-          if (isFirst) {
-            sources.add(groupItem.getSourceId());
-          }
-          targets.add(groupItem.getTargetId());
-        // grouped by target, sources may vary
-        } else if (isTargetSpecificGrouping()) {
-          if (isFirst) {
-            targets.add(groupItem.getTargetId());
-          }
-          sources.add(groupItem.getSourceId());
-        // source or target do not have influence to the grouping
-        } else {
-          sources.add(groupItem.getSourceId());
-          targets.add(groupItem.getTargetId());
-        }
-        if (isFirst) {
-          reuseSuperEdgeGroupItem = groupItem;
-          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
-          isFirst = false;
-        }
-        if (doAggregate()) {
-          aggregate(groupItem.getAggregateValues());
-        }
-      }
-      // collect single item representing the whole group
-      reuseSuperEdgeGroupItem.setSourceIds(sources);
-      reuseSuperEdgeGroupItem.setTargetIds(targets);
-      collector.collect(reuseSuperEdgeGroupItem);
-
-      resetAggregators();
+//      boolean isFirst                       = true;
+//
+//      Set<GradoopId> sources = Sets.newHashSet();
+//      Set<GradoopId> targets = Sets.newHashSet();
+//
+//      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
+//        // grouped by source and target
+//        if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
+//          if (isFirst) {
+//            sources.add(groupItem.getSourceId());
+//            targets.add(groupItem.getTargetId());
+//          }
+//        // grouped by source, targets may vary
+//        } else if (isSourceSpecificGrouping()) {
+//          if (isFirst) {
+//            sources.add(groupItem.getSourceId());
+//          }
+//          targets.add(groupItem.getTargetId());
+//        // grouped by target, sources may vary
+//        } else if (isTargetSpecificGrouping()) {
+//          if (isFirst) {
+//            targets.add(groupItem.getTargetId());
+//          }
+//          sources.add(groupItem.getSourceId());
+//        // source or target do not have influence to the grouping
+//        } else {
+//          sources.add(groupItem.getSourceId());
+//          targets.add(groupItem.getTargetId());
+//        }
+//        if (isFirst) {
+//          reuseSuperEdgeGroupItem = groupItem;
+//          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
+//          isFirst = false;
+//        }
+//        if (doAggregate()) {
+//          aggregate(groupItem.getAggregateValues());
+//        }
+//      }
+//      // collect single item representing the whole group
+//      reuseSuperEdgeGroupItem.setSourceIds(sources);
+//      reuseSuperEdgeGroupItem.setTargetIds(targets);
+//      collector.collect(reuseSuperEdgeGroupItem);
+//
+//      resetAggregators();
     }
   }

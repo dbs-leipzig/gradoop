@@ -22,6 +22,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 
 /**

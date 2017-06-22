@@ -18,6 +18,8 @@ package org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.GroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 /**
  * Vertex representation used for grouping vertices to super vertices.

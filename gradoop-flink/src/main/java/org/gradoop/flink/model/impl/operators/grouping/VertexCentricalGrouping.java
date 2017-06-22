@@ -33,7 +33,8 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.F
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.ReduceVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.TransposeVertexGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
@@ -47,34 +48,33 @@ import java.util.Objects;
 public class VertexCentricalGrouping extends CentricalGrouping {
 
 
-  public VertexCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
-    GroupingStrategy groupingStrategy) {
-    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
-      useEdgeLabels, edgeAggregators, groupingStrategy);
+  public VertexCentricalGrouping(
+    boolean useVertexLabels,
+    boolean useEdgeLabels,
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups,
+    GroupingStrategy groupingStrategy
+  ) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, groupingStrategy);
 
-    Objects.requireNonNull(getVertexGroupingKeys(), "missing vertex grouping key(s)");
     Objects.requireNonNull(getGroupingStrategy(), "missing vertex grouping strategy");
   }
 
   protected LogicalGraph groupReduce(LogicalGraph graph) {
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
-      .map(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function
-      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));
 
     DataSet<Vertex> superVertices = vertexGroupItems
       // filter group representative tuples
       .filter(new FilterSuperVertices())
       // build super vertices
-      .map(new BuildSuperVertex(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
+      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
       // filter group element tuples
@@ -91,26 +91,24 @@ public class VertexCentricalGrouping extends CentricalGrouping {
   protected LogicalGraph groupCombine(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .map(new BuildVertexGroupItem(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function per combined partition
-      .combineGroup(new CombineVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+      .combineGroup(new CombineVertexGroupItems(useVertexLabels()));
 
     // filter super vertex tuples (1..n per partition/group)
     // group  super vertex tuples
     // create super vertex tuple (1 per group) + previous super vertex ids
     DataSet<Tuple2<VertexGroupItem, IdWithIdSet>> superVertexTuples =
       groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))
-        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels()));
 
     // build super vertices from super vertex tuples
     DataSet<Vertex> superVertices = superVertexTuples
       .map(new Value0Of2<>())
-      .map(new BuildSuperVertex(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators(), config.getVertexFactory()));
+      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
     // extract mapping
     DataSet<IdWithIdSet> mapping = superVertexTuples

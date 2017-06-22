@@ -55,13 +55,10 @@ public class UpdateSuperVertexGroupItem
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be used
-   * @param edgeAggregators   aggregate functions for super edges
    */
-  public UpdateSuperVertexGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> edgeAggregators) {
-    super(groupPropertyKeys, useLabel, edgeAggregators);
+  public UpdateSuperVertexGroupItem(boolean useLabel) {
+    super(useLabel);
     usedVertices = new HashSet<>();
     label = new StringBuilder();
   }
@@ -73,40 +70,40 @@ public class UpdateSuperVertexGroupItem
     Collector<SuperVertexGroupItem> collector)
     throws Exception {
 
-    usedVertices.clear();
-    label.setLength(0);
-
-    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
-
-    isFirst = true;
-    Vertex vertex;
-
-    for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
-      vertex = superVertexIdWithVertex.getVertex();
-      duplicate = usedVertices.contains(vertex.getId());
-      if (useLabel()) {
-        if (!duplicate) {
-          if (!isFirst) {
-            label.append(LABEL_SEPARATOR);
-          }
-          label.append(getLabel(vertex));
-        }
-      }
-        if (doAggregate() && !duplicate) {
-          aggregate(getAggregateValues(vertex));
-        }
-      if (isFirst) {
-        superVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
-        isFirst = false;
-      }
-      usedVertices.add(vertex.getId());
-    }
-    superVertexGroupItem.setGroupLabel(label.toString());
-    superVertexGroupItem.setAggregateValues(getAggregateValues());
-
-    collector.collect(superVertexGroupItem);
-
-    resetAggregators();
+//    usedVertices.clear();
+//    label.setLength(0);
+//
+//    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
+//
+//    isFirst = true;
+//    Vertex vertex;
+//
+//    for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
+//      vertex = superVertexIdWithVertex.getVertex();
+//      duplicate = usedVertices.contains(vertex.getId());
+//      if (useLabel()) {
+//        if (!duplicate) {
+//          if (!isFirst) {
+//            label.append(LABEL_SEPARATOR);
+//          }
+//          label.append(getLabel(vertex));
+//        }
+//      }
+//        if (doAggregate() && !duplicate) {
+//          aggregate(getAggregateValues(vertex));
+//        }
+//      if (isFirst) {
+//        superVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
+//        isFirst = false;
+//      }
+//      usedVertices.add(vertex.getId());
+//    }
+//    superVertexGroupItem.setGroupLabel(label.toString());
+//    superVertexGroupItem.setAggregateValues(getAggregateValues());
+//
+//    collector.collect(superVertexGroupItem);
+//
+//    resetAggregators();
 
   }
 }

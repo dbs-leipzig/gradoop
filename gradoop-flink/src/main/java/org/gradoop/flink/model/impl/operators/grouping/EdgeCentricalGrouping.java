@@ -24,12 +24,13 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.*;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators.SetInTupleKeySelector;
 
+
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
@@ -54,23 +55,23 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
   /**
    * Creates an edge grouping grouping operator instance.
    *
-   * @param vertexGroupingKeys      property keys to group vertices
    * @param useVertexLabels         group on vertex label true/false
-   * @param vertexAggregators       aggregate functions for grouped vertices
-   * @param edgeGroupingKeys        property keys to group edges
    * @param useEdgeLabels           group on edge label true/false
-   * @param edgeAggregators         aggregate functions for grouped edges
    * @param groupingStrategy        group by vertices or edges
    * @param sourceSpecificGrouping  set true to consider source on grouping
    * @param targetSpecificGrouping  set true to consider target on grouping
    */
-  public EdgeCentricalGrouping(List<String> vertexGroupingKeys, boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators, List<String> edgeGroupingKeys,
-    boolean useEdgeLabels, List<PropertyValueAggregator> edgeAggregators,
-    GroupingStrategy groupingStrategy, Boolean sourceSpecificGrouping,
-    Boolean targetSpecificGrouping) {
-    super(vertexGroupingKeys, useVertexLabels, vertexAggregators, edgeGroupingKeys,
-      useEdgeLabels, edgeAggregators, groupingStrategy);
+  public EdgeCentricalGrouping(
+    boolean useVertexLabels,
+    boolean useEdgeLabels,
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups,
+    GroupingStrategy groupingStrategy,
+    boolean sourceSpecificGrouping,
+    boolean targetSpecificGrouping
+  ) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, groupingStrategy);
+
     this.sourceSpecificGrouping = sourceSpecificGrouping;
     this.targetSpecificGrouping = targetSpecificGrouping;
   }
@@ -83,16 +84,15 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
     DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
       // map edge to edge group item
-      .map(new PrepareSuperEdgeGroupItem(getEdgeGroupingKeys(), useEdgeLabels(),
-        getEdgeAggregators()));
+      .map(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
 
     // group edges by label / properties / both
     // additionally: source specific / target specific / both
     DataSet<SuperEdgeGroupItem> superEdgeGroupItems = groupSuperEdges(edgesForGrouping,
       sourceSpecificGrouping, targetSpecificGrouping)
       // apply aggregate function
-      .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), getEdgeAggregators(),
-        sourceSpecificGrouping, targetSpecificGrouping));
+      .reduceGroup(new ReduceSuperEdgeGroupItems(useEdgeLabels(), sourceSpecificGrouping,
+        targetSpecificGrouping));
 
     // vertexIds - superVId - edgeId
     DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
@@ -110,8 +110,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // same super vertex id
       .where(0).equalTo(2)
       // build super edges
-      .with(new BuildSuperEdges(getEdgeGroupingKeys(), useEdgeLabels(), getEdgeAggregators(),
-        config.getEdgeFactory()));
+      .with(new BuildSuperEdges(useEdgeLabels(), config.getEdgeFactory()));
 
     // store vertices, where the vertex is its own super vertex, so the vertex stays itself
     DataSet<Vertex> normalSuperVertices = superVertexGroupItems
@@ -138,15 +137,13 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
         .with(new BuildSuperVertexIdWithVertex()))
       .where(1).equalTo(0)
       // and aggregate the super vertex group item based on the vertex aggregations
-      .with(new UpdateSuperVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators()));
+      .with(new UpdateSuperVertexGroupItem(useVertexLabels()));
 
     DataSet<Vertex> superVertices = superVertexGroupItems
       // take super vertex ids where vertex is not its own super vertex
       .filter(new FilterSuperVertexGroupItem(true))
       // and create the vertex element
-      .map(new BuildSuperVertices(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators(), config.getVertexFactory()))
+      .map(new BuildSuperVertices(useVertexLabels(), config.getVertexFactory()))
       // union with vertices which stay as they are
       .union(normalSuperVertices);
 

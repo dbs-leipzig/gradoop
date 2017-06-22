@@ -44,14 +44,11 @@ abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
   /**
    * Creates build base.
    *
-   * @param groupPropertyKeys property keys used for grouping
    * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  aggregate functions for super elements
    */
-  protected ReduceSuperEdgeGroupItemBase(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> valueAggregators, Boolean
-    sourceSpecificGrouping, Boolean targetSpecificGrouping) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  protected ReduceSuperEdgeGroupItemBase(boolean useLabel, boolean sourceSpecificGrouping,
+    boolean targetSpecificGrouping) {
+    super(useLabel);
     this.reuseSuperEdgeGroupItem = new SuperEdgeGroupItem();
     this.sourceSpecificGrouping = sourceSpecificGrouping;
     this.targetSpecificGrouping = targetSpecificGrouping;
