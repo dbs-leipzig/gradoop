@@ -23,7 +23,6 @@ import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 import org.junit.Test;
 
