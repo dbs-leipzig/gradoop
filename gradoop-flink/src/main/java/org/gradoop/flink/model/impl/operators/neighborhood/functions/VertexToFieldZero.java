@@ -36,8 +36,7 @@ public class VertexToFieldZero<K, V>
   private Tuple2<Vertex, V> reuseTuple = new Tuple2<Vertex, V>();
 
   @Override
-  public Tuple2<Vertex, V> join(Tuple2<K, V> tuple,
-    Vertex vertex) throws Exception {
+  public Tuple2<Vertex, V> join(Tuple2<K, V> tuple, Vertex vertex) throws Exception {
     reuseTuple.setFields(vertex, tuple.f1);
     return reuseTuple;
   }
