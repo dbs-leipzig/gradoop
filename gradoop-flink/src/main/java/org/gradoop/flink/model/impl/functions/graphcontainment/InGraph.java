@@ -18,9 +18,12 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * True, if an element is contained in a give graph.
@@ -29,7 +32,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ReadFields("graphIds")
 public class InGraph<EL extends GraphElement>
-  implements FilterFunction<EL> {
+  implements FilterFunction<EL>, FlatJoinFunction<EL, GraphHead, EL> {
 
   /**
    * graph id
@@ -47,5 +50,12 @@ public class InGraph<EL extends GraphElement>
   @Override
   public boolean filter(EL element) throws Exception {
     return element.getGraphIds().contains(this.graphId);
+  }
+
+  @Override
+  public void join(EL el, GraphHead graphHead, Collector<EL> collector) throws Exception {
+    if (el.getGraphIds().contains(graphHead.getId())) {
+      collector.collect(el);
+    }
   }
 }
