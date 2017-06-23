@@ -16,7 +16,8 @@
  */
 
 /**
- * An fusion operator is a binary operator: taking a graph collection where the components
- * appearing in the
+ * An fusion operator is a binary operator: taking a pattern graph (LogicalGraph) to be found into a
+ * to-be-searched graph, it fuses it into one single vertex within the search graph. This package
+ * provides the implementation of both VertexFusion and its reduced version, ReduceVertexFusion
  */
 package org.gradoop.flink.model.impl.operators.fusion;
