@@ -23,7 +23,9 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -32,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 
 import java.util.List;
 
@@ -289,6 +292,32 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All edges where
+   * the vertex is relevant get joined first and then grouped. The relevant edges are specified
+   * using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   *
+   * @return logical graph where vertices store aggregated information about connected edges
+   */
+  LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All vertices
+   * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
+   * specified using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   *
+   * @return logical graph where vertices store aggregated information about connected vertices
+   */
+  LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
 
   /**
    * Checks, if another logical graph contains exactly the same vertices and

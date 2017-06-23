@@ -15,28 +15,34 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
+package org.gradoop.flink.model.impl.operators.neighborhood.functions;
+
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Superclass of aggregate functions that determine a maximal property value.
+ * Super class for all neighbor vertex functions.
  */
-public abstract class MaxProperty extends Max {
-  /**
-   * Property key whose value should be aggregated.
-   */
-  protected final String propertyKey;
+public class NeighborVertexFunction implements NeighborFunction {
 
   /**
-   * Constructor.
-   *
-   * @param propertyKey property key to aggregate
+   * Vertex aggregation function.
    */
-  public MaxProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
+  private VertexAggregateFunction function;
+
+  /**
+   * Valued constructor.
+   *
+   * @param function vertex aggregation function
+   */
+  public NeighborVertexFunction(VertexAggregateFunction function) {
+    this.function = function;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getAggregatePropertyKey() {
-    return "max_" + propertyKey;
+  public VertexAggregateFunction getFunction() {
+    return function;
   }
 }

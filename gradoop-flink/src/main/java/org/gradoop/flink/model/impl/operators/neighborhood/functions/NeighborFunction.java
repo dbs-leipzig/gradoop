@@ -15,28 +15,21 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
+package org.gradoop.flink.model.impl.operators.neighborhood.functions;
+
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+
+import java.io.Serializable;
 
 /**
- * Superclass of aggregate functions that determine a maximal property value.
+ * Interface for all neighbor functions.
  */
-public abstract class MaxProperty extends Max {
-  /**
-   * Property key whose value should be aggregated.
-   */
-  protected final String propertyKey;
+public interface NeighborFunction extends Serializable {
 
   /**
-   * Constructor.
+   * Returns the aggregate function.
    *
-   * @param propertyKey property key to aggregate
+   * @return aggregate function
    */
-  public MaxProperty(String propertyKey) {
-    this.propertyKey = propertyKey;
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return "max_" + propertyKey;
-  }
+  AggregateFunction getFunction();
 }
