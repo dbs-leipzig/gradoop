@@ -15,7 +15,7 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.nest;
+package org.gradoop.flink.model.impl.operators.fusion;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -33,14 +33,14 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadc
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.nest.functions.CoGroupAssociateOldVerticesWithNewIds;
-import org.gradoop.flink.model.impl.operators.nest.functions.CoGroupGraphHeadToVertex;
-import org.gradoop.flink.model.impl.operators.nest.functions.FlatJoinSourceEdgeReference;
-import org.gradoop.flink.model.impl.operators.nest.functions.LeftElementId;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapFunctionAddGraphElementToGraph2;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapGraphHeadForNewGraph;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapVertexToPairWithGraphId;
-import org.gradoop.flink.model.impl.operators.nest.functions.MapVerticesAsTuplesWithNullId;
+import org.gradoop.flink.model.impl.operators.fusion.functions.CoGroupAssociateOldVerticesWithNewIds;
+import org.gradoop.flink.model.impl.operators.fusion.functions.CoGroupGraphHeadToVertex;
+import org.gradoop.flink.model.impl.operators.fusion.functions.FlatJoinSourceEdgeReference;
+import org.gradoop.flink.model.impl.operators.fusion.functions.LeftElementId;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapFunctionAddGraphElementToGraph2;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapGraphHeadForNewGraph;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapVertexToPairWithGraphId;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTuplesWithNullId;
 
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 

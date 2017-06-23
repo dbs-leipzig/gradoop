@@ -15,7 +15,7 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.vertexfusion.actualtests;
+package org.gradoop.flink.model.impl.operators.vertexfusion.reducevertexfusion;
 
 import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.operators.vertexfusion.GraphToGraphTests;

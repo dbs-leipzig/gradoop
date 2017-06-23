@@ -15,17 +15,17 @@
  * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.vertexfusion.reducevertexfusion;
+package org.gradoop.flink.model.impl.operators.vertexfusion.vertexfusion;
 
 import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
-import org.gradoop.flink.model.impl.operators.vertexfusion.GraphToGraphTests;
 import org.gradoop.flink.model.impl.operators.fusion.ReduceVertexFusion;
+import org.gradoop.flink.model.impl.operators.vertexfusion.GraphToGraphTests;
 
 public class SingleGraphWithSingleGraphNesting extends GraphToGraphTests {
 
   @Override
   protected GraphGraphCollectionToGraphOperator op() {
-    return new ReduceVertexFusion();
+    return new VertexFusionAdaptor();
   }
 
 }

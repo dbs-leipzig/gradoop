@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -44,12 +45,12 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 
+
 /**
- * Fuses each Logical Graph's set of vertices appearing in the same hypervertex into a single
- * vertex.
+ * Fuses a pattern logical graph set of vertices within the search graph
  *
  */
-public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
+public class VertexFusion implements BinaryGraphToGraphOperator {
 
   /**
    * Fusing the already-combined sources
@@ -60,7 +61,7 @@ public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
    * @return              A single merged graph
    */
   @Override
-  public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
+  public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
 
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
@@ -68,7 +69,7 @@ public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
     DataSet<GraphHead> gh = searchGraph.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
-    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHeads()
+    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHead()
       .map(new Id<>());
 
     // PHASE 1: Induced Subgraphs
@@ -80,7 +81,7 @@ public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHeads()
+    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHead()
       .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
@@ -120,6 +121,6 @@ public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
 
   @Override
   public String getName() {
-    return ReduceVertexFusion.class.getName();
+    return VertexFusion.class.getName();
   }
 }
