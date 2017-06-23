@@ -12,10 +12,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Functions required for the Nesting operation's definition
- */
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+package org.gradoop.flink.model.impl.operators.vertexfusion.reducevertexfusion;
+
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.operators.vertexfusion.GraphToGraphTests;
+import org.gradoop.flink.model.impl.operators.fusion.ReduceVertexFusion;
+
+public class SingleGraphWithSingleGraphNesting extends GraphToGraphTests {
+
+  @Override
+  protected GraphGraphCollectionToGraphOperator op() {
+    return new ReduceVertexFusion();
+  }
+
+}

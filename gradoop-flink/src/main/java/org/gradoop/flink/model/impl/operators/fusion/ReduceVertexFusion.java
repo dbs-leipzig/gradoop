@@ -23,7 +23,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.GraphGraphCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -43,12 +44,12 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 
 import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 
-
 /**
- * Fuses a pattern logical graph set of vertices within the search graph
+ * Fuses each Logical Graph's set of vertices appearing in the same hypervertex into a single
+ * vertex.
  *
  */
-public class VertexFusion implements BinaryGraphToGraphOperator {
+public class ReduceVertexFusion implements GraphGraphCollectionToGraphOperator {
 
   /**
    * Fusing the already-combined sources
@@ -59,7 +60,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
    * @return              A single merged graph
    */
   @Override
-  public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
+  public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
 
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
@@ -67,7 +68,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
     DataSet<GraphHead> gh = searchGraph.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
-    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHead()
+    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHeads()
       .map(new Id<>());
 
     // PHASE 1: Induced Subgraphs
@@ -79,7 +80,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHead()
+    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHeads()
       .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
@@ -119,6 +120,6 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
 
   @Override
   public String getName() {
-    return VertexFusion.class.getName();
+    return ReduceVertexFusion.class.getName();
   }
 }

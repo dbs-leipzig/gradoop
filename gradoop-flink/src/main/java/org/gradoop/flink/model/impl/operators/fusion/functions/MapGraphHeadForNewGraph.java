@@ -17,17 +17,31 @@
 
 package org.gradoop.flink.model.impl.operators.fusion.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
- * Checks whether the edge contains a given graphId, which means that belongs to a given graph
+ * Creates a new head and sets a new graph id
  */
-public class FilterSubgraphEdges implements FilterFunction<Tuple2<GradoopId, Edge>> {
+public class MapGraphHeadForNewGraph implements MapFunction<GraphHead, GraphHead> {
+
+  /**
+   * Id to be setted
+   */
+  private final GradoopId graphId;
+
+  /**
+   * Default constructor
+   * @param newGraphid   id to be setted
+   */
+  public MapGraphHeadForNewGraph(GradoopId newGraphid) {
+    graphId = newGraphid;
+  }
+
   @Override
-  public boolean filter(Tuple2<GradoopId, Edge> value) throws Exception {
-    return value.f1.getGraphIds().contains(value.f0);
+  public GraphHead map(GraphHead value) throws Exception {
+    value.setId(graphId);
+    return value;
   }
 }

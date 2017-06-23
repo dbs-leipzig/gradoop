@@ -15,7 +15,25 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.functions.utils;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.functions.KeySelector;
+
 /**
- * Functions required for the Nesting operation's definition
+ * Uses the GradoopId element itself as a selection criterion
+ * @param <K> any type
  */
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+@FunctionAnnotation.ForwardedFields("* -> *")
+public class Self<K> implements KeySelector<K, K>, MapFunction<K, K> {
+  @Override
+  public K getKey(K value) throws Exception {
+    return value;
+  }
+
+  @Override
+  public K map(K value) throws Exception {
+    return value;
+  }
+}

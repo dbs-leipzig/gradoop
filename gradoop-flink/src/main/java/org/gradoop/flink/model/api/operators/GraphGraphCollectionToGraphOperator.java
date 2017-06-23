@@ -15,7 +15,23 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.api.operators;
+
+import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.LogicalGraph;
+
 /**
- * Functions required for the Nesting operation's definition
+ * Creates a {@link LogicalGraph} based on two input graphs and a {@link GraphCollection}
  */
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+public interface GraphGraphCollectionToGraphOperator extends Operator {
+
+  /**
+   * Combining a logical graph into a collection
+   *
+   * @param graph           Single Graph
+   * @param collection     Graph collection
+   * @return               Single graph
+   */
+  LogicalGraph execute(LogicalGraph graph, GraphCollection collection);
+
+}
