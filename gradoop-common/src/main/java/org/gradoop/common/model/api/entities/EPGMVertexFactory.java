@@ -68,7 +68,7 @@ public interface EPGMVertexFactory<V extends EPGMVertex>
    * @param properties vertex properties
    * @return vertex data
    */
-  EPGMVertex createVertex(String label, Properties properties);
+  V createVertex(String label, Properties properties);
 
   /**
    * Initializes a vertex based on the given parameters.

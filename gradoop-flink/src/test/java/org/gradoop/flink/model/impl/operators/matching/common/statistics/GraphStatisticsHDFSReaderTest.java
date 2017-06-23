@@ -20,7 +20,7 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
     }
 
     // copy test resources to HDFS
-    Path localPath = new Path(GraphStatisticsHDFSReaderTest.class.getResource("/data/json/sna/statistics").getPath());
+    Path localPath = new Path(GraphStatisticsHDFSReaderTest.class.getResource("/data/json/sna/statistics").getFile());
     Path remotePath = new Path("/");
     utility.getTestFileSystem().copyFromLocalFile(localPath, remotePath);
 

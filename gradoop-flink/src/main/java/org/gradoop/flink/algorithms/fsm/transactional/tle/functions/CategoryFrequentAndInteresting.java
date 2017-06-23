@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.interestingness.Interestingness;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
@@ -65,7 +66,7 @@ public class CategoryFrequentAndInteresting
     super.open(parameters);
 
     this.categoryMinFrequencies = getRuntimeContext()
-      .<Map<String, Long>>getBroadcastVariable(TFSMConstants.MIN_FREQUENCY).get(0);
+      .<Map<String, Long>>getBroadcastVariable(DIMSpanConstants.MIN_FREQUENCY).get(0);
 
     this.categoryCounts = getRuntimeContext()
       .<Map<String, Long>>getBroadcastVariable(TFSMConstants.GRAPH_COUNT).get(0);

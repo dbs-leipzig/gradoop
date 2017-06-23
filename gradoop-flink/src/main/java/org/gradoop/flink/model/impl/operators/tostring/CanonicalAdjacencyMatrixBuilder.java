@@ -23,10 +23,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .IncomingAdjacencyList;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .MultiEdgeStringCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.functions.IncomingAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SourceStringUpdater;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SwitchSourceTargetIds;
@@ -90,6 +88,30 @@ public class CanonicalAdjacencyMatrixBuilder implements
   @Override
   public DataSet<String> execute(GraphCollection collection) {
 
+    // 1-10.
+    DataSet<GraphHeadString> graphHeadLabels = getGraphHeadStrings(collection);
+
+    // 11. add empty head to prevent empty result for empty collection
+
+    graphHeadLabels = graphHeadLabels
+      .union(collection
+        .getConfig()
+        .getExecutionEnvironment()
+        .fromElements(new GraphHeadString(GradoopId.get(), "")));
+
+    // 12. label collection
+
+    return graphHeadLabels
+      .reduceGroup(new ConcatGraphHeadStrings());
+  }
+
+  /**
+   * Created a dataset of (graph id, canonical label) pairs.
+   *
+   * @param collection input collection
+   * @return (graph id, canonical label) pairs
+   */
+  public DataSet<GraphHeadString> getGraphHeadStrings(GraphCollection collection) {
     // 1. label graph heads
     DataSet<GraphHeadString> graphHeadLabels = collection.getGraphHeads()
       .map(graphHeadToString);
@@ -183,18 +205,6 @@ public class CanonicalAdjacencyMatrixBuilder implements
       .leftOuterJoin(adjacencyMatrixLabels)
       .where(0).equalTo(0)
       .with(new LabelCombiner<GraphHeadString>());
-
-    // 11. add empty head to prevent empty result for empty collection
-
-    graphHeadLabels = graphHeadLabels
-      .union(collection
-        .getConfig()
-        .getExecutionEnvironment()
-        .fromElements(new GraphHeadString(GradoopId.get(), "")));
-
-    // 12. label collection
-
-    return graphHeadLabels
-      .reduceGroup(new ConcatGraphHeadStrings());
+    return graphHeadLabels;
   }
 }

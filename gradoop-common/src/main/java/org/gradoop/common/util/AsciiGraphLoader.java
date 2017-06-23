@@ -484,7 +484,7 @@ public class AsciiGraphLoader
    * @return EPGM graph head
    */
   private G initGraphHead(Graph g) {
-    G graphHead = config.getGraphHeadFactory().createGraphHead(
+    G graphHead = (G) config.getGraphHeadFactory().createGraphHead(
       g.getLabel(), Properties.createFromMap(g.getProperties()));
     graphHeadIds.put(g.getId(), graphHead.getId());
     graphHeads.put(graphHead.getId(), graphHead);
@@ -500,7 +500,7 @@ public class AsciiGraphLoader
   private V initVertex(Vertex v) {
     V vertex;
     if (!vertexIds.containsKey(v.getId())) {
-      vertex = config.getVertexFactory().createVertex(
+      vertex = (V) config.getVertexFactory().createVertex(
         v.getLabel(),
         Properties.createFromMap(v.getProperties()),
         createGradoopIdSet(v));
@@ -522,7 +522,7 @@ public class AsciiGraphLoader
   private E initEdge(Edge e) {
     E edge;
     if (!edgeIds.containsKey(e.getId())) {
-      edge = config.getEdgeFactory().createEdge(
+      edge = (E) config.getEdgeFactory().createEdge(
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),

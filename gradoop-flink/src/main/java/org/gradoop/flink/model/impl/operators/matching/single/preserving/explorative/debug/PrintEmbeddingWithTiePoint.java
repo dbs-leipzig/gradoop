@@ -33,8 +33,7 @@ public class PrintEmbeddingWithTiePoint<K> extends Printer<EmbeddingWithTiePoint
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    PrintEmbeddingWithTiePoint.class);
+  private static final Logger LOG = Logger.getLogger(PrintEmbeddingWithTiePoint.class);
 
   /**
    * Constructor

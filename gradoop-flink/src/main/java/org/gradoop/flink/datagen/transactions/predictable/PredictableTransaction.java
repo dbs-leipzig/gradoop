@@ -24,14 +24,14 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -61,15 +61,15 @@ public class PredictableTransaction implements
   /**
    * graph head factory
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * vertex factory
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
   /**
    * edge factory
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * constructor

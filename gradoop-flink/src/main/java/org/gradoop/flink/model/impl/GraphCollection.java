@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.GraphCollectionOperators;
@@ -56,7 +57,9 @@ import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
-import org.gradoop.flink.model.impl.operators.distinct.Distinct;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
@@ -281,14 +284,6 @@ public class GraphCollection extends GraphBase implements
   @Override
   public GraphCollection select(final FilterFunction<GraphHead> predicate) {
     return callForCollection(new Selection(predicate));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphCollection distinct() {
-    return callForCollection(new Distinct());
   }
 
   /**
@@ -552,6 +547,27 @@ public class GraphCollection extends GraphBase implements
       .with(new TransactionFromSets());
 
     return new GraphTransactions(graphTransactions, getConfig());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection distinctById() {
+    return callForCollection(new DistinctById());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection distinctByIsomorphism() {
+    return callForCollection(new DistinctByIsomorphism());
+  }
+
+  @Override
+  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
+    return callForCollection(new GroupByIsomorphism(func));
   }
 
   /**

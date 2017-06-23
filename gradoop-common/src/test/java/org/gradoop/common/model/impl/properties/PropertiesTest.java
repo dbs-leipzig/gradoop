@@ -125,6 +125,14 @@ public class PropertiesTest {
   }
 
   @Test
+  public void testClear() throws Exception {
+    Properties properties = Properties.create();
+    properties.set(KEY_1, BOOL_VAL_1);
+    properties.clear();
+    assertEquals("wrong size", 0, properties.size());
+  }
+
+  @Test
   public void testSize() throws Exception {
     Properties properties = Properties.create();
     assertEquals("wrong size", 0, properties.size());

@@ -19,6 +19,7 @@ package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
@@ -84,14 +85,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return collection with logical graphs that fulfil the predicate
    */
   GraphCollection select(FilterFunction<GraphHead> predicateFunction);
-
-  /**
-   * Returns a distinct collection of logical graphs. Graph equality is based on
-   * graph identifiers.
-   *
-   * @return distinct graph collection
-   */
-  GraphCollection distinct();
 
   /**
    * Returns a graph collection that is sorted by a given graph property key.
@@ -295,4 +288,30 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return graph transactions representing the graph collection
    */
   GraphTransactions toTransactions();
+
+  /**
+   * Returns a distinct collection of logical graphs.
+   * Graph equality is based on graph identifiers.
+   *
+   * @return distinct graph collection
+   */
+  GraphCollection distinctById();
+
+  /**
+   * Groups a graph collection by isomorphism.
+   * Graph equality is based on isomorphism including labels and properties.
+   *
+   * @return distinct graph collection
+   */
+  GraphCollection distinctByIsomorphism();
+
+  /**
+   * Groups a graph collection by isomorphism including labels and values.
+   *
+   * @param func function to reduce all graph heads of a group into a single representative one,
+   *             e.g., to count the number of group members
+   *
+   * @return grouped graph collection
+   */
+  GraphCollection groupByIsomorphism(GraphHeadReduceFunction func);
 }

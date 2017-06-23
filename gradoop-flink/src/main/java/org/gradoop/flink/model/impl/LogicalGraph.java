@@ -25,7 +25,9 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.LogicalGraphOperators;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -45,8 +47,13 @@ import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
 import org.gradoop.flink.model.impl.operators.split.Split;
@@ -146,8 +153,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
-    vertices = vertices.map(new AddToGraph<>(graphHead));
-    edges = edges.map(new AddToGraph<>(graphHead));
+    vertices = vertices
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+    edges = edges
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return new LogicalGraph(graphHeadSet, vertices, edges, config);
   }
@@ -207,10 +218,12 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
     DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
 
     DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<>(graphHead));
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return fromDataSets(
       createGraphHeadDataSet(new ArrayList<>(0), config),
@@ -246,6 +259,25 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
 
   /**
    * {@inheritDoc}
@@ -412,6 +444,24 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
       edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
     }
     return callForGraph(builder.build());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
   }
 
   //----------------------------------------------------------------------------
