@@ -15,19 +15,27 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.gradoop.flink.model.impl.operators.fusion.functions;
+package org.gradoop.flink.model.impl.operators.nest.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.impl.operators.nest.tuples.Hexaplet;
 
 /**
- * Checks whether the edge contains a given graphId, which means that belongs to a given graph
+ * Implements the edge difference for quads using the join as a primitive function
  */
-public class FilterSubgraphEdges implements FilterFunction<Tuple2<GradoopId, Edge>> {
+@FunctionAnnotation.ForwardedFieldsFirst("* -> *")
+public class HexapletEdgeDifference implements
+  FlatJoinFunction<Hexaplet, Tuple2<GradoopId, GradoopId>, Hexaplet> {
   @Override
-  public boolean filter(Tuple2<GradoopId, Edge> value) throws Exception {
-    return value.f1.getGraphIds().contains(value.f0);
+  public void join(Hexaplet first,
+                   Tuple2<GradoopId, GradoopId> second,
+                   Collector<Hexaplet> out) throws Exception {
+    if (second == null) {
+      out.collect(first);
+    }
   }
 }

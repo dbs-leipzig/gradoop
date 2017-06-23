@@ -15,7 +15,20 @@
  * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.gradoop.flink.model.impl.operators.nest.model;
+
 /**
- * Contains all implementations of the graph fusion operator.
+ * Defines an operation that keeps the state of the final result
+ *
+ * @param <T> Representation of the previous state
  */
-package org.gradoop.flink.model.impl.operators.fusion;
+public interface WithNestedResult<T> {
+
+  /**
+   * Retrieves…
+   * @return  an intermediate step of the previous computation that could be used in the following
+   * processes
+   */
+  T getPreviousComputation();
+
+}
