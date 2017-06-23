@@ -300,11 +300,13 @@ public abstract class NestingBase implements GraphGraphCollectionToGraphOperator
     // Creates a new element to the stack
     model.getNestingIndex().addToStack(newStackElement);
 
+    graphIndex.getGraphVertexMap().partitionByRange(0);
+
     // Mark each vertex if either it's present or not in the final match
     // TODO       JOIN COUNT: (1)
     DataSet<Hexaplet> nestedResult = graphIndex.getGraphVertexMap()
       .leftOuterJoin(collectionIndex.getGraphVertexMap())
-      .where(new Value1Of2<>()).equalTo(1)
+      .where(1).equalTo(1)
       // If the vertex does not appear in the graph collection, the f2 element will be null.
       // These vertices are the ones to be returned as vertices alongside with the new
       // graph heads
