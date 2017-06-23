@@ -45,6 +45,15 @@ public class AddToGraph<GE extends GraphElement> implements
   }
 
   /**
+   * Creates a new GraphContainmentUpdater
+   *
+   * @param graphHead graph id used for updating
+   */
+  public AddToGraph(GradoopId graphHead) {
+    this.graphHeadId = graphHead;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

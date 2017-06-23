@@ -123,10 +123,10 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 
     DataSet<Vertex> epgmVertices = vertexTriples
-      .map(new Value2Of3<K, GradoopId, Vertex>());
+      .map(new Value2Of3<>());
 
     DataSet<Tuple2<K, GradoopId>> vertexIdPair = vertexTriples
-      .map(new Project3To0And1<K, GradoopId, Vertex>());
+      .map(new Project3To0And1<>());
 
     DataSet<Edge> epgmEdges = importEdges
       .join(vertexIdPair)

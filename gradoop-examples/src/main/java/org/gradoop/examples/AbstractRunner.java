@@ -53,7 +53,7 @@ public abstract class AbstractRunner {
    * @throws ParseException
    */
   protected static CommandLine parseArguments(String[] args, String className)
-      throws ParseException {
+    throws ParseException {
     if (args.length == 0) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp(className, OPTIONS, true);
@@ -70,7 +70,7 @@ public abstract class AbstractRunner {
    */
   @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory) {
-    return readLogicalGraph(directory, "json");
+    return readLogicalGraph(directory, "csv");
   }
 
   /**
@@ -91,6 +91,30 @@ public abstract class AbstractRunner {
       return new JSONDataSource(directory, config).getLogicalGraph();
     } else if (format.equals("csv")) {
       return new CSVDataSource(directory, config).getLogicalGraph();
+    } else {
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
+  }
+
+  /**
+   * Reads a GraphCollection from a given directory.
+   *
+   * @param directory       path to EPGM database
+   * @param format    format in which the graph is stored (csv, json)
+   * @return EPGM logical graph
+   */
+  @SuppressWarnings("unchecked")
+  protected static GraphCollection readGraphCollection(String directory,
+    String format) {
+    directory = appendSeparator(directory);
+
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    format = format.toLowerCase();
+
+    if (format.equals("json")) {
+      return new JSONDataSource(directory, config).getGraphCollection();
+    } else if (format.equals("csv")) {
+      return new CSVDataSource(directory, config).getGraphCollection();
     } else {
       throw new IllegalArgumentException("Unsupported format: " + format);
     }

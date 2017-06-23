@@ -20,7 +20,6 @@ package org.gradoop.benchmark.grouping;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
-import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -41,8 +40,7 @@ import java.util.regex.Pattern;
 /**
  * A dedicated program for parametrized graph grouping benchmark.
  */
-public class GroupingBenchmark extends AbstractRunner
-  implements ProgramDescription {
+public class GroupingBenchmark extends AbstractRunner {
 
   /**
    * Option to declare path to input graph
@@ -474,11 +472,4 @@ public class GroupingBenchmark extends AbstractRunner
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getDescription() {
-    return GroupingBenchmark.class.getName();
-  }
 }
