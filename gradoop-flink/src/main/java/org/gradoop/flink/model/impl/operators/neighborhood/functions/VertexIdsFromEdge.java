@@ -36,6 +36,11 @@ public class VertexIdsFromEdge
   private boolean switched;
 
   /**
+   * Avoid object instantiation.
+   */
+  private Tuple2<GradoopId, GradoopId> reuseTuple = new Tuple2<>();
+
+  /**
    * Constructor which initiates a mapping to tuple of source id and target id.
    */
   public VertexIdsFromEdge() {
@@ -57,8 +62,10 @@ public class VertexIdsFromEdge
   @Override
   public Tuple2<GradoopId, GradoopId> map(Edge edge) throws Exception {
     if (switched) {
-      return new Tuple2<>(edge.getTargetId(), edge.getSourceId());
+      reuseTuple.setFields(edge.getTargetId(), edge.getSourceId());
+    } else {
+      reuseTuple.setFields(edge.getSourceId(), edge.getTargetId());
     }
-    return new Tuple2<>(edge.getSourceId(), edge.getTargetId());
+    return reuseTuple;
   }
 }

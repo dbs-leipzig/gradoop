@@ -31,11 +31,17 @@ public class VertexToFieldOne<K, V>
   implements JoinFunction<Tuple2<K, V>, Vertex, Tuple2<K, Vertex>> {
 
   /**
+   * Avoid object instantiation.
+   */
+  private Tuple2<K, Vertex> reuseTuple = new Tuple2<K, Vertex>();
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public Tuple2<K, Vertex> join(Tuple2<K, V> tuple,
     Vertex vertex) throws Exception {
-    return new Tuple2<K, Vertex>(tuple.f0, vertex);
+    reuseTuple.setFields(tuple.f0, vertex);
+    return reuseTuple;
   }
 }

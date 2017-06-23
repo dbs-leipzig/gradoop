@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVerte
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class NeiborhoodTest extends GradoopFlinkTestBase {
+public class NeighborhoodTest extends GradoopFlinkTestBase {
 
   // Reduce on Edge Tests
 

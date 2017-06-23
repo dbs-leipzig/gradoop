@@ -30,10 +30,16 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 public class VertexToFieldZero<K, V>
   implements JoinFunction<Tuple2<K, V>, Vertex, Tuple2<Vertex, V>> {
 
+  /**
+   * Avoid object instantiation.
+   */
+  private Tuple2<Vertex, V> reuseTuple = new Tuple2<Vertex, V>();
+
   @Override
   public Tuple2<Vertex, V> join(Tuple2<K, V> tuple,
     Vertex vertex) throws Exception {
-    return new Tuple2<Vertex, V>(vertex, tuple.f1);
+    reuseTuple.setFields(vertex, tuple.f1);
+    return reuseTuple;
   }
 }
 
