@@ -23,14 +23,18 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 
 import java.util.List;
 
@@ -53,8 +57,31 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
+   * @param query Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query Cypher query
+   * @param attachData  attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * @param pattern  GDL graph pattern
    *
@@ -63,8 +90,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control if the original vertex and edge data
    * (labels and properties) shall be attached to the resulting subgraphs.
@@ -77,8 +103,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection match(String pattern, boolean attachData);
 
   /**
-   * Returns a graph collection containing all subgraphs of the input graph
-   * that match the given graph pattern.
+   * Evaluates the given GDL query using the Traverser query engine.
    *
    * This method allows to control the match strategy. This influences mostly
    * if vertices and edges can be matched to multiple vertices/edges in the
@@ -267,6 +292,32 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All edges where
+   * the vertex is relevant get joined first and then grouped. The relevant edges are specified
+   * using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   *
+   * @return logical graph where vertices store aggregated information about connected edges
+   */
+  LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All vertices
+   * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
+   * specified using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   *
+   * @return logical graph where vertices store aggregated information about connected vertices
+   */
+  LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
 
   /**
    * Checks, if another logical graph contains exactly the same vertices and

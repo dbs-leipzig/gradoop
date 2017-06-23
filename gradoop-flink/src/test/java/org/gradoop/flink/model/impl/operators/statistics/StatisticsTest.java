@@ -1,9 +1,7 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -322,7 +320,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     List<WithCount<Tuple2<String, String>>> result =
-      new DistinctEdgePropertyValuesByLabelAndPropertyName()
+      new DistinctEdgePropertiesByLabel()
         .execute(db)
         .collect();
 
@@ -339,7 +337,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     List<WithCount<Tuple2<String, String>>> result =
-      new DistinctVertexPropertyValuesByLabelAndPropertyName()
+      new DistinctVertexPropertiesByLabel()
         .execute(db)
         .collect();
 
@@ -363,7 +361,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     List<WithCount<String>> result =
-      new DistinctEdgePropertyValuesByPropertyName()
+      new DistinctEdgeProperties()
         .execute(db)
         .collect();
 
@@ -379,7 +377,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     List<WithCount<String>> result =
-      new DistinctVertexPropertyValuesByPropertyName()
+      new DistinctVertexProperties()
         .execute(db)
         .collect();
 

@@ -24,8 +24,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -47,15 +47,15 @@ public class EdgeFromIds implements
   /**
    * EPGM edge factory
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Constructor
    *
-   * @param edgeFactory EPGM edge factory
+   * @param epgmEdgeFactory EPGM edge factory
    */
-  public EdgeFromIds(EdgeFactory edgeFactory) {
-    this.edgeFactory = edgeFactory;
+  public EdgeFromIds(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+    this.edgeFactory = epgmEdgeFactory;
   }
 
   /**
@@ -73,7 +73,6 @@ public class EdgeFromIds implements
     return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Edge> getProducedType() {
     return TypeExtractor.createTypeInfo(edgeFactory.getType());

@@ -22,8 +22,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
@@ -43,7 +43,7 @@ public class BuildSuperVertex
   /**
    * Vertex vertexFactory.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Creates map function.
@@ -51,14 +51,14 @@ public class BuildSuperVertex
    * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
    * @param valueAggregators  aggregate functions for vertex values
-   * @param vertexFactory     vertex factory
+   * @param epgmVertexFactory     vertex factory
    */
   public BuildSuperVertex(List<String> groupPropertyKeys,
     boolean useLabel,
     List<PropertyValueAggregator> valueAggregators,
-    VertexFactory vertexFactory) {
+    EPGMVertexFactory<Vertex> epgmVertexFactory) {
     super(groupPropertyKeys, useLabel, valueAggregators);
-    this.vertexFactory = vertexFactory;
+    this.vertexFactory = epgmVertexFactory;
   }
 
   /**

@@ -19,19 +19,8 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators
-  .UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
-
-
 import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Filter logical graphs from a graph collection based on their associated graph
  * head.
  */
-public class Selection implements UnaryCollectionToCollectionOperator {
+public class Selection extends SelectionBase {
 
   /**
    * User-defined predicate function
@@ -57,24 +46,13 @@ public class Selection implements UnaryCollectionToCollectionOperator {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
+
     // find graph heads matching the predicate
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<GraphHead> graphHeads = collection
+      .getGraphHeads()
       .filter(predicate);
 
-    // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
-
-    // use graph ids to filter vertices from the actual graph structure
-    DataSet<Vertex> vertices = collection.getVertices()
-      .filter(new InAnyGraphBroadcast<Vertex>())
-      .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    DataSet<Edge> edges = collection.getEdges()
-      .filter(new InAnyGraphBroadcast<Edge>())
-      .withBroadcastSet(graphIDs, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    return GraphCollection.fromDataSets(
-      graphHeads, vertices, edges, collection.getConfig());
+    return selectVerticesAndEdges(collection, graphHeads);
   }
 
   @Override

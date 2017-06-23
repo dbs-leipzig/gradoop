@@ -41,6 +41,20 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 public class JSONDataSource extends JSONBase implements DataSource {
 
   /**
+   * Creates a new data source. The graph is written from the specified path which points to a
+   * directory containing the JSON files. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param inputPath directory containing JSON files
+   * @param config    Gradoop Flink configuration
+   */
+  public JSONDataSource(String inputPath, GradoopFlinkConfig config) {
+    this(inputPath + DEFAULT_GRAPHS_FILE,
+      inputPath + DEFAULT_VERTEX_FILE,
+      inputPath + DEFAULT_EDGE_FILE,
+      config);
+  }
+
+  /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
    *
    * @param graphHeadPath graph data file

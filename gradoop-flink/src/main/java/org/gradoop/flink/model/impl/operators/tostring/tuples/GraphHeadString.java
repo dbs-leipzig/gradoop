@@ -51,4 +51,8 @@ public class GraphHeadString extends Tuple2<GradoopId, String>
   public void setLabel(String label) {
     this.f1 = label;
   }
+
+  public GradoopId getId() {
+    return this.f0;
+  }
 }

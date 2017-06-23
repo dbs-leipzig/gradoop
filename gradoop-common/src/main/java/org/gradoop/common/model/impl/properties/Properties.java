@@ -17,10 +17,10 @@
 
 package org.gradoop.common.model.impl.properties;
 
-import org.apache.hadoop.io.Writable;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * Represents the properties of an {@link org.gradoop.common.model.impl.pojo.Element}.
  */
-public class Properties implements Iterable<Property>, Writable, Serializable {
+public class Properties implements Iterable<Property>, Value, Serializable {
 
   /**
    * Default capacity for new property lists.
@@ -201,6 +201,13 @@ public class Properties implements Iterable<Property>, Writable, Serializable {
   }
 
   /**
+   * Removes all elements from these properties.
+   */
+  public void clear() {
+    this.properties.clear();
+  }
+
+  /**
    * Returns the number of properties.
    *
    * @return number of properties
@@ -260,27 +267,27 @@ public class Properties implements Iterable<Property>, Writable, Serializable {
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeInt(properties.size());
+  public void write(DataOutputView outputView) throws IOException {
+    outputView.writeInt(properties.size());
 
     for (Map.Entry<String, PropertyValue> entry : properties.entrySet()) {
-      dataOutput.writeUTF(entry.getKey());
-      entry.getValue().write(dataOutput);
+      outputView.writeUTF(entry.getKey());
+      entry.getValue().write(outputView);
     }
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
-    int propertyCount = dataInput.readInt();
+  public void read(DataInputView inputView) throws IOException {
+    int propertyCount = inputView.readInt();
     this.properties = new HashMap<>(propertyCount);
 
     String key;
     PropertyValue value;
 
     for (int i = 0; i < propertyCount; i++) {
-      key = dataInput.readUTF();
+      key = inputView.readUTF();
       value = new PropertyValue();
-      value.readFields(dataInput);
+      value.read(inputView);
       properties.put(key, value);
     }
   }

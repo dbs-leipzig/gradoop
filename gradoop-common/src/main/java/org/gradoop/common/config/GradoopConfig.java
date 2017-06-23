@@ -29,14 +29,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.storage.api.EdgeHandler;
-import org.gradoop.common.storage.api.GraphHeadHandler;
-import org.gradoop.common.storage.api.VertexHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseEdgeHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseVertexHandler;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic Gradoop Configuration.
@@ -48,18 +40,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GradoopConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
-  /**
-   * Graph head handler.
-   */
-  private final GraphHeadHandler<G> graphHeadHandler;
-  /**
-   * EPGMVertex handler.
-   */
-  private final VertexHandler<V, E> vertexHandler;
-  /**
-   * EPGMEdge handler.
-   */
-  private final EdgeHandler<E, V> edgeHandler;
+  private final GraphHeadFactory graphHeadFactory;
+  
+  private final VertexFactory vertexFactory;
+
+  private final EdgeFactory edgeFactory;
 
   /**
    * Creates a new Configuration.
@@ -68,14 +53,11 @@ public class GradoopConfig
    * @param vertexHandler     vertex handler
    * @param edgeHandler       edge handler
    */
-  protected GradoopConfig(GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V, E> vertexHandler, EdgeHandler<E, V> edgeHandler) {
-    this.graphHeadHandler =
-      checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
-    this.vertexHandler =
-      checkNotNull(vertexHandler, "VertexHandler was null");
-    this.edgeHandler =
-      checkNotNull(edgeHandler, "EdgeHandler was null");
+  @SuppressWarnings("unchecked")
+  protected GradoopConfig() {
+	  this.graphHeadFactory = new GraphHeadFactory();
+	  this.vertexFactory = new VertexFactory();
+	  this.edgeFactory = new EdgeFactory();
   }
 
   /**
@@ -85,57 +67,18 @@ public class GradoopConfig
    * @return Default Gradoop configuration.
    */
   public static GradoopConfig<GraphHead, Vertex, Edge> getDefaultConfig() {
-    VertexHandler<Vertex, Edge> vertexHandler = new HBaseVertexHandler<>(
-      new VertexFactory());
-    EdgeHandler<Edge, Vertex> edgeHandler = new HBaseEdgeHandler<>(
-      new EdgeFactory());
-    GraphHeadHandler<GraphHead> graphHeadHandler = new HBaseGraphHeadHandler<>(
-      new GraphHeadFactory());
-    return new GradoopConfig<>(graphHeadHandler, vertexHandler, edgeHandler);
+    return new GradoopConfig<>();
   }
 
-  /**
-   * Creates a Gradoop configuration based on the given arguments.
-   *
-   * @param graphHeadHandler  EPGM graph head handler
-   * @param vertexHandler     EPGM vertex handler
-   * @param edgeHandler       EPGM edge handler
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
-   *
-   * @return Gradoop HBase configuration
-   */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  GradoopConfig createConfig(
-    GraphHeadHandler<G> graphHeadHandler,
-    VertexHandler<V, E> vertexHandler,
-    EdgeHandler<E, V> edgeHandler) {
-    return new GradoopConfig<>(graphHeadHandler, vertexHandler, edgeHandler);
+  public GraphHeadFactory getGraphHeadFactory() {
+    return graphHeadFactory;
   }
 
-  public GraphHeadHandler<G> getGraphHeadHandler() {
-    return graphHeadHandler;
+  public VertexFactory getVertexFactory() {
+    return vertexFactory;
   }
 
-  public VertexHandler<V, E> getVertexHandler() {
-    return vertexHandler;
-  }
-
-  public EdgeHandler<E, V> getEdgeHandler() {
-    return edgeHandler;
-  }
-
-  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
-    return graphHeadHandler.getGraphHeadFactory();
-  }
-
-  public EPGMVertexFactory<V> getVertexFactory() {
-    return vertexHandler.getVertexFactory();
-  }
-
-  public EPGMEdgeFactory<E> getEdgeFactory() {
-    return edgeHandler.getEdgeFactory();
+  public EdgeFactory getEdgeFactory() {
+    return edgeFactory;
   }
 }

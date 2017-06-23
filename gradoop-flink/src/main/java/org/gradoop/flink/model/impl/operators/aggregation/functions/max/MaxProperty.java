@@ -37,6 +37,6 @@ public abstract class MaxProperty extends Max {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "max(" + propertyKey + ")";
+    return "max_" + propertyKey;
   }
 }

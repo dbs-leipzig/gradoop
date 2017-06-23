@@ -20,7 +20,7 @@ package org.gradoop.flink.io.impl.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -47,15 +47,15 @@ public class JSONToVertex extends JSONToEntity
   /**
    * Creates vertex data objects.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Creates map function
    *
-   * @param vertexFactory vertex data factory
+   * @param epgmVertexFactory vertex data factory
    */
-  public JSONToVertex(VertexFactory vertexFactory) {
-    this.vertexFactory = vertexFactory;
+  public JSONToVertex(EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    this.vertexFactory = epgmVertexFactory;
   }
 
   /**

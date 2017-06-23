@@ -18,14 +18,16 @@
 package org.gradoop.common.model.impl.properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.io.WritableComparable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -37,7 +39,7 @@ import java.util.Iterator;
  * Represents a list of property values.
  */
 public class PropertyValueList
-  implements Iterable<PropertyValue>, WritableComparable<PropertyValueList>, Serializable {
+  implements Iterable<PropertyValue>, Serializable, Value, Comparable<PropertyValueList> {
 
   /**
    * Class version for serialization.
@@ -84,13 +86,14 @@ public class PropertyValueList
     Collection<PropertyValue> propertyValues) throws IOException {
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-    DataOutputStream out = new DataOutputStream(byteStream);
+    DataOutputStream outputStream = new DataOutputStream(byteStream);
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
 
     for (PropertyValue propertyValue : propertyValues) {
-      propertyValue.write(out);
+      propertyValue.write(outputView);
     }
 
-    out.flush();
+    outputStream.flush();
     return new PropertyValueList(byteStream.toByteArray());
   }
 
@@ -117,13 +120,13 @@ public class PropertyValueList
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
+  public void write(DataOutputView dataOutput) throws IOException {
     dataOutput.writeShort(bytes.length);
     dataOutput.write(bytes);
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
+  public void read(DataInputView dataInput) throws IOException {
     bytes = new byte[dataInput.readShort()];
     dataInput.readFully(bytes);
   }
@@ -149,10 +152,10 @@ public class PropertyValueList
     private final ByteArrayInputStream byteStream;
 
     /**
-     * Wraps the {@code byteStream} and is used to access the {@code readFields}
+     * Wraps the {@code byteStream} and is used to access the {@code read}
      * method of PropertyValue.
      */
-    private final DataInputStream in;
+    private final DataInputStream inputStream;
 
     /**
      * Creates new iterator
@@ -164,7 +167,7 @@ public class PropertyValueList
         rawBytes = new byte[0];
       }
       byteStream = new ByteArrayInputStream(rawBytes);
-      in = new DataInputStream(byteStream);
+      inputStream = new DataInputStream(byteStream);
     }
 
     @Override
@@ -175,7 +178,7 @@ public class PropertyValueList
       } else {
         // close the stream if no more data is available
         try {
-          in.close();
+          inputStream.close();
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -188,7 +191,8 @@ public class PropertyValueList
     public PropertyValue next() {
       PropertyValue nextValue = new PropertyValue();
       try {
-        nextValue.readFields(in);
+        DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+        nextValue.read(inputView);
       } catch (IOException e) {
         e.printStackTrace();
       }

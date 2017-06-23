@@ -18,8 +18,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -34,18 +34,18 @@ public class TransformVertex extends TransformBase<Vertex> {
   /**
    * Factory to init modified vertex.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Constructor
    *
    * @param transformationFunction  vertex modification function
-   * @param vertexFactory         vertex factory
+   * @param epgmVertexFactory         vertex factory
    */
   public TransformVertex(TransformationFunction<Vertex> transformationFunction,
-    VertexFactory vertexFactory) {
+    EPGMVertexFactory<Vertex> epgmVertexFactory) {
     super(transformationFunction);
-    this.vertexFactory = checkNotNull(vertexFactory);
+    this.vertexFactory = checkNotNull(epgmVertexFactory);
   }
 
   @Override

@@ -22,9 +22,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -36,15 +36,15 @@ public class InitGraphHeadWithLineage
   /**
    * GraphHeadFactory
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
 
   /**
    * Constructor
    *
-   * @param graphHeadFactory graph head factory
+   * @param epgmGraphHeadFactory graph head factory
    */
-  public InitGraphHeadWithLineage(GraphHeadFactory graphHeadFactory) {
-    this.graphHeadFactory = graphHeadFactory;
+  public InitGraphHeadWithLineage(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+    this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
   /**
@@ -62,7 +62,6 @@ public class InitGraphHeadWithLineage
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<GraphHead> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());

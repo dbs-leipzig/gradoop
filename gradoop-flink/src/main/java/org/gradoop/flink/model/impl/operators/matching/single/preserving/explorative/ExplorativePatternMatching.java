@@ -24,12 +24,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -45,7 +45,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraph
 import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Traverser;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
@@ -62,8 +61,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
-import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint
-  .OPTIMIZER_CHOOSES;
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
@@ -79,8 +77,7 @@ public class ExplorativePatternMatching
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(
-    ExplorativePatternMatching.class);
+  private static final Logger LOG = Logger.getLogger(ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
@@ -132,8 +129,8 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    GraphHeadFactory graphHeadFactory = config.getGraphHeadFactory();
-    VertexFactory vertexFactory = config.getVertexFactory();
+    EPGMGraphHeadFactory<GraphHead> graphHeadFactory = config.getGraphHeadFactory();
+    EPGMVertexFactory<Vertex> vertexFactory = config.getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<Vertex> matchingVertices = graph.getVertices()
@@ -198,11 +195,6 @@ public class ExplorativePatternMatching
 
       embeddings = distributedTraverser.traverse(vertices, edges);
     } else if (traverserStrategy == TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION) {
-
-      //--------------------------------------------------------------------------
-      // Pre-processing (filter candidates)
-      //--------------------------------------------------------------------------
-
       DataSet<TripleWithCandidates<GradoopId>> triples = PreProcessor
         .filterTriplets(graph, getQuery());
 
@@ -233,11 +225,6 @@ public class ExplorativePatternMatching
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
       PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
-  }
-
-  @Override
-  protected QueryHandler getQueryHandler() {
-    return new QueryHandler(getQuery());
   }
 
   @Override

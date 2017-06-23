@@ -22,14 +22,14 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
@@ -55,15 +55,15 @@ public class ElementsFromEmbedding
   /**
    * Constructs EPGM graph heads
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
   /**
    * Maps query vertex ids to variables
    */
@@ -80,19 +80,19 @@ public class ElementsFromEmbedding
    * Constructor
    *
    * @param traversalCode     traversal code to retrieve sourceId/targetId
-   * @param graphHeadFactory  EPGM graph head factory
-   * @param vertexFactory     EPGM vertex factory
-   * @param edgeFactory       EPGM edge factory
+   * @param epgmGraphHeadFactory  EPGM graph head factory
+   * @param epgmVertexFactory     EPGM vertex factory
+   * @param epgmEdgeFactory       EPGM edge factory
    * @param query             query handler
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory,
-    EdgeFactory edgeFactory,
+    EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory,
+    EPGMEdgeFactory<Edge> epgmEdgeFactory,
     QueryHandler query) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.vertexFactory = vertexFactory;
-    this.edgeFactory = edgeFactory;
+    this.graphHeadFactory = epgmGraphHeadFactory;
+    this.vertexFactory = epgmVertexFactory;
+    this.edgeFactory = epgmEdgeFactory;
 
     this.queryVertexMapping = query.getVertices()
       .stream()

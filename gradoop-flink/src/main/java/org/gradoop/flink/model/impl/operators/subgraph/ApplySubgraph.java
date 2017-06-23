@@ -30,11 +30,11 @@ import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElem
 import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
@@ -117,7 +117,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
@@ -221,7 +221,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
@@ -296,7 +296,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary

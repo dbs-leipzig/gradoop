@@ -18,9 +18,9 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.util.GConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,18 +34,18 @@ public class TransformEdge extends TransformBase<Edge> {
   /**
    * Factory to init modified edge.
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Constructor
    *
    * @param transformationFunction  edge modification function
-   * @param edgeFactory           edge factory
+   * @param epgmEdgeFactory           edge factory
    */
   public TransformEdge(TransformationFunction<Edge> transformationFunction,
-    EdgeFactory edgeFactory) {
+    EPGMEdgeFactory<Edge> epgmEdgeFactory) {
     super(transformationFunction);
-    this.edgeFactory = checkNotNull(edgeFactory);
+    this.edgeFactory = checkNotNull(epgmEdgeFactory);
   }
 
   @Override

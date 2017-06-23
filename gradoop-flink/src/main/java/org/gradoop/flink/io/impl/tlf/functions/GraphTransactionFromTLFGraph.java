@@ -27,10 +27,10 @@ import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
@@ -47,17 +47,17 @@ public class GraphTransactionFromTLFGraph implements
   /**
    * Creates graph data objects
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
 
   /**
    * Creates graph data objects
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Creates graph data objects
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Reduce object instantiation.
@@ -67,15 +67,15 @@ public class GraphTransactionFromTLFGraph implements
   /**
    * Creates a map function.
    *
-   * @param graphHeadFactory graph head data factory
-   * @param vertexFactory    vertex data factory
-   * @param edgeFactory      edge data factory
+   * @param epgmGraphHeadFactory graph head data factory
+   * @param epgmVertexFactory    vertex data factory
+   * @param epgmEdgeFactory      edge data factory
    */
-  public GraphTransactionFromTLFGraph(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.vertexFactory = vertexFactory;
-    this.edgeFactory = edgeFactory;
+  public GraphTransactionFromTLFGraph(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+    this.graphHeadFactory = epgmGraphHeadFactory;
+    this.vertexFactory = epgmVertexFactory;
+    this.edgeFactory = epgmEdgeFactory;
 
     prepareForProducedType();
   }
