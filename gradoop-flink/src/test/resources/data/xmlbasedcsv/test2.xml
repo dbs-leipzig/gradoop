@@ -8,7 +8,7 @@
 
     <domain name="university">
 
-        <csv name="computerscienceGraph.csv" charset="utf8" separator="|">
+        <csv name="computerscienceGraph.csv" charset="utf8" separator="\t">
             <columns>
                 <column id="0" pos="0" type="Long"/>
                 <column id="1" pos="1" type="String"/>

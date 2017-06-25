@@ -28,20 +28,13 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.xmlbasedcsv.XMLBasedCSVConstants;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.CsvExtension;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Graph;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Key;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Ref;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Reference;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Static;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Vertexedge;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Label;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Property;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.*;
 import org.gradoop.flink.io.impl.xmlbasedcsv.tuples.ReferenceTuple;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -82,7 +75,12 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     CsvExtension csv = tuple.f0;
     String content = tuple.f1;
     // the single values of each line
-    String[] fields = content.split(Pattern.quote(csv.getSeparator()));
+    String[] fields;
+    if (csv.getSeparator().equals("\\t")) {
+      fields = content.split(csv.getSeparator(), -1);
+    } else {
+      fields = content.split(Pattern.quote(csv.getSeparator()), -1);
+    }
     // create the graphhead
     if (csv.getGraphhead() != null) {
       collector.collect(createGraphHead(csv, fields));
@@ -119,7 +117,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     List<Property> propertiesCsv = null;
     // if the label is set in the meta file it is read from csv line
     if (csv.getGraphhead().getLabel() != null) {
-      label = createLabel(csv.getGraphhead().getLabel(), fields);
+      label = createLabel(csv.getGraphhead().getLabel(), fields, csv.getColumns());
     }
     // contains information about the actual class (e.g. tablename) and the actual id (e.g.
     // primary key)
@@ -146,7 +144,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     List<Property> propertiesCsv = null;
     // if the label is set in the meta file it is read from csv line
     if (csv.getVertex().getLabel() != null) {
-      label = createLabel(csv.getVertex().getLabel(), fields);
+      label = createLabel(csv.getVertex().getLabel(), fields, csv.getColumns());
     }
     // contains information about the actual class (e.g. tablename) and the actual id (e.g.
     // primary key)
@@ -161,7 +159,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     List<Graph> graphs = csv.getVertex().getGraphs().getGraph();
     // List containing the keys of graphs the vertex is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
-      className, fields);
+      className, fields, csv.getColumns());
     // if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
@@ -202,7 +200,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     }
     // if the label is set in the meta file it is read from csv line
     if (edge.getLabel() != null) {
-      label = createLabel(edge.getLabel(), fields);
+      label = createLabel(edge.getLabel(), fields, csv.getColumns());
     }
     // contains information about the actual class (e.g. tablename) and the actual id (e.g.
     // primary key)
@@ -217,7 +215,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     List<Graph> graphs = edge.getGraphs().getGraph();
     // List containing the keys of graphs the edge is part of
     String graphList = createGraphList(graphs, csv.getDatasourceName(), csv.getDomainName(),
-      className, fields);
+      className, fields, csv.getColumns());
     // if there are properties set in the meta file they are read from the csv line
     Properties properties = createProperties(csv, propertiesCsv, key, fields);
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_GRAPHS, graphList);
@@ -229,14 +227,14 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       // relevant key information for the source
       referenceTuple = createKeyTupleFromStaticOrRefOrReference(
         csv.getEdge().getSource().getContent(), fields, csv.getDatasourceName(),
-        csv.getDomainName(), className);
+        csv.getDomainName(), className, csv.getColumns());
       fullKey = createKey(referenceTuple);
     }
     // write the source key content as edge property
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_SOURCE, fullKey);
     // relevant key information for the target
     referenceTuple = createKeyTupleFromStaticOrRefOrReference(edge.getTarget().getContent(),
-      fields, csv.getDatasourceName(), csv.getDomainName(), className);
+      fields, csv.getDatasourceName(), csv.getDomainName(), className, csv.getColumns());
     fullKey = createKey(referenceTuple);
     // write the target key content as edge property
     properties.set(XMLBasedCSVConstants.PROPERTY_KEY_TARGET, fullKey);
@@ -255,7 +253,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @return concatenated string representing the key
    */
   private String createGraphList(List<Graph> graphs, String datasourceName, String domainName,
-    String className, String[] fields) {
+    String className, String[] fields, Columns columns) {
     StringBuilder sb = new StringBuilder();
     boolean notFirst = false;
     for (Graph graph : graphs) {
@@ -267,7 +265,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
       }
       // adds a key of a graph to the 'list'
       sb.append(createKey(createKeyTupleFromStaticOrRefOrReference(
-        graph.getContent(), fields, datasourceName, domainName, className)).replaceAll(
+        graph.getContent(), fields, datasourceName, domainName, className, columns)).replaceAll(
           XMLBasedCSVConstants.SEPARATOR_GRAPHS, XMLBasedCSVConstants.ESCAPE_SEPARATOR_GRAPHS));
     }
     return sb.toString();
@@ -284,14 +282,14 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @return tuple containing all relevant information
    */
   private ReferenceTuple createKeyTupleFromStaticOrRefOrReference(List<Serializable> objects,
-    String[] fields, String datasourceName, String domainName, String className) {
+    String[] fields, String datasourceName, String domainName, String className, Columns columns) {
     // this string contains the id
     StringBuilder contentString = new StringBuilder();
     String ref;
     for (Object object : objects) {
       // xsd type allows one static element and an optional ref element or no static element and one
       // ref element or one reference element
-      ref = getEntryFromStaticOrRef(object, fields, XMLBasedCSVConstants.SEPARATOR_ID);
+      ref = getEntryFromStaticOrRef(object, fields, XMLBasedCSVConstants.SEPARATOR_ID, columns);
       // object is static or ref
       if (!ref.equals("")) {
         contentString.append(ref);
@@ -308,7 +306,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         className = reference.getKey().getClazz();
         // append the id from the csv line
         contentString.append(this.getEntriesFromStaticOrRef(reference.getKey().getContent(),
-          fields, XMLBasedCSVConstants.SEPARATOR_ID));
+          fields, XMLBasedCSVConstants.SEPARATOR_ID, columns));
       }
     }
     return new ReferenceTuple(datasourceName, domainName, className, contentString.toString());
@@ -324,14 +322,14 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @return String of all separated entries
    */
   private String getEntriesFromStaticOrRef(List<Serializable> objects, String[] fields,
-    String separator) {
+    String separator, Columns columns) {
     StringBuilder contentString = new StringBuilder();
     boolean notFirst = false;
     boolean hasSeparator = !separator.equals("");
     for (Object object : objects) {
       // xsd type allows one static element and an optional ref element or no static element and one
       // ref element
-      contentString.append(getEntryFromStaticOrRef(object, fields, separator));
+      contentString.append(getEntryFromStaticOrRef(object, fields, separator, columns));
       // add separator in front of each added content except the first one
       if (notFirst && hasSeparator) {
         contentString.append(separator);
@@ -350,7 +348,8 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param separator separates each entry for the string
    * @return String of one entry
    */
-  private String getEntryFromStaticOrRef(Object object, String[] fields, String separator) {
+  private String getEntryFromStaticOrRef(
+    Object object, String[] fields, String separator, Columns columns) {
     StringBuilder contentString = new StringBuilder();
     String fieldContent;
       // xsd type allows one static element and optional ref elements or no static element and at
@@ -358,7 +357,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     if (Static.class.isInstance(object)) {
       contentString.append(((Static) object).getName());
     } else if (Ref.class.isInstance(object)) {
-      fieldContent = fields[((Ref) object).getColumnId().intValue()];
+      fieldContent = fields[getColumn(columns, ((Ref) object).getColumnId()).getPos().intValue()];
       // used to either replace all label separators in case a labels content is needed
       switch (separator) {
       case XMLBasedCSVConstants.SEPARATOR_LABEL:
@@ -385,10 +384,10 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param fields contains the data
    * @return string representation of the label
    */
-  private String createLabel(Label label, String[] fields) {
+  private String createLabel(Label label, String[] fields, Columns columns) {
     String labelSeparator = (label.getSeparator() == null) ?
       XMLBasedCSVConstants.SEPARATOR_LABEL : label.getSeparator();
-    return getEntriesFromStaticOrRef(label.getContent(), fields, labelSeparator);
+    return getEntriesFromStaticOrRef(label.getContent(), fields, labelSeparator, columns);
   }
 
   /**
@@ -433,7 +432,8 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     // add a property which contains the key defined by datasource name,...
     String resultKey = createKey(
       new ReferenceTuple(csv.getDatasourceName(), csv.getDomainName(), key.getClazz(),
-        getEntriesFromStaticOrRef(key.getContent(), fields, XMLBasedCSVConstants.SEPARATOR_ID)));
+        getEntriesFromStaticOrRef(
+          key.getContent(), fields, XMLBasedCSVConstants.SEPARATOR_ID, csv.getColumns())));
     PropertyValue value = new PropertyValue();
     value.setString(resultKey);
     list.set(XMLBasedCSVConstants.PROPERTY_KEY_KEY, value);
@@ -445,39 +445,52 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
         // gradoop property and not the one defined by the xsd
         org.gradoop.common.model.impl.properties.Property prop
           = new org.gradoop.common.model.impl.properties.Property();
-
         prop.setKey(p.getName());
         value = new PropertyValue();
-        String type = csv.getColumns().getColumn().get(p.getColumnId()).getType().value();
-        // set the properties dependent on their type specified in the xsd
-        switch (type) {
-        case "String":
-          value.setString(fields[p.getColumnId()]);
-          break;
-        case "Integer":
-          value.setInt(Integer.parseInt(fields[p.getColumnId()]));
-          break;
-        case "Long":
-          value.setLong(Long.parseLong(fields[p.getColumnId()]));
-          break;
-        case "Float":
-          value.setFloat(Float.parseFloat(fields[p.getColumnId()]));
-          break;
-        case "Double":
-          value.setDouble(Double.parseDouble(fields[p.getColumnId()]));
-          break;
-        case "Boolean":
-          value.setBoolean(Boolean.parseBoolean(fields[p.getColumnId()]));
-          break;
-        // by default the value is stored as string
-        default:
-          value.setString(fields[p.getColumnId()]);
-          break;
+        Column column = getColumn(csv.getColumns(), p.getColumnId().longValue());
+        if (!fields[column.getPos().intValue()].equals("")) {
+          String type = column.getType().value();
+          // set the properties dependent on their type specified in the xsd
+          switch (type) {
+          case "String":
+            value.setString(fields[column.getPos().intValue()]);
+            break;
+          case "Integer":
+            value.setInt(Integer.parseInt(fields[column.getPos().intValue()]));
+            break;
+          case "Long":
+            value.setLong(Long.parseLong(fields[column.getPos().intValue()]));
+            break;
+          case "Float":
+            value.setFloat(Float.parseFloat(fields[column.getPos().intValue()]));
+            break;
+          case "Double":
+            value.setDouble(Double.parseDouble(fields[column.getPos().intValue()]));
+            break;
+          case "Boolean":
+            value.setBoolean(Boolean.parseBoolean(fields[column.getPos().intValue()]));
+            break;
+          // by default the value is stored as string
+          default:
+            value.setString(fields[column.getPos().intValue()]);
+            break;
+          }
+        } else {
+          value = PropertyValue.NULL_VALUE;
         }
         prop.setValue(value);
         list.set(prop);
       }
     }
     return list;
+  }
+
+  public Column getColumn(Columns columns, Long id) {
+    for (Column column : columns.getColumn()) {
+      if (column.getId().equals(id)) {
+        return column;
+      }
+    }
+    return null;
   }
 }
