@@ -56,8 +56,8 @@ public class CoGroupAssociateOldVerticesWithNewIds implements
 
   @Override
   public void coGroup(Iterable<Tuple2<Vertex, GradoopId>> first,
-    Iterable<Tuple2<Vertex, GradoopId>> second, Collector<Tuple2<Vertex, GradoopId>> out) throws
-    Exception {
+    Iterable<Tuple2<Vertex, GradoopId>> second, Collector<Tuple2<Vertex, GradoopId>> out)
+      throws Exception {
     reusableList.clear();
     second.forEach(x -> reusableList.add(x.f0.getId()));
     for (Tuple2<Vertex, GradoopId> x : first) {

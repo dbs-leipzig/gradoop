@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * Function updating the edges' sources or destination
  * for each newly created hypervertex
  */
-public class FlatJoinSourceEdgeReference implements
-  FlatJoinFunction<Edge, Tuple2<Vertex, GradoopId>, Edge> {
+public class FlatJoinSourceEdgeReference
+  implements FlatJoinFunction<Edge, Tuple2<Vertex, GradoopId>, Edge> {
 
   /**
    * Checking if the stuff is actually updating the sources.
@@ -47,8 +47,8 @@ public class FlatJoinSourceEdgeReference implements
   }
 
   @Override
-  public void join(Edge first, Tuple2<Vertex, GradoopId> second, Collector<Edge> out) throws
-    Exception {
+  public void join(Edge first, Tuple2<Vertex, GradoopId> second, Collector<Edge> out)
+      throws Exception {
     if (second != null && !(second.f1.equals(GradoopId.NULL_VALUE))) {
       if (isItSourceDoingNow) {
         first.setSourceId(second.f1);

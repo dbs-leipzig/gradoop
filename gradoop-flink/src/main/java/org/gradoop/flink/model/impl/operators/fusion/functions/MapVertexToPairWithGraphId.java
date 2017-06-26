@@ -28,7 +28,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * Demultiplexes a vertex by associating its graphId
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class MapVertexToPairWithGraphId implements FlatMapFunction<Vertex, Tuple2<Vertex,   GradoopId>> {
+public class MapVertexToPairWithGraphId
+  implements FlatMapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
 
   /**
    * Reusable element ot be returned
@@ -43,7 +44,8 @@ public class MapVertexToPairWithGraphId implements FlatMapFunction<Vertex, Tuple
   }
 
   @Override
-  public void flatMap(Vertex value, Collector<Tuple2<Vertex, GradoopId>> out) throws Exception {
+  public void flatMap(Vertex value, Collector<Tuple2<Vertex, GradoopId>> out)
+      throws Exception {
     if (value != null) {
       for (GradoopId id : value.getGraphIds()) {
         reusableTuple.f0 = value;

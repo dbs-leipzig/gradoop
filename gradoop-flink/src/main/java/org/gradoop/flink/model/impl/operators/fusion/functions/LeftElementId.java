@@ -27,8 +27,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <K> Element where the id is extracted
  *
  */
-public class LeftElementId<K extends EPGMElement> implements KeySelector<Tuple2<K, GradoopId>,
-  GradoopId> {
+public class LeftElementId<K extends EPGMElement>
+  implements KeySelector<Tuple2<K, GradoopId>, GradoopId> {
   @Override
   public GradoopId getKey(Tuple2<K, GradoopId> value) throws Exception {
     return value.f0.getId();

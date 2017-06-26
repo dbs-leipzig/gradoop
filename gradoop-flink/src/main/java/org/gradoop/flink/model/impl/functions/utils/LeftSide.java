@@ -30,8 +30,8 @@ import org.apache.flink.util.Collector;
  * @param <R> right type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->*")
-public class LeftSide<L, R> implements CrossFunction<L, R, L>, JoinFunction<L, R, L>,
-  CoGroupFunction<L, R, L> {
+public class LeftSide<L, R>
+  implements CrossFunction<L, R, L>, JoinFunction<L, R, L>, CoGroupFunction<L, R, L> {
 
   @Override
   public L cross(L left, R right) throws Exception {
