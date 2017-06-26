@@ -99,8 +99,9 @@ import java.util.Set;
       // collect single item representing the whole group
       reuseSuperEdgeGroupItem.setSourceIds(sources);
       reuseSuperEdgeGroupItem.setTargetIds(targets);
-      //TODO CHECK IF BEFORE OR AFTER COLLECT
-      collector.collect(reuseSuperEdgeGroupItem);
+      reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues(reuseSuperEdgeGroupItem.getLabelGroup()
+        .getAggregators()));
       resetAggregators(reuseSuperEdgeGroupItem.getLabelGroup().getAggregators());
+      collector.collect(reuseSuperEdgeGroupItem);
     }
   }

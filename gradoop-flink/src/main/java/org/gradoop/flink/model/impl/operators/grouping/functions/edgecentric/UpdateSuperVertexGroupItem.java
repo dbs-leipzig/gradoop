@@ -94,7 +94,6 @@ public class UpdateSuperVertexGroupItem
         }
       }
       if (doAggregate(superVertexGroupItem.getLabelGroup().getAggregators()) && !duplicate) {
-        // TODO CHECK FOR RIGHT AGGREGATION
         aggregate(
           getAggregateValues(vertex, superVertexGroupItem.getLabelGroup().getAggregators()),
           superVertexGroupItem.getLabelGroup().getAggregators());
@@ -110,7 +109,6 @@ public class UpdateSuperVertexGroupItem
     superVertexGroupItem.setAggregateValues(
       getAggregateValues(superVertexGroupItem.getLabelGroup().getAggregators()));
 
-    //TODO CHECK IF BEFORE OR AFTER COLLECT
     collector.collect(superVertexGroupItem);
     resetAggregators(superVertexGroupItem.getLabelGroup().getAggregators());
 
