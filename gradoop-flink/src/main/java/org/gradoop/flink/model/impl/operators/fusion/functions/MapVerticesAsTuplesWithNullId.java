@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * to a null id.
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class MapVerticesAsTuplesWithNullId implements
-  MapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
+public class MapVerticesAsTuplesWithNullId
+  implements MapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
 
   /**
    * Reusable returned element
