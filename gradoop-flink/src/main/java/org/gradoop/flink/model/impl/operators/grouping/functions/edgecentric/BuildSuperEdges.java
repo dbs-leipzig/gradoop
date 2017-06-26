@@ -61,29 +61,31 @@ public class BuildSuperEdges
   public void coGroup(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
     Iterable<SuperVertexGroupItem> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
     Exception {
-//
-//    // only one Edge per id
-//    SuperEdgeGroupItem superEdgeGroupItem = superEdgeGroupItems.iterator().next();
-//
-//    GradoopId sourceId = null;
-//    GradoopId targetId = null;
-//
-//    for (SuperVertexGroupItem superVertexGroupItem :
-//      vertexWithSuperVertexAndEdges) {
-//      if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getSourceIds())) {
-//        sourceId = superVertexGroupItem.f1;
-//      } else if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getTargetIds())) {
-//        targetId = superVertexGroupItem.f1;
-//      }
-//    }
-//
-//    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getEdgeId(), sourceId, targetId);
-//
-//    setLabel(superEdge, superEdgeGroupItem.getGroupLabel());
-//    setGroupProperties(superEdge, superEdgeGroupItem.getGroupingValues());
-//    setAggregateValues(superEdge, superEdgeGroupItem.getAggregateValues());
-//
-//    collector.collect(superEdge);
+
+    // only one Edge per id
+    SuperEdgeGroupItem superEdgeGroupItem = superEdgeGroupItems.iterator().next();
+
+    GradoopId sourceId = null;
+    GradoopId targetId = null;
+
+    for (SuperVertexGroupItem superVertexGroupItem : vertexWithSuperVertexAndEdges) {
+      if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getSourceIds())) {
+        sourceId = superVertexGroupItem.f1;
+      } else if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getTargetIds())) {
+        targetId = superVertexGroupItem.f1;
+      }
+    }
+
+    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getEdgeId(), sourceId, targetId);
+
+    superEdge.setLabel(superEdgeGroupItem.getGroupLabel());
+    setGroupProperties(superEdge, superEdgeGroupItem.getGroupingValues(), superEdgeGroupItem.getLabelGroup());
+    setAggregateValues(
+      superEdge,
+      superEdgeGroupItem.getAggregateValues(),
+      superEdgeGroupItem.getLabelGroup().getAggregators());
+
+    collector.collect(superEdge);
   }
 
   /**

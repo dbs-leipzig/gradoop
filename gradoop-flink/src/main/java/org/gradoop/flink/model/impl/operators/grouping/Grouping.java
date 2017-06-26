@@ -766,6 +766,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           throw new IllegalArgumentException(
             "Provide edge key(s) and/or use edge labels for grouping.");
         }
+        if (vertexLabelGroups.size() > 1) {
+          throw new IllegalArgumentException(
+            "Using vertex label groups is not allowed with edge centric grouping.");
+        }
       //old grouping or new grouping and vertex centric
       } else {
         if (vertexLabelGroups.isEmpty() && !useVertexLabel) {

@@ -22,7 +22,10 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildGroupItemBase;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexIdWithVertex;
@@ -70,40 +73,47 @@ public class UpdateSuperVertexGroupItem
     Collector<SuperVertexGroupItem> collector)
     throws Exception {
 
-//    usedVertices.clear();
-//    label.setLength(0);
-//
-//    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
-//
-//    isFirst = true;
-//    Vertex vertex;
-//
-//    for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
-//      vertex = superVertexIdWithVertex.getVertex();
-//      duplicate = usedVertices.contains(vertex.getId());
-//      if (useLabel()) {
-//        if (!duplicate) {
-//          if (!isFirst) {
-//            label.append(LABEL_SEPARATOR);
-//          }
-//          label.append(getLabel(vertex));
-//        }
-//      }
-//        if (doAggregate() && !duplicate) {
-//          aggregate(getAggregateValues(vertex));
-//        }
-//      if (isFirst) {
-//        superVertexGroupItem.setGroupingValues(getGroupProperties(vertex));
-//        isFirst = false;
-//      }
-//      usedVertices.add(vertex.getId());
-//    }
-//    superVertexGroupItem.setGroupLabel(label.toString());
-//    superVertexGroupItem.setAggregateValues(getAggregateValues());
-//
-//    collector.collect(superVertexGroupItem);
-//
-//    resetAggregators();
+    usedVertices.clear();
+    label.setLength(0);
+
+    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
+
+    isFirst = true;
+    Vertex vertex;
+
+    for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
+      vertex = superVertexIdWithVertex.getVertex();
+
+      duplicate = usedVertices.contains(vertex.getId());
+      if (useLabel()) {
+        if (!duplicate) {
+          if (!isFirst) {
+            label.append(LABEL_SEPARATOR);
+          }
+          label.append(vertex.getLabel());
+        }
+      }
+      if (doAggregate(superVertexGroupItem.getLabelGroup().getAggregators()) && !duplicate) {
+        // TODO CHECK FOR RIGHT AGGREGATION
+        aggregate(
+          getAggregateValues(vertex, superVertexGroupItem.getLabelGroup().getAggregators()),
+          superVertexGroupItem.getLabelGroup().getAggregators());
+      }
+      if (isFirst) {
+        superVertexGroupItem.setGroupingValues(
+          getGroupProperties(vertex, superVertexGroupItem.getLabelGroup().getPropertyKeys()));
+        isFirst = false;
+      }
+      usedVertices.add(vertex.getId());
+    }
+    superVertexGroupItem.setGroupLabel(label.toString());
+    superVertexGroupItem.setAggregateValues(
+      getAggregateValues(superVertexGroupItem.getLabelGroup().getAggregators()));
+
+    //TODO CHECK IF BEFORE OR AFTER COLLECT
+    collector.collect(superVertexGroupItem);
+    resetAggregators(superVertexGroupItem.getLabelGroup().getAggregators());
+
 
   }
 }

@@ -233,4 +233,30 @@ public abstract class BuildBase implements Serializable {
       }
     }
   }
+
+
+  /**
+   * Returns a {@link PropertyValueList} containing all grouping values. If an
+   * element does not have a value for a specific key, the corresponding value
+   * is set to {@code PropertyValue.NULL_VALUE}.
+   *
+   * @param attributed EPGM attributed element
+   * @return property value list
+   */
+  protected PropertyValueList getGroupProperties(EPGMAttributed attributed, List<String> groupPropertyKeys)
+    throws IOException {
+    List<PropertyValue> values =
+      Lists.newArrayListWithCapacity(attributed.getPropertyCount());
+
+    for (String groupPropertyKey : groupPropertyKeys) {
+      if (attributed.hasProperty(groupPropertyKey)) {
+        values.add(attributed.getPropertyValue(groupPropertyKey));
+      } else {
+        values.add(PropertyValue.NULL_VALUE);
+      }
+    }
+
+    return PropertyValueList.fromPropertyValues(values);
+  }
+
 }

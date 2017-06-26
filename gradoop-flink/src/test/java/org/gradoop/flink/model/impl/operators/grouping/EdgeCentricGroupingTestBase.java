@@ -28,6 +28,7 @@ import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -56,9 +57,10 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
 //      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL, Grouping.TARGET_SYMBOL))
       .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL))
 //      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL,Grouping.TARGET_SYMBOL))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addEdgeAggregator(new CountAggregator("edgeCount"))
       .addVertexGroupingKey(Grouping.LABEL_SYMBOL)
       .addVertexAggregator(new CountAggregator("vertexCount"))
+      .addVertexAggregator(new MaxAggregator("vId", "max"))
       .setStrategy(getStrategy())
       .setCentricalStrategy(GroupingStrategy.EDGE_CENTRIC)
       .build()
@@ -73,6 +75,15 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
     output.getEdges().output(new LocalCollectionOutputFormat<>(edges));
 
     getExecutionEnvironment().execute();
+    for (GraphHead graphHead : graphHeads) {
+      System.out.println(graphHead);
+    }
+    for (Vertex vertex : vertices) {
+      System.out.println(vertex);
+    }
+    for (Edge edge : edges) {
+      System.out.println(edge);
+    }
 
     assertEquals("Wrong graph count", 1, graphHeads.size());
     assertEquals("Wrong vertex count", 5, vertices.size());

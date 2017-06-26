@@ -60,6 +60,10 @@ public class LabelGroup
     super(groupingLabel, groupLabel, propertyKeys, aggregators);
   }
 
+  public static LabelGroup createEmptyLabelGroup(){
+    return new LabelGroup("", "", Lists.newArrayList(), Lists.newArrayList());
+  }
+
   public String getGroupingLabel() {
     return f0;
   }

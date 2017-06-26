@@ -17,16 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildGroupItemBase;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 
 import java.util.List;
@@ -42,7 +38,7 @@ import java.util.List;
 //@FunctionAnnotation.ReadFields("label;properties") //TODO check for updates (source,target)
 public class PrepareSuperEdgeGroupItem
   extends BuildGroupItemBase
-  implements MapFunction<Edge, SuperEdgeGroupItem> {
+  implements FlatMapFunction<Edge, SuperEdgeGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -58,26 +54,33 @@ public class PrepareSuperEdgeGroupItem
     super(useLabel, labelGroups);
 
     this.reuseSuperEdgeGroupItem = new SuperEdgeGroupItem();
-//    this.reuseSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
-//    if (!doAggregate()) {
-//      this.reuseSuperEdgeGroupItem.setAggregateValues(
-//        PropertyValueList.createEmptyList());
-//    }
+    this.reuseSuperEdgeGroupItem.setSuperEdgeId(GradoopId.NULL_VALUE);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public SuperEdgeGroupItem map(Edge edge) throws Exception {
-//    reuseSuperEdgeGroupItem.setEdgeId(edge.getId());
-//    reuseSuperEdgeGroupItem.setSourceId(edge.getSourceId());
-//    reuseSuperEdgeGroupItem.setTargetId(edge.getTargetId());
-//    reuseSuperEdgeGroupItem.setGroupLabel(getLabel(edge));
-//    reuseSuperEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
-//    if (doAggregate()) {
-//      reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
-//    }
-    return reuseSuperEdgeGroupItem;
+  public void flatMap(Edge edge, Collector<SuperEdgeGroupItem> collector)
+    throws Exception {
+    boolean usedEdgeLabelGroup = false;
+
+    reuseSuperEdgeGroupItem.setEdgeId(edge.getId());
+    reuseSuperEdgeGroupItem.setSourceId(edge.getSourceId());
+    reuseSuperEdgeGroupItem.setTargetId(edge.getTargetId());
+
+    // check if edge shall be grouped by a special set of keys
+    for (LabelGroup edgeLabelGroup : getLabelGroups()) {
+      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {
+        usedEdgeLabelGroup = true;
+        setGroupItem(reuseSuperEdgeGroupItem, edge, edgeLabelGroup);
+        collector.collect(reuseSuperEdgeGroupItem);
+      }
+    }
+    // standard grouping case
+    if (!usedEdgeLabelGroup) {
+      setGroupItem(reuseSuperEdgeGroupItem, edge, getDefaultLabelGroup());
+      collector.collect(reuseSuperEdgeGroupItem);
+    }
   }
 }

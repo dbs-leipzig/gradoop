@@ -70,9 +70,9 @@ public class BuildSuperVertices
     Exception {
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
-//    setLabel(supVertex, groupItem.getGroupLabel());
-//    setGroupProperties(supVertex, groupItem.getGroupingValues());
-//    setAggregateValues(supVertex, groupItem.getAggregateValues());
+    supVertex.setLabel(groupItem.getGroupLabel());
+    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
+    setAggregateValues(supVertex, groupItem.getLabelGroup().getAggregators());
 
     return supVertex;
   }

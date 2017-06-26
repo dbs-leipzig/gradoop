@@ -52,8 +52,10 @@ public class BuildSuperVertexGroupItem
     for (SuperVertexGroupItem superVertexGroupItem : superVertexGroupItems) {
       if (isFirst) {
         vertices = superVertexGroupItem.getVertexIds();
+        // super vertex represents multiple nor,al vertices
         if (vertices.size() != 1) {
           superVertexId = GradoopId.get();
+        // super vertex represents only one vertex
         } else {
           superVertexId = vertices.iterator().next();
         }

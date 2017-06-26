@@ -21,13 +21,18 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildGroupItemBase;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
+
+import java.util.List;
 
 /**
  * Returns a tuple which assigns each source/target set of gradoop ids the edge id.
  */
 public class PrepareSuperVertexGroupItem
+  extends BuildGroupItemBase
   implements FlatMapFunction<SuperEdgeGroupItem, SuperVertexGroupItem> {
 
   /**
@@ -38,12 +43,14 @@ public class PrepareSuperVertexGroupItem
   /**
    * Constructor to initialize object.
    */
-  public PrepareSuperVertexGroupItem() {
+  public PrepareSuperVertexGroupItem(boolean useLabel, List<LabelGroup> labelGroups) {
+    super(useLabel, labelGroups);
     reuseSuperVertexGroupItem = new SuperVertexGroupItem();
     reuseSuperVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
 //    reuseSuperVertexGroupItem.setGroupLabel("");
     reuseSuperVertexGroupItem.setGroupingValues(PropertyValueList.createEmptyList());
     reuseSuperVertexGroupItem.setAggregateValues(PropertyValueList.createEmptyList());
+    reuseSuperVertexGroupItem.setLabelGroup(getDefaultLabelGroup());
 
   }
 

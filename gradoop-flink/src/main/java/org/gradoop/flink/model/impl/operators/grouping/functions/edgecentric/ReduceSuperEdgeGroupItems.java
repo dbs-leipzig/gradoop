@@ -57,49 +57,50 @@ import java.util.Set;
     public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
       Collector<SuperEdgeGroupItem> collector) throws Exception {
 
-//      boolean isFirst                       = true;
-//
-//      Set<GradoopId> sources = Sets.newHashSet();
-//      Set<GradoopId> targets = Sets.newHashSet();
-//
-//      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
-//        // grouped by source and target
-//        if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
-//          if (isFirst) {
-//            sources.add(groupItem.getSourceId());
-//            targets.add(groupItem.getTargetId());
-//          }
-//        // grouped by source, targets may vary
-//        } else if (isSourceSpecificGrouping()) {
-//          if (isFirst) {
-//            sources.add(groupItem.getSourceId());
-//          }
-//          targets.add(groupItem.getTargetId());
-//        // grouped by target, sources may vary
-//        } else if (isTargetSpecificGrouping()) {
-//          if (isFirst) {
-//            targets.add(groupItem.getTargetId());
-//          }
-//          sources.add(groupItem.getSourceId());
-//        // source or target do not have influence to the grouping
-//        } else {
-//          sources.add(groupItem.getSourceId());
-//          targets.add(groupItem.getTargetId());
-//        }
-//        if (isFirst) {
-//          reuseSuperEdgeGroupItem = groupItem;
-//          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
-//          isFirst = false;
-//        }
-//        if (doAggregate()) {
-//          aggregate(groupItem.getAggregateValues());
-//        }
-//      }
-//      // collect single item representing the whole group
-//      reuseSuperEdgeGroupItem.setSourceIds(sources);
-//      reuseSuperEdgeGroupItem.setTargetIds(targets);
-//      collector.collect(reuseSuperEdgeGroupItem);
-//
-//      resetAggregators();
+      boolean isFirst                       = true;
+
+      Set<GradoopId> sources = Sets.newHashSet();
+      Set<GradoopId> targets = Sets.newHashSet();
+
+      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
+        // grouped by source and target
+        if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
+          if (isFirst) {
+            sources.add(groupItem.getSourceId());
+            targets.add(groupItem.getTargetId());
+          }
+        // grouped by source, targets may vary
+        } else if (isSourceSpecificGrouping()) {
+          if (isFirst) {
+            sources.add(groupItem.getSourceId());
+          }
+          targets.add(groupItem.getTargetId());
+        // grouped by target, sources may vary
+        } else if (isTargetSpecificGrouping()) {
+          if (isFirst) {
+            targets.add(groupItem.getTargetId());
+          }
+          sources.add(groupItem.getSourceId());
+        // source or target do not have influence to the grouping
+        } else {
+          sources.add(groupItem.getSourceId());
+          targets.add(groupItem.getTargetId());
+        }
+        if (isFirst) {
+          reuseSuperEdgeGroupItem = groupItem;
+          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
+          isFirst = false;
+        }
+        if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
+          aggregate(groupItem.getAggregateValues(), reuseSuperEdgeGroupItem.getLabelGroup().getAggregators());
+        }
+
+      }
+      // collect single item representing the whole group
+      reuseSuperEdgeGroupItem.setSourceIds(sources);
+      reuseSuperEdgeGroupItem.setTargetIds(targets);
+      //TODO CHECK IF BEFORE OR AFTER COLLECT
+      collector.collect(reuseSuperEdgeGroupItem);
+      resetAggregators(reuseSuperEdgeGroupItem.getLabelGroup().getAggregators());
     }
   }

@@ -18,9 +18,11 @@
 package org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric;
 
 import com.google.common.collect.Sets;
-import org.apache.flink.api.java.tuple.Tuple7;
+import org.apache.flink.api.java.tuple.Tuple8;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.GroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.Set;
 
@@ -36,8 +38,9 @@ import java.util.Set;
  * f6: edge group aggregate values
  */
 public class SuperEdgeGroupItem
-  extends Tuple7<GradoopId, GradoopId, Set<GradoopId>, Set<GradoopId>, String, PropertyValueList,
-    PropertyValueList> {
+  extends Tuple8<GradoopId, GradoopId, Set<GradoopId>, Set<GradoopId>, String, PropertyValueList,
+    PropertyValueList, LabelGroup>
+  implements GroupItem {
 
   public SuperEdgeGroupItem() {
     f2 = Sets.newHashSet();
@@ -118,6 +121,16 @@ public class SuperEdgeGroupItem
 
   public void setGroupLabel(String groupLabel) {
     f4 = groupLabel;
+  }
+
+  @Override
+  public LabelGroup getLabelGroup() {
+    return f7;
+  }
+
+  @Override
+  public void setLabelGroup(LabelGroup labelGroup) {
+    f7 = labelGroup;
   }
 
   public PropertyValueList getGroupingValues() {

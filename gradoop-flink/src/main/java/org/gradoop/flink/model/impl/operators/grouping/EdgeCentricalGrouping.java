@@ -17,6 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -84,7 +85,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
     DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
       // map edge to edge group item
-      .map(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
+      .flatMap(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
 
     // group edges by label / properties / both
     // additionally: source specific / target specific / both
@@ -98,7 +99,8 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
       // get all resulting (maybe concatenated) vertices
       // vertexIds - superedgeId
-      .flatMap(new PrepareSuperVertexGroupItem())
+      .flatMap(new PrepareSuperVertexGroupItem(useVertexLabels(), getVertexLabelGroups()))
+      // groups same super vertices (created from edge source and target ids)
       .groupBy(new SetInTupleKeySelector<SuperVertexGroupItem, GradoopId>(0))
       // assign supervertex id
       // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
@@ -127,7 +129,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // only real super vertices
       .filter(new FilterSuperVertexGroupItem(true))
       // assign the vertex ids
-      .flatMap(new BuildvertexWithSuperVertexFromItem());
+      .flatMap(new BuildVertexWithSuperVertexFromItem());
 
     superVertexGroupItems = superVertexGroupItems
       // take all vertices by their id, which is stored in the super vertex group item

@@ -17,9 +17,11 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric;
 
-import org.apache.flink.api.java.tuple.Tuple6;
+import org.apache.flink.api.java.tuple.Tuple7;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.GroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.Set;
 
@@ -34,8 +36,9 @@ import java.util.Set;
  * f5: vertex group aggregate values
  */
 public class SuperVertexGroupItem
-  extends Tuple6<Set<GradoopId>, GradoopId, GradoopId, String, PropertyValueList,
-  PropertyValueList> {
+  extends Tuple7<Set<GradoopId>, GradoopId, GradoopId, String, PropertyValueList,
+  PropertyValueList, LabelGroup>
+  implements GroupItem {
 
   public Set<GradoopId> getVertexIds() {
     return f0;
@@ -67,6 +70,16 @@ public class SuperVertexGroupItem
 
   public void setGroupLabel(String groupLabel) {
     f3 = groupLabel;
+  }
+
+  @Override
+  public LabelGroup getLabelGroup() {
+    return f6;
+  }
+
+  @Override
+  public void setLabelGroup(LabelGroup labelGroup) {
+    f6 = labelGroup;
   }
 
   public PropertyValueList getGroupingValues() {
