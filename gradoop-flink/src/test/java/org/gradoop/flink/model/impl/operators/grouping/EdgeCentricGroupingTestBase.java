@@ -29,8 +29,11 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.SumAggregator;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -53,14 +56,16 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
 
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-//      .addEdgeGroupingKey(Grouping.LABEL_SYMBOL)
+      .addEdgeGroupingKey(Grouping.LABEL_SYMBOL)
 //      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL, Grouping.TARGET_SYMBOL))
-      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL))
+//      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL, Grouping.SOURCE_SYMBOL))
 //      .addEdgeGroupingKeys(Arrays.asList(Grouping.LABEL_SYMBOL,Grouping.TARGET_SYMBOL))
       .addEdgeAggregator(new CountAggregator("edgeCount"))
       .addVertexGroupingKey(Grouping.LABEL_SYMBOL)
       .addVertexAggregator(new CountAggregator("vertexCount"))
       .addVertexAggregator(new MaxAggregator("vId", "max"))
+      .addEdgeLabelGroup("two", Arrays.asList("a"), Lists.newArrayList(new SumAggregator("a","sum")))
+      .addGlobalEdgeAggregator(new CountAggregator("globalCount"))
       .setStrategy(getStrategy())
       .setCentricalStrategy(GroupingStrategy.EDGE_CENTRIC)
       .build()
