@@ -44,47 +44,38 @@ public class FoodBrokerConfig implements Serializable {
   private Integer scaleFactor = 0;
 
   /**
-   * Path to the resources file.
-   */
-  private String resourcePath;
-
-  /**
    * Valued constructor.
    *
    * @param configString string representing a json object
-   * @param resourcePath path to resource files
    */
-  public FoodBrokerConfig(String configString, String resourcePath) throws JSONException {
+  public FoodBrokerConfig(String configString) throws JSONException {
     root = new JSONObject(configString);
-    this.resourcePath = resourcePath;
   }
 
   /**
    * Valued factory method.
    *
    * @param configPath path to the config file
-   * @param resourcePath path to resource files
    * @return new FoodBrokerConfig
    * @throws IOException
    * @throws JSONException
    */
-  public static FoodBrokerConfig fromFile(String configPath, String resourcePath)
+  public static FoodBrokerConfig fromFile(String configPath)
     throws IOException, JSONException {
     File file = FileUtils.getFile(configPath);
-    return new FoodBrokerConfig(FileUtils.readFileToString(file), resourcePath);
+    return new FoodBrokerConfig(FileUtils.readFileToString(file));
   }
 
   /**
    * Valued factory method.
    *
    * @param configString string representing a json object
-   * @param resourcePath path to resource files
    * @return new FoodBrokerConfig
    * @throws JSONException
    */
-  public static FoodBrokerConfig fromJSONString(String configString, String resourcePath)
+  public static FoodBrokerConfig fromJSONString(String configString)
     throws JSONException {
-    return new FoodBrokerConfig(configString, resourcePath);
+    return new FoodBrokerConfig(configString);
   }
 
   /**
@@ -96,7 +87,8 @@ public class FoodBrokerConfig implements Serializable {
   public List<String> getStringValuesFromFile(String fileName) {
     List<String> values = null;
     try {
-      values = FileUtils.readLines(FileUtils.getFile(resourcePath + "/" + fileName));
+      values = FileUtils.readLines(FileUtils.getFile(
+        FoodBrokerConfig.class.getResource("/foodbroker/" + fileName).getFile()));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -750,14 +742,5 @@ public class FoodBrokerConfig implements Serializable {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
     return delayDelayConfiguration(date, influencingMasterDataQualities, node, key);
-  }
-
-  /**
-   * Returns the path to the config file.
-   *
-   * @return resourcePath to config file
-   */
-  public String getResourcePath() {
-    return resourcePath;
   }
 }
