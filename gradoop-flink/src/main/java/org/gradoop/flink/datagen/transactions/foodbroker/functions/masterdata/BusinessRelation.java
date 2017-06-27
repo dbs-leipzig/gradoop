@@ -64,9 +64,9 @@ public abstract class BusinessRelation extends Person {
 
     // set rnd company
     Random rand = new Random();
-    int companyNumber = rand.nextInt(getFoodBrokerConfig().getCompanyCount());
+    int companyNumber = rand.nextInt(companies.size());
     String company = companies.get(companyNumber);
-    String holding = holdings.get(companyNumber % getFoodBrokerConfig().getHoldingCount());
+    String holding = holdings.get(companyNumber % holdings.size());
     int branchNumber = rand.nextInt(
       (getFoodBrokerConfig().getBranchMaxAmount() -
         getFoodBrokerConfig().getBranchMinAmount()) +
