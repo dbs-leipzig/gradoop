@@ -15,12 +15,14 @@
  */
 package org.gradoop.flink.datagen.transactions.foodbroker.config;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -85,14 +87,16 @@ public class FoodBrokerConfig implements Serializable {
    * @return list of String
    */
   public List<String> getStringValuesFromFile(String fileName) {
-    List<String> values = null;
+    String value = "";
+
+    InputStream inputStream = this.getClass().getResourceAsStream("/foodbroker/" + fileName);
     try {
-      values = FileUtils.readLines(FileUtils.getFile(
-        FoodBrokerConfig.class.getResource("/foodbroker/" + fileName).getFile()));
+      value = org.apache.commons.io.IOUtils.toString(inputStream, "UTF-8");
+      inputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return values;
+    return Lists.newArrayList(value.split("\n"));
   }
 
   /**
