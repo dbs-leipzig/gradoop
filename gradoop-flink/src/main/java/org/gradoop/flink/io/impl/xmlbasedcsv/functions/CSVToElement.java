@@ -28,13 +28,22 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.xmlbasedcsv.XMLBasedCSVConstants;
-import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.*;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Columns;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.CsvExtension;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Graph;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Key;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Property;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Ref;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Reference;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Static;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Vertexedge;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Column;
+import org.gradoop.flink.io.impl.xmlbasedcsv.pojos.Label;
 import org.gradoop.flink.io.impl.xmlbasedcsv.tuples.ReferenceTuple;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -250,6 +259,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param domainName name of the domain
    * @param className name of the class
    * @param fields contains the data
+   * @param columns contains the position of the property in the csv line
    * @return concatenated string representing the key
    */
   private String createGraphList(List<Graph> graphs, String datasourceName, String domainName,
@@ -279,6 +289,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param datasourceName name of the datasource
    * @param domainName name of the domain
    * @param className name of the class
+   * @param columns contains the position of the property in the csv line
    * @return tuple containing all relevant information
    */
   private ReferenceTuple createKeyTupleFromStaticOrRefOrReference(List<Serializable> objects,
@@ -319,6 +330,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param objects list of objects which are either from class Static or Ref
    * @param fields contains the data
    * @param separator separates each entry for the string
+   * @param columns contains the position of the property in the csv line
    * @return String of all separated entries
    */
   private String getEntriesFromStaticOrRef(List<Serializable> objects, String[] fields,
@@ -346,6 +358,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    * @param object object which is either from class Static or Ref
    * @param fields contains the data
    * @param separator separates each entry for the string
+   * @param columns contains the position of the property in the csv line
    * @return String of one entry
    */
   private String getEntryFromStaticOrRef(
@@ -382,6 +395,7 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
    *
    * @param label meta information
    * @param fields contains the data
+   * @param columns contains the position of the property in the csv line
    * @return string representation of the label
    */
   private String createLabel(Label label, String[] fields, Columns columns) {
@@ -485,6 +499,13 @@ public class CSVToElement implements FlatMapFunction<Tuple2<CsvExtension, String
     return list;
   }
 
+  /**
+   * Returns a column specified by the id from the columns list.
+   *
+   * @param columns contains all current columns
+   * @param id if of the searched column
+   * @return column with the id
+   */
   public Column getColumn(Columns columns, Long id) {
     for (Column column : columns.getColumn()) {
       if (column.getId().equals(id)) {
