@@ -92,9 +92,16 @@ public class FoodBrokerConfig implements Serializable {
     InputStream inputStream = this.getClass().getResourceAsStream("/foodbroker/" + fileName);
     try {
       value = org.apache.commons.io.IOUtils.toString(inputStream, "UTF-8");
-      inputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
+    } finally {
+      try {
+        if (inputStream != null) {
+          inputStream.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     return Lists.newArrayList(value.split("\n"));
   }
