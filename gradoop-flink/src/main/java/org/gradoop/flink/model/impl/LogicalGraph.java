@@ -38,6 +38,10 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.drilling.Drill;
+import org.gradoop.flink.model.impl.operators.drilling.DrillDown;
+import org.gradoop.flink.model.impl.operators.drilling.RollUp;
+import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
@@ -460,6 +464,135 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   public LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
+  }
+
+
+  @Override
+  public LogicalGraph rollUp(RollUp rollUp) {
+    return callForGraph(rollUp);
+  }
+
+  @Override
+  public LogicalGraph drillDown(DrillDown drillDown) {
+    return callForGraph(drillDown);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpVertex(String propertyKey, DrillFunction function) {
+    return rollUpVertex(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpVertex(String vertexLabel, String propertyKey, DrillFunction function) {
+    return rollUpVertex(vertexLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+    return callForGraph(new RollUp(vertexLabel, propertyKey, function, newPropertyKey, true));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpEdge(String propertyKey, DrillFunction function) {
+    return rollUpEdge(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return rollUpEdge(edgeLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph rollUpEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+    return callForGraph(new RollUp(edgeLabel, propertyKey, function, newPropertyKey, false));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(String propertyKey, DrillFunction function) {
+    return drillDownVertex(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
+    return drillDownVertex(vertexLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+    return callForGraph(new DrillDown(vertexLabel, propertyKey, function, newPropertyKey, true));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, String newPropertyKey) {
+    return drillDownVertex(vertexLabel, propertyKey, null, newPropertyKey);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return drillDownEdge(edgeLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function,
+    String newPropertyKey) {
+    return callForGraph(new DrillDown(edgeLabel, propertyKey, function, newPropertyKey, false));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String propertyKey, DrillFunction function) {
+    return drillDownEdge(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, String newPropertyKey) {
+    return drillDownEdge(edgeLabel, propertyKey, null, newPropertyKey);
   }
 
   //----------------------------------------------------------------------------
