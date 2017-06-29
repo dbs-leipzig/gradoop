@@ -20,6 +20,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
 import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
@@ -69,7 +70,7 @@ public class TLFGraphFromText
               Integer.valueOf(fields[1]),
               fields[2])
             );
-            if (TLFEdge.SYMBOL.equals(String.valueOf(graph
+            if (TLFConstants.EDGE_SYMBOL.equals(String.valueOf(graph
               .charAt(cursor + 1)))) {
               vertexLine = false;
             }

@@ -27,11 +27,6 @@ public class TLFGraph
   extends Tuple3<TLFGraphHead, List<TLFVertex>, Collection<TLFEdge>> {
 
   /**
-   * Symbol identifying a line to represent a graph start.
-   */
-  public static final String SYMBOL = "t";
-
-  /**
    * default constructor
    */
   public TLFGraph() {

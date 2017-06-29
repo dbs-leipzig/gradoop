@@ -117,13 +117,13 @@ public class TLFDataSource extends TLFBase implements DataSource {
       transactions = transactions
         .map(new VertexLabelDecoder())
         .withBroadcastSet(
-          getVertexDictionary(), VertexLabelDecoder.VERTEX_DICTIONARY);
+          getVertexDictionary(), TLFConstants.VERTEX_DICTIONARY);
     }
     if (hasEdgeDictionary()) {
       transactions = transactions
         .map(new EdgeLabelDecoder())
         .withBroadcastSet(
-          getEdgeDictionary(), EdgeLabelDecoder.EDGE_DICTIONARY);
+          getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);
     }
     return new GraphTransactions(transactions, getConfig());
   }

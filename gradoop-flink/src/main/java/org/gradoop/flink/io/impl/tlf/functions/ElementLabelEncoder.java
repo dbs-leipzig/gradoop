@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.flink.io.impl.tlf.constants.BroadcastNames;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -74,12 +74,12 @@ public class ElementLabelEncoder extends
     if (hasVertexDictionary) {
       vertexDictionary = getRuntimeContext()
         .<HashMap<String, Integer>>getBroadcastVariable(
-          BroadcastNames.VERTEX_DICTIONARY).get(0);
+          TLFConstants.VERTEX_DICTIONARY).get(0);
     }
     if (hasEdgeDictionary) {
       edgeDictionary = getRuntimeContext()
         .<HashMap<String, Integer>>getBroadcastVariable(
-          BroadcastNames.EDGE_DICTIONARY).get(0);
+          TLFConstants.EDGE_DICTIONARY).get(0);
     }
   }
 

@@ -18,9 +18,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.io.impl.tlf.tuples.TLFEdge;
-import org.gradoop.flink.io.impl.tlf.tuples.TLFVertex;
-import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
@@ -40,10 +38,6 @@ import java.util.Set;
 public class TLFFileFormat
   implements TextOutputFormat.TextFormatter<GraphTransaction> {
 
-  /**
-   * TLF graph number indicator
-   */
-  private static final String NEW_GRAPH_TAG = "#";
   /**
    * Global counter for the graph id used for each single graph transaction.
    */
@@ -103,9 +97,7 @@ public class TLFFileFormat
    */
   private StringBuilder writeGraphHead(StringBuilder builder, long graphId) {
     return builder.append(String.format("%s %s %s%n",
-      TLFGraph.SYMBOL,
-      NEW_GRAPH_TAG,
-      graphId));
+      TLFConstants.GRAPH_SYMBOL, TLFConstants.NEW_GRAPH_TAG, graphId));
   }
 
   /**
@@ -127,7 +119,7 @@ public class TLFFileFormat
     for (Vertex vertex : vertices) {
       vertexIdMap.put(vertex.getId(), vertexId);
       builder.append(String.format("%s %s %s%n",
-        TLFVertex.SYMBOL,
+        TLFConstants.VERTEX_SYMBOL,
         vertexId,
         vertex.getLabel()));
       vertexId++;
@@ -154,7 +146,7 @@ public class TLFFileFormat
       Long targetId = vertexIdMap.get(edge.getTargetId());
 
       builder.append(String.format("%s %s %s %s%n",
-        TLFEdge.SYMBOL,
+        TLFConstants.EDGE_SYMBOL,
         sourceId,
         targetId,
         edge.getLabel()));
