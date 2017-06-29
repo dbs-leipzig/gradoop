@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
- * Base class for drill up transformations.
+ * Base class for drill up / drill down transformations.
  *
  * @param <EL> element
  */
@@ -89,6 +89,20 @@ public abstract class DrillTransformation<EL extends Element>
     while (element.hasProperty(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i)) {
       i++;
     }
+    return i;
+  }
+
+  /**
+   * Returns the next unused version number used in drill down.
+   *
+   * @param element element whose property shall be drilled down
+   * @return next unused version number
+   */
+  protected int getNextDrillDownVersionNumber(EL element) {
+    int i = 0;
+    do {
+      i--;
+    } while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i));
     return i;
   }
 

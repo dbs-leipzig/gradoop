@@ -51,7 +51,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
 
   /**
    * Valued constructor.
-   *  @param label                  label of the element whose property shall be drilled
+   * @param label                  label of the element whose property shall be drilled
    * @param propertyKey             property key
    * @param function                drill function which shall be applied to a property
    * @param newPropertyKey          new property key
@@ -220,6 +220,17 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
       Objects.requireNonNull(propertyKey);
       Objects.requireNonNull(function);
       return new DrillUp(
+        label, propertyKey, function, newPropertyKey, drillVertex);
+    }
+
+    /**
+     * Creates a drill down operation.
+     *
+     * @return drill down operation
+     */
+    public DrillDown buildDrillDown() {
+      Objects.requireNonNull(propertyKey);
+      return new DrillDown(
         label, propertyKey, function, newPropertyKey, drillVertex);
     }
   }
