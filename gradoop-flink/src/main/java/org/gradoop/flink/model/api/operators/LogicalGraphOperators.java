@@ -347,8 +347,30 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   DataSet<Boolean> equalsByData(LogicalGraph other);
 
+  /**
+   * Returns a graph with the same structure but a specified property of an element is rolled up
+   * by the declared function. It is possible to roll up either on one vertex / edge type or all
+   * vertex / edge types. Additionally the rolled up value can be stored under a new key. If the
+   * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
+   * version number. This number increases on every continuous roll up call where the highest
+   * number is the level direct below the rolled up one.
+   *
+   * @param rollUp roll up operation
+   * @return logical graph with rolled up properties
+   */
   LogicalGraph rollUp(RollUp rollUp);
 
+  /**
+   * Returns a graph with the same structure but a specified property of an element is drilled down
+   * by the declared function. It is possible to drill down either on one vertex / edge type or all
+   * vertex / edge types. Additionally the drilled down value can be stored under a new key. If the
+   * original key shall be reused the old value is overwritten. Drill down can also be used
+   * without specifying a drill down function when it is preceded by a roll up operation on the
+   * same property key.
+   *
+   * @param drillDown drill down operation
+   * @return logical graph with drilled down properties
+   */
   LogicalGraph drillDown(DrillDown drillDown);
 
   /**
