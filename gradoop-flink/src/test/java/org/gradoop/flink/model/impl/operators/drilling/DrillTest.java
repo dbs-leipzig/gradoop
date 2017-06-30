@@ -318,8 +318,8 @@ public class DrillTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521000L,memberCount__1 : 1563145521L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564000L,memberCount__1: 451341564L})" +
+      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521000L})" +
+      "(v01:Forum {topic : \"graph\",memberCount: 451341564000L})" +
       "(v02:User {gender : \"male\",birthMillis : 500000000000L})" +
       "(v03:User {gender : \"male\",birthMillis : 530000000000L})" +
       "(v04:User {gender : \"male\",birthMillis : 560000000000L})" +
@@ -341,22 +341,7 @@ public class DrillTest extends GradoopFlinkTestBase {
         .setPropertyKey("memberCount")
         .setFunction(new DrillDownMultiplyByOneK())
         .drillVertex(true)
-        .buildDrillDown())
-      // workaround because gdl does not support '-1' at 'memberCount__-1'
-      .transformVertices((current, transformed) -> {
-        transformed.setLabel(current.getLabel());
-        transformed.setProperties(current.getProperties());
-        int i = -1;
-        String baseKey = "memberCount" + Drill.PROPERTY_VERSION_SEPARATOR;
-        while (current.hasProperty(baseKey + i)){
-          transformed.setProperty(baseKey + (-1*i),
-            current.getPropertyValue(baseKey + i));
-          transformed.getProperties().remove(baseKey + i);
-          i--;
-        }
-        return transformed;
-        }
-      );
+        .buildDrillDown());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -369,10 +354,8 @@ public class DrillTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L," +
-        "memberCount_times_K: 1563145521000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564L," +
-        "memberCount_times_K: 451341564000L})" +
+      "(v00:Forum {topic : \"rdf\",memberCount_times_K: 1563145521000L})" +
+      "(v01:Forum {topic : \"graph\",memberCount_times_K: 451341564000L})" +
       "(v02:User {gender : \"male\",birthMillis : 500000000000L})" +
       "(v03:User {gender : \"male\",birthMillis : 530000000000L})" +
       "(v04:User {gender : \"male\",birthMillis : 560000000000L})" +
@@ -409,10 +392,8 @@ public class DrillTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521000000L,memberCount__1: 1563145521L," +
-      "memberCount__2: 1563145521000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564000000L,memberCount__1: 451341564L," +
-      "memberCount__2: 451341564000L})" +
+      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521000000L})" +
+      "(v01:Forum {topic : \"graph\",memberCount: 451341564000000L})" +
       "(v02:User {gender : \"male\",birthMillis : 500000000000L})" +
       "(v03:User {gender : \"male\",birthMillis : 530000000000L})" +
       "(v04:User {gender : \"male\",birthMillis : 560000000000L})" +
@@ -439,22 +420,7 @@ public class DrillTest extends GradoopFlinkTestBase {
         .setPropertyKey("memberCount")
         .setFunction(new DrillDownMultiplyByOneK())
         .drillVertex(true)
-        .buildDrillDown())
-      // workaround because gdl does not support '-1' at 'memberCount__-1'
-      .transformVertices((current, transformed) -> {
-          transformed.setLabel(current.getLabel());
-          transformed.setProperties(current.getProperties());
-          int i = -1;
-          String baseKey = "memberCount" + Drill.PROPERTY_VERSION_SEPARATOR;
-          while (current.hasProperty(baseKey + i)){
-            transformed.setProperty(baseKey + (-1*i),
-              current.getPropertyValue(baseKey + i));
-            transformed.getProperties().remove(baseKey + i);
-            i--;
-          }
-          return transformed;
-        }
-      );
+        .buildDrillDown());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -467,10 +433,8 @@ public class DrillTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,memberCount_times_K: 1563145521000L," +
-      "memberCount_times_M: 1563145521000000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564L,memberCount_times_K: 451341564000L," +
-      "memberCount_times_M: 451341564000000L})" +
+      "(v00:Forum {topic : \"rdf\",memberCount_times_M: 1563145521000000L})" +
+      "(v01:Forum {topic : \"graph\",memberCount_times_M: 451341564000000L})" +
       "(v02:User {gender : \"male\",birthMillis : 500000000000L})" +
       "(v03:User {gender : \"male\",birthMillis : 530000000000L})" +
       "(v04:User {gender : \"male\",birthMillis : 560000000000L})" +
@@ -514,19 +478,11 @@ public class DrillTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L})" +
       "(v01:Forum {topic : \"graph\",memberCount: 451341564L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L," +
-        "birthLowerMillis : 500000000000000L," + "birthLowerMillis__1 : 5000000000000L" +
-        ",birthLowerMillis__2 : 50000000000000L,birthTenNanos : 5000000000000000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L," +
-        "birthLowerMillis : 530000000000000L," + "birthLowerMillis__1 : 5300000000000L" +
-        ",birthLowerMillis__2 : 53000000000000L,birthTenNanos : 5300000000000000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L," +
-        "birthLowerMillis : 560000000000000L," + "birthLowerMillis__1 : 5600000000000L" +
-        ",birthLowerMillis__2 : 56000000000000L,birthTenNanos : 5600000000000000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L," +
-        "birthLowerMillis : 590000000000000L," + "birthLowerMillis__1 : 5900000000000L" +
-        ",birthLowerMillis__2 : 59000000000000L,birthTenNanos : 5900000000000000L})" +
-        "(v02)-[:member {until : 1550000000000L}]->(v00)" +
+      "(v02:User {gender : \"male\",birthTenNanos : 5000000000000000L})" +
+      "(v03:User {gender : \"male\",birthTenNanos : 5300000000000000L})" +
+      "(v04:User {gender : \"male\",birthTenNanos : 5600000000000000L})" +
+      "(v05:User {gender : \"female\",birthTenNanos : 5900000000000000L})" +
+      "(v02)-[:member {until : 1550000000000L}]->(v00)" +
       "(v03)-[:member {until : 1550000000000L}]->(v00)" +
       "(v03)-[:member {until : 1550000000000L}]->(v01)" +
       "(v04)-[:member {until : 1550000000000L}]->(v01)" +
@@ -560,22 +516,7 @@ public class DrillTest extends GradoopFlinkTestBase {
         .setNewPropertyKey("birthTenNanos")
         .setFunction(new DrillDownMultiplyByTen())
         .drillVertex(true)
-        .buildDrillDown())
-      // workaround because gdl does not support '-1' at 'memberCount__-1'
-      .transformVertices((current, transformed) -> {
-          transformed.setLabel(current.getLabel());
-          transformed.setProperties(current.getProperties());
-          int i = -1;
-          String baseKey = "birthLowerMillis" + Drill.PROPERTY_VERSION_SEPARATOR;
-          while (current.hasProperty(baseKey + i)){
-            transformed.setProperty(baseKey + (-1*i),
-              current.getPropertyValue(baseKey + i));
-            transformed.getProperties().remove(baseKey + i);
-            i--;
-          }
-          return transformed;
-        }
-      );
+        .buildDrillDown());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -596,11 +537,11 @@ public class DrillTest extends GradoopFlinkTestBase {
       "(v03:User {gender : \"male\",birthMillis : 530000000000L})" +
       "(v04:User {gender : \"male\",birthMillis : 560000000000L})" +
       "(v05:User {gender : \"female\",birthMillis : 590000000000L})" +
-      "(v02)-[:member {until : 1550000000000000L,until__1 : 1550000000000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000000L,until__1 : 1550000000000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000000L,until__1 : 1550000000000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000000L,until__1 : 1550000000000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000000L,until__1 : 1550000000000L}]->(v01)" +
+      "(v02)-[:member {until : 1550000000000000L}]->(v00)" +
+      "(v03)-[:member {until : 1550000000000000L}]->(v00)" +
+      "(v03)-[:member {until : 1550000000000000L}]->(v01)" +
+      "(v04)-[:member {until : 1550000000000000L}]->(v01)" +
+      "(v05)-[:member {until : 1550000000000000L}]->(v01)" +
       "(v02)-[:knows {since : 1350000000000L}]->(v03)" +
       "(v03)-[:knows {since : 1350000000000L}]->(v02)" +
       "(v03)-[:knows {since : 1350000000000L}]->(v04)" +
@@ -613,22 +554,7 @@ public class DrillTest extends GradoopFlinkTestBase {
         .setPropertyKey("until")
         .setFunction(new DrillDownMultiplyByOneK())
         .drillEdge(true)
-        .buildDrillDown())
-      // workaround because gdl does not support '-1' at 'memberCount__-1'
-      .transformEdges((current, transformed) -> {
-          transformed.setLabel(current.getLabel());
-          transformed.setProperties(current.getProperties());
-          int i = -1;
-          String baseKey = "until" + Drill.PROPERTY_VERSION_SEPARATOR;
-          while (current.hasProperty(baseKey + i)){
-            transformed.setProperty(baseKey + (-1*i),
-              current.getPropertyValue(baseKey + i));
-            transformed.getProperties().remove(baseKey + i);
-            i--;
-          }
-          return transformed;
-        }
-      );
+        .buildDrillDown());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -636,7 +562,7 @@ public class DrillTest extends GradoopFlinkTestBase {
 
 
   //----------------------------------------------------------------------------
-  // Tests for drill down
+  // Tests for drill down after roll up
   //----------------------------------------------------------------------------
 
 

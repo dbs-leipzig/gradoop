@@ -73,11 +73,6 @@ public class DrillDownTransformation<EL extends Element> extends DrillTransforma
         } else {
           // drill shall be saved with the same label
           if (getOtherPropertyKey().equals(Drill.KEEP_CURRENT_PROPERTY_KEY)) {
-            int i = getNextDrillDownVersionNumber(current);
-            // store current value under the next version number
-            transformed.setProperty(
-              getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i,
-              current.getPropertyValue(getPropertyKey()));
             // store the drilled value under the property key
             transformed.setProperty(
               getPropertyKey(),
@@ -88,6 +83,7 @@ public class DrillDownTransformation<EL extends Element> extends DrillTransforma
             transformed.setProperty(
               getOtherPropertyKey(),
               getFunction().execute(current.getPropertyValue(getPropertyKey())));
+            transformed.getProperties().remove(getPropertyKey());
           }
         }
       }

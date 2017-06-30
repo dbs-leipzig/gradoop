@@ -92,20 +92,6 @@ public abstract class DrillTransformation<EL extends Element>
     return i;
   }
 
-  /**
-   * Returns the next unused version number used in drill down.
-   *
-   * @param element element whose property shall be drilled down
-   * @return next unused version number
-   */
-  protected int getNextDrillDownVersionNumber(EL element) {
-    int i = 0;
-    do {
-      i--;
-    } while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i));
-    return i;
-  }
-
   protected String getLabel() {
     return label;
   }
