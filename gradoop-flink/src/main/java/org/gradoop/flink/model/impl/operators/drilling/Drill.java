@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
@@ -83,6 +100,9 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     return drillVertex;
   }
 
+  /**
+   * Used for building a drill operator instance.
+   */
   public static class DrillBuilder {
     /**
      * Label of the element whose property shall be drilled.
@@ -119,41 +139,87 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
       drillVertex = true;
     }
 
+    /**
+     * Specifies the label of the element whose property shall be drilled.
+     *
+     * @param label element label
+     * @return the modified drill builder
+     */
     public DrillBuilder setLabel(String label) {
       this.label = label;
       return this;
     }
 
+    /**
+     * Specifies the property key whose value shall be drilled.
+     *
+     * @param propertyKey property key
+     * @return the modified drill builder
+     */
     public DrillBuilder setPropertyKey(String propertyKey) {
       this.propertyKey = propertyKey;
       return this;
     }
 
+    /**
+     * Specifies the function to calculate the new value.
+     *
+     * @param function drill function
+     * @return the modified drill builder
+     */
     public DrillBuilder setFunction(DrillFunction function) {
       this.function = function;
       return this;
     }
 
+    /**
+     * Specifies the new key of the drilled value.
+     *
+     * @param newPropertyKey new property key
+     * @return the modified drill builder
+     */
     public DrillBuilder setNewPropertyKey(String newPropertyKey) {
       this.newPropertyKey = newPropertyKey;
       return this;
     }
 
+    /**
+     * Specifies if a vertex shall be drilled. Negates edge drilling.
+     *
+     * @param drillVertex true to enable vertex drilling
+     * @return the modified drill builder
+     */
     public DrillBuilder drillVertex(boolean drillVertex) {
       this.drillVertex = drillVertex;
       return this;
     }
 
+    /**
+     * Specifies if an edge shall be drilled. Negates vertex drilling.
+     *
+     * @param drillEdge true to enable edge drilling
+     * @return the modified drill builder
+     */
     public DrillBuilder drillEdge(boolean drillEdge) {
       this.drillVertex = !drillEdge;
       return this;
     }
 
+    /**
+     * Creates a drill down operation.
+     *
+     * @return drill down operation
+     */
     public DrillDown buildDrillDown() {
       Objects.requireNonNull(propertyKey);
       return new DrillDown(label, propertyKey, function, newPropertyKey, drillVertex);
     }
 
+    /**
+     * Creates a roll up operation.
+     *
+     * @return rol up operation
+     */
     public RollUp buildRollUp() {
       Objects.requireNonNull(propertyKey);
       Objects.requireNonNull(function);

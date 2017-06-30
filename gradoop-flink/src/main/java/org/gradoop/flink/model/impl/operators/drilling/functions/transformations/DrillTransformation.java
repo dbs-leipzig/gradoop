@@ -72,7 +72,7 @@ public abstract class DrillTransformation<EL extends Element>
    */
   protected int getNextRollUpVersionNumber(EL element) {
     int i = 1;
-    while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i)){
+    while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i)) {
       i++;
     }
     return i;
@@ -94,6 +94,11 @@ public abstract class DrillTransformation<EL extends Element>
     return otherPropertyKey;
   }
 
+  /**
+   * Returns true if there is a function specified.
+   *
+   * @return true if function not null
+   */
   protected boolean hasFunction() {
     return function != null;
   }
