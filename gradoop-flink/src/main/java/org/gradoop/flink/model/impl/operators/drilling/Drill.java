@@ -21,10 +21,10 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
 import java.util.Objects;
 
 /**
- * Base class for the drill up operation. The drill operator gives the opportunity to modify a
- * property value of graph elements. This modification may be applied on all elements of a kind
- * (vertex / edge) or only on elements with a specific label. The old value will be stored on the
- * element to be able to restore the values later.
+ * Base class for the drill up / drill down operation. The drill operator gives the opportunity to
+ * modify a property value of graph elements. This modification may be applied on all elements of
+ * a kind (vertex / edge) or only on elements with a specific label. The old value will be stored
+ * on the element to be able to restore the values later.
  */
 public abstract class Drill implements UnaryGraphToGraphOperator {
 
@@ -135,10 +135,11 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     private boolean drillVertex;
 
     /**
-     * Creates the drill up class. By default the vertices will be transformed, note
+     * Creates the drill up / drill down class. By default the vertices will be transformed, note
      * that {@link DrillBuilder#drillVertex{boolean} and
      * {@link DrillBuilder#drillEdge(boolean)} negate each other so only the last used will be
-     * considered.
+     * considered. In case of drill down where the function is not set it is necessary that a
+     * drill up function was used before.
      */
     public DrillBuilder() {
       function = null;

@@ -1,3 +1,20 @@
+/*
+ * This file is part of Gradoop.
+ *
+ * Gradoop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Gradoop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -7,7 +24,12 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
 import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillDownTransformation;
 
 /**
- * Drill down operation TODO complete with example.
+ * Creates a graph with the same structure but a specified property of an element is drilled down
+ * by the declared function. It is possible to drill down either on one vertex / edge type or all
+ * vertex / edge types. Additionally the drilled down value can be stored under a new key. If the
+ * original key shall be reused the old value is overwritten. Drill down can also be used
+ * without specifying a drill down function when it is preceded by a roll up operation on the
+ * same property key.
  */
 public class DrillDown extends Drill {
 
