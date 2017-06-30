@@ -307,14 +307,15 @@ public class GradoopTestUtils {
    * @param element2 second element
    */
   public static void validateEPGMGraphElements(
-    EPGMGraphElement element1,
-    EPGMGraphElement element2) {
+    EPGMGraphElement element1, EPGMGraphElement element2) {
+
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
-    assertTrue(
-      String.format("graph containment mismatch. expected: %s actual: %s",
-        element1.getGraphIds(), element2.getGraphIds()),
-      element1.getGraphIds().equals(element2.getGraphIds())
+
+    assertTrue(String.format("graph containment mismatch. expected: %s actual: %s",
+      element1.getGraphIds(), element2.getGraphIds()),
+      element1.getGraphIds().containsAll(element2.getGraphIds()) &&
+        element2.getGraphIds().containsAll(element1.getGraphIds())
     );
   }
 

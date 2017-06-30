@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Represents a list of {@link GradoopId} instances, possibly containing duplicates.
@@ -278,15 +279,20 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof GradoopIdList)) {
-      return false;
-    }
-    GradoopIdList that = (GradoopIdList) o;
+    boolean equal = this == o;
 
-    return this.size() == that.size() && this.containsAll(that);
+    if (!equal && o instanceof GradoopIdList) {
+      GradoopIdList that = (GradoopIdList) o;
+      // same number of ids
+      equal = this.size() == that.size();
+
+      if (equal) {
+        // same ids
+        equal = Objects.deepEquals(this.bytes, that.bytes);
+      }
+    }
+
+    return equal;
   }
 
   @Override
