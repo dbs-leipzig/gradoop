@@ -51,14 +51,14 @@ public class RollUpTransformation<EL extends Element> extends DrillTransformatio
     // filters relevant elements
     if (getLabel().equals(Drill.DRILL_ALL_ELEMENTS) || getLabel().equals(current.getLabel())) {
       if (current.hasProperty(getPropertyKey())) {
-        // safe rolled up value with the same key
+        // save rolled up value with the same key
         if (getOtherPropertyKey().equals(Drill.KEEP_CURRENT_PROPERTY_KEY)) {
-          // safe the original value with the version number in the property key
+          // save the original value with the version number in the property key
           transformed.setProperty(
             getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR +
               getNextRollUpVersionNumber(current),
             current.getPropertyValue(getPropertyKey()));
-          // safe the new rolled value
+          // save the new rolled value
           transformed.setProperty(
             getPropertyKey(),
             getFunction().execute(current.getPropertyValue(getPropertyKey())));
