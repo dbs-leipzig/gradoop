@@ -258,27 +258,37 @@ public class GradoopIdListTest {
 
   @Test
   public void testEquals(){
+    GradoopId a = GradoopId.get();
+    GradoopId b = GradoopId.get();
+    GradoopId c = GradoopId.get();
 
-    int idCount = 100;
-    List<GradoopId> ids = new ArrayList<>(idCount);
+    GradoopIdList abc = GradoopIdList.fromExisting(a, b, c);
+    assertTrue("equals failed for same object", abc.equals(abc));
+    assertTrue("hashCode failed for same object", abc.hashCode() == abc.hashCode());
 
-    for(int i = 0; i < idCount; i++) {
-      ids.add(GradoopId.get());
-    }
+    GradoopIdList abc2 = GradoopIdList.fromExisting(a, b, c);
+    assertTrue("equals failed for same ids in same order", abc.equals(abc2));
+    assertTrue("hashCode failed for same ids in same order", abc.hashCode() == abc2.hashCode());
 
-    GradoopIdList set1 = GradoopIdList.fromExisting(ids.toArray(new GradoopId[idCount]));
-    GradoopIdList set2 = GradoopIdList.fromExisting(ids.toArray(new GradoopId[idCount]));
+    GradoopIdList cba = GradoopIdList.fromExisting(c, b, a);
+    assertTrue("equals failed for same ids in different order", !abc.equals(cba));
+    assertTrue("hashCode failed for same ids in different order", abc.hashCode() == cba.hashCode());
 
-    Collections.shuffle(ids);
+    GradoopIdList aab = GradoopIdList.fromExisting(a, a, b);
+    GradoopIdList abb = GradoopIdList.fromExisting(a, b, b);
+    assertTrue("equals failed for same ids in different cardinality", !aab.equals(abb));
+    assertTrue("hashCode failed for same ids in different cardinality", aab.hashCode() != abb.hashCode());
 
-    GradoopIdList set3 = GradoopIdList.fromExisting(ids.toArray(new GradoopId[idCount]));
+    GradoopIdList ab = GradoopIdList.fromExisting(a, b);
+    assertTrue("equals failed for same ids but different sizes", !aab.equals(ab));
+    assertTrue("hashCode failed for same ids but different sizes", aab.hashCode() != ab.hashCode());
 
-    assertTrue("equals failed for same object", set1.equals(set1));
-    assertTrue("equals failed for same ids in same order", set1.equals(set2));
-    assertTrue("equals failed for same ids in different order", set1.equals(set3));
+    GradoopIdList empty = new GradoopIdList();
+    assertTrue("equals failed for one empty list", !abc.equals(empty));
+    assertTrue("hashCode failed for one empty list", abc.hashCode() != empty.hashCode());
 
-    assertTrue("hashCode failed for same object", set1.hashCode() == set1.hashCode());
-    assertTrue("hashCode failed for same ids in same order", set1.hashCode() == set2.hashCode());
-    assertTrue("hashCode failed for same ids in different order", set1.hashCode() == set3.hashCode());
+    GradoopIdList empty2 = new GradoopIdList();
+    assertTrue("equals failed for two empty lists", empty2.equals(empty));
+    assertTrue("hashCode failed two one empty lists", empty2.hashCode() == empty.hashCode());
   }
 }
