@@ -117,6 +117,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public static final transient byte OFFSET            = 0x01;
 
   /**
+   * We use a short as length prefix in binary representations of this property.
+   * This value is the maximum viable length.
+   */
+  public static final int MAX_BINARY_LENGTH = Short.MAX_VALUE - OFFSET;
+
+  /**
    * Class version for serialization.
    */
   private static final long serialVersionUID = 1L;
@@ -502,6 +508,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setObject(Object value) {
     if (value == null) {
       rawBytes = new byte[] {TYPE_NULL};
+      validateBytesLength();
     } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
     } else if (value instanceof Integer) {
@@ -592,6 +599,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_STRING;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code BigDecimal} value.
@@ -603,6 +611,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_BIG_DECIMAL;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code GradoopId} value.
@@ -642,6 +651,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
 
     this.rawBytes = byteStream.toByteArray();
+    validateBytesLength();
   }
 
   /**
@@ -667,7 +677,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
 
     this.rawBytes = byteStream.toByteArray();
+    validateBytesLength();
   }
+
   /**
    * Sets the wrapped value as {@code LocalDate} value.
    *
@@ -732,9 +744,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return this.rawBytes;
   }
 
+  /**
+   * Set internal byte representation
+   * @param bytes array
+   */
   @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
     this.rawBytes = bytes;
+    validateBytesLength();
   }
 
   /**
@@ -880,5 +897,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return getObject() != null ?
       getObject().toString() :
       GConstants.NULL_STRING;
+  }
+
+  /**
+   * Throw a runtime exception if this property value can't be represented
+   * in {@link PropertyValue#MAX_BINARY_LENGTH} bytes.
+   */
+  private void validateBytesLength() {
+    if (rawBytes != null && rawBytes.length > MAX_BINARY_LENGTH) {
+      throw new IllegalStateException("The binary representation of this property is too big: " +
+      rawBytes.length + " > " + MAX_BINARY_LENGTH);
+    }
   }
 }
