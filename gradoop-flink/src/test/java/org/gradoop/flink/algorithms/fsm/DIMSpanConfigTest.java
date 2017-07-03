@@ -8,8 +8,10 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   private static final float MIN_SUPPORT = 1.0f;
   private static final long GRAPH_COUNT = 10;
