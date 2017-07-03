@@ -25,17 +25,13 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-
-import java.util.List;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
  */
-@FunctionAnnotation.ForwardedFields("f1->id")
-@FunctionAnnotation.ReadFields("f1;f2;f3;f4")
+@FunctionAnnotation.ForwardedFields("f1->id;f2->label")
+@FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
 public class BuildSuperVertex
   extends BuildBase
   implements MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
@@ -48,16 +44,11 @@ public class BuildSuperVertex
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
    * @param useLabel          true, if vertex label shall be considered
-   * @param valueAggregators  aggregate functions for vertex values
-   * @param epgmVertexFactory     vertex factory
+   * @param epgmVertexFactory vertex factory
    */
-  public BuildSuperVertex(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators,
-    EPGMVertexFactory<Vertex> epgmVertexFactory) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    super(useLabel);
     this.vertexFactory = epgmVertexFactory;
   }
 
@@ -74,9 +65,12 @@ public class BuildSuperVertex
     Exception {
     Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
-    setLabel(supVertex, groupItem.getGroupLabel());
-    setGroupProperties(supVertex, groupItem.getGroupingValues());
-    setAggregateValues(supVertex, groupItem.getAggregateValues());
+    supVertex.setLabel(groupItem.getGroupLabel());
+    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
+    setAggregateValues(
+      supVertex,
+      groupItem.getAggregateValues(),
+      groupItem.getLabelGroup().getAggregators());
 
     return supVertex;
   }

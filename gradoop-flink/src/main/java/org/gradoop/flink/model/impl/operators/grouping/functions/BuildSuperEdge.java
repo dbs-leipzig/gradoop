@@ -18,12 +18,8 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-import org.gradoop.common.util.GConstants;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Creates a single {@link EdgeGroupItem} from a set of group items.
@@ -36,14 +32,10 @@ abstract class BuildSuperEdge extends BuildBase {
   /**
    * Creates group reducer / combiner
    *
-   * @param groupPropertyKeys edge property keys
-   * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param useLabel    use edge label
    */
-  public BuildSuperEdge(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  public BuildSuperEdge(boolean useLabel) {
+    super(useLabel);
   }
 
   /**
@@ -56,32 +48,28 @@ abstract class BuildSuperEdge extends BuildBase {
     Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {
 
     EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
-
-    boolean firstElement = true;
+    boolean firstElement        = true;
 
     for (EdgeGroupItem edge : edgeGroupItems) {
       if (firstElement) {
         edgeGroupItem.setSourceId(edge.getSourceId());
         edgeGroupItem.setTargetId(edge.getTargetId());
-        if (useLabel()) {
-          edgeGroupItem.setGroupLabel(edge.getGroupLabel());
-        } else {
-          edgeGroupItem.setGroupLabel(GConstants.DEFAULT_EDGE_LABEL);
-        }
+        edgeGroupItem.setGroupLabel(edge.getGroupLabel());
         edgeGroupItem.setGroupingValues(edge.getGroupingValues());
+        edgeGroupItem.setLabelGroup(edge.getLabelGroup());
         firstElement = false;
       }
 
-      if (doAggregate()) {
-        aggregate(edge.getAggregateValues());
+      if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
+        aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
       } else {
         // no need to iterate further
         break;
       }
     }
 
-    edgeGroupItem.setAggregateValues(getAggregateValues());
-
+    edgeGroupItem.setAggregateValues(
+      getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
     return edgeGroupItem;
   }
 }

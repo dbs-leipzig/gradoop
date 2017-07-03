@@ -17,12 +17,12 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.List;
 
@@ -33,7 +33,9 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildEdgeGroupItem extends BuildBase implements MapFunction<Edge, EdgeGroupItem> {
+public class BuildEdgeGroupItem
+  extends BuildGroupItemBase
+  implements FlatMapFunction<Edge, EdgeGroupItem> {
 
   /**
    * Avoid object initialization in each call.
@@ -43,32 +45,35 @@ public class BuildEdgeGroupItem extends BuildBase implements MapFunction<Edge, E
   /**
    * Creates map function.
    *
-   * @param groupPropertyKeys vertex property key for grouping
-   * @param useLabel          true, if vertex label shall be used
-   * @param edgeAggregators   aggregate functions for super edges
+   * @param useLabel                        true, if vertex label shall be used
+   * @param edgeLabelGroups                 stores grouping properties for edge labels
    */
-  public BuildEdgeGroupItem(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> edgeAggregators) {
-    super(groupPropertyKeys, useLabel, edgeAggregators);
+  public BuildEdgeGroupItem(boolean useLabel, List<LabelGroup> edgeLabelGroups) {
+    super(useLabel, edgeLabelGroups);
     this.reuseEdgeGroupItem = new EdgeGroupItem();
-    if (!doAggregate()) {
-      this.reuseEdgeGroupItem.setAggregateValues(
-        PropertyValueList.createEmptyList());
-    }
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EdgeGroupItem map(Edge edge) throws Exception {
+  public void flatMap(Edge edge, Collector<EdgeGroupItem> collector) throws Exception {
+    boolean usedEdgeLabelGroup = false;
     reuseEdgeGroupItem.setSourceId(edge.getSourceId());
     reuseEdgeGroupItem.setTargetId(edge.getTargetId());
-    reuseEdgeGroupItem.setGroupLabel(getLabel(edge));
-    reuseEdgeGroupItem.setGroupingValues(getGroupProperties(edge));
-    if (doAggregate()) {
-      reuseEdgeGroupItem.setAggregateValues(getAggregateValues(edge));
+
+    // check if edge shall be grouped by a special set of keys
+    for (LabelGroup edgeLabelGroup : getLabelGroups()) {
+      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {
+        usedEdgeLabelGroup = true;
+        setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);
+        collector.collect(reuseEdgeGroupItem);
+      }
     }
-    return reuseEdgeGroupItem;
+    // standard grouping case
+    if (!usedEdgeLabelGroup) {
+      setGroupItem(reuseEdgeGroupItem, edge, getDefaultLabelGroup());
+      collector.collect(reuseEdgeGroupItem);
+    }
   }
 }

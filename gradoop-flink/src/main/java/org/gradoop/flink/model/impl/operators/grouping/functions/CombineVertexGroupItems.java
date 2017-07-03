@@ -21,10 +21,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-
-import java.util.List;
 
 /**
  * Combines a group of {@link VertexGroupItem} instances.
@@ -37,7 +34,8 @@ import java.util.List;
 @FunctionAnnotation.ForwardedFields(
     "f0;" + // vertexId
     "f3;" + // label
-    "f4"    // properties
+    "f4;"  + // properties
+    "f6"    // label group
 )
 public class CombineVertexGroupItems
   extends ReduceVertexGroupItems
@@ -46,12 +44,10 @@ public class CombineVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param useLabel                        true, iff labels are used for grouping
    */
-  public CombineVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators) {
-    super(useLabel, vertexAggregators);
+  public CombineVertexGroupItems(boolean useLabel) {
+    super(useLabel);
   }
 
   @Override

@@ -27,10 +27,9 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVe
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
@@ -61,23 +60,18 @@ public class GroupingGroupReduce extends Grouping {
   /**
    * Creates grouping operator instance.
    *
-   * @param vertexGroupingKeys  property key to group vertices
-   * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregators   aggregate functions for grouped vertices
-   * @param edgeGroupingKeys    property key to group edges
-   * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregators     aggregate functions for grouped edges
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
    */
   GroupingGroupReduce(
-    List<String> vertexGroupingKeys,
     boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators,
-    List<String> edgeGroupingKeys,
     boolean useEdgeLabels,
-    List<PropertyValueAggregator> edgeAggregators) {
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups) {
     super(
-      vertexGroupingKeys, useVertexLabels, vertexAggregators,
-      edgeGroupingKeys, useEdgeLabels, edgeAggregators);
+      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
   }
 
   /**
@@ -88,20 +82,18 @@ public class GroupingGroupReduce extends Grouping {
 
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
-      .map(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function
-      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));
 
     DataSet<Vertex> superVertices = vertexGroupItems
       // filter group representative tuples
       .filter(new FilterSuperVertices())
       // build super vertices
-      .map(new BuildSuperVertex(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
+      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
       // filter group element tuples

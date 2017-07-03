@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
@@ -29,9 +29,11 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f2: edge group label
  * f3: edge group property values
  * f4: edge group aggregate values
+ * f5: edge label group
  */
 public class EdgeGroupItem
-  extends Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList> {
+  extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup>
+  implements GroupItem {
 
   public GradoopId getSourceId() {
     return f0;
@@ -71,5 +73,13 @@ public class EdgeGroupItem
 
   public void setAggregateValues(PropertyValueList value) {
     this.f4 = value;
+  }
+
+  public LabelGroup getLabelGroup() {
+    return f5;
+  }
+
+  public void setLabelGroup(LabelGroup edgeLabelGroup) {
+    f5 = edgeLabelGroup;
   }
 }

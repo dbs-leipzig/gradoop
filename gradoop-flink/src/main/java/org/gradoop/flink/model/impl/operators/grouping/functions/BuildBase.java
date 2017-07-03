@@ -18,13 +18,13 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .CountAggregator;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -47,42 +47,28 @@ abstract class BuildBase implements Serializable {
   private static final PropertyValue ONE = PropertyValue.create(1L);
 
   /**
-   * Property keys that are used for grouping.
-   */
-  private final List<String> groupPropertyKeys;
-
-  /**
    * True, if the label shall be considered.
    */
   private final boolean useLabel;
 
   /**
-   * Aggregate functions that are applied on grouped elements.
-   */
-  private final List<PropertyValueAggregator> valueAggregators;
-
-  /**
    * Creates build base.
    *
-   * @param groupPropertyKeys property keys used for grouping
-   * @param useLabel          true, if element label shall be used for grouping
-   * @param valueAggregators  aggregate functions for super elements
+   * @param useLabel    use edge label
    */
-  protected BuildBase(List<String> groupPropertyKeys,
-    boolean useLabel, List<PropertyValueAggregator> valueAggregators) {
-    this.groupPropertyKeys  = groupPropertyKeys;
-    this.useLabel           = useLabel;
-    this.valueAggregators   = valueAggregators;
+  protected BuildBase(boolean useLabel) {
+    this.useLabel = useLabel;
+
   }
 
   /**
    * Resets the underlying aggregators
+   *
+   * @param valueAggregators aggregate functions to be reset
    */
-  protected void resetAggregators() {
-    if (doAggregate()) {
-      for (PropertyValueAggregator valueAggregator : valueAggregators) {
-        valueAggregator.resetAggregate();
-      }
+  protected void resetAggregators(List<PropertyValueAggregator> valueAggregators) {
+    for (PropertyValueAggregator valueAggregator : valueAggregators) {
+      valueAggregator.resetAggregate();
     }
   }
 
@@ -100,70 +86,24 @@ abstract class BuildBase implements Serializable {
     return useLabel;
   }
 
-  /**
-   * Returns the label or {@code null} if {@link #useLabel()} is {@code false}.
-   *
-   * @param labeled labeled element
-   * @return label or {@code null}
-   */
-  protected String getLabel(EPGMLabeled labeled) {
-    return useLabel() ? labeled.getLabel() : null;
-  }
-
-  /**
-   * Sets the given label if {@link #useLabel()} returns {@code true}.
-   *
-   * @param labeled labeled element
-   * @param label   group label
-   */
-  protected void setLabel(EPGMLabeled labeled, String label) {
-    if (useLabel()) {
-      labeled.setLabel(label);
-    }
-  }
-
   //----------------------------------------------------------------------------
   // Grouping properties
   //----------------------------------------------------------------------------
-
-  /**
-   * Returns a {@link PropertyValueList} containing all grouping values. If an
-   * element does not have a value for a specific key, the corresponding value
-   * is set to {@code PropertyValue.NULL_VALUE}.
-   *
-   * @param attributed EPGM attributed element
-   * @return property value list
-   */
-  protected PropertyValueList getGroupProperties(EPGMAttributed attributed)
-      throws IOException {
-    List<PropertyValue> values =
-      Lists.newArrayListWithCapacity(attributed.getPropertyCount());
-
-    for (String groupPropertyKey : groupPropertyKeys) {
-      if (attributed.hasProperty(groupPropertyKey)) {
-        values.add(attributed.getPropertyValue(groupPropertyKey));
-      } else {
-        values.add(PropertyValue.NULL_VALUE);
-      }
-    }
-
-    return PropertyValueList.fromPropertyValues(values);
-  }
 
   /**
    * Adds the given group properties to the attributed element.
    *
    * @param attributed          attributed element
    * @param groupPropertyValues group property values
+   * @param vertexLabelGroup    vertex label group
    */
   protected void setGroupProperties(EPGMAttributed attributed,
-    PropertyValueList groupPropertyValues) {
+    PropertyValueList groupPropertyValues, LabelGroup vertexLabelGroup) {
 
-    Iterator<String> keyIterator = groupPropertyKeys.iterator();
     Iterator<PropertyValue> valueIterator = groupPropertyValues.iterator();
 
-    while (keyIterator.hasNext() && valueIterator.hasNext()) {
-      attributed.setProperty(keyIterator.next(), valueIterator.next());
+    for (String groupPropertyKey : vertexLabelGroup.getPropertyKeys()) {
+      attributed.setProperty(groupPropertyKey, valueIterator.next());
     }
   }
 
@@ -174,9 +114,10 @@ abstract class BuildBase implements Serializable {
   /**
    * Returns true, if the group shall be aggregated.
    *
-   * @return true, iff the group shall be aggregated
+   * @param   valueAggregators aggregate functions
+   * @return  true, iff the group shall be aggregated
    */
-  protected boolean doAggregate() {
+  protected boolean doAggregate(List<PropertyValueAggregator> valueAggregators) {
     return !valueAggregators.isEmpty();
   }
 
@@ -185,24 +126,26 @@ abstract class BuildBase implements Serializable {
    * aggregation. If the EPGM element does not have a property, it uses
    * {@code PropertyValue.NULL_VALUE} instead.
    *
-   * @param   attributed attributed EPGM element
+   * @param   element           attributed EPGM element
+   * @param   valueAggregators  aggregate functions
    * @return  property values for aggregation
    */
-  protected PropertyValueList getAggregateValues(EPGMAttributed attributed)
-      throws IOException {
-    List<PropertyValue> propertyValues =
-      Lists.newArrayListWithCapacity(valueAggregators.size());
+  protected PropertyValueList getAggregateValues(
+    EPGMElement element, List<PropertyValueAggregator> valueAggregators) throws IOException {
+    List<PropertyValue> propertyValues = Lists.newArrayList();
+    String propertyKey;
 
     for (PropertyValueAggregator valueAggregator : valueAggregators) {
-      String propertyKey = valueAggregator.getPropertyKey();
+      propertyKey = valueAggregator.getPropertyKey();
       if (valueAggregator instanceof CountAggregator) {
         propertyValues.add(ONE);
-      } else if (attributed.hasProperty(propertyKey)) {
-        propertyValues.add(attributed.getPropertyValue(propertyKey));
+      } else if (element.hasProperty(propertyKey)) {
+        propertyValues.add(element.getPropertyValue(propertyKey));
       } else {
         propertyValues.add(PropertyValue.NULL_VALUE);
       }
     }
+
     return PropertyValueList.fromPropertyValues(propertyValues);
   }
 
@@ -210,27 +153,29 @@ abstract class BuildBase implements Serializable {
    * Add the given values to the corresponding aggregate.
    *
    * @param values property values
+   * @param valueAggregators aggregate functions
    */
-  protected void aggregate(PropertyValueList values) {
-    Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
+  protected void aggregate(
+    PropertyValueList values, List<PropertyValueAggregator> valueAggregators) {
     Iterator<PropertyValue> valueIt = values.iterator();
+    PropertyValue value;
 
-    while (aggIt.hasNext() && valueIt.hasNext()) {
-      PropertyValueAggregator aggregator = aggIt.next();
-      PropertyValue value = valueIt.next();
-
-      aggregator.aggregate(value);
+    for (PropertyValueAggregator valueAggregator : valueAggregators) {
+      value = valueIt.next();
+      valueAggregator.aggregate(value);
     }
   }
 
   /**
    * Returns the current aggregate values from the aggregators.
    *
+   * @param valueAggregators aggregate functions
    * @return aggregate values
    */
-  protected PropertyValueList getAggregateValues() throws IOException {
+  protected PropertyValueList getAggregateValues(List<PropertyValueAggregator> valueAggregators)
+    throws IOException {
     PropertyValueList result;
-    if (!doAggregate()) {
+    if (!doAggregate(valueAggregators)) {
       result = PropertyValueList.createEmptyList();
     } else {
       List<PropertyValue> propertyValues =
@@ -248,9 +193,11 @@ abstract class BuildBase implements Serializable {
    * values are fetched from the internal aggregators.
    *
    * @param element attributed element
+   * @param valueAggregators aggregate functions
    */
-  protected void setAggregateValues(EPGMAttributed element) {
-    if (doAggregate()) {
+  protected void setAggregateValues(
+    EPGMAttributed element, List<PropertyValueAggregator> valueAggregators) {
+    if (doAggregate(valueAggregators)) {
       for (PropertyValueAggregator valueAggregator : valueAggregators) {
         element.setProperty(
           valueAggregator.getAggregatePropertyKey(),
@@ -263,19 +210,19 @@ abstract class BuildBase implements Serializable {
    * Sets the given property values as new properties at the given element.
    *
    * @param element attributed element
-   * @param values  aggregate values
+   * @param values aggregate values
+   * @param valueAggregators aggregate functions
    */
   protected void setAggregateValues(
-    EPGMAttributed element, PropertyValueList values) {
-    if (doAggregate()) {
-      Iterator<PropertyValueAggregator> aggIt = valueAggregators.iterator();
+    EPGMAttributed element,
+    PropertyValueList values,
+    List<PropertyValueAggregator> valueAggregators) {
+    if (doAggregate(valueAggregators)) {
       Iterator<PropertyValue> valueIt = values.iterator();
 
-      while (aggIt.hasNext() && valueIt.hasNext()) {
-        PropertyValueAggregator aggregator = aggIt.next();
+      for (PropertyValueAggregator valueAggregator : valueAggregators) {
         PropertyValue value = valueIt.next();
-
-        element.setProperty(aggregator.getAggregatePropertyKey(), value);
+        element.setProperty(valueAggregator.getAggregatePropertyKey(), value);
       }
     }
   }

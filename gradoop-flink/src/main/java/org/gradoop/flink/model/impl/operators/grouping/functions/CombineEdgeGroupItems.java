@@ -18,29 +18,37 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-
-import java.util.List;
 
 /**
  * Combines a group of {@link EdgeGroupItem} to a single {@link EdgeGroupItem}.
  */
+@FunctionAnnotation.ForwardedFields(
+    "f0;" + // sourceId
+    "f1;" + // targetId
+    "f2;" + // group label
+    "f3;" + // properties
+    "f4;" + // aggregates
+    "f5"    // label group
+)
 public class CombineEdgeGroupItems
   extends BuildSuperEdge
   implements GroupCombineFunction<EdgeGroupItem, EdgeGroupItem> {
+
+  /**
+   * Avoid object instantiation.
+   */
+  private EdgeGroupItem reuseEdgeGroupItem;
+
   /**
    * Creates group reducer
    *
-   * @param groupPropertyKeys edge property keys
-   * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param useLabel use edge label
    */
-  public CombineEdgeGroupItems(List<String> groupPropertyKeys, boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  public CombineEdgeGroupItems(boolean useLabel) {
+    super(useLabel);
   }
 
   /**
@@ -53,7 +61,8 @@ public class CombineEdgeGroupItems
   @Override
   public void combine(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<EdgeGroupItem> collector) throws Exception {
-    collector.collect(reduceInternal(edgeGroupItems));
-    resetAggregators();
+    reuseEdgeGroupItem = reduceInternal(edgeGroupItems);
+    resetAggregators(reuseEdgeGroupItem.getLabelGroup().getAggregators());
+    collector.collect(reuseEdgeGroupItem);
   }
 }

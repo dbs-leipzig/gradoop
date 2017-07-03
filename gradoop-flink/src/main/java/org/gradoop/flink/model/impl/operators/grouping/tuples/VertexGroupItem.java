@@ -17,7 +17,7 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple6;
+import org.apache.flink.api.java.tuple.Tuple7;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
@@ -30,9 +30,12 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f3: vertex group properties
  * f4: vertex group aggregate values
  * f5: super vertex tuple true/false
+ * f6: vertex label group
  */
 public class VertexGroupItem
-  extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean> {
+  extends Tuple7
+  <GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup>
+  implements GroupItem {
 
   public GradoopId getVertexId() {
     return f0;
@@ -80,5 +83,13 @@ public class VertexGroupItem
 
   public void setSuperVertex(Boolean isSuperVertex) {
     f5 = isSuperVertex;
+  }
+
+  public LabelGroup getLabelGroup() {
+    return f6;
+  }
+
+  public void setLabelGroup(LabelGroup vertexLabelGroup) {
+    f6 = vertexLabelGroup;
   }
 }

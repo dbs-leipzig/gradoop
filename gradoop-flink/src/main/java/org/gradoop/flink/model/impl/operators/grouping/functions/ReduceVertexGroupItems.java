@@ -22,18 +22,17 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
-
-import java.util.List;
 
 /**
  * Reduces a group of {@link VertexGroupItem} instances.
  */
 @FunctionAnnotation.ForwardedFields(
     "f0;" + // vertex id
-    "f3;" + // label
-    "f4"    // properties
+    "f2;" + // label
+    "f3;" + // properties
+    "f4;" + // aggregates
+    "f6"    // label group
 )
 public class ReduceVertexGroupItems
   extends ReduceVertexGroupItemBase
@@ -42,21 +41,19 @@ public class ReduceVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param useLabel true, iff labels are used for grouping
    */
-  public ReduceVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators) {
-    super(null, useLabel, vertexAggregators);
+  public ReduceVertexGroupItems(boolean useLabel) {
+    super(useLabel);
   }
 
   @Override
   public void reduce(Iterable<VertexGroupItem> vertexGroupItems,
     Collector<VertexGroupItem> collector) throws Exception {
 
-    GradoopId superVertexId               = null;
-    String groupLabel                     = null;
-    PropertyValueList groupPropertyValues = null;
+    GradoopId superVertexId                         = null;
+    String groupLabel                               = null;
+    PropertyValueList groupPropertyValues           = null;
 
     VertexGroupItem reuseTuple = getReuseVertexGroupItem();
 
@@ -68,14 +65,12 @@ public class ReduceVertexGroupItems
         groupLabel          = groupItem.getGroupLabel();
         groupPropertyValues = groupItem.getGroupingValues();
 
-        if (useLabel()) {
-          reuseTuple.setGroupLabel(groupLabel);
-        }
-
+        reuseTuple.setGroupLabel(groupLabel);
         reuseTuple.setGroupingValues(groupPropertyValues);
         reuseTuple.setSuperVertexId(superVertexId);
         reuseTuple.setAggregateValues(groupItem.getAggregateValues());
         reuseTuple.setSuperVertex(groupItem.isSuperVertex());
+        reuseTuple.setLabelGroup(groupItem.getLabelGroup());
 
         isFirst = false;
       }
@@ -84,17 +79,17 @@ public class ReduceVertexGroupItems
       // collect updated vertex item
       collector.collect(reuseTuple);
 
-      if (doAggregate()) {
-        aggregate(groupItem.getAggregateValues());
+      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
+        aggregate(groupItem.getAggregateValues(), reuseTuple.getLabelGroup().getAggregators());
       }
     }
 
-    // collect single item representing the whole group
-    collector.collect(createSuperVertexTuple(
+    VertexGroupItem superVertex = createSuperVertexTuple(
       superVertexId,
       groupLabel,
-      groupPropertyValues));
-
-    resetAggregators();
+      groupPropertyValues,
+      reuseTuple.getLabelGroup().getAggregators());
+    resetAggregators(superVertex.getLabelGroup().getAggregators());
+    collector.collect(superVertex);
   }
 }

@@ -21,7 +21,6 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
-
 /**
  * Takes a projected edge and an (vertex-id, group-representative) tuple
  * and replaces the edge-target-id with the group-representative.
