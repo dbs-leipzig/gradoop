@@ -1,5 +1,32 @@
 <?xml version="1.0"?>
 
+<!--
+  This version of checkstyle is based on the Giraph
+  checkstyle configurations.  It is a best effort attempt to try to match
+  the CODE_CONVENTIONS and Oracle "Code Conventions for the Java
+  Programming Language".  See the following link:
+
+  http://www.oracle.com/technetwork/java/codeconvtoc-136057.html
+
+  The documentation for checkstyle is available at
+
+  http://checkstyle.sourceforge.net
+-->
+
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<module name="checker">
+    <property name="localeLanguage" value="en"/>
+
+    <!-- Checks for the correct license header in *.java files -->
+    <module name="Header">
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <!-- Checks for Javadoc comments (checker).           -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->
     <!-- Require package javadoc -->
     <module name="JavadocPackage"/>

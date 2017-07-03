@@ -153,54 +153,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!--<plugin>-->
-                    <!--<groupId>org.codehaus.mojo</groupId>-->
-                    <!--<artifactId>license-maven-plugin</artifactId>-->
-                    <!--<version>1.13</version>-->
-                    <!--<executions>-->
-                        <!--<execution>-->
-                            <!--<id>first</id>-->
-                            <!--<goals>-->
-                                <!--<goal>update-file-header</goal>-->
-                            <!--</goals>-->
-                            <!--<phase>process-sources</phase>-->
-                            <!--<configuration>-->
-                                <!--<licenseName>Apache 2.0</licenseName>-->
-                                <!--<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>-->
-                                <!--<processStartTag>========================LICENSE_START=================================</processStartTag>-->
-                                <!--<processEndTag>=========================LICENSE_END==================================</processEndTag>-->
-                                <!--<roots>-->
-                                    <!--<root>src/main/java</root>-->
-                                    <!--<root>src/test/java</root>-->
-                                <!--</roots>-->
-                            <!--</configuration>-->
-                        <!--</execution>-->
-                    <!--</executions>-->
-                <!--</plugin>-->
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>3.0</version>
-                    <configuration>
-                        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-                        <properties>
-                            <owner>Database Research Group - University of Leipzig</owner>
-                            <email></email>
-                        </properties>
-                        <excludes>
-                            <exclude>**/README</exclude>
-                            <exclude>src/test/resources/**</exclude>
-                            <exclude>src/main/resources/**</exclude>
-                        </excludes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -292,6 +244,33 @@
                         <pushChanges>false</pushChanges>
                         <tagNameFormat>v@{project.version}</tagNameFormat>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                        <properties>
+                            <owner>Gradoop</owner>
+                            <email>University of Leipzig - Database Research Group</email>
+                        </properties>
+                        <excludes>
+                            <exclude>**/README</exclude>
+                            <exclude>**/checkstyle.xml</exclude>
+                            <exclude>**/pom.xml</exclude>
+                            <exclude>src/test/resources/**</exclude>
+                            <exclude>src/main/resources/**</exclude>
+                            <exclude>**/dev-support/**</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
