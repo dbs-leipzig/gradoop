@@ -3,10 +3,12 @@ package org.gradoop.flink.algorithms.fsm.transactional.predgen;
 import org.gradoop.flink.algorithms.fsm.transactional.ThinkLikeAnEmbeddingTFSM;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
+import org.junit.Ignore;
 
 /**
  * Creates an {@link ThinkLikeAnEmbeddingTFSM} instance for test cases
  */
+@Ignore
 public class PredictableGeneratorThinkLikeAnEmbeddingTest extends PredictableGeneratorFSMTestBase {
 
   public PredictableGeneratorThinkLikeAnEmbeddingTest(String testName, String directed,
