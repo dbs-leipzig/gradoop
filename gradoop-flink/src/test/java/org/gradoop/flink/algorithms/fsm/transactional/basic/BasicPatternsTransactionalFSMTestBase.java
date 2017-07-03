@@ -12,9 +12,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-/**
- * Base class for Transactional Frequent Subgraph Mining Tests.
- */
 @RunWith(Parameterized.class)
 public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlinkTestBase {
 

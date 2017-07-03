@@ -160,15 +160,6 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     GradoopId e = GradoopId.get();
     GradoopId f = GradoopId.get();
 
-    /*
-     * ------------------
-     * |  v1   | v1.age |
-     * ------------------
-     * | id(a) | 42     | -> Embedding 1
-     * ------------------
-     * | id(b) | 23     | -> Embedding 2
-     * ------------------
-     */
     EmbeddingMetaData leftInputMetaData = new EmbeddingMetaData();
     leftInputMetaData.setEntryColumn("v1", EntryType.VERTEX, 0);
     leftInputMetaData.setPropertyColumn("v1", "age", 0);

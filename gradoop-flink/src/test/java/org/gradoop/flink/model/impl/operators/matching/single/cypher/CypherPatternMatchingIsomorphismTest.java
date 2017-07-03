@@ -12,9 +12,6 @@ import java.util.List;
 
 import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
 
-/**
- * Runs test for vertex and edge isomorphism.
- */
 public class CypherPatternMatchingIsomorphismTest extends SubgraphIsomorphismTest {
 
   @Parameterized.Parameters(name = "{index}: {0}")

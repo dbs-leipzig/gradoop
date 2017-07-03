@@ -26,15 +26,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 // Test embedding extensions
 //------------------------------------------------------------------------------------------------
 
-  /**
-   * Tests the extension of a vertex embedding with an edge embedding.
-   *
-   * [Id(v0)]
-   * |><|(0=0)
-   * [Id(v0),Id(e0),Id(v1)]
-   * ->
-   * [Id(v0),Id(e0),Id(v1)]
-   */
   @Test
   public void testEdgeJoinOnRightmostColumn() throws Exception {
     GradoopId v0 = GradoopId.get();

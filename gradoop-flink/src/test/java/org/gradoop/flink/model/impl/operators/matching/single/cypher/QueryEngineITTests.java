@@ -17,9 +17,6 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-/**
- * Just a few tests that check for the correct cardinality.
- */
 public class QueryEngineITTests extends GradoopFlinkTestBase {
 
   private LogicalGraph socialNetwork;

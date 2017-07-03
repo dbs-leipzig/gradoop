@@ -5,10 +5,6 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-/**
- * Base class to verify a {@link GraphStatistics} object initialized by a sub-class. Validates
- * against the example social network in "dev-support/social-network.pdf".
- */
 public abstract class GraphStatisticsTest {
   /**
    * Must be initialized in sub-classes using @BeforeClass or @Before

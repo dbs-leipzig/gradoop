@@ -8,12 +8,6 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class TLFDataSourceTest extends GradoopFlinkTestBase {
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
   @Test
   public void testRead() throws Exception {
     String tlfFile = TLFDataSinkTest.class

@@ -60,12 +60,6 @@ public class TransformationTest extends GradoopFlinkTestBase {
     new Transformation(null, null, null);
   }
 
-  /**
-   * Tests if the identifiers of the resulting elements are the same as in the
-   * input graph.
-   *
-   * @throws Exception
-   */
   @Test
   public void testIdEquality() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);

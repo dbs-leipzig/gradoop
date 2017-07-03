@@ -19,9 +19,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Util methods for handling {@link Embedding} objects in unit tests.
- */
 public class EmbeddingTestUtils {
 
   /**

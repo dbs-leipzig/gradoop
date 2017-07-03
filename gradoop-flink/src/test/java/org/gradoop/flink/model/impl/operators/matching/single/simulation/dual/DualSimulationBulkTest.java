@@ -2,9 +2,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual;
 
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
-/**
- * Creates an {@link DualSimulation} instance that used bulk iteration.
- */
 public class DualSimulationBulkTest extends DualSimulationTest {
 
 

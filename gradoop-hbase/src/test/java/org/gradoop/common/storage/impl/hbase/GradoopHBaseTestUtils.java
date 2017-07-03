@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Test Utils for handling persistent EPGM data.
- */
 public class GradoopHBaseTestUtils {
 
   //----------------------------------------------------------------------------

@@ -6,12 +6,6 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
-  /**
-   * Tests if the resulting graph contains vertices and edges with the same
-   * associated data (i.e. the label propagation value).
-   *
-   * @throws Exception
-   */
   @Test
   public void testByElementData() throws Exception {
     String graph = "input[" +

@@ -13,9 +13,6 @@ import java.util.List;
 import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
 import static org.gradoop.flink.model.impl.operators.matching.TestData.VAR_LENGTH_PATH_PATTERN_2;
 
-/**
- * Runs test for vertex and edge homomorphisms.
- */
 public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismTest {
 
   @Parameterized.Parameters(name = "{index}: {0}")

@@ -4,9 +4,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.ThinkLikeAnEmbeddingTFSM;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.TransactionalFSMBase;
 
-/**
- * Creates an {@link ThinkLikeAnEmbeddingTFSM} instance for test cases
- */
 public class BasicPatternsThinkLikeAnEmbeddingTest
   extends BasicPatternsTransactionalFSMTestBase {
 

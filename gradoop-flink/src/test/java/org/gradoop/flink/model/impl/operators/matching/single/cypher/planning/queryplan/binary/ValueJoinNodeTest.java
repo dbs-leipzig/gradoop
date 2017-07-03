@@ -169,15 +169,6 @@ public class ValueJoinNodeTest extends GradoopFlinkTestBase {
     GradoopId g = GradoopId.get();
     GradoopId h = GradoopId.get();
 
-    /*
-     * ------------------
-     * |  v1   | v1.age |
-     * ------------------
-     * | id(a) | 42     | -> Embedding 1
-     * ------------------
-     * | id(b) | 21     | -> Embedding 2
-     * ------------------
-     */
     EmbeddingMetaData leftInputMetaData = new EmbeddingMetaData();
     leftInputMetaData.setEntryColumn("v1", EntryType.VERTEX, 0);
     leftInputMetaData.setPropertyColumn("v1", "age", 0);

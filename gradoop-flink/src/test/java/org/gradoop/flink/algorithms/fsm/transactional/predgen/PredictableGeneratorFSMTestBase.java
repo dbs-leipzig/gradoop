@@ -12,9 +12,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-/**
- * Base class for Transactional Frequent Subgraph Mining with Generator Tests.
- */
 @RunWith(Parameterized.class)
 public abstract class PredictableGeneratorFSMTestBase extends GradoopFlinkTestBase {
 

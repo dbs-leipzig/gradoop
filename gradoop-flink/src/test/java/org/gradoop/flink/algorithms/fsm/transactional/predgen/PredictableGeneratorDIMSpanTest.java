@@ -4,9 +4,6 @@ import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 
-/**
- * Creates an {@link TransactionalFSM} instance for test cases
- */
 public class PredictableGeneratorDIMSpanTest extends PredictableGeneratorFSMTestBase {
 
   public PredictableGeneratorDIMSpanTest(String testName, String directed,

@@ -696,9 +696,6 @@ public class PropertyValueTest {
     validateEqualsAndHashCode(create(dateTime1), create(dateTime2), create(dateTime3));
   }
 
-  /**
-   * Assumes that p1.equals(p2) and !p2.equals(p3)
-   */
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
     assertEquals(p1, p1);

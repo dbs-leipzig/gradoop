@@ -5,9 +5,6 @@ import org.gradoop.common.storage.impl.hbase.GradoopHBaseTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-/**
- * Used for tests that require a HBase and Flink cluster up and running.
- */
 public class FlinkHBaseTestBase extends GradoopFlinkTestBase {
 
   /**

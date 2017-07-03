@@ -14,11 +14,6 @@ import java.io.IOException;
 
 public class SubgraphTest extends GradoopFlinkTestBase {
 
-  /**
-   * Extracts a subgraph that exists in the graph and is valid.
-   *
-   * @throws IOException
-   */
   @Test
   public void testExistingSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();

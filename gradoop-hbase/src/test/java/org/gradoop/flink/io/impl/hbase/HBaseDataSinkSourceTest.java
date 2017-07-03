@@ -24,10 +24,6 @@ import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSoc
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
 import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
 
-/**
- * Test class contains read and write tests to start/shutdown an HBase mini
- * cluster only once.
- */
 public class HBaseDataSinkSourceTest extends GradoopHBaseTestBase {
 
   @Test

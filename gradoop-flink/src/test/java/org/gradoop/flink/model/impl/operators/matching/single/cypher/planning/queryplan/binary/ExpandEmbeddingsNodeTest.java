@@ -126,13 +126,6 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
     GradoopId f = GradoopId.get();
     GradoopId g = GradoopId.get();
 
-    /*
-     * ---------
-     * |  v1   |
-     * ---------
-     * | id(a) | -> Embedding 1
-     * ---------
-     */
     EmbeddingMetaData leftInputMetaData = new EmbeddingMetaData();
     leftInputMetaData.setEntryColumn("v1", EntryType.VERTEX, 0);
 

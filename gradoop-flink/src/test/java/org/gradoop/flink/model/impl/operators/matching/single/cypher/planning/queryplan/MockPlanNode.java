@@ -4,9 +4,6 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
-/**
- * Mock node that can be used as input node in testing other plan nodes.
- */
 public class MockPlanNode extends PlanNode {
   /**
    * Data set to be returned by the node

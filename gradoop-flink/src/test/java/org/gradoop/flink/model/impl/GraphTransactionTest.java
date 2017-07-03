@@ -53,16 +53,6 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
       originalCollection.equalsByGraphData(restoredCollection));
   }
 
-  /**
-   * There was a bug on converting a {@link GraphCollection} to
-   * {@link GraphTransactions} when there was a HeaderId in one of the EPGMVertex
-   * headIds which is not present in the GraphHeads of the Collection.
-   *
-   * @see <a href="https://github.com/dbs-leipzig/gradoop/issues/273">
-   *   Github Gradoop #273</a>
-   *
-   * @throws Exception
-   */
   @Test
   public void testWithSubsetGraphContainment() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();

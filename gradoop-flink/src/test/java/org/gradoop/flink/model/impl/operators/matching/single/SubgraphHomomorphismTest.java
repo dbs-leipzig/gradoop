@@ -6,10 +6,6 @@ import java.util.Arrays;
 
 import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
 
-/**
- * Test data for pattern matching tests. The graphs are visualized in
- * dev-support/pattern_matching_testcases.pdf
- */
 public abstract class SubgraphHomomorphismTest extends PatternMatchingWithBindingTest {
 
   public SubgraphHomomorphismTest(String testName, String dataGraph,
