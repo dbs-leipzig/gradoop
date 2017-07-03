@@ -10,7 +10,7 @@
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2014 - 2017</inceptionYear>
 
     <organization>
         <name>University of Leipzig</name>
@@ -252,8 +252,8 @@
                     <configuration>
                         <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
                         <properties>
-                            <owner>Gradoop</owner>
-                            <email>University of Leipzig - Database Research Group</email>
+                            <owner>Leipzig University</owner>
+                            <email>Database Research Group</email>
                         </properties>
                         <excludes>
                             <exclude>**/README</exclude>
