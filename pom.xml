@@ -10,12 +10,17 @@
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2014 - 2017</inceptionYear>
+
+    <organization>
+        <name>University of Leipzig</name>
+        <url>http://dbs.uni-leipzig.de/en</url>
+    </organization>
 
     <licenses>
         <license>
-            <name>GNU General Public License, Version 3</name>
-            <url>https://www.gnu.org/licenses/gpl.txt</url>
+            <name>Apache 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
@@ -96,6 +101,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.maven.version>3.0.0</project.maven.version>
         <project.build.targetJdk>1.8</project.build.targetJdk>
+
+        <license.licenseName>apache_v2</license.licenseName>
 
         <dep.flink.version>1.1.2</dep.flink.version>
         <dep.gdl.version>0.3.0-SNAPSHOT</dep.gdl.version>
@@ -237,6 +244,33 @@
                         <pushChanges>false</pushChanges>
                         <tagNameFormat>v@{project.version}</tagNameFormat>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                        <properties>
+                            <owner>Leipzig University</owner>
+                            <email>Database Research Group</email>
+                        </properties>
+                        <excludes>
+                            <exclude>**/README</exclude>
+                            <exclude>**/checkstyle.xml</exclude>
+                            <exclude>**/pom.xml</exclude>
+                            <exclude>src/test/resources/**</exclude>
+                            <exclude>src/main/resources/**</exclude>
+                            <exclude>**/dev-support/**</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

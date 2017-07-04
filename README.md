@@ -2,7 +2,7 @@
 
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
-[Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
+[Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework
 for scalable graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/) 
 and [Apache HBase&trade;](http://hbase.apache.org/). It offers a graph data model which 
 extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
