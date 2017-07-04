@@ -421,12 +421,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder() {
       this.useVertexLabel           = false;
       this.useEdgeLabel             = false;
-      this.useEdgeSource          = false;
-      this.useEdgeTarget          = false;
+      this.useEdgeSource            = false;
+      this.useEdgeTarget            = false;
       this.vertexLabelGroups        = Lists.newArrayList();
       this.edgeLabelGroups          = Lists.newArrayList();
       this.globalVertexAggregators  = Lists.newArrayList();
       this.globalEdgeAggregators    = Lists.newArrayList();
+      this.centricalStrategy        = GroupingStrategy.VERTEX_CENTRIC;
       this.defaultVertexLabelGroup  = new LabelGroup(
         Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
       this.defaultEdgeLabelGroup    = new LabelGroup(
@@ -761,7 +762,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public Grouping build() {
       //new grouping approach is edge centric
-      if (centricalStrategy != null && centricalStrategy.equals(GroupingStrategy.EDGE_CENTRIC)) {
+      if (centricalStrategy.equals(GroupingStrategy.EDGE_CENTRIC)) {
         if (edgeLabelGroups.isEmpty() && !useEdgeLabel) {
           throw new IllegalArgumentException(
             "Provide edge key(s) and/or use edge labels for grouping.");
@@ -793,33 +794,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       Grouping groupingOperator;
 
-      if (centricalStrategy != null) {
-        switch (centricalStrategy) {
-        case VERTEX_CENTRIC:
-          groupingOperator = new VertexCentricalGrouping(
-            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy);
-          break;
-        case EDGE_CENTRIC:
-          groupingOperator = new EdgeCentricalGrouping(
-            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy,
-            useEdgeSource, useEdgeTarget);
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported centrical strategy: " + centricalStrategy);
-        }
-      } else {
-        switch (strategy) {
-        case GROUP_REDUCE:
-          groupingOperator = new GroupingGroupReduce(
-            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
-          break;
-        case GROUP_COMBINE:
-          groupingOperator = new GroupingGroupCombine(
-            useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported strategy: " + strategy);
-        }
+      switch (centricalStrategy) {
+      case VERTEX_CENTRIC:
+        groupingOperator = new VertexCentricalGrouping(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy);
+        break;
+      case EDGE_CENTRIC:
+        groupingOperator = new EdgeCentricalGrouping(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy,
+          useEdgeSource, useEdgeTarget);
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported centrical strategy: " + centricalStrategy);
       }
 
       return groupingOperator;
