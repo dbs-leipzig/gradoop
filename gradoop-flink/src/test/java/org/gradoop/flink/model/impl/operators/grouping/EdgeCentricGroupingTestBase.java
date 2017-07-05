@@ -36,14 +36,14 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:UserA {gender : \"male\",age : 20})" +
-      "(v01:UserB {gender : \"male\",age : 20})" +
-      "(v02:UserC {gender : \"female\",age : 30})" +
-      "(v03:UserBUserA)" +
-      "(v04:UserCUserB)" +
-      "(v00)-[:writes {count : 3L}]->(v04)" +
-      "(v01)-[:asks {count : 1L}]->(v00)" +
-      "(v02)-[:asks {count : 2L}]->(v03)" +
+      "(v0:UserA {gender : \"male\",age : 20})" +
+      "(v1:UserB {gender : \"male\",age : 20})" +
+      "(v2:UserC {gender : \"female\",age : 30})" +
+      "(v3:UserAUserB)" +
+      "(v4:UserBUserC)" +
+      "(v0)-[:writes {count : 3L}]->(v4)" +
+      "(v1)-[:asks {count : 1L}]->(v0)" +
+      "(v2)-[:asks {count : 2L}]->(v3)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
@@ -56,9 +56,6 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       .build()
       .execute(input);
 
-    output.getVertices().print();
-    output.getEdges().print();
-
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
@@ -70,14 +67,14 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:UserA {gender : \"male\",age : 20})" +
-      "(v01:UserB {gender : \"male\",age : 20})" +
-      "(v02:UserC {gender : \"female\",age : 30})" +
-      "(v03:UserCUserB)" +
-      "(v00)-[:writes {count : 2L}]->(v01)" +
-      "(v00)-[:writes {count : 1L}]->(v02)" +
-      "(v03)-[:asks {count : 3L}]->(v00)" +
-      "(v02)-[:asks {count : 1L}]->(v01)" +
+      "(v0:UserA {gender : \"male\",age : 20})" +
+      "(v1:UserB {gender : \"male\",age : 20})" +
+      "(v2:UserC {gender : \"female\",age : 30})" +
+      "(v3:UserBUserC)" +
+      "(v0)-[:writes {count : 2L}]->(v1)" +
+      "(v0)-[:writes {count : 1L}]->(v2)" +
+      "(v3)-[:asks {count : 2L}]->(v0)" +
+      "(v2)-[:asks {count : 1L}]->(v1)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
@@ -89,9 +86,6 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       .setCentricalStrategy(GroupingStrategy.EDGE_CENTRIC)
       .build()
       .execute(input);
-
-    output.getVertices().print();
-    output.getEdges().print();
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -125,13 +119,6 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       .build()
       .execute(input);
 
-    output.getVertices().print();
-    output.getEdges().print();
-    System.out.println("--");
-    System.out.println("--");
-    loader.getLogicalGraphByVariable("expected").getVertices().print();
-    loader.getLogicalGraphByVariable("expected").getEdges().print();
-
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
@@ -143,26 +130,23 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:UserA {gender : \"male\",age : 20})" +
-      "(v01:UserBUserA {gender : \"male\",age : 20})" +
-      "(v02:UserCUserB {gender : \"female\",age : 30})" +
-      "(v00)-[:writes {count : 3L}]->(v01)" +
-      "(v01)-[:asks {count : 3L}]->(v02)" +
+      "(v0:UserA {gender : \"male\",age : 20})" +
+      "(v3:UserAUserB)" +
+      "(v4:UserBUserC)" +
+      "(v0)-[:writes {count : 3L}]->(v4)" +
+      "(v4)-[:asks {count : 3L}]->(v3)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .useEdgeSource(true)
-      .useEdgeTarget(true)
+      .useEdgeSource(false)
+      .useEdgeTarget(false)
       .addGlobalEdgeAggregator(new CountAggregator("count"))
       .setStrategy(getStrategy())
       .setCentricalStrategy(GroupingStrategy.EDGE_CENTRIC)
       .build()
       .execute(input);
-
-    output.getVertices().print();
-    output.getEdges().print();
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
