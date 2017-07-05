@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
