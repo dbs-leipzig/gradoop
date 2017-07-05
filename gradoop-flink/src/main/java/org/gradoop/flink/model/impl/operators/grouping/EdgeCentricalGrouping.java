@@ -113,8 +113,10 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     DataSet<Vertex> normalSuperVertices = superVertexGroupItems
       // filter ids where vertex is its own super vertex
       .filter(new FilterSuperVertexGroupItem(false))
+      // remove doubled entries where the vertex is part of different edges
+      .distinct(1)
       // take vertex respectively to the filtered id
-      .rightOuterJoin(graph.getVertices())
+      .join(graph.getVertices())
       .where(1)
       .equalTo(new Id<>())
       .with(new RightSide<>());
