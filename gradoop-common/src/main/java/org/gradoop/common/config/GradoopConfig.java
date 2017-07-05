@@ -16,11 +16,8 @@
 package org.gradoop.common.config;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -38,24 +35,29 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 public class GradoopConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
+  /**
+   * Knows how to create {@link GraphHead}
+   */
   private final GraphHeadFactory graphHeadFactory;
-  
+
+  /**
+   * Knows how to create {@link Vertex}
+   */
   private final VertexFactory vertexFactory;
 
+  /**
+   *  Knows how to create {@link Edge}
+   */
   private final EdgeFactory edgeFactory;
 
   /**
    * Creates a new Configuration.
-   *
-   * @param graphHeadHandler  graph head handler
-   * @param vertexHandler     vertex handler
-   * @param edgeHandler       edge handler
    */
   @SuppressWarnings("unchecked")
   protected GradoopConfig() {
-	  this.graphHeadFactory = new GraphHeadFactory();
-	  this.vertexFactory = new VertexFactory();
-	  this.edgeFactory = new EdgeFactory();
+    this.graphHeadFactory = new GraphHeadFactory();
+    this.vertexFactory = new VertexFactory();
+    this.edgeFactory = new EdgeFactory();
   }
 
   /**

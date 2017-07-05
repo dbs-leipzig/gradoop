@@ -48,8 +48,8 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
    * @param epgmStore HBase store
    * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSource(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore, 
-		  GradoopFlinkConfig config) {
+  public HBaseDataSource(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
+          GradoopFlinkConfig config) {
     super(epgmStore, config);
   }
 
@@ -60,7 +60,7 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
 
   @Override
   public GraphCollection getGraphCollection() {
-	GradoopHBaseConfig config = getHBaseConfig();
+    GradoopHBaseConfig config = getHBaseConfig();
     HBaseEPGMStore store = getStore();
 
     // used for type hinting when loading graph data

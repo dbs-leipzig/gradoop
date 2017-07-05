@@ -22,7 +22,6 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
@@ -218,9 +217,9 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
     byte[] edgeIdentifier = edge.getId().toByteArray();
 
     // extend by source or vertex id
-    byte[] otherVertexIdBytes = isOutgoing
-      ? edge.getTargetId().toByteArray()
-      : edge.getSourceId().toByteArray();
+    byte[] otherVertexIdBytes = isOutgoing ?
+        edge.getTargetId().toByteArray() :
+          edge.getSourceId().toByteArray();
 
     ArrayUtils.addAll(edgeIdentifier, otherVertexIdBytes);
 

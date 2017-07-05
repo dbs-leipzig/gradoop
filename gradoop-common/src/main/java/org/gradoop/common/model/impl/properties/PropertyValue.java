@@ -55,11 +55,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
 
   /**
-   * Class version for serialization.
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
    */
   public static final transient byte TYPE_NULL         = 0x00;
@@ -116,11 +111,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public static final transient byte TYPE_DATETIME     = 0x0d;
 
-
   /**
    * Value offset in byte
    */
   public static final transient byte OFFSET            = 0x01;
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Stores the type and the value
@@ -738,6 +737,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     this.rawBytes = bytes;
   }
 
+  /**
+   * Create a {@link PropertyValue} that wraps a byte array
+   * @param rawBytes array to wrap
+   * @return new instance of {@link PropertyValue}
+   */
   public static PropertyValue fromRawBytes(byte[] rawBytes) {
     return new PropertyValue(rawBytes);
   }

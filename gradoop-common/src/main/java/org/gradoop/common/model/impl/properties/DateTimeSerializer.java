@@ -53,7 +53,7 @@ public class DateTimeSerializer {
     int year = date.getYear();
     int month = date.getMonth().getValue();
     int day = date.getDayOfMonth();
-    
+
     return serialize(new int[] {year, month, day});
   }
 
@@ -121,7 +121,7 @@ public class DateTimeSerializer {
     int year = Bytes.toInt(bytes, 0, SIZEOF_INT);
     int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
     int day = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);
-    
+
     return LocalDate.of(year, month, day);
   }
 
@@ -137,7 +137,7 @@ public class DateTimeSerializer {
     int minute = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
     int second = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);
     int nano = Bytes.toInt(bytes, 3 * SIZEOF_INT, SIZEOF_INT);
-    
+
     return LocalTime.of(hour, minute, second, nano);
   }
 
@@ -156,7 +156,7 @@ public class DateTimeSerializer {
     int minute = Bytes.toInt(bytes, 4 * SIZEOF_INT, SIZEOF_INT);
     int second = Bytes.toInt(bytes, 5 * SIZEOF_INT, SIZEOF_INT);
     int nano = Bytes.toInt(bytes, 6 * SIZEOF_INT, SIZEOF_INT);
-    
+
     return LocalDateTime.of(year, month, day, hour, minute, second, nano);
   }
 }
