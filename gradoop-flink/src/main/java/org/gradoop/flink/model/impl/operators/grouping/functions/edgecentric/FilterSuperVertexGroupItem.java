@@ -52,8 +52,8 @@ public class FilterSuperVertexGroupItem implements FilterFunction<SuperVertexGro
     } else {
       // the only element in the set of super vertex ids is the vertex id itself
       return (superVertexGroupItem.getVertexIds().size() == 1) &&
-        (superVertexGroupItem.getVertexIds().iterator().next() ==
-          superVertexGroupItem.getSuperVertexId());
+        (superVertexGroupItem.getVertexIds().iterator().next().equals(
+          superVertexGroupItem.getSuperVertexId()));
     }
   }
 }
