@@ -20,25 +20,12 @@ package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 
 import java.util.Set;
 
 public class BuildSuperVertexGroupItem
   implements GroupReduceFunction<SuperVertexGroupItem, SuperVertexGroupItem> {
-
-  /**
-   * Avoid object initialization in each call.
-   */
-  private final SuperVertexGroupItem reuseSuperVertexGroupItem;
-
-
-  public BuildSuperVertexGroupItem() {
-    reuseSuperVertexGroupItem = new SuperVertexGroupItem();
-    reuseSuperVertexGroupItem.setAggregateValues(PropertyValueList.createEmptyList());
-    reuseSuperVertexGroupItem.setGroupingValues(PropertyValueList.createEmptyList());
-  }
 
   @Override
   public void reduce(
