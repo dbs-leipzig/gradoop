@@ -21,7 +21,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
-public class SuperVertexIdWithVertex extends Tuple2<GradoopId, Vertex> {
+public class SuperVertexIdWithVertex
+  extends Tuple2<GradoopId, Vertex>
+  implements Comparable<SuperVertexIdWithVertex>{
 
   public void setSuperVertexid(GradoopId gradoopId) {
     f0 = gradoopId;
@@ -39,4 +41,8 @@ public class SuperVertexIdWithVertex extends Tuple2<GradoopId, Vertex> {
     return f1;
   }
 
+  @Override
+  public int compareTo(SuperVertexIdWithVertex o) {
+    return getVertex().getLabel().compareTo(o.getVertex().getLabel());
+  }
 }

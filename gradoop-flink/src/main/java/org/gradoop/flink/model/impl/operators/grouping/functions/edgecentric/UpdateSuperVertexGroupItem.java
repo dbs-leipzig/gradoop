@@ -17,22 +17,19 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildGroupItemBase;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
-import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexIdWithVertex;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
@@ -45,15 +42,17 @@ public class UpdateSuperVertexGroupItem
   extends BuildBase
   implements CoGroupFunction<SuperVertexGroupItem, SuperVertexIdWithVertex, SuperVertexGroupItem> {
 
-  private final String LABEL_SEPARATOR = "_";
+  private final String LABEL_SEPARATOR = "";
 
-  private Set<GradoopId> usedVertices;
+  private Set<GradoopId> usedVertices = Sets.newHashSet();
 
   private StringBuilder label;
 
   private boolean isFirst;
 
   private boolean duplicate;
+
+  private TreeSet<SuperVertexIdWithVertex> orderedSet = Sets.newTreeSet();
 
   /**
    * Creates map function.
@@ -62,7 +61,6 @@ public class UpdateSuperVertexGroupItem
    */
   public UpdateSuperVertexGroupItem(boolean useLabel) {
     super(useLabel);
-    usedVertices = new HashSet<>();
     label = new StringBuilder();
   }
 
@@ -74,14 +72,17 @@ public class UpdateSuperVertexGroupItem
     throws Exception {
 
     usedVertices.clear();
+    orderedSet.clear();
     label.setLength(0);
-
-    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
-
     isFirst = true;
     Vertex vertex;
+    SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
 
     for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
+      orderedSet.add(superVertexIdWithVertex);
+    }
+
+    for (SuperVertexIdWithVertex superVertexIdWithVertex : orderedSet) {
       vertex = superVertexIdWithVertex.getVertex();
 
       duplicate = usedVertices.contains(vertex.getId());
@@ -111,7 +112,5 @@ public class UpdateSuperVertexGroupItem
 
     collector.collect(superVertexGroupItem);
     resetAggregators(superVertexGroupItem.getLabelGroup().getAggregators());
-
-
   }
 }
