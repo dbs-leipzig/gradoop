@@ -41,9 +41,9 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       "(v02:UserC {gender : \"female\",age : 30})" +
       "(v03:UserBUserA)" +
       "(v04:UserCUserB)" +
-      "(v00)-[:writes {count : 3}]->(v04)" +
-      "(v01)-[:asks {count : 1}]->(v00)" +
-      "(v02)-[:asks {count : 2}]->(v03)" +
+      "(v00)-[:writes {count : 3L}]->(v04)" +
+      "(v01)-[:asks {count : 1L}]->(v00)" +
+      "(v02)-[:asks {count : 2L}]->(v03)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
@@ -74,10 +74,10 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       "(v01:UserB {gender : \"male\",age : 20})" +
       "(v02:UserC {gender : \"female\",age : 30})" +
       "(v03:UserCUserB)" +
-      "(v00)-[:writes {count : 2}]->(v01)" +
-      "(v00)-[:writes {count : 1}]->(v02)" +
-      "(v03)-[:asks {count : 3}]->(v00)" +
-      "(v02)-[:asks {count : 1}]->(v01)" +
+      "(v00)-[:writes {count : 2L}]->(v01)" +
+      "(v00)-[:writes {count : 1L}]->(v02)" +
+      "(v03)-[:asks {count : 3L}]->(v00)" +
+      "(v02)-[:asks {count : 1L}]->(v01)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
@@ -107,11 +107,11 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       "(v0:UserA {gender : \"male\",age : 20})" +
       "(v1:UserB {gender : \"male\",age : 20})" +
       "(v2:UserC {gender : \"female\",age : 30})" +
-      "(v0)-[:writes {count : 2}]->(v1)" +
-      "(v0)-[:writes {count : 1}]->(v2)" +
-      "(v1)-[:asks {count : 1}]->(v0)" +
-      "(v2)-[:asks {count : 1}]->(v0)" +
-      "(v2)-[:asks {count : 1}]->(v1)" +
+      "(v0)-[:writes {count : 2L}]->(v1)" +
+      "(v0)-[:writes {count : 1L}]->(v2)" +
+      "(v1)-[:asks {count : 1L}]->(v0)" +
+      "(v2)-[:asks {count : 1L}]->(v0)" +
+      "(v2)-[:asks {count : 1L}]->(v1)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
@@ -146,8 +146,8 @@ public abstract class EdgeCentricGroupingTestBase extends GradoopFlinkTestBase {
       "(v00:UserA {gender : \"male\",age : 20})" +
       "(v01:UserBUserA {gender : \"male\",age : 20})" +
       "(v02:UserCUserB {gender : \"female\",age : 30})" +
-      "(v00)-[:writes {count : 3}]->(v01)" +
-      "(v01)-[:asks {count : 3}]->(v02)" +
+      "(v00)-[:writes {count : 3L}]->(v01)" +
+      "(v01)-[:asks {count : 3L}]->(v02)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
