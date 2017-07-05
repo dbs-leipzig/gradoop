@@ -180,6 +180,8 @@
                         <includeTestResources>false</includeTestResources>
                         <suppressionsLocation>gradoop/checkstyle-suppressions.xml</suppressionsLocation>
                         <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                        <failsOnError>true</failsOnError>
+                        <consoleOutput>true</consoleOutput>
                     </configuration>
                     <executions>
                         <execution>

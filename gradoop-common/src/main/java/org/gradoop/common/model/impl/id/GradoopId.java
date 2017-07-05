@@ -65,8 +65,8 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    * Required for {@link GradoopId#toString()}
    */
   private static final char[] HEX_CHARS = new char[] {
-    '0', '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   /**
    * Internal byte representation
@@ -346,7 +346,7 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
       return false;
     }
     // compare timestamp (byte 0 to 3)
-    if (!equalsInRange(first, second, firstPos, secondPos,3)) {
+    if (!equalsInRange(first, second, firstPos, secondPos, 3)) {
       return false;
     }
 
@@ -425,6 +425,6 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    * @return int value
    */
   private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {
-    return (((b3) << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | ((b0 & 0xff)));
+    return (b3 << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | ((b0 & 0xff));
   }
 }

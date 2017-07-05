@@ -43,7 +43,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIdList() {}
+  public GradoopIdList() { }
 
   /**
    * Initializes the list with the given byte array.
@@ -128,13 +128,13 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids the ids to add
    */
   public void addAll(Collection<GradoopId> ids) {
-    byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
+    byte[] bytesArray = new byte[ids.size() * GradoopId.ID_SIZE];
     int i = 0;
     for (GradoopId id : ids) {
-      System.arraycopy(id.toByteArray(), 0, bytes, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
+      System.arraycopy(id.toByteArray(), 0, bytesArray, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
       i++;
     }
-    addAll(new GradoopIdList(bytes));
+    addAll(new GradoopIdList(bytesArray));
   }
 
   /**

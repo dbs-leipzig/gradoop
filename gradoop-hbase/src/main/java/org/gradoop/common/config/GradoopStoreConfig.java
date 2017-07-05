@@ -21,9 +21,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
@@ -35,7 +32,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * @param <G> EPGM graph head type
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
- */	
+ */
 public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   extends GradoopFlinkConfig {
 

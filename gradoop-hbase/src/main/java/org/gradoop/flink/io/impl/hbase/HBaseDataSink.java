@@ -68,7 +68,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @param config    Gradoop Flink configuration
    */
   public HBaseDataSink(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
-		  GradoopFlinkConfig config) {
+      GradoopFlinkConfig config) {
     super(epgmStore, config);
   }
 
@@ -90,7 +90,6 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   @Override
   public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
     write(GraphCollection.fromGraph(logicalGraph), overWrite);
-
   }
 
   @Override
@@ -111,7 +110,6 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   @Override
   public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
     write(GraphCollection.fromTransactions(graphTransactions), overWrite);
-
   }
 
   /**
@@ -155,7 +153,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     persistentGraphDataSet
     // FIXME remove forced cast...
-      .map(new BuildGraphHeadMutation((GraphHeadHandler<PersistentGraphHead>) ((Object)getHBaseConfig().getGraphHeadHandler())))
+      .map(new BuildGraphHeadMutation((GraphHeadHandler<PersistentGraphHead>)
+((Object) getHBaseConfig().getGraphHeadHandler())))
       .output(new HadoopOutputFormat<>(new TableOutputFormat<>(), job));
   }
 

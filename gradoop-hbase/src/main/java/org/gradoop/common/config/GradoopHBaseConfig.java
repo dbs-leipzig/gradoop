@@ -25,7 +25,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.util.HBaseConstants;
-import org.gradoop.common.config.GradoopStoreConfig;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -50,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GradoopHBaseConfig
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GradoopStoreConfig<G, V, E>{
+  extends GradoopStoreConfig<G, V, E> {
 
   /**
    * Graph table name.
@@ -78,13 +77,14 @@ public class GradoopHBaseConfig
    * EPGMEdge handler.
    */
   private final EdgeHandler<E, V> edgeHandler;
-  
+
   /**
    * Creates a new Configuration.
    *
    * @param graphHeadHandler            graph head handler
    * @param vertexHandler               vertex handler
    * @param edgeHandler                 edge handler
+   * @param env                                   flink execution environment
    * @param graphTableName              graph table name
    * @param vertexTableName             vertex table name
    * @param edgeTableName               edge table name
@@ -97,7 +97,7 @@ public class GradoopHBaseConfig
     String graphTableName,
     String vertexTableName,
     String edgeTableName) {
-    super( new HBaseGraphHeadFactory<G>(),
+    super(new HBaseGraphHeadFactory<G>(),
       new HBaseVertexFactory<V, E>(),
       new HBaseEdgeFactory<E, V>(),
       env);
@@ -111,13 +111,13 @@ public class GradoopHBaseConfig
     this.graphTableName = graphTableName;
     this.vertexTableName = vertexTableName;
     this.edgeTableName = edgeTableName;
-    
+
     this.graphHeadHandler =
-    		checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
+        checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
     this.vertexHandler =
-    		checkNotNull(vertexHandler, "VertexHandler was null");
+        checkNotNull(vertexHandler, "VertexHandler was null");
     this.edgeHandler =
-    		checkNotNull(edgeHandler, "EdgeHandler was null");
+        checkNotNull(edgeHandler, "EdgeHandler was null");
   }
 
   /**
@@ -145,9 +145,11 @@ public class GradoopHBaseConfig
    * Creates a default Configuration using POJO handlers for vertices, edges
    * and graph heads and default table names.
    *
+   *@param env apache flink execution environment
    * @return Default Gradoop HBase configuration.
    */
-  public static GradoopHBaseConfig<GraphHead, Vertex, Edge> getDefaultConfig(ExecutionEnvironment env) {
+  public static GradoopHBaseConfig<GraphHead, Vertex, Edge>
+    getDefaultConfig(ExecutionEnvironment env) {
     GraphHeadHandler<GraphHead> graphHeadHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadFactory());
     VertexHandler<Vertex, Edge> vertexHandler =
@@ -197,16 +199,16 @@ public class GradoopHBaseConfig
   public String getGraphTableName() {
     return graphTableName;
   }
-  
+
   public GraphHeadHandler<G> getGraphHeadHandler() {
-	  return graphHeadHandler;
+    return graphHeadHandler;
   }
 
   public VertexHandler<V, E> getVertexHandler() {
-	  return vertexHandler;
+    return vertexHandler;
   }
 
   public EdgeHandler<E, V> getEdgeHandler() {
-	  return edgeHandler;
+    return edgeHandler;
   }
 }
