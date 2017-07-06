@@ -20,7 +20,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.TextInputFormat;
-import org.gradoop.flink.io.impl.tlf.functions.GraphTransactionFromTLFGraph;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
@@ -30,10 +29,9 @@ import org.gradoop.flink.io.impl.tlf.functions.Dictionary;
 import org.gradoop.flink.io.impl.tlf.functions.DictionaryEntry;
 import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
-import org.gradoop.flink.io.impl.tlf.functions.TLFGraphFromText;
+import org.gradoop.flink.io.impl.tlf.functions.GraphTransactionFromText;
 import org.gradoop.flink.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.flink.io.impl.tlf.tuples.TLFGraph;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
@@ -96,18 +94,13 @@ public class TLFDataSource extends TLFBase implements DataSource {
 
   @Override
   public GraphTransactions getGraphTransactions() throws IOException {
-    DataSet<TLFGraph> graphs;
     DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     // load tlf graphs from file
-    graphs = env.readHadoopFile(
+    transactions = env.readHadoopFile(
       new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath())
-      .map(new TLFGraphFromText());
-
-    // map the tlf graph to transactions
-    transactions = graphs
-      .map(new GraphTransactionFromTLFGraph(
+      .map(new GraphTransactionFromText(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
         getConfig().getEdgeFactory()));
@@ -126,18 +119,5 @@ public class TLFDataSource extends TLFBase implements DataSource {
           getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);
     }
     return new GraphTransactions(transactions, getConfig());
-  }
-
-  /**
-   * Reads the input as dataset of TLFGraphs.
-   *
-   * @return tlf graphs
-   */
-  public DataSet<TLFGraph> getTLFGraphs() throws IOException {
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-
-    return env.readHadoopFile(new TLFInputFormat(),
-      LongWritable.class, Text.class, getTLFPath())
-      .map(new TLFGraphFromText());
   }
 }
