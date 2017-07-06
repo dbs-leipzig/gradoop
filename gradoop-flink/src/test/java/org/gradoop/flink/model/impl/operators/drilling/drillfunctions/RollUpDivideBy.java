@@ -20,13 +20,30 @@ package org.gradoop.flink.model.impl.operators.drilling.drillfunctions;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
-public class RollUpSecondsToMinutes implements DrillFunction {
+public class RollUpDivideBy implements DrillFunction {
 
+  /**
+   * Avoid object instantiation.
+   */
   private PropertyValue reuseProperty = new PropertyValue();
+
+  /**
+   * Value which the property value shall be divided by.
+   */
+  private long divisor;
+
+  /**
+   * Valued constructor.
+   *
+   * @param divisor divisor for the property value
+   */
+  public RollUpDivideBy(long divisor) {
+    this.divisor = divisor;
+  }
 
   @Override
   public PropertyValue execute(PropertyValue property) {
-    reuseProperty.setLong(property.getLong() / 60);
+    reuseProperty.setLong(property.getLong() / divisor);
     return reuseProperty;
   }
 }

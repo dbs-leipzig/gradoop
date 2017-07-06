@@ -48,11 +48,11 @@ public abstract class DrillTransformation<EL extends Element>
   /**
    * Valued constructor.
    *
-   * @param label label of the element whose property shall be drilled, or
-   *              see {@link Drill#DRILL_ALL_ELEMENTS}
-   * @param propertyKey property key
-   * @param function drill function which shall be applied to a property
-   * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
+   * @param label           label of the element whose property shall be drilled, or
+   *                        see {@link Drill#DRILL_ALL_ELEMENTS}
+   * @param propertyKey     property key
+   * @param function        drill function which shall be applied to a property
+   * @param newPropertyKey  new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
    */
   public DrillTransformation(String label, String propertyKey, DrillFunction function,
     String newPropertyKey) {

@@ -124,11 +124,10 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     private boolean drillVertex;
 
     /**
-     * Creates the drill down or roll up class. By default will the vertices be transformed, not
+     * Creates the roll up class. By default the vertices will be transformed, note
      * that {@link DrillBuilder#drillVertex{boolean} and
      * {@link DrillBuilder#drillEdge(boolean)} negate each other so only the last used will be
-     * considered. In case of drill down where the function is not set it is necessary that a
-     * roll up function was used before.
+     * considered.
      */
     public DrillBuilder() {
       label = DRILL_ALL_ELEMENTS;
@@ -204,19 +203,9 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Creates a drill down operation.
-     *
-     * @return drill down operation
-     */
-    public DrillDown buildDrillDown() {
-      Objects.requireNonNull(propertyKey);
-      return new DrillDown(label, propertyKey, function, newPropertyKey, drillVertex);
-    }
-
-    /**
      * Creates a roll up operation.
      *
-     * @return rol up operation
+     * @return roll up operation
      */
     public RollUp buildRollUp() {
       Objects.requireNonNull(propertyKey);

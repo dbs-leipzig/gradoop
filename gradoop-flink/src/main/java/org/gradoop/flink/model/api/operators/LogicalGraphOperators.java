@@ -26,7 +26,6 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.DrillDown;
 import org.gradoop.flink.model.impl.operators.drilling.RollUp;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -361,19 +360,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   LogicalGraph rollUp(RollUp rollUp);
 
   /**
-   * Returns a graph with the same structure but a specified property of an element is drilled down
-   * by the declared function. It is possible to drill down either on one vertex / edge type or all
-   * vertex / edge types. Additionally the drilled down value can be stored under a new key. If the
-   * original key shall be reused the old value is overwritten. Drill down can also be used
-   * without specifying a drill down function when it is preceded by a roll up operation on the
-   * same property key.
-   *
-   * @param drillDown drill down operation
-   * @return logical graph with drilled down properties
-   */
-  LogicalGraph drillDown(DrillDown drillDown);
-
-  /**
    * Creates a graph with the same structure but a specified property of all vertex types is rolled
    * up by the function. The original information is also kept to be able to drill down afterwards.
    *
@@ -468,123 +454,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph with rolled up properties
    */
   LogicalGraph rollUpEdge(String propertyKey, DrillFunction function);
-
-  /**
-   * Creates a graph with the same structure but a specified property of all vertex types is drilled
-   * down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownVertex(String propertyKey, DrillFunction function);
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific vertex
-   * type is drilled down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param vertexLabel vertex label
-   * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownVertex(String vertexLabel, String propertyKey, DrillFunction function);
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific vertex
-   * type is drilled down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param vertexLabel vertex label
-   * @param propertyKey property key
-   * @param function roll up function
-   * @param newPropertyKey new property key
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownVertex(
-    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
-
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific vertex
-   * type is drilled down by the function. In this case the roll up operation was used earlier so
-   * there is no drill function necessary.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param vertexLabel vertex label
-   * @param propertyKey property key
-   * @param newPropertyKey new property key
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownVertex(String vertexLabel, String propertyKey, String newPropertyKey);
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific edge
-   * type is drilled down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param edgeLabel edge label
-   * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function);
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific edge
-   * type is drilled down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param edgeLabel edge label
-   * @param propertyKey property key
-   * @param function roll up function
-   * @param newPropertyKey new property key
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownEdge(
-    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
-
-  /**
-   * Creates a graph with the same structure but a specified property of all edges types is drilled
-   * down by the function.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownEdge(String propertyKey, DrillFunction function);
-
-  /**
-   * Creates a graph with the same structure but a specified property of a specific edge
-   * type is drilled down by the function. In this case the roll up operation was used earlier so
-   * there is no drill function necessary.
-   *
-   * Drill down is a convenience method for the
-   * {@link LogicalGraph#transformEdges(TransformationFunction)} operation.
-   *
-   * @param edgeLabel edge label
-   * @param propertyKey property key
-   * @param newPropertyKey new property key
-   * @return graph with rolled up properties
-   */
-  LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, String newPropertyKey);
 
   //----------------------------------------------------------------------------
   // Binary Operators
