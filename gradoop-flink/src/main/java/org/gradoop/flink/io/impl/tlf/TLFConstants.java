@@ -17,8 +17,6 @@
 
 package org.gradoop.flink.io.impl.tlf;
 
-import org.apache.commons.io.Charsets;
-
 /**
  * Constants needed for Dictionary functions
  */
@@ -46,15 +44,14 @@ public class TLFConstants {
   // record reader constants
 
   /**
-   * The byte representation of the start tag which is 't'.
+   * Start tag of a tlf graph.
    */
-  public static final byte[] START_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
+  public static final String START_TAG = "t";
 
   /**
-   * The byte representation of the end tag which is 't', in this case 't' is
-   * not only the end tag but also the start tag of the next graph.
+   * End tag of a tlf graph, which is not only the end tag but also the start tag of the next graph.
    */
-  public static final byte[] END_TAG_BYTE = "t".getBytes(Charsets.UTF_8);
+  public static final String END_TAG = "t";
 
   // tuple constants
 

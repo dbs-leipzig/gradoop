@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.io.impl.tlf.inputformats;
 
+import org.apache.commons.io.Charsets;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -100,14 +101,15 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * @throws IOException
    */
   private boolean next(LongWritable key, Text value) throws IOException {
-    if (fsin.getPos() < end && readUntilMatch(TLFConstants.START_TAG_BYTE, false)) {
+    if (fsin.getPos() < end &&
+      readUntilMatch(TLFConstants.START_TAG.getBytes(Charsets.UTF_8), false)) {
       try {
-        buffer.write(TLFConstants.START_TAG_BYTE);
-        if (readUntilMatch(TLFConstants.END_TAG_BYTE, true)) {
+        buffer.write(TLFConstants.START_TAG.getBytes(Charsets.UTF_8));
+        if (readUntilMatch(TLFConstants.END_TAG.getBytes(Charsets.UTF_8), true)) {
           key.set(fsin.getPos());
           if (fsin.getPos() != end) {
             //- end tag because it is the new start tag and shall not be added
-            valueLength = buffer.getLength() - TLFConstants.END_TAG_BYTE.length;
+            valueLength = buffer.getLength() - TLFConstants.END_TAG.getBytes(Charsets.UTF_8).length;
           } else {
             // in this case there is no new start tag
             valueLength = buffer.getLength();
@@ -116,7 +118,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
           value.set(buffer.getData(), 0, valueLength);
           //set the buffer to position before end tag of old graph which is
           // start tag of the new one
-          fsin.seek(fsin.getPos() - TLFConstants.END_TAG_BYTE.length);
+          fsin.seek(fsin.getPos() - TLFConstants.END_TAG.getBytes(Charsets.UTF_8).length);
           return true;
         }
       } finally {
