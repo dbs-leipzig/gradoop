@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains the interface for the drilling functions.
+ * Contains the interface for the drilling functions which are applied to the properties.
  */
 package org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions;
