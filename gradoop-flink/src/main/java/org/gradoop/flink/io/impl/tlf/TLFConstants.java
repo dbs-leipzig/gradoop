@@ -46,12 +46,12 @@ public class TLFConstants {
   /**
    * Start tag of a tlf graph.
    */
-  public static final String START_TAG = "t";
+  public static final String START_TAG = "t #";
 
   /**
    * End tag of a tlf graph, which is not only the end tag but also the start tag of the next graph.
    */
-  public static final String END_TAG = "t";
+  public static final String END_TAG = "t #";
 
   // tuple constants
 
