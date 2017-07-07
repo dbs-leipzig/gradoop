@@ -168,7 +168,7 @@ public class ComplaintHandling extends AbstractProcess
         influencingMasterQuality.add(getEdgeTargetQuality(
           FoodBrokerConstants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), FoodBrokerConstants.LOGISTIC_MAP_BC));
         influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerConstants.PLACEDAT_EDGE_LABEL,
-          purchOrderId, FoodBrokerConstants.VENDOR_MAP_BC));
+          purchOrderId, FoodBrokerConstants.BC_VENDORS));
       }
       if (config.happensTransitionConfiguration(
         influencingMasterQuality, FoodBrokerConstants.TICKET_VERTEX_LABEL,
@@ -270,7 +270,7 @@ public class ComplaintHandling extends AbstractProcess
     influencingMasterQuality.add(getEdgeTargetQuality(
       FoodBrokerConstants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), FoodBrokerConstants.USER_MAP));
     influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerConstants.RECEIVEDFROM_EDGE_LABEL,
-      salesOrder.getId(), FoodBrokerConstants.CUSTOMER_MAP_BC));
+      salesOrder.getId(), FoodBrokerConstants.BC_CUSTOMERS));
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(
@@ -321,7 +321,7 @@ public class ComplaintHandling extends AbstractProcess
     influencingMasterQuality.add(getEdgeTargetQuality(
       FoodBrokerConstants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), FoodBrokerConstants.USER_MAP));
     influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerConstants.PLACEDAT_EDGE_LABEL,
-      purchOrderId, FoodBrokerConstants.VENDOR_MAP_BC));
+      purchOrderId, FoodBrokerConstants.BC_VENDORS));
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(

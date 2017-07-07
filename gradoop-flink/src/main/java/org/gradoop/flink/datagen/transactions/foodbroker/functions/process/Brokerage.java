@@ -138,12 +138,12 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.BC_CUSTOMERS);
 
     influencingMasterQuality.add(
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
 
     return config.happensTransitionConfiguration(
       influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
@@ -196,12 +196,12 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.BC_CUSTOMERS);
 
     influencingMasterQuality.add(
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
       influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
@@ -233,12 +233,12 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.BC_CUSTOMERS);
 
     influencingMasterQuality.add(
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
     influencingMasterQuality.add(productQualityMap.get(product));
 
     // calculate and set the lines properties
@@ -280,12 +280,12 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.BC_CUSTOMERS);
 
     influencingMasterQuality.add(
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
 
     LocalDate salesQuotationDate = salesQuotation
       .getPropertyValue(FoodBrokerConstants.DATE_KEY)
@@ -302,10 +302,10 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.BC_CUSTOMERS);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
     influencingMasterQuality.add(getQuality(employeeIndex, employee) * additionalInfluence);
 
     // set calculated properties
@@ -479,12 +479,12 @@ public class Brokerage
     // the additional influence is increased of the two master data objects share the same city
     // or location
     Float additionalInfluence = getAdditionalInfluence(
-      employee, FoodBrokerConstants.BC_EMPLOYEES, vendor, FoodBrokerConstants.VENDOR_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, vendor, FoodBrokerConstants.BC_VENDORS);
 
     influencingMasterQuality.add(
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(vendor, FoodBrokerConstants.VENDOR_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(vendor, FoodBrokerConstants.BC_VENDORS) * additionalInfluence);
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(
@@ -545,7 +545,7 @@ public class Brokerage
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(logisticMap.get(operatedBy));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.VENDOR_MAP_BC));
+      FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.BC_VENDORS));
 
     LocalDate date = config.delayDelayConfiguration(
       purchOrderDate, influencingMasterQuality, FoodBrokerConstants.PURCHORDER_VERTEX_LABEL,
@@ -623,7 +623,7 @@ public class Brokerage
     LocalDate purchOrderDate = purchOrder.getPropertyValue(FoodBrokerConstants.DATE_KEY).getDate();
     LocalDate date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality(
-        FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.VENDOR_MAP_BC),
+        FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.BC_VENDORS),
       FoodBrokerConstants.PURCHORDER_VERTEX_LABEL, FoodBrokerConstants.PO_INVOICEDELAY_CONFIG_KEY);
 
     properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
