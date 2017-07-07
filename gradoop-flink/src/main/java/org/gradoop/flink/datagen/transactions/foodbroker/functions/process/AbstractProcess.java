@@ -30,12 +30,12 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
-import org.gradoop.flink.datagen.transactions.foodbroker.tuples.EmployeeData;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -67,7 +67,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the employee quality of a given gradoop id.
    */
-  protected Map<GradoopId, EmployeeData> employeeMap;
+  protected Map<GradoopId, Vertex> employeeIndex;
   /**
    * Map to get the product quality of a given gradoop id.
    */
@@ -160,26 +160,39 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     super.open(parameters);
     //get broadcasted maps
     customerMap = getRuntimeContext().<Map<GradoopId, BusinessRelationData>>
-      getBroadcastVariable(Constants.CUSTOMER_MAP_BC).get(0);
+      getBroadcastVariable(FoodBrokerConstants.CUSTOMER_MAP_BC).get(0);
 
     vendorMap = getRuntimeContext().<Map<GradoopId, BusinessRelationData>>
-      getBroadcastVariable(Constants.VENDOR_MAP_BC).get(0);
+      getBroadcastVariable(FoodBrokerConstants.VENDOR_MAP_BC).get(0);
 
     logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.LOGISTIC_MAP_BC).get(0);
+      getBroadcastVariable(FoodBrokerConstants.LOGISTIC_MAP_BC).get(0);
 
-    employeeMap = getRuntimeContext().<Map<GradoopId, EmployeeData>>
-      getBroadcastVariable(Constants.EMPLOYEE_MAP_BC).get(0);
+    employeeIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_EMPLOYEES);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(Constants.PRODUCT_QUALITY_MAP_BC).get(0);
+      getBroadcastVariable(FoodBrokerConstants.PRODUCT_QUALITY_MAP_BC).get(0);
     //get the iterator of each map
     customerList = customerMap.keySet().toArray(new GradoopId[customerMap.keySet().size()]);
     vendorList = vendorMap.keySet().toArray(new GradoopId[vendorMap.keySet().size()]);
     logisticList = logisticMap.keySet().toArray(new GradoopId[logisticMap.keySet().size()]);
-    employeeList = employeeMap.keySet().toArray(new GradoopId[employeeMap.keySet().size()]);
+    employeeList = employeeIndex.keySet().toArray(new GradoopId[employeeIndex.keySet().size()]);
     productQualityList = productQualityMap.keySet()
       .toArray(new GradoopId[productQualityMap.keySet().size()]);
+  }
+
+  private Map<GradoopId, Vertex> createIndexFromBroadcast(String broadcastVariable) {
+
+    List<Vertex> broadcast =
+      getRuntimeContext().getBroadcastVariable(broadcastVariable);
+
+    Map<GradoopId, Vertex> map = Maps.newHashMapWithExpectedSize(broadcast.size());
+
+    for(Vertex vertex : broadcast) {
+      map.put(vertex.getId(), vertex);
+    }
+
+    return map;
   }
 
   /**
@@ -289,19 +302,23 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    */
   protected Float getEdgeTargetQuality(GradoopId target, String masterDataMap) {
     switch (masterDataMap) {
-    case Constants.CUSTOMER_MAP_BC:
+    case FoodBrokerConstants.CUSTOMER_MAP_BC:
       return customerMap.get(target).getQuality();
-    case Constants.VENDOR_MAP_BC:
+    case FoodBrokerConstants.VENDOR_MAP_BC:
       return vendorMap.get(target).getQuality();
-    case Constants.LOGISTIC_MAP_BC:
+    case FoodBrokerConstants.LOGISTIC_MAP_BC:
       return logisticMap.get(target);
-    case Constants.EMPLOYEE_MAP_BC:
-      return employeeMap.get(target).getQuality();
-    case Constants.USER_MAP:
+    case FoodBrokerConstants.BC_EMPLOYEES:
+      return getQuality(employeeIndex, target);
+    case FoodBrokerConstants.USER_MAP:
       return userMap.get(target);
     default:
       return null;
     }
+  }
+
+  protected float getQuality(Map<GradoopId, Vertex> index, GradoopId key) {
+    return index.get(key).getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat();
   }
 
   /**
@@ -324,32 +341,34 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     String secondHolding = "2";
 
     switch (firstMasterDataMap) {
-    case Constants.CUSTOMER_MAP_BC:
+    case FoodBrokerConstants.CUSTOMER_MAP_BC:
       firstCity = customerMap.get(firstMasterDataId).getCity();
       firstHolding = customerMap.get(firstMasterDataId).getHolding();
       break;
-    case Constants.VENDOR_MAP_BC:
+    case FoodBrokerConstants.VENDOR_MAP_BC:
       firstCity = vendorMap.get(firstMasterDataId).getCity();
       firstHolding = vendorMap.get(firstMasterDataId).getHolding();
       break;
-    case Constants.EMPLOYEE_MAP_BC:
-      firstCity = employeeMap.get(firstMasterDataId).getCity();
+    case FoodBrokerConstants.BC_EMPLOYEES:
+      firstCity = employeeIndex
+        .get(firstMasterDataId).getPropertyValue(FoodBrokerConstants.CITY_KEY).getString();
       break;
     default:
       break;
     }
 
     switch (secondMasterDataMap) {
-    case Constants.CUSTOMER_MAP_BC:
+    case FoodBrokerConstants.CUSTOMER_MAP_BC:
       secondCity = customerMap.get(secondMasterDataId).getCity();
       secondHolding = customerMap.get(secondMasterDataId).getHolding();
       break;
-    case Constants.VENDOR_MAP_BC:
+    case FoodBrokerConstants.VENDOR_MAP_BC:
       secondCity = vendorMap.get(secondMasterDataId).getCity();
       secondHolding = vendorMap.get(secondMasterDataId).getHolding();
       break;
-    case Constants.EMPLOYEE_MAP_BC:
-      secondCity = employeeMap.get(secondMasterDataId).getCity();
+    case FoodBrokerConstants.BC_EMPLOYEES:
+      secondCity = employeeIndex
+        .get(firstMasterDataId).getPropertyValue(FoodBrokerConstants.CITY_KEY).getString();
       break;
     default:
       break;
@@ -359,7 +378,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       influence *= config.getMasterDataSameCityInfluence();
     }
     if (firstHolding.equals(secondHolding) &&
-      !firstHolding.equals(Constants.HOLDING_TYPE_PRIVATE)) {
+      !firstHolding.equals(FoodBrokerConstants.HOLDING_TYPE_PRIVATE)) {
 
       influence *= config.getMasterDataSameHoldingInfluence();
     }
@@ -409,7 +428,9 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    * @return the next random employee id
    */
   protected GradoopId getNextEmployee() {
-    return getRandomEntryFromArray(employeeList);
+    GradoopId id = getRandomEntryFromArray(employeeList);
+    vertexMap.put(id, employeeIndex.get(id));
+    return id;
   }
 
   /**

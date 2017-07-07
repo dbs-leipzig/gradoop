@@ -19,6 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.codehaus.jettison.json.JSONException;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -33,19 +34,22 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FoodBrokerTest extends GradoopFlinkTestBase {
 
+  private GraphCollection cases;
+
   @Test
   public void testGenerate() throws Exception {
-    GraphCollection cases = generateCollection();
+    generateCollection();
 
     assertNotNull(cases);
   }
 
   @Test
   public void testSalesQuotationLineCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotationLine"));
     int min = 1;
@@ -65,7 +69,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSalesOrderCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotation"));
     DataSet<Vertex> salesOrders = cases.getVertices()
@@ -91,7 +95,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxVertexCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     int casesCount = 10;
     double actual = 0;
     // max 1:SalesQuotation, 20:SalesQuotationLines, 1:SalesOrder,
@@ -111,7 +115,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxEdgeCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     int casesCount = 10;
     double actual = 0;
     double max = 1*2 + 20*2 + 1*3 + 20*2 + 20*3 + 20*2 + 20*2 + 20*1 + 1*1 ;
@@ -152,22 +156,39 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
       .count());
   }
 
-  private GraphCollection generateCollection()
+  @Test
+  public void testMasterData() throws Exception {
+    generateCollection();
+
+    String[] masterDataLabels = new String[] {
+      FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL,
+      FoodBrokerConstants.CUSTOMER_VERTEX_LABEL,
+      FoodBrokerConstants.VENDOR_VERTEX_LABEL,
+      FoodBrokerConstants.LOGISTICS_VERTEX_LABEL,
+      FoodBrokerConstants.PRODUCT_VERTEX_LABEL
+    };
+
+    for (String label : masterDataLabels) {
+      long count = cases.getVertices().filter(new ByLabel<>(label)).count();
+
+      assertTrue( label + " vertices are missing", count > 0);
+    }
+  }
+
+  private void generateCollection()
     throws IOException, JSONException, URISyntaxException {
-    String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
 
-    FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
+    if (cases == null) {
+      String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
 
-    config.setScaleFactor(0);
+      FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 
-    FoodBroker foodBroker =
-      new FoodBroker(getExecutionEnvironment(), getConfig(), config);
+      config.setScaleFactor(0);
 
-    try {
-      return foodBroker.execute();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
+      FoodBroker foodBroker =
+        new FoodBroker(getExecutionEnvironment(), getConfig(), config);
+
+      cases = foodBroker.execute();
     }
   }
 

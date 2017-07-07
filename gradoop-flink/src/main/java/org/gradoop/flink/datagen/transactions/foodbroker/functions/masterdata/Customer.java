@@ -18,7 +18,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
@@ -60,8 +60,8 @@ public class Customer extends BusinessRelation {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.NOUNS_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -72,18 +72,19 @@ public class Customer extends BusinessRelation {
     //set rnd name
     Random random = new Random();
     Vertex vertex = super.map(seed);
-    vertex.setProperty(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    vertex.setProperty(
+      FoodBrokerConstants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
     return vertex;
   }
 
   @Override
   public String getAcronym() {
-    return Constants.CUSTOMER_ACRONYM;
+    return FoodBrokerConstants.CUSTOMER_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return Constants.CUSTOMER_VERTEX_LABEL;
+    return FoodBrokerConstants.CUSTOMER_VERTEX_LABEL;
   }
 }

@@ -18,7 +18,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 /**
@@ -53,9 +53,9 @@ public abstract class MasterData extends RichMapFunction<MasterDataSeed, Vertex>
     String bid = createBusinessIdentifier(seed, acronym);
     Properties properties = new Properties();
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_MASTER);
-    properties.set(Constants.QUALITY_KEY, seed.getQuality());
-    properties.set(Constants.SOURCEID_KEY, Constants.ERP_ACRONYM + "_" + bid);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_MASTER);
+    properties.set(FoodBrokerConstants.QUALITY_KEY, seed.getQuality());
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, FoodBrokerConstants.ERP_ACRONYM + "_" + bid);
 
     return properties;
   }

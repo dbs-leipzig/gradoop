@@ -29,8 +29,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 
 import java.math.BigDecimal;
@@ -66,7 +66,7 @@ public class Brokerage
     super.open(parameters);
 
     productPriceMap = getRuntimeContext().<Map<GradoopId, BigDecimal>>
-      getBroadcastVariable(Constants.PRODUCT_PRICE_MAP_BC).get(0);
+      getBroadcastVariable(FoodBrokerConstants.PRODUCT_PRICE_MAP_BC).get(0);
 
     productPriceIterator = productPriceMap.entrySet().iterator();
   }
@@ -133,21 +133,21 @@ public class Brokerage
    */
   private boolean confirmed(Vertex salesQuotation) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
-    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    GradoopId employee = getEdgeTargetId(FoodBrokerConstants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     return config.happensTransitionConfiguration(
-      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
-      Constants.SQ_CONFIRMATIONPROBABILITY_CONFIG_KEY, false);
+      influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerConstants.SQ_CONFIRMATIONPROBABILITY_CONFIG_KEY, false);
   }
 
   /**
@@ -157,15 +157,15 @@ public class Brokerage
    * @return vertex representation of a sales quotation
    */
   private Vertex newSalesQuotation(LocalDate startDate) {
-    String label = Constants.SALESQUOTATION_VERTEX_LABEL;
+    String label = FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL;
     Properties properties = new Properties();
 
-    String bid = createBusinessIdentifier(currentId++, Constants.SALESQUOTATION_ACRONYM);
+    String bid = createBusinessIdentifier(currentId++, FoodBrokerConstants.SALESQUOTATION_ACRONYM);
 
     // set properties
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, startDate);
-    properties.set(Constants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, startDate);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
 
     Vertex salesQuotation = newVertex(label, properties);
 
@@ -173,8 +173,8 @@ public class Brokerage
     GradoopId rndEmployee = getNextEmployee();
     GradoopId rndCustomer = getNextCustomer();
 
-    newEdge(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), rndEmployee);
-    newEdge(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), rndCustomer);
+    newEdge(FoodBrokerConstants.SENTBY_EDGE_LABEL, salesQuotation.getId(), rndEmployee);
+    newEdge(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId(), rndCustomer);
 
     return salesQuotation;
   }
@@ -191,21 +191,21 @@ public class Brokerage
     GradoopId product;
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
-    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    GradoopId employee = getEdgeTargetId(FoodBrokerConstants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
       getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
-      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
-      Constants.SQ_LINES_CONFIG_KEY, true);
+      influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerConstants.SQ_LINES_CONFIG_KEY, true);
 
     // create sales quotation lines based on calculated amount
     for (int i = 0; i < numberOfQuotationLines; i++) {
@@ -224,42 +224,42 @@ public class Brokerage
    * @return vertex representation of a sales quotation line
    */
   private Edge newSalesQuotationLine(Vertex salesQuotation, GradoopId product) {
-    String label = Constants.SALESQUOTATIONLINE_EDGE_LABEL;
+    String label = FoodBrokerConstants.SALESQUOTATIONLINE_EDGE_LABEL;
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
-    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    GradoopId employee = getEdgeTargetId(FoodBrokerConstants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
     influencingMasterQuality.add(productQualityMap.get(product));
 
     // calculate and set the lines properties
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
-      Constants.SQ_SALESMARGIN_CONFIG_KEY, true);
+      influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerConstants.SQ_SALESMARGIN_CONFIG_KEY, true);
 
     influencingMasterQuality.clear();
     int quantity = config.getIntRangeConfigurationValue(
-      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
-      Constants.SQ_LINEQUANTITY_CONFIG_KEY, true);
+      influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerConstants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.PURCHPRICE_KEY, productPriceMap.get(product));
-    properties.set(Constants.SALESPRICE_KEY,
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.PURCHPRICE_KEY, productPriceMap.get(product));
+    properties.set(FoodBrokerConstants.SALESPRICE_KEY,
       salesMargin
         .add(BigDecimal.ONE)
         .multiply(productPriceMap.get(product))
         .setScale(2, BigDecimal.ROUND_HALF_UP)
     );
-    properties.set(Constants.QUANTITY_KEY, quantity);
+    properties.set(FoodBrokerConstants.QUANTITY_KEY, quantity);
 
     return newEdge(label, salesQuotation.getId(), product, properties);
   }
@@ -271,58 +271,58 @@ public class Brokerage
    * @return vertex representation of a sales order
    */
   private Vertex newSalesOrder(Vertex salesQuotation) {
-    String label = Constants.SALESORDER_VERTEX_LABEL;
+    String label = FoodBrokerConstants.SALESORDER_VERTEX_LABEL;
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
-    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    GradoopId employee = getEdgeTargetId(FoodBrokerConstants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     Float additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     LocalDate salesQuotationDate = salesQuotation
-      .getPropertyValue(Constants.DATE_KEY)
+      .getPropertyValue(FoodBrokerConstants.DATE_KEY)
       .getDate();
     LocalDate date = config.delayDelayConfiguration(salesQuotationDate,
-      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
-      Constants.SQ_CONFIRMATIONDELAY_CONFIG_KEY);
+      influencingMasterQuality, FoodBrokerConstants.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerConstants.SQ_CONFIRMATIONDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(
-      currentId++, Constants.SALESORDER_ACRONYM);
+      currentId++, FoodBrokerConstants.SALESORDER_ACRONYM);
     // get random employee and collect all quality values from influencing master data objects
     influencingMasterQuality.clear();
     employee = getNextEmployee();
-    customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    customer = getEdgeTargetId(FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or holding
     additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, customer, FoodBrokerConstants.CUSTOMER_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
-    influencingMasterQuality.add(employeeMap.get(employee).getQuality() * additionalInfluence);
+      getEdgeTargetQuality(customer, FoodBrokerConstants.CUSTOMER_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(getQuality(employeeIndex, employee) * additionalInfluence);
 
     // set calculated properties
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, date);
-    properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.DELIVERYDATE_KEY, config.delayDelayConfiguration(
-      date, influencingMasterQuality, Constants.SALESORDER_VERTEX_LABEL,
-      Constants.SO_DELIVERYAGREEMENTDELAY_CONFIG_KEY));
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, date);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.DELIVERYDATE_KEY, config.delayDelayConfiguration(
+      date, influencingMasterQuality, FoodBrokerConstants.SALESORDER_VERTEX_LABEL,
+      FoodBrokerConstants.SO_DELIVERYAGREEMENTDELAY_CONFIG_KEY));
 
     Vertex salesOrder = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId(), getEdgeTargetId(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId()));
-    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), employee);
-    newEdge(Constants.BASEDON_EDGE_LABEL, salesOrder.getId(), salesQuotation.getId());
+    newEdge(FoodBrokerConstants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId(), getEdgeTargetId(
+      FoodBrokerConstants.SENTTO_EDGE_LABEL, salesQuotation.getId()));
+    newEdge(FoodBrokerConstants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), employee);
+    newEdge(FoodBrokerConstants.BASEDON_EDGE_LABEL, salesOrder.getId(), salesQuotation.getId());
 
     return salesOrder;
   }
@@ -356,15 +356,15 @@ public class Brokerage
    * @return vertex representation of a sales order line
    */
   private Edge newSalesOrderLine(Vertex salesOrder, Edge salesQuotationLine) {
-    String label = Constants.SALESORDERLINE_EDGE_LABEL;
+    String label = FoodBrokerConstants.SALESORDERLINE_EDGE_LABEL;
     Properties properties = new Properties();
 
     // set properties based on the sales quotation line
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.SALESPRICE_KEY, salesQuotationLine.getPropertyValue(
-      Constants.SALESPRICE_KEY).getBigDecimal());
-    properties.set(Constants.QUANTITY_KEY, salesQuotationLine.getPropertyValue(
-      Constants.QUANTITY_KEY).getInt());
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.SALESPRICE_KEY, salesQuotationLine.getPropertyValue(
+      FoodBrokerConstants.SALESPRICE_KEY).getBigDecimal());
+    properties.set(FoodBrokerConstants.QUANTITY_KEY, salesQuotationLine.getPropertyValue(
+      FoodBrokerConstants.QUANTITY_KEY).getInt());
 
     return newEdge(label, salesOrder.getId(),
       salesQuotationLine.getTargetId(), properties);
@@ -382,8 +382,8 @@ public class Brokerage
     Vertex purchOrder;
 
     int numberOfVendors = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), Constants.PURCHORDER_VERTEX_LABEL,
-      Constants.PO_NUMBEROFVENDORS_CONFIG_KEY, true);
+      new ArrayList<>(), FoodBrokerConstants.PURCHORDER_VERTEX_LABEL,
+      FoodBrokerConstants.PO_NUMBEROFVENDORS_CONFIG_KEY, true);
     for (int i = 0; i < (numberOfVendors > salesOrderLines.size() ?
       salesOrderLines.size() : numberOfVendors); i++) {
       purchOrder = newPurchOrder(salesOrder, getNextEmployee());
@@ -401,27 +401,27 @@ public class Brokerage
    * @return vertex representation of a purch order
    */
   private Vertex newPurchOrder(Vertex salesOrder, GradoopId processedBy) {
-    String label = Constants.PURCHORDER_VERTEX_LABEL;
+    String label = FoodBrokerConstants.PURCHORDER_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
-    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(FoodBrokerConstants.DATE_KEY).getDate();
     LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality(
-        Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
-        Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_PURCHASEDELAY_CONFIG_KEY);
-    String bid = createBusinessIdentifier(currentId++, Constants.PURCHORDER_ACRONYM);
+        FoodBrokerConstants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), FoodBrokerConstants.BC_EMPLOYEES),
+        FoodBrokerConstants.PURCHORDER_VERTEX_LABEL, FoodBrokerConstants.PO_PURCHASEDELAY_CONFIG_KEY);
+    String bid = createBusinessIdentifier(currentId++, FoodBrokerConstants.PURCHORDER_ACRONYM);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, date);
-    properties.set(Constants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, date);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
 
     Vertex purchOrder = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge(Constants.SERVES_EDGE_LABEL, purchOrder.getId(), salesOrder.getId());
-    newEdge(Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), getNextVendor());
-    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), processedBy);
+    newEdge(FoodBrokerConstants.SERVES_EDGE_LABEL, purchOrder.getId(), salesOrder.getId());
+    newEdge(FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), getNextVendor());
+    newEdge(FoodBrokerConstants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), processedBy);
 
     return purchOrder;
   }
@@ -465,7 +465,7 @@ public class Brokerage
    * @return vertex representation of a purch order line
    */
   private Edge newPurchOrderLine(Vertex purchOrder, Edge salesOrderLine) {
-    String label = Constants.PURCHORDERLINE_EDGE_LABEL;
+    String label = FoodBrokerConstants.PURCHORDERLINE_EDGE_LABEL;
     Edge purchOrderLine;
     Properties properties = new Properties();
 
@@ -474,32 +474,32 @@ public class Brokerage
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
 
-    GradoopId employee = getEdgeTargetId(Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId());
-    GradoopId vendor = getEdgeTargetId(Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId());
+    GradoopId employee = getEdgeTargetId(FoodBrokerConstants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId());
+    GradoopId vendor = getEdgeTargetId(FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId());
     // the additional influence is increased of the two master data objects share the same city
     // or location
     Float additionalInfluence = getAdditionalInfluence(
-      employee, Constants.EMPLOYEE_MAP_BC, vendor, Constants.VENDOR_MAP_BC);
+      employee, FoodBrokerConstants.BC_EMPLOYEES, vendor, FoodBrokerConstants.VENDOR_MAP_BC);
 
     influencingMasterQuality.add(
-      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
-      getEdgeTargetQuality(vendor, Constants.VENDOR_MAP_BC) * additionalInfluence);
+      getEdgeTargetQuality(vendor, FoodBrokerConstants.VENDOR_MAP_BC) * additionalInfluence);
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(
-      influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
-      Constants.PO_PRICEVARIATION_CONFIG_KEY, false)
+      influencingMasterQuality, FoodBrokerConstants.PURCHORDER_VERTEX_LABEL,
+      FoodBrokerConstants.PO_PRICEVARIATION_CONFIG_KEY, false)
       .add(BigDecimal.ONE)
       .multiply(purchPrice)
       .setScale(2, BigDecimal.ROUND_HALF_UP);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
     // create indirect connection to the corresponding sales order
     properties.set("salesOrderLine", salesOrderLine.getId().toString());
-    properties.set(Constants.QUANTITY_KEY,
-      salesOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt());
-    properties.set(Constants.PURCHPRICE_KEY, purchPrice);
+    properties.set(FoodBrokerConstants.QUANTITY_KEY,
+      salesOrderLine.getPropertyValue(FoodBrokerConstants.QUANTITY_KEY).getInt());
+    properties.set(FoodBrokerConstants.PURCHPRICE_KEY, purchPrice);
 
     purchOrderLine = newEdge(label, purchOrder.getId(), salesOrderLine.getTargetId(),
       properties);
@@ -535,33 +535,33 @@ public class Brokerage
    * @return vertex representation of a delivery note
    */
   private Vertex newDeliveryNote(Vertex purchOrder) {
-    String label = Constants.DELIVERYNOTE_VERTEX_LABEL;
+    String label = FoodBrokerConstants.DELIVERYNOTE_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
-    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(FoodBrokerConstants.DATE_KEY).getDate();
     GradoopId operatedBy = getNextLogistic();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(logisticMap.get(operatedBy));
     influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
+      FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.VENDOR_MAP_BC));
 
     LocalDate date = config.delayDelayConfiguration(
-      purchOrderDate, influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
-      Constants.PO_DELIVERYDELAY_CONFIG_KEY);
-    String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
+      purchOrderDate, influencingMasterQuality, FoodBrokerConstants.PURCHORDER_VERTEX_LABEL,
+      FoodBrokerConstants.PO_DELIVERYDELAY_CONFIG_KEY);
+    String bid = createBusinessIdentifier(currentId++, FoodBrokerConstants.DELIVERYNOTE_ACRONYM);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, date);
-    properties.set(Constants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, date);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
     properties.set("trackingCode", "***TODO***");
 
     Vertex deliveryNote = newVertex(label, properties);
 
     // create all relevant edges
-    newEdge(Constants.CONTAINS_EDGE_LABEL, deliveryNote.getId(), purchOrder.getId());
-    newEdge(Constants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), operatedBy);
+    newEdge(FoodBrokerConstants.CONTAINS_EDGE_LABEL, deliveryNote.getId(), purchOrder.getId());
+    newEdge(FoodBrokerConstants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), operatedBy);
 
     return deliveryNote;
   }
@@ -588,9 +588,9 @@ public class Brokerage
         total = purchOrderTotals.get(purchOrder);
       }
       purchAmount = BigDecimal.valueOf(
-        purchOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt());
+        purchOrderLine.getPropertyValue(FoodBrokerConstants.QUANTITY_KEY).getInt());
       purchAmount = purchAmount.multiply(purchOrderLine.getPropertyValue(
-        Constants.PURCHPRICE_KEY).getBigDecimal());
+        FoodBrokerConstants.PURCHPRICE_KEY).getBigDecimal());
       total = total.add(purchAmount);
       purchOrderTotals.put(purchOrder, total);
     }
@@ -616,27 +616,27 @@ public class Brokerage
    * @return vertex representation of a purch invoice
    */
   private Vertex newPurchInvoice(Vertex purchOrder, BigDecimal total) {
-    String label = Constants.PURCHINVOICE_VERTEX_LABEL;
+    String label = FoodBrokerConstants.PURCHINVOICE_VERTEX_LABEL;
     Properties properties = new Properties();
 
     // calculate and set the properties
-    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(FoodBrokerConstants.DATE_KEY).getDate();
     LocalDate date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality(
-        Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC),
-      Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_INVOICEDELAY_CONFIG_KEY);
+        FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.VENDOR_MAP_BC),
+      FoodBrokerConstants.PURCHORDER_VERTEX_LABEL, FoodBrokerConstants.PO_INVOICEDELAY_CONFIG_KEY);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, date);
-    String bid = createBusinessIdentifier(currentId++, Constants.PURCHINVOICE_ACRONYM);
-    properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.EXPENSE_KEY, total);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, date);
+    String bid = createBusinessIdentifier(currentId++, FoodBrokerConstants.PURCHINVOICE_ACRONYM);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.EXPENSE_KEY, total);
     properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex purchInvoice = newVertex(label, properties);
 
     // create relevant edge
-    newEdge(Constants.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrder.getId());
+    newEdge(FoodBrokerConstants.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrder.getId());
 
     return purchInvoice;
   }
@@ -648,22 +648,22 @@ public class Brokerage
    * @return vertex representation of a sales invoice
    */
   private Vertex newSalesInvoice(List<Edge> salesOrderLines) {
-    String label = Constants.SALESINVOICE_VERTEX_LABEL;
+    String label = FoodBrokerConstants.SALESINVOICE_VERTEX_LABEL;
     Vertex salesOrder = vertexMap.get(salesOrderLines.get(0).getSourceId());
     Properties properties = new Properties();
 
     // calculate and set the properties
-    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(FoodBrokerConstants.DATE_KEY).getDate();
     LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality
-        (Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
-      Constants.SALESORDER_VERTEX_LABEL, Constants.SO_INVOICEDELAY_CONFIG_KEY);
+        (FoodBrokerConstants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), FoodBrokerConstants.BC_EMPLOYEES),
+      FoodBrokerConstants.SALESORDER_VERTEX_LABEL, FoodBrokerConstants.SO_INVOICEDELAY_CONFIG_KEY);
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.DATE_KEY, date);
-    String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
-    properties.set(Constants.SOURCEID_KEY, bid);
-    properties.set(Constants.REVENUE_KEY, BigDecimal.ZERO);
+    properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
+    properties.set(FoodBrokerConstants.DATE_KEY, date);
+    String bid = createBusinessIdentifier(currentId++, FoodBrokerConstants.SALESINVOICE_ACRONYM);
+    properties.set(FoodBrokerConstants.SOURCEID_KEY, bid);
+    properties.set(FoodBrokerConstants.REVENUE_KEY, BigDecimal.ZERO);
     properties.set("text", "*** TODO @ Brokerage ***");
 
     Vertex salesInvoice = newVertex(label, properties);
@@ -673,16 +673,16 @@ public class Brokerage
     // set the invoices revenue considering all sales order lines
     for (Edge salesOrderLine : salesOrderLines) {
       salesAmount = BigDecimal.valueOf(salesOrderLine.getPropertyValue(
-        Constants.QUANTITY_KEY).getInt())
-        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE_KEY).getBigDecimal())
+        FoodBrokerConstants.QUANTITY_KEY).getInt())
+        .multiply(salesOrderLine.getPropertyValue(FoodBrokerConstants.SALESPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
-      revenue = salesInvoice.getPropertyValue(Constants.REVENUE_KEY).getBigDecimal();
+      revenue = salesInvoice.getPropertyValue(FoodBrokerConstants.REVENUE_KEY).getBigDecimal();
       revenue = revenue.add(salesAmount);
-      salesInvoice.setProperty(Constants.REVENUE_KEY, revenue);
+      salesInvoice.setProperty(FoodBrokerConstants.REVENUE_KEY, revenue);
     }
 
     // create relevant edge
-    newEdge(Constants.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
+    newEdge(FoodBrokerConstants.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
 
     return salesInvoice;
   }

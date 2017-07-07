@@ -17,7 +17,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Vendor;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -43,15 +43,15 @@ public class VendorGenerator extends BusinessRelationGenerator {
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.VENDOR_VERTEX_LABEL);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(FoodBrokerConstants.VENDOR_VERTEX_LABEL);
     loadData();
     return env.fromCollection(seeds)
       .map(new Vendor(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(getAdjectives()), Constants.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(getNouns()), Constants.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(getCities()), Constants.CITIES_BC)
-      .withBroadcastSet(env.fromCollection(getCompanies()), Constants.COMPANIES_BC)
-      .withBroadcastSet(env.fromCollection(getHoldings()), Constants.HOLDINGS_BC)
+      .withBroadcastSet(env.fromCollection(getAdjectives()), FoodBrokerConstants.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(getNouns()), FoodBrokerConstants.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(getCities()), FoodBrokerConstants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(getCompanies()), FoodBrokerConstants.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(getHoldings()), FoodBrokerConstants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }

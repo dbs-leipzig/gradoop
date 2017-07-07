@@ -19,7 +19,7 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
@@ -62,7 +62,7 @@ public abstract class Person extends MasterData {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    cities = getRuntimeContext().getBroadcastVariable(Constants.CITIES_BC);
+    cities = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.CITIES_BC);
     //get the size
     cityCount = cities.size();
   }
@@ -74,9 +74,9 @@ public abstract class Person extends MasterData {
     Random random = new Random();
     //set rnd location
     String[] location = cities.get(random.nextInt(cityCount)).split("-");
-    properties.set(Constants.CITY_KEY, location[0]);
-    properties.set(Constants.STATE_KEY, location[1]);
-    properties.set(Constants.COUNTRY_KEY, location[2]);
+    properties.set(FoodBrokerConstants.CITY_KEY, location[0]);
+    properties.set(FoodBrokerConstants.STATE_KEY, location[1]);
+    properties.set(FoodBrokerConstants.COUNTRY_KEY, location[2]);
 
     return vertexFactory.createVertex(getClassName(), properties);
   }

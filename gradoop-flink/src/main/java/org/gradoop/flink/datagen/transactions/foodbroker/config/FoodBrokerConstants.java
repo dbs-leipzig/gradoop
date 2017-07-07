@@ -18,7 +18,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.config;
 /**
  * Constants used for the FoodBroker data generator
  */
-public class Constants {
+public class FoodBrokerConstants {
   /**
    * Reserved property key referring to master or transactional data.
    */
@@ -434,7 +434,7 @@ public class Constants {
   /**
    * Broadcast variable which is needed to spread the precalculated employee map.
    */
-  public static final String EMPLOYEE_MAP_BC = "employeeMap";
+  public static final String BC_EMPLOYEES = "employeeIndex";
   /**
    * Broadcast variable which is needed to spread the precalculated product quality map.
    */

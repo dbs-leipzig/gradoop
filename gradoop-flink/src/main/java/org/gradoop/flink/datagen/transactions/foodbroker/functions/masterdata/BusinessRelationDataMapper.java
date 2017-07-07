@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
 
 /**
@@ -46,9 +46,9 @@ public class BusinessRelationDataMapper
    */
   @Override
   public Tuple2<GradoopId, BusinessRelationData> map(Vertex v) throws Exception {
-    reuseBusinessRelationData.setQuality(v.getPropertyValue(Constants.QUALITY_KEY).getFloat());
-    reuseBusinessRelationData.setCity(v.getPropertyValue(Constants.CITY_KEY).getString());
-    reuseBusinessRelationData.setHolding(v.getPropertyValue(Constants.HOLDING_KEY).getString());
+    reuseBusinessRelationData.setQuality(v.getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat());
+    reuseBusinessRelationData.setCity(v.getPropertyValue(FoodBrokerConstants.CITY_KEY).getString());
+    reuseBusinessRelationData.setHolding(v.getPropertyValue(FoodBrokerConstants.HOLDING_KEY).getString());
     return new Tuple2<>(v.getId(), reuseBusinessRelationData);
   }
 }

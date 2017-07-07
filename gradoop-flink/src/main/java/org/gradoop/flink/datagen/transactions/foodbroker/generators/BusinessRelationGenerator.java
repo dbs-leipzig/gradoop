@@ -16,7 +16,7 @@
 package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.codehaus.jettison.json.JSONException;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -86,7 +86,7 @@ public abstract class BusinessRelationGenerator  extends AbstractMasterDataGener
     }
     companies = companies.subList(0, companyCount);
     holdings = holdings.subList(0, holdingCount);
-    holdings.add(Constants.HOLDING_TYPE_PRIVATE);
+    holdings.add(FoodBrokerConstants.HOLDING_TYPE_PRIVATE);
   }
 
   public List<String> getCities() {

@@ -17,7 +17,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
@@ -44,7 +44,7 @@ public class EmployeeGenerator
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.EMPLOYEE_VERTEX_LABEL);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
     List<String> firstNamesFemale = foodBrokerConfig
@@ -56,10 +56,10 @@ public class EmployeeGenerator
 
     return env.fromCollection(seeds)
       .map(new Employee(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(firstNamesFemale), Constants.FIRST_NAMES_FEMALE_BC)
-      .withBroadcastSet(env.fromCollection(firstNamesMale), Constants.FIRST_NAMES_MALE_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Constants.LAST_NAMES_BC)
-      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(firstNamesFemale), FoodBrokerConstants.FIRST_NAMES_FEMALE_BC)
+      .withBroadcastSet(env.fromCollection(firstNamesMale), FoodBrokerConstants.FIRST_NAMES_MALE_BC)
+      .withBroadcastSet(env.fromCollection(nouns), FoodBrokerConstants.LAST_NAMES_BC)
+      .withBroadcastSet(env.fromCollection(cities), FoodBrokerConstants.CITIES_BC)
       .returns(vertexFactory.getType());
   }
 }
