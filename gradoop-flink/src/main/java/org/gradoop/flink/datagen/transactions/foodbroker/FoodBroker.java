@@ -17,22 +17,10 @@ package org.gradoop.flink.datagen.transactions.foodbroker;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdList;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdPair;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.UpdateGraphIds;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata
-  .MasterDataMapFromTuple;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata
-  .MasterDataQualityMapper;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.ProductPriceMapper;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.UserClients;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.EnsureGraphContainment;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.process.Brokerage;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.process.ComplaintHandling;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.CustomerGenerator;
@@ -43,18 +31,8 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenera
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-
-import java.math.BigDecimal;
-import java.util.Set;
 
 /**
  * Generates a GraphCollection containing a foodbrokerage and a complaint handling process.
@@ -130,7 +108,7 @@ public class FoodBroker implements GraphCollectionGenerator {
 
 
     // Phase 2.2: Run Complaint Handling
-    DataSet<Tuple2<GraphTransaction, Set<Vertex>>> casesCITMasterData = cases
+    cases = cases
       .map(new ComplaintHandling(
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
@@ -141,47 +119,8 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
       .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
 
-    cases = casesCITMasterData
-      .map(new Value0Of2<>());
-
-    // Phase 3: combine all data
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> transactionTriple = cases
-      .map(new GraphTransactionTriple());
-
-    DataSet<Vertex> transactionalVertices = transactionTriple
-      .flatMap(new TransactionVertices());
-
-    DataSet<Edge> transactionalEdges = transactionTriple
-      .flatMap(new TransactionEdges());
-
-    DataSet<GraphHead> graphHeads = transactionTriple
-      .map(new TransactionGraphHead());
-
-    // get the new master data which was generated in complaint handling
-    DataSet<Vertex> complaintHandlingMasterData = casesCITMasterData
-      .map(new Value1Of2<>())
-      .flatMap(new UserClients());
-
-    // combine all master data and set their graph ids
-    DataSet<Vertex> masterData = customers
-      .union(vendors)
-      .union(logistics)
-      .union(employees)
-      .union(products)
-      .union(complaintHandlingMasterData);
-
-    // extract all graph ids from edges and updated those master data graph ids with these where
-    // the master data vertex is the target
-    masterData = transactionalEdges
-      .map(new TargetGraphIdPair())
-      .groupBy(0)
-      .reduceGroup(new TargetGraphIdList())
-      .join(masterData)
-      .where(0).equalTo(new Id<>())
-      .with(new UpdateGraphIds());
-
-    DataSet<Vertex> vertices = masterData
-      .union(transactionalVertices);
+    cases = cases
+      .map(new EnsureGraphContainment());
 
     return cases;
   }

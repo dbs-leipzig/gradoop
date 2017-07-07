@@ -119,7 +119,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * List of all employees.
    */
-  private GradoopId[] employeeList;
+  protected GradoopId[] employeeList;
   /**
    * List of all product prices.
    */

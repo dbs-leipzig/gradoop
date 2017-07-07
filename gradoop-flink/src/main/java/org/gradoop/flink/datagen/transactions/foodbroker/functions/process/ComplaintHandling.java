@@ -45,15 +45,8 @@ import java.util.Set;
  * master data (user, clients).
  */
 public class ComplaintHandling extends AbstractProcess
-  implements MapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
-  /**
-   * List of employees. Used to create new user.
-   */
-  private List<Vertex> employees;
-  /**
-   * List of customers. Used to create new clients.
-   */
-  private List<Vertex> customers;
+  implements MapFunction<GraphTransaction, GraphTransaction> {
+
   /**
    * Map wich stores the vertex for each gradoop id.
    */
@@ -70,6 +63,7 @@ public class ComplaintHandling extends AbstractProcess
    * The sales order from one graph transaction.
    */
   private Vertex salesOrder;
+  private GraphTransaction graph;
 
   /**
    * Valued constructor.
@@ -88,12 +82,11 @@ public class ComplaintHandling extends AbstractProcess
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    employees = Lists.newArrayList(employeeIndex.values());
-    customers = Lists.newArrayList(customerIndex.values());
   }
 
   @Override
-  public Tuple2<GraphTransaction, Set<Vertex>> map(GraphTransaction graph) throws Exception {
+  public GraphTransaction map(GraphTransaction graph) throws Exception {
+    this.graph = graph;
 
     //init new maps
     vertexMap = Maps.newHashMap();
@@ -138,7 +131,7 @@ public class ComplaintHandling extends AbstractProcess
       }
     }
 
-    return new Tuple2<>(graph, getMasterData());
+    return graph;
   }
 
   /**
@@ -239,18 +232,20 @@ public class ComplaintHandling extends AbstractProcess
     properties.set(FoodBrokerConstants.PROBLEM_KEY, problem);
     properties.set(FoodBrokerConstants.ERPSONUM_KEY, salesOrder.getId().toString());
 
-    GradoopId employeeId = getNextEmployee();
+    GradoopId employeeId = getRandomEntryFromArray(employeeList);
+    Vertex employee = employeeIndex.get(employeeId);
+
     GradoopId customerId = getEdgeTargetId(FoodBrokerConstants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId());
 
     Vertex ticket = newVertex(label, properties);
 
     newEdge(FoodBrokerConstants.CONCERNS_EDGE_LABEL, ticket.getId(), salesOrder.getId());
     //new master data, user
-    Vertex user = getUserFromEmployeeId(employeeId);
+    Vertex user = getUserFromEmployee(employee);
     newEdge(FoodBrokerConstants.CREATEDBY_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, user
     employeeId = getNextEmployee();
-    user = getUserFromEmployeeId(employeeId);
+    user = getUserFromEmployee(employee);
     newEdge(FoodBrokerConstants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, client
     Vertex client = getClientFromCustomerId(customerId);
@@ -444,49 +439,18 @@ public class ComplaintHandling extends AbstractProcess
   }
 
   /**
-   * Returns the vertex to the given customer id.
-   *
-   * @param id gradoop id of the customer
-   * @return the vertex representing a customer
-   */
-  private Vertex getCustomerById(GradoopId id) {
-    for (Vertex vertex : customers) {
-      if (vertex.getId().equals(id)) {
-        return vertex;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns the vertex to the given employee id.
-   *
-   * @param id gradoop id of the employee
-   * @return the vertex representing an employee
-   */
-  private Vertex getEmployeeById(GradoopId id) {
-    for (Vertex vertex : employees) {
-      if (vertex.getId().equals(id)) {
-        return vertex;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Creates, if not already existing, and returns the corresponding user vertex to the given
    * employee id.
    *
-   * @param employeeId gradoop id of the employee
+   * @param employee gradoop id of the employee
    * @return the vertex representing an user
    */
-  private Vertex getUserFromEmployeeId(GradoopId employeeId) {
-    if (masterDataMap.containsKey(employeeId)) {
-      return masterDataMap.get(employeeId);
+  private Vertex getUserFromEmployee(Vertex employee) {
+    if (masterDataMap.containsKey(employee)) {
+      return masterDataMap.get(employee);
     } else {
       //create properties
       Properties properties;
-      Vertex employee = getEmployeeById(employeeId);
       properties = employee.getProperties();
       String sourceIdKey = properties.get(FoodBrokerConstants.SOURCEID_KEY).getString();
       sourceIdKey = sourceIdKey.replace(FoodBrokerConstants.EMPLOYEE_ACRONYM, FoodBrokerConstants.USER_ACRONYM);
@@ -499,10 +463,10 @@ public class ComplaintHandling extends AbstractProcess
       properties.set(FoodBrokerConstants.EMAIL_KEY, email);
       //create the vertex and store it in a map for fast access
       Vertex user = vertexFactory.createVertex(FoodBrokerConstants.USER_VERTEX_LABEL, properties, graphIds);
-      masterDataMap.put(employeeId, user);
+      masterDataMap.put(employee.getId(), user);
       userMap.put(user.getId(), user.getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat());
 
-      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
+      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, user.getId(), employee.getId());
       return user;
     }
   }
@@ -515,12 +479,14 @@ public class ComplaintHandling extends AbstractProcess
    * @return the vertex representing a client
    */
   private Vertex getClientFromCustomerId(GradoopId customerId) {
+    Vertex client;
+
     if (masterDataMap.containsKey(customerId)) {
-      return masterDataMap.get(customerId);
+      client = masterDataMap.get(customerId);
     } else {
       //create properties
       Properties properties;
-      Vertex customer = getCustomerById(customerId);
+      Vertex customer = graph.getVertexById(customerId);
       properties = customer.getProperties();
       String sourceIdKey = properties.get(FoodBrokerConstants.SOURCEID_KEY).getString();
       sourceIdKey = sourceIdKey.replace(FoodBrokerConstants.CUSTOMER_ACRONYM, FoodBrokerConstants.CLIENT_ACRONYM);
@@ -530,22 +496,14 @@ public class ComplaintHandling extends AbstractProcess
       properties.set(FoodBrokerConstants.CONTACTPHONE_KEY, "0123456789");
       properties.set(FoodBrokerConstants.ACCOUNT_KEY, "CL" + customer.getId().toString());
       //create the vertex and store it in a map for fast access
-      Vertex client = vertexFactory.createVertex(
+      client = vertexFactory.createVertex(
         FoodBrokerConstants.CLIENT_VERTEX_LABEL, properties, graphIds);
       masterDataMap.put(customerId, client);
 
       newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
-      return client;
     }
-  }
 
-  /**
-   * Returns set of vertices which contains all in this process created master data.
-   *
-   * @return set of vertices
-   */
-  private Set<Vertex> getMasterData() {
-    return Sets.newHashSet(masterDataMap.values());
+    return client;
   }
 
   /**
