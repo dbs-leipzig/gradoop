@@ -15,26 +15,29 @@
  */
 package org.gradoop.flink.datagen.transactions.foodbroker;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.codehaus.jettison.json.JSONException;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InNoGraph;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FoodBrokerTest extends GradoopFlinkTestBase {
 
@@ -141,19 +144,32 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
     FoodBroker foodBroker = new FoodBroker(getExecutionEnvironment(), getConfig(), config);
 
-    GraphCollection result10K = foodBroker.execute();
+    List<GraphTransaction> result10K = foodBroker.getTransactions().collect();
 
-    assertEquals(10000, result10K.getGraphHeads().count());
+    assertEquals(1000, result10K.size());
 
-    assertEquals(0, result10K
-      .getVertices()
-      .filter(new InNoGraph<>())
-      .count());
+    for (GraphTransaction graph : result10K) {
+      Set<GradoopId> vertexIds = Sets.newHashSetWithExpectedSize(graph.getVertices().size());
 
-    assertEquals(0, result10K
-      .getEdges()
-      .filter(new InNoGraph<>())
-      .count());
+      for (Vertex vertex : graph.getVertices()) {
+        vertexIds.add(vertex.getId());
+        assertTrue(vertex.getGraphIds().size() >= 1);
+      }
+
+      // EDGE CONSISTENCY
+
+      for (Edge edge : graph.getEdges()) {
+        assertTrue("graph does not contain source of " + edge.getLabel(),
+          vertexIds.contains(edge.getSourceId()));
+
+        if (!vertexIds.contains(edge.getTargetId())) {
+          System.out.println(graph.getVertexById(edge.getSourceId()));
+        }
+
+        assertTrue("graph does not contain target of " + edge.getLabel(),
+          vertexIds.contains(edge.getTargetId()));
+      }
+    }
   }
 
   @Test

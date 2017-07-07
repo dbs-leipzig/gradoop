@@ -174,6 +174,9 @@ public class ComplaintHandling extends AbstractProcess
         Vertex ticket = newTicket(
           FoodBrokerConstants.BADQUALITY_TICKET_PROBLEM,
           deliveryNote.getPropertyValue(FoodBrokerConstants.DATE_KEY).getLong());
+
+        graph.getVertices().add(ticket);
+
         grantSalesRefund(badSalesOrderLines, ticket);
         claimPurchRefund(currentPurchOrderLines, ticket);
       }
@@ -466,7 +469,10 @@ public class ComplaintHandling extends AbstractProcess
       masterDataMap.put(employee.getId(), user);
       userMap.put(user.getId(), user.getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat());
 
-      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, user.getId(), employee.getId());
+//      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, user.getId(), employee.getId());
+
+      graph.getVertices().add(user);
+
       return user;
     }
   }
@@ -500,8 +506,10 @@ public class ComplaintHandling extends AbstractProcess
         FoodBrokerConstants.CLIENT_VERTEX_LABEL, properties, graphIds);
       masterDataMap.put(customerId, client);
 
-      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
+//      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
     }
+
+    graph.getVertices().add(client);
 
     return client;
   }

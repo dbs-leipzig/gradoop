@@ -90,6 +90,11 @@ public class FoodBroker implements GraphCollectionGenerator {
   @Override
   public GraphCollection execute() {
 
+    return GraphCollection
+      .fromTransactions(new GraphTransactions(getTransactions(), gradoopFlinkConfig));
+  }
+
+  public DataSet<GraphTransaction> getTransactions() {
     // Phase 1: Create MasterData
     initMasterData();
 
@@ -118,6 +123,23 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(logistics, FoodBrokerConstants.BC_LOGISTICS)
       .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
       .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
+
+//    TODO:
+//    DataSet<Tuple2<String, GradoopId>> clientMapping = cases
+//      .flatMap(new GetVerticesByLabel(FoodBrokerConstants.CLIENT_VERTEX_LABEL))
+//      .map((MapFunction<Vertex, Tuple2<String, GradoopId>>) value ->
+//        new Tuple2<>(
+//          value.getPropertyValue(FoodBrokerConstants.ERPCUSTNUM_KEY).getString(), value.getId()))
+//      .groupBy(0)
+//      .first(1);
+//
+//    DataSet<Tuple2<String, GradoopId>> userMapping = cases
+//      .flatMap(new GetVerticesByLabel(FoodBrokerConstants.USER_VERTEX_LABEL))
+//      .map((MapFunction<Vertex, Tuple2<String, GradoopId>>) value ->
+//        new Tuple2<>(
+//          value.getPropertyValue(FoodBrokerConstants.ERPEMPLNUM_KEY).getString(), value.getId()))
+//      .groupBy(0)
+//      .first(1);
 
     cases = cases
       .map(new EnsureGraphContainment());
