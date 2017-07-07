@@ -543,7 +543,7 @@ public class Brokerage
     GradoopId operatedBy = getNextLogistic();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(logisticMap.get(operatedBy));
+    influencingMasterQuality.add(getQuality(logisticIndex, operatedBy));
     influencingMasterQuality.add(getEdgeTargetQuality(
       FoodBrokerConstants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), FoodBrokerConstants.BC_VENDORS));
 

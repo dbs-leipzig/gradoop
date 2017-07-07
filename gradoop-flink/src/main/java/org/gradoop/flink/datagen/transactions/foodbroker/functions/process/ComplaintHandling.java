@@ -166,7 +166,7 @@ public class ComplaintHandling extends AbstractProcess
       // increase relative influence of vendor and logistics
       for (int i = 1; i <= containedProducts / 2; i++) {
         influencingMasterQuality.add(getEdgeTargetQuality(
-          FoodBrokerConstants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), FoodBrokerConstants.LOGISTIC_MAP_BC));
+          FoodBrokerConstants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), FoodBrokerConstants.BC_LOGISTICS));
         influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerConstants.PLACEDAT_EDGE_LABEL,
           purchOrderId, FoodBrokerConstants.BC_VENDORS));
       }

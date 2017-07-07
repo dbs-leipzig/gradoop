@@ -62,7 +62,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the logistic quality of a given gradoop id.
    */
-  protected Map<GradoopId, Float> logisticMap;
+  protected Map<GradoopId, Vertex> logisticIndex;
   /**
    * Map to get the employee quality of a given gradoop id.
    */
@@ -159,20 +159,17 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     super.open(parameters);
     //get broadcasted maps
     customerIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_CUSTOMERS);
-
     vendorIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_VENDORS);
-
-    logisticMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(FoodBrokerConstants.LOGISTIC_MAP_BC).get(0);
-
+    logisticIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_LOGISTICS);
     employeeIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_EMPLOYEES);
 
     productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
       getBroadcastVariable(FoodBrokerConstants.PRODUCT_QUALITY_MAP_BC).get(0);
+
     //get the iterator of each map
     customerList = customerIndex.keySet().toArray(new GradoopId[customerIndex.keySet().size()]);
     vendorList = vendorIndex.keySet().toArray(new GradoopId[vendorIndex.keySet().size()]);
-    logisticList = logisticMap.keySet().toArray(new GradoopId[logisticMap.keySet().size()]);
+    logisticList = logisticIndex.keySet().toArray(new GradoopId[logisticIndex.keySet().size()]);
     employeeList = employeeIndex.keySet().toArray(new GradoopId[employeeIndex.keySet().size()]);
     productQualityList = productQualityMap.keySet()
       .toArray(new GradoopId[productQualityMap.keySet().size()]);
@@ -303,8 +300,8 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       return getQuality(customerIndex, target);
     case FoodBrokerConstants.BC_VENDORS:
       return getQuality(vendorIndex, target);
-    case FoodBrokerConstants.LOGISTIC_MAP_BC:
-      return logisticMap.get(target);
+    case FoodBrokerConstants.BC_LOGISTICS:
+      return getQuality(logisticIndex, target);
     case FoodBrokerConstants.BC_EMPLOYEES:
       return getQuality(employeeIndex, target);
     case FoodBrokerConstants.USER_MAP:
@@ -420,7 +417,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    * @return the next random logistic id
    */
   protected GradoopId getNextLogistic() {
-    return getRandomEntryFromArray(logisticList);
+    return getNextMasterData(this.logisticList, this.logisticIndex);
   }
 
   /**

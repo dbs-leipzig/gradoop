@@ -430,7 +430,7 @@ public class FoodBrokerConstants {
   /**
    * Broadcast variable which is needed to spread the precalculated logistic map.
    */
-  public static final String LOGISTIC_MAP_BC = "logisticMap";
+  public static final String BC_LOGISTICS = "logisticMap";
   /**
    * Broadcast variable which is needed to spread the precalculated employee map.
    */
