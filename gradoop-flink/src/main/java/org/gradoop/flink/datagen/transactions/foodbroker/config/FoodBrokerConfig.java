@@ -15,17 +15,17 @@
  */
 package org.gradoop.flink.datagen.transactions.foodbroker.config;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -46,34 +46,38 @@ public class FoodBrokerConfig implements Serializable {
   private Integer scaleFactor = 0;
 
   /**
-   * Path to the config file.
-   */
-  private String path;
-
-  /**
    * Valued constructor.
    *
-   * @param path path to config file
-   * @throws IOException
-   * @throws JSONException
+   * @param configString string representing a json object
    */
-  public FoodBrokerConfig(String path) throws IOException, JSONException {
-    this.path = path;
-    File file = FileUtils.getFile(path);
-    root = new JSONObject(FileUtils.readFileToString(file));
+  public FoodBrokerConfig(String configString) throws JSONException {
+    root = new JSONObject(configString);
   }
 
   /**
    * Valued factory method.
    *
-   * @param path path to config file
+   * @param configPath path to the config file
    * @return new FoodBrokerConfig
    * @throws IOException
    * @throws JSONException
    */
-  public static FoodBrokerConfig fromFile(String path) throws
-    IOException, JSONException {
-    return new FoodBrokerConfig(path);
+  public static FoodBrokerConfig fromFile(String configPath)
+    throws IOException, JSONException {
+    File file = FileUtils.getFile(configPath);
+    return new FoodBrokerConfig(FileUtils.readFileToString(file));
+  }
+
+  /**
+   * Valued factory method.
+   *
+   * @param configString string representing a json object
+   * @return new FoodBrokerConfig
+   * @throws JSONException
+   */
+  public static FoodBrokerConfig fromJSONString(String configString)
+    throws JSONException {
+    return new FoodBrokerConfig(configString);
   }
 
   /**
@@ -83,19 +87,14 @@ public class FoodBrokerConfig implements Serializable {
    * @return list of String
    */
   public List<String> getStringValuesFromFile(String fileName) {
-    List<String> values = null;
-    String adjectivesPath = null;
-    // get path relevant to the config file
-    Path parentDirectory = Paths.get(path).getParent();
-    if (parentDirectory != null) {
-      adjectivesPath = parentDirectory.toString() + "/" + fileName;
-    }
-    try {
-      values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
+    String value = "";
+
+    try (InputStream inputStream = this.getClass().getResourceAsStream("/foodbroker/" + fileName)) {
+      value = org.apache.commons.io.IOUtils.toString(inputStream, "UTF-8");
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return values;
+    return Lists.newArrayList(value.split("\n"));
   }
 
   /**
@@ -745,14 +744,5 @@ public class FoodBrokerConfig implements Serializable {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
     return delayDelayConfiguration(date, influencingMasterDataQualities, node, key);
-  }
-
-  /**
-   * Returns the path to the config file.
-   *
-   * @return path to config file
-   */
-  public String getPath() {
-    return path;
   }
 }

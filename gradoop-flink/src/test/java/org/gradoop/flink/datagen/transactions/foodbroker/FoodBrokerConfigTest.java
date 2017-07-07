@@ -16,9 +16,11 @@
 package org.gradoop.flink.datagen.transactions.foodbroker;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -34,7 +36,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetIntRangeConfigurationValue()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(0.33f, 0.01f);
     boolean higherIsBetter = true;
@@ -76,7 +79,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetDecimalVariationConfigurationValue()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(0.33f, 0.32f, 0.33f);
     boolean higherIsBetter = true;
@@ -108,7 +112,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testHappensTransitionConfiguration()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(0.50f, 0.82f);
     boolean higherIsBetter = true;
@@ -139,7 +144,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetValueHomogenInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(
       0.17f, 0.17f, 0.17f, 0.5f, 0.5f, 0.5f, 0.83f, 0.83f, 0.83f);
@@ -154,7 +160,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetValueHomogenInfluence2()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(
       0.17f, 0.17f, 0.83f, 0.83f);
@@ -169,7 +176,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetValueHomogenInfluence3()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(0.17f, 0.83f);
     boolean higherIsBetter = true;
@@ -184,7 +192,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetValueOnePositivInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(
       0.16f, 0.16f, 0.5f, 0.5f, 0.5f, 0.83f, 0.83f, 0.83f);
@@ -201,7 +210,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   public void testGetValueTwoPositivInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
-    TestFoodBrokerConfig config = new TestFoodBrokerConfig(configPath);
+    File file = FileUtils.getFile(configPath);
+    TestFoodBrokerConfig config = new TestFoodBrokerConfig(FileUtils.readFileToString(file));
 
     List<Float> influencingMasterData = Lists.newArrayList(0.01f, 0.99f, 0.99f, 0.99f);
     boolean higherIsBetter = true;
@@ -217,13 +227,14 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
     /**
      * Valued constructor.
      *
-     * @param path path to config file
+     * @param content config content
      * @throws IOException
      * @throws JSONException
      */
-    public TestFoodBrokerConfig(String path) throws IOException, JSONException {
-      super(path);
+    public TestFoodBrokerConfig(String content) throws IOException, JSONException {
+      super(content);
     }
+
 
     /**
      * {@inheritDoc}

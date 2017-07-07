@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Generator for vertices which represent vendors.
  */
-public class VendorGenerator extends AbstractMasterDataGenerator {
+public class VendorGenerator extends BusinessRelationGenerator {
 
   /**
    * Valued constructor.
@@ -44,25 +44,14 @@ public class VendorGenerator extends AbstractMasterDataGenerator {
   @Override
   public DataSet<Vertex> generate() {
     List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.VENDOR_VERTEX_LABEL);
-    List<String> cities = foodBrokerConfig
-      .getStringValuesFromFile("cities");
-    List<String> companies = foodBrokerConfig
-      .getStringValuesFromFile("companies");
-    List<String> holdings = foodBrokerConfig
-      .getStringValuesFromFile("holdings");
-    holdings.add(Constants.HOLDING_TYPE_PRIVATE);
-    List<String> adjectives = foodBrokerConfig
-      .getStringValuesFromFile("vendor.adjectives");
-    List<String> nouns = foodBrokerConfig
-      .getStringValuesFromFile("vendor.nouns");
-
+    loadData();
     return env.fromCollection(seeds)
       .map(new Vendor(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Constants.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
-      .withBroadcastSet(env.fromCollection(companies), Constants.COMPANIES_BC)
-      .withBroadcastSet(env.fromCollection(holdings), Constants.HOLDINGS_BC)
+      .withBroadcastSet(env.fromCollection(getAdjectives()), Constants.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(getNouns()), Constants.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(getCities()), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(getCompanies()), Constants.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(getHoldings()), Constants.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }
