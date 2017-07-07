@@ -33,7 +33,6 @@ import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -70,15 +69,8 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the product quality of a given gradoop id.
    */
-  protected Map<GradoopId, Float> productQualityMap;
-  /**
-   * Map to get the product price of a given gradoop id.
-   */
-  protected Map<GradoopId, BigDecimal> productPriceMap;
-  /**
-   * Iterator over all products.
-   */
-  protected Iterator<Map.Entry<GradoopId, BigDecimal>> productPriceIterator;
+  protected Map<GradoopId, Vertex> productIndex;
+
   /**
    * Graph ids, one seperate id for each case.
    */
@@ -107,7 +99,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Map to get the customer quality of a given gradoop id.
    */
-  private Map<GradoopId, Vertex> customerIndex;
+  protected Map<GradoopId, Vertex> customerIndex;
   /**
    * Map to get the vendor quality of a given gradoop id.
    */
@@ -131,7 +123,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * List of all product prices.
    */
-  private GradoopId[] productQualityList;
+  private GradoopId[] productList;
 
   /**
    * Valued constructor.
@@ -163,16 +155,15 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     logisticIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_LOGISTICS);
     employeeIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_EMPLOYEES);
 
-    productQualityMap = getRuntimeContext().<Map<GradoopId, Float>>
-      getBroadcastVariable(FoodBrokerConstants.PRODUCT_QUALITY_MAP_BC).get(0);
+    productIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_PRODUCTS);
 
     //get the iterator of each map
     customerList = customerIndex.keySet().toArray(new GradoopId[customerIndex.keySet().size()]);
     vendorList = vendorIndex.keySet().toArray(new GradoopId[vendorIndex.keySet().size()]);
     logisticList = logisticIndex.keySet().toArray(new GradoopId[logisticIndex.keySet().size()]);
     employeeList = employeeIndex.keySet().toArray(new GradoopId[employeeIndex.keySet().size()]);
-    productQualityList = productQualityMap.keySet()
-      .toArray(new GradoopId[productQualityMap.keySet().size()]);
+    productList = productIndex.keySet()
+      .toArray(new GradoopId[productIndex.keySet().size()]);
   }
 
   private Map<GradoopId, Vertex> createIndexFromBroadcast(String broadcastVariable) {
@@ -441,7 +432,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    * @return the next random product id
    */
   protected GradoopId getNextProduct() {
-    return getRandomEntryFromArray(productQualityList);
+    return getNextMasterData(this.productList, this.productIndex);
   }
 
   /**
@@ -464,5 +455,9 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       edges.addAll(entry.getValue());
     }
     return edges;
+  }
+
+  protected BigDecimal getPrice(GradoopId id) {
+    return productIndex.get(id).getPropertyValue(FoodBrokerConstants.PRICE_KEY).getBigDecimal();
   }
 }

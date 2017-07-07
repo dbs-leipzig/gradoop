@@ -436,13 +436,9 @@ public class FoodBrokerConstants {
    */
   public static final String BC_EMPLOYEES = "employeeIndex";
   /**
-   * Broadcast variable which is needed to spread the precalculated product quality map.
-   */
-  public static final String PRODUCT_QUALITY_MAP_BC = "productQualityMap";
-  /**
    * Broadcast variable which is needed to spread the precalculated product price map.
    */
-  public static final String PRODUCT_PRICE_MAP_BC = "productPriceMap";
+  public static final String BC_PRODUCTS = "productPriceMap";
   /**
    * Used to select the map which is then used to get the object from a gradoop id.
    */

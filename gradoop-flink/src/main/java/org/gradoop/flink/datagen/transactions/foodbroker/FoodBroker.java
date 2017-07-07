@@ -19,7 +19,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -55,7 +54,6 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -97,16 +95,6 @@ public class FoodBroker implements GraphCollectionGenerator {
   private DataSet<Vertex> products;
 
   /**
-   * Set which contains one map from the gradoop id to the quality of a product vertex.
-   */
-  private DataSet<Map<GradoopId, Float>> productsQualityMap;
-  /**
-   * Set which contains one map from the gradoop id to the price of a product vertex.
-   */
-  private DataSet<Map<GradoopId, BigDecimal>> productsPriceMap;
-
-
-  /**
    * Valued constructor.
    *
    * @param env execution environment
@@ -138,8 +126,7 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(vendors, FoodBrokerConstants.BC_VENDORS)
       .withBroadcastSet(logistics, FoodBrokerConstants.BC_LOGISTICS)
       .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
-      .withBroadcastSet(productsQualityMap, FoodBrokerConstants.PRODUCT_QUALITY_MAP_BC)
-      .withBroadcastSet(productsPriceMap, FoodBrokerConstants.PRODUCT_PRICE_MAP_BC);
+      .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
 
 
     // Phase 2.2: Run Complaint Handling
@@ -152,9 +139,7 @@ public class FoodBroker implements GraphCollectionGenerator {
       .withBroadcastSet(vendors, FoodBrokerConstants.BC_VENDORS)
       .withBroadcastSet(logistics, FoodBrokerConstants.BC_LOGISTICS)
       .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
-      .withBroadcastSet(productsQualityMap, FoodBrokerConstants.PRODUCT_QUALITY_MAP_BC)
-      .withBroadcastSet(employees, FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL)
-      .withBroadcastSet(customers, FoodBrokerConstants.CUSTOMER_VERTEX_LABEL);
+      .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
 
     cases = casesCITMasterData
       .map(new Value0Of2<>());
@@ -215,16 +200,6 @@ public class FoodBroker implements GraphCollectionGenerator {
     logistics = new LogisticsGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
     employees = new EmployeeGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
     products = new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-
-    // reduce all master data objects to their id and their quality value
-
-    productsQualityMap = products
-      .map(new MasterDataQualityMapper())
-      .reduceGroup(new MasterDataMapFromTuple<Float>());
-    productsPriceMap = products
-      .map(new ProductPriceMapper())
-      .reduceGroup(new MasterDataMapFromTuple<BigDecimal>());
-
   }
 
 }

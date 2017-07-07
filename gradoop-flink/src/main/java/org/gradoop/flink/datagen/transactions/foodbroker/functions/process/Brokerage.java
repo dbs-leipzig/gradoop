@@ -18,7 +18,6 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.process;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
@@ -58,17 +57,6 @@ public class Brokerage
     EPGMVertexFactory<Vertex> vertexFactory, EPGMEdgeFactory<Edge> edgeFactory,
     FoodBrokerConfig config) {
     super(graphHeadFactory, vertexFactory, edgeFactory, config);
-  }
-
-
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    super.open(parameters);
-
-    productPriceMap = getRuntimeContext().<Map<GradoopId, BigDecimal>>
-      getBroadcastVariable(FoodBrokerConstants.PRODUCT_PRICE_MAP_BC).get(0);
-
-    productPriceIterator = productPriceMap.entrySet().iterator();
   }
 
   @Override
@@ -239,7 +227,7 @@ public class Brokerage
       getEdgeTargetQuality(employee, FoodBrokerConstants.BC_EMPLOYEES) * additionalInfluence);
     influencingMasterQuality.add(
       getEdgeTargetQuality(customer, FoodBrokerConstants.BC_CUSTOMERS) * additionalInfluence);
-    influencingMasterQuality.add(productQualityMap.get(product));
+    influencingMasterQuality.add(getQuality(productIndex, product));
 
     // calculate and set the lines properties
     BigDecimal salesMargin = config.getDecimalVariationConfigurationValue(
@@ -252,17 +240,18 @@ public class Brokerage
       FoodBrokerConstants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
     properties.set(FoodBrokerConstants.SUPERTYPE_KEY, FoodBrokerConstants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(FoodBrokerConstants.PURCHPRICE_KEY, productPriceMap.get(product));
+    properties.set(FoodBrokerConstants.PURCHPRICE_KEY, getPrice(product));
     properties.set(FoodBrokerConstants.SALESPRICE_KEY,
       salesMargin
         .add(BigDecimal.ONE)
-        .multiply(productPriceMap.get(product))
+        .multiply(getPrice(product))
         .setScale(2, BigDecimal.ROUND_HALF_UP)
     );
     properties.set(FoodBrokerConstants.QUANTITY_KEY, quantity);
 
     return newEdge(label, salesQuotation.getId(), product, properties);
   }
+
 
   /**
    * Creates a sales order for a confirmed sales quotation.
@@ -470,7 +459,7 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    BigDecimal price = productPriceMap.get(salesOrderLine.getTargetId());
+    BigDecimal price = getPrice(salesOrderLine.getTargetId());
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
 

@@ -88,8 +88,8 @@ public class ComplaintHandling extends AbstractProcess
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    employees = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL);
-    customers = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.CUSTOMER_VERTEX_LABEL);
+    employees = Lists.newArrayList(employeeIndex.values());
+    customers = Lists.newArrayList(customerIndex.values());
   }
 
   @Override
@@ -160,7 +160,7 @@ public class ComplaintHandling extends AbstractProcess
       currentPurchOrderLines = getPurchOrderLinesByPurchOrder(purchOrderId);
 
       for (Edge purchOrderLine : currentPurchOrderLines) {
-        influencingMasterQuality.add(productQualityMap.get(purchOrderLine.getTargetId()));
+        influencingMasterQuality.add(getQuality(productIndex, purchOrderLine.getTargetId()));
       }
       int containedProducts = influencingMasterQuality.size();
       // increase relative influence of vendor and logistics
