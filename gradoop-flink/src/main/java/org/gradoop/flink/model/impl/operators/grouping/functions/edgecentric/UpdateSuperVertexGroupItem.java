@@ -77,7 +77,6 @@ public class UpdateSuperVertexGroupItem
     orderedSet.clear();
     label.setLength(0);
     boolean isFirst = true;
-    boolean duplicate;
     Vertex vertex;
     // the super vertex group items are all the same and only the first is needed
     SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
@@ -89,18 +88,15 @@ public class UpdateSuperVertexGroupItem
     for (SuperVertexIdWithVertex superVertexIdWithVertex : orderedSet) {
       vertex = superVertexIdWithVertex.getVertex();
 
-      duplicate = usedVertices.contains(vertex.getId());
       // build the new super vertex label
       if (useLabel()) {
-        if (!duplicate) {
-          if (!isFirst) {
-            label.append(Grouping.LABEL_SEPARATOR);
-          }
-          label.append(vertex.getLabel());
+        if (!isFirst) {
+          label.append(Grouping.LABEL_SEPARATOR);
         }
+        label.append(vertex.getLabel());
       }
       // aggregate the values of each vertex which is assigned to the super vertex
-      if (doAggregate(superVertexGroupItem.getLabelGroup().getAggregators()) && !duplicate) {
+      if (doAggregate(superVertexGroupItem.getLabelGroup().getAggregators())) {
         aggregate(
           getAggregateValues(vertex, superVertexGroupItem.getLabelGroup().getAggregators()),
           superVertexGroupItem.getLabelGroup().getAggregators());
