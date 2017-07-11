@@ -78,7 +78,7 @@ public class BuildSuperEdges
       }
     }
 
-    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getEdgeId(), sourceId, targetId);
+    Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getSuperEdgeId(), sourceId, targetId);
 
     superEdge.setLabel(superEdgeGroupItem.getGroupLabel());
     setGroupProperties(

@@ -63,6 +63,10 @@ public class SuperEdgeGroupItem
     f1 = superEdgeId;
   }
 
+  public GradoopId getSuperEdgeId() {
+    return f1;
+  }
+
   public Set<GradoopId> getSourceIds() {
     return f2;
   }

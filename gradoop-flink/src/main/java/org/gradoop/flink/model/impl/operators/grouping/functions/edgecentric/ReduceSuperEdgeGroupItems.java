@@ -99,7 +99,7 @@ public class ReduceSuperEdgeGroupItems
       }
       if (isFirst) {
         setReuseSuperEdgeGroupItem(groupItem);
-        getReuseSuperEdgeGroupItem().setEdgeId(GradoopId.get());
+        getReuseSuperEdgeGroupItem().setSuperEdgeId(GradoopId.get());
         isFirst = false;
       }
       if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
