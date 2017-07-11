@@ -22,14 +22,10 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
 
-import java.util.List;
 import java.util.Set;
 
-/**
+  /**
    * Reduces a group of {@link SuperEdgeGroupItem} instances.
    */
  // @FunctionAnnotation.ForwardedFields(
@@ -40,8 +36,6 @@ import java.util.Set;
   public class ReduceSuperEdgeGroupItems
     extends ReduceSuperEdgeGroupItemBase
     implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {
-
-    private SuperEdgeGroupItem reuseSuperEdgeGroupItem;
 
     /**
      * Creates group reduce function.
@@ -87,21 +81,23 @@ import java.util.Set;
           targets.add(groupItem.getTargetId());
         }
         if (isFirst) {
-          reuseSuperEdgeGroupItem = groupItem;
-          reuseSuperEdgeGroupItem.setEdgeId(GradoopId.get());
+          setReuseSuperEdgeGroupItem(groupItem);
+          getReuseSuperEdgeGroupItem().setEdgeId(GradoopId.get());
           isFirst = false;
         }
         if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-          aggregate(groupItem.getAggregateValues(), reuseSuperEdgeGroupItem.getLabelGroup().getAggregators());
+          aggregate(
+            groupItem.getAggregateValues(),
+            getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
         }
 
       }
       // collect single item representing the whole group
-      reuseSuperEdgeGroupItem.setSourceIds(sources);
-      reuseSuperEdgeGroupItem.setTargetIds(targets);
-      reuseSuperEdgeGroupItem.setAggregateValues(getAggregateValues(reuseSuperEdgeGroupItem.getLabelGroup()
-        .getAggregators()));
-      resetAggregators(reuseSuperEdgeGroupItem.getLabelGroup().getAggregators());
-      collector.collect(reuseSuperEdgeGroupItem);
+      getReuseSuperEdgeGroupItem().setSourceIds(sources);
+      getReuseSuperEdgeGroupItem().setTargetIds(targets);
+      getReuseSuperEdgeGroupItem().setAggregateValues(
+        getAggregateValues(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators()));
+      resetAggregators(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
+      collector.collect(getReuseSuperEdgeGroupItem());
     }
   }
