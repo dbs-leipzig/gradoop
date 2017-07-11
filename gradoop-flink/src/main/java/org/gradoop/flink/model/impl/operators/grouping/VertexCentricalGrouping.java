@@ -37,29 +37,64 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.T
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
 import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * A vertex centrical grouping where the vertices are grouped first and are represented by a
+ * super vertex. Additionally new super edges are created based on the edges of the
+ * original vertices.
  */
 public class VertexCentricalGrouping extends CentricalGrouping {
 
-
+  /**
+   * Creates grouping operator instance.
+   *
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param groupingStrategy  grouping strategy
+   */
   public VertexCentricalGrouping(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups,
-    GroupingStrategy groupingStrategy
-  ) {
+    GroupingStrategy groupingStrategy) {
     super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, groupingStrategy);
 
-    Objects.requireNonNull(getGroupingStrategy(), "missing vertex grouping strategy");
+    Objects.requireNonNull(getGroupingStrategy(), "Missing vertex grouping strategy.");
   }
 
+  /**
+   * Grouping implementation that uses group + groupReduce for building super
+   * vertices and updating the original vertices.
+   *
+   * Algorithmic idea:
+   *
+   * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
+   * 2) Group vertices on label and/or property.
+   * 3) Create a super vertex id for each group and collect a non-candidate
+   *    {@link VertexGroupItem} for each group element and one additional
+   *    super vertex tuple that holds the group aggregate.
+   * 4) Filter output of 3)
+   *    a) non-candidate tuples are mapped to {@link VertexWithSuperVertex}
+   *    b) super vertex tuples are used to build final super vertices
+   * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
+   * 6) Join edges with output of 4a) and replace source/target id with super
+   *    vertex id.
+   * 7) Updated edges are grouped by source and target id and optionally by label
+   *    and/or edge property.
+   * 8) Group combine on the workers and compute aggregate.
+   * 9) Group reduce globally and create final super edges.
+   *
+   * @param graph input graph
+   * @return grouped output graph
+   */
   protected LogicalGraph groupReduce(LogicalGraph graph) {
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
@@ -88,6 +123,35 @@ public class VertexCentricalGrouping extends CentricalGrouping {
     return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
+  /**
+   * Grouping implementation that uses group + groupCombine + groupReduce for
+   * building super vertices and updating the original vertices.
+   *
+   * Algorithmic idea:
+   *
+   * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
+   * 2) Group vertices on label and/or property
+   * 3) Use groupCombine to process the grouped partitions. Creates a super vertex
+   *    tuple for each group partition, including the local aggregates.
+   *    Update each vertex tuple with their super vertex id and forward them.
+   * 4) Filter output of 3)
+   *    a) super vertex tuples are filtered, grouped and merged via groupReduce to
+   *       create a final super vertex representing the group. An additional
+   *       mapping from the final super vertex id to the super vertex ids of the
+   *       original partitions is also created.
+   *    b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
+   *       the broadcasted mapping output of 4a)
+   * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
+   * 6) Join edges with output of 4b) and replace source/target id with super
+   *    vertex id.
+   * 7) Updated edges are grouped by source and target id and optionally by label
+   *    and/or edge property.
+   * 8) Group combine on the workers and compute aggregate.
+   * 9) Group reduce globally and create final super edges.
+   *
+   * @param graph input graph
+   * @return grouped output graph
+   */
   protected LogicalGraph groupCombine(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()

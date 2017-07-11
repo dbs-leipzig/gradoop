@@ -23,13 +23,32 @@ import org.apache.flink.api.java.tuple.Tuple;
 import java.util.TreeSet;
 import java.util.Set;
 
-
+/**
+ * Creates a key of a tuple based on specified fields. To support sets as a key the sets elements
+ * are ordered and the ordered elements hash codes are concatenated.
+ * @param <T>
+ * @param <E>
+ */
 public class SetInTupleKeySelector<T extends Tuple, E> implements KeySelector<T, String> {
 
+  /**
+   * String builder to concatenate the hash codes.
+   */
   private final StringBuilder sb;
+  /**
+   * Ordered set.
+   */
   private final TreeSet<E> sortedSet;
+  /**
+   * Fields which specify the key.
+   */
   private final int[] fields;
 
+  /**
+   * Valued constructor.
+   *
+   * @param fields fields of the tuple which shall be used to generate the key
+   */
   public SetInTupleKeySelector(int... fields) {
     this.fields = fields;
     sb = new StringBuilder();
@@ -39,7 +58,6 @@ public class SetInTupleKeySelector<T extends Tuple, E> implements KeySelector<T,
   @Override
   public String getKey(T tuple) throws Exception {
     sb.setLength(0);
-
     for (int i = 0; i < fields.length; i++) {
       if (Set.class.isInstance(tuple.getField(fields[i]))) {
         sortedSet.clear();

@@ -84,10 +84,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
    */
   public static final String LABEL_SYMBOL = ":label";
-
+  /**
+   * Used as property key to declare a source based edge centric grouping.
+   */
   public static final String SOURCE_SYMBOL = ":source";
-
+  /**
+   * Used as property key to declare a target based edge centric grouping.
+   */
   public static final String TARGET_SYMBOL = ":target";
+  /**
+   * Defines the default label separator between aggregated labels in edge centric grouping.
+   */
+  public static final String LABEL_SEPARATOR = "";
   /**
    * Used to verify if a grouping key is used for all vertices.
    */
@@ -255,6 +263,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * target specific or both.
    *
    * @param groupSuperEdges dataset containing edge representation for grouping
+   * @param sourceSpecific true if the source vertex shall be considered for grouping
+   * @param targetSpecific true if the target vertex shall be considered for grouping
    * @return unsorted edge grouping
    */
   protected UnsortedGrouping<SuperEdgeGroupItem> groupSuperEdges(

@@ -21,9 +21,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
+/**
+ * Assigns each super vertex id to all vertices the super vertex represents. This tuple is also
+ * comparable based on the labels of the vertex.
+ */
 public class SuperVertexIdWithVertex
   extends Tuple2<GradoopId, Vertex>
-  implements Comparable<SuperVertexIdWithVertex>{
+  implements Comparable<SuperVertexIdWithVertex> {
 
   public void setSuperVertexid(GradoopId gradoopId) {
     f0 = gradoopId;

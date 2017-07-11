@@ -17,34 +17,33 @@
 
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Base class for reducer/combiner implementations on edges.
  */
 abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
+
   /**
-   * Reduce instantiations
+   * Reduce object instantiation.
    */
-  private final SuperEdgeGroupItem reuseSuperEdgeGroupItem;
-
+  private SuperEdgeGroupItem reuseSuperEdgeGroupItem;
+  /**
+   * True if the source shall be considered for grouping.
+   */
   private boolean sourceSpecificGrouping;
-
+  /**
+   * True if the target shall be considered for grouping.
+   */
   private boolean targetSpecificGrouping;
 
   /**
    * Creates build base.
    *
-   * @param useLabel          true, if element label shall be used for grouping
+   * @param useLabel true, if element label shall be used for grouping
+   * @param sourceSpecificGrouping true if the source vertex shall be considered for grouping
+   * @param targetSpecificGrouping true if the target vertex shall be considered for grouping
    */
   protected ReduceSuperEdgeGroupItemBase(boolean useLabel, boolean sourceSpecificGrouping,
     boolean targetSpecificGrouping) {
@@ -58,6 +57,9 @@ abstract class ReduceSuperEdgeGroupItemBase extends BuildBase {
     return this.reuseSuperEdgeGroupItem;
   }
 
+  public void setReuseSuperEdgeGroupItem(SuperEdgeGroupItem reuseSuperEdgeGroupItem) {
+    this.reuseSuperEdgeGroupItem = reuseSuperEdgeGroupItem;
+  }
 
   protected boolean isSourceSpecificGrouping() {
     return sourceSpecificGrouping;

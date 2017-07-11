@@ -34,6 +34,7 @@ import java.util.Set;
  * f3: vertex group label
  * f4: vertex group property values
  * f5: vertex group aggregate values
+ * f6: vertex label group
  */
 public class SuperVertexGroupItem
   extends Tuple7<Set<GradoopId>, GradoopId, GradoopId, String, PropertyValueList,
@@ -64,10 +65,12 @@ public class SuperVertexGroupItem
     f2 = edgeId;
   }
 
+  @Override
   public String getGroupLabel() {
     return f3;
   }
 
+  @Override
   public void setGroupLabel(String groupLabel) {
     f3 = groupLabel;
   }
@@ -82,18 +85,22 @@ public class SuperVertexGroupItem
     f6 = labelGroup;
   }
 
+  @Override
   public PropertyValueList getGroupingValues() {
     return f4;
   }
 
+  @Override
   public void setGroupingValues(PropertyValueList groupPropertyValues) {
     f4 = groupPropertyValues;
   }
 
+  @Override
   public PropertyValueList getAggregateValues() {
     return f5;
   }
 
+  @Override
   public void setAggregateValues(PropertyValueList value) {
     this.f5 = value;
   }

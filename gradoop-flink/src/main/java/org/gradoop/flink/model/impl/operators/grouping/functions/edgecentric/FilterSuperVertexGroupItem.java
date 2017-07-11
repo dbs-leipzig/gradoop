@@ -48,7 +48,7 @@ public class FilterSuperVertexGroupItem implements FilterFunction<SuperVertexGro
   @Override
   public boolean filter(SuperVertexGroupItem superVertexGroupItem) throws Exception {
     if (filterConcatenatedSuperVertices) {
-      return (superVertexGroupItem.getVertexIds().size() > 1);
+      return superVertexGroupItem.getVertexIds().size() > 1;
     } else {
       // the only element in the set of super vertex ids is the vertex id itself
       return (superVertexGroupItem.getVertexIds().size() == 1) &&

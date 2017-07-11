@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
 import java.util.List;
 
 /**
- * Returns a tuple which assigns each source/target set of gradoop ids the edge id.
+ * Returns tuples which assigns each source/target set of gradoop ids the edge id.
  */
 public class PrepareSuperVertexGroupItem
   extends BuildGroupItemBase
@@ -42,12 +42,14 @@ public class PrepareSuperVertexGroupItem
 
   /**
    * Constructor to initialize object.
+   *
+   * @param useLabel true, if vertex label shall be considered
+   * @param labelGroups all vertex label groups
    */
   public PrepareSuperVertexGroupItem(boolean useLabel, List<LabelGroup> labelGroups) {
     super(useLabel, labelGroups);
     reuseSuperVertexGroupItem = new SuperVertexGroupItem();
     reuseSuperVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
-//    reuseSuperVertexGroupItem.setGroupLabel("");
     reuseSuperVertexGroupItem.setGroupingValues(PropertyValueList.createEmptyList());
     reuseSuperVertexGroupItem.setAggregateValues(PropertyValueList.createEmptyList());
     reuseSuperVertexGroupItem.setLabelGroup(getDefaultLabelGroup());

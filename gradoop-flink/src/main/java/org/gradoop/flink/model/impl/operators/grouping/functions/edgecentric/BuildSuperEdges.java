@@ -39,7 +39,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
 @FunctionAnnotation.ReadFields("f1;f4;f5;f6")
 public class BuildSuperEdges
   extends BuildBase
-  implements CoGroupFunction<SuperEdgeGroupItem, SuperVertexGroupItem, Edge>, ResultTypeQueryable<Edge> {
+  implements CoGroupFunction<
+    SuperEdgeGroupItem, SuperVertexGroupItem, Edge>, ResultTypeQueryable<Edge> {
 
   /**
    * Edge edgeFactory.
@@ -49,7 +50,8 @@ public class BuildSuperEdges
   /**
    * Creates map function.
    *
-   * @param useLabel          true, if vertex label shall be considered
+   * @param useLabel true, if vertex label shall be considered
+   * @param edgeFactory edge factory
    */
   public BuildSuperEdges(boolean useLabel, EdgeFactory edgeFactory) {
     super(useLabel);
@@ -62,13 +64,16 @@ public class BuildSuperEdges
     Iterable<SuperVertexGroupItem> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
     Exception {
 
-    // only one Edge per id
+    // only one edge per id
     SuperEdgeGroupItem superEdgeGroupItem = superEdgeGroupItems.iterator().next();
 
     GradoopId sourceId = null;
     GradoopId targetId = null;
 
+    // set the correct super vertex id as source or target id
     for (SuperVertexGroupItem superVertexGroupItem : vertexWithSuperVertexAndEdges) {
+      // check if the collection of source/target ids of vertices of the edge group item is equal
+      // to the one represented by the super vertex item and take its id
       if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getSourceIds())) {
         sourceId = superVertexGroupItem.f1;
       } else if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getTargetIds())) {
@@ -79,7 +84,10 @@ public class BuildSuperEdges
     Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getEdgeId(), sourceId, targetId);
 
     superEdge.setLabel(superEdgeGroupItem.getGroupLabel());
-    setGroupProperties(superEdge, superEdgeGroupItem.getGroupingValues(), superEdgeGroupItem.getLabelGroup());
+    setGroupProperties(
+      superEdge,
+      superEdgeGroupItem.getGroupingValues(),
+      superEdgeGroupItem.getLabelGroup());
     setAggregateValues(
       superEdge,
       superEdgeGroupItem.getAggregateValues(),

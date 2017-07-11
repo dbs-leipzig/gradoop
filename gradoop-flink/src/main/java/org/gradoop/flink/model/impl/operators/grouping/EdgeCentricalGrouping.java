@@ -24,7 +24,16 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.*;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperEdges;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertexIdWithVertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildVertexWithSuperVertexFromItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.FilterSuperVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.PrepareSuperEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.PrepareSuperVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.ReduceSuperEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.UpdateSuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators.SetInTupleKeySelector;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
@@ -34,7 +43,9 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import java.util.List;
 
 /**
- *
+ * An edge centrical grouping where the edges are grouped first and are represented by a
+ * super edge. Additionally new super vertices are created based on the vertices of the original
+ * edges. In this case it is possible that a super vertex represents different types of vertices.
  */
 public class EdgeCentricalGrouping extends CentricalGrouping {
 
@@ -53,6 +64,8 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
    *
    * @param useVertexLabels         group on vertex label true/false
    * @param useEdgeLabels           group on edge label true/false
+   * @param vertexLabelGroups       stores grouping properties for vertex labels
+   * @param edgeLabelGroups         stores grouping properties for edge labels
    * @param groupingStrategy        group by vertices or edges
    * @param sourceSpecificGrouping  set true to consider source on grouping
    * @param targetSpecificGrouping  set true to consider target on grouping
@@ -64,8 +77,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     List<LabelGroup> edgeLabelGroups,
     GroupingStrategy groupingStrategy,
     boolean sourceSpecificGrouping,
-    boolean targetSpecificGrouping
-  ) {
+    boolean targetSpecificGrouping) {
     super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, groupingStrategy);
 
     this.sourceSpecificGrouping = sourceSpecificGrouping;
@@ -73,7 +85,31 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
   }
 
   /**
-   * {@inheritDoc}
+   * Grouping implementation that uses group + groupReduce for building super
+   * vertices and updating the original vertices.
+   *
+   * Algorithmic idea:
+   *
+   * 1) Map edges to a minimal representation, i.e. {@link SuperEdgeGroupItem}.
+   * 2) Group edges on label and/or property and/or their source vertex and/or their target vertex
+   * 3) Prepare minimal super vertex representations, i.e. {@link SuperVertexGroupItem} and
+   *    group them based on the vertices they represent. If a super vertex represents multiple
+   *    vertices create a new super vertex id, but if it represents only one vertex the keep the id.
+   * 4) Cogroup the {@link SuperEdgeGroupItem} with the {@link SuperVertexGroupItem} based on the
+   *    registered super edge id in both items and create the super edge with the corresponding
+   *    super vertex ids as source/target.
+   * 5) Filter those {@link SuperVertexGroupItem} where the vertex is its own super vertex and
+   *    join them with the corresponding vertex from the input graph.
+   * 6) Filter the {@link SuperVertexGroupItem} which represent multiple vertices.
+   * 7) And assign the super vertex id to each of these vertex ids.
+   * 8) Cogroup the {@link SuperVertexGroupItem}s with the represented vertices taken by a join
+   *    of the result of 7) with the graphs vertices and aggregate the vertex properties and
+   *    concatenate the label.
+   * 9) Union the vertices which are their own super vertex with new created super vertices based
+   *    on the {@link SuperVertexGroupItem}s.
+   *
+   * @param graph input graph
+   * @return grouped output graph
    */
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
@@ -121,15 +157,19 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .equalTo(new Id<>())
       .with(new RightSide<>());
 
-    // get for a super vertex id each single relevant vertex id
+    // keep only super vertices which represent multiple vertices
+    superVertexGroupItems = superVertexGroupItems
+      .filter(new FilterSuperVertexGroupItem(true));
+
+    // get each single relevant vertex id for a super vertex id
     DataSet<VertexWithSuperVertex> vertexWithSuper = superVertexGroupItems
-      // only real super vertices
-      .filter(new FilterSuperVertexGroupItem(true))
       // assign the vertex ids
       .flatMap(new BuildVertexWithSuperVertexFromItem());
 
+
     superVertexGroupItems = superVertexGroupItems
-      // take all vertices by their id, which is stored in the super vertex group item
+      // take all vertices by their id, which is stored in the super vertex group item, and
+      // assigns them to the super vertex id
       .coGroup(vertexWithSuper
         .join(graph.getVertices())
         .where(0).equalTo(new Id<>())
@@ -139,8 +179,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .with(new UpdateSuperVertexGroupItem(useVertexLabels()));
 
     DataSet<Vertex> superVertices = superVertexGroupItems
-      // take super vertex ids where vertex is not its own super vertex
-      .filter(new FilterSuperVertexGroupItem(true))
       // and create the vertex element
       .map(new BuildSuperVertices(useVertexLabels(), config.getVertexFactory()))
       // union with vertices which stay as they are

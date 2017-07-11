@@ -241,9 +241,11 @@ public abstract class BuildBase implements Serializable {
    * is set to {@code PropertyValue.NULL_VALUE}.
    *
    * @param attributed EPGM attributed element
+   * @param groupPropertyKeys group property keys
    * @return property value list
    */
-  protected PropertyValueList getGroupProperties(EPGMAttributed attributed, List<String> groupPropertyKeys)
+  protected PropertyValueList getGroupProperties(
+    EPGMAttributed attributed, List<String> groupPropertyKeys)
     throws IOException {
     List<PropertyValue> values =
       Lists.newArrayListWithCapacity(attributed.getPropertyCount());

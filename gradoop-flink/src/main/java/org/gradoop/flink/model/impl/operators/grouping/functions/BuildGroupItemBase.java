@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;

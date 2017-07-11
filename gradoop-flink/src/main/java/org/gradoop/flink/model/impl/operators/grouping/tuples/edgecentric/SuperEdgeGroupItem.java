@@ -36,12 +36,16 @@ import java.util.Set;
  * f4: edge group label
  * f5: edge group property values
  * f6: edge group aggregate values
+ * f7: edge label group
  */
 public class SuperEdgeGroupItem
   extends Tuple8<GradoopId, GradoopId, Set<GradoopId>, Set<GradoopId>, String, PropertyValueList,
     PropertyValueList, LabelGroup>
   implements GroupItem {
 
+  /**
+   * Constructor to initialize sets.
+   */
   public SuperEdgeGroupItem() {
     f2 = Sets.newHashSet();
     f3 = Sets.newHashSet();
@@ -53,10 +57,6 @@ public class SuperEdgeGroupItem
 
   public void setEdgeId(GradoopId edgeId) {
     f0 = edgeId;
-  }
-
-  public GradoopId getSuperEdgeId() {
-    return f1;
   }
 
   public void setSuperEdgeId(GradoopId superEdgeId) {
@@ -71,22 +71,18 @@ public class SuperEdgeGroupItem
     return f2.iterator().next();
   }
 
-  public void addSourceId(GradoopId sourceVertexId) {
-    f2.add(sourceVertexId);
+  public void setSourceIds(Set<GradoopId> sourceIds) {
+    f2 = sourceIds;
   }
 
-  public void addSourceIds(Set<GradoopId> sourceVertexIds) {
-    f2.addAll(sourceVertexIds);
-  }
-
-  public void setSourceIds(Set<GradoopId> sourceVertexIds) {
+  /**
+   * Sets the source id as single element.
+   *
+   * @param sourceId source id
+   */
+  public void setSourceId(GradoopId sourceId) {
     f2.clear();
-    f2.addAll(sourceVertexIds);
-  }
-
-  public void setSourceId(GradoopId sourceVertexId) {
-    f2.clear();
-    f2.add(sourceVertexId);
+    f2.add(sourceId);
   }
 
   public Set<GradoopId> getTargetIds() {
@@ -97,28 +93,26 @@ public class SuperEdgeGroupItem
     return f3.iterator().next();
   }
 
-  public void addTargetId(GradoopId targetVertexId) {
-    f3.add(targetVertexId);
+  public void setTargetIds(Set<GradoopId> targetIds) {
+    f3 = targetIds;
   }
 
-  public void addTargetIds(Set<GradoopId> targetVertexIds) {
-    f3.addAll(targetVertexIds);
-  }
-
-  public void setTargetIds(Set<GradoopId> targetVertexIds) {
+  /**
+   * Sets the target id as single element.
+   *
+   * @param targetId target id
+   */
+  public void setTargetId(GradoopId targetId) {
     f3.clear();
-    f3.addAll(targetVertexIds);
+    f3.add(targetId);
   }
 
-  public void setTargetId(GradoopId targetVertexId) {
-    f3.clear();
-    f3.add(targetVertexId);
-  }
-
+  @Override
   public String getGroupLabel() {
     return f4;
   }
 
+  @Override
   public void setGroupLabel(String groupLabel) {
     f4 = groupLabel;
   }
@@ -133,18 +127,22 @@ public class SuperEdgeGroupItem
     f7 = labelGroup;
   }
 
+  @Override
   public PropertyValueList getGroupingValues() {
     return f5;
   }
 
+  @Override
   public void setGroupingValues(PropertyValueList groupPropertyValues) {
     f5 = groupPropertyValues;
   }
 
+  @Override
   public PropertyValueList getAggregateValues() {
     return f6;
   }
 
+  @Override
   public void setAggregateValues(PropertyValueList value) {
     this.f6 = value;
   }

@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 /**
- * Creates a tuple which  all vertices by their id, which is stored in the super vertex group item
+ * Assigns the graphs vertices to all super vertex ids they are part of.
  */
 public class BuildSuperVertexIdWithVertex
   implements JoinFunction<VertexWithSuperVertex, Vertex, SuperVertexIdWithVertex> {
@@ -31,14 +31,7 @@ public class BuildSuperVertexIdWithVertex
   /**
    * Avoid object initialization in each call.
    */
-  private SuperVertexIdWithVertex superVertexIdWithVertex;
-
-  /**
-   * Constructor to initialize object.
-   */
-  public BuildSuperVertexIdWithVertex() {
-    superVertexIdWithVertex = new SuperVertexIdWithVertex();
-  }
+  private SuperVertexIdWithVertex superVertexIdWithVertex = new SuperVertexIdWithVertex();
 
   /**
    * {@inheritDoc}

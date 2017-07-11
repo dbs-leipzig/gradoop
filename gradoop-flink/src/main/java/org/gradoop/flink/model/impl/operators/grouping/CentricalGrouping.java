@@ -18,18 +18,29 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Base class for vertex and edge centric grouping.
+ */
 public abstract class CentricalGrouping extends Grouping {
 
+  /**
+   * Grouping strategy.
+   */
   private final GroupingStrategy groupingStrategy;
 
+  /**
+   * Creates grouping operator instance.
+   *
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param groupingStrategy  grouping strategy
+   */
   CentricalGrouping(
     boolean useVertexLabels,
     boolean useEdgeLabels,
@@ -41,12 +52,28 @@ public abstract class CentricalGrouping extends Grouping {
     this.groupingStrategy = groupingStrategy;
   }
 
+  /**
+   * Overridden by concrete implementations.
+   *
+   * @param graph input graph
+   * @return grouped output graph
+   */
   protected abstract LogicalGraph groupReduce(LogicalGraph graph);
 
+  /**
+   * Overridden by concrete implementations.
+   *
+   * @param graph input graph
+   * @return grouped output graph
+   */
   protected abstract LogicalGraph groupCombine(LogicalGraph graph);
 
   /**
-   * {@inheritDoc}
+   * Based on the defined strategy the elements are first combined locally or are directly reduced
+   * globally.
+   *
+   * @param graph input graph
+   * @return grouped output graph
    */
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {

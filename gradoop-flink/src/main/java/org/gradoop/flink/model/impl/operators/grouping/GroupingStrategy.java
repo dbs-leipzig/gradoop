@@ -21,15 +21,19 @@ package org.gradoop.flink.model.impl.operators.grouping;
  */
 public enum GroupingStrategy {
   /**
-   * {@see GroupingGroupReduce}
+   * @see CentricalGrouping#groupReduce(LogicalGraph)
    */
   GROUP_REDUCE,
   /**
-   * {@see GroupingGroupCombine}
+   * @see CentricalGrouping#groupCombine(LogicalGraph)
    */
   GROUP_COMBINE,
-
+  /**
+   * @see VertexCentricalGrouping
+   */
   VERTEX_CENTRIC,
-
+  /**
+   * @see EdgeCentricalGrouping
+   */
   EDGE_CENTRIC
 }

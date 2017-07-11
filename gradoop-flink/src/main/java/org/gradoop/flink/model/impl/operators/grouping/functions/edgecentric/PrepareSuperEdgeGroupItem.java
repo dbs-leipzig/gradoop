@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Creates a minimal representation of edge data to be used for grouping.
  *
- * The output of that mapper is {@link SuperEdgeGroupItem} that contains
+ * The output of that mapper is a {@link SuperEdgeGroupItem} that contains
  * the edge id, edge label, edge source, edge target, edge group properties and edge aggregate
  * properties.
  */
@@ -48,7 +48,8 @@ public class PrepareSuperEdgeGroupItem
   /**
    * Creates map function
    *
-   * @param useLabel          true, if label shall be considered
+   * @param useLabel true, if label shall be considered
+   * @param labelGroups all edge label groups
    */
   public PrepareSuperEdgeGroupItem(boolean useLabel, List<LabelGroup> labelGroups) {
     super(useLabel, labelGroups);

@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 /**
- * Maps for each vertex which is part of a super vertex the related ids.
+ * Maps the related ids for each vertex which is part of a super vertex .
  */
 public class BuildVertexWithSuperVertexFromItem
   implements FlatMapFunction<SuperVertexGroupItem, VertexWithSuperVertex> {
@@ -32,14 +32,7 @@ public class BuildVertexWithSuperVertexFromItem
   /**
    * Avoid object initialization in each call.
    */
-  private VertexWithSuperVertex vertexWithSuperVertex;
-
-  /**
-   * Constructor to initialize object.
-   */
-  public BuildVertexWithSuperVertexFromItem() {
-    this.vertexWithSuperVertex = new VertexWithSuperVertex();
-  }
+  private VertexWithSuperVertex vertexWithSuperVertex = new VertexWithSuperVertex();
 
   /**
    * {@inheritDoc}

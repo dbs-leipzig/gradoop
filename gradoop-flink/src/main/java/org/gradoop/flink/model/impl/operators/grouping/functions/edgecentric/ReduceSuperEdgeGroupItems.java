@@ -26,78 +26,91 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperE
 import java.util.Set;
 
   /**
-   * Reduces a group of {@link SuperEdgeGroupItem} instances.
+   * Creates a {@link SuperEdgeGroupItem} which represents one group of super edges based on the
+   * grouping settings.
    */
  // @FunctionAnnotation.ForwardedFields(
  //   "f0;" + // edge id
  //     "f3;" + // label
  //     "f4"    // properties
  // )
-  public class ReduceSuperEdgeGroupItems
-    extends ReduceSuperEdgeGroupItemBase
-    implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {
+public class ReduceSuperEdgeGroupItems
+  extends ReduceSuperEdgeGroupItemBase
+  implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {
 
-    /**
-     * Creates group reduce function.
-     *
-     * @param useLabel          true, iff labels are used for grouping
-     */
-    public ReduceSuperEdgeGroupItems(boolean useLabel, boolean sourceSpecificGrouping,
-      boolean targetSpecificGrouping) {
-      super(useLabel, sourceSpecificGrouping, targetSpecificGrouping);
-    }
+  /**
+   * Avoid object instantiation.
+   */
+  private Set<GradoopId> sources;
+  /**
+   * Avoid object instantiation.
+   */
+  private Set<GradoopId> targets;
 
-    @Override
-    public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
-      Collector<SuperEdgeGroupItem> collector) throws Exception {
-
-      boolean isFirst                       = true;
-
-      Set<GradoopId> sources = Sets.newHashSet();
-      Set<GradoopId> targets = Sets.newHashSet();
-
-      for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
-        // grouped by source and target
-        if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
-          if (isFirst) {
-            sources.add(groupItem.getSourceId());
-            targets.add(groupItem.getTargetId());
-          }
-        // grouped by source, targets may vary
-        } else if (isSourceSpecificGrouping()) {
-          if (isFirst) {
-            sources.add(groupItem.getSourceId());
-          }
-          targets.add(groupItem.getTargetId());
-        // grouped by target, sources may vary
-        } else if (isTargetSpecificGrouping()) {
-          if (isFirst) {
-            targets.add(groupItem.getTargetId());
-          }
-          sources.add(groupItem.getSourceId());
-        // source or target do not have influence to the grouping
-        } else {
-          sources.add(groupItem.getSourceId());
-          targets.add(groupItem.getTargetId());
-        }
-        if (isFirst) {
-          setReuseSuperEdgeGroupItem(groupItem);
-          getReuseSuperEdgeGroupItem().setEdgeId(GradoopId.get());
-          isFirst = false;
-        }
-        if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-          aggregate(
-            groupItem.getAggregateValues(),
-            getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
-        }
-
-      }
-      // collect single item representing the whole group
-      getReuseSuperEdgeGroupItem().setSourceIds(sources);
-      getReuseSuperEdgeGroupItem().setTargetIds(targets);
-      getReuseSuperEdgeGroupItem().setAggregateValues(
-        getAggregateValues(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators()));
-      resetAggregators(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
-      collector.collect(getReuseSuperEdgeGroupItem());
-    }
+  /**
+   * Creates group reduce function.
+   *
+   * @param useLabel true, iff labels are used for grouping
+   * @param sourceSpecificGrouping true if the source vertex shall be considered for grouping
+   * @param targetSpecificGrouping true if the target vertex shall be considered for grouping
+   */
+  public ReduceSuperEdgeGroupItems(boolean useLabel, boolean sourceSpecificGrouping,
+    boolean targetSpecificGrouping) {
+    super(useLabel, sourceSpecificGrouping, targetSpecificGrouping);
+    sources = Sets.newHashSet();
+    targets = Sets.newHashSet();
   }
+
+  @Override
+  public void reduce(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
+    Collector<SuperEdgeGroupItem> collector) throws Exception {
+
+    boolean isFirst = true;
+    sources.clear();
+    targets.clear();
+
+    for (SuperEdgeGroupItem groupItem : superEdgeGroupItems) {
+      // grouped by source and target
+      if (isSourceSpecificGrouping() && isTargetSpecificGrouping()) {
+        if (isFirst) {
+          sources.add(groupItem.getSourceId());
+          targets.add(groupItem.getTargetId());
+        }
+      // grouped by source, targets may vary
+      } else if (isSourceSpecificGrouping()) {
+        if (isFirst) {
+          sources.add(groupItem.getSourceId());
+        }
+        targets.add(groupItem.getTargetId());
+      // grouped by target, sources may vary
+      } else if (isTargetSpecificGrouping()) {
+        if (isFirst) {
+          targets.add(groupItem.getTargetId());
+        }
+        sources.add(groupItem.getSourceId());
+      // source or target do not have influence to the grouping
+      } else {
+        sources.add(groupItem.getSourceId());
+        targets.add(groupItem.getTargetId());
+      }
+      if (isFirst) {
+        setReuseSuperEdgeGroupItem(groupItem);
+        getReuseSuperEdgeGroupItem().setEdgeId(GradoopId.get());
+        isFirst = false;
+      }
+      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
+        aggregate(
+          groupItem.getAggregateValues(),
+          getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
+      }
+
+    }
+    // collect single item representing the whole group
+    getReuseSuperEdgeGroupItem().setSourceIds(sources);
+    getReuseSuperEdgeGroupItem().setTargetIds(targets);
+    getReuseSuperEdgeGroupItem().setAggregateValues(
+      getAggregateValues(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators()));
+    resetAggregators(getReuseSuperEdgeGroupItem().getLabelGroup().getAggregators());
+    collector.collect(getReuseSuperEdgeGroupItem());
+  }
+}

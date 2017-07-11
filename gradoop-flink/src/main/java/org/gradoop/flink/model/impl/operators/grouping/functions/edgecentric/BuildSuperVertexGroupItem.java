@@ -24,6 +24,11 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
 
 import java.util.Set;
 
+/**
+ * Assigns the same new gradoop id to all super vertex group items which represent the same group.
+ * It is necessary to keep all these representative group items because they contain the
+ * information on which edge they are part of.
+ * */
 public class BuildSuperVertexGroupItem
   implements GroupReduceFunction<SuperVertexGroupItem, SuperVertexGroupItem> {
 
@@ -39,7 +44,7 @@ public class BuildSuperVertexGroupItem
     for (SuperVertexGroupItem superVertexGroupItem : superVertexGroupItems) {
       if (isFirst) {
         vertices = superVertexGroupItem.getVertexIds();
-        // super vertex represents multiple nor,al vertices
+        // super vertex represents multiple or all vertices
         if (vertices.size() != 1) {
           superVertexId = GradoopId.get();
         // super vertex represents only one vertex

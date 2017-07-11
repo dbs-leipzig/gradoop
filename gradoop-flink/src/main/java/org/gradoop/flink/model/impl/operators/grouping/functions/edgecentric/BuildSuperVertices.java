@@ -24,12 +24,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
-
-import java.util.List;
 
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
@@ -59,7 +54,7 @@ public class BuildSuperVertices
 
   /**
    * Creates a {@link Vertex} object from the given {@link
-   * VertexGroupItem} and returns a new {@link org.apache.flink.graph.Vertex}.
+   * VertexGroupItem} and returns a new {@link Vertex}.
    *
    * @param groupItem vertex group item
    * @return vertex including new vertex data
@@ -68,9 +63,9 @@ public class BuildSuperVertices
   @Override
   public Vertex map(SuperVertexGroupItem groupItem) throws
     Exception {
-    Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
+    Vertex supVertex = vertexFactory.initVertex(
+      groupItem.getSuperVertexId(), groupItem.getGroupLabel());
 
-    supVertex.setLabel(groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
     setAggregateValues(supVertex, groupItem.getLabelGroup().getAggregators());
 
