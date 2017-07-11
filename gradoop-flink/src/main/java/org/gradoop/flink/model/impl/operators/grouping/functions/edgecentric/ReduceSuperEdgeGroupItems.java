@@ -19,21 +19,25 @@ package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 
 import java.util.Set;
 
-  /**
-   * Creates a {@link SuperEdgeGroupItem} which represents one group of super edges based on the
-   * grouping settings.
-   */
- // @FunctionAnnotation.ForwardedFields(
- //   "f0;" + // edge id
- //     "f3;" + // label
- //     "f4"    // properties
- // )
+/**
+ * Creates a {@link SuperEdgeGroupItem} which represents one group of super edges based on the
+ * grouping settings.
+ */
+@FunctionAnnotation.ForwardedFields(
+  "f0;" + // edge id
+    "f3;" + // label
+    "f4"    // properties
+)
+@FunctionAnnotation.ReadFields(
+  "f1;" + // source
+    "f2") // target
 public class ReduceSuperEdgeGroupItems
   extends ReduceSuperEdgeGroupItemBase
   implements GroupReduceFunction<SuperEdgeGroupItem, SuperEdgeGroupItem> {

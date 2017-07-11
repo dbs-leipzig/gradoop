@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
@@ -26,6 +27,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 /**
  * Maps the related ids for each vertex which is part of a super vertex .
  */
+@FunctionAnnotation.ForwardedFields("f1")
+@FunctionAnnotation.ReadFields("f0")
 public class BuildVertexWithSuperVertexFromItem
   implements FlatMapFunction<SuperVertexGroupItem, VertexWithSuperVertex> {
 

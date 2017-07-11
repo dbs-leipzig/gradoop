@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -31,6 +32,8 @@ import java.util.List;
 /**
  * Returns tuples which assigns each source/target set of gradoop ids the edge id.
  */
+@FunctionAnnotation.ForwardedFields("f0->f2")
+@FunctionAnnotation.ReadFields("f2;f3")
 public class PrepareSuperVertexGroupItem
   extends BuildGroupItemBase
   implements FlatMapFunction<SuperEdgeGroupItem, SuperVertexGroupItem> {

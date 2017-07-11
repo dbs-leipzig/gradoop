@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -34,8 +35,8 @@ import java.util.List;
  * the edge id, edge label, edge source, edge target, edge group properties and edge aggregate
  * properties.
  */
-//@FunctionAnnotation.ForwardedFields("id->f0")
-//@FunctionAnnotation.ReadFields("label;properties") //TODO check for updates (source,target)
+@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ReadFields("label;properties;sourceId;targetId")
 public class PrepareSuperEdgeGroupItem
   extends BuildGroupItemBase
   implements FlatMapFunction<Edge, SuperEdgeGroupItem> {

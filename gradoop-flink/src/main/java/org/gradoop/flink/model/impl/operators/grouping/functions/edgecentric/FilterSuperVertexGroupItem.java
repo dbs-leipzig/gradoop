@@ -18,12 +18,14 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 
 /**
  * Filter to get items which either represent new, concatenated super vertices or those which
  * represent vertices which stay unchanged.
  */
+@FunctionAnnotation.ReadFields("f0")
 public class FilterSuperVertexGroupItem implements FilterFunction<SuperVertexGroupItem> {
 
   /**

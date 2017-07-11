@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
@@ -29,6 +30,13 @@ import java.util.Set;
  * It is necessary to keep all these representative group items because they contain the
  * information on which edge they are part of.
  * */
+@FunctionAnnotation.ForwardedFields(
+  "f0;" +   //vertex ids
+    "f2;" + //super edge id
+    "f3;" + // vertex group label
+    "f4;" + // vertex group property values
+    "f5;" + // vertex label group
+    "f6")
 public class BuildSuperVertexGroupItem
   implements GroupReduceFunction<SuperVertexGroupItem, SuperVertexGroupItem> {
 

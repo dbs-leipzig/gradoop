@@ -19,6 +19,7 @@ package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -30,8 +31,8 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
  */
-//@FunctionAnnotation.ForwardedFields("f1->id")
-//@FunctionAnnotation.ReadFields("f1;f2;f3;f4")
+@FunctionAnnotation.ForwardedFields("f1->id;f3->label")
+@FunctionAnnotation.ReadFields("f4;f6")
 public class BuildSuperVertices
   extends BuildBase
   implements MapFunction<SuperVertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
@@ -53,8 +54,8 @@ public class BuildSuperVertices
   }
 
   /**
-   * Creates a {@link Vertex} object from the given {@link
-   * VertexGroupItem} and returns a new {@link Vertex}.
+   * Creates a {@link Vertex} object from the given {@link SuperVertexGroupItem} and returns a new
+   * {@link Vertex}.
    *
    * @param groupItem vertex group item
    * @return vertex including new vertex data

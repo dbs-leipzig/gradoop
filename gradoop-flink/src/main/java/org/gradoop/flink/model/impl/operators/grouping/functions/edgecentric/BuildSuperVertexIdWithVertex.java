@@ -18,6 +18,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexIdWithVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
@@ -25,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 /**
  * Assigns the graphs vertices to all super vertex ids they are part of.
  */
+@FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
 public class BuildSuperVertexIdWithVertex
   implements JoinFunction<VertexWithSuperVertex, Vertex, SuperVertexIdWithVertex> {
 
