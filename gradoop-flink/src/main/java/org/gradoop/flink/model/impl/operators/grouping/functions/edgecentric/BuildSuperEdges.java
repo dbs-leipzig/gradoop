@@ -35,8 +35,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
  * Creates a new super edge representing an edge group. The edge stores the
  * group label, the group property value and the aggregate values for its group.
  */
-@FunctionAnnotation.ForwardedFields("f1->id")
-@FunctionAnnotation.ReadFields("f1;f4;f5;f6")
 public class BuildSuperEdges
   extends BuildBase
   implements CoGroupFunction<
