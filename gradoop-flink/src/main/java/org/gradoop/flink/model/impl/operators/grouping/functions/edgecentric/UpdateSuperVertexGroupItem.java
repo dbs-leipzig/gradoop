@@ -22,9 +22,9 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 
-import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexIdWithVertex;
 
@@ -32,9 +32,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
- * contains only necessary information for further processing.
- *
+ * Aggregates the grouping values and concatenates the labels in one super vertex group and
+ * assigns this to the super vertex group item.
  */
 //@FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 //@FunctionAnnotation.ReadFields("label;properties")
@@ -42,26 +41,29 @@ public class UpdateSuperVertexGroupItem
   extends BuildBase
   implements CoGroupFunction<SuperVertexGroupItem, SuperVertexIdWithVertex, SuperVertexGroupItem> {
 
-  private final String LABEL_SEPARATOR = "";
-
-  private Set<GradoopId> usedVertices = Sets.newHashSet();
-
+  /**
+   * Avoid object instantiation.
+   */
+  private Set<GradoopId> usedVertices;
+  /**
+   * Avoid object instantiation.
+   */
   private StringBuilder label;
-
-  private boolean isFirst;
-
-  private boolean duplicate;
-
-  private TreeSet<SuperVertexIdWithVertex> orderedSet = Sets.newTreeSet();
+  /**
+   * Avoid object instantiation.
+   */
+  private TreeSet<SuperVertexIdWithVertex> orderedSet;
 
   /**
    * Creates map function.
    *
-   * @param useLabel          true, if vertex label shall be used
+   * @param useLabel true, if vertex label shall be used
    */
   public UpdateSuperVertexGroupItem(boolean useLabel) {
     super(useLabel);
     label = new StringBuilder();
+    usedVertices = Sets.newHashSet();
+    orderedSet = Sets.newTreeSet();
   }
 
   @Override
@@ -74,10 +76,12 @@ public class UpdateSuperVertexGroupItem
     usedVertices.clear();
     orderedSet.clear();
     label.setLength(0);
-    isFirst = true;
+    boolean isFirst = true;
+    boolean duplicate;
     Vertex vertex;
+    // the super vertex group items are all the same and only the first is needed
     SuperVertexGroupItem superVertexGroupItem = superVertexGroupItems.iterator().next();
-
+    // natural ordered set
     for (SuperVertexIdWithVertex superVertexIdWithVertex : superVertexIdWithVertices) {
       orderedSet.add(superVertexIdWithVertex);
     }
@@ -86,14 +90,16 @@ public class UpdateSuperVertexGroupItem
       vertex = superVertexIdWithVertex.getVertex();
 
       duplicate = usedVertices.contains(vertex.getId());
+      // build the new super vertex label
       if (useLabel()) {
         if (!duplicate) {
           if (!isFirst) {
-            label.append(LABEL_SEPARATOR);
+            label.append(Grouping.LABEL_SEPARATOR);
           }
           label.append(vertex.getLabel());
         }
       }
+      // aggregate the values of each vertex which is assigned to the super vertex
       if (doAggregate(superVertexGroupItem.getLabelGroup().getAggregators()) && !duplicate) {
         aggregate(
           getAggregateValues(vertex, superVertexGroupItem.getLabelGroup().getAggregators()),
