@@ -89,6 +89,15 @@ public class SuperEdgeGroupItem
     f2.add(sourceId);
   }
 
+  /**
+   * Adds the source ids.
+   *
+   * @param sourceIds source ids
+   */
+  public void addSourceIds(Set<GradoopId> sourceIds) {
+    f2.addAll(sourceIds);
+  }
+
   public Set<GradoopId> getTargetIds() {
     return f3;
   }
@@ -109,6 +118,15 @@ public class SuperEdgeGroupItem
   public void setTargetId(GradoopId targetId) {
     f3.clear();
     f3.add(targetId);
+  }
+
+  /**
+   * Adds the target ids.
+   *
+   * @param targetIds target ids
+   */
+  public void addTargetIds(Set<GradoopId> targetIds) {
+    f3.addAll(targetIds);
   }
 
   @Override

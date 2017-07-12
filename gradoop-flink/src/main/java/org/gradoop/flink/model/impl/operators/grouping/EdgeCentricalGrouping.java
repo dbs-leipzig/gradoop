@@ -28,9 +28,11 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.Bui
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertexIdWithVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildVertexWithSuperVertexFromItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.CombineSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.FilterSuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.PrepareSuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.PrepareSuperVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.ReduceCombinedSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.ReduceSuperEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.UpdateSuperVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators.SetInTupleKeySelector;
@@ -188,7 +190,84 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
   @Override
   protected LogicalGraph groupCombine(LogicalGraph graph) {
-    return null;
+
+    DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges().rebalance()
+      // map edge to edge group item
+      .flatMap(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
+
+    // group edges by label / properties / both
+    // additionally: source specific / target specific / both
+    DataSet<SuperEdgeGroupItem> combinedSuperEdgeGroupItems = groupSuperEdges(edgesForGrouping,
+      sourceSpecificGrouping, targetSpecificGrouping)
+      // apply aggregate function
+      .combineGroup(new CombineSuperEdgeGroupItems(useEdgeLabels(), sourceSpecificGrouping,
+        targetSpecificGrouping));
+
+    DataSet<SuperEdgeGroupItem> superEdgeGroupItems = groupSuperEdges(combinedSuperEdgeGroupItems,
+      sourceSpecificGrouping, targetSpecificGrouping)
+      .reduceGroup(new ReduceCombinedSuperEdgeGroupItems(useEdgeLabels(), sourceSpecificGrouping,
+       targetSpecificGrouping));
+
+
+      // vertexIds - superVId - edgeId
+    DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
+      // get all resulting (maybe concatenated) vertices
+      // vertexIds - superedgeId
+      .flatMap(new PrepareSuperVertexGroupItem(useVertexLabels(), getVertexLabelGroups()))
+      // groups same super vertices (created from edge source and target ids)
+      .groupBy(new SetInTupleKeySelector<SuperVertexGroupItem>(0))
+      // assign supervertex id
+      // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
+      .reduceGroup(new BuildSuperVertexGroupItem());
+
+    // create super edges based on grouped edges and resulting super vertex ids
+    DataSet<Edge> superEdges = superEdgeGroupItems
+      .coGroup(superVertexGroupItems)
+      // same super vertex id
+      .where(0).equalTo(2)
+      // build super edges
+      .with(new BuildSuperEdges(useEdgeLabels(), config.getEdgeFactory()));
+
+    // store vertices, where the vertex is its own super vertex, so the vertex stays itself
+    DataSet<Vertex> normalSuperVertices = superVertexGroupItems
+      // filter ids where vertex is its own super vertex
+      .filter(new FilterSuperVertexGroupItem(false))
+      // remove doubled entries where the vertex is part of different edges
+      .distinct(1)
+      // take vertex respectively to the filtered id
+      .join(graph.getVertices())
+      .where(1)
+      .equalTo(new Id<>())
+      .with(new RightSide<>());
+
+    // keep only super vertices which represent multiple vertices
+    superVertexGroupItems = superVertexGroupItems
+      .filter(new FilterSuperVertexGroupItem(true));
+
+    // get each single relevant vertex id for a super vertex id
+    DataSet<VertexWithSuperVertex> vertexWithSuper = superVertexGroupItems
+      // assign the vertex ids
+      .flatMap(new BuildVertexWithSuperVertexFromItem());
+
+
+    superVertexGroupItems = superVertexGroupItems
+      // take all vertices by their id, which is stored in the super vertex group item, and
+      // assigns them to the super vertex id
+      .coGroup(vertexWithSuper
+        .join(graph.getVertices())
+        .where(0).equalTo(new Id<>())
+        .with(new BuildSuperVertexIdWithVertex()))
+      .where(1).equalTo(0)
+      // and aggregate the super vertex group item based on the vertex aggregations
+      .with(new UpdateSuperVertexGroupItem(useVertexLabels()));
+
+    DataSet<Vertex> superVertices = superVertexGroupItems
+      // and create the vertex element
+      .map(new BuildSuperVertices(useVertexLabels(), config.getVertexFactory()))
+      // union with vertices which stay as they are
+      .union(normalSuperVertices);
+
+    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
 
