@@ -18,7 +18,6 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
@@ -114,7 +113,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
 
-    DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges()
+    DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges().rebalance()
       // map edge to edge group item
       .flatMap(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
 
@@ -132,7 +131,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // vertexIds - superedgeId
       .flatMap(new PrepareSuperVertexGroupItem(useVertexLabels(), getVertexLabelGroups()))
       // groups same super vertices (created from edge source and target ids)
-      .groupBy(new SetInTupleKeySelector<SuperVertexGroupItem, GradoopId>(0))
+      .groupBy(new SetInTupleKeySelector<SuperVertexGroupItem>(0))
       // assign supervertex id
       // vertexIds - superVId - edgeId - label - groupingVal - aggregatVal (last 3 are empty)
       .reduceGroup(new BuildSuperVertexGroupItem());

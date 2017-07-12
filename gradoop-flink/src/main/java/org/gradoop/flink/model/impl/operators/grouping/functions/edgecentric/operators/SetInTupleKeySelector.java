@@ -25,20 +25,19 @@ import java.util.Set;
 
 /**
  * Creates a key of a tuple based on specified fields. To support sets as a key the sets elements
- * are ordered and the ordered elements hash codes are concatenated.
+ * are ordered and the ordered elements hash codes are aggregated.
  * @param <T>
- * @param <E>
  */
-public class SetInTupleKeySelector<T extends Tuple, E> implements KeySelector<T, String> {
+public class SetInTupleKeySelector<T extends Tuple> implements KeySelector<T, Long> {
 
   /**
-   * String builder to concatenate the hash codes.
+   * Result hash.
    */
-  private final StringBuilder sb;
+  private Long resultHash;
   /**
    * Ordered set.
    */
-  private final TreeSet<E> sortedSet;
+  private final TreeSet<Object> sortedSet;
   /**
    * Fields which specify the key.
    */
@@ -51,24 +50,23 @@ public class SetInTupleKeySelector<T extends Tuple, E> implements KeySelector<T,
    */
   public SetInTupleKeySelector(int... fields) {
     this.fields = fields;
-    sb = new StringBuilder();
     sortedSet = new TreeSet<>();
   }
 
   @Override
-  public String getKey(T tuple) throws Exception {
-    sb.setLength(0);
+  public Long getKey(T tuple) throws Exception {
+    resultHash = 7L;
     for (int i = 0; i < fields.length; i++) {
       if (Set.class.isInstance(tuple.getField(fields[i]))) {
         sortedSet.clear();
         sortedSet.addAll(tuple.getField(fields[i]));
-        for (E element : sortedSet) {
-          sb.append(element.hashCode());
+        for (Object object : sortedSet) {
+          resultHash = resultHash * 31 + object.hashCode();
         }
       } else {
-        sb.append(tuple.getField(fields[i]).hashCode());
+        resultHash = resultHash * 31 + tuple.getField(fields[i]).hashCode();
       }
     }
-    return sb.toString();
+    return resultHash;
   }
 }

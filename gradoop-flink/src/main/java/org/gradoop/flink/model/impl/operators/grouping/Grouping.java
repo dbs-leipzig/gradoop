@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -274,39 +273,39 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     if (useEdgeLabels() && useEdgeProperties()) {
       if (sourceSpecific && targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 3, 4, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 4, 5));
       } else if (sourceSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 4, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 4, 5));
       } else if (targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(3, 4, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 4, 5));
       } else {
         edgeGrouping = groupSuperEdges.groupBy(4, 5);
       }
     } else if (useEdgeLabels()) {
       if (sourceSpecific && targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 3, 4));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 4));
       } else if (sourceSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 4));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 4));
       } else if (targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(3, 4));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 4));
       } else {
         edgeGrouping = groupSuperEdges.groupBy(4);
       }
     } else {
       if (sourceSpecific && targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 3, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 5));
       } else if (sourceSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(2, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 5));
       } else if (targetSpecific) {
         edgeGrouping = groupSuperEdges.groupBy(
-          new SetInTupleKeySelector<SuperEdgeGroupItem, GradoopId>(3, 5));
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 5));
       } else {
         edgeGrouping = groupSuperEdges.groupBy(5);
       }
