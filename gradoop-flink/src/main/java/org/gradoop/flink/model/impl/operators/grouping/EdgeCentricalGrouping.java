@@ -92,7 +92,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
    * Algorithmic idea:
    *
    * 1) Map edges to a minimal representation, i.e. {@link SuperEdgeGroupItem}.
-   * 2) Group edges on label and/or property and/or their source vertex and/or their target vertex
+   * 2) Group edges on label and/or property and/or their source vertex and/or their target vertex.
    * 3) Prepare minimal super vertex representations, i.e. {@link SuperVertexGroupItem} and
    *    group them based on the vertices they represent. If a super vertex represents multiple
    *    vertices create a new super vertex id, but if it represents only one vertex the keep the id.
@@ -114,7 +114,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
    */
   @Override
   protected LogicalGraph groupReduce(LogicalGraph graph) {
-
     DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges().rebalance()
       // map edge to edge group item
       .flatMap(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
@@ -167,7 +166,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // assign the vertex ids
       .flatMap(new BuildVertexWithSuperVertexFromItem());
 
-
     superVertexGroupItems = superVertexGroupItems
       // take all vertices by their id, which is stored in the super vertex group item, and
       // assigns them to the super vertex id
@@ -188,14 +186,42 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
   }
 
+  /**
+   * Grouping implementation that uses group + groupReduce for building super
+   * vertices and updating the original vertices.
+   *
+   * Algorithmic idea:
+   *
+   * 1) Map edges to a minimal representation, i.e. {@link SuperEdgeGroupItem}.
+   * 2) Locally group edges on label and/or property and/or their source vertex and/or their target
+   *    vertex.
+   * 3) Globally group the edges (like in 2)) and adjust the source and target ids.
+   * 4) Prepare minimal super vertex representations, i.e. {@link SuperVertexGroupItem} and
+   *    group them based on the vertices they represent. If a super vertex represents multiple
+   *    vertices create a new super vertex id, but if it represents only one vertex the keep the id.
+   * 5) Cogroup the {@link SuperEdgeGroupItem} with the {@link SuperVertexGroupItem} based on the
+   *    registered super edge id in both items and create the super edge with the corresponding
+   *    super vertex ids as source/target.
+   * 6) Filter those {@link SuperVertexGroupItem} where the vertex is its own super vertex and
+   *    join them with the corresponding vertex from the input graph.
+   * 7) Filter the {@link SuperVertexGroupItem} which represent multiple vertices.
+   * 8) And assign the super vertex id to each of these vertex ids.
+   * 9) Cogroup the {@link SuperVertexGroupItem}s with the represented vertices taken by a join
+   *    of the result of 7) with the graphs vertices and aggregate the vertex properties and
+   *    concatenate the label.
+   * 10)Union the vertices which are their own super vertex with new created super vertices based
+   *    on the {@link SuperVertexGroupItem}s.
+   *
+   * @param graph input graph
+   * @return grouped output graph
+   */
   @Override
   protected LogicalGraph groupCombine(LogicalGraph graph) {
-
     DataSet<SuperEdgeGroupItem> edgesForGrouping = graph.getEdges().rebalance()
       // map edge to edge group item
       .flatMap(new PrepareSuperEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()));
 
-    // group edges by label / properties / both
+    // locally group edges by label / properties / both
     // additionally: source specific / target specific / both
     DataSet<SuperEdgeGroupItem> combinedSuperEdgeGroupItems = groupSuperEdges(edgesForGrouping,
       sourceSpecificGrouping, targetSpecificGrouping)
@@ -203,11 +229,11 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       .combineGroup(new CombineSuperEdgeGroupItems(useEdgeLabels(), sourceSpecificGrouping,
         targetSpecificGrouping));
 
+    // globally regroup all local defined super edges
     DataSet<SuperEdgeGroupItem> superEdgeGroupItems = groupSuperEdges(combinedSuperEdgeGroupItems,
       sourceSpecificGrouping, targetSpecificGrouping)
       .reduceGroup(new ReduceCombinedSuperEdgeGroupItems(useEdgeLabels(), sourceSpecificGrouping,
        targetSpecificGrouping));
-
 
       // vertexIds - superVId - edgeId
     DataSet<SuperVertexGroupItem> superVertexGroupItems = superEdgeGroupItems
@@ -248,7 +274,6 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
     DataSet<VertexWithSuperVertex> vertexWithSuper = superVertexGroupItems
       // assign the vertex ids
       .flatMap(new BuildVertexWithSuperVertexFromItem());
-
 
     superVertexGroupItems = superVertexGroupItems
       // take all vertices by their id, which is stored in the super vertex group item, and
