@@ -379,7 +379,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * True, iff vertex labels shall be considered.
      */
     private boolean useVertexLabel;
-
     /**
      * True, iff edge labels shall be considered.
      */
@@ -388,7 +387,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Stores grouping keys for a specific vertex label.
      */
     private List<LabelGroup> vertexLabelGroups;
-
     /**
      * True, iff edge's source shall be considered.
      */
@@ -398,27 +396,22 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * True, iff edge's target shall be considered.
      */
     private boolean useEdgeTarget;
-
     /**
      * Stores grouping keys for a specific edge label.
      */
     private List<LabelGroup> edgeLabelGroups;
-
     /**
      * Default vertex label group.
      */
     private LabelGroup defaultVertexLabelGroup;
-
     /**
      * Default edge label group.
      */
     private LabelGroup defaultEdgeLabelGroup;
-
     /**
      * List of all global vertex aggregate functions.
      */
     private List<PropertyValueAggregator> globalVertexAggregators;
-
     /**
      * List of all global edge aggregate functions.
      */
