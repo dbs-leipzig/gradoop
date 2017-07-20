@@ -15,18 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.util.Collector;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildBase;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperVertexGroupItem;
-
+import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric
+  .SuperEdgeIdWithSourceAndTargetId;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
@@ -34,8 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperV
  */
 public class BuildSuperEdges
   extends BuildBase
-  implements CoGroupFunction<
-    SuperEdgeGroupItem, SuperVertexGroupItem, Edge>, ResultTypeQueryable<Edge> {
+  implements JoinFunction<SuperEdgeGroupItem, SuperEdgeIdWithSourceAndTargetId, Edge> {
 
   /**
    * Edge edgeFactory.
@@ -53,27 +48,28 @@ public class BuildSuperEdges
     this.edgeFactory = edgeFactory;
   }
 
-
   @Override
-  public void coGroup(Iterable<SuperEdgeGroupItem> superEdgeGroupItems,
-    Iterable<SuperVertexGroupItem> vertexWithSuperVertexAndEdges, Collector<Edge> collector) throws
-    Exception {
-
-    // only one edge per id
-    SuperEdgeGroupItem superEdgeGroupItem = superEdgeGroupItems.iterator().next();
+  public Edge join(SuperEdgeGroupItem superEdgeGroupItem,
+    SuperEdgeIdWithSourceAndTargetId superEdgeIdWithSourceAndTargetId) throws Exception {
 
     GradoopId sourceId = null;
     GradoopId targetId = null;
 
-    // set the correct super vertex id as source or target id
-    for (SuperVertexGroupItem superVertexGroupItem : vertexWithSuperVertexAndEdges) {
-      // check if the collection of source/target ids of vertices of the edge group item is equal
-      // to the one represented by the super vertex item and take its id
-      if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getSourceIds())) {
-        sourceId = superVertexGroupItem.f1;
-      } else if (superVertexGroupItem.f0.equals(superEdgeGroupItem.getTargetIds())) {
-        targetId = superVertexGroupItem.f1;
-      }
+    // assign the first id to either the source or the target
+    if (superEdgeIdWithSourceAndTargetId.getFirstSuperVertexIds()
+      .equals(superEdgeGroupItem.getSourceIds())) {
+      sourceId = superEdgeIdWithSourceAndTargetId.getFirstSuperVertexId();
+    } else if (superEdgeIdWithSourceAndTargetId.getFirstSuperVertexIds()
+      .equals(superEdgeGroupItem.getTargetIds())) {
+      targetId = superEdgeIdWithSourceAndTargetId.getFirstSuperVertexId();
+    }
+    // if source/target is not assigned yet then assign the second id
+    if (sourceId == null && superEdgeIdWithSourceAndTargetId.getSecondSuperVertexIds()
+      .equals(superEdgeGroupItem.getSourceIds())) {
+      sourceId = superEdgeIdWithSourceAndTargetId.getSecondSuperVertexId();
+    } else if (targetId == null && superEdgeIdWithSourceAndTargetId.getSecondSuperVertexIds()
+      .equals(superEdgeGroupItem.getTargetIds())) {
+      targetId = superEdgeIdWithSourceAndTargetId.getSecondSuperVertexId();
     }
 
     Edge superEdge = edgeFactory.initEdge(superEdgeGroupItem.getSuperEdgeId(), sourceId, targetId);
@@ -88,15 +84,6 @@ public class BuildSuperEdges
       superEdgeGroupItem.getAggregateValues(),
       superEdgeGroupItem.getLabelGroup().getAggregators());
 
-    collector.collect(superEdge);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public TypeInformation<Edge> getProducedType() {
-    return TypeExtractor.createTypeInfo(edgeFactory.getType());
+    return superEdge;
   }
 }

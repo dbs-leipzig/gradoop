@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperEdgeIdWithSourceAndTargetId;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperEdges;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperVertexGroupItem;
@@ -137,9 +138,11 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
     // create super edges based on grouped edges and resulting super vertex ids
     DataSet<Edge> superEdges = superEdgeGroupItems
-      .coGroup(superVertexGroupItems)
+      .join(superVertexGroupItems
+        .groupBy(2)
+        .reduceGroup(new BuildSuperEdgeIdWithSourceAndTargetId()))
       // same super vertex id
-      .where(0).equalTo(2)
+      .where(0).equalTo(0)
       // build super edges
       .with(new BuildSuperEdges(useEdgeLabels(), config.getEdgeFactory()));
 
@@ -246,9 +249,11 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
 
     // create super edges based on grouped edges and resulting super vertex ids
     DataSet<Edge> superEdges = superEdgeGroupItems
-      .coGroup(superVertexGroupItems)
+      .join(superVertexGroupItems
+        .groupBy(2)
+        .reduceGroup(new BuildSuperEdgeIdWithSourceAndTargetId()))
       // same super vertex id
-      .where(0).equalTo(2)
+      .where(0).equalTo(0)
       // build super edges
       .with(new BuildSuperEdges(useEdgeLabels(), config.getEdgeFactory()));
 
