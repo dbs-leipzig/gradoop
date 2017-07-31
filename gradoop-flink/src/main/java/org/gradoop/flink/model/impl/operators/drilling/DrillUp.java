@@ -51,7 +51,7 @@ public class DrillUp extends Drill {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    if (isDrillVertex()) {
+    if (drillVertex()) {
       graph = graph.transformVertices(
         new DrillUpTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));

@@ -103,10 +103,20 @@ public abstract class DrillTransformation<EL extends Element>
     return newPropertyKey;
   }
 
+  /**
+   * True, if all elements of a kind (vertex / edge) shall be drilled.
+   *
+   * @return true for drilling all elements
+   */
   protected boolean drillAllLabels() {
     return drillAllLabels;
   }
 
+  /**
+   * True, if the current property key shall be reused.
+   *
+   * @return true for keeping the property key
+   */
   protected boolean keepCurrentPropertyKey() {
     return keepCurrentPropertyKey;
   }

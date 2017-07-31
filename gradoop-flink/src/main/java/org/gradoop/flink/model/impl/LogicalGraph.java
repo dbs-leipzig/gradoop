@@ -39,7 +39,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.drilling.Drill;
-import org.gradoop.flink.model.impl.operators.drilling.DrillUp;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
@@ -477,7 +476,9 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function) {
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
+
     return drillUpVertex(vertexLabel, propertyKey, function, null);
   }
 

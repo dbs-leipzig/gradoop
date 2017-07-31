@@ -52,7 +52,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
    */
   private boolean drillVertex;
   /**
-   * True, if all vertices shall be drilled.
+   * True, if all elements of a kind (vertex / edge) shall be drilled.
    */
   private boolean drillAllLabels;
   /**
@@ -97,14 +97,29 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     return newPropertyKey;
   }
 
-  protected boolean isDrillVertex() {
+  /**
+   * True, if vertices shall be drilled, false for edges
+   *
+   * @return true for vertex drilling
+   */
+  protected boolean drillVertex() {
     return drillVertex;
   }
 
+  /**
+   * True, if all elements of a kind (vertex / edge) shall be drilled.
+   *
+   * @return true for drilling all elements
+   */
   protected boolean drillAllLabels() {
     return drillAllLabels;
   }
 
+  /**
+   * True, if the current property key shall be reused.
+   *
+   * @return true for keeping the property key
+   */
   protected boolean keepCurrentPropertyKey() {
     return keepCurrentPropertyKey;
   }
