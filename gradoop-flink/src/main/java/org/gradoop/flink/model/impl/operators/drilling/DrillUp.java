@@ -27,7 +27,24 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
  * vertex / edge types. Additionally the drilled up value can be stored under a new key. If the
  * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
  * version number. This number increases on every continuous drill up call where the highest
- * number is the level direct below the drilled up one..
+ * number is the level direct below the drilled up one.
+ * <p>
+ * Consider the following example:
+ * <p>
+ * Input vertices:<br>
+ * (0, "Person", {yob: 1973})<br>
+ * (1, "Person", {yob: 1977})<br>
+ * (2, "Person", {yob: 1984})<br>
+ * (3, "Person", {yob: 1989})<br>
+ * <p>
+ * Output vertices (drilled by the century of their year of birth):<br>
+ * (0, "Person", {yob: 1970, yob__1: 1973})<br>
+ * (1, "Person", {yob: 1970, yob__1: 1977})<br>
+ * (2, "Person", {yob: 1980, yob__1: 1984})<br>
+ * (3, "Person", {yob: 1980, yob__1: 1989})<br>
+ * <p>
+ * This example shows that this operation may be used as pre processing for the
+ * {@link org.gradoop.flink.model.impl.operators.grouping.Grouping} operator.
  */
 public class DrillUp extends Drill {
 
