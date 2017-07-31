@@ -478,7 +478,6 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph drillUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function) {
-
     return drillUpVertex(vertexLabel, propertyKey, function, null);
   }
 
