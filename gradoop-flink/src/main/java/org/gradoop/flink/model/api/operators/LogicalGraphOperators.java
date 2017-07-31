@@ -26,7 +26,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.RollUp;
+import org.gradoop.flink.model.impl.operators.drilling.DrillUp;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
@@ -347,113 +347,113 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   DataSet<Boolean> equalsByData(LogicalGraph other);
 
   /**
-   * Returns a graph with the same structure but a specified property of an element is rolled up
-   * by the declared function. It is possible to roll up either on one vertex / edge type or all
-   * vertex / edge types. Additionally the rolled up value can be stored under a new key. If the
+   * Returns a graph with the same structure but a specified property of an element is drilled up
+   * by the declared function. It is possible to drill up either on one vertex / edge type or all
+   * vertex / edge types. Additionally the drilled up value can be stored under a new key. If the
    * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
-   * version number. This number increases on every continuous roll up call where the highest
-   * number is the level direct below the rolled up one.
+   * version number. This number increases on every continuous drill up call where the highest
+   * number is the level direct below the drilled up one.
    *
-   * @param rollUp roll up operation
-   * @return logical graph with rolled up properties
+   * @param drillUp drill up operation
+   * @return logical graph with drilled up properties
    */
-  LogicalGraph rollUp(RollUp rollUp);
+  LogicalGraph drillUp(DrillUp drillUp);
 
   /**
-   * Creates a graph with the same structure but a specified property of all vertex types is rolled
+   * Creates a graph with the same structure but a specified property of all vertex types is drilled
    * up by the function. The original information is also kept to be able to drill down afterwards.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformVertices(TransformationFunction)} operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
+   * @param function drill up function
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpVertex(String propertyKey, DrillFunction function);
+  LogicalGraph drillUpVertex(String propertyKey, DrillFunction function);
 
   /**
    * Creates a graph with the same structure but a specified property of a specific vertex
-   * type is rolled up by the function. The original information is also kept to be able to drill
+   * type is drilled up by the function. The original information is also kept to be able to drill
    * down afterwards.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformVertices(TransformationFunction)} operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param vertexLabel vertex label
    * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
+   * @param function drill up function
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
+  LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
 
   /**
    * Creates a graph with the same structure but a specified property of a specific vertex
-   * type is rolled up by the function. The original information is also kept to be able to drill
-   * down afterwards. Additionally a new property key is used for the rolled up property.
+   * type is drilled up by the function. The original information is also kept to be able to drill
+   * down afterwards. Additionally a new property key is used for the drilled up property.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformVertices(TransformationFunction)} operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param vertexLabel vertex label
    * @param propertyKey property key
-   * @param function roll up function
+   * @param function drill up function
    * @param newPropertyKey new property key
-   * @return graph with rolled up properties
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpVertex(
+  LogicalGraph drillUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
   /**
    * Creates a graph with the same structure but a specified property of a specific edge
-   * type is rolled up by the function. The original information is also kept to be able to drill
+   * type is drilled up by the function. The original information is also kept to be able to drill
    * down afterwards.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformEdges(TransformationFunction)} operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param edgeLabel edge label
    * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
+   * @param function drill up function
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
+  LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
 
   /**
    * Creates a graph with the same structure but a specified property of a specific edge
-   * type is rolled up by the function. The original information is also kept to be able to drill
-   * down afterwards. Additionally a new property key is used for the rolled up property.
+   * type is drilled up by the function. The original information is also kept to be able to drill
+   * down afterwards. Additionally a new property key is used for the drilled up property.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformEdges(TransformationFunction)} operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param edgeLabel edge label
    * @param propertyKey property key
-   * @param function roll up function
+   * @param function drill up function
    * @param newPropertyKey new property key
-   * @return graph with rolled up properties
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpEdge(
+  LogicalGraph drillUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
   /**
-   * Creates a graph with the same structure but a specified property of all edges types is rolled
+   * Creates a graph with the same structure but a specified property of all edges types is drilled
    * up by the function. The original information is also kept to be able to drill down afterwards.
    *
-   * Roll up is a convenience method for the
+   * Drill up is a convenience method for the
    * {@link LogicalGraph#transformEdges(TransformationFunction)}operation and can be used as
    * pre processing for the {@link LogicalGraph#groupBy(List)} operation.
    *
    * @param propertyKey property key
-   * @param function roll up function
-   * @return graph with rolled up properties
+   * @param function drill up function
+   * @return graph with drilled up properties
    */
-  LogicalGraph rollUpEdge(String propertyKey, DrillFunction function);
+  LogicalGraph drillUpEdge(String propertyKey, DrillFunction function);
 
   //----------------------------------------------------------------------------
   // Binary Operators

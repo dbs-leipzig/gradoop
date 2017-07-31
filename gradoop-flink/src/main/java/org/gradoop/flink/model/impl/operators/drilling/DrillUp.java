@@ -18,18 +18,18 @@ package org.gradoop.flink.model.impl.operators.drilling;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.RollUpTransformation;
+import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillUpTransformation;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
- * Creates a graph with the same structure but a specified property of an element is rolled up
- * by the declared function. It is possible to roll up either on one vertex / edge type or all
- * vertex / edge types. Additionally the rolled up value can be stored under a new key. If the
+ * Creates a graph with the same structure but a specified property of an element is drilled up
+ * by the declared function. It is possible to drill up either on one vertex / edge type or all
+ * vertex / edge types. Additionally the drilled up value can be stored under a new key. If the
  * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
- * version number. This number increases on every continuous roll up call where the highest
- * number is the level direct below the rolled up one..
+ * version number. This number increases on every continuous drill up call where the highest
+ * number is the level direct below the drilled up one..
  */
-public class RollUp extends Drill {
+public class DrillUp extends Drill {
 
   /**
    * Valued constructor.
@@ -41,7 +41,7 @@ public class RollUp extends Drill {
    * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
    * @param drillVertex    true, if vertices shall be drilled, false for edges
    */
-  public RollUp(
+  public DrillUp(
     String label, String propertyKey, DrillFunction function, String newPropertyKey,
     boolean drillVertex) {
     super(label, propertyKey, function, newPropertyKey, drillVertex);
@@ -52,11 +52,11 @@ public class RollUp extends Drill {
   public LogicalGraph execute(LogicalGraph graph) {
     if (isDrillVertex()) {
       graph = graph.transformVertices(
-        new RollUpTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
+        new DrillUpTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
           getNewPropertyKey()));
     } else {
       graph = graph.transformEdges(
-        new RollUpTransformation<Edge>(getLabel(), getPropertyKey(), getFunction(),
+        new DrillUpTransformation<Edge>(getLabel(), getPropertyKey(), getFunction(),
           getNewPropertyKey()));
     }
     return graph;
@@ -64,7 +64,7 @@ public class RollUp extends Drill {
 
   @Override
   public String getName() {
-    return RollUp.class.getName();
+    return DrillUp.class.getName();
   }
 
 }

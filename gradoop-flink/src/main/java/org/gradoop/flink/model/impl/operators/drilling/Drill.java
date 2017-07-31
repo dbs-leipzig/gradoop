@@ -21,7 +21,7 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
 import java.util.Objects;
 
 /**
- * Base class for the roll up / drill down operation. Also contains a builder for these.
+ * Base class for the drill up operation. Also contains a builder for these.
  */
 public abstract class Drill implements UnaryGraphToGraphOperator {
 
@@ -124,7 +124,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     private boolean drillVertex;
 
     /**
-     * Creates the roll up class. By default the vertices will be transformed, note
+     * Creates the drill up class. By default the vertices will be transformed, note
      * that {@link DrillBuilder#drillVertex{boolean} and
      * {@link DrillBuilder#drillEdge(boolean)} negate each other so only the last used will be
      * considered.
@@ -203,14 +203,14 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Creates a roll up operation.
+     * Creates a drill up operation.
      *
-     * @return roll up operation
+     * @return drill up operation
      */
-    public RollUp buildRollUp() {
+    public DrillUp buildDrillUp() {
       Objects.requireNonNull(propertyKey);
       Objects.requireNonNull(function);
-      return new RollUp(label, propertyKey, function, newPropertyKey, drillVertex);
+      return new DrillUp(label, propertyKey, function, newPropertyKey, drillVertex);
     }
   }
 }

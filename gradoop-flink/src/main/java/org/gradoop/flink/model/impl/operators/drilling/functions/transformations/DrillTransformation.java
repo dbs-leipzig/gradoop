@@ -21,7 +21,7 @@ import org.gradoop.flink.model.impl.operators.drilling.Drill;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
- * Base class for roll up / drill transformations.
+ * Base class for drill up transformations.
  *
  * @param <EL> element
  */
@@ -63,12 +63,12 @@ public abstract class DrillTransformation<EL extends Element>
   }
 
   /**
-   * Returns the next unused version number used in roll up.
+   * Returns the next unused version number used in drill up.
    *
-   * @param element element whose property shall be rolled up
+   * @param element element whose property shall be drilled up
    * @return next unused version number
    */
-  protected int getNextRollUpVersionNumber(EL element) {
+  protected int getNextDrillUpVersionNumber(EL element) {
     int i = 1;
     while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i)) {
       i++;
