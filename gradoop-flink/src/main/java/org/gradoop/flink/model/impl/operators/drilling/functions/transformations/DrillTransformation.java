@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.operators.drilling.functions.transformation
 
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.impl.operators.drilling.Drill;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
@@ -27,6 +26,12 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
  */
 public abstract class DrillTransformation<EL extends Element>
   implements TransformationFunction<EL> {
+
+  /**
+   * Separator between the iteration number and the original property key when the property key
+   * shall be kept.
+   */
+  static final String PROPERTY_VERSION_SEPARATOR = "__";
 
   /**
    * Label of the element whose property shall be drilled.
@@ -81,7 +86,7 @@ public abstract class DrillTransformation<EL extends Element>
    */
   protected int getNextDrillUpVersionNumber(EL element) {
     int i = 1;
-    while (element.hasProperty(getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR + i)) {
+    while (element.hasProperty(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i)) {
       i++;
     }
     return i;

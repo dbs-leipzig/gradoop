@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.operators.drilling.functions.transformations;
 
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.operators.drilling.Drill;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
@@ -54,8 +53,7 @@ public class DrillUpTransformation<EL extends Element> extends DrillTransformati
         if (keepCurrentPropertyKey()) {
           // save the original value with the version number in the property key
           transformed.setProperty(
-            getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR +
-              getNextDrillUpVersionNumber(current),
+            getPropertyKey() + PROPERTY_VERSION_SEPARATOR + getNextDrillUpVersionNumber(current),
             current.getPropertyValue(getPropertyKey()));
           // save the new drilled value
           transformed.setProperty(

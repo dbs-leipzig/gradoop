@@ -29,12 +29,6 @@ import java.util.Objects;
 public abstract class Drill implements UnaryGraphToGraphOperator {
 
   /**
-   * Separator between the iteration number and the original property key when the property key
-   * shall be kept.
-   */
-  public static final String PROPERTY_VERSION_SEPARATOR = "__";
-
-  /**
    * Label of the element whose property shall be drilled.
    */
   private String label;
