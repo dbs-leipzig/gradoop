@@ -15,14 +15,17 @@
  */
 package org.gradoop.flink.io.impl.dot;
 
+import java.io.IOException;
+
+import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.LogicalGraph;
-
-import java.io.IOException;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
@@ -81,13 +84,71 @@ public class DOTDataSink implements DataSink {
     write(graphCollection.toTransactions(), overWrite);
   }
 
+  /**
+   * Write opening and closing lines around strings
+   * representing individual {@link GraphTransaction}s in graphviz.
+   */
+  private static class GraphvizWriter extends TextOutputFormat<String> {
+
+    /**
+     * Default class version for serialization.
+     */
+    private static final long serialVersionUID = 1;
+
+    /**
+     * see super constructor.
+     * @param outputPath graphviz dot file name
+     * @param charset encoding
+     */
+    public GraphvizWriter(Path outputPath, String charset) {
+      super(outputPath, charset);
+    }
+
+    /**
+     * see super constructor.
+     * @param outputPath graphviz dot file name
+     */
+    public GraphvizWriter(Path outputPath) {
+      super(outputPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void open(int taskNumber, int numTasks) throws IOException {
+      super.open(taskNumber, numTasks);
+      super.writeRecord("digraph {\n");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close() throws IOException {
+      super.writeRecord("}");
+      super.close();
+    }
+  }
+
+  /**
+   * We want to write multiple {@link GraphTransaction} instances into ONE text file,
+   * with correct text prefix and suffix. This means, we need parallism=1.
+   */
   @Override
   public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
 
     FileSystem.WriteMode writeMode =
-      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+        overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
-    graphTransactions.getTransactions()
-      .writeAsFormattedText(path, writeMode, new DOTFileFormat(graphInformation));
+    DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
+    GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
+    graphvizWriter.setWriteMode(writeMode);
+
+    graphTransactions
+      .getTransactions()
+      .map(tr -> dotFileFormat.format(tr))
+      .output(graphvizWriter)
+      .setParallelism(1);
   }
 }

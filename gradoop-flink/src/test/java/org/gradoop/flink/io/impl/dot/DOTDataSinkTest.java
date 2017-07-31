@@ -58,28 +58,36 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     int graphLines = 0;
+    int lines = 0;
+    int subgraphLines = 0;
     int vertexLines = 0;
     int edgeLines = 0;
 
     // read written file
     List<String> dotLines = getExecutionEnvironment()
       .readTextFile(dotFile)
+      .setParallelism(1) // force reading lines in order
       .collect();
 
     // count vertex and edge lines
-    for (String line : dotLines){
+    for (String line : dotLines) {
 
-      if (line.contains("->")){
+      if(line.contains("digraph") && lines == 0) {
+        graphLines++;
+      } else  if (line.contains("->")) {
         edgeLines++;
       } else if (line.startsWith("v")) {
         vertexLines++;
-      } else if (line.startsWith("graph") || line.startsWith("digraph")) {
-        graphLines++;
+      } else if (line.startsWith("subgraph")) {
+        subgraphLines++;
       }
+      lines++;
     }
 
     // assert
-    assertEquals("Wrong number of graph lines", 2, graphLines);
+    assertEquals("Wrong prefix/missing 'digraph'", 1, graphLines);
+    assertEquals("Wrong number of subgraph lines", 1, subgraphLines);
+    assertEquals("Wrong number of graph lines", 1, graphLines);
     assertEquals("Wrong number of edge lines", 4, edgeLines);
     assertEquals("Wrong number of vertex lines", 3, vertexLines);
  }
