@@ -30,15 +30,16 @@ public class DrillUpTransformation<EL extends Element> extends DrillTransformati
   /**
    * Valued constructor.
    *
-   * @param label          getLabel() of the element whose property shall be drilled, or
-   *                       see {@link Drill#DRILL_ALL_ELEMENTS}
-   * @param propertyKey    property key
-   * @param function       drill function which shall be applied to a property
-   * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
+   * @param label                  label of the element whose property shall be drilled
+   * @param propertyKey            property key
+   * @param function               drill function which shall be applied to a property
+   * @param newPropertyKey         new property key
+   * @param drillAllLabels         true, if all elements of a kind (vertex / edge) shall be drilled
+   * @param keepCurrentPropertyKey true, if the current property key shall be reused
    */
   public DrillUpTransformation(String label, String propertyKey, DrillFunction function,
-    String newPropertyKey) {
-    super(label, propertyKey, function, newPropertyKey);
+    String newPropertyKey, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
+    super(label, propertyKey, function, newPropertyKey, drillAllLabels, keepCurrentPropertyKey);
   }
 
   @Override
@@ -47,10 +48,10 @@ public class DrillUpTransformation<EL extends Element> extends DrillTransformati
     transformed.setLabel(current.getLabel());
     transformed.setProperties(current.getProperties());
     // filters relevant elements
-    if (getLabel().equals(Drill.DRILL_ALL_ELEMENTS) || getLabel().equals(current.getLabel())) {
+    if (drillAllLabels() || getLabel().equals(current.getLabel())) {
       if (current.hasProperty(getPropertyKey())) {
         // save drilled up value with the same key
-        if (getOtherPropertyKey().equals(Drill.KEEP_CURRENT_PROPERTY_KEY)) {
+        if (keepCurrentPropertyKey()) {
           // save the original value with the version number in the property key
           transformed.setProperty(
             getPropertyKey() + Drill.PROPERTY_VERSION_SEPARATOR +
@@ -64,7 +65,7 @@ public class DrillUpTransformation<EL extends Element> extends DrillTransformati
         } else {
           // store the drilled value with the new key
           transformed.setProperty(
-            getOtherPropertyKey(),
+            getNewPropertyKey(),
             getFunction().execute(current.getPropertyValue(getPropertyKey())));
         }
       }

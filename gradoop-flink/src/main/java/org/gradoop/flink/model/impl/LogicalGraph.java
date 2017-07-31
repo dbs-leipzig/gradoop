@@ -469,16 +469,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUp(DrillUp drillUp) {
-    return callForGraph(drillUp);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public LogicalGraph drillUpVertex(String propertyKey, DrillFunction function) {
-    return drillUpVertex(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+    return drillUpVertex(null, propertyKey, function);
   }
 
   /**
@@ -486,7 +478,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function) {
-    return drillUpVertex(vertexLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+    return drillUpVertex(vertexLabel, propertyKey, function, null);
   }
 
   /**
@@ -495,7 +487,24 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph drillUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
-    return callForGraph(new DrillUp(vertexLabel, propertyKey, function, newPropertyKey, true));
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillVertex(true);
+
+    if (vertexLabel != null) {
+      builder.setLabel(vertexLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
   }
 
   /**
@@ -503,7 +512,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public LogicalGraph drillUpEdge(String propertyKey, DrillFunction function) {
-    return drillUpEdge(Drill.DRILL_ALL_ELEMENTS, propertyKey, function);
+    return drillUpEdge(null, propertyKey, function);
   }
 
   /**
@@ -511,7 +520,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
    */
   @Override
   public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
-    return drillUpEdge(edgeLabel, propertyKey, function, Drill.KEEP_CURRENT_PROPERTY_KEY);
+    return drillUpEdge(edgeLabel, propertyKey, function, null);
   }
 
   /**
@@ -520,7 +529,24 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph drillUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
-    return callForGraph(new DrillUp(edgeLabel, propertyKey, function, newPropertyKey, false));
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillEdge(true);
+
+    if (edgeLabel != null) {
+      builder.setLabel(edgeLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
   }
 
   //----------------------------------------------------------------------------

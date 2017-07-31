@@ -43,23 +43,34 @@ public abstract class DrillTransformation<EL extends Element>
   /**
    * New property key.
    */
-  private String otherPropertyKey;
+  private String newPropertyKey;
+  /**
+   * True, if all elements if a kind (vertex / edge) shall be drilled.
+   */
+  private boolean drillAllLabels;
+  /**
+   * True, if the current property key shall be reused.
+   */
+  private boolean keepCurrentPropertyKey;
 
   /**
    * Valued constructor.
    *
-   * @param label           label of the element whose property shall be drilled, or
-   *                        see {@link Drill#DRILL_ALL_ELEMENTS}
-   * @param propertyKey     property key
-   * @param function        drill function which shall be applied to a property
-   * @param newPropertyKey  new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
+   * @param label                   label of the element whose property shall be drilled
+   * @param propertyKey             property key
+   * @param function                drill function which shall be applied to a property
+   * @param newPropertyKey          new property key
+   * @param drillAllLabels          true, if all elements of a kind (vertex / edge) shall be drilled
+   * @param keepCurrentPropertyKey  true, if the current property key shall be reused
    */
   public DrillTransformation(String label, String propertyKey, DrillFunction function,
-    String newPropertyKey) {
+    String newPropertyKey, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
     this.label = label;
     this.propertyKey = propertyKey;
     this.function = function;
-    this.otherPropertyKey = newPropertyKey;
+    this.newPropertyKey = newPropertyKey;
+    this.drillAllLabels = drillAllLabels;
+    this.keepCurrentPropertyKey = keepCurrentPropertyKey;
   }
 
   /**
@@ -88,8 +99,16 @@ public abstract class DrillTransformation<EL extends Element>
     return function;
   }
 
-  protected String getOtherPropertyKey() {
-    return otherPropertyKey;
+  protected String getNewPropertyKey() {
+    return newPropertyKey;
+  }
+
+  protected boolean drillAllLabels() {
+    return drillAllLabels;
+  }
+
+  protected boolean keepCurrentPropertyKey() {
+    return keepCurrentPropertyKey;
   }
 
   /**

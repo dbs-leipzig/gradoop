@@ -26,14 +26,6 @@ import java.util.Objects;
 public abstract class Drill implements UnaryGraphToGraphOperator {
 
   /**
-   * Used as new property key to declare that the current property key shall be kept.
-   */
-  public static final String KEEP_CURRENT_PROPERTY_KEY = ":keepKey";
-  /**
-   * Used as label to declare that all vertices or all edges shall be drilled.
-   */
-  public static final String DRILL_ALL_ELEMENTS = ":allElements";
-  /**
    * Separator between the iteration number and the original property key when the property key
    * shall be kept.
    */
@@ -59,23 +51,34 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
    * True, if vertices shall be drilled, false for edges
    */
   private boolean drillVertex;
+  /**
+   * True, if all vertices shall be drilled.
+   */
+  private boolean drillAllLabels;
+  /**
+   * True, if the current property key shall be reused.
+   */
+  private boolean keepCurrentPropertyKey;
 
   /**
    * Valued constructor.
-   *  @param label label of the element whose property shall be drilled, or
-   *              see {@link Drill#DRILL_ALL_ELEMENTS}
-   * @param propertyKey property key
-   * @param function drill function which shall be applied to a property
-   * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
-   * @param drillVertex true, if vertices shall be drilled, false for edges
+   *  @param label                  label of the element whose property shall be drilled
+   * @param propertyKey             property key
+   * @param function                drill function which shall be applied to a property
+   * @param newPropertyKey          new property key
+   * @param drillVertex             true, if vertices shall be drilled, false for edges
+   * @param drillAllLabels          true, if all elements of a kind (vertex / edge) shall be drilled
+   * @param keepCurrentPropertyKey  true, if the current property key shall be reused
    */
-  public Drill(String label, String propertyKey, DrillFunction function, String newPropertyKey,
-    boolean drillVertex) {
+  Drill(String label, String propertyKey, DrillFunction function, String newPropertyKey,
+    boolean drillVertex, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
     this.label = label;
     this.propertyKey = propertyKey;
     this.function = function;
     this.newPropertyKey = newPropertyKey;
     this.drillVertex = drillVertex;
+    this.drillAllLabels = drillAllLabels;
+    this.keepCurrentPropertyKey = keepCurrentPropertyKey;
   }
 
   protected String getLabel() {
@@ -96,6 +99,14 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
 
   protected boolean isDrillVertex() {
     return drillVertex;
+  }
+
+  protected boolean drillAllLabels() {
+    return drillAllLabels;
+  }
+
+  protected boolean keepCurrentPropertyKey() {
+    return keepCurrentPropertyKey;
   }
 
   /**
@@ -122,6 +133,14 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
      * True, if vertices shall be drilled, false for edges
      */
     private boolean drillVertex;
+    /**
+     * True, if all elements if a kind (vertex / edge) shall be drilled.
+     */
+    private boolean drillAllLabels;
+    /**
+     * True, if the current property key shall be reused.
+     */
+    private boolean keepCurrentPropertyKey;
 
     /**
      * Creates the drill up class. By default the vertices will be transformed, note
@@ -130,10 +149,10 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
      * considered.
      */
     public DrillBuilder() {
-      label = DRILL_ALL_ELEMENTS;
       function = null;
-      newPropertyKey = Drill.KEEP_CURRENT_PROPERTY_KEY;
       drillVertex = true;
+      drillAllLabels = true;
+      keepCurrentPropertyKey = true;
     }
 
     /**
@@ -144,6 +163,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
      */
     public DrillBuilder setLabel(String label) {
       this.label = label;
+      drillAllLabels = false;
       return this;
     }
 
@@ -177,6 +197,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
      */
     public DrillBuilder setNewPropertyKey(String newPropertyKey) {
       this.newPropertyKey = newPropertyKey;
+      keepCurrentPropertyKey = false;
       return this;
     }
 
@@ -210,7 +231,9 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     public DrillUp buildDrillUp() {
       Objects.requireNonNull(propertyKey);
       Objects.requireNonNull(function);
-      return new DrillUp(label, propertyKey, function, newPropertyKey, drillVertex);
+      return new DrillUp(
+        label, propertyKey, function, newPropertyKey, drillVertex, drillAllLabels,
+        keepCurrentPropertyKey);
     }
   }
 }

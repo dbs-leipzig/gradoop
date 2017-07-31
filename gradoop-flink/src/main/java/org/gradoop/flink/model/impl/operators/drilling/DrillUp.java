@@ -31,33 +31,34 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
  */
 public class DrillUp extends Drill {
 
+
   /**
    * Valued constructor.
    *
-   * @param label          label of the element whose property shall be drilled, or
-   *                       see {@link Drill#DRILL_ALL_ELEMENTS}
-   * @param propertyKey    property key
-   * @param function       drill function which shall be applied to a property
-   * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
-   * @param drillVertex    true, if vertices shall be drilled, false for edges
+   * @param label                  label of the element whose property shall be drilled
+   * @param propertyKey            property key
+   * @param function               drill function which shall be applied to a property
+   * @param newPropertyKey         new property key
+   * @param drillVertex            true, if vertices shall be drilled, false for edges
+   * @param drillAllLabels         true, if all elements of a kind (vertex / edge) shall be drilled
+   * @param keepCurrentPropertyKey true, if the current property key shall be reused
    */
-  public DrillUp(
-    String label, String propertyKey, DrillFunction function, String newPropertyKey,
-    boolean drillVertex) {
-    super(label, propertyKey, function, newPropertyKey, drillVertex);
+  DrillUp(String label, String propertyKey, DrillFunction function, String newPropertyKey,
+    boolean drillVertex, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
+    super(label, propertyKey, function, newPropertyKey, drillVertex, drillAllLabels,
+      keepCurrentPropertyKey);
   }
-
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     if (isDrillVertex()) {
       graph = graph.transformVertices(
         new DrillUpTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
-          getNewPropertyKey()));
+          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else {
       graph = graph.transformEdges(
         new DrillUpTransformation<Edge>(getLabel(), getPropertyKey(), getFunction(),
-          getNewPropertyKey()));
+          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     }
     return graph;
   }

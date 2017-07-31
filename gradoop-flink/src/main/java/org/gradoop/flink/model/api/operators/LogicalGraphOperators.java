@@ -347,19 +347,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   DataSet<Boolean> equalsByData(LogicalGraph other);
 
   /**
-   * Returns a graph with the same structure but a specified property of an element is drilled up
-   * by the declared function. It is possible to drill up either on one vertex / edge type or all
-   * vertex / edge types. Additionally the drilled up value can be stored under a new key. If the
-   * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
-   * version number. This number increases on every continuous drill up call where the highest
-   * number is the level direct below the drilled up one.
-   *
-   * @param drillUp drill up operation
-   * @return logical graph with drilled up properties
-   */
-  LogicalGraph drillUp(DrillUp drillUp);
-
-  /**
    * Creates a graph with the same structure but a specified property of all vertex types is drilled
    * up by the function. The original information is also kept to be able to drill down afterwards.
    *

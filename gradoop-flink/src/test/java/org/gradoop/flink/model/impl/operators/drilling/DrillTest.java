@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.RollUpDivideBy;
+import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillUpDivideBy;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import org.junit.Test;
 public class DrillTest extends GradoopFlinkTestBase {
 
   //----------------------------------------------------------------------------
-  // Tests for roll up
+  // Tests for drill up
   //----------------------------------------------------------------------------
 
 
@@ -35,9 +35,9 @@ public class DrillTest extends GradoopFlinkTestBase {
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    LogicalGraph output = input.rollUp(new Drill.DrillBuilder()
+    LogicalGraph output = input.callForGraph(new Drill.DrillBuilder()
       .drillVertex(true)
-      .buildRollUp());
+      .buildDrillUp());
   }
 
   @Test(expected = NullPointerException.class)
@@ -47,10 +47,10 @@ public class DrillTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
-        .setFunction(new RollUpDivideBy(1000L))
+      .callForGraph(new Drill.DrillBuilder()
+        .setFunction(new DrillUpDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp());
+        .buildDrillUp());
   }
 
   @Test
@@ -79,11 +79,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new RollUpDivideBy(1000L))
-        .drillVertex(true)
-        .buildRollUp());
+      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -115,12 +111,12 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_in_K")
-        .setFunction(new RollUpDivideBy(1000L))
+        .setFunction(new DrillUpDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp());
+        .buildDrillUp());
 
 
     collectAndAssertTrue(
@@ -155,16 +151,8 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new RollUpDivideBy(1000L))
-        .drillVertex(true)
-        .buildRollUp())
-      .rollUp(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new RollUpDivideBy(1000L))
-        .drillVertex(true)
-        .buildRollUp());
+      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L))
+      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -198,18 +186,18 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_in_K")
-        .setFunction(new RollUpDivideBy(1000L))
+        .setFunction(new DrillUpDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp())
-      .rollUp(new Drill.DrillBuilder()
+        .buildDrillUp())
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount_in_K")
         .setNewPropertyKey("memberCount_in_M")
-        .setFunction(new RollUpDivideBy(1000L))
+        .setFunction(new DrillUpDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp());
+        .buildDrillUp());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -245,28 +233,28 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthMillis")
         .setNewPropertyKey("birth")
-        .setFunction(new RollUpDivideBy(1000L))
+        .setFunction(new DrillUpDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp())
-      .rollUp(new Drill.DrillBuilder()
+        .buildDrillUp())
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
-        .setFunction(new RollUpDivideBy(60L))
+        .setFunction(new DrillUpDivideBy(60L))
         .drillVertex(true)
-        .buildRollUp())
-      .rollUp(new Drill.DrillBuilder()
+        .buildDrillUp())
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
-        .setFunction(new RollUpDivideBy(60L))
+        .setFunction(new DrillUpDivideBy(60L))
         .drillVertex(true)
-        .buildRollUp())
-      .rollUp(new Drill.DrillBuilder()
+        .buildDrillUp())
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
         .setNewPropertyKey("birthDays")
-        .setFunction(new RollUpDivideBy(24L))
+        .setFunction(new DrillUpDivideBy(24L))
         .drillVertex(true)
-        .buildRollUp());
+        .buildDrillUp());
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -300,11 +288,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
-        .setPropertyKey("until")
-        .setFunction(new RollUpDivideBy(1000L))
-        .drillEdge(true)
-        .buildRollUp());
+      .drillUpEdge("until", new DrillUpDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
