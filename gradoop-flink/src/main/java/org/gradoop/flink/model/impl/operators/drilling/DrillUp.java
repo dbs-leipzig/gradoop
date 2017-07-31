@@ -48,7 +48,6 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
  */
 public class DrillUp extends Drill {
 
-
   /**
    * Valued constructor.
    *
@@ -57,13 +56,10 @@ public class DrillUp extends Drill {
    * @param function               drill function which shall be applied to a property
    * @param newPropertyKey         new property key
    * @param drillVertex            true, if vertices shall be drilled, false for edges
-   * @param drillAllLabels         true, if all elements of a kind (vertex / edge) shall be drilled
-   * @param keepCurrentPropertyKey true, if the current property key shall be reused
    */
   DrillUp(String label, String propertyKey, DrillFunction function, String newPropertyKey,
-    boolean drillVertex, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
-    super(label, propertyKey, function, newPropertyKey, drillVertex, drillAllLabels,
-      keepCurrentPropertyKey);
+    boolean drillVertex) {
+    super(label, propertyKey, function, newPropertyKey, drillVertex);
   }
 
   @Override
@@ -84,5 +80,4 @@ public class DrillUp extends Drill {
   public String getName() {
     return DrillUp.class.getName();
   }
-
 }
