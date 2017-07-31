@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 

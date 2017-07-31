@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 import java.util.HashMap;
@@ -31,15 +32,7 @@ import java.util.Map;
  */
 public class VertexLabelDecoder extends
   RichMapFunction<GraphTransaction, GraphTransaction> {
-  /**
-   * Constant for broadcast set containing the vertex dictionary.
-   */
-  public static final String VERTEX_DICTIONARY = "vertexDictionary";
-  /**
-   * Constant string which is added to those edges or vertices which do not
-   * have an entry in the dictionary while others have one.
-   */
-  private static final String EMPTY_LABEL = "";
+
   /**
    * Map which contains a vertex dictionary.
    */
@@ -52,7 +45,7 @@ public class VertexLabelDecoder extends
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     vertexDictionary = getRuntimeContext()
-      .<HashMap<Integer, String>>getBroadcastVariable(VERTEX_DICTIONARY)
+      .<HashMap<Integer, String>>getBroadcastVariable(TLFConstants.VERTEX_DICTIONARY)
       .get(0);
   }
 
@@ -68,7 +61,7 @@ public class VertexLabelDecoder extends
       if (label != null) {
         vertex.setLabel(label);
       } else {
-        vertex.setLabel(vertex.getLabel() + EMPTY_LABEL);
+        vertex.setLabel(vertex.getLabel() + TLFConstants.EMPTY_LABEL);
       }
     }
     return graphTransaction;

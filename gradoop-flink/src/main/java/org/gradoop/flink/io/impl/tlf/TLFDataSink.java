@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.tlf;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.tlf.constants.BroadcastNames;
 import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelList;
 import org.gradoop.flink.io.impl.tlf.functions.ElementLabelEncoder;
 import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryFileFormat;
@@ -135,23 +134,23 @@ public class TLFDataSink extends TLFBase implements DataSink {
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(vertexDictionary,
-            BroadcastNames.VERTEX_DICTIONARY)
+            TLFConstants.VERTEX_DICTIONARY)
           .withBroadcastSet(edgeDictionary,
-            BroadcastNames.EDGE_DICTIONARY);
+            TLFConstants.EDGE_DICTIONARY);
       } else if (hasVertexDictionary()) {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(vertexDictionary,
-            BroadcastNames.VERTEX_DICTIONARY);
+            TLFConstants.VERTEX_DICTIONARY);
       } else {
         simpleLabelTransaction = graphTransactions.getTransactions()
           // map the simple integer-like labels
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(edgeDictionary,
-            BroadcastNames.EDGE_DICTIONARY);
+            TLFConstants.EDGE_DICTIONARY);
       }
       // write the TLF format adjusted graphs to file
       simpleLabelTransaction
