@@ -26,6 +26,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -343,6 +344,108 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return 1-element dataset containing true, iff equal by element data
    */
   DataSet<Boolean> equalsByData(LogicalGraph other);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * graph. The property is identified by the specified property key. The previous version of the
+   * property value is stored at the vertex. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @param function drill up function
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpVertex(String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * graph. The vertices are selected by their label and the property is identified by the
+   * specified property key. The previous version of the property value is stored at the vertex.
+   * The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param vertexLabel vertex label
+   * @param propertyKey property key
+   * @param function drill up function
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * graph. The vertices are selected by their label and the property is identified by the
+   * specified property key. The new version of the property value is stored at the vertex
+   * under the new property key. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param vertexLabel vertex label
+   * @param propertyKey property key
+   * @param function drill up function
+   * @param newPropertyKey new property key
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * graph. The property is identified by the specified property key. The previous version of the
+   * property value is stored at the edge. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @param function drill up function
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpEdge(String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * graph. The edges are selected by their label and the property is identified by the
+   * specified property key. The previous version of the property value is stored at the edge.
+   * The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param edgeLabel edge label
+   * @param propertyKey property key
+   * @param function drill up function
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * graph. The edges are selected by their label and the property is identified by the
+   * specified property key. The new version of the property value is stored at the edge
+   * under the new property key. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param edgeLabel edge label
+   * @param propertyKey property key
+   * @param function drill up function
+   * @param newPropertyKey new property key
+   * @return graph with drilled up properties
+   */
+  LogicalGraph drillUpEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
   //----------------------------------------------------------------------------
   // Binary Operators

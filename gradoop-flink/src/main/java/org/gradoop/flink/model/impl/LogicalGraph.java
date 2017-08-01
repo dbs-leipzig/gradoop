@@ -38,6 +38,8 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.drilling.Drill;
+import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
@@ -460,6 +462,91 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   public LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpVertex(String propertyKey, DrillFunction function) {
+    return drillUpVertex(null, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
+    return drillUpVertex(vertexLabel, propertyKey, function, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillVertex(true);
+
+    if (vertexLabel != null) {
+      builder.setLabel(vertexLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpEdge(String propertyKey, DrillFunction function) {
+    return drillUpEdge(null, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return drillUpEdge(edgeLabel, propertyKey, function, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillUpEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillEdge(true);
+
+    if (edgeLabel != null) {
+      builder.setLabel(edgeLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
   }
 
   //----------------------------------------------------------------------------
