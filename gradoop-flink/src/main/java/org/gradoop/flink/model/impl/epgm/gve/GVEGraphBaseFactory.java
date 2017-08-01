@@ -13,58 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl;
+package org.gradoop.flink.model.impl.epgm.gve;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.GraphBaseOperators;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
- * Base class for graph representations.
- *
- * @see LogicalGraph
- * @see GraphCollection
+ * Base class for constructing GVE-based graphs and graph collections.
  */
-public abstract class GraphBase implements GraphBaseOperators {
-  /**
-   * Gradoop Flink configuration.
-   */
-  private final GradoopFlinkConfig config;
-  /**
-   * Graph data associated with the logical graphs in that collection.
-   */
-  private final DataSet<GraphHead> graphHeads;
-  /**
-   * DataSet containing vertices associated with that graph.
-   */
-  private final DataSet<Vertex> vertices;
-  /**
-   * DataSet containing edges associated with that graph.
-   */
-  private final DataSet<Edge> edges;
+abstract class GVEGraphBaseFactory {
 
   /**
-   * Creates a new graph instance.
-   *
-   * @param graphHeads  graph head data set
-   * @param vertices    vertex data set
-   * @param edges       edge data set
-   * @param config      Gradoop Flink configuration
+   * Configuration
    */
-  protected GraphBase(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config) {
-    this.graphHeads = graphHeads;
-    this.vertices = vertices;
-    this.edges = edges;
+  GradoopFlinkConfig config;
+
+  /**
+   * Creates a new GVE-based factory.
+   *
+   * @param config Gradoop config
+   */
+  GVEGraphBaseFactory(GradoopFlinkConfig config) {
+    Objects.requireNonNull(config);
     this.config = config;
   }
 
@@ -73,11 +52,9 @@ public abstract class GraphBase implements GraphBaseOperators {
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
    * @param graphHeads  graph heads
-   * @param config      configuration
    * @return graph head dataset
    */
-  protected static DataSet<GraphHead> createGraphHeadDataSet(
-    Collection<GraphHead> graphHeads, GradoopFlinkConfig config) {
+  DataSet<GraphHead> createGraphHeadDataSet(Collection<GraphHead> graphHeads) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
@@ -97,11 +74,9 @@ public abstract class GraphBase implements GraphBaseOperators {
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
    * @param vertices  vertex collection
-   * @param config    configuration
    * @return vertex dataset
    */
-  protected static DataSet<Vertex> createVertexDataSet(
-    Collection<Vertex> vertices, GradoopFlinkConfig config) {
+  DataSet<Vertex> createVertexDataSet(Collection<Vertex> vertices) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
@@ -121,11 +96,9 @@ public abstract class GraphBase implements GraphBaseOperators {
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
    * @param edges edge collection
-   * @param config configuration
    * @return edge dataset
    */
-  protected static DataSet<Edge> createEdgeDataSet(Collection<Edge> edges,
-    GradoopFlinkConfig config) {
+  DataSet<Edge> createEdgeDataSet(Collection<Edge> edges) {
 
     DataSet<Edge> edgeSet;
     if (edges.isEmpty()) {
@@ -137,67 +110,5 @@ public abstract class GraphBase implements GraphBaseOperators {
       edgeSet = config.getExecutionEnvironment().fromCollection(edges);
     }
     return edgeSet;
-  }
-
-  /**
-   * Returns the Gradoop Flink configuration.
-   *
-   * @return Gradoop Flink configuration
-   */
-  public GradoopFlinkConfig getConfig() {
-    return config;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Vertex> getVertices() {
-    return vertices;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Edge> getEdges() {
-    return edges;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Edge> getOutgoingEdges(final GradoopId vertexID) {
-    return
-      this.edges.filter(new FilterFunction<Edge>() {
-        @Override
-        public boolean filter(Edge edge) throws Exception {
-          return edge.getSourceId().equals(vertexID);
-        }
-      });
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DataSet<Edge> getIncomingEdges(final GradoopId vertexID) {
-    return
-      this.edges.filter(new FilterFunction<Edge>() {
-        @Override
-        public boolean filter(Edge edge) throws Exception {
-          return edge.getTargetId().equals(vertexID);
-        }
-      });
-  }
-
-  /**
-   * Returns the graphHeads associated with that graph / graph collection.
-   *
-   * @return graph heads
-   */
-  protected DataSet<GraphHead> getGraphHeads() {
-    return this.graphHeads;
   }
 }

@@ -31,6 +31,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -126,7 +128,8 @@ public class GradoopFlinkTestUtils {
   public static void printDirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printDirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
+    printDirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+      .fromGraph(graph));
   }
 
   public static void printDirectedCanonicalAdjacencyMatrix(
@@ -141,7 +144,8 @@ public class GradoopFlinkTestUtils {
   public static void printUndirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printUndirectedCanonicalAdjacencyMatrix(GraphCollection.fromGraph(graph));
+    printUndirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+      .fromGraph(graph));
   }
 
   public static void printUndirectedCanonicalAdjacencyMatrix(

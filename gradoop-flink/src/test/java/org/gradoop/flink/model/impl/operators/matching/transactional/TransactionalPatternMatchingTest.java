@@ -20,7 +20,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;

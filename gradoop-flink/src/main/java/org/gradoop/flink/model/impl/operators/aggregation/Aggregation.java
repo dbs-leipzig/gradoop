@@ -20,15 +20,15 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateEdges;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateVertices;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -86,8 +86,8 @@ public class Aggregation implements UnaryGraphToGraphOperator {
       .map(new SetAggregateProperty(aggregateFunction))
       .withBroadcastSet(aggregate, SetAggregateProperty.VALUE);
 
-    return LogicalGraph
-      .fromDataSets(graphHead, vertices, edges, graph.getConfig());
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graphHead, vertices, edges);
   }
 
   /**

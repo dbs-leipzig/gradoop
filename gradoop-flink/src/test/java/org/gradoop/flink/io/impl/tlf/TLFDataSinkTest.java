@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 

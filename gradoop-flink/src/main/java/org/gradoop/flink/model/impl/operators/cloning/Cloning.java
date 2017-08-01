@@ -17,23 +17,22 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.operators.cloning.functions
-  .EdgeSourceUpdateJoin;
-import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
-import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
-import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
+import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeSourceUpdateJoin;
+import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
+import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
+import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 
 /**
  * Creates a copy of the logical graph with new ids for the graph head,
@@ -90,8 +89,8 @@ public class Cloning implements UnaryGraphToGraphOperator {
       .map(new ElementGraphUpdater<Edge>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 
-    return LogicalGraph.fromDataSets(graphHead,
-      vertices, edges, graph.getConfig());
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graphHead, vertices, edges);
   }
 
   /**

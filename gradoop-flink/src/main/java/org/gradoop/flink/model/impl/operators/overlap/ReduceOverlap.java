@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -43,10 +43,9 @@ public class ReduceOverlap extends OverlapBase implements
 
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<GraphHead>());
 
-    return LogicalGraph.fromDataSets(
+    return collection.getConfig().getLogicalGraphFactory().fromDataSets(
       getVertices(collection.getVertices(), graphIDs),
-      getEdges(collection.getEdges(), graphIDs),
-      collection.getConfig()
+      getEdges(collection.getEdges(), graphIDs)
     );
   }
 

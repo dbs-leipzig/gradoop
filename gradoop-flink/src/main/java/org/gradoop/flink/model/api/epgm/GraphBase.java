@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -31,7 +30,14 @@ import java.io.IOException;
  * @see LogicalGraph
  * @see GraphCollection
  */
-public interface GraphBaseOperators {
+public interface GraphBase {
+
+  /**
+   * Returns the Gradoop Flink configuration.
+   *
+   * @return Gradoop Flink configuration
+   */
+  GradoopFlinkConfig getConfig();
 
   //----------------------------------------------------------------------------
   // Containment methods

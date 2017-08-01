@@ -1,12 +1,12 @@
 /**
  * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -70,28 +70,26 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph logicalGraph) {
+  public LogicalGraph execute(LogicalGraph graph) {
     // prepare vertex set for Gelly vertex centric iteration
     DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> vertices =
-      logicalGraph.getVertices()
-        .map(new VertexToGellyVertexMapper(propertyKey));
+      graph.getVertices().map(new VertexToGellyVertexMapper(propertyKey));
 
     // prepare edge set for Gelly vertex centric iteration
     DataSet<org.apache.flink.graph.Edge<GradoopId, NullValue>> edges =
-      logicalGraph.getEdges().map(new EdgeToGellyEdgeMapper());
+      graph.getEdges().map(new EdgeToGellyEdgeMapper());
 
     // create Gelly graph
-    Graph<GradoopId, PropertyValue, NullValue> gellyGraph = Graph.fromDataSet(
-      vertices, edges, logicalGraph.getConfig().getExecutionEnvironment());
+    Graph<GradoopId, PropertyValue, NullValue> gellyGraph =
+      Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());
 
-    DataSet<Vertex> labeledVertices = executeInternal(gellyGraph)
-      .join(logicalGraph.getVertices())
-      .where(0).equalTo(new Id<Vertex>())
-      .with(new LPVertexJoin(propertyKey));
+    DataSet<Vertex> labeledVertices =
+      executeInternal(gellyGraph).join(graph.getVertices()).where(0)
+        .equalTo(new Id<Vertex>()).with(new LPVertexJoin(propertyKey));
 
     // return labeled graph
-    return LogicalGraph.fromDataSets(
-      labeledVertices, logicalGraph.getEdges(), logicalGraph.getConfig());
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(labeledVertices, graph.getEdges());
   }
 
   /**
@@ -100,9 +98,9 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * @param gellyGraph gelly graph with initialized vertices
    * @return updated vertex set
    */
-  protected abstract
-  DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>>
-  executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
+  protected abstract DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>>
+  executeInternal(
+    Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
 
   /**
    * Returns the maximum number of iterations the algorithm is executed.

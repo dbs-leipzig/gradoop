@@ -17,9 +17,9 @@ package org.gradoop.flink.algorithms.fsm.transactional.predgen;
 
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,7 +97,7 @@ public abstract class PredictableGeneratorFSMTestBase extends GradoopFlinkTestBa
       graphCount, 1, true, getConfig()).execute();
 
     GraphCollection frequentSubgraphs = getImplementation(threshold, directed)
-      .execute(GraphCollection.fromTransactions(transactions));
+      .execute(getConfig().getGraphCollectionFactory().fromTransactions(transactions));
 
     if (directed){
       Assert.assertEquals(PredictableTransactionsGenerator

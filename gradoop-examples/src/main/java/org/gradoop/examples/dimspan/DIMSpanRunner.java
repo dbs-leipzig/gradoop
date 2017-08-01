@@ -24,7 +24,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 

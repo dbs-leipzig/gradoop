@@ -19,21 +19,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
-
-
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
 import java.util.Map;
 import java.util.stream.Collectors;

@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -38,8 +38,8 @@ public class EqualityTest extends GradoopFlinkTestBase {
     GraphCollection gRef1 = loader.getGraphCollectionByVariables("gRef");
     GraphCollection gRef2 = loader.getGraphCollectionByVariables("gRef");
     GraphCollection gClone = loader.getGraphCollectionByVariables("gClone");
-    GraphCollection gEmpty = GraphCollection
-      .createEmptyCollection(gRef1.getConfig());
+    GraphCollection gEmpty = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef1, gRef2));
@@ -71,8 +71,8 @@ public class EqualityTest extends GradoopFlinkTestBase {
       .getGraphCollectionByVariables("gRef", "gRef");
     GraphCollection gDiffId = loader
       .getGraphCollectionByVariables("gRef", "gDiffId", "gEmpty");
-    GraphCollection gEmpty =
-      GraphCollection.createEmptyCollection(gRef.getConfig());
+    GraphCollection gEmpty = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gClone));
@@ -106,8 +106,8 @@ public class EqualityTest extends GradoopFlinkTestBase {
       .getGraphCollectionByVariables("gRef", "gRef");
     GraphCollection gDiffData = loader
       .getGraphCollectionByVariables("gRef", "gDiffData", "gEmpty");
-    GraphCollection gEmpty =
-      GraphCollection.createEmptyCollection(gRef.getConfig());
+    GraphCollection gEmpty = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gClone));
@@ -143,8 +143,8 @@ public class EqualityTest extends GradoopFlinkTestBase {
       .getGraphCollectionByVariables("gRef");
     GraphCollection gDiffData = loader
       .getGraphCollectionByVariables("gDiffData", "gEmpty");
-    GraphCollection gEmpty =
-      GraphCollection.createEmptyCollection(gRef.getConfig());
+    GraphCollection gEmpty = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
@@ -184,8 +184,8 @@ public class EqualityTest extends GradoopFlinkTestBase {
       .getGraphCollectionByVariables("gRef");
     GraphCollection gDiffData = loader
       .getGraphCollectionByVariables("gDiffData", "gEmpty");
-    GraphCollection gEmpty =
-      GraphCollection.createEmptyCollection(gRef.getConfig());
+    GraphCollection gEmpty = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));

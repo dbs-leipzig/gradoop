@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 
 /**
  * Generates a set of graph transactions

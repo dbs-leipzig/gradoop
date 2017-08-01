@@ -20,6 +20,12 @@ import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.impl.epgm.gve.GVEGraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.gve.GVELogicalGraphFactory;
+
+import java.util.Objects;
 
 /**
  * Configuration for Gradoop running on Flink.
@@ -32,17 +38,34 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   private final ExecutionEnvironment executionEnvironment;
 
   /**
+   * Creates instances of {@link org.gradoop.flink.model.api.epgm.LogicalGraph}
+   */
+  private final LogicalGraphFactory logicalGraphFactory;
+
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.api.epgm.GraphCollection}
+   */
+  private final GraphCollectionFactory graphCollectionFactory;
+
+  /**
    * Creates a new Configuration.
    *
    * @param executionEnvironment  Flink execution environment
    */
-  protected GradoopFlinkConfig(ExecutionEnvironment executionEnvironment) {
+  protected GradoopFlinkConfig(
+    ExecutionEnvironment executionEnvironment,
+    LogicalGraphFactory logicalGraphFactory,
+    GraphCollectionFactory graphCollectionFactory) {
     super();
-    if (executionEnvironment == null) {
-      throw new IllegalArgumentException(
-        "Execution environment must not be null");
-    }
+
+    Objects.requireNonNull(executionEnvironment);
     this.executionEnvironment = executionEnvironment;
+
+    this.logicalGraphFactory = logicalGraphFactory == null ?
+      new GVELogicalGraphFactory(this) : logicalGraphFactory;
+
+    this.graphCollectionFactory = graphCollectionFactory == null ?
+      new GVEGraphCollectionFactory(this) : graphCollectionFactory;
   }
 
   /**
@@ -53,7 +76,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
-    return new GradoopFlinkConfig(env);
+    return new GradoopFlinkConfig(env, null, null);
   }
 
   /**
@@ -63,5 +86,23 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    */
   public ExecutionEnvironment getExecutionEnvironment() {
     return executionEnvironment;
+  }
+
+  /**
+   * Returns a factory that is able to create logical graphs.
+   *
+   * @return factory for logical graphs
+   */
+  public LogicalGraphFactory getLogicalGraphFactory() {
+    return logicalGraphFactory;
+  }
+
+  /**
+   * Returns a factory that is able to create graph collections.
+   *
+   * @return factory for graph collections
+   */
+  public GraphCollectionFactory getGraphCollectionFactory() {
+    return graphCollectionFactory;
   }
 }

@@ -15,9 +15,6 @@
  */
 package org.gradoop.flink.io.impl.hbase;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -35,24 +32,18 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
-import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
-import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentGraphHead;
-import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentVertex;
-import org.gradoop.flink.io.impl.hbase.functions.BuildVertexDataWithEdges;
-import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
-import org.gradoop.flink.io.impl.hbase.functions.EdgeSetBySourceId;
-import org.gradoop.flink.io.impl.hbase.functions.EdgeSetByTargetId;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.io.impl.hbase.functions.*;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.PairGraphIdWithElementId;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Converts runtime representation of EPGM elements into persistent
@@ -89,7 +80,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph), overWrite);
+    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overWrite);
   }
 
   @Override
@@ -109,7 +100,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
   @Override
   public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-    write(GraphCollection.fromTransactions(graphTransactions), overWrite);
+    write(getFlinkConfig().getGraphCollectionFactory()
+      .fromTransactions(graphTransactions), overWrite);
   }
 
   /**

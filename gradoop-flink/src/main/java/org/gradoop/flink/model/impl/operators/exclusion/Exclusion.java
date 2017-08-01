@@ -33,16 +33,16 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Computes the exclusion graph from two logical graphs.
@@ -81,8 +81,7 @@ public class Exclusion implements BinaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return LogicalGraph.fromDataSets(
-      newVertexSet, newEdgeSet, firstGraph.getConfig());
+    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
   }
 
   /**

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;

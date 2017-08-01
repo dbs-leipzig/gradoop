@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.distinction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
 import org.gradoop.flink.model.impl.operators.distinction.functions.IdFromGraphHeadString;

@@ -155,7 +155,7 @@ public class CategoryCharacteristicSubgraphs
     }
 
     return characteristicSubgraphs
-      .map(new CCSSubgraphDecoder(gradoopFlinkConfig));
+      .map(new CCSSubgraphDecoder(config));
   }
 
   /**

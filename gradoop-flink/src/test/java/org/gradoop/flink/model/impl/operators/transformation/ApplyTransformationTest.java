@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;

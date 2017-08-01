@@ -20,8 +20,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
@@ -59,7 +59,8 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    return GraphCollection.fromDataSets(graphHeads, vertices, edges, collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(graphHeads, vertices, edges);
   }
 
   @Override

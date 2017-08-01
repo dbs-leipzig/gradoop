@@ -17,8 +17,9 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
@@ -33,7 +34,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 import java.util.List;
 
@@ -119,7 +119,7 @@ public class GroupingGroupCombine extends Grouping {
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   @Override

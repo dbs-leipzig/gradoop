@@ -21,14 +21,14 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelList;
 import org.gradoop.flink.io.impl.tlf.functions.ElementLabelEncoder;
 import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryFileFormat;
+import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
 import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.flink.io.impl.tlf.functions.VertexLabelList;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
-import org.gradoop.flink.model.impl.GraphCollection;
 
 import java.io.IOException;
 import java.util.Map;
@@ -83,7 +83,8 @@ public class TLFDataSink extends TLFBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph).toTransactions(), overWrite);
+    write(logicalGraph.getConfig().getGraphCollectionFactory()
+      .fromGraph(logicalGraph).toTransactions(), overWrite);
   }
 
   @Override

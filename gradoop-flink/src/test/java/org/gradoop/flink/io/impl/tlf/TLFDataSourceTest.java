@@ -17,8 +17,7 @@ package org.gradoop.flink.io.impl.tlf;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -41,7 +40,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(
       loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
-        GraphCollection.fromTransactions(transactions)
+        getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );
   }
@@ -75,7 +74,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(
       loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
-        GraphCollection.fromTransactions(transactions)
+        getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );
   }

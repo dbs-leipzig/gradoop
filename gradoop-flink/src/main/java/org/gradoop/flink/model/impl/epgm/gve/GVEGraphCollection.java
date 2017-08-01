@@ -13,46 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl;
+package org.gradoop.flink.model.impl.epgm.gve;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.api.operators.GraphCollectionOperators;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
-import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionFromSets;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.functions.utils.Cast;
-import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
@@ -63,8 +59,8 @@ import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraph
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
-import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
@@ -77,19 +73,14 @@ import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
-
-import static org.apache.flink.shaded.com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a collection of graphs inside the EPGM. As graphs may share
  * vertices and edges, the collections contains a single gelly graph
  * representing all subgraphs. Graph data is stored in an additional dataset.
  */
-public class GraphCollection extends GraphBase implements
-  GraphCollectionOperators {
+public class GVEGraphCollection extends GVEGraphBase implements GraphCollection {
 
   /**
    * Creates a graph collection from the given arguments.
@@ -99,109 +90,11 @@ public class GraphCollection extends GraphBase implements
    * @param edges       edges
    * @param config      Gradoop Flink configuration
    */
-  private GraphCollection(DataSet<GraphHead> graphHeads,
+  GVEGraphCollection(DataSet<GraphHead> graphHeads,
     DataSet<Vertex> vertices,
     DataSet<Edge> edges,
     GradoopFlinkConfig config) {
     super(graphHeads, vertices, edges, config);
-  }
-
-  //----------------------------------------------------------------------------
-  // Factory methods
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates an empty graph collection.
-   *
-   * @param config  Gradoop Flink configuration
-   * @return empty graph collection
-   */
-  public static GraphCollection createEmptyCollection(
-    GradoopFlinkConfig config) {
-    Collection<GraphHead> graphHeads = new ArrayList<>();
-    Collection<Vertex> vertices = new ArrayList<>();
-    Collection<Edge> edges = new ArrayList<>();
-
-    return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
-  }
-
-  /**
-   * Creates a graph collection from the given arguments.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param config      Gradoop Flink configuration
-   * @return Graph collection
-   */
-  public static GraphCollection fromDataSets(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices, GradoopFlinkConfig config) {
-    return fromDataSets(
-      graphHeads,
-      vertices,
-      createEdgeDataSet(new ArrayList<>(0), config),
-      config
-    );
-  }
-
-  /**
-   * Creates a graph collection from the given arguments.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @param config      Gradoop Flink configuration
-   * @return Graph collection
-   */
-  public static GraphCollection fromDataSets(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
-
-    checkNotNull(graphHeads, "GraphHead DataSet was null");
-    checkNotNull(vertices, "Vertex DataSet was null");
-    checkNotNull(edges, "Edge DataSet was null");
-    checkNotNull(config, "Config was null");
-    return new GraphCollection(graphHeads, vertices, edges, config);
-  }
-
-  /**
-   * Creates a new graph collection from the given collection.
-   *
-   * @param graphHeads  Graph Head collection
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @param config      Gradoop Flink configuration
-   * @return Graph collection
-   */
-  public static GraphCollection fromCollections(
-    Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices,
-    Collection<Edge> edges,
-    GradoopFlinkConfig config) {
-
-    checkNotNull(graphHeads, "GraphHead collection was null");
-    checkNotNull(vertices, "Vertex collection was null");
-    checkNotNull(edges, "Vertex collection was null");
-    checkNotNull(config, "Config was null");
-    return fromDataSets(
-      createGraphHeadDataSet(graphHeads, config),
-      createVertexDataSet(vertices, config),
-      createEdgeDataSet(edges, config),
-      config
-    );
-  }
-
-  /**
-   * Creates a graph collection from a given logical graph.
-   *
-   * @param logicalGraph  input graph
-   * @return 1-element graph collection
-   */
-  public static GraphCollection fromGraph(LogicalGraph logicalGraph) {
-    return fromDataSets(
-      logicalGraph.getGraphHead(),
-      logicalGraph.getVertices(),
-      logicalGraph.getEdges(),
-      logicalGraph.getConfig()
-    );
   }
 
   //----------------------------------------------------------------------------
@@ -223,13 +116,12 @@ public class GraphCollection extends GraphBase implements
     // filter vertices and edges based on given graph id
     DataSet<GraphHead> graphHead = getGraphHeads()
       .filter(new BySameId<>(graphID));
-
     DataSet<Vertex> vertices = getVertices()
       .filter(new InGraph<>(graphID));
     DataSet<Edge> edges = getEdges()
       .filter(new InGraph<>(graphID));
 
-    return LogicalGraph.fromDataSets(graphHead, vertices, edges, getConfig());
+    return new GVELogicalGraph(graphHead, vertices, edges, getConfig());
   }
 
   /**
@@ -269,7 +161,7 @@ public class GraphCollection extends GraphBase implements
     DataSet<Edge> edges = getEdges()
       .filter(new InAnyGraph<>(identifiers));
 
-    return new GraphCollection(newGraphHeads, vertices, edges, getConfig());
+    return new GVEGraphCollection(newGraphHeads, vertices, edges, getConfig());
   }
 
   //----------------------------------------------------------------------------
@@ -465,56 +357,6 @@ public class GraphCollection extends GraphBase implements
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
-  }
-
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   * Overlapping vertices and edge are merged by Id comparison only.
-   *
-   * @param transactions  transaction dataset
-   * @return graph collection
-   */
-  public static GraphCollection fromTransactions(GraphTransactions transactions) {
-
-    GroupReduceFunction<Vertex, Vertex> vertexReducer = new First<>();
-    GroupReduceFunction<Edge, Edge> edgeReducer = new First<>();
-
-    return fromTransactions(transactions, vertexReducer, edgeReducer);
-  }
-
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   * Overlapping vertices and edge are merged using provided reduce functions.
-   *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
-   * @return graph collection
-   */
-  public static GraphCollection fromTransactions(
-    GraphTransactions transactions,
-    GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
-
-    GradoopFlinkConfig config = transactions.getConfig();
-
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> triples = transactions
-      .getTransactions()
-      .map(new GraphTransactionTriple());
-
-    DataSet<GraphHead> graphHeads = triples.map(new TransactionGraphHead());
-
-    DataSet<Vertex> vertices = triples
-      .flatMap(new TransactionVertices())
-      .groupBy(new Id<>())
-      .reduceGroup(vertexMergeReducer);
-
-    DataSet<Edge> edges = triples
-      .flatMap(new TransactionEdges())
-      .groupBy(new Id<>())
-      .reduceGroup(edgeMergeReducer);
-
-    return fromDataSets(graphHeads, vertices, edges, config);
   }
 
   /**

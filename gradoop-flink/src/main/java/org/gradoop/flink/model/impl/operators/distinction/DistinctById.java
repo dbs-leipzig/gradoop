@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.distinction;
 
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
@@ -27,12 +27,10 @@ public class DistinctById implements UnaryCollectionToCollectionOperator {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-    return GraphCollection.fromDataSets(
+    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
       collection.getGraphHeads().distinct(new Id<>()),
       collection.getVertices(),
-      collection.getEdges(),
-      collection.getConfig()
-    );
+      collection.getEdges());
   }
 
   @Override

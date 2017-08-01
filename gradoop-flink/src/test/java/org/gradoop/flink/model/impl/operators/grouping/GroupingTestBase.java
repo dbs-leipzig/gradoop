@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;

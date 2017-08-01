@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Project4To0And1;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
@@ -33,17 +33,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.functions.Matching
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildIdWithCandidatesAndGraphs;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildTripleWithCandidatesAndGraphs;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildGraphWithCandidates;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.ExpandFirstField;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.FindEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.HasEmbeddings;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.InitGraphHeadWithLineage;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.MergeSecondField;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
-import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.*;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
 
@@ -159,8 +149,8 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // return updated graph collection
     //--------------------------------------------------------------------------
-    return GraphCollection.fromDataSets(
-      newHeads, collection.getVertices(), collection.getEdges(), collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+      newHeads, collection.getVertices(), collection.getEdges());
   }
 
 
@@ -216,7 +206,8 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // return the embeddings
     //--------------------------------------------------------------------------
-    return GraphCollection.fromDataSets(newHeads, newVertices, newEdges, collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newHeads, newVertices, newEdges);
   }
 
   /**

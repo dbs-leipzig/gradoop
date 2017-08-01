@@ -23,9 +23,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubg
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasLabel;
@@ -33,8 +33,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.
 import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 
 import java.util.List;
@@ -48,7 +48,8 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
     GraphTransactions transactions = new PredictableTransactionsGenerator(
       100, 1, true, getConfig()).execute();
 
-    GraphCollection collection = GraphCollection.fromTransactions(transactions);
+    GraphCollection collection = getConfig().getGraphCollectionFactory()
+      .fromTransactions(transactions);
 
     HasLabel hasVertexLabelB = new HasVertexLabel("B");
     HasLabel hasVertexLabelC = new HasVertexLabel("C");

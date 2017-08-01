@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.common.InvalidProgramException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.Test;
@@ -58,9 +58,8 @@ public class LimitTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEmpty() throws Exception {
-    GraphCollection inputCollection =
-      GraphCollection.createEmptyCollection(
-        GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
+    GraphCollection inputCollection = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     int limit = 4;
     int expectedCount = 0;
@@ -72,9 +71,8 @@ public class LimitTest extends GradoopFlinkTestBase {
 
   @Test(expected = InvalidProgramException.class)
   public void testNegativeLimit() throws Exception {
-    GraphCollection inputCollection =
-      GraphCollection.createEmptyCollection(
-        GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
+    GraphCollection inputCollection = getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
 
     int limit = -1;
     int expectedCount = 0;

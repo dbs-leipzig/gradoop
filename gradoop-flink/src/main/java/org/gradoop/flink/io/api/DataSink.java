@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.io.api;
 
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 
 import java.io.IOException;
 

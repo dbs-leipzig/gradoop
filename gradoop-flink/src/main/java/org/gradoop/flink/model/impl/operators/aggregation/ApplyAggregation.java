@@ -22,11 +22,11 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
@@ -86,10 +86,8 @@ public class ApplyAggregation
       .where(new Id<GraphHead>()).equalTo(0)
       .with(new SetAggregateProperties(aggregateFunction));
 
-    return GraphCollection.fromDataSets(graphHeads,
-      collection.getVertices(),
-      collection.getEdges(),
-      collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
   }
 
   /**

@@ -16,8 +16,7 @@
 package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.GraphCollection;
-
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 /**
  * Creates a (usually 1-element) Boolean dataset based on two input graphs.
  *

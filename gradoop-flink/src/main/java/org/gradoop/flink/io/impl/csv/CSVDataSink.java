@@ -29,9 +29,9 @@ import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;

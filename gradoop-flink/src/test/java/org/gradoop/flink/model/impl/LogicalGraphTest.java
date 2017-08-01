@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -58,8 +59,8 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     DataSet<Edge> edgeDataSet = getExecutionEnvironment()
       .fromCollection(edges);
 
-    LogicalGraph graph =
-      LogicalGraph.fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet, getConfig());
+    LogicalGraph graph = getConfig().getLogicalGraphFactory()
+      .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 
     Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
     Collection<Vertex> loadedVertices       = Lists.newArrayList();
@@ -88,11 +89,10 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g0");
 
-    LogicalGraph graph =
-      LogicalGraph.fromCollections(graphHead,
+    LogicalGraph graph = getConfig().getLogicalGraphFactory()
+      .fromCollections(graphHead,
         loader.getVerticesByGraphVariables("g0"),
-        loader.getEdgesByGraphVariables("g0"),
-        getConfig());
+        loader.getEdgesByGraphVariables("g0"));
 
     Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
     Collection<Vertex> loadedVertices       = Lists.newArrayList();
@@ -129,11 +129,10 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader
       loader = getLoaderFromString("()-->()<--()-->()");
 
-    LogicalGraph logicalGraph =
-      LogicalGraph.fromDataSets(
+    LogicalGraph logicalGraph = getConfig().getLogicalGraphFactory()
+      .fromDataSets(
         getExecutionEnvironment().fromCollection(loader.getVertices()),
-        getExecutionEnvironment().fromCollection(loader.getEdges()),
-        getConfig());
+        getExecutionEnvironment().fromCollection(loader.getEdges()));
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
     Collection<Vertex> loadedVertices   = Lists.newArrayList();

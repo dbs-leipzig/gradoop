@@ -20,9 +20,9 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformEdge;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphHead;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
@@ -114,11 +114,10 @@ public class Transformation implements UnaryGraphToGraphOperator {
         .returns(TypeExtractor.createTypeInfo(
           config.getEdgeFactory().getType())) : edges;
 
-    return LogicalGraph.fromDataSets(
+    return config.getLogicalGraphFactory().fromDataSets(
       transformedGraphHeads,
       transformedVertices,
-      transformedEdges,
-      config
+      transformedEdges
     );
   }
 

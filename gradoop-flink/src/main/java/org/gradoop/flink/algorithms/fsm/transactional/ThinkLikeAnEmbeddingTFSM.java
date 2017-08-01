@@ -106,7 +106,7 @@ public class ThinkLikeAnEmbeddingTFSM
         .filter(new MinEdgeCount<>(fsmConfig));
     }
 
-    return allFrequentSubgraphs.map(new TFSMSubgraphDecoder(gradoopFlinkConfig));
+    return allFrequentSubgraphs.map(new TFSMSubgraphDecoder(config));
   }
 
   /**

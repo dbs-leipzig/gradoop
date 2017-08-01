@@ -19,13 +19,13 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
 
 /**
  * Extracts a subgraph from a logical graph using the given filter functions.
@@ -100,8 +100,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
       .where(new TargetId<>()).equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>());
 
-    return LogicalGraph.fromDataSets(
-      filteredVertices, newEdges, superGraph.getConfig());
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(filteredVertices, newEdges);
   }
 
   /**
@@ -126,8 +125,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
           .with(new RightSide<Edge, Vertex>()))
       .distinct(new Id<Vertex>());
 
-    return LogicalGraph.fromDataSets(
-      newVertices, filteredEdges, superGraph.getConfig());
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, filteredEdges);
   }
 
   /**
@@ -142,10 +140,9 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @return subgraph
    */
   private LogicalGraph subgraph(LogicalGraph superGraph) {
-    return LogicalGraph.fromDataSets(
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       superGraph.getVertices().filter(vertexFilterFunction),
-      superGraph.getEdges().filter(edgeFilterFunction),
-      superGraph.getConfig()
+      superGraph.getEdges().filter(edgeFilterFunction)
     );
   }
 

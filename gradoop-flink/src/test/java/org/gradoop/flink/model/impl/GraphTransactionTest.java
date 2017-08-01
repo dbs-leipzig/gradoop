@@ -16,6 +16,8 @@
 package org.gradoop.flink.model.impl;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -32,7 +34,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions);
 
     collectAndAssertTrue(
@@ -55,7 +57,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
@@ -78,7 +80,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     GraphTransactions transactions = originalCollection.toTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(

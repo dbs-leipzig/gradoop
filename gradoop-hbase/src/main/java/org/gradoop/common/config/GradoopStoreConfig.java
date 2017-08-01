@@ -24,6 +24,8 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -62,7 +64,28 @@ public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGM
     PersistentVertexFactory<V, E> persistentVertexFactory,
     PersistentEdgeFactory<E, V> persistentEdgeFactory,
     ExecutionEnvironment env) {
-    super(env);
+    this(persistentGraphHeadFactory, persistentVertexFactory, persistentEdgeFactory, env, null,
+      null);
+  }
+
+  /**
+   * Creates a new Configuration.
+   *
+   * @param persistentGraphHeadFactory  persistent graph head factory
+   * @param persistentVertexFactory     persistent vertex factory
+   * @param persistentEdgeFactory       persistent edge factory
+   * @param logicalGraphFactory         logical graph factory
+   * @param graphCollectionFactory      graph collection factory
+   * @param env                         Flink {@link ExecutionEnvironment}
+   */
+  protected GradoopStoreConfig(
+    PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
+    PersistentVertexFactory<V, E> persistentVertexFactory,
+    PersistentEdgeFactory<E, V> persistentEdgeFactory,
+    ExecutionEnvironment env,
+    LogicalGraphFactory logicalGraphFactory,
+    GraphCollectionFactory graphCollectionFactory) {
+    super(env, logicalGraphFactory, graphCollectionFactory);
 
     this.persistentGraphHeadFactory =
       checkNotNull(persistentGraphHeadFactory,

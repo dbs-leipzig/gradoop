@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl;
+package org.gradoop.flink.model.impl.epgm.transactional;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.operators.GraphTransactionsOperators;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 /**
- * Represents a logical graph inside the EPGM.
+ * Represents a graph collection inside the EPGM.
  */
 public class GraphTransactions implements GraphTransactionsOperators {
 

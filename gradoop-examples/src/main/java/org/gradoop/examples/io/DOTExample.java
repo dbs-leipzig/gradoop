@@ -18,15 +18,16 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
+import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation
- * into a {@link org.gradoop.flink.model.impl.GraphCollection} and stores the
- * resulting {@link org.gradoop.flink.model.impl.GraphCollection} as DOT.
+ * into a {@link GraphCollection} and stores the
+ * resulting {@link GraphCollection} as DOT.
  * The resulting format is described in {@link DOTFileFormat}.
  */
 public class DOTExample extends AbstractRunner implements ProgramDescription {

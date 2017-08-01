@@ -21,8 +21,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -124,8 +124,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .with(new FlatJoinSourceEdgeReference(false))
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
-    return LogicalGraph.fromDataSets(gh, vToRet, edges, searchGraph.getConfig());
-
+    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
   }
 
   @Override

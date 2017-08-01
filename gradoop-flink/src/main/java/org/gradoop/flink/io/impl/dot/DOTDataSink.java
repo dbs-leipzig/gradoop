@@ -15,17 +15,17 @@
  */
 package org.gradoop.flink.io.impl.dot;
 
-import java.io.IOException;
-
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
+
+import java.io.IOException;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
@@ -75,8 +75,9 @@ public class DOTDataSink implements DataSink {
 
 
   @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph).toTransactions(), overWrite);
+  public void write(LogicalGraph graph, boolean overWrite) throws IOException {
+    write(graph.getConfig().getGraphCollectionFactory().fromGraph(graph).toTransactions(),
+      overWrite);
   }
 
   @Override

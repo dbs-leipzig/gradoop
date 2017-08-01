@@ -19,9 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators
-  .BinaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 
 /**
  * Abstract operator implementation which can be used with binary collection
@@ -55,8 +54,8 @@ public abstract class BinaryCollectionToCollectionOperatorBase
     final DataSet<Vertex> newVertices = computeNewVertices(newGraphHeads);
     final DataSet<Edge> newEdges = computeNewEdges(newVertices);
 
-    return GraphCollection.fromDataSets(newGraphHeads, newVertices,
-      newEdges, firstCollection.getConfig());
+    return firstCollection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 
   /**

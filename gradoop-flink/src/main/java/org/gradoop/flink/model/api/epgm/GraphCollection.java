@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.common.util.Order;
-import org.gradoop.flink.model.impl.GraphCollection;
 
 /**
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.
  */
-public interface GraphCollectionOperators extends GraphBaseOperators {
+public interface GraphCollection extends GraphBase {
 
   //----------------------------------------------------------------------------
   // Logical Graph / Graph Head Getters

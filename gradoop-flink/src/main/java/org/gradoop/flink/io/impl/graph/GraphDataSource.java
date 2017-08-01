@@ -20,21 +20,21 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.graph.functions.UpdateEdge;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.graph.functions.InitVertex;
 import org.gradoop.flink.io.impl.graph.functions.InitEdge;
+import org.gradoop.flink.io.impl.graph.functions.InitVertex;
+import org.gradoop.flink.io.impl.graph.functions.UpdateEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -135,12 +135,12 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
       .where(0).equalTo(0)
       .with(new UpdateEdge<Edge, K>());
 
-    return LogicalGraph.fromDataSets(epgmVertices, epgmEdges, config);
+    return config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return GraphCollection.fromGraph(getLogicalGraph());
+    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
 
   @Override
