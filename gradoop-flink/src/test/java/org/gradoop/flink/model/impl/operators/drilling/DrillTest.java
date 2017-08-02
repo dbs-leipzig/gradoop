@@ -17,7 +17,9 @@ package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillUpDivideBy;
+import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillMultiplyBy;
+import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillDivideBy;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -30,7 +32,7 @@ public class DrillTest extends GradoopFlinkTestBase {
 
 
   @Test(expected = NullPointerException.class)
-  public void testVertexRollUpNoProperty() {
+  public void testVertexDrillUpNoProperty() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -41,20 +43,20 @@ public class DrillTest extends GradoopFlinkTestBase {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testVertexRollUpFunctionOnly() {
+  public void testVertexDrillUpFunctionOnly() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = input
       .callForGraph(new Drill.DrillBuilder()
-        .setFunction(new DrillUpDivideBy(1000L))
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
         .buildDrillUp());
   }
 
   @Test
-  public void testVertexRollUpPropertyKeyFunction() throws Exception {
+  public void testVertexDrillUpPropertyKeyFunction() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -79,14 +81,14 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L));
+      .drillUpVertex("memberCount", new DrillDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
-  public void testVertexRollUpPropertyKeyFunctionNewPropertyKey() throws Exception {
+  public void testVertexDrillUpPropertyKeyFunctionNewPropertyKey() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -114,7 +116,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_in_K")
-        .setFunction(new DrillUpDivideBy(1000L))
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
         .buildDrillUp());
 
@@ -124,7 +126,7 @@ public class DrillTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testVertexRollUpChainedRollUp() throws Exception {
+  public void testVertexDrillUpChainedDrillUp() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -151,15 +153,15 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L))
-      .drillUpVertex("memberCount", new DrillUpDivideBy(1000L));
+      .drillUpVertex("memberCount", new DrillDivideBy(1000L))
+      .drillUpVertex("memberCount", new DrillDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
   @Test
-  public void testVertexRollUpNewPropertyKeyChainedRollUp() throws Exception {
+  public void testVertexDrillUpNewPropertyKeyChainedDrillUp() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -189,13 +191,13 @@ public class DrillTest extends GradoopFlinkTestBase {
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_in_K")
-        .setFunction(new DrillUpDivideBy(1000L))
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
         .buildDrillUp())
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount_in_K")
         .setNewPropertyKey("memberCount_in_M")
-        .setFunction(new DrillUpDivideBy(1000L))
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
         .buildDrillUp());
 
@@ -204,7 +206,7 @@ public class DrillTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testVertexRollUpMixedChainedRollUp() throws Exception {
+  public void testVertexDrillUpMixedChainedDrillUp() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -236,23 +238,23 @@ public class DrillTest extends GradoopFlinkTestBase {
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthMillis")
         .setNewPropertyKey("birth")
-        .setFunction(new DrillUpDivideBy(1000L))
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
         .buildDrillUp())
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
-        .setFunction(new DrillUpDivideBy(60L))
+        .setFunction(new DrillDivideBy(60L))
         .drillVertex(true)
         .buildDrillUp())
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
-        .setFunction(new DrillUpDivideBy(60L))
+        .setFunction(new DrillDivideBy(60L))
         .drillVertex(true)
         .buildDrillUp())
       .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birth")
         .setNewPropertyKey("birthDays")
-        .setFunction(new DrillUpDivideBy(24L))
+        .setFunction(new DrillDivideBy(24L))
         .drillVertex(true)
         .buildDrillUp());
 
@@ -263,7 +265,7 @@ public class DrillTest extends GradoopFlinkTestBase {
 
 
   @Test
-  public void testEdgeRollUpPropertyKeyFunction() throws Exception {
+  public void testEdgeDrillUpPropertyKeyFunction() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -288,7 +290,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillUpEdge("until", new DrillUpDivideBy(1000L));
+      .drillUpEdge("until", new DrillDivideBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -306,7 +308,7 @@ public class DrillTest extends GradoopFlinkTestBase {
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    LogicalGraph output = input.drillDown(new Drill.DrillBuilder()
+    LogicalGraph output = input.callForGraph(new Drill.DrillBuilder()
       .drillVertex(true)
       .buildDrillDown());
   }
@@ -337,11 +339,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new DrillDownMultiplyByOneK())
-        .drillVertex(true)
-        .buildDrillDown());
+      .drillDownVertex("memberCount", new DrillMultiplyBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -373,10 +371,10 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_times_K")
-        .setFunction(new DrillDownMultiplyByOneK())
+        .setFunction(new DrillMultiplyBy(1000L))
         .drillVertex(true)
         .buildDrillDown());
 
@@ -411,16 +409,8 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new DrillDownMultiplyByOneK())
-        .drillVertex(true)
-        .buildDrillDown())
-      .drillDown(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new DrillDownMultiplyByOneK())
-        .drillVertex(true)
-        .buildDrillDown());
+      .drillDownVertex("memberCount", new DrillMultiplyBy(1000L))
+      .drillDownVertex("memberCount", new DrillMultiplyBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -452,16 +442,16 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_times_K")
-        .setFunction(new DrillDownMultiplyByOneK())
+        .setFunction(new DrillMultiplyBy(1000L))
         .drillVertex(true)
         .buildDrillDown())
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount_times_K")
         .setNewPropertyKey("memberCount_times_M")
-        .setFunction(new DrillDownMultiplyByOneK())
+        .setFunction(new DrillMultiplyBy(1000L))
         .drillVertex(true)
         .buildDrillDown());
 
@@ -495,26 +485,26 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthMillis")
         .setNewPropertyKey("birthLowerMillis")
-        .setFunction(new DrillDownMultiplyByTen())
+        .setFunction(new DrillMultiplyBy(10L))
         .drillVertex(true)
         .buildDrillDown())
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthLowerMillis")
-        .setFunction(new DrillDownMultiplyByTen())
+        .setFunction(new DrillMultiplyBy(10L))
         .drillVertex(true)
         .buildDrillDown())
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthLowerMillis")
-        .setFunction(new DrillDownMultiplyByTen())
+        .setFunction(new DrillMultiplyBy(10L))
         .drillVertex(true)
         .buildDrillDown())
-      .drillDown(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("birthLowerMillis")
         .setNewPropertyKey("birthTenNanos")
-        .setFunction(new DrillDownMultiplyByTen())
+        .setFunction(new DrillMultiplyBy(10L))
         .drillVertex(true)
         .buildDrillDown());
 
@@ -550,11 +540,7 @@ public class DrillTest extends GradoopFlinkTestBase {
       "]");
 
     LogicalGraph output = input
-      .drillDown(new Drill.DrillBuilder()
-        .setPropertyKey("until")
-        .setFunction(new DrillDownMultiplyByOneK())
-        .drillEdge(true)
-        .buildDrillDown());
+      .drillDownEdge("until", new DrillMultiplyBy(1000L));
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
@@ -562,45 +548,38 @@ public class DrillTest extends GradoopFlinkTestBase {
 
 
   //----------------------------------------------------------------------------
-  // Tests for drill down after roll up
+  // Tests for drill down after drill up
   //----------------------------------------------------------------------------
 
 
   @Test
-  public void testVertexDrillDownAfterRollUp() throws Exception {
+  public void testVertexDrillDownAfterDrillUp() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .setFunction(new RollUpDivideByOneK())
-        .drillVertex(true)
-        .buildRollUp())
-      .drillDown(new Drill.DrillBuilder()
-        .setPropertyKey("memberCount")
-        .drillVertex(true)
-        .buildDrillDown());
+      .drillUpVertex("memberCount", new DrillDivideBy(1000L))
+      .drillDownVertex("memberCount");
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("input")));
   }
 
   @Test
-  public void testVertexDrillDownAfterRollUpNewPropertyKey() throws Exception {
+  public void testVertexDrillDownAfterDrillUpNewPropertyKey() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = input
-      .rollUp(new Drill.DrillBuilder()
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount")
         .setNewPropertyKey("memberCount_in_K")
-        .setFunction(new RollUpDivideByOneK())
+        .setFunction(new DrillDivideBy(1000L))
         .drillVertex(true)
-        .buildRollUp())
-      .drillDown(new Drill.DrillBuilder()
+        .buildDrillUp())
+      .callForGraph(new Drill.DrillBuilder()
         .setPropertyKey("memberCount_in_K")
         .setNewPropertyKey("memberCount")
         .drillVertex(true)

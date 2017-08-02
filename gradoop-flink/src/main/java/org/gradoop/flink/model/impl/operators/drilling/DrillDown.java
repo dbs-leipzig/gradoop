@@ -34,11 +34,10 @@ public class DrillDown extends Drill {
   /**
    * Valued constructor.
    *
-   * @param label          label of the element whose property shall be drilled, or
-   *                       see {@link Drill#DRILL_ALL_ELEMENTS}
+   * @param label          label of the element whose property shall be drilled
    * @param propertyKey    property key
    * @param function       drill function which shall be applied to a property
-   * @param newPropertyKey new property key, or see {@link Drill#KEEP_CURRENT_PROPERTY_KEY}
+   * @param newPropertyKey new property key
    * @param drillVertex    true, if vertices shall be drilled, false for edges
    */
   public DrillDown(
@@ -50,14 +49,14 @@ public class DrillDown extends Drill {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    if (isDrillVertex()) {
+    if (drillVertex()) {
       graph = graph.transformVertices(
         new DrillDownTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
-          getNewPropertyKey()));
+          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else {
       graph = graph.transformEdges(
         new DrillDownTransformation<Edge>(getLabel(), getPropertyKey(), getFunction(),
-          getNewPropertyKey()));
+          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     }
     return graph;
   }
