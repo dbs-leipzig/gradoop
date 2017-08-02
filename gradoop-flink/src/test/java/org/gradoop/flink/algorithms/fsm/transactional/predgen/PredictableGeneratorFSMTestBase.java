@@ -15,11 +15,12 @@
  */
 package org.gradoop.flink.algorithms.fsm.transactional.predgen;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,7 +94,7 @@ public abstract class PredictableGeneratorFSMTestBase extends GradoopFlinkTestBa
 
   @Test
   public void withGeneratorTest() throws Exception {
-    GraphTransactions transactions = new PredictableTransactionsGenerator(
+    DataSet<GraphTransaction> transactions = new PredictableTransactionsGenerator(
       graphCount, 1, true, getConfig()).execute();
 
     GraphCollection frequentSubgraphs = getImplementation(threshold, directed)

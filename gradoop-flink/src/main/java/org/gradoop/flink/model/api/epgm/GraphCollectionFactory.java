@@ -5,78 +5,58 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 
-public interface GraphCollectionFactory {
+public class GraphCollectionFactory {
 
-  /**
-   * Creates a graph collection from the given arguments.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @return Graph collection
-   */
-  GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices);
+  private GraphCollectionLayoutFactory layoutFactory;
 
-  /**
-   * Creates a graph collection from the given arguments.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @return Graph collection
-   */
-  GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges);
+  private final GradoopFlinkConfig config;
 
-  /**
-   * Creates a new graph collection from the given collection.
-   *
-   * @param graphHeads  Graph Head collection
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @return Graph collection
-   */
-  GraphCollection fromCollections(Collection<GraphHead> graphHeads, Collection<Vertex> vertices,
-    Collection<Edge> edges);
+  public GraphCollectionFactory(GraphCollectionLayoutFactory layoutFactory,
+    GradoopFlinkConfig config) {
+    this.layoutFactory = layoutFactory;
+    this.config = config;
+  }
 
-  /**
-   * Creates a graph collection from a given logical graph.
-   *
-   * @param logicalGraph  input graph
-   * @return 1-element graph collection
-   */
-  GraphCollection fromGraph(LogicalGraph logicalGraph);
+  public void setLayoutFactory(GraphCollectionLayoutFactory layoutFactory) {
+    this.layoutFactory = layoutFactory;
+  }
 
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   * Overlapping vertices and edge are merged by Id comparison only.
-   *
-   * @param transactions  transaction dataset
-   * @return graph collection
-   */
-  GraphCollection fromTransactions(GraphTransactions transactions);
+  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
+    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, config), config);
+  }
 
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   * Overlapping vertices and edge are merged using provided reduce functions.
-   *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
-   * @return graph collection
-   */
-  GraphCollection fromTransactions(
-    GraphTransactions transactions,
+  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
+    DataSet<Edge> edges) {
+    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges, config), config);
+  }
+
+  public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
+    Collection<Vertex> vertices, Collection<Edge> edges) {
+    return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges, config), config);
+  }
+
+  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
+    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout, config), config);
+  }
+
+  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions) {
+    return new GraphCollection(layoutFactory.fromTransactions(transactions, config), config);
+  }
+
+  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer);
+    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
+    return new GraphCollection(layoutFactory
+      .fromTransactions(transactions, vertexMergeReducer, edgeMergeReducer, config), config);
+  }
 
-  /**
-   * Creates an empty graph collection.
-   *
-   * @return empty graph collection
-   */
-  GraphCollection createEmptyCollection();
+  public GraphCollection createEmptyCollection() {
+    return new GraphCollection(layoutFactory.createEmptyCollection(config), config);
+  }
 }

@@ -30,7 +30,6 @@ import org.gradoop.flink.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -89,11 +88,6 @@ public class TLFDataSource extends TLFBase implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return getConfig().getGraphCollectionFactory().fromTransactions(getGraphTransactions());
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
     DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
@@ -118,6 +112,6 @@ public class TLFDataSource extends TLFBase implements DataSource {
         .withBroadcastSet(
           getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);
     }
-    return new GraphTransactions(transactions, getConfig());
+    return getConfig().getGraphCollectionFactory().fromTransactions(transactions);
   }
 }

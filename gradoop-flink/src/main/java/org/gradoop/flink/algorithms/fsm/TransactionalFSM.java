@@ -22,7 +22,6 @@ import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.EPGMGraphTr
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 
 /**
@@ -60,16 +59,14 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
     // convert Gradoop graph collection to DIMSpan input format
     DataSet<LabeledGraphStringString> input = collection
-      .toTransactions()
-      .getTransactions()
+      .getGraphTransactions()
       .map(new EPGMGraphTransactionToLabeledGraph());
 
     // run DIMSpan
     DataSet<GraphTransaction> output = dimSpan.execute(input);
 
     // convert to Gradoop graph collection
-    return collection.getConfig().getGraphCollectionFactory()
-      .fromTransactions(new GraphTransactions(output, collection.getConfig()));
+    return collection.getConfig().getGraphCollectionFactory().fromTransactions(output);
   }
 
   @Override

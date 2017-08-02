@@ -15,11 +15,11 @@
  */
 package org.gradoop.flink.io.impl.tlf;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Test;
 
@@ -31,11 +31,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSink#write(GraphTransactions)}
-   */
+
   @Test
   public void testWrite() throws Exception {
     String tlfFileImport = TLFDataSinkTest.class
@@ -48,7 +44,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     DataSource dataSource = new TLFDataSource(tlfFileImport, config);
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport, getConfig());
-    dataSink.write(dataSource.getGraphTransactions(), true);
+    dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
     DataSource dataSource2 = new TLFDataSource(tlfFileExport, config);
 
@@ -59,11 +55,6 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       .equalsByGraphElementData(dataSource2.getGraphCollection()));
   }
 
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSink#write(GraphTransactions)}
-   */
   @Test
   public void testWriteWithVertexDictionary() throws Exception {
     String tlfFileImport = TLFDataSinkTest.class
@@ -84,15 +75,15 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     // write to output path
     DataSink dataSink = new TLFDataSink(tlfFileExport, 
       tlfVertexDictionaryFileExport, "", getConfig());
-    dataSink.write(dataSource.getGraphTransactions(), true);
+    dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
     dataSource = new TLFDataSource(tlfFileExport, config);
-    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
+    DataSet<GraphTransaction> graphTransactions = dataSource
+      .getGraphCollection()
+      .getGraphTransactions();
 
     // get first transaction which contains one complete graph
-    GraphTransaction graphTransaction = graphTransactions
-      .getTransactions()
-      .collect().get(0);
+    GraphTransaction graphTransaction = graphTransactions.collect().get(0);
     // get vertices of the first transaction/graph
     EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
       new EPGMVertex[graphTransaction.getVertices().size()]);
@@ -106,15 +97,9 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
     assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());
-    assertEquals("Wrong graph count", 2,
-      graphTransactions.getTransactions().count());
+    assertEquals("Wrong graph count", 2, graphTransactions.count());
   }
 
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSink#write(GraphTransactions)}
-   */
   @Test
   public void testWriteWithDictionaries() throws Exception {
     String tlfFileImport = TLFDataSinkTest.class
@@ -141,14 +126,13 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport,
       tlfVertexDictionaryFileExport, tlfEdgeDictionaryFileExport, getConfig());
-    dataSink.write(dataSource.getGraphTransactions(), true);
+    dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
     dataSource = new TLFDataSource(tlfFileExport, config);
-    GraphTransactions graphTransactions = dataSource.getGraphTransactions();
+    DataSet<GraphTransaction> graphTransactions = dataSource.getGraphCollection().getGraphTransactions();
 
     //get first transaction which contains one complete graph
-    GraphTransaction graphTransaction = graphTransactions
-      .getTransactions().collect().get(0);
+    GraphTransaction graphTransaction = graphTransactions.collect().get(0);
     //get vertices of the first transaction/graph
     EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
       new EPGMVertex[graphTransaction.getVertices().size()]);
@@ -162,7 +146,6 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
     assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());
-    assertEquals("Wrong graph count", 2, graphTransactions.getTransactions()
-      .count());
+    assertEquals("Wrong graph count", 2, graphTransactions.count());
   }
 }

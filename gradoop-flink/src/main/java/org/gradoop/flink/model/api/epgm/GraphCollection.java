@@ -15,305 +15,415 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
-import org.gradoop.flink.model.impl.operators.combination.Combination;
-import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.epgm.BySameId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.operators.difference.Difference;
+import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
+import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
-import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.selection.Selection;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
 
 /**
  * Describes all operators that can be applied on a collection of logical
  * graphs in the EPGM.
  */
-public interface GraphCollection extends GraphBase {
+public class GraphCollection implements GraphCollectionOperators, GraphCollectionLayout {
+
+  private final GraphCollectionLayout layout;
+
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
+   * @param config      Gradoop Flink configuration
+   */
+  GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
+    this.layout = layout;
+    this.config = config;
+  }
+
+  //----------------------------------------------------------------------------
+  // Data methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public DataSet<Vertex> getVertices() {
+    return layout.getVertices();
+  }
+
+  @Override
+  public DataSet<Vertex> getVerticesByLabel(String label) {
+    return layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getEdges() {
+    return layout.getEdges();
+  }
+
+  @Override
+  public DataSet<Edge> getEdgesByLabel(String label) {
+    return layout.getEdgesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
+    return layout.getOutgoingEdges(vertexID);
+  }
+
+  @Override
+  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
+    return layout.getIncomingEdges(vertexID);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataSet<GraphHead> getGraphHeads() {
+    return layout.getGraphHeads();
+  }
+
+  @Override
+  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+    return layout.getGraphHeadsByLabel(label);
+  }
+
+  @Override
+  public DataSet<GraphTransaction> getGraphTransactions() {
+    return layout.getGraphTransactions();
+  }
 
   //----------------------------------------------------------------------------
   // Logical Graph / Graph Head Getters
   //----------------------------------------------------------------------------
 
   /**
-   * Returns the graph heads associated with the logical graphs in that
-   * collection.
-   *
-   * @return graph heads
+   * {@inheritDoc}
    */
-  DataSet<GraphHead> getGraphHeads();
+  @Override
+  public LogicalGraph getGraph(final GradoopId graphID) {
+    // filter vertices and edges based on given graph id
+    DataSet<GraphHead> graphHead = getGraphHeads()
+      .filter(new BySameId<>(graphID));
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InGraph<>(graphID));
+    DataSet<Edge> edges = getEdges()
+      .filter(new InGraph<>(graphID));
+
+    return new LogicalGraph(
+      config.getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges),
+      getConfig());
+  }
 
   /**
-   * Returns logical graph from collection using the given identifier. If the
-   * graph does not exist, an empty logical graph is returned.
-   *
-   * @param graphID graph identifier
-   * @return logical graph with given id or an empty logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph getGraph(final GradoopId graphID);
-  /**
-   * Extracts logical graphs from collection using their identifiers.
-   *
-   * @param identifiers graph identifiers
-   * @return collection containing requested logical graphs
-   */
-  GraphCollection getGraphs(final GradoopId... identifiers);
+  @Override
+  public GraphCollection getGraphs(final GradoopId... identifiers) {
+
+    GradoopIdList graphIds = new GradoopIdList();
+
+    for (GradoopId id : identifiers) {
+      graphIds.add(id);
+    }
+
+    return getGraphs(graphIds);
+  }
 
   /**
-   * Extracts logical graphs from collection using their identifiers.
-   *
-   * @param identifiers graph identifiers
-   * @return collection containing requested logical graphs
+   * {@inheritDoc}
    */
-  GraphCollection getGraphs(GradoopIdList identifiers);
+  @Override
+  public GraphCollection getGraphs(final GradoopIdList identifiers) {
+
+    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
+      .filter(new FilterFunction<GraphHead>() {
+        @Override
+        public boolean filter(GraphHead graphHead) throws Exception {
+          return identifiers.contains(graphHead.getId());
+        }
+      });
+
+    // build new vertex set
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InAnyGraph<>(identifiers));
+
+    // build new edge set
+    DataSet<Edge> edges = getEdges()
+      .filter(new InAnyGraph<>(identifiers));
+
+    return new GraphCollection(
+      getConfig().getGraphCollectionFactory().fromDataSets(newGraphHeads, vertices, edges),
+      getConfig());
+  }
 
   //----------------------------------------------------------------------------
-  // Unary operators
+  // Unary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Filter containing graphs based on their associated graph head.
-   *
-   * @param predicateFunction predicate function for graph head
-   * @return collection with logical graphs that fulfil the predicate
+   * {@inheritDoc}
    */
-  GraphCollection select(FilterFunction<GraphHead> predicateFunction);
+  @Override
+  public GraphCollection select(final FilterFunction<GraphHead> predicate) {
+    return callForCollection(new Selection(predicate));
+  }
 
   /**
-   * Returns a graph collection that is sorted by a given graph property key.
-   *
-   * @param propertyKey property which is used for comparison
-   * @param order       ascending, descending
-   * @return ordered collection
+   * {@inheritDoc}
    */
-  GraphCollection sortBy(String propertyKey, Order order);
+  @Override
+  public GraphCollection sortBy(String propertyKey, Order order) {
+    throw new NotImplementedException();
+  }
 
   /**
-   * Returns the first {@code n} arbitrary logical graphs contained in that
-   * collection.
-   *
-   * @param n number of graphs to return from collection
-   * @return subset of the graph collection
+   * {@inheritDoc}
    */
-  GraphCollection limit(int n);
+  @Override
+  public GraphCollection limit(int n) {
+    return callForCollection(new Limit(n));
+  }
 
   /**
-   * Matches a given pattern on a graph collection.
-   * The boolean flag specifies, if the return shall be the input graphs with
-   * a new property ("contains pattern"), or a new collection consisting of the
-   * constructed embeddings
-   *
-   * @param algorithm         custom pattern matching algorithm
-   * @param pattern           query pattern
-   * @param returnEmbeddings  true -> return embeddings as new collection,
-   *                          false -> return collection with new property
-   * @return  a graph collection containing either the embeddings or the input
-   * graphs with a new property ("contains pattern")
+   * {@inheritDoc}
    */
-  GraphCollection match(
+  @Override
+  public GraphCollection match(
     String pattern,
     PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings);
+    boolean returnEmbeddings) {
+    return new TransactionalPatternMatching(
+      pattern,
+      algorithm,
+      returnEmbeddings).execute(this);
+  }
 
   //----------------------------------------------------------------------------
-  // Binary operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns a collection with all logical graphs from two input collections.
-   * Graph equality is based on their identifiers.
-   *
-   * @param otherCollection collection to build union with
-   * @return union of both collections
-   */
-  GraphCollection union(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that exist in both input
-   * collections. Graph equality is based on their identifiers.
-   *
-   * @param otherCollection collection to build intersect with
-   * @return intersection of both collections
-   */
-  GraphCollection intersect(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that exist in both input
-   * collections. Graph equality is based on their identifiers.
-   * <p>
-   * Implementation that works faster if {@code otherCollection} is small
-   * (e.g. fits in the workers main memory).
-   *
-   * @param otherCollection collection to build intersect with
-   * @return intersection of both collections
-   */
-  GraphCollection intersectWithSmallResult(
-    GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that are contained in that
-   * collection but not in the other. Graph equality is based on their
-   * identifiers.
-   *
-   * @param otherCollection collection to subtract from that collection
-   * @return difference between that and the other collection
-   */
-  GraphCollection difference(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that are contained in that
-   * collection but not in the other. Graph equality is based on their
-   * identifiers.
-   * <p>
-   * Alternate implementation that works faster if the intermediate result
-   * (list of graph identifiers) fits into the workers memory.
-   *
-   * @param otherCollection collection to subtract from that collection
-   * @return difference between that and the other collection
-   */
-  GraphCollection differenceWithSmallResult(
-    GraphCollection otherCollection);
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by id).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by graph ids
-   */
-  DataSet<Boolean> equalsByGraphIds(GraphCollection other);
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by vertex and edge ids).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByGraphElementIds(GraphCollection other);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the element data contained inside the collection,
-   * i.e. vertices and edges.
-   *
-   * @param other graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphElementData(GraphCollection other);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the data contained inside the collection, i.e.
-   * graph heads, vertices and edges.
-   *
-   * @param other graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphData(GraphCollection other);
-
-  //----------------------------------------------------------------------------
-  // Auxiliary operators
+  // Binary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Calls the given unary collection to collection operator for the collection.
-   *
-   * @param op unary collection to collection operator
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  GraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op);
+  @Override
+  public GraphCollection union(GraphCollection otherCollection) {
+    return callForCollection(new Union(), otherCollection);
+  }
 
   /**
-   * Calls the given binary collection to collection operator using that
-   * graph and the input graph.
-   *
-   * @param op              binary collection to collection operator
-   * @param otherCollection second input collection for operator
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  GraphCollection callForCollection(
+  @Override
+  public GraphCollection intersect(GraphCollection otherCollection) {
+    return callForCollection(new Intersection(), otherCollection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection intersectWithSmallResult(
+    GraphCollection otherCollection) {
+    return callForCollection(new IntersectionBroadcast(),
+      otherCollection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection difference(GraphCollection otherCollection) {
+    return callForCollection(new Difference(), otherCollection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection differenceWithSmallResult(
+    GraphCollection otherCollection) {
+    return callForCollection(new DifferenceBroadcast(),
+      otherCollection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
+    return new CollectionEqualityByGraphIds().execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
+    return new CollectionEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(), true).execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
+    return new CollectionEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
+    return new CollectionEquality(
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
+  }
+
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection callForCollection(
+    UnaryCollectionToCollectionOperator op) {
+    return op.execute(this);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection callForCollection(
     BinaryCollectionToCollectionOperator op,
-    GraphCollection otherCollection);
+    GraphCollection otherCollection) {
+    return op.execute(this, otherCollection);
+  }
 
   /**
-   * Calls the given unary collection to graph operator for the collection.
-   *
-   * @param op unary collection to graph operator
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  LogicalGraph callForGraph(
-    UnaryCollectionToGraphOperator op);
+  @Override
+  public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
+    return op.execute(this);
+  }
 
   /**
-   * Applies a given unary graph to graph operator (e.g., aggregate) on each
-   * logical graph in the graph collection.
-   *
-   * @param op applicable unary graph to graph operator
-   * @return collection with resulting logical graphs
+   * {@inheritDoc}
    */
-  GraphCollection apply(
-    ApplicableUnaryGraphToGraphOperator op);
+  @Override
+  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
+    return callForCollection(op);
+  }
 
   /**
-   * Transforms a graph collection into a logical graph by applying a
-   * {@link BinaryGraphToGraphOperator} pairwise on the elements of the
-   * collection.
-   *
-   * @param op reducible binary graph to graph operator
-   * @return logical graph
-   *
-   * @see Exclusion
-   * @see Overlap
-   * @see Combination
+   * {@inheritDoc}
    */
-  LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op);
+  @Override
+  public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
+    return callForGraph(op);
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
 
   /**
-   * Transforms a graph collection into a set of graph transactions.
-   * @return graph transactions representing the graph collection
+   * {@inheritDoc}
    */
-  GraphTransactions toTransactions();
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getGraphHeads()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
+  }
 
   /**
-   * Returns a distinct collection of logical graphs.
-   * Graph equality is based on graph identifiers.
-   *
-   * @return distinct graph collection
+   * {@inheritDoc}
    */
-  GraphCollection distinctById();
+  @Override
+  public GraphCollection distinctById() {
+    return callForCollection(new DistinctById());
+  }
 
   /**
-   * Groups a graph collection by isomorphism.
-   * Graph equality is based on isomorphism including labels and properties.
-   *
-   * @return distinct graph collection
+   * {@inheritDoc}
    */
-  GraphCollection distinctByIsomorphism();
+  @Override
+  public GraphCollection distinctByIsomorphism() {
+    return callForCollection(new DistinctByIsomorphism());
+  }
+
+  @Override
+  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
+    return callForCollection(new GroupByIsomorphism(func));
+  }
 
   /**
-   * Groups a graph collection by isomorphism including labels and values.
-   *
-   * @param func function to reduce all graph heads of a group into a single representative one,
-   *             e.g., to count the number of group members
-   *
-   * @return grouped graph collection
+   * {@inheritDoc}
    */
-  GraphCollection groupByIsomorphism(GraphHeadReduceFunction func);
+  @Override
+  public void writeTo(DataSink dataSink) throws IOException {
+    dataSink.write(this);
+  }
 }

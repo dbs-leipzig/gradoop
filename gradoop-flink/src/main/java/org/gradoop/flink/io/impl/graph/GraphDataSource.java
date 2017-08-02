@@ -31,7 +31,6 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -141,10 +140,5 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
   @Override
   public GraphCollection getGraphCollection() throws IOException {
     return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
-    return getGraphCollection().toTransactions();
   }
 }

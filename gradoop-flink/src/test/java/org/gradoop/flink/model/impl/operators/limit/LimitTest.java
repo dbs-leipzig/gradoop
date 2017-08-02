@@ -19,7 +19,6 @@ import org.apache.flink.api.common.InvalidProgramException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -15,8 +15,6 @@
  */
 package org.gradoop.common.config;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -27,6 +25,8 @@ import org.gradoop.common.storage.api.PersistentVertexFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic configuration for Gradoop Stores
@@ -74,8 +74,8 @@ public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGM
    * @param persistentGraphHeadFactory  persistent graph head factory
    * @param persistentVertexFactory     persistent vertex factory
    * @param persistentEdgeFactory       persistent edge factory
-   * @param logicalGraphFactory         logical graph factory
-   * @param graphCollectionFactory      graph collection factory
+   * @param logicalGraphFactory         logical graph layout factory
+   * @param graphCollectionFactory      graph collection layout factory
    * @param env                         Flink {@link ExecutionEnvironment}
    */
   protected GradoopStoreConfig(

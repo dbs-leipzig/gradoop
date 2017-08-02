@@ -27,7 +27,6 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -118,10 +117,5 @@ public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
 
     return new GraphDataSource<>(importVertices, importEdges, getConfig())
       .getGraphCollection();
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
-    return getGraphCollection().toTransactions();
   }
 }

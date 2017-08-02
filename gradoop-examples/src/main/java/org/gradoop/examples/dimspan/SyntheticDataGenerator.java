@@ -21,6 +21,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
+import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -47,6 +48,7 @@ public class SyntheticDataGenerator
   static {
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
     OPTIONS.addOption(OPTION_GRAPH_COUNT, "graph-count", true, "Number of graphs");
+    GRADOOP_CONFIG.getGraphCollectionFactory().setLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**
@@ -73,7 +75,9 @@ public class SyntheticDataGenerator
     DataSink dataSink = new TLFDataSink(outputPath, GRADOOP_CONFIG);
 
     // execute and write to disk
-    dataSink.write(dataSource.execute(), true);
+    dataSink.write(
+      GRADOOP_CONFIG.getGraphCollectionFactory().fromTransactions(dataSource.execute()),
+      true);
     getExecutionEnvironment().execute();
   }
 

@@ -26,13 +26,11 @@ import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.flink.io.impl.tlf.functions.VertexLabelList;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.Map;
-
 
 /**
  * Writes an EPGM representation into one TLF file. The format
@@ -75,35 +73,23 @@ public class TLFDataSink extends TLFBase implements DataSink {
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws
-    IOException {
-
-    write(graphTransactions, false);
-  }
-
-  @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(logicalGraph.getConfig().getGraphCollectionFactory()
-      .fromGraph(logicalGraph).toTransactions(), overWrite);
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
-    write(graphCollection.toTransactions(), overWrite);
-  }
-
-  @Override
-  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-
     FileSystem.WriteMode writeMode =
       overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
+    DataSet<GraphTransaction> graphTransactions = graphCollection.getGraphTransactions();
     DataSet<GraphTransaction> simpleLabelTransaction;
     DataSet<Map<String, Integer>> vertexDictionary = null;
     DataSet<Map<String, Integer>> edgeDictionary = null;
     // if the graph transaction vertex labels are set by a dictionary
     if (hasVertexDictionary()) {
-      vertexDictionary = graphTransactions.getTransactions()
+
+      vertexDictionary = graphTransactions
         // get a vertex dictionary for each transaction
         .flatMap(new VertexLabelList())
         .distinct()
@@ -116,7 +102,7 @@ public class TLFDataSink extends TLFBase implements DataSink {
     }
 
     if (hasEdgeDictionary()) {
-      edgeDictionary = graphTransactions.getTransactions()
+      edgeDictionary = graphTransactions
         // get an edge dictionary for each transaction
         .flatMap(new EdgeLabelList())
         .distinct()
@@ -127,10 +113,9 @@ public class TLFDataSink extends TLFBase implements DataSink {
         .writeAsFormattedText(getTLFEdgeDictionaryPath(), writeMode, new TLFDictionaryFileFormat());
     }
 
-
     if (hasVertexDictionary() || hasEdgeDictionary()) {
       if (hasVertexDictionary() && hasEdgeDictionary()) {
-        simpleLabelTransaction = graphTransactions.getTransactions()
+        simpleLabelTransaction = graphTransactions
           // map the simple integer-like labels
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
@@ -139,14 +124,14 @@ public class TLFDataSink extends TLFBase implements DataSink {
           .withBroadcastSet(edgeDictionary,
             TLFConstants.EDGE_DICTIONARY);
       } else if (hasVertexDictionary()) {
-        simpleLabelTransaction = graphTransactions.getTransactions()
+        simpleLabelTransaction = graphTransactions
           // map the simple integer-like labels
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
           .withBroadcastSet(vertexDictionary,
             TLFConstants.VERTEX_DICTIONARY);
       } else {
-        simpleLabelTransaction = graphTransactions.getTransactions()
+        simpleLabelTransaction = graphTransactions
           // map the simple integer-like labels
           .map(new ElementLabelEncoder(
             hasVertexDictionary(), hasEdgeDictionary()))
@@ -158,7 +143,7 @@ public class TLFDataSink extends TLFBase implements DataSink {
         .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());
       // if there was no dictionary used the graphs can simply be written
     } else {
-      graphTransactions.getTransactions()
+      graphTransactions
         .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());
     }
   }

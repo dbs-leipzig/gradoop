@@ -27,7 +27,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -63,10 +63,14 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
   private static GradoopFlinkConfig GRADOOP_CONFIG =
     GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 
+
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true, "Path to input file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
     OPTIONS.addOption(COPY_COUNT, "copy-count", true, "Number of copies per input graph");
+
+    GRADOOP_CONFIG.getGraphCollectionFactory()
+      .setLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**
@@ -93,8 +97,8 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
     DataSink dataSink = new TLFDataSink(outputPath, GRADOOP_CONFIG);
 
     DataSet<GraphTransaction> input = dataSource
-      .getGraphTransactions()
-      .getTransactions();
+      .getGraphCollection()
+      .getGraphTransactions();
 
     DataSet<GraphTransaction> output = input
       .flatMap(
@@ -108,7 +112,9 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
         .getForObject(new GraphTransaction(new GraphHead(), Sets.newHashSet(), Sets.newHashSet())));
 
     // execute and write to disk
-    dataSink.write(new GraphTransactions(output, GRADOOP_CONFIG), true);
+    dataSink.write(
+      GRADOOP_CONFIG.getGraphCollectionFactory().fromTransactions(output),
+      true);
     getExecutionEnvironment().execute();
   }
 

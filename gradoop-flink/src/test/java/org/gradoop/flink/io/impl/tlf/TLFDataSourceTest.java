@@ -15,9 +15,10 @@
  */
 package org.gradoop.flink.io.impl.tlf;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -29,8 +30,8 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, config);
-    //get transactions
-    GraphTransactions transactions = dataSource.getGraphTransactions();
+    // get transactions
+    DataSet<GraphTransaction> transactions = dataSource.getGraphCollection().getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
@@ -45,12 +46,6 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     );
   }
 
-  /**
-   * Test method for
-   *
-   * {@link TLFDataSource#getGraphTransactions()}
-   * @throws Exception
-   */
   @Test
   public void testReadWithDictionary() throws Exception {
     String tlfFile = TLFDataSinkTest.class
@@ -63,8 +58,8 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, tlfVertexDictionaryFile,
       tlfEdgeDictionaryFile, config);
-    //get transactions
-    GraphTransactions transactions = dataSource.getGraphTransactions();
+    // get transactions
+    DataSet<GraphTransaction> transactions = dataSource.getGraphCollection().getGraphTransactions();
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +

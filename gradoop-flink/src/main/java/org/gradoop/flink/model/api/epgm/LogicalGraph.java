@@ -15,509 +15,541 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.flink.model.impl.operators.cloning.Cloning;
+import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.drilling.Drill;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
+import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
+import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.flink.model.impl.operators.split.Split;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Describes all operators that can be applied on a single logical graph in the EPGM.
  */
-public interface LogicalGraph extends GraphBase {
+public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
+
+  private final LogicalGraphLayout layout;
+
+  private final GradoopFlinkConfig config;
 
   /**
-   * Returns a dataset containing a single graph head associated with that
-   * logical graph.
+   * Creates a new logical graph based on the given parameters.
    *
-   * @return 1-element dataset
+   * @param layout representation of the logical graph
+   * @param config    Gradoop Flink configuration
    */
-  DataSet<GraphHead> getGraphHead();
+  LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+    this.layout = layout;
+    this.config = config;
+  }
+
+  //----------------------------------------------------------------------------
+  // Data methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataSet<GraphHead> getGraphHead() {
+    return layout.getGraphHead();
+  }
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
+
+  @Override
+  public DataSet<Vertex> getVertices() {
+    return layout.getVertices();
+  }
+
+  @Override
+  public DataSet<Vertex> getVerticesByLabel(String label) {
+    return layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getEdges() {
+    return layout.getEdges();
+  }
+
+  @Override
+  public DataSet<Edge> getEdgesByLabel(String label) {
+    return layout.getEdgesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
+    return layout.getOutgoingEdges(vertexID);
+  }
+
+  @Override
+  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
+    return layout.getIncomingEdges(vertexID);
+  }
 
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * @param query Cypher query
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
+   * {@inheritDoc}
    */
-  GraphCollection cypher(String query, GraphStatistics graphStatistics);
+  @Override
+  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
 
   /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query Cypher query
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
+   * {@inheritDoc}
    */
-  GraphCollection cypher(String query, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+  @Override
+  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
-   *
-   * @param pattern  GDL graph pattern
-   *
-   * @return subgraphs of the input graph that match the given graph pattern
+   * {@inheritDoc}
    */
-  GraphCollection match(String pattern);
+  @Override
+  public GraphCollection match(String pattern) {
+    return match(pattern, true);
+  }
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
-   *
-   * This method allows to control if the original vertex and edge data
-   * (labels and properties) shall be attached to the resulting subgraphs.
-   * Note that this requires additional JOIN operations.
-   *
-   * @param pattern     GDL graph pattern
-   * @param attachData  attach original vertex and edge data to the result
-   * @return subgraphs of the input graph that match the given graph pattern
+   * {@inheritDoc}
    */
-  GraphCollection match(String pattern, boolean attachData);
+  @Override
+  public GraphCollection match(String pattern, boolean attachData) {
+    return match(pattern, attachData, MatchStrategy.ISOMORPHISM,
+      TraverserStrategy.SET_PAIR_BULK_ITERATION);
+  }
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
-   *
-   * This method allows to control the match strategy. This influences mostly
-   * if vertices and edges can be matched to multiple vertices/edges in the
-   * query.
-   *
-   * @param pattern           GDL graph pattern
-   * @param attachData        attach original vertex and edge data to the result
-   * @param matchStrategy     strategy for vertex and edge mappings
-   * @param iterationStrategy strategy for internal iteration
-   * @return subgraphs of the input graph that match the given graph pattern
+   * {@inheritDoc}
    */
-  GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, TraverserStrategy iterationStrategy);
+  @Override
+  public GraphCollection match(String pattern, boolean attachData,
+    MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
+
+    ExplorativePatternMatching op = new ExplorativePatternMatching.Builder()
+      .setQuery(pattern)
+      .setAttachData(attachData)
+      .setMatchStrategy(matchStrategy)
+      .setTraverserStrategy(traverserStrategy)
+      .setTraverser(new DFSTraverser()).build();
+
+    return callForCollection(op);
+  }
 
   /**
-   * Creates a copy of the logical graph.
-   *
-   * Note that this method creates new graph head, vertex and edge instances.
-   *
-   * @return projected logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph copy();
+  @Override
+  public LogicalGraph copy() {
+    return callForGraph(new Cloning());
+  }
 
   /**
-   * Transforms the elements of the logical graph using the given transformation
-   * functions. The identity of the elements is preserved.
-   *
-   * @param graphHeadTransformationFunction graph head transformation function
-   * @param vertexTransformationFunction    vertex transformation function
-   * @param edgeTransformationFunction      edge transformation function
-   * @return transformed logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph transform(
+  @Override
+  public LogicalGraph transform(
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
-    TransformationFunction<Edge> edgeTransformationFunction);
+    TransformationFunction<Edge> edgeTransformationFunction) {
+    return callForGraph(new Transformation(
+      graphHeadTransformationFunction,
+      vertexTransformationFunction,
+      edgeTransformationFunction));
+  }
+
+  @Override
+  public LogicalGraph transformGraphHead(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction) {
+    return transform(graphHeadTransformationFunction, null, null);
+  }
+
+  @Override
+  public LogicalGraph transformVertices(
+    TransformationFunction<Vertex> vertexTransformationFunction) {
+    return transform(null, vertexTransformationFunction, null);
+  }
+
+  @Override
+  public LogicalGraph transformEdges(
+    TransformationFunction<Edge> edgeTransformationFunction) {
+    return transform(null, null, edgeTransformationFunction);
+  }
 
   /**
-   * Transforms the graph head of the logical graph using the given
-   * transformation function. The identity of the graph is preserved.
-   *
-   * @param graphHeadTransformationFunction graph head transformation function
-   * @return transformed logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph transformGraphHead(
-    TransformationFunction<GraphHead> graphHeadTransformationFunction);
+  @Override
+  public LogicalGraph vertexInducedSubgraph(
+    FilterFunction<Vertex> vertexFilterFunction) {
+    Objects.requireNonNull(vertexFilterFunction);
+    return callForGraph(new Subgraph(vertexFilterFunction, null));
+  }
 
   /**
-   * Transforms the vertices of the logical graph using the given transformation
-   * function. The identity of the vertices is preserved.
-   *
-   * @param vertexTransformationFunction vertex transformation function
-   * @return transformed logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph transformVertices(TransformationFunction<Vertex> vertexTransformationFunction);
+  @Override
+  public LogicalGraph edgeInducedSubgraph(
+    FilterFunction<Edge> edgeFilterFunction) {
+    Objects.requireNonNull(edgeFilterFunction);
+    return callForGraph(new Subgraph(null, edgeFilterFunction));
+  }
 
   /**
-   * Transforms the edges of the logical graph using the given transformation
-   * function. The identity of the edges is preserved.
-   *
-   * @param edgeTransformationFunction edge transformation function
-   * @return transformed logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction);
+  @Override
+  public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
+    Objects.requireNonNull(vertexFilterFunction);
+    Objects.requireNonNull(edgeFilterFunction);
+    return callForGraph(
+      new Subgraph(vertexFilterFunction, edgeFilterFunction));
+  }
 
   /**
-   * Returns the subgraph that is induced by the vertices which fulfill the
-   * given filter function.
-   *
-   * @param vertexFilterFunction vertex filter function
-   * @return vertex-induced subgraph as a new logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph vertexInducedSubgraph(FilterFunction<Vertex> vertexFilterFunction);
+  @Override
+  public LogicalGraph aggregate(AggregateFunction aggregateFunc) {
+    return callForGraph(new Aggregation(aggregateFunc));
+  }
 
   /**
-   * Returns the subgraph that is induced by the edges which fulfill the given
-   * filter function.
-   *
-   * @param edgeFilterFunction edge filter function
-   * @return edge-induced subgraph as a new logical graph
+   * {@inheritDoc}
    */
-  LogicalGraph edgeInducedSubgraph(FilterFunction<Edge> edgeFilterFunction);
+  @Override
+  public LogicalGraph sampleRandomNodes(float sampleSize) {
+    return callForGraph(new RandomNodeSampling(sampleSize));
+  }
 
   /**
-   * Returns a subgraph of the logical graph which contains only those vertices
-   * and edges that fulfil the given vertex and edge filter function
-   * respectively.
-   *
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
-   *
-   * @param vertexFilterFunction  vertex filter function
-   * @param edgeFilterFunction    edge filter function
-   * @return  logical graph which fulfils the given predicates and is a subgraph
-   *          of that graph
+   * {@inheritDoc}
    */
-  LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction);
+  @Override
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null);
+  }
 
   /**
-   * Applies the given aggregate function to the logical graph and stores the
-   * result of that function at the resulting graph using the given property
-   * key.
-   *
-   * @param aggregateFunc computes an aggregate on the logical graph
-   * @return logical graph with additional property storing the aggregate
+   * {@inheritDoc}
    */
-  LogicalGraph aggregate(AggregateFunction aggregateFunc);
+  @Override
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
+  }
 
   /**
-   * Creates a new graph from a randomly chosen subset of nodes and their
-   * associated edges.
-   *
-   * @param sampleSize relative amount of nodes in the result graph
-   * @return logical graph with random nodes and their associated edges
+   * {@inheritDoc}
    */
-  LogicalGraph sampleRandomNodes(float sampleSize);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices based on the specified
-   * property keys.
-   *
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices.
-   *
-   * Note: To group vertices by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   *
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   *
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys.
-   *
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   *
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys property keys to group edges
-   *
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   *
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
-   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
-   * represented by the same super vertex/edge.
-   *
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   *
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys property keys to group edges
-   * @param edgeAggregateFunctions aggregate functions to apply on super edges
-   * @param groupingStrategy execution strategy for vertex grouping
-   *
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(
+  @Override
+  public LogicalGraph groupBy(
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
-    GroupingStrategy groupingStrategy);
+    GroupingStrategy groupingStrategy) {
+
+    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
+    Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
+
+    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
+
+    builder.addVertexGroupingKeys(vertexGroupingKeys);
+    builder.setStrategy(groupingStrategy);
+
+    if (edgeGroupingKeys != null) {
+      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    }
+    if (vertexAggregateFunctions != null) {
+      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
+    }
+    if (edgeAggregateFunctions != null) {
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
+    }
+    return callForGraph(builder.build());
+  }
 
   /**
-   * Sets the aggregation result of the given function as property for each vertex. All edges where
-   * the vertex is relevant get joined first and then grouped. The relevant edges are specified
-   * using the direction which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   *
-   * @return logical graph where vertices store aggregated information about connected edges
+   * {@inheritDoc}
    */
-  LogicalGraph reduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+  @Override
+  public LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
+  }
 
   /**
-   * Sets the aggregation result of the given function as property for each vertex. All vertices
-   * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
-   * specified using the direction which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   *
-   * @return logical graph where vertices store aggregated information about connected vertices
+   * {@inheritDoc}
    */
-  LogicalGraph reduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+  @Override
+  public LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
+  }
 
   /**
-   * Checks, if another logical graph contains exactly the same vertices and
-   * edges (by id) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
+   * {@inheritDoc}
    */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph other);
+  @Override
+  public LogicalGraph drillUpVertex(String propertyKey, DrillFunction function) {
+    return drillUpVertex(null, propertyKey, function);
+  }
 
   /**
-   * Checks, if another logical graph contains vertices and edges with the same
-   * attached data (i.e. label and properties) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
+   * {@inheritDoc}
    */
-  DataSet<Boolean> equalsByElementData(LogicalGraph other);
+  @Override
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
+    return drillUpVertex(vertexLabel, propertyKey, function, null);
+  }
 
   /**
-   * Checks, if another logical graph has the same attached data and contains
-   * vertices and edges with the same attached data as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
+   * {@inheritDoc}
    */
-  DataSet<Boolean> equalsByData(LogicalGraph other);
+  @Override
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillVertex(true);
+
+    if (vertexLabel != null) {
+      builder.setLabel(vertexLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
+  }
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
-   * graph. The property is identified by the specified property key. The previous version of the
-   * property value is stored at the vertex. The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param propertyKey property key
-   * @param function drill up function
-   * @return graph with drilled up properties
+   * {@inheritDoc}
    */
-  LogicalGraph drillUpVertex(String propertyKey, DrillFunction function);
+  @Override
+  public LogicalGraph drillUpEdge(String propertyKey, DrillFunction function) {
+    return drillUpEdge(null, propertyKey, function);
+  }
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
-   * graph. The vertices are selected by their label and the property is identified by the
-   * specified property key. The previous version of the property value is stored at the vertex.
-   * The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param vertexLabel vertex label
-   * @param propertyKey property key
-   * @param function drill up function
-   * @return graph with drilled up properties
+   * {@inheritDoc}
    */
-  LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
+  @Override
+  public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return drillUpEdge(edgeLabel, propertyKey, function, null);
+  }
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
-   * graph. The vertices are selected by their label and the property is identified by the
-   * specified property key. The new version of the property value is stored at the vertex
-   * under the new property key. The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param vertexLabel vertex label
-   * @param propertyKey property key
-   * @param function drill up function
-   * @param newPropertyKey new property key
-   * @return graph with drilled up properties
+   * {@inheritDoc}
    */
-  LogicalGraph drillUpVertex(
-    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
+  @Override
+  public LogicalGraph drillUpEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
-  /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
-   * graph. The property is identified by the specified property key. The previous version of the
-   * property value is stored at the edge. The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param propertyKey property key
-   * @param function drill up function
-   * @return graph with drilled up properties
-   */
-  LogicalGraph drillUpEdge(String propertyKey, DrillFunction function);
+    Objects.requireNonNull(propertyKey, "missing property key");
+    Objects.requireNonNull(function, "missing drill function");
 
-  /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
-   * graph. The edges are selected by their label and the property is identified by the
-   * specified property key. The previous version of the property value is stored at the edge.
-   * The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param edgeLabel edge label
-   * @param propertyKey property key
-   * @param function drill up function
-   * @return graph with drilled up properties
-   */
-  LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
-  /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
-   * graph. The edges are selected by their label and the property is identified by the
-   * specified property key. The new version of the property value is stored at the edge
-   * under the new property key. The structure of the graph remains unchanged.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
-   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
-   *
-   * @param edgeLabel edge label
-   * @param propertyKey property key
-   * @param function drill up function
-   * @param newPropertyKey new property key
-   * @return graph with drilled up properties
-   */
-  LogicalGraph drillUpEdge(
-    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillEdge(true);
+
+    if (edgeLabel != null) {
+      builder.setLabel(edgeLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+
+    return callForGraph(builder.buildDrillUp());
+  }
 
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Creates a new logical graph by combining the vertex and edge sets of
-   * this graph and the given graph. Vertex and edge equality is based on their
-   * identifiers.
-   *
-   * @param otherGraph logical graph to combine this graph with
-   * @return logical graph containing all vertices and edges of the
-   * input graphs
+   * {@inheritDoc}
    */
-  LogicalGraph combine(LogicalGraph otherGraph);
+  @Override
+  public LogicalGraph combine(LogicalGraph otherGraph) {
+    return callForGraph(new Combination(), otherGraph);
+  }
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of this graph and the given graph. Vertex and edge equality is
-   * based on their identifiers.
-   *
-   * @param otherGraph logical graph to compute overlap with
-   * @return logical graph that contains all vertices and edges that exist in
-   * both input graphs
+   * {@inheritDoc}
    */
-  LogicalGraph overlap(LogicalGraph otherGraph);
+  @Override
+  public LogicalGraph overlap(LogicalGraph otherGraph) {
+    return callForGraph(new Overlap(), otherGraph);
+  }
 
   /**
-   * Creates a new logical graph containing only vertices and edges that
-   * exist in that graph but not in the other graph. Vertex and edge equality
-   * is based on their identifiers.
-   *
-   * @param otherGraph logical graph to exclude from that graph
-   * @return logical that contains only vertices and edges that are not in
-   * the other graph
+   * {@inheritDoc}
    */
-  LogicalGraph exclude(LogicalGraph otherGraph);
+  @Override
+  public LogicalGraph exclude(LogicalGraph otherGraph) {
+    return callForGraph(new Exclusion(), otherGraph);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+      new EdgeToIdString(), true).execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> equalsByData(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+      new EdgeToDataString(), true).execute(this, other);
+  }
 
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Splits the graph into multiple logical graphs using the property value
-   * which is assigned to the given property key. Vertices and edges that do
-   * not have this property will be removed from the resulting collection.
-   *
-   * @param propertyKey split property key
-   * @return graph collection
+   * {@inheritDoc}
    */
-  GraphCollection splitBy(String propertyKey);
+  @Override
+  public LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
+    return operator.execute(this);
+  }
 
   /**
-   * Creates a logical graph using the given unary graph operator.
-   *
-   * @param operator unary graph to graph operator
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  LogicalGraph callForGraph(UnaryGraphToGraphOperator operator);
+  @Override
+  public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
+    return operator.execute(this, otherGraph);
+  }
 
   /**
-   * Creates a logical graph from that graph and the input graph using the
-   * given binary operator.
-   *
-   * @param operator   binary graph to graph operator
-   * @param otherGraph other graph
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph);
+  @Override
+  public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
+    return operator.execute(this);
+  }
 
   /**
-   * Creates a graph collection from that grpah using the given unary graph
-   * operator.
-   *
-   * @param operator unary graph to collection operator
-   * @return result of given operator
+   * {@inheritDoc}
    */
-  GraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+  @Override
+  public GraphCollection splitBy(String propertyKey) {
+    return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getVertices()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink dataSink) throws IOException {
+    dataSink.write(this);
+  }
+
 }

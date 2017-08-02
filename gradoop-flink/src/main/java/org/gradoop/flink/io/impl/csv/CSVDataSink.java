@@ -31,7 +31,6 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -79,13 +78,8 @@ public class CSVDataSink extends CSVBase implements DataSink {
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws IOException {
-    write(graphTransactions, false);
-  }
-
-  @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    FileSystem.WriteMode writeMode = overWrite ?
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+    FileSystem.WriteMode writeMode = overwrite ?
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
     DataSet<Tuple2<String, String>> metaData;
@@ -118,12 +112,6 @@ public class CSVDataSink extends CSVBase implements DataSink {
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
     throw new UnsupportedOperationException(
       "Writing a graph collection is currently not supported by this data sink");
-  }
-
-  @Override
-  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-    throw new UnsupportedOperationException(
-      "Writing graph transactions is currently not supported by this data sink");
   }
 
   /**

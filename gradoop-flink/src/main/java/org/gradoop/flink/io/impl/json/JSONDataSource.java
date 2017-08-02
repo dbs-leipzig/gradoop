@@ -28,7 +28,6 @@ import org.gradoop.flink.io.impl.json.functions.JSONToGraphHead;
 import org.gradoop.flink.io.impl.json.functions.JSONToVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -103,10 +102,5 @@ public class JSONDataSource extends JSONBase implements DataSource {
 
     return getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, vertices, edges);
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() {
-    return getGraphCollection().toTransactions();
   }
 }

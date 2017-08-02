@@ -22,8 +22,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.impl.epgm.gve.GVEGraphCollectionFactory;
-import org.gradoop.flink.model.impl.epgm.gve.GVELogicalGraphFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 
 import java.util.Objects;
 
@@ -59,13 +59,14 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     super();
 
     Objects.requireNonNull(executionEnvironment);
+
     this.executionEnvironment = executionEnvironment;
-
-    this.logicalGraphFactory = logicalGraphFactory == null ?
-      new GVELogicalGraphFactory(this) : logicalGraphFactory;
-
-    this.graphCollectionFactory = graphCollectionFactory == null ?
-      new GVEGraphCollectionFactory(this) : graphCollectionFactory;
+    this.logicalGraphFactory = (logicalGraphFactory == null) ?
+      new LogicalGraphFactory(new GVEGraphLayoutFactory(), this)
+      : logicalGraphFactory;
+    this.graphCollectionFactory = (graphCollectionFactory == null) ?
+      new GraphCollectionFactory(new GVECollectionLayoutFactory(), this)
+      : graphCollectionFactory;
   }
 
   /**
@@ -89,18 +90,18 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   }
 
   /**
-   * Returns a factory that is able to create logical graphs.
+   * Returns a factory that is able to create logical graph layouts.
    *
-   * @return factory for logical graphs
+   * @return factory for logical graph layouts
    */
   public LogicalGraphFactory getLogicalGraphFactory() {
     return logicalGraphFactory;
   }
 
   /**
-   * Returns a factory that is able to create graph collections.
+   * Returns a factory that is able to create graph collection layouts.
    *
-   * @return factory for graph collections
+   * @return factory for graph collection layouts
    */
   public GraphCollectionFactory getGraphCollectionFactory() {
     return graphCollectionFactory;

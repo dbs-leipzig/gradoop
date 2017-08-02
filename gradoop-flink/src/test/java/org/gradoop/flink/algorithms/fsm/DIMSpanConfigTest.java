@@ -15,13 +15,14 @@
  */
 package org.gradoop.flink.algorithms.fsm;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DictionaryType;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
+import org.gradoop.flink.representation.transactional.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -86,7 +87,7 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   }
 
   private void executeWith(DIMSpanConfig config) throws Exception {
-    GraphTransactions transactions = new PredictableTransactionsGenerator(
+    DataSet<GraphTransaction> transactions = new PredictableTransactionsGenerator(
       GRAPH_COUNT, 1, true, getConfig()).execute();
 
     config.setDirected(true);

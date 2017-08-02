@@ -19,7 +19,6 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
@@ -60,7 +59,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
 
   @Override
   public DataSet<Boolean> execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    GraphCollectionFactory collectionFactory = firstGraph.getConfig().getGraphCollectionFactory();
+    GraphCollectionFactory collectionFactory = firstGraph.getConfig()
+      .getGraphCollectionFactory();
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }

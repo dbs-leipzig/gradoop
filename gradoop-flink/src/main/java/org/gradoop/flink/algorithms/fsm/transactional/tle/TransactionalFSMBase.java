@@ -32,7 +32,6 @@ import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLab
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -79,29 +78,12 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
     config = collection.getConfig();
 
     DataSet<GraphTransaction> input = collection
-      .toTransactions()
-      .getTransactions();
+      .getGraphTransactions();
 
     DataSet<GraphTransaction> output = execute(input);
 
     return config.getGraphCollectionFactory()
-      .fromTransactions(new GraphTransactions(output, config));
-  }
-
-  /**
-   * Executes the algorithm for graphs in Gradoop transactional representation.
-   *
-   * @param transactions graphs in transactional representation
-   *
-   * @return frequent patterns in transactional representation
-   */
-  public GraphTransactions execute(GraphTransactions transactions) {
-    this.config = transactions.getConfig();
-
-    DataSet<GraphTransaction> input = transactions.getTransactions();
-    DataSet<GraphTransaction> output = execute(input);
-
-    return new GraphTransactions(output, config);
+      .fromTransactions(output);
   }
 
   /**

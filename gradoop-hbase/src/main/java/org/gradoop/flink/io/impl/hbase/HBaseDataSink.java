@@ -35,7 +35,6 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.hbase.functions.*;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.transactional.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -74,13 +73,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws IOException {
-    write(graphTransactions, false);
-  }
-
-  @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overWrite);
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
@@ -96,12 +90,6 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     // transform edge data to persistent edge data and write it
     writeEdges(graphCollection);
-  }
-
-  @Override
-  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-    write(getFlinkConfig().getGraphCollectionFactory()
-      .fromTransactions(graphTransactions), overWrite);
   }
 
   /**

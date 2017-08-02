@@ -1,27 +1,11 @@
-/**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.gradoop.flink.model.impl.epgm.gve;
+package org.gradoop.flink.model.impl.layouts.gve;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -30,28 +14,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Responsible for producing GVE-based graph collections.
- */
-public class GVELogicalGraphFactory extends GVEGraphBaseFactory implements LogicalGraphFactory {
-
-  /**
-   * Creates a new logical graph factory.
-   *
-   * @param config Gradoop config
-   */
-  public GVELogicalGraphFactory(GradoopFlinkConfig config) {
-    super(config);
-  }
+public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGraphLayoutFactory {
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<Vertex> vertices) {
+  public GVELayout fromDataSets(DataSet<Vertex> vertices, GradoopFlinkConfig config) {
     return fromDataSets(vertices,
-      GVEGraphBase.createEdgeDataSet(Lists.newArrayListWithCapacity(0), config));
+      createEdgeDataSet(Lists.newArrayListWithCapacity(0), config), config);
   }
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges) {
+  public GVELayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges,
+    GradoopFlinkConfig config) {
     Objects.requireNonNull(vertices, "Vertex DataSet was null");
     Objects.requireNonNull(edges, "Edge DataSet was null");
     Objects.requireNonNull(config, "Config was null");
@@ -70,18 +43,18 @@ public class GVELogicalGraphFactory extends GVEGraphBaseFactory implements Logic
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;sourceId;targetId;label;properties");
 
-    return new GVELogicalGraph(graphHeadSet, vertices, edges, config);
+    return new GVELayout(graphHeadSet, vertices, edges);
   }
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
-    return new GVELogicalGraph(graphHead, vertices, edges, config);
+  public GVELayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
+    DataSet<Edge> edges, GradoopFlinkConfig config) {
+    return new GVELayout(graphHead, vertices, edges);
   }
 
   @Override
-  public LogicalGraph fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
-    Collection<Edge> edges) {
+  public GVELayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
+    Collection<Edge> edges, GradoopFlinkConfig config) {
     List<GraphHead> graphHeads;
     if (graphHead == null) {
       graphHeads = Lists.newArrayListWithCapacity(0);
@@ -98,38 +71,40 @@ public class GVELogicalGraphFactory extends GVEGraphBaseFactory implements Logic
     Objects.requireNonNull(config, "Config was null");
 
     return fromDataSets(
-      createGraphHeadDataSet(graphHeads),
-      createVertexDataSet(vertices),
-      createEdgeDataSet(edges)
+      createGraphHeadDataSet(graphHeads, config),
+      createVertexDataSet(vertices, config),
+      createEdgeDataSet(edges, config),
+      config
     );
   }
 
   @Override
-  public LogicalGraph fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
+  public GVELayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges,
+    GradoopFlinkConfig config) {
     Objects.requireNonNull(vertices, "Vertex collection was null");
     Objects.requireNonNull(edges, "Edge collection was null");
     Objects.requireNonNull(config, "Config was null");
 
     GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
 
-    DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices)
+    DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;label;properties");
 
-    DataSet<Edge> edgeDataSet = createEdgeDataSet(edges)
+    DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;sourceId;targetId;label;properties");
 
     return fromDataSets(
-      createGraphHeadDataSet(new ArrayList<>(0)),
-      vertexDataSet, edgeDataSet
+      createGraphHeadDataSet(new ArrayList<>(0), config),
+      vertexDataSet, edgeDataSet, config
     );
   }
 
   @Override
-  public LogicalGraph createEmptyGraph() {
+  public GVELayout createEmptyGraph(GradoopFlinkConfig config) {
     Collection<Vertex> vertices = new ArrayList<>(0);
     Collection<Edge> edges = new ArrayList<>(0);
-    return fromCollections(null, vertices, edges);
+    return fromCollections(null, vertices, edges, config);
   }
 }

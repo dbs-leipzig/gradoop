@@ -88,18 +88,20 @@ public class DualSimulation extends PatternMatching {
       .filterVertices(graph, getQuery())
       .project(0);
 
-    LogicalGraphFactory logicalGraphFactory = graph.getConfig().getLogicalGraphFactory();
-    GraphCollectionFactory graphCollectionFactory = graph.getConfig().getGraphCollectionFactory();
+    LogicalGraphFactory graphFactory = graph.getConfig()
+      .getLogicalGraphFactory();
+    GraphCollectionFactory collectionFactory = graph.getConfig()
+      .getGraphCollectionFactory();
 
     if (doAttachData()) {
-      return graphCollectionFactory.fromGraph(
-        logicalGraphFactory.fromDataSets(matchingVertexIds
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
             .join(graph.getVertices())
             .where(0).equalTo(new Id<>())
             .with(new RightSide<>())));
     } else {
-      return graphCollectionFactory.fromGraph(
-        logicalGraphFactory.fromDataSets(matchingVertexIds
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
             .map(new VertexFromId(graph.getConfig().getVertexFactory()))));
     }
   }

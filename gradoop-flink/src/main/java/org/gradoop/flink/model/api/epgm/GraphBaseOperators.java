@@ -30,7 +30,7 @@ import java.io.IOException;
  * @see LogicalGraph
  * @see GraphCollection
  */
-public interface GraphBase {
+public interface GraphBaseOperators {
 
   /**
    * Returns the Gradoop Flink configuration.
@@ -38,44 +38,6 @@ public interface GraphBase {
    * @return Gradoop Flink configuration
    */
   GradoopFlinkConfig getConfig();
-
-  //----------------------------------------------------------------------------
-  // Containment methods
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns all vertices including vertex data associated with that graph.
-   *
-   * @return vertices
-   */
-  DataSet<Vertex> getVertices();
-
-  /**
-   * Returns all edge data associated with that logical graph.
-   *
-   * @return edges
-   */
-  DataSet<Edge> getEdges();
-
-  /**
-   * Returns the edge data associated with the outgoing edges of the given
-   * vertex.
-   *
-   * @param vertexID vertex identifier
-   * @return outgoing edge data of given vertex
-   */
-  @Deprecated
-  DataSet<Edge> getOutgoingEdges(final GradoopId vertexID);
-
-  /**
-   * Returns the edge data associated with the incoming edges of the given
-   * vertex.
-   *
-   * @param vertexID vertex identifier
-   * @return incoming edge data of given vertex
-   */
-  @Deprecated
-  DataSet<Edge> getIncomingEdges(final GradoopId vertexID);
 
   //----------------------------------------------------------------------------
   // Utility methods
@@ -95,7 +57,7 @@ public interface GraphBase {
   /**
    * Writes logical graph/graph collection to given data sink.
    *
-   * @param dataSink data sing
+   * @param dataSink data sink
    */
   void writeTo(DataSink dataSink) throws IOException;
 }
