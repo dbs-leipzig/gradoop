@@ -48,8 +48,8 @@ public class JSONDataSinkTest extends GradoopFlinkTestBase {
       getSocialNetworkLoader();
 
     // write to JSON
-    loader.getDatabase().writeTo(
-      new JSONDataSink(graphFile, vertexFile, edgeFile, getConfig()));
+    loader.getDatabase()
+      .writeTo(new JSONDataSink(graphFile, vertexFile, edgeFile, getConfig()));
 
     getExecutionEnvironment().execute();
 

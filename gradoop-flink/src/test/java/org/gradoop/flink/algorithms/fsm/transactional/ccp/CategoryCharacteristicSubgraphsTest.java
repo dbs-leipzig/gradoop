@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Test;
 
 import java.util.List;

@@ -13,32 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
+import java.util.Set;
+
 /**
- * drops properties and graph containment of vertices and edges.
+ * GraphTransaction -> (GraphHead, VertexSet, EdgeSet)
  */
-public class DropPropertiesAndGraphContainment
-  implements MapFunction<GraphTransaction, GraphTransaction> {
+@FunctionAnnotation.ForwardedFields("f0;f1;f2")
+public class TransactionTuple implements
+  MapFunction<GraphTransaction, Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> {
+
+  private final Tuple3<GraphHead, Set<Vertex>, Set<Edge>> reuseTuple = new Tuple3<>();
 
   @Override
-  public GraphTransaction map(GraphTransaction transaction) throws Exception {
-
-    for (Vertex vertex : transaction.getVertices()) {
-      vertex.setProperties(null);
-      vertex.setGraphIds(null);
-    }
-
-    for (Edge edge : transaction.getEdges()) {
-      edge.setProperties(null);
-      edge.setGraphIds(null);
-    }
-
-    return transaction;
+  public Tuple3<GraphHead, Set<Vertex>, Set<Edge>> map(GraphTransaction graphTransaction) throws
+    Exception {
+    reuseTuple.f0 = graphTransaction.getGraphHead();
+    reuseTuple.f1 = graphTransaction.getVertices();
+    reuseTuple.f2 = graphTransaction.getEdges();
+    return reuseTuple;
   }
 }

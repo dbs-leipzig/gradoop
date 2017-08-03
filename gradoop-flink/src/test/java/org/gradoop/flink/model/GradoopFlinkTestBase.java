@@ -69,6 +69,7 @@ public abstract class GradoopFlinkTestBase {
     testEnv.setAsContext();
     this.env = testEnv;
     this.config = GradoopFlinkConfig.createConfig(env);
+    this.config.setGraphCollectionLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**

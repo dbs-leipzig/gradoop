@@ -44,7 +44,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfre
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentVertexLabels;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
 import org.gradoop.flink.model.impl.functions.utils.First;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Map;
 

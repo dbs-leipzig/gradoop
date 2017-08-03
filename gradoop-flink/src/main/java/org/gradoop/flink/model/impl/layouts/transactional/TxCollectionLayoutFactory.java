@@ -1,50 +1,97 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
+import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionFromSets;
+import org.gradoop.flink.model.impl.functions.utils.Cast;
+import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Collection;
-import java.util.Objects;
+import java.util.Set;
 
-public class TxCollectionLayoutFactory implements GraphCollectionLayoutFactory {
-
-  private GradoopFlinkConfig config;
-
-  @Override
-  public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
-    Objects.requireNonNull(config);
-    this.config = config;
-  }
+public class TxCollectionLayoutFactory extends BaseFactory implements GraphCollectionLayoutFactory {
 
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
-    throw new NotImplementedException();
+    return fromDataSets(graphHeads, vertices,
+      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
-    throw new NotImplementedException();
+  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads, DataSet<Vertex> inVertices,
+    DataSet<Edge> inEdges) {
+
+    DataSet<Tuple2<GradoopId, GraphElement>> vertices = inVertices
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
+      .flatMap(new GraphElementExpander<>());
+
+    DataSet<Tuple2<GradoopId, GraphElement>> edges = inEdges
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
+      .flatMap(new GraphElementExpander<>());
+
+    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
+      .union(edges)
+      .groupBy(0)
+      .combineGroup(new GraphVerticesEdges())
+      .groupBy(0)
+      .reduceGroup(new GraphVerticesEdges());
+
+    DataSet<GraphTransaction> graphTransactions = inGraphHeads
+      .leftOuterJoin(transactions)
+      .where(new Id<>()).equalTo(0)
+      .with(new TransactionFromSets());
+
+    return new TxCollectionLayout(graphTransactions);
   }
 
   @Override
   public GraphCollectionLayout fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
-    throw new NotImplementedException();
+    return fromDataSets(
+      createGraphHeadDataSet(graphHeads),
+      createVertexDataSet(vertices),
+      createEdgeDataSet(edges)
+    );
   }
 
   @Override
   public GraphCollectionLayout fromGraphLayout(LogicalGraphLayout logicalGraphLayout) {
-    throw new NotImplementedException();
+    return fromDataSets(logicalGraphLayout.getGraphHead(),
+      logicalGraphLayout.getVertices(),
+      logicalGraphLayout.getEdges());
   }
 
   @Override
@@ -56,11 +103,13 @@ public class TxCollectionLayoutFactory implements GraphCollectionLayoutFactory {
   public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
-    throw new NotImplementedException();
+    return new TxCollectionLayout(transactions);
   }
 
   @Override
   public GraphCollectionLayout createEmptyCollection() {
-    throw new NotImplementedException();
+    return fromDataSets(createGraphHeadDataSet(Lists.newArrayListWithCapacity(0)),
+      createVertexDataSet(Lists.newArrayListWithCapacity(0)),
+      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
 }

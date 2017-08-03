@@ -22,7 +22,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.EPGMGraphTr
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * Gradoop operator wrapping the DIMSpan algorithm for transactional frequent subgraph mining.

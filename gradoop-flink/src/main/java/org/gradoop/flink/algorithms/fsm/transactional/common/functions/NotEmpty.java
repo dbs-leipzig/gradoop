@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * (g, V, E) => true, if E not empty

@@ -15,7 +15,6 @@
  */
 
 /**
- * Contains the GVE graph and collection layout. This layout represents a graph/collection by three
- * separate datasets: one for graph (heads), one for vertices and one for edges.
+ * Contains functionality that is used by all layout implementations.
  */
-package org.gradoop.flink.model.impl.layouts.gve;
+package org.gradoop.flink.model.impl.layouts.common;

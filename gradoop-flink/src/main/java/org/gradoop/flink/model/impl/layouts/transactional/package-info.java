@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
- * Contains the Transactinal (Tx) collection layout. This layout represens a graph collection
+ * Contains the Transactional (Tx) collection layout. This layout represens a graph collection
  * by an single dataset where each row represents a logical graph.
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
