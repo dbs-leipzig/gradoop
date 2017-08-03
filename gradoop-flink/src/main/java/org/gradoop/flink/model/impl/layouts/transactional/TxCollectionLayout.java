@@ -15,10 +15,7 @@
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -27,9 +24,9 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.BySourceId;
 import org.gradoop.flink.model.impl.functions.epgm.ByTargetId;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
-import org.gradoop.flink.model.impl.functions.epgm.TransactionTuple;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -49,8 +46,7 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   @Override
   public DataSet<GraphHead> getGraphHeads() {
     return transactions
-      .map(new TransactionTuple())
-      .map(new TransactionGraphHead());
+      .map(new TransactionGraphHead<>());
   }
 
   @Override
@@ -66,8 +62,8 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   @Override
   public DataSet<Vertex> getVertices() {
     return transactions
-      .map(new TransactionTuple())
-      .flatMap(new TransactionVertices());
+      .flatMap(new TransactionVertices<>())
+      .distinct(new Id<>());
   }
 
   @Override
@@ -78,8 +74,8 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   @Override
   public DataSet<Edge> getEdges() {
     return transactions
-      .map(new TransactionTuple())
-      .flatMap(new TransactionEdges());
+      .flatMap(new TransactionEdges<>())
+      .distinct(new Id<>());
   }
 
   @Override

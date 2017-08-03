@@ -29,11 +29,11 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFields("f0->*")
 @FunctionAnnotation.ReadFields("f0")
-public class TransactionGraphHead implements
-  MapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, GraphHead> {
+public class TransactionGraphHead<T extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> implements
+  MapFunction<T, GraphHead> {
 
   @Override
-  public GraphHead map(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> triple) throws Exception {
+  public GraphHead map(T triple) throws Exception {
     return triple.f0;
   }
 }
