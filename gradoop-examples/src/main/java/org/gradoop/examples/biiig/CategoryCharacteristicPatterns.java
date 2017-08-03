@@ -36,7 +36,10 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
-import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.*;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SOURCEID_KEY;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL;
+import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERTYPE_KEY;
 import static org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs.CATEGORY_KEY;
 
 /**

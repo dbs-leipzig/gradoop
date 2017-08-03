@@ -41,17 +41,21 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * Responsible for producing instances of {@link TxCollectionLayout}.
+ */
 public class TxCollectionLayoutFactory extends BaseFactory implements GraphCollectionLayoutFactory {
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
+  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices) {
     return fromDataSets(graphHeads, vertices,
       createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads, DataSet<Vertex> inVertices,
-    DataSet<Edge> inEdges) {
+  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads,
+    DataSet<Vertex> inVertices, DataSet<Edge> inEdges) {
 
     // Add a dummy graph head for entities which have no assigned graph
     DataSet<GraphHead> dbGraphHead = config.getExecutionEnvironment().fromElements(

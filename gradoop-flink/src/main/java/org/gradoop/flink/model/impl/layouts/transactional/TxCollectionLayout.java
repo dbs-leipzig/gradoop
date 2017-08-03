@@ -39,9 +39,16 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
  * with all its associated vertex and edge data.
  */
 public class TxCollectionLayout implements GraphCollectionLayout {
-
+  /**
+   * Flink dataset holding the actual data of that layout.
+   */
   private final DataSet<GraphTransaction> transactions;
 
+  /**
+   * Creates a new transactional collection layout.
+   *
+   * @param transactions graph transactions
+   */
   TxCollectionLayout(DataSet<GraphTransaction> transactions) {
     this.transactions = transactions;
   }

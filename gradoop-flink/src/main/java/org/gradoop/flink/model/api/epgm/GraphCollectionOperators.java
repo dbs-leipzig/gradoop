@@ -33,6 +33,9 @@ import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 
+/**
+ * Defines the operators that available on a {@link GraphCollection}.
+ */
 public interface GraphCollectionOperators extends GraphBaseOperators {
 
   //----------------------------------------------------------------------------

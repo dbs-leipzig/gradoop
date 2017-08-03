@@ -42,6 +42,11 @@ public class GraphCollectionFactory {
    */
   private final GradoopFlinkConfig config;
 
+  /**
+   * Creates a new factory.
+   *
+   * @param config Gradoop Flink configuration
+   */
   public GraphCollectionFactory(GradoopFlinkConfig config) {
     this.config = config;
   }

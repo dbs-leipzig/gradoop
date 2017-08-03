@@ -26,6 +26,8 @@ import java.util.Set;
 
 /**
  * (graphHead, {vertex,..}, {edge,..}) => graphHead
+ *
+ * @param <T> tuple type
  */
 @FunctionAnnotation.ForwardedFields("f0->*")
 @FunctionAnnotation.ReadFields("f0")

@@ -58,6 +58,13 @@ public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
    */
   private final DataSet<Edge> edges;
 
+  /**
+   * Constructor
+   *
+   * @param graphHeads graph head dataset
+   * @param vertices vertex dataset
+   * @param edges edge dataset
+   */
   GVELayout(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices, DataSet<Edge> edges) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
@@ -76,18 +83,18 @@ public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
 
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
-    DataSet<Tuple2<GradoopId, GraphElement>> vertices = getVertices()
+    DataSet<Tuple2<GradoopId, GraphElement>> graphVertexTuples = getVertices()
       .map(new Cast<>(GraphElement.class))
       .returns(TypeExtractor.getForClass(GraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple2<GradoopId, GraphElement>> edges = getEdges()
+    DataSet<Tuple2<GradoopId, GraphElement>> graphEdgeTuples = getEdges()
       .map(new Cast<>(GraphElement.class))
       .returns(TypeExtractor.getForClass(GraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
-      .union(edges)
+    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = graphVertexTuples
+      .union(graphEdgeTuples)
       .groupBy(0)
       .combineGroup(new GraphVerticesEdges())
       .groupBy(0)

@@ -19,10 +19,22 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 
+/**
+ * Filters edges having the specified target vertex id.
+ *
+ * @param <E> EPGM edge type
+ */
 public class ByTargetId<E extends Edge> implements FilterFunction<E> {
-
+  /**
+   * Vertex id to filter on
+   */
   private final GradoopId targetId;
 
+  /**
+   * Constructor
+   *
+   * @param targetId vertex id to filter on
+   */
   public ByTargetId(GradoopId targetId) {
     this.targetId = targetId;
   }

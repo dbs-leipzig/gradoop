@@ -38,10 +38,11 @@ public class LogicalGraphFactory {
    * Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
+
   /**
    * Creates a new factory.
    *
-   * @param config
+   * @param config Configuration
    */
   public LogicalGraphFactory(GradoopFlinkConfig config) {
     this.config = config;

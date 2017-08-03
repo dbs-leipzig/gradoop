@@ -75,9 +75,13 @@ import java.util.Objects;
  * Describes all operators that can be applied on a single logical graph in the EPGM.
  */
 public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
-
+  /**
+   * Layout for that logical graph.
+   */
   private final LogicalGraphLayout layout;
-
+  /**
+   * Configuration
+   */
   private final GradoopFlinkConfig config;
 
   /**

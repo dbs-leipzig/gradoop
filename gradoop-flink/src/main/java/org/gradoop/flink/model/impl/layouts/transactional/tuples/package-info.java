@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.layouts;
-
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Base interface for layout factories.
+ * Contains tuple implementations related to the Transactional Collection layout.
  */
-public interface BaseLayoutFactory {
-  /**
-   * Sets the config.
-   *
-   * @param config Gradoop flink config
-   */
-  void setGradoopFlinkConfig(GradoopFlinkConfig config);
-}
+package org.gradoop.flink.model.impl.layouts.transactional.tuples;

@@ -38,6 +38,9 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 
 import java.util.List;
 
+/**
+ * Defines the operators that available on a {@link LogicalGraph}.
+ */
 public interface LogicalGraphOperators extends GraphBaseOperators {
 
   //----------------------------------------------------------------------------

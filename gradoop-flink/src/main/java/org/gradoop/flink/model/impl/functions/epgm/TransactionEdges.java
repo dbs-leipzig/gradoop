@@ -26,6 +26,8 @@ import java.util.Set;
 
 /**
  * (graphHead, {vertex,..}, {edge,..}) => edge,..
+ *
+ * @param <T> tuple type
  */
 public class TransactionEdges<T extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> implements
   FlatMapFunction<T, Edge> {

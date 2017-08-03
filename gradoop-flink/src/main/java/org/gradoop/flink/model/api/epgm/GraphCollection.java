@@ -69,15 +69,20 @@ import java.util.Objects;
  * graphs in the EPGM.
  */
 public class GraphCollection implements GraphCollectionOperators, GraphCollectionLayout {
-
+  /**
+   * Layout for that graph collection
+   */
   private final GraphCollectionLayout layout;
-
+  /**
+   * Configuration
+   */
   private final GradoopFlinkConfig config;
 
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param config      Gradoop Flink configuration
+   * @param layout Graph collection layout
+   * @param config Gradoop Flink configuration
    */
   GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);

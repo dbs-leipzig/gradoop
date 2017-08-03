@@ -21,7 +21,6 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
-import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
