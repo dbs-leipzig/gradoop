@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Different graph representations that can be used in DataSets.
+ * Contains interfaces for describing graph and graph collection layouts.
  */
-package org.gradoop.flink.representation;
+package org.gradoop.flink.model.api.layouts;

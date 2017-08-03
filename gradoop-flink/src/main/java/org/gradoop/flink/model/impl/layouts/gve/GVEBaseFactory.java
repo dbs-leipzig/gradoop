@@ -6,12 +6,28 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
+import java.util.Objects;
 
-abstract class GVEBaseFactory {
+/**
+ * Base class for GVE layout factories.
+ */
+abstract class GVEBaseFactory implements BaseLayoutFactory {
+
+  /**
+   * Gradoop Flink config
+   */
+  protected GradoopFlinkConfig config;
+
+  @Override
+  public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
+    Objects.requireNonNull(config);
+    this.config = config;
+  }
 
   /**
    * Creates a graph head dataset from a given collection.
@@ -20,8 +36,7 @@ abstract class GVEBaseFactory {
    * @param graphHeads  graph heads
    * @return graph head dataset
    */
-  DataSet<GraphHead> createGraphHeadDataSet(Collection<GraphHead> graphHeads,
-    GradoopFlinkConfig config) {
+  DataSet<GraphHead> createGraphHeadDataSet(Collection<GraphHead> graphHeads) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
@@ -43,7 +58,7 @@ abstract class GVEBaseFactory {
    * @param vertices  vertex collection
    * @return vertex dataset
    */
-  DataSet<Vertex> createVertexDataSet(Collection<Vertex> vertices, GradoopFlinkConfig config) {
+  DataSet<Vertex> createVertexDataSet(Collection<Vertex> vertices) {
 
     ExecutionEnvironment env = config.getExecutionEnvironment();
 
@@ -65,7 +80,7 @@ abstract class GVEBaseFactory {
    * @param edges edge collection
    * @return edge dataset
    */
-  DataSet<Edge> createEdgeDataSet(Collection<Edge> edges, GradoopFlinkConfig config) {
+  DataSet<Edge> createEdgeDataSet(Collection<Edge> edges) {
 
     DataSet<Edge> edgeSet;
     if (edges.isEmpty()) {

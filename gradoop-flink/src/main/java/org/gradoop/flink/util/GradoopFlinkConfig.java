@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 
@@ -61,12 +63,15 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     Objects.requireNonNull(executionEnvironment);
 
     this.executionEnvironment = executionEnvironment;
+
+    // init with default layout factories
     this.logicalGraphFactory = (logicalGraphFactory == null) ?
-      new LogicalGraphFactory(new GVEGraphLayoutFactory(), this)
-      : logicalGraphFactory;
+      new LogicalGraphFactory(this) : logicalGraphFactory;
+    this.logicalGraphFactory.setLayoutFactory(new GVEGraphLayoutFactory());
+
     this.graphCollectionFactory = (graphCollectionFactory == null) ?
-      new GraphCollectionFactory(new GVECollectionLayoutFactory(), this)
-      : graphCollectionFactory;
+      new GraphCollectionFactory(this) : graphCollectionFactory;
+    this.graphCollectionFactory.setLayoutFactory(new GVECollectionLayoutFactory());
   }
 
   /**
@@ -105,5 +110,29 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    */
   public GraphCollectionFactory getGraphCollectionFactory() {
     return graphCollectionFactory;
+  }
+
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link org.gradoop.flink.model.api.epgm.LogicalGraph}.
+   *
+   * @param factory logical graph layout factor
+   */
+  public void setLogicalGraphLayoutFactory(LogicalGraphLayoutFactory factory) {
+    Objects.requireNonNull(factory);
+    factory.setGradoopFlinkConfig(this);
+    logicalGraphFactory.setLayoutFactory(factory);
+  }
+
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link org.gradoop.flink.model.api.epgm.GraphCollection}.
+   *
+   * @param factory graph collection layout factory
+   */
+  public void setGraphCollectionLayoutFactory(GraphCollectionLayoutFactory factory) {
+    Objects.requireNonNull(factory);
+    factory.setGradoopFlinkConfig(this);
+    graphCollectionFactory.setLayoutFactory(factory);
   }
 }

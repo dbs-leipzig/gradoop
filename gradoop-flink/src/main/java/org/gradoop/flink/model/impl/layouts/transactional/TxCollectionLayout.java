@@ -9,6 +9,11 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.representation.transactional.GraphTransaction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+/**
+ * Represents a {@link org.gradoop.flink.model.api.epgm.GraphCollection} with a single dataset.
+ * Each row in the dataset represents a single {@link org.gradoop.flink.model.api.epgm.LogicalGraph}
+ * with all its associated vertex and edge data.
+ */
 public class TxCollectionLayout implements GraphCollectionLayout {
 
   private final DataSet<GraphTransaction> transactions;

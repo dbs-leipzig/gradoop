@@ -3,6 +3,10 @@ package org.gradoop.flink.model.api.layouts;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
+/**
+ * A logical graph layout defines the Flink internal (DataSet) representation of a
+ * {@link org.gradoop.flink.model.api.epgm.LogicalGraph}.
+ */
 public interface LogicalGraphLayout extends Layout {
 
   /**

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /**
- * Different graph representations that can be used in DataSets.
+ * Contains the Transactinal (Tx) collection layout. This layout represens a graph collection
+ * by an single dataset where each row represents a logical graph.
  */
-package org.gradoop.flink.representation;
+package org.gradoop.flink.model.impl.layouts.transactional;

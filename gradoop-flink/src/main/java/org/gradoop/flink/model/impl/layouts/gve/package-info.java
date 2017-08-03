@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /**
- * Classes related to partial EPGM element data.
+ * Contains the GVE graph and collection layout. This layout represens a graph/collection by three
+ * separate datasets: one for graph (heads), one for vertices and one for edges.
  */
-package org.gradoop.flink.representation.common.elementdata;
+package org.gradoop.flink.model.impl.layouts.gve;

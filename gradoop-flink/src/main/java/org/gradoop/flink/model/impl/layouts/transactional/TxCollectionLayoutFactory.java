@@ -13,48 +13,54 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class TxCollectionLayoutFactory implements GraphCollectionLayoutFactory {
+
+  private GradoopFlinkConfig config;
+
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices, GradoopFlinkConfig config) {
+  public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
+    Objects.requireNonNull(config);
+    this.config = config;
+  }
+
+  @Override
+  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
     throw new NotImplementedException();
   }
 
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config) {
+    DataSet<Edge> edges) {
     throw new NotImplementedException();
   }
 
   @Override
   public GraphCollectionLayout fromCollections(Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices, Collection<Edge> edges, GradoopFlinkConfig config) {
+    Collection<Vertex> vertices, Collection<Edge> edges) {
     throw new NotImplementedException();
   }
 
   @Override
-  public GraphCollectionLayout fromGraphLayout(LogicalGraphLayout logicalGraphLayout,
-    GradoopFlinkConfig config) {
+  public GraphCollectionLayout fromGraphLayout(LogicalGraphLayout logicalGraphLayout) {
     throw new NotImplementedException();
   }
 
   @Override
-  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,
-    GradoopFlinkConfig config) {
+  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions) {
     return new TxCollectionLayout(transactions);
   }
 
   @Override
   public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer,
-    GradoopFlinkConfig config) {
+    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
     throw new NotImplementedException();
   }
 
   @Override
-  public GraphCollectionLayout createEmptyCollection(GradoopFlinkConfig config) {
+  public GraphCollectionLayout createEmptyCollection() {
     throw new NotImplementedException();
   }
 }

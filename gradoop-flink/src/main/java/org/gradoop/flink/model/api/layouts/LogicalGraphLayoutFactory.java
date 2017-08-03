@@ -9,18 +9,20 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 
-public interface LogicalGraphLayoutFactory {
-
+/**
+ * Enables the construction of a {@link LogicalGraphLayout}.
+ */
+public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph layout from the given vertex dataset.
    *
    * @param vertices  Vertex dataset
    * @return Logical graph
    */
-  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices, GradoopFlinkConfig config);
+  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices);
 
   /**
-   * Creates a logical graph from the given argument.
+   * Creates a logical graph layout from given vertex and edge datasets.
    * <p>
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
@@ -29,11 +31,10 @@ public interface LogicalGraphLayoutFactory {
    * @param edges    Edge DataSet
    * @return Logical graph
    */
-  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges,
-    GradoopFlinkConfig config);
+  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges);
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph layout from given graphHead, vertex and edge datasets.
    *
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
@@ -44,10 +45,13 @@ public interface LogicalGraphLayoutFactory {
    * @return Logical graph
    */
   LogicalGraphLayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config);
+    DataSet<Edge> edges);
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph layout from the given graphHead, vertex and edge collections.
+   *
+   * The method assumes that the given vertices and edges are already assigned
+   * to the given graph head.
    *
    * @param graphHead Graph head associated with the logical graph
    * @param vertices  Vertex collection
@@ -55,23 +59,22 @@ public interface LogicalGraphLayoutFactory {
    * @return Logical graph
    */
   LogicalGraphLayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
-    Collection<Edge> edges, GradoopFlinkConfig config);
+    Collection<Edge> edges);
 
   /**
-   * Creates a logical graph from the given arguments. A new graph head is
+   * Creates a logical graph layout from the given vertex and edge collections. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
    * @param vertices    Vertex collection
    * @param edges       Edge collection
    * @return Logical graph
    */
-  LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges,
-    GradoopFlinkConfig config);
+  LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges);
 
   /**
-   * Creates an empty graph.
+   * Creates a layout representing the empty graph.
    *
    * @return empty graph
    */
-  LogicalGraphLayout createEmptyGraph(GradoopFlinkConfig config);
+  LogicalGraphLayout createEmptyGraph();
 }
