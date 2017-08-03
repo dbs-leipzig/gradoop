@@ -48,7 +48,6 @@ public class SyntheticDataGenerator
   static {
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
     OPTIONS.addOption(OPTION_GRAPH_COUNT, "graph-count", true, "Number of graphs");
-    GRADOOP_CONFIG.getGraphCollectionFactory().setLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**

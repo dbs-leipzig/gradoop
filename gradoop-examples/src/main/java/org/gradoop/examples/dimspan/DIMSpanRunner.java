@@ -62,7 +62,6 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
     OPTIONS.addOption(OPTION_MIN_SUPPORT, "min-support", true, "Minimum support threshold");
     OPTIONS.addOption(OPTION_UNDIRECTED_MODE, "undirected", false, "Enable undirected mode");
-    GRADOOP_CONFIG.getGraphCollectionFactory().setLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**

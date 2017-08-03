@@ -38,6 +38,7 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
@@ -58,10 +59,10 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Describes all operators that can be applied on a collection of logical
@@ -79,6 +80,8 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
    * @param config      Gradoop Flink configuration
    */
   GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
+    Objects.requireNonNull(layout);
+    Objects.requireNonNull(config);
     this.layout = layout;
     this.config = config;
   }

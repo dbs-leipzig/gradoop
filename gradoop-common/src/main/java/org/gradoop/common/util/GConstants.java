@@ -15,6 +15,8 @@
  */
 package org.gradoop.common.util;
 
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
  * Constants used in Gradoop.
  */
@@ -37,6 +39,10 @@ public final class GConstants {
    */
   public static final String NULL_STRING = "NULL";
 
+  /**
+   * Static identifier for the database graph.
+   */
+  public static final GradoopId DB_GRAPH_ID = GradoopId.fromString("598349bcda43031d1ea62d3b");
   /**
    * Default label of an EPGM database graph.
    */

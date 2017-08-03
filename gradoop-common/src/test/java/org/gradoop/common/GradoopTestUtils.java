@@ -209,6 +209,8 @@ public class GradoopTestUtils {
     Collection<? extends EPGMElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
+    assertTrue(String.format("collections of different size: %d and %d", collection1.size(),
+      collection2.size()), collection1.size() == collection2.size());
 
     List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
     List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);

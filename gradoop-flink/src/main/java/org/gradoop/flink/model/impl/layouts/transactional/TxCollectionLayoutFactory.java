@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -51,6 +52,12 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads, DataSet<Vertex> inVertices,
     DataSet<Edge> inEdges) {
+
+    // Add a dummy graph head for entities which have no assigned graph
+    DataSet<GraphHead> dbGraphHead = config.getExecutionEnvironment().fromElements(
+      config.getGraphHeadFactory().initGraphHead(GConstants.DB_GRAPH_ID, GConstants.DB_GRAPH_LABEL)
+    );
+    inGraphHeads = inGraphHeads.union(dbGraphHead);
 
     DataSet<Tuple2<GradoopId, GraphElement>> vertices = inVertices
       .map(new Cast<>(GraphElement.class))

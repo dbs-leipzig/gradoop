@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -43,6 +44,7 @@ import static org.junit.Assert.assertEquals;
 
 public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
   @Test
+  @Ignore
   public void execute() throws Exception {
 
     DataSet<GraphTransaction> transactions = new PredictableTransactionsGenerator(

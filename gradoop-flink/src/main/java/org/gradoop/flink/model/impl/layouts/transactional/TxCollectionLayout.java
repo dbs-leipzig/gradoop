@@ -15,12 +15,15 @@
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.BySourceId;
 import org.gradoop.flink.model.impl.functions.epgm.ByTargetId;
@@ -46,7 +49,8 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   @Override
   public DataSet<GraphHead> getGraphHeads() {
     return transactions
-      .map(new TransactionGraphHead<>());
+      .map(new TransactionGraphHead<>())
+      .filter(new ByDifferentId<>(GConstants.DB_GRAPH_ID));
   }
 
   @Override
@@ -56,7 +60,13 @@ public class TxCollectionLayout implements GraphCollectionLayout {
 
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
-    return transactions;
+    return transactions
+      .filter(new FilterFunction<GraphTransaction>() {
+        @Override
+        public boolean filter(GraphTransaction graphTransaction) throws Exception {
+          return !graphTransaction.getGraphHead().getId().equals(GConstants.DB_GRAPH_ID);
+        }
+      });
   }
 
   @Override

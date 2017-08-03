@@ -68,9 +68,6 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true, "Path to input file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");
     OPTIONS.addOption(COPY_COUNT, "copy-count", true, "Number of copies per input graph");
-
-    GRADOOP_CONFIG.getGraphCollectionFactory()
-      .setLayoutFactory(new TxCollectionLayoutFactory());
   }
 
   /**

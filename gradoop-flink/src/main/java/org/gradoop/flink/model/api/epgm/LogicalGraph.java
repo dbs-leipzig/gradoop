@@ -87,6 +87,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @param config    Gradoop Flink configuration
    */
   LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+    Objects.requireNonNull(layout);
+    Objects.requireNonNull(config);
     this.layout = layout;
     this.config = config;
   }
@@ -551,5 +553,4 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
   }
-
 }

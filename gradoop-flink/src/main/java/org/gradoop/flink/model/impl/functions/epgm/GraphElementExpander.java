@@ -21,6 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.util.GConstants;
 
 /**
  * Takes an object of type GraphElement, and creates a tuple2 for each
@@ -49,6 +50,11 @@ public class GraphElementExpander<EL extends GraphElement>
     reuse.f1 = element;
     for (GradoopId graphId : element.getGraphIds()) {
       reuse.f0 = graphId;
+      collector.collect(reuse);
+    }
+    // assign entities with no graph to the DB graph
+    if (element.getGraphCount() == 0) {
+      reuse.f0 = GConstants.DB_GRAPH_ID;
       collector.collect(reuse);
     }
   }

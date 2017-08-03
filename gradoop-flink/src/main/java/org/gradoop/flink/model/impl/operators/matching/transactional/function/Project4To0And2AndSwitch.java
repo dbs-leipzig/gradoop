@@ -28,7 +28,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
  * @param <T2> f2 type
  * @param <T3> f3 type
  */
-@FunctionAnnotation.ForwardedFields("f0->f1,f2->f0")
+@FunctionAnnotation.ForwardedFields("f0->f1;f2->f0")
 public class Project4To0And2AndSwitch<T0, T1, T2, T3>
   implements MapFunction<Tuple4<T0, T1, T2, T3>, Tuple2<T2, T0>> {
 
