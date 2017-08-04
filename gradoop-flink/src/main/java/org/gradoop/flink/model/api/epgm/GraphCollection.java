@@ -125,6 +125,16 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     return layout.getIncomingEdges(vertexID);
   }
 
+  @Override
+  public boolean hasGVELayout() {
+    return layout.hasGVELayout();
+  }
+
+  @Override
+  public boolean hasTransactionalLayout() {
+    return layout.hasTransactionalLayout();
+  }
+
   /**
    * {@inheritDoc}
    */

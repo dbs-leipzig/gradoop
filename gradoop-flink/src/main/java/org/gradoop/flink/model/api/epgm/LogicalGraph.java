@@ -101,6 +101,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   // Data methods
   //----------------------------------------------------------------------------
 
+  @Override
+  public boolean hasGVELayout() {
+    return layout.hasGVELayout();
+  }
+
   /**
    * {@inheritDoc}
    */

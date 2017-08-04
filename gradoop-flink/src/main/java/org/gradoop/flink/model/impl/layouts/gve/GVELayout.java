@@ -72,6 +72,17 @@ public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
   }
 
   @Override
+  public boolean hasTransactionalLayout() {
+    return false;
+  }
+
+
+  @Override
+  public boolean hasGVELayout() {
+    return true;
+  }
+
+  @Override
   public DataSet<GraphHead> getGraphHeads() {
     return graphHeads;
   }

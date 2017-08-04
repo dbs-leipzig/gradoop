@@ -26,6 +26,19 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 public interface GraphCollectionLayout extends Layout {
 
   /**
+   * True, if the layout is based on three separate datasets.
+   *
+   * @return true, iff layout based on three separate datasets.
+   */
+  boolean hasGVELayout();
+
+  /**
+   * True, if the layout is based on a transactional data representation.
+   *
+   * @return true, iff layout based on a transactional representation
+   */
+  boolean hasTransactionalLayout();
+  /**
    * Returns the graph heads associated with the logical graphs in that
    * collection.
    *

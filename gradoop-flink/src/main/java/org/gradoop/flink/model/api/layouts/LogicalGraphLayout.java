@@ -25,6 +25,13 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 public interface LogicalGraphLayout extends Layout {
 
   /**
+   * True, if the layout is based on three separate datasets.
+   *
+   * @return true, iff layout based on three separate datasets.
+   */
+  boolean hasGVELayout();
+
+  /**
    * Returns a dataset containing a single graph head associated with that
    * logical graph.
    *

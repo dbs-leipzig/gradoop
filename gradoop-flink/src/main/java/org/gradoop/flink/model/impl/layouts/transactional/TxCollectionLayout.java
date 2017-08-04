@@ -54,6 +54,16 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   }
 
   @Override
+  public boolean hasGVELayout() {
+    return false;
+  }
+
+  @Override
+  public boolean hasTransactionalLayout() {
+    return true;
+  }
+
+  @Override
   public DataSet<GraphHead> getGraphHeads() {
     return transactions
       .map(new TransactionGraphHead<>())
@@ -65,6 +75,7 @@ public class TxCollectionLayout implements GraphCollectionLayout {
     return getGraphHeads().filter(new ByLabel<>(label));
   }
 
+  // TODO refactor into method
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
     return transactions
