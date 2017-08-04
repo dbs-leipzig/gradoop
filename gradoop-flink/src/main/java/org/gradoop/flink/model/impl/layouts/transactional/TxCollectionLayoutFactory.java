@@ -17,7 +17,9 @@ package org.gradoop.flink.model.impl.layouts.transactional;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -30,6 +32,7 @@ import org.gradoop.common.util.GConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -119,8 +122,28 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
 
   @Override
   public GraphCollectionLayout createEmptyCollection() {
-    return fromDataSets(createGraphHeadDataSet(Lists.newArrayListWithCapacity(0)),
-      createVertexDataSet(Lists.newArrayListWithCapacity(0)),
-      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
+    return fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));
+  }
+
+  /**
+   * Creates a dataset from a given (possibly empty) collection of graph transactions.
+   *
+   * @param transactions graph transactions
+   * @return a dataset containing the given transactions
+   */
+  private DataSet<GraphTransaction> createGraphTransactionDataSet(
+    Collection<GraphTransaction> transactions) {
+    ExecutionEnvironment env = config.getExecutionEnvironment();
+
+    DataSet<GraphTransaction> graphTransactionSet;
+    if (transactions.isEmpty()) {
+      graphTransactionSet = config.getExecutionEnvironment()
+        .fromCollection(Lists.newArrayList(new GraphTransaction()),
+          new TypeHint<GraphTransaction>() { }.getTypeInfo())
+        .filter(new False<>());
+    } else {
+      graphTransactionSet =  env.fromCollection(transactions);
+    }
+    return graphTransactionSet;
   }
 }

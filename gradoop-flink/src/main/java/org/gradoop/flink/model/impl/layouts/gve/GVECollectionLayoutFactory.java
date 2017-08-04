@@ -17,14 +17,12 @@ package org.gradoop.flink.model.impl.layouts.gve;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
@@ -36,7 +34,6 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Responsible for creating a {@link GVELayout} from given data.
@@ -90,18 +87,15 @@ public class GVECollectionLayoutFactory extends BaseFactory implements GraphColl
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
 
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> triples = transactions
-      .map(new GraphTransactionTriple());
+    DataSet<GraphHead> graphHeads = transactions.map(new TransactionGraphHead<>());
 
-    DataSet<GraphHead> graphHeads = triples.map(new TransactionGraphHead());
-
-    DataSet<Vertex> vertices = triples
-      .flatMap(new TransactionVertices())
+    DataSet<Vertex> vertices = transactions
+      .flatMap(new TransactionVertices<>())
       .groupBy(new Id<>())
       .reduceGroup(vertexMergeReducer);
 
-    DataSet<Edge> edges = triples
-      .flatMap(new TransactionEdges())
+    DataSet<Edge> edges = transactions
+      .flatMap(new TransactionEdges<>())
       .groupBy(new Id<>())
       .reduceGroup(edgeMergeReducer);
 

@@ -18,7 +18,6 @@ package org.gradoop.flink.datagen.transactions.foodbroker;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -45,7 +44,6 @@ import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelation
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.EmployeeData;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
-import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
@@ -176,17 +174,14 @@ public class FoodBroker implements GraphCollectionGenerator {
       .map(new Value0Of2<>());
 
     // Phase 3: combine all data
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> transactionTriple = cases
-      .map(new GraphTransactionTriple());
+    DataSet<Vertex> transactionalVertices = cases
+      .flatMap(new TransactionVertices<>());
 
-    DataSet<Vertex> transactionalVertices = transactionTriple
-      .flatMap(new TransactionVertices());
+    DataSet<Edge> transactionalEdges = cases
+      .flatMap(new TransactionEdges<>());
 
-    DataSet<Edge> transactionalEdges = transactionTriple
-      .flatMap(new TransactionEdges());
-
-    DataSet<GraphHead> graphHeads = transactionTriple
-      .map(new TransactionGraphHead());
+    DataSet<GraphHead> graphHeads = cases
+      .map(new TransactionGraphHead<>());
 
     // get the new master data which was generated in complaint handling
     DataSet<Vertex> complaintHandlingMasterData = casesCITMasterData

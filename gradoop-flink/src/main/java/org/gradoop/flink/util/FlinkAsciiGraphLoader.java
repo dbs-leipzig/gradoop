@@ -166,6 +166,16 @@ public class FlinkAsciiGraphLoader {
   }
 
   /**
+   * Returns the graph heads assigned to the specified variables.
+   *
+   * @param variables variables used in the GDL script
+   * @return graphHeads assigned to the variables
+   */
+  public Collection<GraphHead> getGraphHeadsByVariables(String... variables) {
+    return loader.getGraphHeadsByVariables(variables);
+  }
+
+  /**
    * Returns all vertices contained in the ASCII graph.
    *
    * @return vertices

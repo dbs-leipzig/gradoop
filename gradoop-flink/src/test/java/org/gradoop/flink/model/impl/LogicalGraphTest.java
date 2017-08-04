@@ -16,10 +16,7 @@
 package org.gradoop.flink.model.impl;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -27,142 +24,14 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.gradoop.common.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class LogicalGraphTest extends GradoopFlinkTestBase {
-
-  /**
-   * Creates a logical graph from a 1-element graph head dataset, vertex
-   * and edge datasets.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testFromDataSets() throws Exception {
-    FlinkAsciiGraphLoader
-      loader = getSocialNetworkLoader();
-
-    GraphHead graphHead = loader.getGraphHeadByVariable("g0");
-    Collection<Vertex> vertices = loader.getVerticesByGraphVariables("g0");
-    Collection<Edge> edges = loader.getEdgesByGraphVariables("g0");
-
-    DataSet<GraphHead> graphHeadDataSet = getExecutionEnvironment()
-      .fromElements(graphHead);
-    DataSet<Vertex> vertexDataSet = getExecutionEnvironment()
-      .fromCollection(vertices);
-    DataSet<Edge> edgeDataSet = getExecutionEnvironment()
-      .fromCollection(edges);
-
-    LogicalGraph graph = getConfig().getLogicalGraphFactory()
-      .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
-
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
-
-    graph.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHeads));
-    graph.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    graph.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
-
-    getExecutionEnvironment().execute();
-
-    validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
-  }
-
-  @Test
-  public void testFromCollections() throws Exception {
-    FlinkAsciiGraphLoader
-      loader = getSocialNetworkLoader();
-
-    GraphHead graphHead = loader.getGraphHeadByVariable("g0");
-
-    LogicalGraph graph = getConfig().getLogicalGraphFactory()
-      .fromCollections(graphHead,
-        loader.getVerticesByGraphVariables("g0"),
-        loader.getEdgesByGraphVariables("g0"));
-
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
-
-    graph.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHeads));
-    graph.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    graph.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
-
-    getExecutionEnvironment().execute();
-
-    validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-    validateEPGMElementCollections(
-      loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMElementCollections(
-      loader.getEdgesByGraphVariables("g0"), loadedEdges);
-    validateEPGMGraphElementCollections(
-      loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMGraphElementCollections(
-      loader.getEdgesByGraphVariables("g0"), loadedEdges);
-  }
-
-  /**
-   * Creates a logical graph from a vertex and edge datasets.
-   *
-   * @throws Exception
-   */
-
-  @Test
-  public void testFromDataSetsWithoutGraphHead() throws Exception {
-    FlinkAsciiGraphLoader
-      loader = getLoaderFromString("()-->()<--()-->()");
-
-    LogicalGraph logicalGraph = getConfig().getLogicalGraphFactory()
-      .fromDataSets(
-        getExecutionEnvironment().fromCollection(loader.getVertices()),
-        getExecutionEnvironment().fromCollection(loader.getEdges()));
-
-    Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
-    Collection<Vertex> loadedVertices   = Lists.newArrayList();
-    Collection<Edge> loadedEdges      = Lists.newArrayList();
-
-    logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHead));
-    logicalGraph.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    logicalGraph.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
-
-    getExecutionEnvironment().execute();
-
-    GraphHead newGraphHead = loadedGraphHead.iterator().next();
-
-    validateEPGMElementCollections(loadedVertices, loader.getVertices());
-    validateEPGMElementCollections(loadedEdges, loader.getEdges());
-
-    Collection<GraphElement> epgmElements = new ArrayList<>();
-    epgmElements.addAll(loadedVertices);
-    epgmElements.addAll(loadedEdges);
-
-    for (GraphElement loadedVertex : epgmElements) {
-      assertEquals("graph element has wrong graph count",
-        1, loadedVertex.getGraphCount());
-      assertTrue("graph element was not in new graph",
-        loadedVertex.getGraphIds().contains(newGraphHead.getId()));
-    }
-  }
 
   @Test
   public void testGetGraphHead() throws Exception {

@@ -53,27 +53,27 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * Creates a new Configuration.
    *
    * @param executionEnvironment  Flink execution environment
-   * @param logicalGraphFactory Factory for creating logical graphs
-   * @param graphCollectionFactory Factory for creating graph collections
+   * @param logicalGraphLayoutFactory Factory for creating logical graphs
+   * @param graphCollectionLayoutFactory Factory for creating graph collections
    */
   protected GradoopFlinkConfig(
     ExecutionEnvironment executionEnvironment,
-    LogicalGraphFactory logicalGraphFactory,
-    GraphCollectionFactory graphCollectionFactory) {
+    LogicalGraphLayoutFactory logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
     super();
 
     Objects.requireNonNull(executionEnvironment);
+    Objects.requireNonNull(logicalGraphLayoutFactory);
+    Objects.requireNonNull(graphCollectionLayoutFactory);
 
     this.executionEnvironment = executionEnvironment;
 
     // init with default layout factories
-    this.logicalGraphFactory = (logicalGraphFactory == null) ?
-      new LogicalGraphFactory(this) : logicalGraphFactory;
-    this.logicalGraphFactory.setLayoutFactory(new GVEGraphLayoutFactory());
+    this.logicalGraphFactory = new LogicalGraphFactory(this);
+    this.logicalGraphFactory.setLayoutFactory(logicalGraphLayoutFactory);
 
-    this.graphCollectionFactory = (graphCollectionFactory == null) ?
-      new GraphCollectionFactory(this) : graphCollectionFactory;
-    this.graphCollectionFactory.setLayoutFactory(new GVECollectionLayoutFactory());
+    this.graphCollectionFactory = new GraphCollectionFactory(this);
+    this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);
   }
 
   /**
@@ -84,7 +84,22 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
-    return new GradoopFlinkConfig(env, null, null);
+    return new GradoopFlinkConfig(env,
+      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
+  }
+
+  /**
+   * Creates a Gradoop Flink configuration using the given parameters.
+   *
+   * @param env Flink execution environment
+   * @param logicalGraphLayoutFactory factory to create logical graph layouts
+   * @param graphCollectionLayoutFactory factory to create graph collection layouts
+   * @return Gradoop Flink configuration
+   */
+  public static GradoopFlinkConfig createConfig(ExecutionEnvironment env,
+    LogicalGraphLayoutFactory logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
+    return new GradoopFlinkConfig(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
   }
 
   /**

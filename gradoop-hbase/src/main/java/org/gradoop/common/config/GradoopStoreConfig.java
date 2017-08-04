@@ -24,6 +24,10 @@ import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,28 +68,30 @@ public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGM
     PersistentVertexFactory<V, E> persistentVertexFactory,
     PersistentEdgeFactory<E, V> persistentEdgeFactory,
     ExecutionEnvironment env) {
-    this(persistentGraphHeadFactory, persistentVertexFactory, persistentEdgeFactory, env, null,
-      null);
+    this(persistentGraphHeadFactory, persistentVertexFactory, persistentEdgeFactory,
+      env,
+      new GVEGraphLayoutFactory(),
+      new GVECollectionLayoutFactory());
   }
 
   /**
    * Creates a new Configuration.
    *
-   * @param persistentGraphHeadFactory  persistent graph head factory
-   * @param persistentVertexFactory     persistent vertex factory
-   * @param persistentEdgeFactory       persistent edge factory
-   * @param logicalGraphFactory         logical graph layout factory
-   * @param graphCollectionFactory      graph collection layout factory
-   * @param env                         Flink {@link ExecutionEnvironment}
+   * @param persistentGraphHeadFactory    persistent graph head factory
+   * @param persistentVertexFactory       persistent vertex factory
+   * @param persistentEdgeFactory         persistent edge factory
+   * @param logicalGraphLayoutFactory     logical graph layout factory
+   * @param graphCollectionLayoutFactory  graph collection layout factory
+   * @param env                           Flink {@link ExecutionEnvironment}
    */
   protected GradoopStoreConfig(
     PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
     PersistentVertexFactory<V, E> persistentVertexFactory,
     PersistentEdgeFactory<E, V> persistentEdgeFactory,
     ExecutionEnvironment env,
-    LogicalGraphFactory logicalGraphFactory,
-    GraphCollectionFactory graphCollectionFactory) {
-    super(env, logicalGraphFactory, graphCollectionFactory);
+    LogicalGraphLayoutFactory logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
+    super(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
 
     this.persistentGraphHeadFactory =
       checkNotNull(persistentGraphHeadFactory,
