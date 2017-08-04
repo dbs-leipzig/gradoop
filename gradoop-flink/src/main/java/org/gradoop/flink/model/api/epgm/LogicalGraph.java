@@ -72,7 +72,19 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Describes all operators that can be applied on a single logical graph in the EPGM.
+ * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
+ * encapsulates three concepts:
+ *
+ * - a so-called graph head, that stores information about the graph (i.e. label and properties)
+ * - a set of vertices assigned to the graph
+ * - a set of directed, possibly parallel edges assigned to the graph
+ *
+ * Furthermore, a logical graph provides operations that are performed on the underlying data. These
+ * operations result in either another logical graph or in a {@link GraphCollection}.
+ *
+ * A logical graph is wrapping a {@link LogicalGraphLayout} which defines, how the graph is
+ * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
+ * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   /**

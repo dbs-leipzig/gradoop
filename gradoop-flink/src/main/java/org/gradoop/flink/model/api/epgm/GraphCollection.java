@@ -27,6 +27,7 @@ import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
@@ -65,8 +66,20 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Describes all operators that can be applied on a collection of logical
- * graphs in the EPGM.
+ * A graph collection graph is one of the base concepts of the Extended Property Graph Model. From
+ * a model perspective, the collection represents a set of logical graphs. From a data perspective
+ * this is reflected by providing three concepts:
+ *
+ * - a set of graph heads assigned to the graphs in that collection
+ * - a set of vertices which is the union of all vertex sets of the represented graphs
+ * - a set of edges which is the union of all edge sets of the represented graphs
+ *
+ * Furthermore, a graph collection provides operations that are performed on the underlying data.
+ * These operations result in either another graph collection or in a {@link LogicalGraph}.
+ *
+ * A graph collection is wrapping a {@link GraphCollectionLayout} which defines, how the collection
+ * is represented in Apache Flink. Note that the GraphCollection also implements that interface and
+ * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements GraphCollectionOperators, GraphCollectionLayout {
   /**
