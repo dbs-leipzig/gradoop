@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.drilling.drillfunctions;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
-public class DrillUpDivideBy implements DrillFunction {
+public class DrillDivideBy implements DrillFunction {
 
   /**
    * Avoid object instantiation.
@@ -35,7 +35,7 @@ public class DrillUpDivideBy implements DrillFunction {
    *
    * @param divisor divisor for the property value
    */
-  public DrillUpDivideBy(long divisor) {
+  public DrillDivideBy(long divisor) {
     this.divisor = divisor;
   }
 
