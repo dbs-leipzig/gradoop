@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.selection;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 /**
  * (vertexId, label) => ImportVertex
@@ -51,7 +51,7 @@ public class CreateLabeledImportVertex<K extends Comparable<K>>
   public CreateLabeledImportVertex(String propertyKey) {
     this.propertyKey = propertyKey;
     this.reuseVertex = new ImportVertex<>();
-    reuseVertex.setLabel(GConstants.DEFAULT_VERTEX_LABEL);
+    reuseVertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
     reuseVertex.setProperties(Properties.createWithCapacity(1));
   }
 

@@ -20,20 +20,19 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.TextInputFormat;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.tlf.functions.Dictionary;
 import org.gradoop.flink.io.impl.tlf.functions.DictionaryEntry;
 import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelDecoder;
-import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.flink.io.impl.tlf.functions.GraphTransactionFromText;
+import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
 import org.gradoop.flink.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.inputformats.TLFInputFormat;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -89,11 +88,6 @@ public class TLFDataSource extends TLFBase implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return GraphCollection.fromTransactions(getGraphTransactions());
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
     DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
@@ -118,6 +112,6 @@ public class TLFDataSource extends TLFBase implements DataSource {
         .withBroadcastSet(
           getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);
     }
-    return new GraphTransactions(transactions, getConfig());
+    return getConfig().getGraphCollectionFactory().fromTransactions(transactions);
   }
 }

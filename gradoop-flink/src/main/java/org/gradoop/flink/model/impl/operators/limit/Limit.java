@@ -16,19 +16,15 @@
 package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators
-  .UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
-
-
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Returns the first n (arbitrary) logical graphs from a collection.
@@ -67,10 +63,8 @@ public class Limit implements UnaryCollectionToCollectionOperator {
       .filter(new InAllGraphsBroadcast<Edge>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    return GraphCollection.fromDataSets(graphHeads,
-      filteredVertices,
-      filteredEdges,
-      collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(graphHeads, filteredVertices, filteredEdges);
   }
 
   @Override

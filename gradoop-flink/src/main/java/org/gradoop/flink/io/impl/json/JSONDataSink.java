@@ -18,12 +18,11 @@ package org.gradoop.flink.io.impl.json;
 import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.json.functions.EdgeToJSON;
-import org.gradoop.flink.io.impl.json.functions.VertexToJSON;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.json.functions.GraphHeadToJSON;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.io.impl.json.functions.VertexToJSON;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -72,13 +71,8 @@ public class JSONDataSink extends JSONBase implements DataSink {
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws IOException {
-    write(graphTransactions, false);
-  }
-
-  @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph), overWrite);
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
@@ -93,10 +87,5 @@ public class JSONDataSink extends JSONBase implements DataSink {
       new VertexToJSON<>());
     graphCollection.getEdges().writeAsFormattedText(getEdgePath(), writeMode,
       new EdgeToJSON<>());
-  }
-
-  @Override
-  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-    write(GraphCollection.fromTransactions(graphTransactions), overWrite);
   }
 }

@@ -16,11 +16,18 @@
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.AdjacencyMatrix;
+import org.gradoop.flink.model.impl.operators.tostring.functions.ConcatGraphHeadStrings;
 import org.gradoop.flink.model.impl.operators.tostring.functions.IncomingAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
@@ -30,14 +37,6 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.TargetStringUpd
 import org.gradoop.flink.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.AdjacencyMatrix;
-import org.gradoop.flink.model.impl.operators.tostring.functions.ConcatGraphHeadStrings;
-
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**

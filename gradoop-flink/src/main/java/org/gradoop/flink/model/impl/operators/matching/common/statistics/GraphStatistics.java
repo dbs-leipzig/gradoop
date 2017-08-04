@@ -15,11 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+
 import java.util.Collections;
 import java.util.Map;
 
 /**
- * Represents several statistics related to a {@link org.gradoop.flink.model.impl.LogicalGraph}.
+ * Represents several statistics related to a {@link LogicalGraph}.
  */
 public class GraphStatistics {
   /**

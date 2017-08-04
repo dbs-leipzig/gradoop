@@ -20,8 +20,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -86,8 +86,8 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
     default:
       vertices = null;
     }
-    return LogicalGraph.fromDataSets(
-      graph.getGraphHead(), vertices, graph.getEdges(), graph.getConfig());
+    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
+      vertices, graph.getEdges());
   }
 
   /**

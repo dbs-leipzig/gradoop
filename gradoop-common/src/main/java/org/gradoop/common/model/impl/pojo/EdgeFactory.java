@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import java.io.Serializable;
 
@@ -50,7 +50,7 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
   @Override
   public Edge initEdge(final GradoopId id, final GradoopId sourceVertexId,
     final GradoopId targetVertexId) {
-    return initEdge(id, GConstants.DEFAULT_EDGE_LABEL, sourceVertexId,
+    return initEdge(id, GradoopConstants.DEFAULT_EDGE_LABEL, sourceVertexId,
       targetVertexId);
   }
 

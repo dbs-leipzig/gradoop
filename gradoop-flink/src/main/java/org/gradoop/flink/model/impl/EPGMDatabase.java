@@ -18,16 +18,17 @@ package org.gradoop.flink.model.impl;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .AddToGraphBroadcast;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -68,10 +69,10 @@ public class EPGMDatabase {
     DataSet<Edge> edges,
     GradoopFlinkConfig config) {
     this.config = config;
-    this.database = GraphCollection.fromDataSets(graphHeads, vertices,
-      edges, config);
+    this.database = config.getGraphCollectionFactory()
+      .fromDataSets(graphHeads, vertices, edges);
     graphHead = config.getExecutionEnvironment().fromElements(
-      config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
+      config.getGraphHeadFactory().createGraphHead(GradoopConstants.DB_GRAPH_LABEL));
   }
 
   //----------------------------------------------------------------------------
@@ -141,15 +142,14 @@ public class EPGMDatabase {
   public LogicalGraph getDatabaseGraph(boolean withGraphContainment) {
     if (withGraphContainment) {
       DataSet<GradoopId> graphId = graphHead.map(new Id<GraphHead>());
-      return LogicalGraph.fromDataSets(graphHead,
+      return config.getLogicalGraphFactory().fromDataSets(graphHead,
         database.getVertices().map(new AddToGraphBroadcast<Vertex>())
           .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
         database.getEdges().map(new AddToGraphBroadcast<Edge>())
-          .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID),
-        config);
+          .withBroadcastSet(graphId, AddToGraphBroadcast.GRAPH_ID));
     } else {
-      return LogicalGraph.fromDataSets(graphHead,
-        database.getVertices(), database.getEdges(), config);
+      return config.getLogicalGraphFactory().fromDataSets(graphHead,
+        database.getVertices(), database.getEdges());
     }
   }
 
@@ -188,8 +188,8 @@ public class EPGMDatabase {
         }
       });
 
-    return GraphCollection.fromDataSets(database.getGraphHeads(), newVertices,
-      newEdges, config);
+    return config.getGraphCollectionFactory()
+      .fromDataSets(database.getGraphHeads(), newVertices, newEdges);
   }
 
   /**

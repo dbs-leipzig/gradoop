@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.GDLHandler;
@@ -86,9 +86,9 @@ public class QueryHandler {
    */
   public QueryHandler(String gdlString) {
     gdlHandler = new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(gdlString);
   }
 

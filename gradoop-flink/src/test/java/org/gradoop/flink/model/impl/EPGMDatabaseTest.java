@@ -16,11 +16,13 @@
 package org.gradoop.flink.model.impl;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

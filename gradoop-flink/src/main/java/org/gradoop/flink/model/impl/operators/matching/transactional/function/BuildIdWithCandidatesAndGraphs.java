@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 
 import java.util.Collection;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Converts an EPGM vertex to a Tuple2 with its graph ids in field 0 and a

@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMa
 
 import java.util.Collection;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
 
 /**
  * Filter edges based on their occurrence in the given GDL pattern.

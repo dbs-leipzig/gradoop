@@ -20,19 +20,20 @@ import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
+import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintDeletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintFatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintMessage;
@@ -48,6 +49,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.fu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
@@ -86,20 +88,21 @@ public class DualSimulation extends PatternMatching {
       .filterVertices(graph, getQuery())
       .project(0);
 
+    LogicalGraphFactory graphFactory = graph.getConfig()
+      .getLogicalGraphFactory();
+    GraphCollectionFactory collectionFactory = graph.getConfig()
+      .getGraphCollectionFactory();
+
     if (doAttachData()) {
-      return GraphCollection.fromGraph(
-        LogicalGraph.fromDataSets(matchingVertexIds
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
             .join(graph.getVertices())
             .where(0).equalTo(new Id<>())
-            .with(new RightSide<>()),
-          graph.getConfig()
-        ));
+            .with(new RightSide<>())));
     } else {
-      return GraphCollection.fromGraph(
-        LogicalGraph.fromDataSets(matchingVertexIds
-            .map(new VertexFromId(graph.getConfig().getVertexFactory())),
-          graph.getConfig()
-        ));
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
+            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));
     }
   }
 
@@ -288,8 +291,8 @@ public class DualSimulation extends PatternMatching {
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 
-    return GraphCollection.fromGraph(
-      LogicalGraph.fromDataSets(matchVertices, matchEdges, config));
+    return config.getGraphCollectionFactory().fromGraph(
+      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
   }
 
   /**

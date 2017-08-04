@@ -17,15 +17,15 @@ package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
-import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
-import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 
 /**
  * Operator to determine if two graph collections are equal according to given

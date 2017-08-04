@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,8 +48,8 @@ public class JSONDataSinkTest extends GradoopFlinkTestBase {
       getSocialNetworkLoader();
 
     // write to JSON
-    loader.getDatabase().writeTo(
-      new JSONDataSink(graphFile, vertexFile, edgeFile, getConfig()));
+    loader.getDatabase()
+      .writeTo(new JSONDataSink(graphFile, vertexFile, edgeFile, getConfig()));
 
     getExecutionEnvironment().execute();
 

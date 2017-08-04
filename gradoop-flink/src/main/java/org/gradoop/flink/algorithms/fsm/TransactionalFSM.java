@@ -20,10 +20,9 @@ import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.EPGMGraphTransactionToLabeledGraph;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * Gradoop operator wrapping the DIMSpan algorithm for transactional frequent subgraph mining.
@@ -60,16 +59,14 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 
     // convert Gradoop graph collection to DIMSpan input format
     DataSet<LabeledGraphStringString> input = collection
-      .toTransactions()
-      .getTransactions()
+      .getGraphTransactions()
       .map(new EPGMGraphTransactionToLabeledGraph());
 
     // run DIMSpan
     DataSet<GraphTransaction> output = dimSpan.execute(input);
 
     // convert to Gradoop graph collection
-    return GraphCollection
-      .fromTransactions(new GraphTransactions(output, collection.getConfig()));
+    return collection.getConfig().getGraphCollectionFactory().fromTransactions(output);
   }
 
   @Override

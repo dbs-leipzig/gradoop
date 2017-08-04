@@ -25,8 +25,8 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.GradoopHBaseTestBase;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.EPGMDatabase;
-import org.gradoop.flink.model.impl.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -35,9 +35,7 @@ import java.util.List;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentEdges;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentGraphHeads;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.getSocialPersistentVertices;
+import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.*;
 
 public class HBaseDataSinkSourceTest extends GradoopHBaseTestBase {
 

@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillUpTransformation;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
+import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillUpTransformation;
 
 /**
  * Creates a graph with the same structure but a specified property of an element is drilled up

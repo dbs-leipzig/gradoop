@@ -60,7 +60,7 @@ public class AsciiGraphLoaderTest {
 
     for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
       assertEquals("Graph has wrong label",
-        GConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
+        GradoopConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
     }
   }
 
@@ -100,7 +100,7 @@ public class AsciiGraphLoaderTest {
 
     for (Vertex vertex : asciiGraphLoader.getVertices()) {
       assertEquals("Vertex has wrong label",
-        GConstants.DEFAULT_VERTEX_LABEL, vertex.getLabel());
+        GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getLabel());
     }
   }
 
@@ -114,7 +114,7 @@ public class AsciiGraphLoaderTest {
 
     Vertex v = asciiGraphLoader.getVertexByVariable("a");
     assertEquals("Vertex has wrong label",
-      GConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
+      GradoopConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
     assertNotNull("Vertex was null", v);
   }
 
@@ -216,7 +216,7 @@ public class AsciiGraphLoaderTest {
 
     for (Edge edge : asciiGraphLoader.getEdges()) {
       assertEquals("Edge has wrong label",
-        GConstants.DEFAULT_EDGE_LABEL, edge.getLabel());
+        GradoopConstants.DEFAULT_EDGE_LABEL, edge.getLabel());
     }
   }
 

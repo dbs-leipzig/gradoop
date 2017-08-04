@@ -15,9 +15,8 @@
  */
 package org.gradoop.flink.io.api;
 
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 import java.io.IOException;
 
@@ -39,11 +38,4 @@ public interface DataSource {
    * @return graph collection
    */
   GraphCollection getGraphCollection() throws IOException;
-
-  /**
-   * Reads the input as graph transactions.
-   *
-   * @return graph transactions
-   */
-  GraphTransactions getGraphTransactions() throws IOException;
 }

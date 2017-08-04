@@ -19,7 +19,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,7 +49,7 @@ public class TransformEdge extends TransformBase<Edge> {
   @Override
   protected Edge initFrom(Edge edge) {
     return edgeFactory.initEdge(edge.getId(),
-      GConstants.DEFAULT_EDGE_LABEL,
+      GradoopConstants.DEFAULT_EDGE_LABEL,
       edge.getSourceId(),
       edge.getTargetId(),
       edge.getGraphIds());

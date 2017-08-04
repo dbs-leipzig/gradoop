@@ -13,32 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.util;
+package org.gradoop.flink.model.api.layouts;
+
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Constants used in Gradoop.
+ * Base interface for layout factories.
  */
-public final class GConstants {
+public interface BaseLayoutFactory {
   /**
-   * Default label for unlabeled vertices.
+   * Sets the config.
+   *
+   * @param config Gradoop flink config
    */
-  public static final String DEFAULT_VERTEX_LABEL = "";
-  /**
-   * Default label for unlabeled graphs.
-   */
-  public static final String DEFAULT_GRAPH_LABEL = "";
-  /**
-   * Default label for unlabeled edges.
-   */
-  public static final String DEFAULT_EDGE_LABEL = "";
-
-  /**
-   * String representation of {@code null}.
-   */
-  public static final String NULL_STRING = "NULL";
-
-  /**
-   * Default label of an EPGM database graph.
-   */
-  public static final String DB_GRAPH_LABEL = "_DB";
+  void setGradoopFlinkConfig(GradoopFlinkConfig config);
 }

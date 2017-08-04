@@ -20,16 +20,15 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.utils.DataSetUtils;
+import org.gradoop.flink.io.impl.edgelist.functions.CreateImportEdge;
 import org.gradoop.flink.io.impl.edgelist.functions.CreateLabeledImportVertex;
 import org.gradoop.flink.io.impl.graph.GraphDataSource;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.flink.io.impl.edgelist.functions.CreateImportEdge;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
@@ -118,10 +117,5 @@ public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
 
     return new GraphDataSource<>(importVertices, importEdges, getConfig())
       .getGraphCollection();
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() throws IOException {
-    return getGraphCollection().toTransactions();
   }
 }

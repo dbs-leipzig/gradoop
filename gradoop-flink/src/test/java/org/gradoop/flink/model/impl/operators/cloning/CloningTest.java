@@ -17,14 +17,14 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.IdAsIdSet;
-import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIdSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.IdAsIdSet;
 import org.gradoop.flink.model.impl.functions.epgm.IdSetCombiner;
+import org.gradoop.flink.model.impl.functions.graphcontainment.ExpandGraphsToIdSet;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 

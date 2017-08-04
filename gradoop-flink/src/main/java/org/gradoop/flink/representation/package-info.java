@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Pojo classes related to graph representations.
+ * Different graph representations that can be used in DataSets.
  */
 package org.gradoop.flink.representation;

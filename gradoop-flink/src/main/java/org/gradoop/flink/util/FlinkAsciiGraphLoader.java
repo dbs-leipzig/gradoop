@@ -19,9 +19,9 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.AsciiGraphLoader;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.EPGMDatabase;
-import org.gradoop.flink.model.impl.GraphCollection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -125,7 +125,7 @@ public class FlinkAsciiGraphLoader {
     Collection<Vertex> vertices = loader.getVerticesByGraphVariables(variable);
     Collection<Edge> edges = loader.getEdgesByGraphVariables(variable);
 
-    return LogicalGraph.fromCollections(graphHead, vertices, edges, config);
+    return config.getLogicalGraphFactory().fromCollections(graphHead, vertices, edges);
   }
 
   /**
@@ -143,7 +143,7 @@ public class FlinkAsciiGraphLoader {
     Collection<Edge> edges =
       loader.getEdgesByGraphVariables(variables);
 
-    return GraphCollection.fromCollections(graphHeads, vertices, edges, config);
+    return config.getGraphCollectionFactory().fromCollections(graphHeads, vertices, edges);
   }
 
   /**
@@ -163,6 +163,16 @@ public class FlinkAsciiGraphLoader {
    */
   public GraphHead getGraphHeadByVariable(String variable) {
     return loader.getGraphHeadByVariable(variable);
+  }
+
+  /**
+   * Returns the graph heads assigned to the specified variables.
+   *
+   * @param variables variables used in the GDL script
+   * @return graphHeads assigned to the variables
+   */
+  public Collection<GraphHead> getGraphHeadsByVariables(String... variables) {
+    return loader.getGraphHeadsByVariables(variables);
   }
 
   /**

@@ -20,23 +20,22 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
 import org.apache.flink.api.java.operators.AggregateOperator;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
-import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.DropPropertiesAndGraphContainment;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.EdgeLabels;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterEdgesByLabel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterVerticesByLabel;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.NotEmpty;
 import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLabels;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -63,7 +62,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
   /**
    * Gradoop configuration
    */
-  protected GradoopFlinkConfig gradoopFlinkConfig;
+  protected GradoopFlinkConfig config;
 
   /**
    * Constructor.
@@ -76,31 +75,15 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
 
   @Override
   public GraphCollection execute(GraphCollection collection)  {
-    gradoopFlinkConfig = collection.getConfig();
+    config = collection.getConfig();
 
     DataSet<GraphTransaction> input = collection
-      .toTransactions()
-      .getTransactions();
+      .getGraphTransactions();
 
     DataSet<GraphTransaction> output = execute(input);
 
-    return GraphCollection.fromTransactions(new GraphTransactions(output, gradoopFlinkConfig));
-  }
-
-  /**
-   * Executes the algorithm for graphs in Gradoop transactional representation.
-   *
-   * @param transactions graphs in transactional representation
-   *
-   * @return frequent patterns in transactional representation
-   */
-  public GraphTransactions execute(GraphTransactions transactions) {
-    this.gradoopFlinkConfig = transactions.getConfig();
-
-    DataSet<GraphTransaction> input = transactions.getTransactions();
-    DataSet<GraphTransaction> output = execute(input);
-
-    return new GraphTransactions(output, gradoopFlinkConfig);
+    return config.getGraphCollectionFactory()
+      .fromTransactions(output);
   }
 
   /**

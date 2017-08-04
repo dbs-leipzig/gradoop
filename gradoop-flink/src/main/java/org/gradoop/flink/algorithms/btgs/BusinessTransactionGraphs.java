@@ -19,32 +19,32 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.flink.algorithms.btgs.functions.MasterData;
-import org.gradoop.flink.algorithms.btgs.functions.NewBtgGraphHead;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.algorithms.btgs.functions.ComponentToNewBtgId;
 import org.gradoop.flink.algorithms.btgs.functions.BtgMessenger;
 import org.gradoop.flink.algorithms.btgs.functions.BtgUpdater;
-import org.gradoop.flink.algorithms.btgs.functions.ToGellyVertexWithIdValue;
 import org.gradoop.flink.algorithms.btgs.functions.CollectGradoopIds;
+import org.gradoop.flink.algorithms.btgs.functions.ComponentToNewBtgId;
+import org.gradoop.flink.algorithms.btgs.functions.MasterData;
+import org.gradoop.flink.algorithms.btgs.functions.NewBtgGraphHead;
 import org.gradoop.flink.algorithms.btgs.functions.SetBtgId;
 import org.gradoop.flink.algorithms.btgs.functions.SetBtgIds;
 import org.gradoop.flink.algorithms.btgs.functions.TargetIdBtgId;
+import org.gradoop.flink.algorithms.btgs.functions.ToGellyVertexWithIdValue;
 import org.gradoop.flink.algorithms.btgs.functions.TransactionalData;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ExpandGradoopIds;
-import org.gradoop.flink.model.impl.functions.epgm.ToGellyEdgeWithNullValue;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.functions.epgm.ToGellyEdgeWithNullValue;
 import org.gradoop.flink.model.impl.functions.tuple.SwitchPair;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Part of the BIIIG approach.
@@ -144,16 +144,12 @@ public class BusinessTransactionGraphs implements
       .where(new Id<>()).equalTo(0)
       .with(new SetBtgIds<>());
 
-    return GraphCollection.fromDataSets(
-      graphHeads,
-      transVertices.union(masterVertices),
-      btgEdges,
-      iig.getConfig()
-    );
+    return iig.getConfig().getGraphCollectionFactory()
+      .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);
   }
 
   @Override
   public String getName() {
-    return null;
+    return BusinessTransactionGraphs.class.getName();
   }
 }

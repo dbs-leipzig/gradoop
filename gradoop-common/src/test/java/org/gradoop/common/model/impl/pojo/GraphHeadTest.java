@@ -18,7 +18,7 @@ package org.gradoop.common.model.impl.pojo;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -56,7 +56,7 @@ public class GraphHeadTest {
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
     EPGMGraphHead g = new GraphHeadFactory().initGraphHead(graphID);
-    assertThat(g.getLabel(), is(GConstants.DEFAULT_GRAPH_LABEL));
+    assertThat(g.getLabel(), is(GradoopConstants.DEFAULT_GRAPH_LABEL));
   }
 
   @Test(expected = NullPointerException.class)

@@ -18,7 +18,7 @@ package org.gradoop.utils.sampling;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 /**
  * Runs {@link org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling} for a given

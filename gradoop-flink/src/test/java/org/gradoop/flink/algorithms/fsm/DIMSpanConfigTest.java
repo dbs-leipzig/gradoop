@@ -15,13 +15,14 @@
  */
 package org.gradoop.flink.algorithms.fsm;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DictionaryType;
 import org.gradoop.flink.datagen.transactions.predictable.PredictableTransactionsGenerator;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -86,13 +87,13 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
   }
 
   private void executeWith(DIMSpanConfig config) throws Exception {
-    GraphTransactions transactions = new PredictableTransactionsGenerator(
+    DataSet<GraphTransaction> transactions = new PredictableTransactionsGenerator(
       GRAPH_COUNT, 1, true, getConfig()).execute();
 
     config.setDirected(true);
 
     GraphCollection frequentSubgraphs = new TransactionalFSM(config)
-      .execute(GraphCollection.fromTransactions(transactions));
+      .execute(getConfig().getGraphCollectionFactory().fromTransactions(transactions));
 
     Assert.assertEquals(PredictableTransactionsGenerator
         .containedDirectedFrequentSubgraphs(MIN_SUPPORT),
@@ -101,7 +102,7 @@ public class DIMSpanConfigTest extends GradoopFlinkTestBase {
     config.setDirected(false);
 
     frequentSubgraphs = new TransactionalFSM(config)
-      .execute(GraphCollection.fromTransactions(transactions));
+      .execute(getConfig().getGraphCollectionFactory().fromTransactions(transactions));
 
     Assert.assertEquals(PredictableTransactionsGenerator
         .containedUndirectedFrequentSubgraphs(MIN_SUPPORT),

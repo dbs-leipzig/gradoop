@@ -25,14 +25,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
-import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Matches the elements of GraphTransactions against a query string. Returns

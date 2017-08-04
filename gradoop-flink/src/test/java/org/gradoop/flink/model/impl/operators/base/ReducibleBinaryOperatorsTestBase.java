@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.base;
 
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 
 import static org.junit.Assert.assertTrue;

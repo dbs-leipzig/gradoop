@@ -15,8 +15,11 @@
  */
 package org.gradoop.flink.model.impl;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.utils.First;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -30,9 +33,9 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
       .getDatabase()
       .getCollection();
 
-    GraphTransactions transactions = originalCollection.toTransactions();
+    DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions);
 
     collectAndAssertTrue(
@@ -53,9 +56,9 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
       .getDatabase()
       .getCollection();
 
-    GraphTransactions transactions = originalCollection.toTransactions();
+    DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
@@ -76,9 +79,9 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     GraphCollection originalCollection = loader.getGraphCollectionByVariables("g1");
 
-    GraphTransactions transactions = originalCollection.toTransactions();
+    DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = GraphCollection
+    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
@@ -90,5 +93,4 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       originalCollection.equalsByGraphData(restoredCollection));
   }
-
 }

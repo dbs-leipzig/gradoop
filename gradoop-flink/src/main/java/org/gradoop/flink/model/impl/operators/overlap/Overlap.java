@@ -16,11 +16,11 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Computes the overlap graph from two logical graphs.
@@ -44,10 +44,9 @@ public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
       .map(new Id<GraphHead>())
       .union(secondGraph.getGraphHead().map(new Id<GraphHead>()));
 
-    return LogicalGraph.fromDataSets(
+    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       getVertices(firstGraph.getVertices(), graphIds),
-      getEdges(firstGraph.getEdges(), graphIds),
-      firstGraph.getConfig());
+      getEdges(firstGraph.getEdges(), graphIds));
   }
 
   /**

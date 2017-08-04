@@ -24,8 +24,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.tlf.TLFDataSink;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -98,7 +97,9 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
       new DIMSpan(fsmConfig).execute(dataSource.getGraphs());
 
     // Execute and write to disk
-    dataSink.write(new GraphTransactions(frequentPatterns, GRADOOP_CONFIG), true);
+    dataSink.write(
+      GRADOOP_CONFIG.getGraphCollectionFactory().fromTransactions(frequentPatterns),
+      true);
     getExecutionEnvironment().execute();
   }
 

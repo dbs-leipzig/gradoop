@@ -18,19 +18,18 @@ package org.gradoop.flink.datagen.transactions.foodbroker;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdList;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.TargetGraphIdPair;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.UpdateGraphIds;
+import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.BusinessRelationDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.EmployeeDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataMapFromTuple;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.BusinessRelationDataMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.MasterDataQualityMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.ProductPriceMapper;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.UserClients;
@@ -43,16 +42,15 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.ProductGener
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.EmployeeData;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.GraphTransactionTriple;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
@@ -70,7 +68,7 @@ public class FoodBroker implements GraphCollectionGenerator {
   /**
    * Gradoop Flink configuration.
    */
-  private final GradoopFlinkConfig gradoopFlinkConfig;
+  private final GradoopFlinkConfig config;
   /**
    * Foodbroker configuration.
    */
@@ -126,14 +124,14 @@ public class FoodBroker implements GraphCollectionGenerator {
    * Valued constructor.
    *
    * @param env execution environment
-   * @param gradoopFlinkConfig Gradoop Flink configuration
+   * @param config Gradoop Flink configuration
    * @param foodBrokerConfig Foodbroker configuration
    */
-  public FoodBroker(ExecutionEnvironment env, GradoopFlinkConfig gradoopFlinkConfig,
+  public FoodBroker(ExecutionEnvironment env, GradoopFlinkConfig config,
     FoodBrokerConfig foodBrokerConfig) {
 
     this.env = env;
-    this.gradoopFlinkConfig = gradoopFlinkConfig;
+    this.config = config;
     this.foodBrokerConfig = foodBrokerConfig;
   }
 
@@ -148,8 +146,8 @@ public class FoodBroker implements GraphCollectionGenerator {
       .getCaseCount());
 
     DataSet<GraphTransaction> cases = caseSeeds
-      .map(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
-        .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
+      .map(new Brokerage(config.getGraphHeadFactory(), config
+        .getVertexFactory(), config.getEdgeFactory(), foodBrokerConfig))
       .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
       .withBroadcastSet(vendorMap, Constants.VENDOR_MAP_BC)
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
@@ -161,9 +159,9 @@ public class FoodBroker implements GraphCollectionGenerator {
     // Phase 2.2: Run Complaint Handling
     DataSet<Tuple2<GraphTransaction, Set<Vertex>>> casesCITMasterData = cases
       .map(new ComplaintHandling(
-        gradoopFlinkConfig.getGraphHeadFactory(),
-        gradoopFlinkConfig.getVertexFactory(),
-        gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
+        config.getGraphHeadFactory(),
+        config.getVertexFactory(),
+        config.getEdgeFactory(), foodBrokerConfig))
       .withBroadcastSet(customerMap, Constants.CUSTOMER_MAP_BC)
       .withBroadcastSet(vendorMap, Constants.VENDOR_MAP_BC)
       .withBroadcastSet(logisticsQualityMap, Constants.LOGISTIC_MAP_BC)
@@ -176,17 +174,14 @@ public class FoodBroker implements GraphCollectionGenerator {
       .map(new Value0Of2<>());
 
     // Phase 3: combine all data
-    DataSet<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> transactionTriple = cases
-      .map(new GraphTransactionTriple());
+    DataSet<Vertex> transactionalVertices = cases
+      .flatMap(new TransactionVertices<>());
 
-    DataSet<Vertex> transactionalVertices = transactionTriple
-      .flatMap(new TransactionVertices());
+    DataSet<Edge> transactionalEdges = cases
+      .flatMap(new TransactionEdges<>());
 
-    DataSet<Edge> transactionalEdges = transactionTriple
-      .flatMap(new TransactionEdges());
-
-    DataSet<GraphHead> graphHeads = transactionTriple
-      .map(new TransactionGraphHead());
+    DataSet<GraphHead> graphHeads = cases
+      .map(new TransactionGraphHead<>());
 
     // get the new master data which was generated in complaint handling
     DataSet<Vertex> complaintHandlingMasterData = casesCITMasterData
@@ -214,8 +209,8 @@ public class FoodBroker implements GraphCollectionGenerator {
     DataSet<Vertex> vertices = masterData
       .union(transactionalVertices);
 
-    return GraphCollection.fromDataSets(graphHeads, vertices, transactionalEdges,
-      gradoopFlinkConfig);
+    return config.getGraphCollectionFactory()
+      .fromDataSets(graphHeads, vertices, transactionalEdges);
   }
 
   @Override
@@ -227,11 +222,11 @@ public class FoodBroker implements GraphCollectionGenerator {
    * Initialises all maps which store reduced vertex information.
    */
   private void initMasterData() {
-    customers = new CustomerGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-    vendors = new VendorGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-    logistics = new LogisticsGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-    employees = new EmployeeGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
-    products = new ProductGenerator(gradoopFlinkConfig, foodBrokerConfig).generate();
+    customers = new CustomerGenerator(config, foodBrokerConfig).generate();
+    vendors = new VendorGenerator(config, foodBrokerConfig).generate();
+    logistics = new LogisticsGenerator(config, foodBrokerConfig).generate();
+    employees = new EmployeeGenerator(config, foodBrokerConfig).generate();
+    products = new ProductGenerator(config, foodBrokerConfig).generate();
 
     // reduce all master data objects to their id and their quality value
     customerMap = customers

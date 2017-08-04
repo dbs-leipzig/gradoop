@@ -17,13 +17,13 @@ package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomFilter;
 
 /**
@@ -82,8 +82,7 @@ public class RandomNodeSampling implements UnaryGraphToGraphOperator {
       .equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>());
 
-    return LogicalGraph.fromDataSets(
-      newVertices, newEdges, graph.getConfig());
+    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
   /**

@@ -15,17 +15,16 @@
  */
 package org.gradoop.flink.io.impl.dot;
 
-import java.io.IOException;
-
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.io.IOException;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
@@ -67,21 +66,24 @@ public class DOTDataSink implements DataSink {
   }
 
   @Override
-  public void write(GraphTransactions graphTransactions) throws
-    IOException {
-
-    write(graphTransactions, false);
-  }
-
-
-  @Override
-  public void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException {
-    write(GraphCollection.fromGraph(logicalGraph).toTransactions(), overWrite);
+  public void write(LogicalGraph graph, boolean overwrite) throws IOException {
+    write(graph.getConfig().getGraphCollectionFactory().fromGraph(graph), overwrite);
   }
 
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
-    write(graphCollection.toTransactions(), overWrite);
+    FileSystem.WriteMode writeMode =
+      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+
+    DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
+    GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
+    graphvizWriter.setWriteMode(writeMode);
+
+    graphCollection
+      .getGraphTransactions()
+      .map(tx -> dotFileFormat.format(tx))
+      .output(graphvizWriter)
+      .setParallelism(1);
   }
 
   /**
@@ -129,26 +131,5 @@ public class DOTDataSink implements DataSink {
       super.writeRecord("}");
       super.close();
     }
-  }
-
-  /**
-   * We want to write multiple {@link GraphTransaction} instances into ONE text file,
-   * with correct text prefix and suffix. This means, we need parallism=1.
-   */
-  @Override
-  public void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException {
-
-    FileSystem.WriteMode writeMode =
-        overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
-
-    DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
-    GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
-    graphvizWriter.setWriteMode(writeMode);
-
-    graphTransactions
-      .getTransactions()
-      .map(tr -> dotFileFormat.format(tr))
-      .output(graphvizWriter)
-      .setParallelism(1);
   }
 }

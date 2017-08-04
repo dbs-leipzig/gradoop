@@ -29,9 +29,8 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.VertexTableInputFormat;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -88,15 +87,9 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
       new EdgeTableInputFormat<>(config.getEdgeHandler(),
         store.getEdgeTableName()), edgeTypeInfo);
 
-    return GraphCollection.fromDataSets(
+    return config.getGraphCollectionFactory().fromDataSets(
       graphHeads.map(new ValueOf1<>()),
       vertices.map(new ValueOf1<>()),
-      edges.map(new ValueOf1<>()),
-      config);
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() {
-    return getGraphCollection().toTransactions();
+      edges.map(new ValueOf1<>()));
   }
 }

@@ -19,28 +19,28 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
-import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToVertex;
-import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
-import org.gradoop.flink.model.impl.operators.split.functions.JoinVertexIdWithGraphIds;
-import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.Function;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
+import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToEdge;
+import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToVertex;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
 import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
+import org.gradoop.flink.model.impl.operators.split.functions.JoinVertexIdWithGraphIds;
 import org.gradoop.flink.model.impl.operators.split.functions.MultipleGraphIdsGroupReducer;
-import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToEdge;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
 
 import java.io.Serializable;
 import java.util.List;
@@ -143,8 +143,8 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     // return new graph collection
     //--------------------------------------------------------------------------
 
-    return GraphCollection.fromDataSets(
-      newGraphs, vertices, edges, graph.getConfig());
+    return graph.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newGraphs, vertices, edges);
   }
 
   /**

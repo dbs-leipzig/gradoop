@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
@@ -24,8 +24,9 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
@@ -38,18 +39,9 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import java.util.List;
 
 /**
- * Describes all operators that can be applied on a single logical graph in the
- * EPGM.
+ * Defines the operators that are available on a {@link LogicalGraph}.
  */
 public interface LogicalGraphOperators extends GraphBaseOperators {
-
-  /**
-   * Returns a dataset containing a single graph head associated with that
-   * logical graph.
-   *
-   * @return 1-element dataset
-   */
-  DataSet<GraphHead> getGraphHead();
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -157,8 +149,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param vertexTransformationFunction vertex transformation function
    * @return transformed logical graph
    */
-  LogicalGraph transformVertices(
-    TransformationFunction<Vertex> vertexTransformationFunction);
+  LogicalGraph transformVertices(TransformationFunction<Vertex> vertexTransformationFunction);
 
   /**
    * Transforms the edges of the logical graph using the given transformation
@@ -167,8 +158,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeTransformationFunction edge transformation function
    * @return transformed logical graph
    */
-  LogicalGraph transformEdges(
-    TransformationFunction<Edge> edgeTransformationFunction);
+  LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the
@@ -177,8 +167,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param vertexFilterFunction vertex filter function
    * @return vertex-induced subgraph as a new logical graph
    */
-  LogicalGraph vertexInducedSubgraph(
-    FilterFunction<Vertex> vertexFilterFunction);
+  LogicalGraph vertexInducedSubgraph(FilterFunction<Vertex> vertexFilterFunction);
 
   /**
    * Returns the subgraph that is induced by the edges which fulfill the given
@@ -187,8 +176,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeFilterFunction edge filter function
    * @return edge-induced subgraph as a new logical graph
    */
-  LogicalGraph edgeInducedSubgraph(
-    FilterFunction<Edge> edgeFilterFunction);
+  LogicalGraph edgeInducedSubgraph(FilterFunction<Edge> edgeFilterFunction);
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices

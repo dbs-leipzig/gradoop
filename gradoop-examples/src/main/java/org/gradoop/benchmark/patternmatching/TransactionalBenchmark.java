@@ -99,7 +99,7 @@ public class TransactionalBenchmark extends AbstractRunner {
       new TLFDataSource(inputPath, GradoopFlinkConfig.createConfig(env));
 
     DataSet<GraphWithCandidates> graphs =
-      source.getGraphTransactions().getTransactions()
+      source.getGraphCollection().getGraphTransactions()
         .map(new GraphTransactionMatcher(queryString));
 
     if (returnEmbeddings) {

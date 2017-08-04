@@ -13,43 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
-
-import java.io.IOException;
 
 /**
- * Operators that are available at all graph structures.
- *
- * @see LogicalGraph
- * @see GraphCollection
+ * Base description of a graph / collection layout.
  */
-public interface GraphBaseOperators {
-
-  //----------------------------------------------------------------------------
-  // Containment methods
-  //----------------------------------------------------------------------------
+public interface Layout {
 
   /**
-   * Returns all vertices including vertex data associated with that graph.
+   * Returns all vertices.
    *
    * @return vertices
    */
   DataSet<Vertex> getVertices();
 
   /**
-   * Returns all edge data associated with that logical graph.
+   * Returns all vertices having the specified label.
+   *
+   * @param label vertex label
+   * @return filtered vertices
+   */
+  DataSet<Vertex> getVerticesByLabel(String label);
+
+  /**
+   * Returns all edges.
    *
    * @return edges
    */
   DataSet<Edge> getEdges();
+
+  /**
+   * Returns all edges having the specified label.
+   *
+   * @param label edge label
+   * @return filtered edges
+   */
+  DataSet<Edge> getEdgesByLabel(String label);
 
   /**
    * Returns the edge data associated with the outgoing edges of the given
@@ -70,26 +74,4 @@ public interface GraphBaseOperators {
    */
   @Deprecated
   DataSet<Edge> getIncomingEdges(final GradoopId vertexID);
-
-  //----------------------------------------------------------------------------
-  // Utility methods
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the collection is empty.
-   *
-   * A collection is considered empty, if it contains no logical graphs.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
-
-  /**
-   * Writes logical graph/graph collection to given data sink.
-   *
-   * @param dataSink data sing
-   */
-  void writeTo(DataSink dataSink) throws IOException;
 }

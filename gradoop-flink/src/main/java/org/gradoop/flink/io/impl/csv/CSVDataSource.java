@@ -22,9 +22,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVEdgeToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -56,16 +55,11 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .map(new CSVEdgeToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    return LogicalGraph.fromDataSets(vertices, edges, getConfig());
+    return getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);
   }
 
   @Override
   public GraphCollection getGraphCollection() {
-    return GraphCollection.fromGraph(getLogicalGraph());
-  }
-
-  @Override
-  public GraphTransactions getGraphTransactions() {
-    return getGraphCollection().toTransactions();
+    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
 }

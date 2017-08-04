@@ -26,14 +26,14 @@ import java.util.Set;
 
 /**
  * (graphHead, {vertex,..}, {edge,..}) => edge,..
+ *
+ * @param <T> tuple type
  */
-public class TransactionEdges implements
-  FlatMapFunction<Tuple3<GraphHead, Set<Vertex>, Set<Edge>>, Edge> {
+public class TransactionEdges<T extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> implements
+  FlatMapFunction<T, Edge> {
 
   @Override
-  public void flatMap(Tuple3<GraphHead, Set<Vertex>, Set<Edge>> graphTriple,
-    Collector<Edge> collector) throws Exception {
-
+  public void flatMap(T graphTriple, Collector<Edge> collector) throws Exception {
     graphTriple.f2.forEach(collector::collect);
   }
 }

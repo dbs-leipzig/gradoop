@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -69,7 +69,7 @@ public class VertexTest {
   public void createWithMissingLabelTest() {
     GradoopId vertexID = GradoopId.get();
     EPGMVertex v = new VertexFactory().initVertex(vertexID);
-    assertThat(v.getLabel(), is(GConstants.DEFAULT_VERTEX_LABEL));
+    assertThat(v.getLabel(), is(GradoopConstants.DEFAULT_VERTEX_LABEL));
   }
 
   @Test(expected = NullPointerException.class)

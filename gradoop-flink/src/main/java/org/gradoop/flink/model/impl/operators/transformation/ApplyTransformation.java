@@ -15,13 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.transformation;
 
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -52,9 +52,9 @@ public class ApplyTransformation extends Transformation
       collection.getEdges(),
       collection.getConfig());
 
-    return GraphCollection.fromDataSets(modifiedGraph.getGraphHead(),
+    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+      modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
-      modifiedGraph.getEdges(),
-      modifiedGraph.getConfig());
+      modifiedGraph.getEdges());
   }
 }

@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,7 +48,7 @@ public class ImportEdge<K extends Comparable<K>>
    * @param targetId  import target vertex id
    */
   public ImportEdge(K edgeId, K sourceId, K targetId) {
-    this(edgeId, sourceId, targetId, GConstants.DEFAULT_EDGE_LABEL);
+    this(edgeId, sourceId, targetId, GradoopConstants.DEFAULT_EDGE_LABEL);
   }
 
   /**

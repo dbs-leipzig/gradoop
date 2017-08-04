@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl;
+package org.gradoop.flink.model.api.epgm;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -26,15 +27,14 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.LogicalGraphOperators;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -42,7 +42,7 @@ import org.gradoop.flink.model.impl.operators.drilling.Drill;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -68,192 +68,96 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * Represents a logical graph inside the EPGM.
+ * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
+ * encapsulates three concepts:
+ *
+ * - a so-called graph head, that stores information about the graph (i.e. label and properties)
+ * - a set of vertices assigned to the graph
+ * - a set of directed, possibly parallel edges assigned to the graph
+ *
+ * Furthermore, a logical graph provides operations that are performed on the underlying data. These
+ * operations result in either another logical graph or in a {@link GraphCollection}.
+ *
+ * A logical graph is wrapping a {@link LogicalGraphLayout} which defines, how the graph is
+ * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
+ * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
+public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
+  /**
+   * Layout for that logical graph.
+   */
+  private final LogicalGraphLayout layout;
+  /**
+   * Configuration
+   */
+  private final GradoopFlinkConfig config;
 
   /**
    * Creates a new logical graph based on the given parameters.
    *
-   * @param graphHead graph head data set associated with that graph
-   * @param vertices  vertex data set
-   * @param edges     edge data set
-   * @param config    Gradoop Flink configuration
+   * @param layout representation of the logical graph
+   * @param config Gradoop Flink configuration
    */
-  private LogicalGraph(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config) {
-    super(graphHead, vertices, edges, config);
+  LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+    Objects.requireNonNull(layout);
+    Objects.requireNonNull(config);
+    this.layout = layout;
+    this.config = config;
   }
 
   //----------------------------------------------------------------------------
-  // Factory methods
+  // Data methods
   //----------------------------------------------------------------------------
 
-  /**
-   * Creates a logical graph from the given arguments.
-   *
-   * @param vertices  Vertex dataset
-   * @param config    Gradoop Flink configuration
-   * @return Logical graph
-   */
-  public static LogicalGraph fromDataSets(DataSet<Vertex> vertices,
-    GradoopFlinkConfig config) {
-    return fromDataSets(vertices,
-      createEdgeDataSet(Lists.newArrayListWithCapacity(0), config),
-      config);
+  @Override
+  public boolean hasGVELayout() {
+    return layout.hasGVELayout();
   }
-
-  /**
-   * Creates a logical graph from the given arguments.
-   *
-   * The method assumes that the given vertices and edges are already assigned
-   * to the given graph head.
-   *
-   * @param graphHead   1-element GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @param config      Gradoop Flink configuration
-   * @return Logical graph
-   */
-  public static LogicalGraph fromDataSets(DataSet<GraphHead> graphHead,
-    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
-    return new LogicalGraph(graphHead, vertices, edges, config);
-  }
-
-  /**
-   * Creates a logical graph from the given argument.
-   *
-   * The method creates a new graph head element and assigns the vertices and
-   * edges to that graph.
-   *
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @param config      Gradoop Flink configuration
-   * @return Logical graph
-   */
-  public static LogicalGraph fromDataSets(DataSet<Vertex> vertices,
-    DataSet<Edge> edges, GradoopFlinkConfig config) {
-
-    checkNotNull(vertices, "Vertex DataSet was null");
-    checkNotNull(edges, "Edge DataSet was null");
-    checkNotNull(config, "Config was null");
-    GraphHead graphHead = config
-      .getGraphHeadFactory()
-      .createGraphHead();
-
-    DataSet<GraphHead> graphHeadSet = config.getExecutionEnvironment()
-      .fromElements(graphHead);
-
-    // update vertices and edges with new graph head id
-    vertices = vertices
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
-    edges = edges
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties");
-
-    return new LogicalGraph(graphHeadSet, vertices, edges, config);
-  }
-
-  /**
-   * Creates a logical graph from the given arguments.
-   *
-   * @param graphHead   Graph head associated with the logical graph
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @param config      Gradoop Flink configuration
-   * @return Logical graph
-   */
-  @SuppressWarnings("unchecked")
-  public static LogicalGraph fromCollections(GraphHead graphHead,
-    Collection<Vertex> vertices, Collection<Edge> edges,
-    GradoopFlinkConfig config) {
-
-    List<GraphHead> graphHeads;
-    if (graphHead == null) {
-      graphHeads = Lists.newArrayListWithCapacity(0);
-    } else {
-      graphHeads = Lists.newArrayList(graphHead);
-    }
-
-    if (edges == null) {
-      edges = Lists.newArrayListWithCapacity(0);
-    }
-
-    checkNotNull(vertices, "Vertex collection was null");
-    checkNotNull(edges, "Edge collection was null");
-    checkNotNull(config, "Config was null");
-    return fromDataSets(
-      createGraphHeadDataSet(graphHeads, config),
-      createVertexDataSet(vertices, config),
-      createEdgeDataSet(edges, config),
-      config
-    );
-  }
-
-  /**
-   * Creates a logical graph from the given arguments. A new graph head is
-   * created and all vertices and edges are assigned to that graph.
-   *
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @param config      Gradoop Flink configuration
-   * @return Logical graph
-   */
-  public static LogicalGraph fromCollections(Collection<Vertex> vertices,
-    Collection<Edge> edges, GradoopFlinkConfig config) {
-
-    checkNotNull(vertices, "Vertex collection was null");
-    checkNotNull(edges, "Edge collection was null");
-    checkNotNull(config, "Config was null");
-
-    GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
-
-    DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices, config)
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
-
-    DataSet<Edge> edgeDataSet = createEdgeDataSet(edges, config)
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties");
-
-    return fromDataSets(
-      createGraphHeadDataSet(new ArrayList<>(0), config),
-      vertexDataSet, edgeDataSet, config
-    );
-  }
-
-  /**
-   * Creates an empty graph collection.
-   *
-   * @param config  Gradoop Flink configuration
-   * @return empty graph collection
-   */
-  public static LogicalGraph createEmptyGraph(GradoopFlinkConfig config) {
-    checkNotNull(config, "Config was null");
-
-    Collection<Vertex> vertices = new ArrayList<>(0);
-    Collection<Edge> edges = new ArrayList<>(0);
-    return fromCollections(null, vertices, edges, config);
-  }
-
-  //----------------------------------------------------------------------------
-  // Containment methods
-  //----------------------------------------------------------------------------
 
   /**
    * {@inheritDoc}
    */
   public DataSet<GraphHead> getGraphHead() {
-    return super.getGraphHeads();
+    return layout.getGraphHead();
+  }
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
+
+  @Override
+  public DataSet<Vertex> getVertices() {
+    return layout.getVertices();
+  }
+
+  @Override
+  public DataSet<Vertex> getVerticesByLabel(String label) {
+    return layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getEdges() {
+    return layout.getEdges();
+  }
+
+  @Override
+  public DataSet<Edge> getEdgesByLabel(String label) {
+    return layout.getEdgesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
+    return layout.getOutgoingEdges(vertexID);
+  }
+
+  @Override
+  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
+    return layout.getIncomingEdges(vertexID);
   }
 
   //----------------------------------------------------------------------------
@@ -359,7 +263,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
-    checkNotNull(vertexFilterFunction);
+    Objects.requireNonNull(vertexFilterFunction);
     return callForGraph(new Subgraph(vertexFilterFunction, null));
   }
 
@@ -369,7 +273,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
-    checkNotNull(edgeFilterFunction);
+    Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(new Subgraph(null, edgeFilterFunction));
   }
 
@@ -379,8 +283,8 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
   @Override
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction) {
-    checkNotNull(vertexFilterFunction);
-    checkNotNull(edgeFilterFunction);
+    Objects.requireNonNull(vertexFilterFunction);
+    Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(
       new Subgraph(vertexFilterFunction, edgeFilterFunction));
   }
@@ -429,7 +333,7 @@ public class LogicalGraph extends GraphBase implements LogicalGraphOperators {
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
     Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
 
-    GroupingBuilder builder = new GroupingBuilder();
+    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
 
     builder.addVertexGroupingKeys(vertexGroupingKeys);
     builder.setStrategy(groupingStrategy);

@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ToIdWithLabel;
 import org.gradoop.flink.model.impl.functions.tuple.Tuple2ToWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;

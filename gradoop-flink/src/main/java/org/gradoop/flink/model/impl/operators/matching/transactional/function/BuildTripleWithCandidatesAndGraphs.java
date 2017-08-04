@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 
 import java.util.Collection;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_EDGE_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
 
 /**
  * Converts an EPGM edge to a Tuple2 with its graphs in field 0 and a
