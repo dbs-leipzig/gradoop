@@ -3,6 +3,7 @@ package org.gradoop.flink.model.impl.layouts.gve;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.junit.Test;
 
 public class GVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override

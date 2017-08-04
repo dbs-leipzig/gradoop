@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -72,7 +72,7 @@ public class EPGMDatabase {
     this.database = config.getGraphCollectionFactory()
       .fromDataSets(graphHeads, vertices, edges);
     graphHead = config.getExecutionEnvironment().fromElements(
-      config.getGraphHeadFactory().createGraphHead(GConstants.DB_GRAPH_LABEL));
+      config.getGraphHeadFactory().createGraphHead(GradoopConstants.DB_GRAPH_LABEL));
   }
 
   //----------------------------------------------------------------------------

@@ -62,7 +62,7 @@ public class GVECollectionLayoutFactory extends BaseFactory implements GraphColl
     Collection<Vertex> vertices, Collection<Edge> edges) {
     Objects.requireNonNull(graphHeads, "GraphHead collection was null");
     Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(edges, "Vertex collection was null");
+    Objects.requireNonNull(edges, "Edge collection was null");
     return fromDataSets(
       createGraphHeadDataSet(graphHeads),
       createVertexDataSet(vertices),

@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Responsible to create instances of {@link LogicalGraph} based on a specific
+ * Responsible for create instances of {@link LogicalGraph} based on a specific
  * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  */
 public class LogicalGraphFactory {
@@ -71,7 +71,7 @@ public class LogicalGraphFactory {
 
   /**
    * Creates a logical graph from the given argument.
-   * <p>
+   *
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *

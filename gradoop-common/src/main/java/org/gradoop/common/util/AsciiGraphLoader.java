@@ -139,9 +139,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
     GradoopConfig<G, V, E> config) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(asciiGraph),
       config);
   }
@@ -163,9 +163,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromFile(fileName),
       config);
   }
@@ -187,9 +187,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromStream(InputStream inputStream,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromStream(inputStream),
       config);
   }

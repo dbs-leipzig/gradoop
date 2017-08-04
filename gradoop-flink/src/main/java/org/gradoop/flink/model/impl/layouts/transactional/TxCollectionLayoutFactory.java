@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -62,7 +62,8 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
 
     // Add a dummy graph head for entities which have no assigned graph
     DataSet<GraphHead> dbGraphHead = config.getExecutionEnvironment().fromElements(
-      config.getGraphHeadFactory().initGraphHead(GConstants.DB_GRAPH_ID, GConstants.DB_GRAPH_LABEL)
+      config.getGraphHeadFactory()
+        .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
     );
     inGraphHeads = inGraphHeads.union(dbGraphHead);
 

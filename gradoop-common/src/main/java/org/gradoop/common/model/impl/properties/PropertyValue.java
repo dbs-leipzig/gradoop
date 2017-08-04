@@ -24,7 +24,7 @@ import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -896,7 +896,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public String toString() {
     return getObject() != null ?
       getObject().toString() :
-      GConstants.NULL_STRING;
+      GradoopConstants.NULL_STRING;
   }
 
   /**

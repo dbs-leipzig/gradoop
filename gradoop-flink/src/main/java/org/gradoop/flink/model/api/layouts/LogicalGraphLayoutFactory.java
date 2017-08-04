@@ -36,7 +36,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
 
   /**
    * Creates a logical graph layout from given vertex and edge datasets.
-   * <p>
+   *
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *

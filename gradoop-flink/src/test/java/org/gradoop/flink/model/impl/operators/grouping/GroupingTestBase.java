@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.gradoop.common.util.GConstants.NULL_STRING;
+import static org.gradoop.common.util.GradoopConstants.NULL_STRING;
 
 public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 

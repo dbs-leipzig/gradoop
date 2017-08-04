@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import java.io.Serializable;
 
@@ -47,7 +47,7 @@ public class GraphHeadFactory implements EPGMGraphHeadFactory<GraphHead>,
    */
   @Override
   public GraphHead initGraphHead(final GradoopId id) {
-    return initGraphHead(id, GConstants.DEFAULT_GRAPH_LABEL, null);
+    return initGraphHead(id, GradoopConstants.DEFAULT_GRAPH_LABEL, null);
   }
 
   /**

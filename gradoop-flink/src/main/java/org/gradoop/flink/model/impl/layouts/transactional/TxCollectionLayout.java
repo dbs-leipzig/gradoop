@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -67,7 +67,7 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   public DataSet<GraphHead> getGraphHeads() {
     return transactions
       .map(new TransactionGraphHead<>())
-      .filter(new ByDifferentId<>(GConstants.DB_GRAPH_ID));
+      .filter(new ByDifferentId<>(GradoopConstants.DB_GRAPH_ID));
   }
 
   @Override
@@ -82,7 +82,7 @@ public class TxCollectionLayout implements GraphCollectionLayout {
       .filter(new FilterFunction<GraphTransaction>() {
         @Override
         public boolean filter(GraphTransaction graphTransaction) throws Exception {
-          return !graphTransaction.getGraphHead().getId().equals(GConstants.DB_GRAPH_ID);
+          return !graphTransaction.getGraphHead().getId().equals(GradoopConstants.DB_GRAPH_ID);
         }
       });
   }

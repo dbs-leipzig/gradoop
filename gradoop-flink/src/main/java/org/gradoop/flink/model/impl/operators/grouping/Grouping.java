@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
@@ -349,9 +349,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       this.globalVertexAggregators  = Lists.newArrayList();
       this.globalEdgeAggregators    = Lists.newArrayList();
       this.defaultVertexLabelGroup  = new LabelGroup(
-        GConstants.DEFAULT_VERTEX_LABEL, Grouping.DEFAULT_VERTEX_LABEL_GROUP);
+        GradoopConstants.DEFAULT_VERTEX_LABEL, Grouping.DEFAULT_VERTEX_LABEL_GROUP);
       this.defaultEdgeLabelGroup    = new LabelGroup(
-        GConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
+        GradoopConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
 
       vertexLabelGroups.add(defaultVertexLabelGroup);
       edgeLabelGroups.add(defaultEdgeLabelGroup);

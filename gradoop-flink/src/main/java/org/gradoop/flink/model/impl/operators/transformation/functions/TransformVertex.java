@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.transformation.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,6 +49,6 @@ public class TransformVertex extends TransformBase<Vertex> {
   @Override
   protected Vertex initFrom(Vertex element) {
     return vertexFactory.initVertex(
-      element.getId(), GConstants.DEFAULT_VERTEX_LABEL, element.getGraphIds());
+      element.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, element.getGraphIds());
   }
 }

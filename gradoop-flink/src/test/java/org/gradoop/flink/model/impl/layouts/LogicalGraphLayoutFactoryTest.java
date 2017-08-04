@@ -32,19 +32,16 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     Collection<Vertex> vertices = loader.getVerticesByGraphVariables("g0");
     Collection<Edge> edges = loader.getEdgesByGraphVariables("g0");
 
-    DataSet<GraphHead> graphHeadDataSet = getExecutionEnvironment()
-      .fromElements(graphHead);
-    DataSet<Vertex> vertexDataSet = getExecutionEnvironment()
-      .fromCollection(vertices);
-    DataSet<Edge> edgeDataSet = getExecutionEnvironment()
-      .fromCollection(edges);
+    DataSet<GraphHead> graphHeadDataSet = getExecutionEnvironment().fromElements(graphHead);
+    DataSet<Vertex> vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
+    DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(edges);
 
     LogicalGraphLayout logicalGraphLayout = getFactory()
       .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
 
     logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(
       loadedGraphHeads));
@@ -72,15 +69,12 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
         getExecutionEnvironment().fromCollection(loader.getEdges()));
 
     Collection<GraphHead> loadedGraphHead = Lists.newArrayList();
-    Collection<Vertex> loadedVertices   = Lists.newArrayList();
-    Collection<Edge> loadedEdges      = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
 
-    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHead));
-    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
+    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(loadedGraphHead));
+    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
 
@@ -112,16 +106,13 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
         loader.getVerticesByGraphVariables("g0"),
         loader.getEdgesByGraphVariables("g0"));
 
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
 
-    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHeads));
-    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
+    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
 
@@ -136,16 +127,13 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
   public void testCreateEmptyGraph() throws Exception {
     LogicalGraphLayout logicalGraphLayout = getFactory().createEmptyGraph();
 
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
 
-    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(
-      loadedGraphHeads));
-    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(
-      loadedVertices));
-    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(
-      loadedEdges));
+    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
 
     getExecutionEnvironment().execute();
 

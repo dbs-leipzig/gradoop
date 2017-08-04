@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.edgelist.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
@@ -43,7 +43,7 @@ public class CreateImportVertex<K extends Comparable<K>>
    */
   public CreateImportVertex() {
     this.reuseVertex = new ImportVertex<>();
-    this.reuseVertex.setLabel(GConstants.DEFAULT_VERTEX_LABEL);
+    this.reuseVertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
   }
 
   @Override

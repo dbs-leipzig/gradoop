@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 /**
  * (edgeId, (sourceId, targetId)) => ImportEdge
@@ -46,7 +46,7 @@ public class CreateImportEdge<K extends Comparable<K>>
    */
   public CreateImportEdge() {
     this.reuseEdge = new ImportEdge<>();
-    reuseEdge.setLabel(GConstants.DEFAULT_EDGE_LABEL);
+    reuseEdge.setLabel(GradoopConstants.DEFAULT_EDGE_LABEL);
   }
 
   /**

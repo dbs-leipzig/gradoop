@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
@@ -79,7 +79,7 @@ public class EdgeTest {
     GradoopId targetId = GradoopId.get();
     EPGMEdge e =
       new EdgeFactory().initEdge(edgeId, sourceId, targetId);
-    assertThat(e.getLabel(), is(GConstants.DEFAULT_EDGE_LABEL));
+    assertThat(e.getLabel(), is(GradoopConstants.DEFAULT_EDGE_LABEL));
   }
 
   @Test(expected = NullPointerException.class)

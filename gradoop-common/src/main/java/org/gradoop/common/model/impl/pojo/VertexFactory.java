@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import java.io.Serializable;
 
@@ -47,7 +47,7 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
    */
   @Override
   public Vertex initVertex(final GradoopId vertexID) {
-    return initVertex(vertexID, GConstants.DEFAULT_VERTEX_LABEL, null, null);
+    return initVertex(vertexID, GradoopConstants.DEFAULT_VERTEX_LABEL, null, null);
   }
 
   /**

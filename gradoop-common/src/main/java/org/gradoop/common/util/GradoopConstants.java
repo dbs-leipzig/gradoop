@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Constants used in Gradoop.
  */
-public final class GConstants {
+public final class GradoopConstants {
   /**
    * Default label for unlabeled vertices.
    */

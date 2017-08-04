@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Collection;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Converts an EPGM vertex to a {@link IdWithCandidates} tuple.

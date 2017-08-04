@@ -22,9 +22,8 @@ import org.apache.flink.test.util.ForkableFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -193,5 +192,11 @@ public abstract class GradoopFlinkTestBase {
   protected void collectAndAssertFalse(DataSet<Boolean> result) throws
     Exception {
     assertFalse("expected false", result.collect().get(0));
+  }
+
+  protected <T extends EPGMElement> DataSet<T> getEmptyDataSet(T dummy) {
+    return getExecutionEnvironment()
+      .fromElements(dummy)
+      .filter(new False<>());
   }
 }

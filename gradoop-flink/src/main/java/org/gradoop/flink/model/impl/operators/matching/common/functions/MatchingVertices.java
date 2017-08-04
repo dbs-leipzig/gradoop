@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMa
 
 import java.util.Collection;
 
-import static org.gradoop.common.util.GConstants.DEFAULT_VERTEX_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Filter vertices based on their occurrence in the given GDL pattern.

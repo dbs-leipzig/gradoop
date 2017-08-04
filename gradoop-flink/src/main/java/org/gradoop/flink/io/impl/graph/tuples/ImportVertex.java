@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.graph.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,7 +44,7 @@ public class ImportVertex<K extends Comparable<K>>
    * @param id import vertex id (i.e. identifier in the source system)
    */
   public ImportVertex(K id) {
-    this(id, GConstants.DEFAULT_VERTEX_LABEL);
+    this(id, GradoopConstants.DEFAULT_VERTEX_LABEL);
   }
 
   /**
