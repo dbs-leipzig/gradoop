@@ -59,8 +59,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
-import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint
-  .OPTIMIZER_CHOOSES;
+import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES;
 
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a

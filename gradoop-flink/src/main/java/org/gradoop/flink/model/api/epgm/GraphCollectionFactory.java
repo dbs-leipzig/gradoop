@@ -38,7 +38,7 @@ public class GraphCollectionFactory {
   private GraphCollectionLayoutFactory layoutFactory;
 
   /**
-   * Gradoop Flink configuration
+   * Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
 

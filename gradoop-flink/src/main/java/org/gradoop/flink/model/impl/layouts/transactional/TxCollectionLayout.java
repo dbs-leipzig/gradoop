@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -23,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.epgm.ByDifferentGraphId;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.BySourceId;
@@ -75,16 +75,9 @@ public class TxCollectionLayout implements GraphCollectionLayout {
     return getGraphHeads().filter(new ByLabel<>(label));
   }
 
-  // TODO refactor into method
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
-    return transactions
-      .filter(new FilterFunction<GraphTransaction>() {
-        @Override
-        public boolean filter(GraphTransaction graphTransaction) throws Exception {
-          return !graphTransaction.getGraphHead().getId().equals(GradoopConstants.DB_GRAPH_ID);
-        }
-      });
+    return transactions.filter(new ByDifferentGraphId(GradoopConstants.DB_GRAPH_ID));
   }
 
   @Override

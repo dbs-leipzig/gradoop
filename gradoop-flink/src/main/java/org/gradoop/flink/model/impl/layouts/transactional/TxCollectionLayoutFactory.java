@@ -143,7 +143,7 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
           new TypeHint<GraphTransaction>() { }.getTypeInfo())
         .filter(new False<>());
     } else {
-      graphTransactionSet =  env.fromCollection(transactions);
+      graphTransactionSet = env.fromCollection(transactions);
     }
     return graphTransactionSet;
   }

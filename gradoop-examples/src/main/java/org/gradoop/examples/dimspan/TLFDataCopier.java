@@ -62,7 +62,6 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
   private static GradoopFlinkConfig GRADOOP_CONFIG =
     GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 
-
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true, "Path to input file");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true, "Path to output file");

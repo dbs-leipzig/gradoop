@@ -110,8 +110,8 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
     default:
       vertices = null;
     }
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
-      vertices, graph.getEdges());
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());
   }
 
   /**

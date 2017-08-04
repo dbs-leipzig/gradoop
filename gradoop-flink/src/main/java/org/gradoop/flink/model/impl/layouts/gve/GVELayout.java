@@ -40,9 +40,9 @@ import java.util.Set;
 
 /**
  * Represents a graph or a graph collection using three separate datasets:
- * - the first dataset contains the graph heads which is the meta data of logical graphs
+ * - the first dataset contains the graph heads which are the meta data of logical graphs
  * - the second dataset contains the vertices contained in all graphs of the collection
- * - the thirs dataset contains the edges contained in all graphs of the collection
+ * - the third dataset contains the edges contained in all graphs of the collection
  */
 public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
   /**

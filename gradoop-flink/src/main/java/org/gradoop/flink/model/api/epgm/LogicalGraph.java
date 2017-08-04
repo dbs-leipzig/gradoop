@@ -100,7 +100,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * Creates a new logical graph based on the given parameters.
    *
    * @param layout representation of the logical graph
-   * @param config    Gradoop Flink configuration
+   * @param config Gradoop Flink configuration
    */
   LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);

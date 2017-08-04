@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.P
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 
 /**
- * Defines the operators that available on a {@link GraphCollection}.
+ * Defines the operators that are available on a {@link GraphCollection}.
  */
 public interface GraphCollectionOperators extends GraphBaseOperators {
 

@@ -72,20 +72,21 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     // prepare vertex set for Gelly vertex centric iteration
-    DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> vertices =
-      graph.getVertices().map(new VertexToGellyVertexMapper(propertyKey));
+    DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> vertices = graph.getVertices()
+      .map(new VertexToGellyVertexMapper(propertyKey));
 
     // prepare edge set for Gelly vertex centric iteration
-    DataSet<org.apache.flink.graph.Edge<GradoopId, NullValue>> edges =
-      graph.getEdges().map(new EdgeToGellyEdgeMapper());
+    DataSet<org.apache.flink.graph.Edge<GradoopId, NullValue>> edges = graph.getEdges()
+      .map(new EdgeToGellyEdgeMapper());
 
     // create Gelly graph
-    Graph<GradoopId, PropertyValue, NullValue> gellyGraph =
-      Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());
+    Graph<GradoopId, PropertyValue, NullValue> gellyGraph = Graph.fromDataSet(
+      vertices, edges, graph.getConfig().getExecutionEnvironment());
 
-    DataSet<Vertex> labeledVertices =
-      executeInternal(gellyGraph).join(graph.getVertices()).where(0)
-        .equalTo(new Id<Vertex>()).with(new LPVertexJoin(propertyKey));
+    DataSet<Vertex> labeledVertices = executeInternal(gellyGraph)
+      .join(graph.getVertices())
+      .where(0).equalTo(new Id<>())
+      .with(new LPVertexJoin(propertyKey));
 
     // return labeled graph
     return graph.getConfig().getLogicalGraphFactory()
@@ -99,8 +100,7 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * @return updated vertex set
    */
   protected abstract DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>>
-  executeInternal(
-    Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
+  executeInternal(Graph<GradoopId, PropertyValue, NullValue> gellyGraph);
 
   /**
    * Returns the maximum number of iterations the algorithm is executed.

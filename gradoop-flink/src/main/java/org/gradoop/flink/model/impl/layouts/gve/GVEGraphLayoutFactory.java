@@ -84,7 +84,6 @@ public class GVEGraphLayoutFactory extends BaseFactory implements LogicalGraphLa
     }
 
     Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(edges, "Edge collection was null");
     Objects.requireNonNull(config, "Config was null");
 
     return fromDataSets(

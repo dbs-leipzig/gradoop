@@ -52,7 +52,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates a new Configuration.
    *
-   * @param executionEnvironment  Flink execution environment
+   * @param executionEnvironment Flink execution environment
    * @param logicalGraphLayoutFactory Factory for creating logical graphs
    * @param graphCollectionLayoutFactory Factory for creating graph collections
    */
