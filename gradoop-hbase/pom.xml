@@ -14,6 +14,10 @@
     <name>Gradoop HBase</name>
 	<description>Read/write graphs from/to HBase</description>
 
+    <properties>
+        <hbaseSuite>**/HBaseTestSuite.class</hbaseSuite>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -29,7 +33,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <includes>
-                        **/HBaseTestSuite.class
+                        <include>${hbaseSuite}</include>
                     </includes>
                 </configuration>
             </plugin>
