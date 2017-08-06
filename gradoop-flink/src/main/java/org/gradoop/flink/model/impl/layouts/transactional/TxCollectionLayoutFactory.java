@@ -42,6 +42,8 @@ import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -52,6 +54,9 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
     DataSet<Vertex> vertices) {
+    Objects.requireNonNull(graphHeads);
+    Objects.requireNonNull(vertices);
+
     return fromDataSets(graphHeads, vertices,
       createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
@@ -59,6 +64,9 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads,
     DataSet<Vertex> inVertices, DataSet<Edge> inEdges) {
+    Objects.requireNonNull(inGraphHeads);
+    Objects.requireNonNull(inVertices);
+    Objects.requireNonNull(inEdges);
 
     // Add a dummy graph head for entities which have no assigned graph
     DataSet<GraphHead> dbGraphHead = config.getExecutionEnvironment().fromElements(
@@ -90,6 +98,22 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
       .with(new TransactionFromSets());
 
     return new TxCollectionLayout(graphTransactions);
+  }
+
+  @Override
+  public GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+    Objects.requireNonNull(graphHeads);
+    Objects.requireNonNull(vertices);
+    Objects.requireNonNull(edges);
+    return fromDataSets(
+      graphHeads.values().stream().reduce(DataSet::union)
+        .orElseThrow(() -> new RuntimeException("Error during graph head union")),
+      vertices.values().stream().reduce(DataSet::union)
+        .orElseThrow(() -> new RuntimeException("Error during vertex union")),
+      edges.values().stream().reduce(DataSet::union)
+        .orElseThrow(() -> new RuntimeException("Error during edge union"))
+    );
   }
 
   @Override

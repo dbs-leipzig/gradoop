@@ -28,17 +28,17 @@ import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.functions.utils.First;
-import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Responsible for creating a {@link GVELayout} from given data.
  */
-public class GVECollectionLayoutFactory extends BaseFactory implements GraphCollectionLayoutFactory {
+public class GVECollectionLayoutFactory extends GVEBaseFactory implements GraphCollectionLayoutFactory {
 
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
@@ -50,11 +50,13 @@ public class GVECollectionLayoutFactory extends BaseFactory implements GraphColl
   @Override
   public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
-    Objects.requireNonNull(graphHeads, "GraphHead DataSet was null");
-    Objects.requireNonNull(vertices, "Vertex DataSet was null");
-    Objects.requireNonNull(edges, "Edge DataSet was null");
-    Objects.requireNonNull(config, "Config was null");
-    return new GVELayout(graphHeads, vertices, edges);
+    return create(graphHeads, vertices, edges);
+  }
+
+  @Override
+  public GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+    return create(graphHeads, vertices, edges);
   }
 
   @Override

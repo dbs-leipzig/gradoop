@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Enables the construction of a {@link GraphCollectionLayout}.
@@ -31,30 +32,41 @@ public interface GraphCollectionLayoutFactory extends BaseLayoutFactory {
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @return Graph collection
+   * @param graphHeads GraphHead DataSet
+   * @param vertices Vertex DataSet
+   * @return Graph collection layout
    */
   GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices);
 
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @return Graph collection
+   * @param graphHeads GraphHead DataSet
+   * @param vertices Vertex DataSet
+   * @param edges Edge DataSet
+   * @return Graph collection layout
    */
   GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges);
 
   /**
+   * Creates a collection layout from the given datasets indexed by label.
+   *
+   * @param graphHeads Mapping from label to graph head dataset
+   * @param vertices Mapping from label to vertex dataset
+   * @param edges Mapping from label to edge dataset
+   * @return Graph collection layout
+   */
+  GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges);
+
+  /**
    * Creates a collection layout from the given collections.
    *
-   * @param graphHeads  Graph Head collection
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @return Graph collection
+   * @param graphHeads Graph Head collection
+   * @param vertices Vertex collection
+   * @param edges Edge collection
+   * @return Graph collection layout
    */
   GraphCollectionLayout fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges);
@@ -62,8 +74,8 @@ public interface GraphCollectionLayoutFactory extends BaseLayoutFactory {
   /**
    * Creates a graph collection layout from a given logical graph layout.
    *
-   * @param logicalGraphLayout  input graph
-   * @return 1-element graph collection
+   * @param logicalGraphLayout input graph
+   * @return graph collection layout
    */
   GraphCollectionLayout fromGraphLayout(LogicalGraphLayout logicalGraphLayout);
 
@@ -72,8 +84,8 @@ public interface GraphCollectionLayoutFactory extends BaseLayoutFactory {
    *
    * Overlapping vertices and edge are merged by Id comparison only.
    *
-   * @param transactions  transaction dataset
-   * @return graph collection
+   * @param transactions transaction dataset
+   * @return graph collection layout
    */
   GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions);
 
@@ -82,9 +94,9 @@ public interface GraphCollectionLayoutFactory extends BaseLayoutFactory {
    *
    * Overlapping vertices and edge are merged using provided reduce functions.
    *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
+   * @param transactions  transaction dataset
+   * @param vertexMergeReducer vertex merge function
+   * @param edgeMergeReducer edge merge function
    * @return graph collection layout
    */
   GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,

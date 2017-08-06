@@ -30,14 +30,21 @@ public interface GraphCollectionLayout extends Layout {
    *
    * @return true, iff layout based on three separate datasets.
    */
-  boolean hasGVELayout();
+  boolean isGVELayout();
+
+  /**
+   * True, if the layout is based on separate datasets separated by graph, vertex and edge labels.
+   *
+   * @return true, iff layout is based on label-separated datasets
+   */
+  boolean isIndexedGVELayout();
 
   /**
    * True, if the layout is based on a transactional data representation.
    *
    * @return true, iff layout based on a transactional representation
    */
-  boolean hasTransactionalLayout();
+  boolean isTransactionalLayout();
   /**
    * Returns the graph heads associated with the logical graphs in that
    * collection.

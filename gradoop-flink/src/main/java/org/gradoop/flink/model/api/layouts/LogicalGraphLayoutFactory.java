@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Enables the construction of a {@link LogicalGraphLayout}.
@@ -59,6 +60,20 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    */
   LogicalGraphLayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
     DataSet<Edge> edges);
+
+  /**
+   * Creates a graph layout from the given datasets indexed by label.
+   *
+   * The method assumes that the given vertices and edges are already assigned
+   * to the given graph head.
+   *
+   * @param graphHeads Mapping from label to graph head dataset
+   * @param vertices Mapping from label to vertex dataset
+   * @param edges Mapping from label to edge dataset
+   * @return Graph collection layout
+   */
+  LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges);
 
   /**
    * Creates a logical graph layout from the given graphHead, vertex and edge collections.

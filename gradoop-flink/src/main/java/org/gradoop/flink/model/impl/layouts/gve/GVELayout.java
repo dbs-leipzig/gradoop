@@ -65,21 +65,26 @@ public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
    * @param vertices vertex dataset
    * @param edges edge dataset
    */
-  GVELayout(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices, DataSet<Edge> edges) {
+  protected GVELayout(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
+    DataSet<Edge> edges) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
   }
 
   @Override
-  public boolean hasTransactionalLayout() {
+  public boolean isGVELayout() {
+    return true;
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
     return false;
   }
 
-
   @Override
-  public boolean hasGVELayout() {
-    return true;
+  public boolean isTransactionalLayout() {
+    return false;
   }
 
   @Override

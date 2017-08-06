@@ -18,18 +18,15 @@ package org.gradoop.flink.model.impl.layouts.transactional;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,13 +68,13 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
   @Test
   public void hasGVELayout() throws Exception {
     TxCollectionLayout layout = new TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
-    assertFalse(layout.hasGVELayout());
+    assertFalse(layout.isGVELayout());
   }
 
   @Test
   public void hasTransactionalLayout() throws Exception {
     TxCollectionLayout layout = new TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
-    assertTrue(layout.hasTransactionalLayout());
+    assertTrue(layout.isTransactionalLayout());
   }
 
   @Test

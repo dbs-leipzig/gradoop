@@ -108,6 +108,21 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   //----------------------------------------------------------------------------
 
   @Override
+  public boolean isGVELayout() {
+    return layout.isGVELayout();
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+    return layout.isIndexedGVELayout();
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
+    return layout.isTransactionalLayout();
+  }
+
+  @Override
   public DataSet<Vertex> getVertices() {
     return layout.getVertices();
   }
@@ -135,16 +150,6 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   @Override
   public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
     return layout.getIncomingEdges(vertexID);
-  }
-
-  @Override
-  public boolean hasGVELayout() {
-    return layout.hasGVELayout();
-  }
-
-  @Override
-  public boolean hasTransactionalLayout() {
-    return layout.hasTransactionalLayout();
   }
 
   /**
