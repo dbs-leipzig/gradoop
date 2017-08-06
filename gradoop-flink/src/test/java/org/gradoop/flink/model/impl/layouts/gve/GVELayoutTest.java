@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.layouts.gve;
 
 import com.google.common.collect.Sets;
@@ -12,19 +27,23 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 
 public class GVELayoutTest extends GradoopFlinkTestBase {
 
-  private static GraphHead g0;
-  private static GraphHead g1;
+  protected static GraphHead g0;
+  protected static GraphHead g1;
 
-  private static Vertex v0;
-  private static Vertex v1;
-  private static Vertex v2;
+  protected static Vertex v0;
+  protected static Vertex v1;
+  protected static Vertex v2;
 
-  private static Edge e0;
-  private static Edge e1;
+  protected static Edge e0;
+  protected static Edge e1;
 
   @BeforeClass
   public static void setup() {
@@ -50,134 +69,88 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
     e1.addGraphId(g1.getId());
   }
 
-  @Test
-  public void hasTransactionalLayout() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
-    assertFalse(layout.hasTransactionalLayout());
+  protected GVELayout from(Collection<GraphHead> graphHeads, Collection<Vertex> vertices,
+    Collection<Edge> edges) {
+    return new GVELayout(
+      getExecutionEnvironment().fromCollection(graphHeads),
+      getExecutionEnvironment().fromCollection(vertices),
+      getExecutionEnvironment().fromCollection(edges));
   }
 
   @Test
-  public void hasGVELayout() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
+  public void isGVELayout() throws Exception {
+    assertTrue(from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).isGVELayout());
+  }
 
-    assertTrue(layout.hasGVELayout());
+  @Test
+  public void isIndexedGVELayout() throws Exception {
+    assertFalse(from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).isIndexedGVELayout());
+  }
+
+  @Test
+  public void hasTransactionalLayout() throws Exception {
+    assertFalse(from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).isTransactionalLayout());
   }
 
   @Test
   public void getGraphTransactions() throws Exception {
     GraphTransaction tx0 = new GraphTransaction(g0, Sets.newHashSet(v0, v1), Sets.newHashSet(e0));
 
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0),
-      getExecutionEnvironment().fromElements(v0, v1),
-      getExecutionEnvironment().fromElements(e0));
-
-    assertEquals(tx0, layout.getGraphTransactions().collect().get(0));
+    assertEquals(tx0,
+      from(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphTransactions().collect().get(0));
   }
 
   @Test
   public void getGraphHead() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0),
-      getExecutionEnvironment().fromElements(v0, v1),
-      getExecutionEnvironment().fromElements(e0));
-
     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
-      layout.getGraphHead().collect());
+      from(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphHead().collect());
   }
 
   @Test
   public void getGraphHeads() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0, g1),
-      layout.getGraphHeads().collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeads().collect());
   }
 
   @Test
   public void getGraphHeadsByLabel() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
-      layout.getGraphHeadsByLabel("A").collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("A").collect());
   }
 
   @Test
   public void getVertices() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0, v1, v2),
-      layout.getVertices().collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVertices().collect());
   }
 
   @Test
   public void getVerticesByLabel() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0),
-      layout.getVerticesByLabel("A").collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVerticesByLabel("A").collect());
   }
 
   @Test
   public void getEdges() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0, e1),
-      layout.getEdges().collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdges().collect());
   }
 
   @Test
   public void getEdgesByLabel() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
-      layout.getEdgesByLabel("a").collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel("a").collect());
   }
 
   @Test
   public void getOutgoingEdges() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
-      layout.getOutgoingEdges(v0.getId()).collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getOutgoingEdges(v0.getId()).collect());
   }
 
   @Test
   public void getIncomingEdges() throws Exception {
-    GVELayout layout = new GVELayout(
-      getExecutionEnvironment().fromElements(g0, g1),
-      getExecutionEnvironment().fromElements(v0, v1, v2),
-      getExecutionEnvironment().fromElements(e0, e1));
-
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
-      layout.getIncomingEdges(v1.getId()).collect());
+      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getIncomingEdges(v1.getId()).collect());
   }
 }

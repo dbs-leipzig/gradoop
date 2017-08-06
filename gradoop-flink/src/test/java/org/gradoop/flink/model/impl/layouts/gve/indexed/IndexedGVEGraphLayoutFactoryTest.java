@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.layouts.gve;
+package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
-import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-public class GVEGraphCollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
+public class IndexedGVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override
-  protected GraphCollectionLayoutFactory getFactory() {
-    GraphCollectionLayoutFactory graphCollectionLayoutFactory = new GVECollectionLayoutFactory();
+  protected LogicalGraphLayoutFactory getFactory() {
+    IndexedGVEGraphLayoutFactory logicalGraphLayoutFactory = new IndexedGVEGraphLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    config.setGraphCollectionLayoutFactory(graphCollectionLayoutFactory);
-    return graphCollectionLayoutFactory;
+    config.setLogicalGraphLayoutFactory(logicalGraphLayoutFactory);
+    return logicalGraphLayoutFactory;
   }
 }

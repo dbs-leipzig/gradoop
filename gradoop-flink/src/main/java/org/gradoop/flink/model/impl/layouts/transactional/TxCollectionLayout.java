@@ -54,12 +54,17 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   }
 
   @Override
-  public boolean hasGVELayout() {
+  public boolean isGVELayout() {
     return false;
   }
 
   @Override
-  public boolean hasTransactionalLayout() {
+  public boolean isIndexedGVELayout() {
+    return false;
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
     return true;
   }
 

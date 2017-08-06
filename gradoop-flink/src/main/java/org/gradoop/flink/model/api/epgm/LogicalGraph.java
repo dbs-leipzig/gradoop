@@ -114,8 +114,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   //----------------------------------------------------------------------------
 
   @Override
-  public boolean hasGVELayout() {
-    return layout.hasGVELayout();
+  public boolean isGVELayout() {
+    return layout.isGVELayout();
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+    return layout.isIndexedGVELayout();
   }
 
   /**

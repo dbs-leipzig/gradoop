@@ -1,6 +1,22 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.layouts;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -10,13 +26,18 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
@@ -57,6 +78,45 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
     validateEPGMElementCollections(edges, loadedEdges);
     validateEPGMGraphElementCollections(vertices, loadedVertices);
     validateEPGMGraphElementCollections(edges, loadedEdges);
+  }
+
+  @Test
+  public void testFromIndexedDataSets() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    Map<String, DataSet<GraphHead>> indexedGraphHeads = loader.getGraphHeads().stream()
+      .collect(Collectors.groupingBy(GraphHead::getLabel)).entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
+
+    Map<String, DataSet<Vertex>> indexedVertices = loader.getVertices().stream()
+      .collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
+
+    Map<String, DataSet<Edge>> indexedEdges = loader.getEdges().stream()
+      .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
+
+    GraphCollectionLayout collectionLayout = getFactory()
+      .fromIndexedDataSets(indexedGraphHeads, indexedVertices, indexedEdges);
+
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
+
+    collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(
+      loadedGraphHeads));
+    collectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(
+      loadedVertices));
+    collectionLayout.getEdges().output(new LocalCollectionOutputFormat<>(
+      loadedEdges));
+
+    getExecutionEnvironment().execute();
+
+    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
+    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
+    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test

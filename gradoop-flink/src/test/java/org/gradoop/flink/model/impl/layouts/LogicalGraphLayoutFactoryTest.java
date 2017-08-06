@@ -1,6 +1,22 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.layouts;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -15,6 +31,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
@@ -57,6 +75,45 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     validateEPGMElementCollections(edges, loadedEdges);
     validateEPGMGraphElementCollections(vertices, loadedVertices);
     validateEPGMGraphElementCollections(edges, loadedEdges);
+  }
+
+  @Test
+  public void testFromIndexedDataSets() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    GraphHead g0 = loader.getGraphHeadByVariable("g0");
+    Map<String, DataSet<GraphHead>> indexedGraphHead = Maps.newHashMap();
+    indexedGraphHead.put(g0.getLabel(), getExecutionEnvironment().fromElements(g0));
+
+    Map<String, DataSet<Vertex>> indexedVertices = loader.getVerticesByGraphVariables("g0").stream()
+      .collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
+
+    Map<String, DataSet<Edge>> indexedEdges = loader.getEdgesByGraphVariables("g0").stream()
+      .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
+
+    LogicalGraphLayout logicalGraphLayout = getFactory()
+      .fromIndexedDataSets(indexedGraphHead, indexedVertices, indexedEdges);
+
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
+
+    logicalGraphLayout.getGraphHead().output(new LocalCollectionOutputFormat<>(
+      loadedGraphHeads));
+    logicalGraphLayout.getVertices().output(new LocalCollectionOutputFormat<>(
+      loadedVertices));
+    logicalGraphLayout.getEdges().output(new LocalCollectionOutputFormat<>(
+      loadedEdges));
+
+    getExecutionEnvironment().execute();
+
+    validateEPGMElements(g0, loadedGraphHeads.iterator().next());
+    validateEPGMElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+    validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
   }
 
   @Test

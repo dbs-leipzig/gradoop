@@ -20,19 +20,20 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
-import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Responsible for creating a {@link GVELayout} from given data.
  */
-public class GVEGraphLayoutFactory extends BaseFactory implements LogicalGraphLayoutFactory {
+public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGraphLayoutFactory {
 
   @Override
   public GVELayout fromDataSets(DataSet<Vertex> vertices) {
@@ -64,13 +65,19 @@ public class GVEGraphLayoutFactory extends BaseFactory implements LogicalGraphLa
   }
 
   @Override
-  public GVELayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
+  public LogicalGraphLayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
-    return new GVELayout(graphHead, vertices, edges);
+    return create(graphHead, vertices, edges);
   }
 
   @Override
-  public GVELayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
+  public LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+    return create(graphHeads, vertices, edges);
+  }
+
+  @Override
+  public LogicalGraphLayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
     Collection<Edge> edges) {
     List<GraphHead> graphHeads;
     if (graphHead == null) {
@@ -93,7 +100,7 @@ public class GVEGraphLayoutFactory extends BaseFactory implements LogicalGraphLa
   }
 
   @Override
-  public GVELayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
+  public LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
     Objects.requireNonNull(vertices, "Vertex collection was null");
     Objects.requireNonNull(edges, "Edge collection was null");
     Objects.requireNonNull(config, "Config was null");
@@ -113,7 +120,7 @@ public class GVEGraphLayoutFactory extends BaseFactory implements LogicalGraphLa
   }
 
   @Override
-  public GVELayout createEmptyGraph() {
+  public LogicalGraphLayout createEmptyGraph() {
     Collection<Vertex> vertices = new ArrayList<>(0);
     Collection<Edge> edges = new ArrayList<>(0);
     return fromCollections(null, vertices, edges);
