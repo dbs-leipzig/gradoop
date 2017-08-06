@@ -163,7 +163,7 @@ public abstract class GradoopFlinkTestBase {
    *
    * @return graph store containing a simple social network for tests.
    */
-  public FlinkAsciiGraphLoader getSocialNetworkLoader() throws IOException {
+  protected FlinkAsciiGraphLoader getSocialNetworkLoader() throws IOException {
     InputStream inputStream = getClass()
       .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
     return getLoaderFromStream(inputStream);
