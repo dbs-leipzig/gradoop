@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase;
+package org.gradoop;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
@@ -25,14 +25,11 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStoreFactory;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  * Used for tests that need a HBase cluster to run.
  */
-public class GradoopHBaseTestBase extends GradoopFlinkTestBase{
+public class GradoopHBaseTestBase {
 
   //----------------------------------------------------------------------------
   // Cluster related
@@ -48,7 +45,6 @@ public class GradoopHBaseTestBase extends GradoopFlinkTestBase{
    *
    * @throws Exception
    */
-  @BeforeClass
   public static void setUpHBase() throws Exception {
     if (utility == null) {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
@@ -61,7 +57,6 @@ public class GradoopHBaseTestBase extends GradoopFlinkTestBase{
    *
    * @throws Exception
    */
-  @AfterClass
   public static void tearDownHBase() throws Exception {
     if (utility != null) {
       utility.shutdownMiniCluster();

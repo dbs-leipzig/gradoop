@@ -17,6 +17,8 @@ package org.gradoop.common.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.gradoop.GradoopHBaseTestBase;
+import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
@@ -34,13 +36,13 @@ import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.common.util.AsciiGraphLoader;
-import org.gradoop.common.config.GradoopConfig;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -75,6 +77,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateEdge(graphStore, edge);
     graphStore.close();
   }
+
+
 
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,

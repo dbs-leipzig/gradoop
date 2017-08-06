@@ -55,6 +55,11 @@
             <artifactId>hbase-server</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-hadoop-compatibility</artifactId>
+        </dependency>
+
         <!-- Flink -->
         <dependency>
             <groupId>org.apache.flink</groupId>

@@ -18,7 +18,7 @@ package org.gradoop.flink.model;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.test.util.ForkableFlinkMiniCluster;
+import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
@@ -50,7 +50,7 @@ public abstract class GradoopFlinkTestBase {
 
   protected static final long TASKMANAGER_MEMORY_SIZE_MB = 512;
 
-  protected static ForkableFlinkMiniCluster CLUSTER = null;
+  protected static LocalFlinkMiniCluster CLUSTER = null;
 
   /**
    * Flink Execution Environment
@@ -63,7 +63,7 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig config;
 
   public GradoopFlinkTestBase() {
-    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM);
+    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
@@ -122,8 +122,7 @@ public abstract class GradoopFlinkTestBase {
     config.setString("akka.startup-timeout", "60 s");
     config.setInteger("jobmanager.web.port", 8081);
     config.setString("jobmanager.web.log.path", logFile.toString());
-    CLUSTER =
-      new ForkableFlinkMiniCluster(config, true);
+    CLUSTER = new LocalFlinkMiniCluster(config, true);
     CLUSTER.start();
   }
 
@@ -164,7 +163,7 @@ public abstract class GradoopFlinkTestBase {
    *
    * @return graph store containing a simple social network for tests.
    */
-  protected FlinkAsciiGraphLoader getSocialNetworkLoader() throws IOException {
+  public FlinkAsciiGraphLoader getSocialNetworkLoader() throws IOException {
     InputStream inputStream = getClass()
       .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
     return getLoaderFromStream(inputStream);

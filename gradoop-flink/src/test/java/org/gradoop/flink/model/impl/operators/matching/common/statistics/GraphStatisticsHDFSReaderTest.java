@@ -20,8 +20,15 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
+/**
+ * @Ignore annotation can be removed as soon issue #661 is fixed
+ * @link https://github.com/dbs-leipzig/gradoop/issues/661
+ */
+@Ignore
 public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
+
   private static HBaseTestingUtility utility;
 
   @BeforeClass
@@ -30,6 +37,8 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
       utility.startMiniCluster().waitForActiveAndReadyMaster();
     }
+
+
 
     // copy test resources to HDFS
     Path localPath = new Path(GraphStatisticsHDFSReaderTest.class.getResource("/data/json/sna/statistics").getFile());

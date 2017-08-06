@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.hbase;
+package org.gradoop;
 
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.storage.impl.hbase.GradoopHBaseTestBase;
+import org.gradoop.common.storage.impl.hbase.HBaseGraphStoreTest;
+import org.gradoop.flink.io.impl.hbase.HBaseDataSinkSourceTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-public class FlinkHBaseTestBase extends GradoopFlinkTestBase {
 
-  /**
-   * Start Flink and HBase cluster.
-   *
-   * @throws Exception
-   */
+/**
+ * Test Suite class to make sure HBase and Flink test instances are started only once for all tests.
+ *
+ * Usage: append TestClasses to SuiteClasses to run them within the suite.
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+  HBaseGraphStoreTest.class,
+  HBaseDataSinkSourceTest.class
+})
+public class HBaseTestSuite {
+
   @BeforeClass
-  public static void setup() throws Exception {
-    GradoopFlinkTestBase.setupFlink();
+  public static void setupHBase() throws Exception {
     GradoopHBaseTestBase.setUpHBase();
   }
 
-  /**
-   * Stop Flink and HBase cluster.
-   *
-   * @throws Exception
-   */
   @AfterClass
-  public static void tearDown() throws Exception {
+  public static void tearDownHBase() throws Exception {
     GradoopHBaseTestBase.tearDownHBase();
-    GradoopFlinkTestBase.tearDownFlink();
   }
 }
