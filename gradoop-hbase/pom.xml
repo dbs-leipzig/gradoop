@@ -24,6 +24,15 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        **/HBaseTestSuite.class
+                    </includes>
+                </configuration>
+            </plugin>
             <!-- Creates an extra *-tests.jar which can be used as dependency -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
