@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.BuildSuperVertex;
@@ -118,7 +118,7 @@ public class VertexCentricalGrouping extends CentricalGrouping {
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   /**
@@ -186,7 +186,7 @@ public class VertexCentricalGrouping extends CentricalGrouping {
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   /**

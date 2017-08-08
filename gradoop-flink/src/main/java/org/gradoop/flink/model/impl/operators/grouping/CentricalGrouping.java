@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.util.List;

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.BuildSuperEdgeIdWithSourceAndTargetId;
@@ -184,7 +184,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // union with vertices which stay as they are
       .union(normalSuperVertices);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   /**
@@ -295,7 +295,7 @@ public class EdgeCentricalGrouping extends CentricalGrouping {
       // union with vertices which stay as they are
       .union(normalSuperVertices);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
 

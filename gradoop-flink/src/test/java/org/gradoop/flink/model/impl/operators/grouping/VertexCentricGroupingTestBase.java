@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.gradoop.common.util.GConstants.NULL_STRING;
+import static org.gradoop.common.util.GradoopConstants.NULL_STRING;
 
 public abstract class VertexCentricGroupingTestBase extends GradoopFlinkTestBase {
 
