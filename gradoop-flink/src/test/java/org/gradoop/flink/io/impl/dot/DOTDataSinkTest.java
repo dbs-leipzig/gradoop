@@ -26,6 +26,7 @@ import org.junit.rules.TemporaryFolder;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DOTDataSinkTest extends GradoopFlinkTestBase {
 
@@ -80,6 +81,10 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
         vertexLines++;
       } else if (line.startsWith("subgraph")) {
         subgraphLines++;
+      }
+      int index = line.indexOf('&');
+      if (index != -1) {
+        assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
       }
       lines++;
     }

@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.io.impl.dot.functions;
 
+import  static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -195,23 +197,23 @@ public class DOTFileFormat implements TextOutputFormat.TextFormatter<GraphTransa
         .append("<tr><td colspan=\"2\" bgcolor=\"")
         .append(color)
         .append("\"><font color=\"white\">")
-        .append(lbl)
+        .append(escapeHtml4(lbl))
         .append("</font></td></tr>");
 
       Iterator<Property> iterator = properties.iterator();
       while (iterator.hasNext()) {
         Property property = iterator.next();
         builder.append("<tr><td>")
-          .append(property.getKey())
+          .append(escapeHtml4(property.getKey()))
           .append("</td><td>")
-          .append(property.getValue())
+          .append(escapeHtml4(property.getValue().toString()))
           .append("</td></tr>");
       }
       builder.append("</table></font>>");
     } else {
       //write id/label as node label in dot
       builder.append("label=\"")
-        .append(lbl)
+        .append(escapeHtml4(lbl))
         .append("\"");
     }
   }
