@@ -531,7 +531,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param superEdgeLabel label of the group and therefore of the new super edge
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
@@ -546,7 +546,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param superEdgeLabel label of the group and therefore of the new super edge
      * @param groupingKeys keys used for grouping
      * @param aggregators edge aggregators
      * @return this builder
