@@ -473,7 +473,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label, String superVertexLabel,
+      String label,
+      String superVertexLabel,
       List<String> groupingKeys) {
       return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
     }
@@ -489,7 +490,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label, String superVertexLabel,
+      String label,
+      String superVertexLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
@@ -536,7 +538,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label, String superEdgeLabel,
+      String label,
+      String superEdgeLabel,
       List<String> groupingKeys) {
       return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
     }
@@ -552,7 +555,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label, String superEdgeLabel,
+      String label,
+      String superEdgeLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
