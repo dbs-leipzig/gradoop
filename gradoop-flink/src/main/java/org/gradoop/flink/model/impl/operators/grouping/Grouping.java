@@ -349,9 +349,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       this.globalVertexAggregators  = Lists.newArrayList();
       this.globalEdgeAggregators    = Lists.newArrayList();
       this.defaultVertexLabelGroup  = new LabelGroup(
-        GradoopConstants.DEFAULT_VERTEX_LABEL, Grouping.DEFAULT_VERTEX_LABEL_GROUP);
+        Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
       this.defaultEdgeLabelGroup    = new LabelGroup(
-        GradoopConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
+        Grouping.DEFAULT_EDGE_LABEL_GROUP, GradoopConstants.DEFAULT_EDGE_LABEL);
 
       vertexLabelGroups.add(defaultVertexLabelGroup);
       edgeLabelGroups.add(defaultEdgeLabelGroup);

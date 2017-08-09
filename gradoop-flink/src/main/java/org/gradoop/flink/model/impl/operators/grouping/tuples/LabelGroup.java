@@ -60,19 +60,19 @@ public class LabelGroup
     super(groupingLabel, groupLabel, propertyKeys, aggregators);
   }
 
-  public String getGroupLabel() {
+  public String getGroupingLabel() {
     return f0;
   }
 
-  public void setGroupLabel(String label) {
+  public void setGroupingLabel(String label) {
     f0 = label;
   }
 
-  public String getGroupingLabel() {
+  public String getGroupLabel() {
     return f1;
   }
 
-  public void setGroupingLabel(String label) {
+  public void setGroupLabel(String label) {
     f1 = label;
   }
 
