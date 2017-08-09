@@ -349,9 +349,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       this.globalVertexAggregators  = Lists.newArrayList();
       this.globalEdgeAggregators    = Lists.newArrayList();
       this.defaultVertexLabelGroup  = new LabelGroup(
-        GradoopConstants.DEFAULT_VERTEX_LABEL, Grouping.DEFAULT_VERTEX_LABEL_GROUP);
+        Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
       this.defaultEdgeLabelGroup    = new LabelGroup(
-        GradoopConstants.DEFAULT_EDGE_LABEL, Grouping.DEFAULT_EDGE_LABEL_GROUP);
+        Grouping.DEFAULT_EDGE_LABEL_GROUP, GradoopConstants.DEFAULT_EDGE_LABEL);
 
       vertexLabelGroups.add(defaultVertexLabelGroup);
       edgeLabelGroups.add(defaultEdgeLabelGroup);
@@ -473,7 +473,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label, String superVertexLabel,
+      String label,
+      String superVertexLabel,
       List<String> groupingKeys) {
       return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
     }
@@ -489,7 +490,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label, String superVertexLabel,
+      String label,
+      String superVertexLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
@@ -531,12 +533,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param superEdgeLabel label of the group and therefore of the new super edge
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label, String superEdgeLabel,
+      String label,
+      String superEdgeLabel,
       List<String> groupingKeys) {
       return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
     }
@@ -546,13 +549,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super vertex
+     * @param superEdgeLabel label of the group and therefore of the new super edge
      * @param groupingKeys keys used for grouping
      * @param aggregators edge aggregators
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label, String superEdgeLabel,
+      String label,
+      String superEdgeLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));

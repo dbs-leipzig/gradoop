@@ -1403,7 +1403,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("UserGender", "User", Lists.newArrayList("gender"))
+      .addVertexLabelGroup("User", "UserGender", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1588,7 +1588,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"),
         Lists.newArrayList(new CountAggregator("count"), new MaxAggregator("age", "max")))
-      .addVertexLabelGroup("UserAge", "User", Lists.newArrayList("age"),
+      .addVertexLabelGroup("User", "UserAge", Lists.newArrayList("age"),
         Lists.newArrayList(new CountAggregator("count"), new SumAggregator("age", "sum")))
       .addVertexAggregator(new CountAggregator("count"))
       .setStrategy(getStrategy())
@@ -1646,7 +1646,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knowsSince", "knows", Lists.newArrayList("since"))
+      .addEdgeLabelGroup("knows", "knowsSince", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1792,7 +1792,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumAggregator("since", "sum")))
-      .addEdgeLabelGroup("knowsMax", "knows", Lists.newArrayList(),
+      .addEdgeLabelGroup("knows", "knowsMax", Lists.newArrayList(),
         Lists.newArrayList(new MaxAggregator("since", "max")))
       .addEdgeLabelGroup("member", Lists.newArrayList("until"),
         Lists.newArrayList(new MinAggregator("until", "min")))
