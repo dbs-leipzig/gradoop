@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
- * Base class for drill up transformations.
+ * Base class for drill up / drill down transformations.
  *
  * @param <EL> element
  */

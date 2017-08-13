@@ -435,6 +435,170 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   LogicalGraph drillUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
+  /**
+   * Applies a drill-down operation on a single vertex property of the input graph. The property
+   * is identified by the specified property key. The detailed version of the property value has
+   * to be stored at the vertex as a result from a previous drill-up operation.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownVertex(String propertyKey);
+
+  /**
+   * Applies a given drill-down operation on a single vertex property of the input graph. The
+   * vertices are selected by their label and the property is identified by the specified
+   * property key. The detailed version of the property value has to be stored at the vertex as a
+   * result from a previous drill-up operation. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param vertexLabel vertex label
+   * @param propertyKey property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownVertex(String vertexLabel, String propertyKey);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single vertex property of the input
+   * graph. The property is identified by the specified property key. The previous version of the
+   * property value is overwritten. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @param function roll up function
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownVertex(String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single vertex property of the input
+   * graph. The vertices are selected by their label and the property is identified by the
+   * specified property key. The previous version of the property value is overwritten. The
+   * structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param vertexLabel vertex label
+   * @param propertyKey property key
+   * @param function roll up function
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownVertex(String vertexLabel, String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single vertex property of the input
+   * graph. The vertices are selected by their label and the property is identified by the
+   * specified property key. The new version of the property value is stored at the vertex
+   * under the new property key while the old one is removed. The structure of the graph remains
+   * unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param vertexLabel vertex label
+   * @param propertyKey property key
+   * @param function roll up function
+   * @param newPropertyKey new property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
+
+  /**
+   * Applies a drill-down operation on a single edge property of the input graph. The property
+   * is identified by the specified property key. The detailed version of the property value has
+   * to be stored at the edge as a result from a previous drill-up operation.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownEdge(String propertyKey);
+
+  /**
+   * Applies a given drill-down operation on a single edge property of the input graph. The
+   * edges are selected by their label and the property is identified by the specified
+   * property key. The detailed version of the property value has to be stored at the edge as a
+   * result from a previous drill-up operation. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param edgeLabel edge label
+   * @param propertyKey property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownEdge(String edgeLabel, String propertyKey);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single edge property of the input
+   * graph. The property is identified by the specified property key. The previous version of the
+   * property value is overwritten. The structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param propertyKey property key
+   * @param function roll up function
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownEdge(String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single edge property of the input
+   * graph. The edges are selected by their label and the property is identified by the
+   * specified property key. The previous version of the property value is overwritten. The
+   * structure of the graph remains unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param edgeLabel edge label
+   * @param propertyKey property key
+   * @param function roll up function
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function);
+
+  /**
+   * Applies a given drill-down (transformation) function on a single edge property of the input
+   * graph. The edges are selected by their label and the property is identified by the
+   * specified property key. The new version of the property value is stored at the edge
+   * under the new property key while the old one is removed. The structure of the graph remains
+   * unchanged.
+   *
+   * This is a convenience function for
+   * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
+   * pre-processor for {@link LogicalGraph#groupBy(List)} which performs the structural aggregation.
+   *
+   * @param edgeLabel edge label
+   * @param propertyKey property key
+   * @param function roll up function
+   * @param newPropertyKey new property key
+   * @return graph with rolled up properties
+   */
+  LogicalGraph drillDownEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
+
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------

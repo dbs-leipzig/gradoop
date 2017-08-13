@@ -458,6 +458,128 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     return callForGraph(builder.buildDrillUp());
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(String propertyKey) {
+    return drillDownVertex(null, propertyKey, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(String vertexLabel, String propertyKey) {
+    return drillDownVertex(vertexLabel, propertyKey, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(String propertyKey, DrillFunction function) {
+    return drillDownVertex(null, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
+    return drillDownVertex(vertexLabel, propertyKey, function, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillVertex(true);
+
+    if (vertexLabel != null) {
+      builder.setLabel(vertexLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+    if (function != null) {
+      builder.setFunction(function);
+    }
+
+    return callForGraph(builder.buildDrillDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String propertyKey) {
+    return drillDownEdge(null, propertyKey, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey) {
+    return drillDownEdge(edgeLabel, propertyKey, null);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String propertyKey, DrillFunction function) {
+    return drillDownEdge(null, propertyKey, function);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return drillDownEdge(edgeLabel, propertyKey, function, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph drillDownEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
+
+    Objects.requireNonNull(propertyKey, "missing property key");
+
+    Drill.DrillBuilder builder = new Drill.DrillBuilder();
+
+    builder.setPropertyKey(propertyKey);
+    builder.setFunction(function);
+    builder.drillEdge(true);
+
+    if (edgeLabel != null) {
+      builder.setLabel(edgeLabel);
+    }
+    if (newPropertyKey != null) {
+      builder.setNewPropertyKey(newPropertyKey);
+    }
+    if (function != null) {
+      builder.setFunction(function);
+    }
+
+    return callForGraph(builder.buildDrillDown());
+  }
+
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------

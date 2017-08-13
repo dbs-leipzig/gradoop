@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.io.Serializable;
 
 /**
- * Interface for all drill functions which are used for drill up operations.
+ * Interface for all drill functions which are used for drill down / drill up operations.
  */
 public interface DrillFunction extends Serializable {
 
