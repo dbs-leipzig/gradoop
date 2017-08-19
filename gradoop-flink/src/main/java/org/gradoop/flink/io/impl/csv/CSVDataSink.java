@@ -26,6 +26,7 @@ import org.gradoop.flink.io.impl.csv.functions.EdgeToCSVEdge;
 import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
+import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
@@ -86,7 +87,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
     if (!reuseMetadata()) {
       metaData = createMetaData(logicalGraph);
     } else {
-      metaData = readMetaData(metaDataPath);
+      metaData = MetaData.fromFile(metaDataPath, getConfig());
     }
 
     DataSet<CSVVertex> csvVertices = logicalGraph.getVertices()

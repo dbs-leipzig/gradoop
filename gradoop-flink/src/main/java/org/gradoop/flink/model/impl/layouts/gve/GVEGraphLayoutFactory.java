@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.layouts.gve;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Responsible for creating a {@link GVELayout} from given data.
@@ -45,12 +47,11 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGrap
   public GVELayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges) {
     Objects.requireNonNull(vertices, "Vertex DataSet was null");
     Objects.requireNonNull(edges, "Edge DataSet was null");
-    Objects.requireNonNull(config, "Config was null");
-    GraphHead graphHead = config
+    GraphHead graphHead = getConfig()
       .getGraphHeadFactory()
       .createGraphHead();
 
-    DataSet<GraphHead> graphHeadSet = config.getExecutionEnvironment()
+    DataSet<GraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
@@ -71,6 +72,33 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGrap
   }
 
   @Override
+  public LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges) {
+    GraphHead graphHead = getConfig()
+      .getGraphHeadFactory()
+      .createGraphHead();
+
+    DataSet<GraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
+      .fromElements(graphHead);
+
+    Map<String, DataSet<GraphHead>> graphHeads = Maps.newHashMap();
+    graphHeads.put(graphHead.getLabel(), graphHeadSet);
+
+    // update vertices and edges with new graph head id
+    vertices = vertices.entrySet().stream()
+      .collect(Collectors.toMap(
+        Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
+          .withForwardedFields("id;label;properties")));
+
+    edges = edges.entrySet().stream()
+      .collect(Collectors.toMap(
+        Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
+          .withForwardedFields("id;sourceId;targetId;label;properties")));
+
+    return create(graphHeads, vertices, edges);
+  }
+
+  @Override
   public LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     return create(graphHeads, vertices, edges);
@@ -79,19 +107,18 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGrap
   @Override
   public LogicalGraphLayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
     Collection<Edge> edges) {
+
+    Objects.requireNonNull(vertices, "Vertex collection was null");
+
     List<GraphHead> graphHeads;
     if (graphHead == null) {
       graphHeads = Lists.newArrayListWithCapacity(0);
     } else {
       graphHeads = Lists.newArrayList(graphHead);
     }
-
     if (edges == null) {
       edges = Lists.newArrayListWithCapacity(0);
     }
-
-    Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(config, "Config was null");
 
     return fromDataSets(
       createGraphHeadDataSet(graphHeads),
@@ -103,9 +130,8 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGrap
   public LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
     Objects.requireNonNull(vertices, "Vertex collection was null");
     Objects.requireNonNull(edges, "Edge collection was null");
-    Objects.requireNonNull(config, "Config was null");
 
-    GraphHead graphHead = config.getGraphHeadFactory().createGraphHead();
+    GraphHead graphHead = getConfig().getGraphHeadFactory().createGraphHead();
 
     DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices)
       .map(new AddToGraph<>(graphHead))

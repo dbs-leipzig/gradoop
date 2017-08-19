@@ -42,7 +42,6 @@ abstract class GVEBaseFactory extends BaseFactory {
     Objects.requireNonNull(graphHeads, "GraphHead DataSet was null");
     Objects.requireNonNull(vertices, "Vertex DataSet was null");
     Objects.requireNonNull(edges, "Edge DataSet was null");
-    Objects.requireNonNull(config, "Config was null");
     return new GVELayout(graphHeads, vertices, edges);
   }
 
