@@ -173,6 +173,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  public GraphCollection cypher(String query) {
+    return cypher(query, new GraphStatistics(1, 1, 1, 1));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
     return cypher(query, true,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);

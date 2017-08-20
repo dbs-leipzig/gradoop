@@ -52,6 +52,20 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
    *
+   * Note, that this method used no statistics about the data graph which may result in bad
+   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
+   * provide statistics for the query planner.
+   *
+   * @param query Cypher query
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection cypher(String query);
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
    * @param query Cypher query
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
