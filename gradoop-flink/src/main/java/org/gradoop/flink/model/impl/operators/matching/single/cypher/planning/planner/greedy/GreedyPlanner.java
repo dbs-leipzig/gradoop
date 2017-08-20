@@ -17,6 +17,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.p
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -163,7 +165,11 @@ public class GreedyPlanner {
       CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
       Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
-      FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(graph.getVertices(),
+      DataSet<org.gradoop.common.model.impl.pojo.Vertex> vertices =
+        vertex.getLabel().equals(GradoopConstants.DEFAULT_VERTEX_LABEL) ?
+          graph.getVertices() : graph.getVerticesByLabel(vertex.getLabel());
+
+      FilterAndProjectVerticesNode node = new FilterAndProjectVerticesNode(vertices,
         vertex.getVariable(), vertexPredicates, projectionKeys);
 
       planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
@@ -191,7 +197,11 @@ public class GreedyPlanner {
 
       boolean isPath = edge.getUpperBound() != 1;
 
-      FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(graph.getEdges(),
+      DataSet<org.gradoop.common.model.impl.pojo.Edge> edges =
+        edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
+          graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
+
+      FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(edges,
         sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
 
       PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
