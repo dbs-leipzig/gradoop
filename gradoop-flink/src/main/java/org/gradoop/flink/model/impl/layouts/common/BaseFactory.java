@@ -36,12 +36,16 @@ public abstract class BaseFactory implements BaseLayoutFactory {
   /**
    * Gradoop Flink config
    */
-  protected GradoopFlinkConfig config;
+  private GradoopFlinkConfig config;
 
   @Override
   public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
     Objects.requireNonNull(config);
     this.config = config;
+  }
+
+  protected GradoopFlinkConfig getConfig() {
+    return config;
   }
 
   /**
@@ -53,13 +57,13 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    */
   protected DataSet<GraphHead> createGraphHeadDataSet(Collection<GraphHead> graphHeads) {
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     DataSet<GraphHead> graphHeadSet;
     if (graphHeads.isEmpty()) {
-      graphHeadSet = config.getExecutionEnvironment()
-        .fromElements(config.getGraphHeadFactory().createGraphHead())
-        .filter(new False<GraphHead>());
+      graphHeadSet = env
+        .fromElements(getConfig().getGraphHeadFactory().createGraphHead())
+        .filter(new False<>());
     } else {
       graphHeadSet =  env.fromCollection(graphHeads);
     }
@@ -75,13 +79,13 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    */
   protected DataSet<Vertex> createVertexDataSet(Collection<Vertex> vertices) {
 
-    ExecutionEnvironment env = config.getExecutionEnvironment();
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     DataSet<Vertex> vertexSet;
     if (vertices.isEmpty()) {
-      vertexSet = config.getExecutionEnvironment()
-        .fromElements(config.getVertexFactory().createVertex())
-        .filter(new False<Vertex>());
+      vertexSet = env
+        .fromElements(getConfig().getVertexFactory().createVertex())
+        .filter(new False<>());
     } else {
       vertexSet = env.fromCollection(vertices);
     }
@@ -96,15 +100,16 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    * @return edge dataset
    */
   protected DataSet<Edge> createEdgeDataSet(Collection<Edge> edges) {
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     DataSet<Edge> edgeSet;
     if (edges.isEmpty()) {
       GradoopId dummyId = GradoopId.get();
-      edgeSet = config.getExecutionEnvironment()
-        .fromElements(config.getEdgeFactory().createEdge(dummyId, dummyId))
-        .filter(new False<Edge>());
+      edgeSet = env
+        .fromElements(getConfig().getEdgeFactory().createEdge(dummyId, dummyId))
+        .filter(new False<>());
     } else {
-      edgeSet = config.getExecutionEnvironment().fromCollection(edges);
+      edgeSet = env.fromCollection(edges);
     }
     return edgeSet;
   }

@@ -23,6 +23,7 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -97,6 +98,33 @@ public class LogicalGraphFactory {
   public LogicalGraph fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
+  }
+
+  /**
+   * Creates a logical graph from the given datasets. A new graph head is created and all vertices
+   * and edges are assigned to that graph head.
+   *
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return Logical graph
+   */
+  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges) {
+    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
+  }
+
+  /**
+   * Creates a logical graph from the given datasets. The method assumes, that all vertices and
+   * edges are already assigned to the specified graph head.
+   *
+   * @param graphHeads label indexed graph head dataset (1-element)
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return Logical graph
+   */
+  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges), config);
   }
 
   /**

@@ -15,9 +15,6 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -32,29 +29,25 @@ public abstract class CSVBase {
    */
   public static final String BC_METADATA = "metadata";
   /**
+   * File ending for CSV files.
+   */
+  private static final String CSV_FILE_SUFFIX = ".csv";
+  /**
    * CSV file for vertices.
    */
-  private static final String VERTEX_FILE = "vertices.csv";
+  private static final String VERTEX_FILE = "vertices" + CSV_FILE_SUFFIX;
   /**
    * CSV file for edges.
    */
-  private static final String EDGE_FILE = "edges.csv";
+  private static final String EDGE_FILE = "edges" + CSV_FILE_SUFFIX;
   /**
    * CSV file for meta data.
    */
-  private static final String METADATA_FILE = "metadata.csv";
+  private static final String METADATA_FILE = "metadata" + CSV_FILE_SUFFIX;
   /**
-   * Path to the vertex CSV file.
+   * Root directory containing the CSV and metadata files.
    */
-  private final String vertexCSVPath;
-  /**
-   * Path to the edge CSV file.
-   */
-  private final String edgeCSVPath;
-  /**
-   * Path to the meta data CSV file.
-   */
-  private final String metaDataPath;
+  private final String csvRoot;
   /**
    * Gradoop Flink configuration
    */
@@ -66,44 +59,48 @@ public abstract class CSVBase {
    * @param csvPath directory to the CSV files
    * @param config Gradoop Flink configuration
    */
-  CSVBase(String csvPath, GradoopFlinkConfig config) {
+  protected CSVBase(String csvPath, GradoopFlinkConfig config) {
     Objects.requireNonNull(csvPath);
     Objects.requireNonNull(config);
-    this.vertexCSVPath = csvPath + File.separator + VERTEX_FILE;
-    this.edgeCSVPath = csvPath + File.separator + EDGE_FILE;
-    this.metaDataPath = csvPath + File.separator + METADATA_FILE;
+    this.csvRoot = csvPath.endsWith(File.separator) ? csvPath : csvPath + File.separator;
     this.config = config;
   }
 
-  String getVertexCSVPath() {
-    return vertexCSVPath;
-  }
-
-  String getEdgeCSVPath() {
-    return edgeCSVPath;
-  }
-
-  String getMetaDataPath() {
-    return metaDataPath;
-  }
-
-  GradoopFlinkConfig getConfig() {
-    return config;
+  protected String getVertexCSVPath() {
+    return csvRoot + VERTEX_FILE;
   }
 
   /**
-   * Reads the meta data from the specified file.
+   * Returns the path to the vertex file containing only vertices with the specified label.
    *
-   * @param path path to meta data csv file
-   * @return meta data information
+   * @param label vertex label
+   * @return path to csv file
    */
-  DataSet<Tuple2<String, String>> readMetaData(String path) {
-    return getConfig().getExecutionEnvironment()
-      .readTextFile(path)
-      .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
-          return Tuple2.of(tokens[0], tokens[1]);
-        })
-      .returns(new TypeHint<Tuple2<String, String>>() { });
+  protected String getVertexCSVPath(String label) {
+    Objects.requireNonNull(label);
+    return csvRoot + label + CSV_FILE_SUFFIX;
+  }
+
+  protected String getEdgeCSVPath() {
+    return csvRoot + EDGE_FILE;
+  }
+
+  /**
+   * Returns the path to the edge file containing only edges with the specified label.
+   *
+   * @param label edge label
+   * @return path to csv file
+   */
+  protected String getEdgeCSVPath(String label) {
+    Objects.requireNonNull(label);
+    return csvRoot + label + CSV_FILE_SUFFIX;
+  }
+
+  protected String getMetaDataPath() {
+    return csvRoot + METADATA_FILE;
+  }
+
+  protected GradoopFlinkConfig getConfig() {
+    return config;
   }
 }

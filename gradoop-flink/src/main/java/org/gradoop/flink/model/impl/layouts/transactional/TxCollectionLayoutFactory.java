@@ -69,8 +69,8 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
     Objects.requireNonNull(inEdges);
 
     // Add a dummy graph head for entities which have no assigned graph
-    DataSet<GraphHead> dbGraphHead = config.getExecutionEnvironment().fromElements(
-      config.getGraphHeadFactory()
+    DataSet<GraphHead> dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
+      getConfig().getGraphHeadFactory()
         .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
     );
     inGraphHeads = inGraphHeads.union(dbGraphHead);
@@ -158,13 +158,12 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
    */
   private DataSet<GraphTransaction> createGraphTransactionDataSet(
     Collection<GraphTransaction> transactions) {
-    ExecutionEnvironment env = config.getExecutionEnvironment();
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     DataSet<GraphTransaction> graphTransactionSet;
     if (transactions.isEmpty()) {
-      graphTransactionSet = config.getExecutionEnvironment()
-        .fromCollection(Lists.newArrayList(new GraphTransaction()),
-          new TypeHint<GraphTransaction>() { }.getTypeInfo())
+      graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()),
+        new TypeHint<GraphTransaction>() { }.getTypeInfo())
         .filter(new False<>());
     } else {
       graphTransactionSet = env.fromCollection(transactions);

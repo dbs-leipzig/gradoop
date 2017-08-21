@@ -20,14 +20,23 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.functions.CSVEdgeToEdge;
+import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
+import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A graph data source for CSV files.
+ *
+ * The datasource expects files separated by vertices and edges, e.g. in the following directory
+ * structure:
+ *
+ * csvRoot
+ *   |- vertices.csv # all vertex data
+ *   |- edges.csv    # all edge data
+ *   |- metadata.csv # Meta data for all data contained in the graph
  */
 public class CSVDataSource extends CSVBase implements DataSource {
 
@@ -43,7 +52,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    DataSet<Tuple2<String, String>> metaData = readMetaData(getMetaDataPath());
+    DataSet<Tuple2<String, String>> metaData = MetaData.fromFile(getMetaDataPath(), getConfig());
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
@@ -52,7 +61,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
     DataSet<Edge> edges = getConfig().getExecutionEnvironment()
       .readTextFile(getEdgeCSVPath())
-      .map(new CSVEdgeToEdge(getConfig().getEdgeFactory()))
+      .map(new CSVLineToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     return getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);

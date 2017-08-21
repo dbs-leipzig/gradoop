@@ -31,7 +31,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * Creates a logical graph layout from the given vertex dataset.
    *
    * @param vertices  Vertex dataset
-   * @return Logical graph
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices);
 
@@ -43,7 +43,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    *
    * @param vertices Vertex DataSet
    * @param edges    Edge DataSet
-   * @return Logical graph
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges);
 
@@ -56,7 +56,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param graphHead   1-element GraphHead DataSet
    * @param vertices    Vertex DataSet
    * @param edges       Edge DataSet
-   * @return Logical graph
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
     DataSet<Edge> edges);
@@ -64,13 +64,23 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
   /**
    * Creates a graph layout from the given datasets indexed by label.
    *
+   * @param vertices Mapping from label to vertex dataset
+   * @param edges Mapping from label to edge dataset
+   * @return Logical graph layout
+   */
+  LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges);
+
+  /**
+   * Creates a graph layout from the given datasets indexed by label.
+   *
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
    *
-   * @param graphHeads Mapping from label to graph head dataset
+   * @param graphHeads 1-element Mapping from label to GraphHead DataSet
    * @param vertices Mapping from label to vertex dataset
    * @param edges Mapping from label to edge dataset
-   * @return Graph collection layout
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges);
@@ -84,7 +94,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param graphHead Graph head associated with the logical graph
    * @param vertices  Vertex collection
    * @param edges     Edge collection
-   * @return Logical graph
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
     Collection<Edge> edges);
@@ -95,7 +105,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    *
    * @param vertices    Vertex collection
    * @param edges       Edge collection
-   * @return Logical graph
+   * @return Logical graph layout
    */
   LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges);
 

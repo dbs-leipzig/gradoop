@@ -28,7 +28,7 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
  *
  * edge-id;source-id;target-id;edge-label;value_1|value_2|...|value_n
  */
-public class CSVEdgeToEdge extends CSVLineToElement<Edge> {
+public class CSVLineToEdge extends CSVLineToElement<Edge> {
   /**
    * Used to instantiate the edge.
    */
@@ -39,7 +39,7 @@ public class CSVEdgeToEdge extends CSVLineToElement<Edge> {
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-  public CSVEdgeToEdge(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public CSVLineToEdge(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 
