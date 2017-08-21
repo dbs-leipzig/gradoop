@@ -30,7 +30,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * A graph data source for CSV files.
  *
- * The datasource expects files separated by label, e.g. in the following directory structure:
+ * The datasource expects files separated by vertices and edges, e.g. in the following directory
+ * structure:
  *
  * csvRoot
  *   |- vertices.csv # all vertex data
