@@ -79,7 +79,7 @@ public class SNABenchmark1 extends AbstractRunner implements
   private static LogicalGraph execute(LogicalGraph socialNetwork) {
     return socialNetwork
       .subgraph(
-        vertex -> vertex.getLabel().equals("person"),
+        vertex -> vertex.getLabel().equals("Person"),
         edge -> edge.getLabel().equals("knows"))
       .groupBy(Arrays.asList("gender", "city"))
       .aggregate(new VertexCount())
