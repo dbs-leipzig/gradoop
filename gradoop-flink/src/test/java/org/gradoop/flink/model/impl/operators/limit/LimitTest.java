@@ -80,4 +80,18 @@ public class LimitTest extends GradoopFlinkTestBase {
 
     assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }
+
+  @Test
+  public void testDistinctGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("(v1) (v2) g1[(v1)] g2[(v1) (v2)]");
+
+    int limit = 2;
+
+    GraphCollection inputCollection = loader.getGraphCollectionByVariables("g1", "g2");
+
+    GraphCollection outputCollection = inputCollection.limit(limit);
+
+    assertEquals(limit, outputCollection.getGraphHeads().count());
+    assertEquals(2, outputCollection.getVertices().count());
+  }
 }

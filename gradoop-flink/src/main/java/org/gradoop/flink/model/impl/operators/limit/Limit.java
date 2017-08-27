@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 
 /**
  * Returns the first n (arbitrary) logical graphs from a collection.
@@ -53,14 +53,14 @@ public class Limit implements UnaryCollectionToCollectionOperator {
 
     DataSet<GraphHead> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<GradoopId> firstIds = graphHeads.map(new Id<GraphHead>());
+    DataSet<GradoopId> firstIds = graphHeads.map(new Id<>());
 
     DataSet<Vertex> filteredVertices = collection.getVertices()
-      .filter(new InAllGraphsBroadcast<Vertex>())
+      .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     DataSet<Edge> filteredEdges = collection.getEdges()
-      .filter(new InAllGraphsBroadcast<Edge>())
+      .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
     return collection.getConfig().getGraphCollectionFactory()
