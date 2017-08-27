@@ -36,7 +36,7 @@ public class SplitTest extends GradoopFlinkTestBase {
       valueList.add(v.getPropertyValue(key1));
     }
     if (v.hasProperty(key2)) {
-      valueList.add(v.getProperties().get(key2));
+      valueList.add(v.getPropertyValue(key2));
     }
     return valueList;
   }

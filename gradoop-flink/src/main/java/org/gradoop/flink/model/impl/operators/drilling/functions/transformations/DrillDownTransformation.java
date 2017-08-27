@@ -60,12 +60,11 @@ public class DrillDownTransformation<EL extends Element> extends DrillTransforma
             transformed.setProperty(getPropertyKey(),
               current.getPropertyValue(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i));
             // remove the property which is now one level above
-            transformed.getProperties().remove(
-              getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i);
+            transformed.removeProperty(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i);
           // drill was stored under a new label
           } else {
             if (current.hasProperty(getNewPropertyKey())) {
-              transformed.getProperties().remove(getPropertyKey());
+              transformed.removeProperty(getPropertyKey());
             }
           }
         // drill down has its own function
@@ -82,7 +81,7 @@ public class DrillDownTransformation<EL extends Element> extends DrillTransforma
             transformed.setProperty(
               getNewPropertyKey(),
               getFunction().execute(current.getPropertyValue(getPropertyKey())));
-            transformed.getProperties().remove(getPropertyKey());
+            transformed.removeProperty(getPropertyKey());
           }
         }
       }

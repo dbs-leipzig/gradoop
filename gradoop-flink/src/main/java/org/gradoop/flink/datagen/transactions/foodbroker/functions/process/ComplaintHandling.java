@@ -485,25 +485,27 @@ public class ComplaintHandling extends AbstractProcess
       return masterDataMap.get(employeeId);
     } else {
       //create properties
-      Properties properties;
       Vertex employee = getEmployeeById(employeeId);
-      properties = employee.getProperties();
-      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Constants.EMPLOYEE_ACRONYM, Constants.USER_ACRONYM);
-      sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
-      String email = properties.get(Constants.NAME_KEY).getString();
-      email = email.replace(" ", ".").toLowerCase();
-      email += "@biiig.org";
-      properties.set(Constants.EMAIL_KEY, email);
-      //create the vertex and store it in a map for fast access
-      Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
-      masterDataMap.put(employeeId, user);
-      userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
+      if (employee != null && employee.getProperties() != null) {
+        Properties properties = employee.getProperties();
+        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+        sourceIdKey = sourceIdKey.replace(Constants.EMPLOYEE_ACRONYM, Constants.USER_ACRONYM);
+        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
+        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
+        properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
+        String email = properties.get(Constants.NAME_KEY).getString();
+        email = email.replace(" ", ".").toLowerCase();
+        email += "@biiig.org";
+        properties.set(Constants.EMAIL_KEY, email);
+        //create the vertex and store it in a map for fast access
+        Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
+        masterDataMap.put(employeeId, user);
+        userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
 
-      newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
-      return user;
+        newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
+        return user;
+      }
+      throw new IllegalArgumentException("No employee for id: " + employeeId);
     }
   }
 
@@ -519,23 +521,25 @@ public class ComplaintHandling extends AbstractProcess
       return masterDataMap.get(customerId);
     } else {
       //create properties
-      Properties properties;
       Vertex customer = getCustomerById(customerId);
-      properties = customer.getProperties();
-      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Constants.CUSTOMER_ACRONYM, Constants.CLIENT_ACRONYM);
-      sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
-      properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
-      properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
-      //create the vertex and store it in a map for fast access
-      Vertex client = vertexFactory.createVertex(
-        Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
-      masterDataMap.put(customerId, client);
+      if (customer != null && customer.getProperties() != null) {
+        Properties properties = customer.getProperties();
+        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+        sourceIdKey = sourceIdKey.replace(Constants.CUSTOMER_ACRONYM, Constants.CLIENT_ACRONYM);
+        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
+        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
+        properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
+        properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
+        properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
+        //create the vertex and store it in a map for fast access
+        Vertex client = vertexFactory.createVertex(
+          Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
+        masterDataMap.put(customerId, client);
 
-      newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
-      return client;
+        newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
+        return client;
+      }
+      throw new IllegalArgumentException("No customer for id: " + customerId);
     }
   }
 

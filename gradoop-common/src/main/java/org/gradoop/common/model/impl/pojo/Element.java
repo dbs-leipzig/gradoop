@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
+import javax.annotation.Nullable;
+
 /**
  * Abstract base class for graphs, vertices and edges.
  */
@@ -98,6 +100,7 @@ public abstract class Element implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
+  @Nullable
   public Properties getProperties() {
     return properties;
   }
@@ -115,6 +118,7 @@ public abstract class Element implements EPGMElement {
    */
   @Override
   public PropertyValue getPropertyValue(String key) {
+    // TODO: return PropertyValue.NULL_VALUE instead?
     return (properties != null) ? properties.get(key) : null;
   }
 
@@ -154,6 +158,14 @@ public abstract class Element implements EPGMElement {
     this.properties.set(key, value);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PropertyValue removeProperty(String key) {
+    return this.properties != null ? properties.remove(key) : null;
+  }
+
   @Override
   public int getPropertyCount() {
     return (this.properties != null) ? this.properties.size() : 0;
@@ -164,7 +176,7 @@ public abstract class Element implements EPGMElement {
    */
   @Override
   public boolean hasProperty(String key) {
-    return getProperties() != null && getProperties().containsKey(key);
+    return this.properties != null && this.properties.containsKey(key);
   }
 
   /**

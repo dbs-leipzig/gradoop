@@ -26,8 +26,7 @@ import org.gradoop.common.model.impl.properties.Property;
  *
  * @param <T> entity type
  */
-public abstract class HBaseElement<T extends EPGMElement>
-  implements EPGMElement {
+public abstract class HBaseElement<T extends EPGMElement> implements EPGMElement {
 
   /**
    * Encapsulated EPGM element.
@@ -97,6 +96,14 @@ public abstract class HBaseElement<T extends EPGMElement>
   @Override
   public void setProperty(String key, Object value) {
     epgmElement.setProperty(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PropertyValue removeProperty(String key) {
+    return epgmElement.removeProperty(key);
   }
 
   /**
