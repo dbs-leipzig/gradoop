@@ -168,7 +168,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
 
     FilterFunction<Vertex> vertexFilterFunction = v -> {
-      PropertyValue city = v.getProperties().get("city");
+      PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };
 
@@ -223,7 +223,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
 
     FilterFunction<Vertex> vertexFilterFunction = v -> {
-      PropertyValue city = v.getProperties().get("city");
+      PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };
 

@@ -61,9 +61,9 @@ public class AddMatchesToProperties
     GraphHead graphHead = heads.iterator().next();
     Iterator<Tuple2<GradoopId, Boolean>> it = matches.iterator();
     if (!it.hasNext()) {
-      graphHead.getProperties().set(propertyKey, false);
+      graphHead.setProperty(propertyKey, false);
     } else {
-      graphHead.getProperties().set(propertyKey, it.next().f1);
+      graphHead.setProperty(propertyKey, it.next().f1);
     }
     collector.collect(graphHead);
   }

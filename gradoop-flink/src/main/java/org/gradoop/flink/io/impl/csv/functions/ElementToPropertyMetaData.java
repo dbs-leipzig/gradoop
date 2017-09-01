@@ -48,8 +48,10 @@ public class ElementToPropertyMetaData<E extends Element> implements MapFunction
   public Tuple2<String, Set<String>> map(E e) throws Exception {
     reuseTuple.f0 = e.getLabel();
     reuseTuple.f1.clear();
-    for (Property property : e.getProperties()) {
-      reuseTuple.f1.add(MetaDataParser.getPropertyMetaData(property));
+    if (e.getProperties() != null) {
+      for (Property property : e.getProperties()) {
+        reuseTuple.f1.add(MetaDataParser.getPropertyMetaData(property));
+      }
     }
     return reuseTuple;
   }

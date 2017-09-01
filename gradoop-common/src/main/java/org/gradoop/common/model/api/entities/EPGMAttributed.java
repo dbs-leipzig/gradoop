@@ -19,6 +19,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.Property;
 
+import javax.annotation.Nullable;
+
 /**
  * Used to describe entities that can have properties.
  */
@@ -29,7 +31,7 @@ public interface EPGMAttributed {
    *
    * @return properties
    */
-  Properties getProperties();
+  @Nullable Properties getProperties();
 
   /**
    * Returns all property keys of that entity or {@code null} it that entity has
@@ -84,6 +86,14 @@ public interface EPGMAttributed {
    * @param value property value
    */
   void setProperty(String key, Object value);
+
+  /**
+   * Removes the properties associated with the given key.
+   *
+   * @param key property key
+   * @return associated property value or {@code null} if the key was not found
+   */
+  PropertyValue removeProperty(String key);
 
   /**
    * Returns the number of properties stored at that entity.

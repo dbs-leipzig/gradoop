@@ -52,12 +52,14 @@ public class ExtractPropertyValuesByLabel<T extends GraphElement>
   public void flatMap(T value, Collector<Tuple2<Tuple2<String, String>, Set<PropertyValue>>> out)
       throws Exception {
 
-    for (Property property : value.getProperties()) {
-      reuseTuple.f0.f0 = value.getLabel();
-      reuseTuple.f0.f1 = property.getKey();
-      reuseTuple.f1 = Sets.newHashSet(property.getValue());
+    if (value.getProperties() != null) {
+      for (Property property : value.getProperties()) {
+        reuseTuple.f0.f0 = value.getLabel();
+        reuseTuple.f0.f1 = property.getKey();
+        reuseTuple.f1 = Sets.newHashSet(property.getValue());
 
-      out.collect(reuseTuple);
+        out.collect(reuseTuple);
+      }
     }
   }
 }

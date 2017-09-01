@@ -47,11 +47,13 @@ public class ExtractPropertyValues<T extends GraphElement>
 
   @Override
   public void flatMap(T value, Collector<Tuple2<String, Set<PropertyValue>>> out) throws Exception {
-    for (Property property : value.getProperties()) {
-      reuseTuple.f0 = property.getKey();
-      reuseTuple.f1 = Sets.newHashSet(property.getValue());
+    if (value.getProperties() != null) {
+      for (Property property : value.getProperties()) {
+        reuseTuple.f0 = property.getKey();
+        reuseTuple.f1 = Sets.newHashSet(property.getValue());
 
-      out.collect(reuseTuple);
+        out.collect(reuseTuple);
+      }
     }
   }
 }

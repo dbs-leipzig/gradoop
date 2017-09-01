@@ -144,7 +144,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
       int dCount = 0;
       int eCount = 0;
       for(GraphHead head : resultHeads) {
-        GradoopId id = head.getProperties().get("lineage").getGradoopId();
+        GradoopId id = head.getPropertyValue("lineage").getGradoopId();
         if (lineageIdMap.get(id).equals("A")) {
           aCount++;
         }
