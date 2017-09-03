@@ -1,3 +1,12 @@
+cache:
+  directories:
+  - $HOME/.m2
+
+before_cache:
+  - rm -rf $HOME/.m2/repository/org/gradoop/
+
+install: true
+
 language: java
+
 jdk: oraclejdk8
-script: "mvn verify"
