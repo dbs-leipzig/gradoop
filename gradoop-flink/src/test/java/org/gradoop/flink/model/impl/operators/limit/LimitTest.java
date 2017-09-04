@@ -19,11 +19,23 @@ import org.apache.flink.api.common.InvalidProgramException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.jamon.annotations.Template;
 import org.junit.Test;
+import org.s1ck.gdl.model.Graph;
 
 import static org.junit.Assert.assertEquals;
 
 public class LimitTest extends GradoopFlinkTestBase {
+
+  @Test
+  public void testSameCollection() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    int limit = 2;
+
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1");
+    collectAndAssertTrue(input.equalsByGraphElementData(input.limit(limit)));
+  }
 
   @Test
   public void testInBound() throws Exception {
@@ -31,12 +43,9 @@ public class LimitTest extends GradoopFlinkTestBase {
 
     int limit = 2;
 
-    GraphCollection inputCollection = loader
-      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+    GraphCollection inputCollection = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
-    GraphCollection outputCollection =
-      inputCollection.limit(limit);
-
+    GraphCollection outputCollection = inputCollection.limit(limit);
     assertEquals(limit, outputCollection.getGraphHeads().count());
   }
 
@@ -44,15 +53,13 @@ public class LimitTest extends GradoopFlinkTestBase {
   public void testOutOfBound() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection inputCollection = loader
-      .getGraphCollectionByVariables("g0", "g1");
+    GraphCollection inputCollection = loader.getGraphCollectionByVariables("g0", "g1");
 
     int limit = 4;
-    int expectedLimit = 2;
+    int expectedCount = 2;
 
     GraphCollection outputCollection = inputCollection.limit(limit);
-
-    assertEquals(expectedLimit, outputCollection.getGraphHeads().count());
+    assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }
 
   @Test
@@ -64,7 +71,6 @@ public class LimitTest extends GradoopFlinkTestBase {
     int expectedCount = 0;
 
     GraphCollection outputCollection = inputCollection.limit(limit);
-
     assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }
 
@@ -77,7 +83,6 @@ public class LimitTest extends GradoopFlinkTestBase {
     int expectedCount = 0;
 
     GraphCollection outputCollection = inputCollection.limit(limit);
-
     assertEquals(expectedCount, outputCollection.getGraphHeads().count());
   }
 
@@ -88,10 +93,6 @@ public class LimitTest extends GradoopFlinkTestBase {
     int limit = 2;
 
     GraphCollection inputCollection = loader.getGraphCollectionByVariables("g1", "g2");
-
-    GraphCollection outputCollection = inputCollection.limit(limit);
-
-    assertEquals(limit, outputCollection.getGraphHeads().count());
-    assertEquals(2, outputCollection.getVertices().count());
+    collectAndAssertTrue(inputCollection.equalsByGraphElementData(inputCollection.limit(limit)));
   }
 }
