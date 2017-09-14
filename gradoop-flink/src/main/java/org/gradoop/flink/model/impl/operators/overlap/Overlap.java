@@ -16,16 +16,19 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Computes the overlap graph from two logical graphs.
  */
-public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
+public class Overlap implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
@@ -40,13 +43,23 @@ public class Overlap extends OverlapBase implements BinaryGraphToGraphOperator {
   public LogicalGraph execute(
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
-    DataSet<GradoopId> graphIds = firstGraph.getGraphHead()
-      .map(new Id<GraphHead>())
-      .union(secondGraph.getGraphHead().map(new Id<GraphHead>()));
+    DataSet<Vertex> newVertices = firstGraph.getVertices()
+      .join(secondGraph.getVertices())
+      .where(new Id<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(
-      getVertices(firstGraph.getVertices(), graphIds),
-      getEdges(firstGraph.getEdges(), graphIds));
+    DataSet<Edge> newEdges = firstGraph.getEdges()
+      .join(newVertices)
+      .where(new SourceId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
+      .join(newVertices)
+      .where(new TargetId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
+
+    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
   /**
