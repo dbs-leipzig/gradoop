@@ -69,6 +69,20 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
   }
 
   @Test
+  public void testDerivedOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true, y: true}), (b {x: true, y: false})]");
+
+    LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
+    LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
+    LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("y").getBoolean());
+
+    loader.appendToDatabaseFromString("expected[(a),(b)]");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(derivedGraph1.combine(derivedGraph2).equalsByElementIds(expected));
+  }
+
+  @Test
   public void testNonOverlappingGraphs() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -91,6 +105,20 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       expected.equalsByElementIds(g0.combine(g1)).collect().get(0));
     assertTrue("combining switched non overlapping graphs failed",
       expected.equalsByElementIds(g1.combine(g0)).collect().get(0));
+  }
+
+  @Test
+  public void testDerivedNonOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true}), (b {x: false})]");
+
+    LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
+    LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
+    LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("x").getBoolean());
+
+    loader.appendToDatabaseFromString("expected[(a),(b)]");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(derivedGraph1.combine(derivedGraph2).equalsByElementIds(expected));
   }
 
   @Test
