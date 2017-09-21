@@ -41,7 +41,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.exclusion.functions.LeftWhenRightIsNull;
+import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 
 /**
  * Computes the exclusion graph from two logical graphs.

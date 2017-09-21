@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.gradoop.flink.model.impl.functions.utils;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.util.Collector;
+
 /**
- * Contains all user defined functions related to the graph exclusion
- * operator implementations.
+ * Returns the left side if the right side is null.
+ *
+ * @param <E> an object type
  */
-package org.gradoop.flink.model.impl.operators.exclusion.functions;
+public class LeftWhenRightIsNull<E> implements FlatJoinFunction<E, E, E> {
+
+  @Override
+  public void join(E left, E right, Collector<E> collector) {
+    if (left != null && right == null) {
+      collector.collect(left);
+    }
+  }
+}
