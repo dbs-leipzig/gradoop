@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.labelpropagation;
+package org.gradoop.flink.algorithms.gelly.labelpropagation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.flink.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
-import org.gradoop.flink.algorithms.labelpropagation.functions.LPVertexJoin;
-import org.gradoop.flink.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.EdgeToGellyEdgeMapper;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.LPVertexJoin;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.VertexToGellyVertexMapper;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;

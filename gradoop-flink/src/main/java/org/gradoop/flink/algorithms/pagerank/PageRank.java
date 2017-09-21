@@ -18,8 +18,8 @@ package org.gradoop.flink.algorithms.pagerank;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
-import org.gradoop.flink.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.EdgeToGellyEdgeMapper;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.VertexToGellyVertexMapper;
 import org.gradoop.flink.algorithms.pagerank.functions.PageRankToAttribute;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
@@ -60,6 +60,21 @@ public class PageRank implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
+    try {
+      return executeInternal(graph);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Wrapping the {@link PageRank#execute(LogicalGraph)} functionality to handle exceptions.
+   *
+   * @param graph      The input graph.
+   * @return           The output graph.
+   * @throws Exception unhandled Exception from Gelly.
+   */
+  private LogicalGraph executeInternal(LogicalGraph graph) throws Exception {
     Graph gellyGraph = Graph.fromDataSet(
       graph.getVertices().map(new VertexToGellyVertexMapper(propertyKey)),
       graph.getEdges().map(new EdgeToGellyEdgeMapper()),
@@ -70,7 +85,7 @@ public class PageRank implements UnaryGraphToGraphOperator {
       .join(graph.getVertices())
       .where(0)
       .equalTo(new Id<>())
-      .with(new PageRankToAttribute());
+      .with(new PageRankToAttribute(propertyKey));
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
   }
 

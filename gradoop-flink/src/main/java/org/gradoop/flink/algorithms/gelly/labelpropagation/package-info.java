@@ -16,4 +16,4 @@
 /**
  * Contains classes related to the Label Propagation algorithm.
  */
-package org.gradoop.flink.algorithms.labelpropagation;
+package org.gradoop.flink.algorithms.gelly.labelpropagation;
