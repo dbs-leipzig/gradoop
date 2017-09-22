@@ -65,6 +65,20 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
   }
 
   @Test
+  public void testDerivedOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true, y: true}),(b {x:true, y: false})]");
+
+    LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
+    LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
+    LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("y").getBoolean());
+
+    loader.appendToDatabaseFromString("expected[(a)]");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
+  }
+
+  @Test
   public void testNonOverlappingGraphs() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -75,6 +89,20 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
       g0.equalsByElementIds(g0.exclude(g1)).collect().get(0));
     assertTrue("excluding switched non overlapping graphs failed",
       g1.equalsByElementIds(g1.exclude(g0)).collect().get(0));
+  }
+
+  @Test
+  public void testDerivedNonOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true}),(b {x: false})]");
+
+    LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
+    LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
+    LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("x").getBoolean());
+
+    loader.appendToDatabaseFromString("expected[(a)]");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
   }
 
   @Test
