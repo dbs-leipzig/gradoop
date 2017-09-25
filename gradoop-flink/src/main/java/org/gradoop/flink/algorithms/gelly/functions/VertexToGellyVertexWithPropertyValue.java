@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.labelpropagation.functions;
+package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and the
- * label propagation value.
+ * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and a {@link PropertyValue}.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("properties")
-public class VertexToGellyVertexMapper implements
-  MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> {
+public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex<PropertyValue> {
   /**
    * Property key to access the label value which will be propagated
    */
@@ -45,7 +42,7 @@ public class VertexToGellyVertexMapper implements
    *
    * @param propertyKey property key for get property value
    */
-  public VertexToGellyVertexMapper(String propertyKey) {
+  public VertexToGellyVertexWithPropertyValue(String propertyKey) {
     this.propertyKey = propertyKey;
     this.reuseVertex = new org.apache.flink.graph.Vertex<>();
   }

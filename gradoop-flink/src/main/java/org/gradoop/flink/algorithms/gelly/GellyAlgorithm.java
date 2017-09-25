@@ -29,6 +29,11 @@ public abstract class GellyAlgorithm<E, F> implements UnaryGraphToGraphOperator 
   private final VertexToGellyVertex<E> toGellyVertex;
 
   /**
+   * The graph used in {@link GellyAlgorithm#execute(LogicalGraph)}.
+   */
+  protected LogicalGraph currentGraph;
+
+  /**
    * Base constructor, only setting the mapper functions.
    *
    * @param vertexValue Function mapping vertices from Gradoop to Gelly.
@@ -41,16 +46,17 @@ public abstract class GellyAlgorithm<E, F> implements UnaryGraphToGraphOperator 
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    return executeInternal(transformToGelly(graph));
+    currentGraph = graph;
+    return executeInGelly(transformToGelly(graph));
   }
 
   /**
-   * Transform the Gelly graph back to a Gradoop {@link LogicalGraph}.
+   * Perform some operation in Gelly and transform the Gelly graph back to a Gradoop {@link LogicalGraph}.
    *
    * @param graph The Gelly graph.
    * @return The Gradoop graph.
    */
-  protected abstract LogicalGraph executeInternal(Graph<GradoopId, E, F> graph);
+  protected abstract LogicalGraph executeInGelly(Graph<GradoopId, E, F> graph);
 
   /**
    * Default transformation from a Gradoop Graph to a Gelly Graph.
@@ -62,7 +68,6 @@ public abstract class GellyAlgorithm<E, F> implements UnaryGraphToGraphOperator 
     DataSet<Vertex<GradoopId, E>> gellyVertices = graph.getVertices().map(toGellyVertex);
     DataSet<Edge<GradoopId, F>> gellyEdges = graph.getEdges().map(toGellyEdge);
     return Graph.fromDataSet(gellyVertices, gellyEdges, graph.getConfig().getExecutionEnvironment());
-
   }
 
 }
