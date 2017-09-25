@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains functions related to the Page Rank algorithm.
+ * Contains implementations of algorithms in Flink Gelly.
  */
-package org.gradoop.flink.algorithms.pagerank.functions;
+package org.gradoop.flink.algorithms.gelly;

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains classes related to the Page Rank algorithm.
+ * Contains common functions used to map Gradoop to Gelly graphs.
  */
-package org.gradoop.flink.algorithms.pagerank;
+package org.gradoop.flink.algorithms.gelly.functions;

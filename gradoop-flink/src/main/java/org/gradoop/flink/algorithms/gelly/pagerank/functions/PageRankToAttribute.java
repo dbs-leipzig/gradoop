@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.pagerank.functions;
+package org.gradoop.flink.algorithms.gelly.pagerank.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.library.link_analysis.PageRank;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Stores the page rank result from the left as a Property in in the right.
  */
-public class PageRankToAttribute implements JoinFunction<PageRank.Result, Vertex, Vertex> {
+public class PageRankToAttribute implements JoinFunction<PageRank.Result<GradoopId>, Vertex, Vertex> {
 
   /**
    * Property to store the page rank in.
@@ -40,7 +41,7 @@ public class PageRankToAttribute implements JoinFunction<PageRank.Result, Vertex
   }
 
   @Override
-  public Vertex join(PageRank.Result result, Vertex vertex) throws Exception {
+  public Vertex join(PageRank.Result result, Vertex vertex) {
     vertex.setProperty(pageRankPropery, PropertyValue.create(result.getPageRankScore().getValue()));
     return vertex;
   }
