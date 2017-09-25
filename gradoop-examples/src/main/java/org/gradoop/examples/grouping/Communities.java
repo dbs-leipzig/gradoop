@@ -16,7 +16,7 @@
 package org.gradoop.examples.grouping;
 
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.labelpropagation.GellyLabelPropagation;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.GellyLabelPropagation;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
