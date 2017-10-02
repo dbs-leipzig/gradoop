@@ -31,6 +31,7 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenera
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
+import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -89,7 +90,10 @@ public class FoodBroker implements GraphCollectionGenerator {
 
   @Override
   public GraphCollection execute() {
-    return new GraphCollectionFactory(gradoopFlinkConfig)
+    GraphCollectionFactory graphCollectionFactory = new GraphCollectionFactory(gradoopFlinkConfig);
+    graphCollectionFactory.setLayoutFactory(new TxCollectionLayoutFactory());
+
+    return graphCollectionFactory
       .fromTransactions(getTransactions());
   }
 
