@@ -3,7 +3,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * Created by peet on 07.07.17.

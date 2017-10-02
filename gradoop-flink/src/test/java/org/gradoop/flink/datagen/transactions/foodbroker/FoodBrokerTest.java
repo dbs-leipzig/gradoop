@@ -25,10 +25,10 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 

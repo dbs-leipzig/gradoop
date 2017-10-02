@@ -28,10 +28,10 @@ import org.gradoop.flink.datagen.transactions.foodbroker.generators.EmployeeGene
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.LogisticsGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.ProductGenerator;
 import org.gradoop.flink.datagen.transactions.foodbroker.generators.VendorGenerator;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.operators.GraphCollectionGenerator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -89,9 +89,8 @@ public class FoodBroker implements GraphCollectionGenerator {
 
   @Override
   public GraphCollection execute() {
-
-    return GraphCollection
-      .fromTransactions(new GraphTransactions(getTransactions(), gradoopFlinkConfig));
+    return new GraphCollectionFactory(gradoopFlinkConfig)
+      .fromTransactions(getTransactions());
   }
 
   public DataSet<GraphTransaction> getTransactions() {

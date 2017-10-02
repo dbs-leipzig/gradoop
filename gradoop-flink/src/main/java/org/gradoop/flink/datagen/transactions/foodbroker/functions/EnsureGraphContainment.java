@@ -3,7 +3,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * Created by peet on 07.07.17.
