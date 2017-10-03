@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.labelpropagation.functions;
+package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -26,17 +25,16 @@ import org.gradoop.common.model.impl.pojo.Edge;
  * identifier and {@link NullValue} as edge value.
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
-public class EdgeToGellyEdgeMapper implements
-  MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, NullValue>> {
+public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> {
   /**
    * Reduce object instantiations
    */
   private final org.apache.flink.graph.Edge<GradoopId, NullValue> reuseEdge;
 
   /**
-   * Constructor
+   * Constructor.
    */
-  public EdgeToGellyEdgeMapper() {
+  public EdgeToGellyEdgeWithNullValue() {
     reuseEdge = new org.apache.flink.graph.Edge<>();
     reuseEdge.setValue(NullValue.getInstance());
   }

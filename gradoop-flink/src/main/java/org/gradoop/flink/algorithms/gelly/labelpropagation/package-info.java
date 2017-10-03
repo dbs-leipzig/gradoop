@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains functions related to the Label Propagation algorithm.
+ * Contains classes related to the Label Propagation algorithm.
  */
-package org.gradoop.flink.algorithms.labelpropagation.functions;
+package org.gradoop.flink.algorithms.gelly.labelpropagation;

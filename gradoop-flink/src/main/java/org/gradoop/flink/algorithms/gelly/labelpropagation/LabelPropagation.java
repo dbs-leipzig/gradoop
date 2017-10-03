@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.labelpropagation;
+package org.gradoop.flink.algorithms.gelly.labelpropagation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
-import org.gradoop.flink.algorithms.labelpropagation.functions.EdgeToGellyEdgeMapper;
-import org.gradoop.flink.algorithms.labelpropagation.functions.LPVertexJoin;
-import org.gradoop.flink.algorithms.labelpropagation.functions.VertexToGellyVertexMapper;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
+import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithPropertyValue;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.LPVertexJoin;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * The computation will terminate if no new values are assigned.
  */
-public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
+public abstract class LabelPropagation extends GellyAlgorithm<PropertyValue, NullValue> {
 
   /**
    * Counter to define maximum number of iterations for the algorithm
@@ -62,6 +62,8 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * @param propertyKey   Property key to access the label value
    */
   protected LabelPropagation(int maxIterations, String propertyKey) {
+    super(new VertexToGellyVertexWithPropertyValue(propertyKey),
+            new EdgeToGellyEdgeWithNullValue());
     this.maxIterations = maxIterations;
     this.propertyKey = checkNotNull(propertyKey);
   }
@@ -70,27 +72,15 @@ public abstract class LabelPropagation implements UnaryGraphToGraphOperator {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    // prepare vertex set for Gelly vertex centric iteration
-    DataSet<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> vertices = graph.getVertices()
-      .map(new VertexToGellyVertexMapper(propertyKey));
-
-    // prepare edge set for Gelly vertex centric iteration
-    DataSet<org.apache.flink.graph.Edge<GradoopId, NullValue>> edges = graph.getEdges()
-      .map(new EdgeToGellyEdgeMapper());
-
-    // create Gelly graph
-    Graph<GradoopId, PropertyValue, NullValue> gellyGraph = Graph.fromDataSet(
-      vertices, edges, graph.getConfig().getExecutionEnvironment());
-
-    DataSet<Vertex> labeledVertices = executeInternal(gellyGraph)
-      .join(graph.getVertices())
+  protected LogicalGraph executeInGelly(Graph<GradoopId, PropertyValue, NullValue> graph) {
+    DataSet<Vertex> labeledVertices = executeInternal(graph)
+      .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new LPVertexJoin(propertyKey));
 
     // return labeled graph
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(labeledVertices, graph.getEdges());
+    return currentGraph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(labeledVertices, currentGraph.getEdges());
   }
 
   /**

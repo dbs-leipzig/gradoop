@@ -13,23 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.labelpropagation.functions;
-
-import org.apache.flink.graph.Vertex;
-import org.apache.flink.graph.spargel.ScatterFunction;
-import org.apache.flink.types.NullValue;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-
 /**
- * Distributes the new vertex value
+ * Contains functions related to the Label Propagation algorithm.
  */
-public class LPMessageFunction
-  extends ScatterFunction<GradoopId, PropertyValue, PropertyValue, NullValue> {
-
-  @Override
-  public void sendMessages(Vertex<GradoopId, PropertyValue> vertex) throws
-    Exception {
-    sendMessageToAllNeighbors(vertex.getValue());
-  }
-}
+package org.gradoop.flink.algorithms.gelly.labelpropagation.functions;

@@ -13,48 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.labelpropagation.functions;
+package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and the
- * label propagation value.
+ * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * identifier and {@link PropertyValue} as edge value.
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
 @FunctionAnnotation.ReadFields("properties")
-public class VertexToGellyVertexMapper implements
-  MapFunction<Vertex, org.apache.flink.graph.Vertex<GradoopId, PropertyValue>> {
+public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge<PropertyValue> {
   /**
-   * Property key to access the label value which will be propagated
+   * Property key to get the value for.
    */
   private final String propertyKey;
 
   /**
-   * Reduce object instantiations
+   * Reduce object instantiations.
    */
-  private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue>
-  reuseVertex;
+  private final org.apache.flink.graph.Edge<GradoopId, PropertyValue>
+    reuseEdge;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param propertyKey property key for get property value
    */
-  public VertexToGellyVertexMapper(String propertyKey) {
+  public EdgeToGellyEdgeWithPropertyValue(String propertyKey) {
     this.propertyKey = propertyKey;
-    this.reuseVertex = new org.apache.flink.graph.Vertex<>();
+    this.reuseEdge = new org.apache.flink.graph.Edge<>();
   }
 
   @Override
-  public org.apache.flink.graph.Vertex<GradoopId, PropertyValue> map(
-    Vertex epgmVertex) throws Exception {
-    reuseVertex.setId(epgmVertex.getId());
-    reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));
-    return reuseVertex;
+  public org.apache.flink.graph.Edge<GradoopId, PropertyValue> map(Edge epgmEdge) {
+    reuseEdge.setSource(epgmEdge.getSourceId());
+    reuseEdge.setTarget(epgmEdge.getTargetId());
+    reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey));
+    return reuseEdge;
   }
 }
