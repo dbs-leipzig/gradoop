@@ -18,8 +18,9 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -54,8 +55,8 @@ public abstract class BusinessRelation extends Person {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     // load broadcasted lists
-    companies = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.COMPANIES_BC);
-    holdings = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.HOLDINGS_BC);
+    companies = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.COMPANIES_BC);
+    holdings = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.HOLDINGS_BC);
   }
 
   @Override
@@ -71,9 +72,9 @@ public abstract class BusinessRelation extends Person {
       (getFoodBrokerConfig().getBranchMaxAmount() -
         getFoodBrokerConfig().getBranchMinAmount()) +
       1) + getFoodBrokerConfig().getBranchMinAmount();
-    vertex.setProperty(FoodBrokerConstants.BRANCHNUMBER_KEY, branchNumber);
-    vertex.setProperty(FoodBrokerConstants.COMPANY_KEY, company);
-    vertex.setProperty(FoodBrokerConstants.HOLDING_KEY, holding);
+    vertex.setProperty(FoodBrokerPropertyKeys.BRANCHNUMBER_KEY, branchNumber);
+    vertex.setProperty(FoodBrokerPropertyKeys.COMPANY_KEY, company);
+    vertex.setProperty(FoodBrokerPropertyKeys.HOLDING_KEY, holding);
 
     return vertex;
   }

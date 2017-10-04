@@ -20,8 +20,11 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.math.BigDecimal;
@@ -133,8 +136,8 @@ public class Product extends MasterData {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted lists
-    nameGroupPairs = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.NAMES_GROUPS_BC);
-    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.ADJECTIVES_BC);
+    nameGroupPairs = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NAMES_GROUPS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
     //get their sizes
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
@@ -143,29 +146,29 @@ public class Product extends MasterData {
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
     //create standard properties from acronym and seed
-    Properties properties = createDefaultProperties(seed, FoodBrokerConstants.PRODUCT_ACRONYM);
+    Properties properties = createDefaultProperties(seed, FoodBrokerAcronyms.PRODUCT_ACRONYM);
     Random random = new Random();
     //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
-    properties.set(FoodBrokerConstants.CATEGORY_KEY, nameGroupPair.f1);
+    properties.set(FoodBrokerPropertyKeys.CATEGORY_KEY, nameGroupPair.f1);
     int randomProduct = random.nextInt(adjectiveCount);
     properties.set(
-      FoodBrokerConstants.NAME_KEY, adjectives.get(randomProduct) + " " +  nameGroupPair.f0);
+      FoodBrokerPropertyKeys.NAME_KEY, adjectives.get(randomProduct) + " " +  nameGroupPair.f0);
 
-    properties.set(FoodBrokerConstants.PRODUCT_TYPE_KEY, nameGroupPair.f1);
+    properties.set(FoodBrokerPropertyKeys.PRODUCT_TYPE_KEY, nameGroupPair.f1);
 
     int minLevel = 1;
     int maxLevel = 6;
     switch (nameGroupPair.f1) {
-    case FoodBrokerConstants.PRODUCT_TYPE_FRUITS :
+    case FoodBrokerPropertyKeys.PRODUCT_TYPE_FRUITS :
       minLevel = 2;
       maxLevel = 4;
       break;
-    case FoodBrokerConstants.PRODUCT_TYPE_VEGETABLES :
+    case FoodBrokerPropertyKeys.PRODUCT_TYPE_VEGETABLES :
       minLevel = 4;
       maxLevel = 6;
       break;
-    case FoodBrokerConstants.PRODUCT_TYPE_NUTS :
+    case FoodBrokerPropertyKeys.PRODUCT_TYPE_NUTS :
       minLevel = 1;
       maxLevel = 3;
       break;
@@ -174,10 +177,10 @@ public class Product extends MasterData {
     }
     int level = random.nextInt((maxLevel - minLevel) + 1) + minLevel;
     properties.set(
-      FoodBrokerConstants.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level - 1].toString());
+      FoodBrokerPropertyKeys.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level - 1].toString());
 
-    properties.set(FoodBrokerConstants.PRICE_KEY, generatePrice());
-    return vertexFactory.createVertex(FoodBrokerConstants.PRODUCT_VERTEX_LABEL, properties);
+    properties.set(FoodBrokerPropertyKeys.PRICE_KEY, generatePrice());
+    return vertexFactory.createVertex(FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL, properties);
   }
 
   /**
@@ -196,11 +199,11 @@ public class Product extends MasterData {
 
   @Override
   public String getAcronym() {
-    return FoodBrokerConstants.PRODUCT_ACRONYM;
+    return FoodBrokerAcronyms.PRODUCT_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return FoodBrokerConstants.PRODUCT_VERTEX_LABEL;
+    return FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL;
   }
 }

@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 
 import java.math.BigDecimal;
 
@@ -32,7 +32,7 @@ public class ProductPriceMapper implements
 
   @Override
   public Tuple2<GradoopId, BigDecimal> map(Vertex v) throws Exception {
-    BigDecimal price = v.getPropertyValue(FoodBrokerConstants.PRICE_KEY).getBigDecimal();
+    BigDecimal price = v.getPropertyValue(FoodBrokerPropertyKeys.PRICE_KEY).getBigDecimal();
     return new Tuple2<>(v.getId(), price);
   }
 }

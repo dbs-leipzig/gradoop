@@ -18,8 +18,12 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyValues;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -68,9 +72,9 @@ public class Employee extends Person {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcast maps
-    firstNamesFemale = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.FIRST_NAMES_FEMALE_BC);
-    firstNamesMale = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.FIRST_NAMES_MALE_BC);
-    lastNames = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.LAST_NAMES_BC);
+    firstNamesFemale = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_FEMALE_BC);
+    firstNamesMale = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_MALE_BC);
+    lastNames = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.LAST_NAMES_BC);
     //get their sizes.
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();
@@ -94,38 +98,38 @@ public class Employee extends Person {
       name = firstNamesMale.get(random.nextInt(firstNameCountMale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
-    vertex.setProperty(FoodBrokerConstants.NAME_KEY, name);
-    vertex.setProperty(FoodBrokerConstants.GENDER_KEY, gender);
+    vertex.setProperty(FoodBrokerPropertyKeys.NAME_KEY, name);
+    vertex.setProperty(FoodBrokerPropertyKeys.GENDER_KEY, gender);
 
     //update quality and set type
-    Float quality = vertex.getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat();
+    Float quality = vertex.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat();
     Double assistantRatio = getFoodBrokerConfig().getMasterDataTypeAssistantRatio(getClassName());
     Double normalRatio = getFoodBrokerConfig().getMasterDataTypeNormalRatio(getClassName());
     Double rnd = random.nextDouble();
     if (rnd <= assistantRatio) {
       quality *= getFoodBrokerConfig().getMasterDataTypeAssistantInfluence();
-      vertex.setProperty(FoodBrokerConstants.EMPLOYEE_TYPE_KEY, FoodBrokerConstants.EMPLOYEE_TYPE_ASSISTANT);
+      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_ASSISTANT);
     } else if (rnd >= assistantRatio + normalRatio) {
       quality *= getFoodBrokerConfig().getMasterDataTypeSupervisorInfluence();
       if (quality > 1f) {
         quality = 1f;
       }
-      vertex.setProperty(FoodBrokerConstants.EMPLOYEE_TYPE_KEY, FoodBrokerConstants.EMPLOYEE_TYPE_SUPERVISOR);
+      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_SUPERVISOR);
     } else {
-      vertex.setProperty(FoodBrokerConstants.EMPLOYEE_TYPE_KEY, FoodBrokerConstants.EMPLOYEE_TYPE_NORMAL);
+      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_NORMAL);
     }
-    vertex.setProperty(FoodBrokerConstants.QUALITY_KEY, quality);
+    vertex.setProperty(FoodBrokerPropertyKeys.QUALITY_KEY, quality);
 
     return vertex;
   }
 
   @Override
   public String getAcronym() {
-    return FoodBrokerConstants.EMPLOYEE_ACRONYM;
+    return FoodBrokerAcronyms.EMPLOYEE_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL;
+    return FoodBrokerVertexLabels.EMPLOYEE_VERTEX_LABEL;
   }
 }

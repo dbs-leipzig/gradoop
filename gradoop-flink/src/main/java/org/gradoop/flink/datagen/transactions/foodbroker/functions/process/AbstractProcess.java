@@ -30,7 +30,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -150,12 +151,12 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted maps
-    customerIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_CUSTOMERS);
-    vendorIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_VENDORS);
-    logisticIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_LOGISTICS);
-    employeeIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_EMPLOYEES);
+    customerIndex = createIndexFromBroadcast(FoodBrokerBroadcastNames.BC_CUSTOMERS);
+    vendorIndex = createIndexFromBroadcast(FoodBrokerBroadcastNames.BC_VENDORS);
+    logisticIndex = createIndexFromBroadcast(FoodBrokerBroadcastNames.BC_LOGISTICS);
+    employeeIndex = createIndexFromBroadcast(FoodBrokerBroadcastNames.BC_EMPLOYEES);
 
-    productIndex = createIndexFromBroadcast(FoodBrokerConstants.BC_PRODUCTS);
+    productIndex = createIndexFromBroadcast(FoodBrokerBroadcastNames.BC_PRODUCTS);
 
     //get the iterator of each map
     customerList = customerIndex.keySet().toArray(new GradoopId[customerIndex.keySet().size()]);
@@ -287,15 +288,15 @@ public abstract class AbstractProcess extends AbstractRichFunction {
    */
   protected Float getEdgeTargetQuality(GradoopId target, String masterDataMap) {
     switch (masterDataMap) {
-    case FoodBrokerConstants.BC_CUSTOMERS:
+    case FoodBrokerBroadcastNames.BC_CUSTOMERS:
       return getQuality(customerIndex, target);
-    case FoodBrokerConstants.BC_VENDORS:
+    case FoodBrokerBroadcastNames.BC_VENDORS:
       return getQuality(vendorIndex, target);
-    case FoodBrokerConstants.BC_LOGISTICS:
+    case FoodBrokerBroadcastNames.BC_LOGISTICS:
       return getQuality(logisticIndex, target);
-    case FoodBrokerConstants.BC_EMPLOYEES:
+    case FoodBrokerBroadcastNames.BC_EMPLOYEES:
       return getQuality(employeeIndex, target);
-    case FoodBrokerConstants.USER_MAP:
+    case FoodBrokerBroadcastNames.USER_MAP:
       return userMap.get(target);
     default:
       return null;
@@ -303,7 +304,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   }
 
   protected float getQuality(Map<GradoopId, Vertex> index, GradoopId key) {
-    return index.get(key).getPropertyValue(FoodBrokerConstants.QUALITY_KEY).getFloat();
+    return index.get(key).getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat();
   }
 
   /**
@@ -326,34 +327,34 @@ public abstract class AbstractProcess extends AbstractRichFunction {
     String secondHolding = "2";
 
     switch (firstMasterDataMap) {
-    case FoodBrokerConstants.BC_CUSTOMERS:
-      firstCity = getStringValue(customerIndex, firstMasterDataId, FoodBrokerConstants.CITY_KEY);
-      firstHolding = getStringValue(customerIndex, firstMasterDataId, FoodBrokerConstants.HOLDING_KEY);
+    case FoodBrokerBroadcastNames.BC_CUSTOMERS:
+      firstCity = getStringValue(customerIndex, firstMasterDataId, FoodBrokerPropertyKeys.CITY_KEY);
+      firstHolding = getStringValue(customerIndex, firstMasterDataId, FoodBrokerPropertyKeys.HOLDING_KEY);
       break;
-    case FoodBrokerConstants.BC_VENDORS:
-      firstCity = getStringValue(vendorIndex, firstMasterDataId, FoodBrokerConstants.CITY_KEY);
-      firstHolding = getStringValue(vendorIndex, firstMasterDataId, FoodBrokerConstants.HOLDING_KEY);
+    case FoodBrokerBroadcastNames.BC_VENDORS:
+      firstCity = getStringValue(vendorIndex, firstMasterDataId, FoodBrokerPropertyKeys.CITY_KEY);
+      firstHolding = getStringValue(vendorIndex, firstMasterDataId, FoodBrokerPropertyKeys.HOLDING_KEY);
       break;
-    case FoodBrokerConstants.BC_EMPLOYEES:
+    case FoodBrokerBroadcastNames.BC_EMPLOYEES:
       firstCity = employeeIndex
-        .get(firstMasterDataId).getPropertyValue(FoodBrokerConstants.CITY_KEY).getString();
+        .get(firstMasterDataId).getPropertyValue(FoodBrokerPropertyKeys.CITY_KEY).getString();
       break;
     default:
       break;
     }
 
     switch (secondMasterDataMap) {
-    case FoodBrokerConstants.BC_CUSTOMERS:
-      secondCity = getStringValue(customerIndex, secondMasterDataId, FoodBrokerConstants.CITY_KEY);
-      secondHolding = getStringValue(customerIndex, secondMasterDataId, FoodBrokerConstants.HOLDING_KEY);
+    case FoodBrokerBroadcastNames.BC_CUSTOMERS:
+      secondCity = getStringValue(customerIndex, secondMasterDataId, FoodBrokerPropertyKeys.CITY_KEY);
+      secondHolding = getStringValue(customerIndex, secondMasterDataId, FoodBrokerPropertyKeys.HOLDING_KEY);
       break;
-    case FoodBrokerConstants.BC_VENDORS:
-      secondCity = getStringValue(vendorIndex, secondMasterDataId, FoodBrokerConstants.CITY_KEY);
-      secondHolding = getStringValue(vendorIndex, secondMasterDataId, FoodBrokerConstants.HOLDING_KEY);
+    case FoodBrokerBroadcastNames.BC_VENDORS:
+      secondCity = getStringValue(vendorIndex, secondMasterDataId, FoodBrokerPropertyKeys.CITY_KEY);
+      secondHolding = getStringValue(vendorIndex, secondMasterDataId, FoodBrokerPropertyKeys.HOLDING_KEY);
       break;
-    case FoodBrokerConstants.BC_EMPLOYEES:
+    case FoodBrokerBroadcastNames.BC_EMPLOYEES:
       secondCity = employeeIndex
-        .get(firstMasterDataId).getPropertyValue(FoodBrokerConstants.CITY_KEY).getString();
+        .get(firstMasterDataId).getPropertyValue(FoodBrokerPropertyKeys.CITY_KEY).getString();
       break;
     default:
       break;
@@ -363,7 +364,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
       influence *= config.getMasterDataSameCityInfluence();
     }
     if (firstHolding.equals(secondHolding) &&
-      !firstHolding.equals(FoodBrokerConstants.HOLDING_TYPE_PRIVATE)) {
+      !firstHolding.equals(FoodBrokerPropertyKeys.HOLDING_TYPE_PRIVATE)) {
 
       influence *= config.getMasterDataSameHoldingInfluence();
     }
@@ -458,6 +459,6 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   }
 
   protected BigDecimal getPrice(GradoopId id) {
-    return productIndex.get(id).getPropertyValue(FoodBrokerConstants.PRICE_KEY).getBigDecimal();
+    return productIndex.get(id).getPropertyValue(FoodBrokerPropertyKeys.PRICE_KEY).getBigDecimal();
   }
 }

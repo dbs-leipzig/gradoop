@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -177,11 +177,11 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     generateCollection();
 
     String[] masterDataLabels = new String[] {
-      FoodBrokerConstants.EMPLOYEE_VERTEX_LABEL,
-      FoodBrokerConstants.CUSTOMER_VERTEX_LABEL,
-      FoodBrokerConstants.VENDOR_VERTEX_LABEL,
-      FoodBrokerConstants.LOGISTICS_VERTEX_LABEL,
-      FoodBrokerConstants.PRODUCT_VERTEX_LABEL
+      FoodBrokerVertexLabels.EMPLOYEE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.CUSTOMER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.VENDOR_VERTEX_LABEL,
+      FoodBrokerVertexLabels.LOGISTICS_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL
     };
 
     for (String label : masterDataLabels) {

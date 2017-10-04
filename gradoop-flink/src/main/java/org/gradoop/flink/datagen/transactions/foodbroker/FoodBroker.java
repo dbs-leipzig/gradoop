@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.EnsureGraphContainment;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.process.Brokerage;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.process.ComplaintHandling;
@@ -108,11 +108,11 @@ public class FoodBroker implements GraphCollectionGenerator {
     DataSet<GraphTransaction> cases = caseSeeds
       .map(new Brokerage(gradoopFlinkConfig.getGraphHeadFactory(), gradoopFlinkConfig
         .getVertexFactory(), gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
-      .withBroadcastSet(customers, FoodBrokerConstants.BC_CUSTOMERS)
-      .withBroadcastSet(vendors, FoodBrokerConstants.BC_VENDORS)
-      .withBroadcastSet(logistics, FoodBrokerConstants.BC_LOGISTICS)
-      .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
-      .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
+      .withBroadcastSet(customers, FoodBrokerBroadcastNames.BC_CUSTOMERS)
+      .withBroadcastSet(vendors, FoodBrokerBroadcastNames.BC_VENDORS)
+      .withBroadcastSet(logistics, FoodBrokerBroadcastNames.BC_LOGISTICS)
+      .withBroadcastSet(employees, FoodBrokerBroadcastNames.BC_EMPLOYEES)
+      .withBroadcastSet(products, FoodBrokerBroadcastNames.BC_PRODUCTS);
 
 
     // Phase 2.2: Run Complaint Handling
@@ -121,11 +121,11 @@ public class FoodBroker implements GraphCollectionGenerator {
         gradoopFlinkConfig.getGraphHeadFactory(),
         gradoopFlinkConfig.getVertexFactory(),
         gradoopFlinkConfig.getEdgeFactory(), foodBrokerConfig))
-      .withBroadcastSet(customers, FoodBrokerConstants.BC_CUSTOMERS)
-      .withBroadcastSet(vendors, FoodBrokerConstants.BC_VENDORS)
-      .withBroadcastSet(logistics, FoodBrokerConstants.BC_LOGISTICS)
-      .withBroadcastSet(employees, FoodBrokerConstants.BC_EMPLOYEES)
-      .withBroadcastSet(products, FoodBrokerConstants.BC_PRODUCTS);
+      .withBroadcastSet(customers, FoodBrokerBroadcastNames.BC_CUSTOMERS)
+      .withBroadcastSet(vendors, FoodBrokerBroadcastNames.BC_VENDORS)
+      .withBroadcastSet(logistics, FoodBrokerBroadcastNames.BC_LOGISTICS)
+      .withBroadcastSet(employees, FoodBrokerBroadcastNames.BC_EMPLOYEES)
+      .withBroadcastSet(products, FoodBrokerBroadcastNames.BC_PRODUCTS);
 
 //    TODO:
 //    DataSet<Tuple2<String, GradoopId>> clientMapping = cases

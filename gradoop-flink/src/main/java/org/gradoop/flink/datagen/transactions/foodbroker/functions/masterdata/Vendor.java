@@ -18,8 +18,11 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -60,8 +63,8 @@ public class Vendor extends BusinessRelation {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(FoodBrokerConstants.NOUNS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NOUNS_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -73,18 +76,18 @@ public class Vendor extends BusinessRelation {
     Random random = new Random();
     Vertex vertex = super.map(seed);
     vertex.setProperty(
-      FoodBrokerConstants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+      FoodBrokerPropertyKeys.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
     return vertex;
   }
 
   @Override
   public String getAcronym() {
-    return FoodBrokerConstants.VENDOR_ACRONYM;
+    return FoodBrokerAcronyms.VENDOR_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return FoodBrokerConstants.VENDOR_VERTEX_LABEL;
+    return FoodBrokerVertexLabels.VENDOR_VERTEX_LABEL;
   }
 }

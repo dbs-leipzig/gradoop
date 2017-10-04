@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConstants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 
 /**
  * Creates a master data tuple from the given vertex. The tuple consists of the gradoop id and
@@ -30,6 +30,6 @@ public class MasterDataQualityMapper implements MapFunction<Vertex, Tuple2<Grado
   @Override
   public Tuple2<GradoopId, Float> map(Vertex v) throws Exception {
     return new Tuple2<>(v.getId(), v.getPropertyValue(
-      FoodBrokerConstants.QUALITY_KEY).getFloat());
+      FoodBrokerPropertyKeys.QUALITY_KEY).getFloat());
   }
 }
