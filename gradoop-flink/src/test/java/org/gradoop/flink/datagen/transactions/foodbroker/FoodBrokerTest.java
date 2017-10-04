@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerEdgeLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -173,21 +174,75 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMasterData() throws Exception {
-    generateCollection();
+  public void testSchema() throws Exception {
 
-    String[] masterDataLabels = new String[] {
-      FoodBrokerVertexLabels.EMPLOYEE_VERTEX_LABEL,
+    Set<String> foundVertexLabels = Sets.newHashSet();
+    Set<String> foundEdgeLabels = Sets.newHashSet();
+
+
+    for (int ignored : new int[] {0, 1, 2}) {
+      generateCollection();
+
+      for (Vertex vertex : cases.getVertices().collect()) {
+        foundVertexLabels.add(vertex.getLabel());
+      }
+
+      for (Edge edge : cases.getEdges().collect()) {
+        foundEdgeLabels.add(edge.getLabel());
+      }
+    }
+
+    Set<String> expectedVertexLabels = Sets.newHashSet(
+      FoodBrokerVertexLabels.CLIENT_VERTEX_LABEL,
       FoodBrokerVertexLabels.CUSTOMER_VERTEX_LABEL,
-      FoodBrokerVertexLabels.VENDOR_VERTEX_LABEL,
+      FoodBrokerVertexLabels.DELIVERYNOTE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.EMPLOYEE_VERTEX_LABEL,
       FoodBrokerVertexLabels.LOGISTICS_VERTEX_LABEL,
-      FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL
-    };
+      FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PURCHINVOICE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESINVOICE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PURCHORDER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESORDER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerVertexLabels.TICKET_VERTEX_LABEL,
+      FoodBrokerVertexLabels.USER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.VENDOR_VERTEX_LABEL
+    );
 
-    for (String label : masterDataLabels) {
-      long count = cases.getVertices().filter(new ByLabel<>(label)).count();
+    for (String label : expectedVertexLabels) {
+      assertTrue( label + " vertices are missing", foundVertexLabels.contains(label));
+    }
 
-      assertTrue( label + " vertices are missing", count > 0);
+    for (String label : foundVertexLabels) {
+      assertTrue( label + " vertices was not expected", expectedVertexLabels.contains(label));
+    }
+
+    Set<String> expectedEdgeLabels = Sets.newHashSet(
+      FoodBrokerEdgeLabels.ALLOCATEDTO_EDGE_LABEL,
+      FoodBrokerEdgeLabels.BASEDON_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CONCERNS_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CONTAINS_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CREATEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CREATEDFOR_EDGE_LABEL,
+      FoodBrokerEdgeLabels.OPENEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.OPERATEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PLACEDAT_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PROCESSEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PURCHORDERLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.RECEIVEDFROM_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SALESORDERLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SALESQUOTATIONLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SENTBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SENTTO_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SERVES_EDGE_LABEL
+    );
+
+    for (String label : expectedEdgeLabels) {
+      assertTrue( label + " edges are missing", foundEdgeLabels.contains(label));
+    }
+
+    for (String label : foundEdgeLabels) {
+      assertTrue( label + " edges was not expected", expectedEdgeLabels.contains(label));
     }
   }
 
