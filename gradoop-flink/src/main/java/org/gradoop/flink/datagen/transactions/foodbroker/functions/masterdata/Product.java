@@ -136,8 +136,10 @@ public class Product extends MasterData {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted lists
-    nameGroupPairs = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NAMES_GROUPS_BC);
-    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
+    nameGroupPairs =
+      getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NAMES_GROUPS_BC);
+    adjectives =
+      getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
     //get their sizes
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
@@ -177,7 +179,9 @@ public class Product extends MasterData {
     }
     int level = random.nextInt((maxLevel - minLevel) + 1) + minLevel;
     properties.set(
-      FoodBrokerPropertyKeys.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level - 1].toString());
+      FoodBrokerPropertyKeys.PERISHABLENESS_LEVEL,
+      PerishablenessLevel.values()[level - 1].toString()
+    );
 
     properties.set(FoodBrokerPropertyKeys.PRICE_KEY, generatePrice());
     return vertexFactory.createVertex(FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL, properties);

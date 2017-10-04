@@ -55,9 +55,12 @@ public abstract class MasterData extends RichMapFunction<MasterDataSeed, Vertex>
     String bid = createBusinessIdentifier(seed, acronym);
     Properties properties = new Properties();
 
-    properties.set(FoodBrokerPropertyKeys.SUPERTYPE_KEY, FoodBrokerPropertyValues.SUPERCLASS_VALUE_MASTER);
-    properties.set(FoodBrokerPropertyKeys.QUALITY_KEY, seed.getQuality());
-    properties.set(FoodBrokerPropertyKeys.SOURCEID_KEY, FoodBrokerAcronyms.ERP_ACRONYM + "_" + bid);
+    properties
+      .set(FoodBrokerPropertyKeys.SUPERTYPE_KEY, FoodBrokerPropertyValues.SUPERCLASS_VALUE_MASTER);
+    properties
+      .set(FoodBrokerPropertyKeys.QUALITY_KEY, seed.getQuality());
+    properties
+      .set(FoodBrokerPropertyKeys.SOURCEID_KEY, FoodBrokerAcronyms.ERP_ACRONYM + "_" + bid);
 
     return properties;
   }

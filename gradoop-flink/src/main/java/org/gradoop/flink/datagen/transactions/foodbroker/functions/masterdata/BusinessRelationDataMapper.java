@@ -46,9 +46,12 @@ public class BusinessRelationDataMapper
    */
   @Override
   public Tuple2<GradoopId, BusinessRelationData> map(Vertex v) throws Exception {
-    reuseBusinessRelationData.setQuality(v.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat());
-    reuseBusinessRelationData.setCity(v.getPropertyValue(FoodBrokerPropertyKeys.CITY_KEY).getString());
-    reuseBusinessRelationData.setHolding(v.getPropertyValue(FoodBrokerPropertyKeys.HOLDING_KEY).getString());
+    reuseBusinessRelationData
+      .setQuality(v.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat());
+    reuseBusinessRelationData
+      .setCity(v.getPropertyValue(FoodBrokerPropertyKeys.CITY_KEY).getString());
+    reuseBusinessRelationData
+      .setHolding(v.getPropertyValue(FoodBrokerPropertyKeys.HOLDING_KEY).getString());
     return new Tuple2<>(v.getId(), reuseBusinessRelationData);
   }
 }

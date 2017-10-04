@@ -72,9 +72,12 @@ public class Employee extends Person {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcast maps
-    firstNamesFemale = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_FEMALE_BC);
-    firstNamesMale = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_MALE_BC);
-    lastNames = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.LAST_NAMES_BC);
+    firstNamesFemale =
+      getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_FEMALE_BC);
+    firstNamesMale =
+      getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.FIRST_NAMES_MALE_BC);
+    lastNames =
+      getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.LAST_NAMES_BC);
     //get their sizes.
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();
@@ -108,15 +111,19 @@ public class Employee extends Person {
     Double rnd = random.nextDouble();
     if (rnd <= assistantRatio) {
       quality *= getFoodBrokerConfig().getMasterDataTypeAssistantInfluence();
-      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_ASSISTANT);
+      vertex.setProperty(
+        FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_ASSISTANT);
     } else if (rnd >= assistantRatio + normalRatio) {
       quality *= getFoodBrokerConfig().getMasterDataTypeSupervisorInfluence();
       if (quality > 1f) {
         quality = 1f;
       }
-      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_SUPERVISOR);
+      vertex.setProperty(
+        FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY,
+        FoodBrokerPropertyValues.EMPLOYEE_TYPE_SUPERVISOR);
     } else {
-      vertex.setProperty(FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_NORMAL);
+      vertex.setProperty(
+        FoodBrokerPropertyKeys.EMPLOYEE_TYPE_KEY, FoodBrokerPropertyValues.EMPLOYEE_TYPE_NORMAL);
     }
     vertex.setProperty(FoodBrokerPropertyKeys.QUALITY_KEY, quality);
 

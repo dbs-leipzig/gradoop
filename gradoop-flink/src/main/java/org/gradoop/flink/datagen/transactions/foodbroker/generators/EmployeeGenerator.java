@@ -57,10 +57,14 @@ public class EmployeeGenerator
 
     return env.fromCollection(seeds)
       .map(new Employee(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(firstNamesFemale), FoodBrokerBroadcastNames.FIRST_NAMES_FEMALE_BC)
-      .withBroadcastSet(env.fromCollection(firstNamesMale), FoodBrokerBroadcastNames.FIRST_NAMES_MALE_BC)
-      .withBroadcastSet(env.fromCollection(nouns), FoodBrokerBroadcastNames.LAST_NAMES_BC)
-      .withBroadcastSet(env.fromCollection(cities), FoodBrokerBroadcastNames.CITIES_BC)
+      .withBroadcastSet(
+        env.fromCollection(firstNamesFemale), FoodBrokerBroadcastNames.FIRST_NAMES_FEMALE_BC)
+      .withBroadcastSet(
+        env.fromCollection(firstNamesMale), FoodBrokerBroadcastNames.FIRST_NAMES_MALE_BC)
+      .withBroadcastSet(
+        env.fromCollection(nouns), FoodBrokerBroadcastNames.LAST_NAMES_BC)
+      .withBroadcastSet(
+        env.fromCollection(cities), FoodBrokerBroadcastNames.CITIES_BC)
       .returns(vertexFactory.getType());
   }
 }

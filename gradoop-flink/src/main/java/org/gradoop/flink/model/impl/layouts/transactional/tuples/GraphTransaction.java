@@ -70,6 +70,12 @@ public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> 
     this.f2 = edges;
   }
 
+  /**
+   * Returns a vertex matching a given identifier.
+   *
+   * @param id identifier.
+   * @return vertex
+   */
   public Vertex getVertexById(GradoopId id) {
     Vertex match = null;
 

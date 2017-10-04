@@ -70,8 +70,10 @@ public class ProductGenerator extends AbstractMasterDataGenerator {
 
     return env.fromCollection(seeds)
       .map(new Product(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(nameGroupPairs), FoodBrokerBroadcastNames.NAMES_GROUPS_BC)
-      .withBroadcastSet(env.fromCollection(adjectives), FoodBrokerBroadcastNames.ADJECTIVES_BC)
+      .withBroadcastSet(
+        env.fromCollection(nameGroupPairs), FoodBrokerBroadcastNames.NAMES_GROUPS_BC)
+      .withBroadcastSet(
+        env.fromCollection(adjectives), FoodBrokerBroadcastNames.ADJECTIVES_BC)
       .returns(vertexFactory.getType());
   }
 }

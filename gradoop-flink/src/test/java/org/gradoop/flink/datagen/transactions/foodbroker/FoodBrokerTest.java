@@ -145,7 +145,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
     FoodBroker foodBroker = new FoodBroker(getExecutionEnvironment(), getConfig(), config);
 
-    List<GraphTransaction> result10K = foodBroker.getTransactions().collect();
+    List<GraphTransaction> result10K = foodBroker.execute().getGraphTransactions().collect();
 
     assertEquals(1000, result10K.size());
 
