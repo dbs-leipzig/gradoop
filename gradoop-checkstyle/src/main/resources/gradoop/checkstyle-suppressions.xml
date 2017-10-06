@@ -9,9 +9,6 @@
              files="GraphStatistics.java"
              lines="0-9999"/>
   <suppress checks="IllegalCatch"
-            files="PageRank.java"
-            lines="50-70"/>
-  <suppress checks="IllegalCatch"
-            files="ConnectedComponents.java"
-            lines="50-70"/>
+            files="GellyAlgorithm.java"
+            lines="60-70"/>
 </suppressions>

@@ -57,23 +57,7 @@ public class ConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph) {
-    try {
-      return executeInternal(graph);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Wrapping the {@link ConnectedComponents#executeInGelly(Graph)} functionality to handle
-   * exceptions.
-   *
-   * @param graph The input graph.
-   * @return The output graph.
-   * @throws Exception unhandled Exception from Gelly.
-   */
-  private LogicalGraph executeInternal(Graph<GradoopId, GradoopId, NullValue> graph)
+  protected LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph)
     throws Exception {
     DataSet<Vertex> newVertices = new org.apache.flink.graph.library.ConnectedComponents<GradoopId,
       GradoopId, NullValue>(maxIterations)

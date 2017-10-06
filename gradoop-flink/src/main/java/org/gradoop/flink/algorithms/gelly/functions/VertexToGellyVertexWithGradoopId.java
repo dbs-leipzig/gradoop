@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Maps EPGM vertex to a Gelly vertex with the {@link GradoopId} as its id and value.
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ForwardedFields("id->f0;id->f1")
 public class VertexToGellyVertexWithGradoopId implements VertexToGellyVertex<GradoopId> {
   /**
    * Reduce object instantiations
