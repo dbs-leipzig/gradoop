@@ -81,7 +81,7 @@
 
         <!-- Others -->
         <dependency>
-            <groupId>org.s1ck</groupId>
+            <groupId>com.github.s1ck</groupId>
             <artifactId>gdl</artifactId>
         </dependency>
 
