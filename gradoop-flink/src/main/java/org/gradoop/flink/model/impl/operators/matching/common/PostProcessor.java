@@ -1,45 +1,43 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.matching.common;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.MergedGraphIds;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.functions.utils.IsInstance;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Provides methods for post-processing query results.
@@ -73,11 +71,10 @@ public class PostProcessor {
     Class<GraphHead> graphHeadType = config.getGraphHeadFactory().getType();
     Class<Vertex> vertexType = config.getVertexFactory().getType();
     Class<Edge> edgeType = config.getEdgeFactory().getType();
-    return GraphCollection.fromDataSets(
+    return config.getGraphCollectionFactory().fromDataSets(
       extractGraphHeads(elements, graphHeadType),
       extractVertices(elements, vertexType, mayOverlap),
-      extractEdges(elements, edgeType, mayOverlap),
-      config
+      extractEdges(elements, edgeType, mayOverlap)
     );
   }
 
@@ -111,8 +108,8 @@ public class PostProcessor {
       .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties");
 
-    return GraphCollection.fromDataSets(
-      collection.getGraphHeads(), newVertices, newEdges, config);
+    return config.getGraphCollectionFactory().fromDataSets(
+      collection.getGraphHeads(), newVertices, newEdges);
   }
   /**
    * Extracts vertex ids from the given pattern matching result.
@@ -156,12 +153,12 @@ public class PostProcessor {
    * Initializes EPGM vertices from the given pattern matching result.
    *
    * @param result        pattern matching result
-   * @param vertexFactory EPGM vertex factory
+   * @param epgmVertexFactory EPGM vertex factory
    * @return EPGM vertices
    */
   public static DataSet<Vertex> extractVertices(DataSet<FatVertex> result,
-    VertexFactory vertexFactory) {
-    return extractVertexIds(result).map(new VertexFromId(vertexFactory));
+    EPGMVertexFactory<Vertex> epgmVertexFactory) {
+    return extractVertexIds(result).map(new VertexFromId(epgmVertexFactory));
   }
 
   /**
@@ -189,12 +186,12 @@ public class PostProcessor {
    * Initializes EPGM edges from the given pattern matching result.
    *
    * @param result      pattern matching result
-   * @param edgeFactory EPGM edge factory
+   * @param epgmEdgeFactory EPGM edge factory
    * @return EPGM edges
    */
   public static DataSet<Edge> extractEdges(DataSet<FatVertex> result,
-    EdgeFactory edgeFactory) {
-    return extractEdgeIds(result).map(new EdgeFromIds(edgeFactory));
+    EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+    return extractEdgeIds(result).map(new EdgeFromIds(epgmEdgeFactory));
   }
 
   /**

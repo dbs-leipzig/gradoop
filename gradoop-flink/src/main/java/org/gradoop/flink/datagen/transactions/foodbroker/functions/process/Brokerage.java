@@ -1,41 +1,40 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +54,8 @@ public class Brokerage
    * @param edgeFactory EPGM edge factory
    * @param config Foodbroker configuration
    */
-  public Brokerage(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory,
+  public Brokerage(EPGMGraphHeadFactory<GraphHead> graphHeadFactory,
+    EPGMVertexFactory<Vertex> vertexFactory, EPGMEdgeFactory<Edge> edgeFactory,
     FoodBrokerConfig config) {
     super(graphHeadFactory, vertexFactory, edgeFactory, config);
   }
@@ -78,7 +77,7 @@ public class Brokerage
     GraphHead graphHead;
     GraphTransaction graphTransaction;
 
-    long startDate = config.getStartDate();
+    LocalDate startDate = config.getStartDate();
 
     // each seed stands for one created sales quotation
 
@@ -134,10 +133,17 @@ public class Brokerage
    */
   private boolean confirmed(Vertex salesQuotation) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     return config.happensTransitionConfiguration(
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
@@ -150,7 +156,7 @@ public class Brokerage
    * @param startDate of the quotation
    * @return vertex representation of a sales quotation
    */
-  private Vertex newSalesQuotation(long startDate) {
+  private Vertex newSalesQuotation(LocalDate startDate) {
     String label = Constants.SALESQUOTATION_VERTEX_LABEL;
     Properties properties = new Properties();
 
@@ -185,10 +191,17 @@ public class Brokerage
     GradoopId product;
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
 
     int numberOfQuotationLines = config.getIntRangeConfigurationValue(
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
@@ -215,10 +228,17 @@ public class Brokerage
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
     influencingMasterQuality.add(productQualityMap.get(product));
 
     // calculate and set the lines properties
@@ -226,8 +246,9 @@ public class Brokerage
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_SALESMARGIN_CONFIG_KEY, true);
 
+    influencingMasterQuality.clear();
     int quantity = config.getIntRangeConfigurationValue(
-      new ArrayList<Float>(), Constants.SALESQUOTATION_VERTEX_LABEL,
+      influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_LINEQUANTITY_CONFIG_KEY, true);
 
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -254,25 +275,38 @@ public class Brokerage
     Properties properties = new Properties();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTBY_EDGE_LABEL, salesQuotation.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
+    GradoopId employee = getEdgeTargetId(Constants.SENTBY_EDGE_LABEL, salesQuotation.getId());
+    GradoopId customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
 
-    Long salesQuotationDate = salesQuotation
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+
+    LocalDate salesQuotationDate = salesQuotation
       .getPropertyValue(Constants.DATE_KEY)
-      .getLong();
-    long date = config.delayDelayConfiguration(salesQuotationDate,
+      .getDate();
+    LocalDate date = config.delayDelayConfiguration(salesQuotationDate,
       influencingMasterQuality, Constants.SALESQUOTATION_VERTEX_LABEL,
       Constants.SQ_CONFIRMATIONDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(
       currentId++, Constants.SALESORDER_ACRONYM);
     // get random employee and collect all quality values from influencing master data objects
-    GradoopId rndEmployee = getNextEmployee();
     influencingMasterQuality.clear();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.SENTTO_EDGE_LABEL, salesQuotation.getId(), Constants.CUSTOMER_MAP_BC));
-    influencingMasterQuality.add(employeeMap.get(rndEmployee));
+    employee = getNextEmployee();
+    customer = getEdgeTargetId(Constants.SENTTO_EDGE_LABEL, salesQuotation.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or holding
+    additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, customer, Constants.CUSTOMER_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(customer, Constants.CUSTOMER_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(employeeMap.get(employee).getQuality() * additionalInfluence);
 
     // set calculated properties
     properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
@@ -287,7 +321,7 @@ public class Brokerage
     // create all relevant edges
     newEdge(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId(), getEdgeTargetId(
       Constants.SENTTO_EDGE_LABEL, salesQuotation.getId()));
-    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), rndEmployee);
+    newEdge(Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), employee);
     newEdge(Constants.BASEDON_EDGE_LABEL, salesOrder.getId(), salesQuotation.getId());
 
     return salesOrder;
@@ -371,8 +405,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(salesOrderDate,
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality(
         Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
         Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_PURCHASEDELAY_CONFIG_KEY);
@@ -439,10 +473,18 @@ public class Brokerage
     BigDecimal price = productPriceMap.get(salesOrderLine.getTargetId());
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId(), Constants.EMPLOYEE_MAP_BC));
-    influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
+
+    GradoopId employee = getEdgeTargetId(Constants.PROCESSEDBY_EDGE_LABEL, purchOrder.getId());
+    GradoopId vendor = getEdgeTargetId(Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId());
+    // the additional influence is increased of the two master data objects share the same city
+    // or location
+    Float additionalInfluence = getAdditionalInfluence(
+      employee, Constants.EMPLOYEE_MAP_BC, vendor, Constants.VENDOR_MAP_BC);
+
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(employee, Constants.EMPLOYEE_MAP_BC) * additionalInfluence);
+    influencingMasterQuality.add(
+      getEdgeTargetQuality(vendor, Constants.VENDOR_MAP_BC) * additionalInfluence);
 
     BigDecimal purchPrice = price;
     purchPrice = config.getDecimalVariationConfigurationValue(
@@ -497,7 +539,7 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
     GradoopId operatedBy = getNextLogistic();
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
@@ -505,7 +547,7 @@ public class Brokerage
     influencingMasterQuality.add(getEdgeTargetQuality(
       Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC));
 
-    long date = config.delayDelayConfiguration(
+    LocalDate date = config.delayDelayConfiguration(
       purchOrderDate, influencingMasterQuality, Constants.PURCHORDER_VERTEX_LABEL,
       Constants.PO_DELIVERYDELAY_CONFIG_KEY);
     String bid = createBusinessIdentifier(currentId++, Constants.DELIVERYNOTE_ACRONYM);
@@ -578,8 +620,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(purchOrderDate,
+    LocalDate purchOrderDate = purchOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(purchOrderDate,
       getEdgeTargetQuality(
         Constants.PLACEDAT_EDGE_LABEL, purchOrder.getId(), Constants.VENDOR_MAP_BC),
       Constants.PURCHORDER_VERTEX_LABEL, Constants.PO_INVOICEDELAY_CONFIG_KEY);
@@ -611,8 +653,8 @@ public class Brokerage
     Properties properties = new Properties();
 
     // calculate and set the properties
-    long salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getLong();
-    long date = config.delayDelayConfiguration(salesOrderDate,
+    LocalDate salesOrderDate = salesOrder.getPropertyValue(Constants.DATE_KEY).getDate();
+    LocalDate date = config.delayDelayConfiguration(salesOrderDate,
       getEdgeTargetQuality
         (Constants.PROCESSEDBY_EDGE_LABEL, salesOrder.getId(), Constants.EMPLOYEE_MAP_BC),
       Constants.SALESORDER_VERTEX_LABEL, Constants.SO_INVOICEDELAY_CONFIG_KEY);

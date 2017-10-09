@@ -1,18 +1,17 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.gradoop.flink.model.impl.operators.subgraph;
 
@@ -20,31 +19,31 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
+import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
 
 /**
  * Takes a collection of logical graphs and a user defined aggregate function as
@@ -117,7 +116,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
@@ -194,8 +193,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new AddGraphsToElements<>());
 
-    return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
-      collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 
   /**
@@ -221,7 +220,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
@@ -265,8 +264,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new AddGraphsToElementsCoGroup<>());
 
-    return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
-      collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 
   /**
@@ -296,7 +295,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    GraphHeadFactory graphFactory = collection.getConfig()
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
       .getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
@@ -343,8 +342,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new AddGraphsToElements<>());
 
-    return GraphCollection.fromDataSets(newGraphHeads, newVertices, newEdges,
-      collection.getConfig());
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 
   @Override

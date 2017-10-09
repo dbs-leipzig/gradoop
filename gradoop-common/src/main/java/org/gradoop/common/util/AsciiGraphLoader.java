@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common.util;
 
 import com.google.common.collect.ImmutableMap;
@@ -141,9 +139,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
     GradoopConfig<G, V, E> config) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(asciiGraph),
       config);
   }
@@ -165,9 +163,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromFile(fileName),
       config);
   }
@@ -189,9 +187,9 @@ public class AsciiGraphLoader
   AsciiGraphLoader<G, V, E> fromStream(InputStream inputStream,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
-      .setDefaultGraphLabel(GConstants.DEFAULT_GRAPH_LABEL)
-      .setDefaultVertexLabel(GConstants.DEFAULT_VERTEX_LABEL)
-      .setDefaultEdgeLabel(GConstants.DEFAULT_EDGE_LABEL)
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromStream(inputStream),
       config);
   }
@@ -484,7 +482,7 @@ public class AsciiGraphLoader
    * @return EPGM graph head
    */
   private G initGraphHead(Graph g) {
-    G graphHead = config.getGraphHeadFactory().createGraphHead(
+    G graphHead = (G) config.getGraphHeadFactory().createGraphHead(
       g.getLabel(), Properties.createFromMap(g.getProperties()));
     graphHeadIds.put(g.getId(), graphHead.getId());
     graphHeads.put(graphHead.getId(), graphHead);
@@ -500,7 +498,7 @@ public class AsciiGraphLoader
   private V initVertex(Vertex v) {
     V vertex;
     if (!vertexIds.containsKey(v.getId())) {
-      vertex = config.getVertexFactory().createVertex(
+      vertex = (V) config.getVertexFactory().createVertex(
         v.getLabel(),
         Properties.createFromMap(v.getProperties()),
         createGradoopIdSet(v));
@@ -522,7 +520,7 @@ public class AsciiGraphLoader
   private E initEdge(Edge e) {
     E edge;
     if (!edgeIds.containsKey(e.getId())) {
-      edge = config.getEdgeFactory().createEdge(
+      edge = (E) config.getEdgeFactory().createEdge(
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),

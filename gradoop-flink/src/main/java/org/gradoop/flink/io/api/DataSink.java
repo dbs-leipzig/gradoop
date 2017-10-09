@@ -1,25 +1,22 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.io.api;
 
-import org.gradoop.flink.model.impl.GraphTransactions;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 import java.io.IOException;
 
@@ -36,40 +33,25 @@ public interface DataSink {
   void write(LogicalGraph logicalGraph) throws IOException;
 
   /**
-   * Writes a logical graph to the data sink.
+   * Writes a graph collection graph to the data sink.
    *
    * @param graphCollection graph collection
    */
   void write(GraphCollection graphCollection) throws IOException;
 
   /**
-   * Writes a logical graph to the data sink.
-   *
-   * @param graphTransactions graph transactions
-   */
-  void write(GraphTransactions graphTransactions) throws IOException;
-
-  /**
-   * Writes a logical graph to the data sink with overWrite option.
+   * Writes a logical graph to the data sink with overwrite option.
    *
    * @param logicalGraph logical graph
-   * @param overWrite true, if existing files should be overwritten
+   * @param overwrite true, if existing files should be overwritten
    */
-  void write(LogicalGraph logicalGraph, boolean overWrite) throws IOException;
+  void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException;
 
   /**
-   * Writes a logical graph to the data sink with overWrite option.
+   * Writes a graph collection to the data sink with overWrite option.
    *
    * @param graphCollection graph collection
    * @param overWrite true, if existing files should be overwritten
    */
   void write(GraphCollection graphCollection, boolean overWrite) throws IOException;
-
-  /**
-   * Writes a logical graph to the data sink with overWrite option.
-   *
-   * @param graphTransactions graph transactions
-   * @param overWrite true, if existing files should be overwritten
-   */
-  void write(GraphTransactions graphTransactions, boolean overWrite) throws IOException;
 }

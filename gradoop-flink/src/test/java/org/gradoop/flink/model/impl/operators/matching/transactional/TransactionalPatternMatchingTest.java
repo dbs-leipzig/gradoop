@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.operators.matching.transactional;
 
 import com.google.common.collect.Lists;
@@ -5,7 +20,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -129,7 +144,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
       int dCount = 0;
       int eCount = 0;
       for(GraphHead head : resultHeads) {
-        GradoopId id = head.getProperties().get("lineage").getGradoopId();
+        GradoopId id = head.getPropertyValue("lineage").getGradoopId();
         if (lineageIdMap.get(id).equals("A")) {
           aCount++;
         }

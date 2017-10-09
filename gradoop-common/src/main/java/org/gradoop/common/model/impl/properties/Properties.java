@@ -1,26 +1,24 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common.model.impl.properties;
 
-import org.apache.hadoop.io.Writable;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -32,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * Represents the properties of an {@link org.gradoop.common.model.impl.pojo.Element}.
  */
-public class Properties implements Iterable<Property>, Writable, Serializable {
+public class Properties implements Iterable<Property>, Value, Serializable {
 
   /**
    * Default capacity for new property lists.
@@ -267,27 +265,27 @@ public class Properties implements Iterable<Property>, Writable, Serializable {
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
-    dataOutput.writeInt(properties.size());
+  public void write(DataOutputView outputView) throws IOException {
+    outputView.writeInt(properties.size());
 
     for (Map.Entry<String, PropertyValue> entry : properties.entrySet()) {
-      dataOutput.writeUTF(entry.getKey());
-      entry.getValue().write(dataOutput);
+      outputView.writeUTF(entry.getKey());
+      entry.getValue().write(outputView);
     }
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
-    int propertyCount = dataInput.readInt();
+  public void read(DataInputView inputView) throws IOException {
+    int propertyCount = inputView.readInt();
     this.properties = new HashMap<>(propertyCount);
 
     String key;
     PropertyValue value;
 
     for (int i = 0; i < propertyCount; i++) {
-      key = dataInput.readUTF();
+      key = inputView.readUTF();
       value = new PropertyValue();
-      value.readFields(dataInput);
+      value.read(inputView);
       properties.put(key, value);
     }
   }

@@ -1,23 +1,20 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -34,23 +31,68 @@ import java.util.Random;
 /**
  * Creates a product vertex.
  */
-public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
+public class Product extends MasterData {
+
   /**
-   * Class name of the vertex.
+   * Enum for the preishableness level from "ONE"(extreme durable) to "SIX"(extreme perishable).
    */
-  public static final String CLASS_NAME = "Product";
-  /**
-   * Broadcast variable for product names.
-   */
-  public static final String NAMES_GROUPS_BC = "nameGroupPairs";
-  /**
-   * Broadcast variable for the products adjectives.
-   */
-  public static final String ADJECTIVES_BC = "adjectives";
-  /**
-   * Acronym for product.
-   */
-  private static final String ACRONYM = "PRD";
+  public enum PerishablenessLevel {
+    /**
+     * Level one, extreme durable.
+     */
+    ONE {
+      @Override
+      public String toString() {
+        return "extreme durable";
+      }
+    },
+    /**
+     * Level two, very durable.
+     */
+    TWO {
+      @Override
+      public String toString() {
+        return "very durable";
+      }
+    },
+    /**
+     * Level three, durable.
+     */
+    THREE {
+      @Override
+      public String toString() {
+        return "durable";
+      }
+    },
+    /**
+     * Level four, perishable.
+     */
+    FOUR {
+      @Override
+      public String toString() {
+        return "perishable";
+      }
+    },
+    /**
+     * Level five, very perishable.
+     */
+    FIVE {
+      @Override
+      public String toString() {
+        return "very perishable";
+      }
+    },
+    /**
+     * Level six, extreme perishable.
+     */
+    SIX {
+      @Override
+      public String toString() {
+        return "extreme perishable";
+      }
+    },
+  }
+
   /**
    * List of possible product names and the corresponding type.
    */
@@ -91,8 +133,8 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //get broadcasted lists
-    nameGroupPairs = getRuntimeContext().getBroadcastVariable(NAMES_GROUPS_BC);
-    adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
+    nameGroupPairs = getRuntimeContext().getBroadcastVariable(Constants.NAMES_GROUPS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
     //get their sizes
     nameGroupPairCount = nameGroupPairs.size();
     adjectiveCount = adjectives.size();
@@ -101,15 +143,40 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
     //create standard properties from acronym and seed
-    Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
+    Properties properties = createDefaultProperties(seed, Constants.PRODUCT_ACRONYM);
     Random random = new Random();
     //set category, name and price
     Tuple2<String, String> nameGroupPair = nameGroupPairs.get(random.nextInt(nameGroupPairCount));
     properties.set(Constants.CATEGORY_KEY, nameGroupPair.f1);
-    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
-      nameGroupPair.f0);
+    int randomProduct = random.nextInt(adjectiveCount);
+    properties.set(Constants.NAME_KEY, adjectives.get(randomProduct) + " " +  nameGroupPair.f0);
+
+    properties.set(Constants.PRODUCT_TYPE_KEY, nameGroupPair.f1);
+
+    int minLevel = 1;
+    int maxLevel = 6;
+    switch (nameGroupPair.f1) {
+    case Constants.PRODUCT_TYPE_FRUITS :
+      minLevel = 2;
+      maxLevel = 4;
+      break;
+    case Constants.PRODUCT_TYPE_VEGETABLES :
+      minLevel = 4;
+      maxLevel = 6;
+      break;
+    case Constants.PRODUCT_TYPE_NUTS :
+      minLevel = 1;
+      maxLevel = 3;
+      break;
+    default:
+      break;
+    }
+    int level = random.nextInt((maxLevel - minLevel) + 1) + minLevel;
+    properties.set(
+      Constants.PERISHABLENESS_LEVEL, PerishablenessLevel.values()[level - 1].toString());
+
     properties.set(Constants.PRICE_KEY, generatePrice());
-    return vertexFactory.createVertex(Product.CLASS_NAME, properties);
+    return vertexFactory.createVertex(Constants.PRODUCT_VERTEX_LABEL, properties);
   }
 
   /**
@@ -124,5 +191,15 @@ public class Product extends RichMapFunction<MasterDataSeed, Vertex> {
     // generate price between min and max value
     return  BigDecimal.valueOf(minPrice + (float) (Math.random() * ((1 + maxPrice) - minPrice)))
       .setScale(2, BigDecimal.ROUND_HALF_UP);
+  }
+
+  @Override
+  public String getAcronym() {
+    return Constants.PRODUCT_ACRONYM;
+  }
+
+  @Override
+  public String getClassName() {
+    return Constants.PRODUCT_VERTEX_LABEL;
   }
 }

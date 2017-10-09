@@ -1,32 +1,35 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .IncomingAdjacencyList;
-import org.gradoop.flink.model.impl.operators.tostring.functions
-  .MultiEdgeStringCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.functions.AdjacencyMatrix;
+import org.gradoop.flink.model.impl.operators.tostring.functions.ConcatGraphHeadStrings;
+import org.gradoop.flink.model.impl.operators.tostring.functions.IncomingAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SourceStringUpdater;
 import org.gradoop.flink.model.impl.operators.tostring.functions.SwitchSourceTargetIds;
@@ -34,14 +37,6 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.TargetStringUpd
 import org.gradoop.flink.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
-import org.gradoop.flink.model.impl.GraphCollection;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.AdjacencyMatrix;
-import org.gradoop.flink.model.impl.operators.tostring.functions.ConcatGraphHeadStrings;
-
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**
@@ -90,6 +85,30 @@ public class CanonicalAdjacencyMatrixBuilder implements
   @Override
   public DataSet<String> execute(GraphCollection collection) {
 
+    // 1-10.
+    DataSet<GraphHeadString> graphHeadLabels = getGraphHeadStrings(collection);
+
+    // 11. add empty head to prevent empty result for empty collection
+
+    graphHeadLabels = graphHeadLabels
+      .union(collection
+        .getConfig()
+        .getExecutionEnvironment()
+        .fromElements(new GraphHeadString(GradoopId.get(), "")));
+
+    // 12. label collection
+
+    return graphHeadLabels
+      .reduceGroup(new ConcatGraphHeadStrings());
+  }
+
+  /**
+   * Created a dataset of (graph id, canonical label) pairs.
+   *
+   * @param collection input collection
+   * @return (graph id, canonical label) pairs
+   */
+  public DataSet<GraphHeadString> getGraphHeadStrings(GraphCollection collection) {
     // 1. label graph heads
     DataSet<GraphHeadString> graphHeadLabels = collection.getGraphHeads()
       .map(graphHeadToString);
@@ -183,18 +202,6 @@ public class CanonicalAdjacencyMatrixBuilder implements
       .leftOuterJoin(adjacencyMatrixLabels)
       .where(0).equalTo(0)
       .with(new LabelCombiner<GraphHeadString>());
-
-    // 11. add empty head to prevent empty result for empty collection
-
-    graphHeadLabels = graphHeadLabels
-      .union(collection
-        .getConfig()
-        .getExecutionEnvironment()
-        .fromElements(new GraphHeadString(GradoopId.get(), "")));
-
-    // 12. label collection
-
-    return graphHeadLabels
-      .reduceGroup(new ConcatGraphHeadStrings());
+    return graphHeadLabels;
   }
 }

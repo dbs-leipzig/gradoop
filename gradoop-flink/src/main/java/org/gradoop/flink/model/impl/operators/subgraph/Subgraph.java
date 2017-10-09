@@ -1,33 +1,31 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
 
 /**
  * Extracts a subgraph from a logical graph using the given filter functions.
@@ -102,8 +100,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
       .where(new TargetId<>()).equalTo(new Id<Vertex>())
       .with(new LeftSide<Edge, Vertex>());
 
-    return LogicalGraph.fromDataSets(
-      filteredVertices, newEdges, superGraph.getConfig());
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(filteredVertices, newEdges);
   }
 
   /**
@@ -128,8 +125,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
           .with(new RightSide<Edge, Vertex>()))
       .distinct(new Id<Vertex>());
 
-    return LogicalGraph.fromDataSets(
-      newVertices, filteredEdges, superGraph.getConfig());
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, filteredEdges);
   }
 
   /**
@@ -144,10 +140,9 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @return subgraph
    */
   private LogicalGraph subgraph(LogicalGraph superGraph) {
-    return LogicalGraph.fromDataSets(
+    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       superGraph.getVertices().filter(vertexFilterFunction),
-      superGraph.getEdges().filter(edgeFilterFunction),
-      superGraph.getConfig()
+      superGraph.getEdges().filter(edgeFilterFunction)
     );
   }
 

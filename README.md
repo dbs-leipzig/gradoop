@@ -2,7 +2,7 @@
 
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
-[Gradoop](http://www.gradoop.com) is an open source (GPLv3) research framework 
+[Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework
 for scalable graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/) 
 and [Apache HBase&trade;](http://hbase.apache.org/). It offers a graph data model which 
 extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
@@ -17,6 +17,8 @@ as a proof of concept implementation and far from production ready.
 
 ##### Further Information (articles and talks)
 
+* [Cypher-based Graph Pattern Matching in Apache Flink, FlinkForward, September 2017](https://youtu.be/dZ8_v_P1j98)
+* [Cypher-based Graph Pattern Matching in GRADOOP, SIGMOD GRADES Workshop, May 2017](https://dbs.uni-leipzig.de/file/GRADES17_Cypher_in_Gradoop.pdf)
 * [DIMSpan - Transactional Frequent Subgraph Mining with Distributed In-Memory Dataflow Systems, arXiv, March 2017](https://arxiv.org/pdf/1703.01910.pdf)
 * [Distributed Grouping of Property Graphs with GRADOOP, BTW Conf., March 2017](http://dbs.uni-leipzig.de/file/BTW17_Grouping_Research.pdf)
 * [Graph Mining for Complex Data Analytics, ICDM Demo, December 2016](http://dbs.uni-leipzig.de/file/Graph_Mining_for_Complex_Data_Analytics.pdf)
@@ -141,6 +143,10 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 The main contents of that module are the EPGM data model and a corresponding POJO 
 implementation which is used in Flink&trade;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
+
+### gradoop-hbase
+
+Input and output formats for reading and writing graph collections from Apache HBase.
 
 ### gradoop-flink
 

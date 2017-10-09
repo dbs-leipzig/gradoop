@@ -1,23 +1,21 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple6;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
@@ -29,9 +27,11 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f2: edge group label
  * f3: edge group property values
  * f4: edge group aggregate values
+ * f5: edge label group
  */
 public class EdgeGroupItem
-  extends Tuple5<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList> {
+  extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup>
+  implements GroupItem {
 
   public GradoopId getSourceId() {
     return f0;
@@ -71,5 +71,13 @@ public class EdgeGroupItem
 
   public void setAggregateValues(PropertyValueList value) {
     this.f4 = value;
+  }
+
+  public LabelGroup getLabelGroup() {
+    return f5;
+  }
+
+  public void setLabelGroup(LabelGroup edgeLabelGroup) {
+    f5 = edgeLabelGroup;
   }
 }

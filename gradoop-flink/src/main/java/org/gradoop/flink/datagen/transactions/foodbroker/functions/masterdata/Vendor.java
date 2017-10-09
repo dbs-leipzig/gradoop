@@ -1,28 +1,25 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -31,27 +28,7 @@ import java.util.Random;
 /**
  * Creates a vendor vertex.
  */
-public class Vendor extends RichMapFunction<MasterDataSeed, Vertex> {
-  /**
-   * Class name of the vertex.
-   */
-  public static final String CLASS_NAME = "Vendor";
-  /**
-   * Broadcast variable for the vendors adjectives.
-   */
-  public static final String ADJECTIVES_BC = "adjectives";
-  /**
-   * Broadcast variable for the vendors nouns.
-   */
-  public static final String NOUNS_BC = "nouns";
-  /**
-   * Broadcast variable for the vendors cities.
-   */
-  public static final String CITIES_BC = "cities";
-  /**
-   * Acronym for vendor.
-   */
-  private static final String ACRONYM = "CUS";
+public class Vendor extends BusinessRelation {
   /**
    * List of possible adjectives.
    */
@@ -61,10 +38,6 @@ public class Vendor extends RichMapFunction<MasterDataSeed, Vertex> {
    */
   private List<String> nouns;
   /**
-   * List of possible cities.
-   */
-  private List<String> cities;
-  /**
    * Amount of possible adjectives.
    */
   private Integer adjectiveCount;
@@ -72,46 +45,45 @@ public class Vendor extends RichMapFunction<MasterDataSeed, Vertex> {
    * Amount of possible nouns.
    */
   private Integer nounCount;
-  /**
-   * Amount of pissible cities.
-   */
-  private Integer cityCount;
-  /**
-   * EPGM vertex factory.
-   */
-  private final VertexFactory vertexFactory;
 
   /**
    * Valued constructor.
    *
    * @param vertexFactory EPGM vertex factory
+   * @param foodBrokerConfig FoodBroker configuration
    */
-  public Vendor(VertexFactory vertexFactory) {
-    this.vertexFactory = vertexFactory;
+  public Vendor(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
+    super(vertexFactory, foodBrokerConfig);
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(NOUNS_BC);
-    cities = getRuntimeContext().getBroadcastVariable(CITIES_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
-    cityCount = cities.size();
   }
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    //create standard properties from acronym and seed
-    Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
+    //set rnd name
     Random random = new Random();
-    //set rnd city and name
-    properties.set(Constants.CITY_KEY, cities.get(random.nextInt(cityCount)));
-    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    Vertex vertex = super.map(seed);
+    vertex.setProperty(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
-    return vertexFactory.createVertex(Vendor.CLASS_NAME, properties);
+    return vertex;
+  }
+
+  @Override
+  public String getAcronym() {
+    return Constants.VENDOR_ACRONYM;
+  }
+
+  @Override
+  public String getClassName() {
+    return Constants.VENDOR_VERTEX_LABEL;
   }
 }

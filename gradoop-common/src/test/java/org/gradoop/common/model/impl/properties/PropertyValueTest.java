@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
@@ -9,7 +24,12 @@ import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,9 +129,21 @@ public class PropertyValueTest {
     assertTrue(p.isMap());
     assertEquals(MAP_VAL_9, p.getMap());
     //List
-    p = create(LIST_VAL_A);
+    p = create(LIST_VAL_a);
     assertTrue(p.isList());
-    assertEquals(LIST_VAL_A, p.getList());
+    assertEquals(LIST_VAL_a, p.getList());
+    //Date
+    p = create(DATE_VAL_b);
+    assertTrue(p.isDate());
+    assertEquals(DATE_VAL_b, p.getDate());
+    //Time
+    p = create(TIME_VAL_c);
+    assertTrue(p.isTime());
+    assertEquals(TIME_VAL_c, p.getTime());
+    //DateTime
+    p = create(DATETIME_VAL_d);
+    assertTrue(p.isDateTime());
+    assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
   @Test
@@ -158,9 +190,21 @@ public class PropertyValueTest {
     assertTrue(p.isMap());
     assertEquals(MAP_VAL_9, p.getObject());
     // List
-    p.setObject(LIST_VAL_A);
+    p.setObject(LIST_VAL_a);
     assertTrue(p.isList());
-    assertEquals(LIST_VAL_A, p.getObject());
+    assertEquals(LIST_VAL_a, p.getObject());
+    //Date
+    p.setObject(DATE_VAL_b);
+    assertTrue(p.isDate());
+    assertEquals(DATE_VAL_b, p.getDate());
+    //Time
+    p.setObject(TIME_VAL_c);
+    assertTrue(p.isTime());
+    assertEquals(TIME_VAL_c, p.getTime());
+    //DateTime
+    p.setObject(DATETIME_VAL_d);
+    assertTrue(p.isDateTime());
+    assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
   @Test(expected = UnsupportedTypeException.class)
@@ -183,6 +227,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -199,6 +246,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -228,6 +278,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -257,6 +310,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -286,6 +342,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -315,6 +374,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -344,6 +406,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -373,6 +438,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -402,6 +470,9 @@ public class PropertyValueTest {
     assertTrue(p.isGradoopId());
     assertFalse(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -431,6 +502,9 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertTrue(p.isMap());
     assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
@@ -448,7 +522,7 @@ public class PropertyValueTest {
 
   @Test
   public void testIsList() throws Exception {
-    PropertyValue p = PropertyValue.create(LIST_VAL_A);
+    PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
     assertFalse(p.isInt());
@@ -460,20 +534,121 @@ public class PropertyValueTest {
     assertFalse(p.isGradoopId());
     assertFalse(p.isMap());
     assertTrue(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
   }
 
   @Test
   public void testGetList() throws Exception {
-    PropertyValue p = PropertyValue.create(LIST_VAL_A);
-    assertEquals(LIST_VAL_A, p.getList());
+    PropertyValue p = PropertyValue.create(LIST_VAL_a);
+    assertEquals(LIST_VAL_a, p.getList());
   }
 
   @Test
   public void testSetList() throws Exception {
     PropertyValue p = new PropertyValue();
-    p.setList(LIST_VAL_A);
-    assertEquals(LIST_VAL_A, p.getList());
+    p.setList(LIST_VAL_a);
+    assertEquals(LIST_VAL_a, p.getList());
   }
+
+  @Test
+  public void testIsDate() throws Exception {
+    PropertyValue p = PropertyValue.create(DATE_VAL_b);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
+    assertTrue(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
+  }
+
+  @Test
+  public void testGetDate() throws Exception {
+    PropertyValue p = PropertyValue.create(DATE_VAL_b);
+    assertEquals(DATE_VAL_b, p.getDate());
+  }
+
+  @Test
+  public void testSetDate() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setDate(DATE_VAL_b);
+    assertEquals(DATE_VAL_b, p.getDate());
+  }
+
+  @Test
+  public void testIsTime() throws Exception {
+    PropertyValue p = PropertyValue.create(TIME_VAL_c);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertTrue(p.isTime());
+    assertFalse(p.isDateTime());
+  }
+
+  @Test
+  public void testGetTime() throws Exception {
+    PropertyValue p = PropertyValue.create(TIME_VAL_c);
+    assertEquals(TIME_VAL_c, p.getTime());
+  }
+
+  @Test
+  public void testSetTime() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setTime(TIME_VAL_c);
+    assertEquals(TIME_VAL_c, p.getTime());
+  }
+
+
+  @Test
+  public void testIsDateTime() throws Exception {
+    PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertTrue(p.isDateTime());
+  }
+
+  @Test
+  public void testGetDateTime() throws Exception {
+    PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
+    assertEquals(DATETIME_VAL_d, p.getDateTime());
+  }
+
+  @Test
+  public void testSetDateTime() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setDateTime(DATETIME_VAL_d);
+    assertEquals(DATETIME_VAL_d, p.getDateTime());
+  }
+
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
@@ -519,11 +694,26 @@ public class PropertyValueTest {
       PropertyValue.create("foo"), PropertyValue.create("baz")
     );
     validateEqualsAndHashCode(create(list1), create(list2), create(list3));
+
+    LocalDate date1 = LocalDate.MAX;
+    LocalDate date2 = LocalDate.MAX;
+    LocalDate date3 = LocalDate.now();
+
+    validateEqualsAndHashCode(create(date1), create(date2), create(date3));
+
+    LocalTime time1 = LocalTime.MAX;
+    LocalTime time2 = LocalTime.MAX;
+    LocalTime time3 = LocalTime.now();
+
+    validateEqualsAndHashCode(create(time1), create(time2), create(time3));
+
+    LocalDateTime dateTime1 = LocalDateTime.of(date1, time1);
+    LocalDateTime dateTime2 = LocalDateTime.of(date2, time2);
+    LocalDateTime dateTime3 = LocalDateTime.of(date3, time3);
+
+    validateEqualsAndHashCode(create(dateTime1), create(dateTime2), create(dateTime3));
   }
 
-  /**
-   * Assumes that p1.equals(p2) and !p2.equals(p3)
-   */
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
     assertEquals(p1, p1);
@@ -579,13 +769,91 @@ public class PropertyValueTest {
     create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
   }
 
-
   @Test(expected = UnsupportedOperationException.class)
   public void testCompareToWithList() {
-    create(LIST_VAL_A).compareTo(create(LIST_VAL_A));
+    create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
 
+  @Test
+  public void testArrayValueMaxSize() {
+    PropertyValue property = new PropertyValue();
+    property.setBytes(new byte[PropertyValue.MAX_BINARY_LENGTH]);
+  }
+  
+  @Test(expected = IllegalStateException.class)
+  public void testArrayValueTooBig() {
+    PropertyValue property = new PropertyValue();
+    property.setBytes(new byte[PropertyValue.MAX_BINARY_LENGTH + 1]);
+  }
 
+  @Test
+  public void testStringValueMaxSize() {
+    create(new String(new byte[PropertyValue.MAX_BINARY_LENGTH - 1]));
+  }
+  
+  @Test(expected = IllegalStateException.class)
+  public void testStringValueTooBig() {
+    create(new String(new byte[PropertyValue.MAX_BINARY_LENGTH]));
+  }
+  
+  @Test
+  public void testListValueMaxSize() {
+    int n = PropertyValue.MAX_BINARY_LENGTH / 9;
+    List<PropertyValue> list = new ArrayList<>(n);
+    while ( n-- > 0 ){
+      list.add(create(Math.random()));
+    }
+    create(list);
+  }
+  
+  @Test(expected = IllegalStateException.class)
+  public void testListValueTooBig() {
+    // 8 bytes per double + 1 byte overhead
+    int n = PropertyValue.MAX_BINARY_LENGTH / 9 + 1;
+    List<PropertyValue> list = new ArrayList<>(n);
+    while ( n-- > 0 ){
+      list.add(create(Math.random()));
+    }
+    create(list);
+  }
+  
+  @Test
+  public void testMapValueMaxSize() {
+    Map<PropertyValue, PropertyValue> m = new HashMap<>();
+    // 8 bytes per double + 1 byte overhead
+    for (int i = 0; i < PropertyValue.MAX_BINARY_LENGTH / 18; i++) {
+      PropertyValue p = create(Math.random());
+      m.put(p, p);
+    }
+    create(m);
+  }
+  
+  @Test(expected = IllegalStateException.class)
+  public void testMapValueTooBig() {
+    Map<PropertyValue, PropertyValue> m = new HashMap<>();
+    // 8 bytes per double + 1 byte overhead
+    for (int i = 0; i < PropertyValue.MAX_BINARY_LENGTH / 18 + 1; i++) {
+      PropertyValue p = create(Math.random());
+      m.put(p, p);
+    }
+    create(m);
+  }
+  
+  @Test
+  public void testBigDecimalValueMaxSize() {
+    // internal representation of BigInteger needs 5 bytes
+    byte [] bigendian = new byte[PropertyValue.MAX_BINARY_LENGTH - 5];
+    Arrays.fill(bigendian, (byte) 121);
+    create(new BigDecimal(new BigInteger(bigendian)));
+  }
+  
+  @Test(expected = IllegalStateException.class)
+  public void testBigDecimalValueTooBig() {
+    byte [] bigendian = new byte[PropertyValue.MAX_BINARY_LENGTH - 4];
+    Arrays.fill(bigendian, (byte) 121);
+    create(new BigDecimal(new BigInteger(bigendian)));
+  }
+  
   @Test
   public void testWriteAndReadFields() throws IOException {
     PropertyValue p = create(NULL_VAL_0);
@@ -618,7 +886,16 @@ public class PropertyValueTest {
     p = create(MAP_VAL_9);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
-    p = create(LIST_VAL_A);
+    p = create(LIST_VAL_a);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(DATE_VAL_b);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(TIME_VAL_c);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(DATETIME_VAL_d);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
   /**

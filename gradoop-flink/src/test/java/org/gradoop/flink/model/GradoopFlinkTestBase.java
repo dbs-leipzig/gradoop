@@ -1,29 +1,29 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.test.util.ForkableFlinkMiniCluster;
+import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -50,7 +50,7 @@ public abstract class GradoopFlinkTestBase {
 
   protected static final long TASKMANAGER_MEMORY_SIZE_MB = 512;
 
-  protected static ForkableFlinkMiniCluster CLUSTER = null;
+  protected static LocalFlinkMiniCluster CLUSTER = null;
 
   /**
    * Flink Execution Environment
@@ -63,7 +63,7 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig config;
 
   public GradoopFlinkTestBase() {
-    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM);
+    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
@@ -102,7 +102,7 @@ public abstract class GradoopFlinkTestBase {
    * @throws Exception
    */
   @BeforeClass
-  public static void setup() throws Exception {
+  public static void setupFlink() throws Exception {
     File logDir = File.createTempFile("TestBaseUtils-logdir", null);
     Assert.assertTrue("Unable to delete temp file", logDir.delete());
     Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
@@ -122,13 +122,12 @@ public abstract class GradoopFlinkTestBase {
     config.setString("akka.startup-timeout", "60 s");
     config.setInteger("jobmanager.web.port", 8081);
     config.setString("jobmanager.web.log.path", logFile.toString());
-    CLUSTER =
-      new ForkableFlinkMiniCluster(config, true);
+    CLUSTER = new LocalFlinkMiniCluster(config, true);
     CLUSTER.start();
   }
 
   @AfterClass
-  public static void tearDown() throws Exception {
+  public static void tearDownFlink() throws Exception {
     TestBaseUtils.stopCluster(CLUSTER, new FiniteDuration(1000, TimeUnit.SECONDS));
   }
 
@@ -191,5 +190,11 @@ public abstract class GradoopFlinkTestBase {
   protected void collectAndAssertFalse(DataSet<Boolean> result) throws
     Exception {
     assertFalse("expected false", result.collect().get(0));
+  }
+
+  protected <T extends EPGMElement> DataSet<T> getEmptyDataSet(T dummy) {
+    return getExecutionEnvironment()
+      .fromElements(dummy)
+      .filter(new False<>());
   }
 }

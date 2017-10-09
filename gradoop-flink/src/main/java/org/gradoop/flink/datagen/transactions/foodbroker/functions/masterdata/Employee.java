@@ -1,28 +1,25 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 
-import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -31,31 +28,7 @@ import java.util.Random;
 /**
  * Creates a employee vertex.
  */
-public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
-  /**
-   * Class name of the vertex.
-   */
-  public static final String CLASS_NAME = "Employee";
-  /**
-   * Broadcast variable for male employees first name.
-   */
-  public static final String FIRST_NAMES_MALE_BC = "firstNamesMale";
-  /**
-   * Broadcast variable for female employees first name.
-   */
-  public static final String FIRST_NAMES_FEMALE_BC = "firstNamesFemale";
-  /**
-   * Broadcast variable for employees last name.
-   */
-  public static final String LAST_NAMES_BC = "nouns";
-  /**
-   * Broadcast variable for employees cities.
-   */
-  public static final String CITIES_BC = "cities";
-  /**
-   * Acronym for employee.
-   */
-  public static final String ACRONYM = "EMP";
+public class Employee extends Person {
   /**
    * List of possible first female names.
    */
@@ -69,10 +42,6 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
    */
   private List<String> lastNames;
   /**
-   * List of possible cities.
-   */
-  private List<String> cities;
-  /**
    * Amount of possible female first names.
    */
   private Integer firstNameCountFemale;
@@ -84,54 +53,37 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
    * Amount of possible last names.
    */
   private Integer lastNameCount;
-  /**
-   * Amount of possible cities.
-   */
-  private Integer cityCount;
-  /**
-   * EPGM vertex factory.
-   */
-  private final VertexFactory vertexFactory;
 
   /**
    * Valued constructor.
    *
    * @param vertexFactory EPGM vertex factory.
+   * @param foodBrokerConfig FoodBroker configuration.
    */
-  public Employee(VertexFactory vertexFactory) {
-    this.vertexFactory = vertexFactory;
+  public Employee(VertexFactory vertexFactory, FoodBrokerConfig foodBrokerConfig) {
+    super(vertexFactory, foodBrokerConfig);
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcast maps
-    firstNamesFemale = getRuntimeContext()
-      .getBroadcastVariable(FIRST_NAMES_FEMALE_BC);
-    firstNamesMale = getRuntimeContext()
-      .getBroadcastVariable(FIRST_NAMES_MALE_BC);
-    lastNames = getRuntimeContext()
-      .getBroadcastVariable(LAST_NAMES_BC);
-    cities = getRuntimeContext()
-      .getBroadcastVariable(CITIES_BC);
+    firstNamesFemale = getRuntimeContext().getBroadcastVariable(Constants.FIRST_NAMES_FEMALE_BC);
+    firstNamesMale = getRuntimeContext().getBroadcastVariable(Constants.FIRST_NAMES_MALE_BC);
+    lastNames = getRuntimeContext().getBroadcastVariable(Constants.LAST_NAMES_BC);
     //get their sizes.
     firstNameCountFemale = firstNamesFemale.size();
     firstNameCountMale = firstNamesMale.size();
     lastNameCount = lastNames.size();
-    cityCount = cities.size();
   }
 
   @Override
   public Vertex map(MasterDataSeed seed) throws  Exception {
-    //create standard properties from acronym and seed
-    Properties properties = MasterData.createDefaultProperties(seed, ACRONYM);
+    Vertex vertex = super.map(seed);
     Random random = new Random();
-    //set rnd city, name and gender
-    properties.set(Constants.CITY_KEY, cities.get(random.nextInt(cityCount)));
-
+    //set rnd name and gender
     String gender;
     String name;
-
     // separate between male and female and load the corresponding names
     if (seed.getNumber() % 2 == 0) {
       gender = "f";
@@ -142,8 +94,38 @@ public class Employee extends RichMapFunction<MasterDataSeed, Vertex> {
       name = firstNamesMale.get(random.nextInt(firstNameCountMale)) +
         " " + lastNames.get(random.nextInt(lastNameCount));
     }
-    properties.set(Constants.NAME_KEY, name);
-    properties.set(Constants.GENDER_KEY, gender);
-    return vertexFactory.createVertex(Employee.CLASS_NAME, properties);
+    vertex.setProperty(Constants.NAME_KEY, name);
+    vertex.setProperty(Constants.GENDER_KEY, gender);
+
+    //update quality and set type
+    Float quality = vertex.getPropertyValue(Constants.QUALITY_KEY).getFloat();
+    Double assistantRatio = getFoodBrokerConfig().getMasterDataTypeAssistantRatio(getClassName());
+    Double normalRatio = getFoodBrokerConfig().getMasterDataTypeNormalRatio(getClassName());
+    Double rnd = random.nextDouble();
+    if (rnd <= assistantRatio) {
+      quality *= getFoodBrokerConfig().getMasterDataTypeAssistantInfluence();
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_ASSISTANT);
+    } else if (rnd >= assistantRatio + normalRatio) {
+      quality *= getFoodBrokerConfig().getMasterDataTypeSupervisorInfluence();
+      if (quality > 1f) {
+        quality = 1f;
+      }
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_SUPERVISOR);
+    } else {
+      vertex.setProperty(Constants.EMPLOYEE_TYPE_KEY, Constants.EMPLOYEE_TYPE_NORMAL);
+    }
+    vertex.setProperty(Constants.QUALITY_KEY, quality);
+
+    return vertex;
+  }
+
+  @Override
+  public String getAcronym() {
+    return Constants.EMPLOYEE_ACRONYM;
+  }
+
+  @Override
+  public String getClassName() {
+    return Constants.EMPLOYEE_VERTEX_LABEL;
   }
 }

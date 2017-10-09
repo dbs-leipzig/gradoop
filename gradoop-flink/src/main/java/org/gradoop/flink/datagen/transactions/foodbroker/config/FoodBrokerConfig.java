@@ -1,39 +1,34 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.config;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -51,34 +46,38 @@ public class FoodBrokerConfig implements Serializable {
   private Integer scaleFactor = 0;
 
   /**
-   * Path to the config file.
-   */
-  private String path;
-
-  /**
    * Valued constructor.
    *
-   * @param path path to config file
-   * @throws IOException
-   * @throws JSONException
+   * @param configString string representing a json object
    */
-  public FoodBrokerConfig(String path) throws IOException, JSONException {
-    this.path = path;
-    File file = FileUtils.getFile(path);
-    root = new JSONObject(FileUtils.readFileToString(file));
+  public FoodBrokerConfig(String configString) throws JSONException {
+    root = new JSONObject(configString);
   }
 
   /**
    * Valued factory method.
    *
-   * @param path path to config file
+   * @param configPath path to the config file
    * @return new FoodBrokerConfig
    * @throws IOException
    * @throws JSONException
    */
-  public static FoodBrokerConfig fromFile(String path) throws
-    IOException, JSONException {
-    return new FoodBrokerConfig(path);
+  public static FoodBrokerConfig fromFile(String configPath)
+    throws IOException, JSONException {
+    File file = FileUtils.getFile(configPath);
+    return new FoodBrokerConfig(FileUtils.readFileToString(file));
+  }
+
+  /**
+   * Valued factory method.
+   *
+   * @param configString string representing a json object
+   * @return new FoodBrokerConfig
+   * @throws JSONException
+   */
+  public static FoodBrokerConfig fromJSONString(String configString)
+    throws JSONException {
+    return new FoodBrokerConfig(configString);
   }
 
   /**
@@ -88,19 +87,14 @@ public class FoodBrokerConfig implements Serializable {
    * @return list of String
    */
   public List<String> getStringValuesFromFile(String fileName) {
-    List<String> values = null;
-    String adjectivesPath = null;
-    // get path relevant to the config file
-    Path parentDirectory = Paths.get(path).getParent();
-    if (parentDirectory != null) {
-      adjectivesPath = parentDirectory.toString() + "/" + fileName;
-    }
-    try {
-      values = FileUtils.readLines(FileUtils.getFile(adjectivesPath));
+    String value = "";
+
+    try (InputStream inputStream = this.getClass().getResourceAsStream("/foodbroker/" + fileName)) {
+      value = org.apache.commons.io.IOUtils.toString(inputStream, "UTF-8");
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return values;
+    return Lists.newArrayList(value.split("\n"));
   }
 
   /**
@@ -110,19 +104,58 @@ public class FoodBrokerConfig implements Serializable {
    * @return json object of the searched master data
    * @throws JSONException
    */
-  private JSONObject getMasterDataConfigNode(String className) throws
-    JSONException {
+  private JSONObject getMasterDataConfigNode(String className) throws JSONException {
     return root.getJSONObject("MasterData").getJSONObject(className);
   }
 
   /**
-   * Loads the "good" value a master data object.
+   * Loads the number of companies to use.
+   *
+   * @return number of companies to use
+   * @throws JSONException
+   */
+  public Integer getCompanyCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("companyCount");
+  }
+
+  /**
+   * Loads the number of holdings to use.
+   *
+   * @return number of holdings to use
+   * @throws JSONException
+   */
+  public Integer getHoldingCount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("holdingCount");
+  }
+
+  /**
+   * Loads the min number of branches for a company.
+   *
+   * @return min number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMinAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMin");
+  }
+
+  /**
+   * Loads the max number of branches for a company.
+   *
+   * @return max number of branches for a company
+   * @throws JSONException
+   */
+  public Integer getBranchMaxAmount() throws JSONException {
+    return getMasterDataConfigNode("Company").getInt("branchesMax");
+  }
+
+  /**
+   * Loads the "good" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataGoodRatio(String className)  {
-    Double good = null;
+  public Double getMasterDataGoodRatio(String className) {
+    Double good = 0.0d;
 
     try {
       good = getMasterDataConfigNode(className).getDouble("good");
@@ -133,13 +166,13 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "bad" value a master data object.
+   * Loads the "bad" ratio value of a master data object.
    *
    * @param className class name of the master data
    * @return double representation of the value
    */
-  public Double getMasterDataBadRatio(String className)  {
-    Double bad = null;
+  public Double getMasterDataBadRatio(String className) {
+    Double bad = 0.0d;
 
     try {
       bad = getMasterDataConfigNode(className).getDouble("bad");
@@ -150,12 +183,94 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "offset" value a master data object.
+   * Loads the "assistant" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeAssistantRatio(String className) {
+    Double ratio = 0.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("assistant");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "normal" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeNormalRatio(String className) {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("normal");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+  /**
+   * Loads the "supervisor" type ratio value of a master data object.
+   *
+   * @param className class name of the master data
+   * @return double representation of the value
+   */
+  public double getMasterDataTypeSupervisorRatio(String className) {
+    Double ratio = 0.0d;
+
+    try {
+      ratio = getMasterDataConfigNode(className).getJSONObject("type").getDouble("supervisor");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio;
+  }
+
+  /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataTypeAssistantInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("assistantInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the "assistant" type relative influence value of a master data object.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataTypeSupervisorInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("supervisorInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the "offset" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value
    */
-  private Integer getMasterDataOffset(String className)  {
+  private Integer getMasterDataOffset(String className) {
     Integer offset = null;
 
     try {
@@ -167,7 +282,7 @@ public class FoodBrokerConfig implements Serializable {
   }
 
   /**
-   * Loads the "growth" value a master data object.
+   * Loads the "growth" value of a master data object.
    *
    * @param className class name of the master data
    * @return integer representation of the value
@@ -181,6 +296,38 @@ public class FoodBrokerConfig implements Serializable {
       e.printStackTrace();
     }
     return growth;
+  }
+
+  /**
+   * Loads the relative influence value if two master data objects are located in the same city.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataSameCityInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("sameCityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
+  }
+
+  /**
+   * Loads the relative influence value if two master data objects belong to the same holding.
+   *
+   * @return float representation of the value
+   */
+  public float getMasterDataSameHoldingInfluence() {
+    Double ratio = 1.0d;
+
+    try {
+      ratio = getMasterDataConfigNode("Influence").getDouble("sameCityInfluence");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return ratio.floatValue();
   }
 
   /**
@@ -259,19 +406,19 @@ public class FoodBrokerConfig implements Serializable {
    *
    * @return long representation of the start date
    */
-  public Long getStartDate() {
+  public LocalDate getStartDate() {
     String startDate;
-    DateFormat formatter;
-    Date date = Date.from(Instant.EPOCH);
+    DateTimeFormatter formatter;
+    LocalDate date = LocalDate.MIN;
 
     try {
       startDate = root.getJSONObject("Process").getString("startDate");
-      formatter = new SimpleDateFormat("yyyy-MM-dd");
-      date = formatter.parse(startDate);
-    } catch (JSONException | ParseException e) {
+      formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      date = LocalDate.parse(startDate, formatter);
+    } catch (JSONException e) {
       e.printStackTrace();
     }
-    return date.getTime();
+    return date;
   }
 
   /**
@@ -404,27 +551,62 @@ public class FoodBrokerConfig implements Serializable {
    * @param startValue the start value
    * @return aggregated start value
    */
-  private Float getValue(List<Float> influencingMasterDataQuality, boolean higherIsBetter,
+  protected Float getValue(List<Float> influencingMasterDataQuality, boolean higherIsBetter,
     Float influence, Float startValue) {
     Float value = startValue;
 
+    BigDecimal influenceCount = BigDecimal.ZERO;
+
     for (float quality : influencingMasterDataQuality) {
       // check quality value of the masterdata and adjust the result value
-      if (quality >= getQualityGood()) {
-        if (higherIsBetter) {
-          value += influence;
-        } else {
-          value -= influence;
-        }
-      } else if (quality <= getQualityBad()) {
-        if (higherIsBetter) {
-          value -= influence;
-        } else {
-          value += influence;
-        }
+      influenceCount = influenceCount.add(BigDecimal.valueOf(quality));
+    }
+
+    if (influenceCount.compareTo(BigDecimal.ZERO) > 0) {
+      influenceCount = influenceCount.setScale(2, BigDecimal.ROUND_HALF_UP);
+
+      // normalize the quality value
+      influenceCount = influenceCount
+        .divide(BigDecimal.valueOf(influencingMasterDataQuality.size()), 8, RoundingMode.HALF_UP);
+      // subtract the avg normal, for standard config it is 0.5
+      influenceCount = influenceCount.subtract(getAvgNormal());
+
+      // if the normalized value is greater than the avg
+      if (influenceCount.compareTo(BigDecimal.ZERO) == 1) {
+        // calculate how much times the value is greater than the difference
+        // between the avg normal value and the lowest good value
+        influenceCount = influenceCount
+          .divide(BigDecimal.valueOf(getQualityGood())
+            .subtract(getAvgNormal())
+            .abs(), 0, BigDecimal.ROUND_HALF_UP);
+      // if the normalized value is LOWER than the avg
+      } else if (influenceCount.compareTo(BigDecimal.ZERO) == -1) {
+        // calculate how much times the value is smaller than the difference
+        // between the avg normal value and the lowest normal value
+        influenceCount = influenceCount
+          .divide(BigDecimal.valueOf(getQualityNormal())
+            .subtract(getAvgNormal())
+            .abs(), 0, BigDecimal.ROUND_HALF_UP);
       }
     }
+    influence *= influenceCount.intValue();
+
+    if (higherIsBetter) {
+      value += influence;
+    } else {
+      value -= influence;
+    }
     return value;
+  }
+
+  /**
+   * Returns the average normal value, for default config it is 0.5.
+   *
+   * @return big decimal value of the average normal value
+   */
+  private BigDecimal getAvgNormal() {
+    return BigDecimal.valueOf((getQualityBad() + getQualityNormal() + getQualityGood()) / 2)
+      .setScale(2, BigDecimal.ROUND_HALF_UP);
   }
 
   /**
@@ -482,7 +664,7 @@ public class FoodBrokerConfig implements Serializable {
    */
   public BigDecimal getDecimalVariationConfigurationValue(List<Float> influencingMasterDataQuality,
     String node, String key, boolean higherIsBetterDefault) {
-    Float baseValue = null;
+    Float baseValue = 0.0f;
     Float value;
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
@@ -512,7 +694,7 @@ public class FoodBrokerConfig implements Serializable {
    */
   public boolean happensTransitionConfiguration(List<Float> influencingMasterDataQuality,
     String node, String key, boolean higherIsBetterDefault) {
-    Float baseValue = null;
+    Float baseValue = 0.0f;
     Float value;
     Boolean higherIsBetter = getHigherIsBetter(node, key, higherIsBetterDefault);
     Float influence = getInfluence(node, key, null);
@@ -540,17 +722,11 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date, List<Float> influencingMasterDataQuality,
+  public LocalDate delayDelayConfiguration(LocalDate date, List<Float> influencingMasterDataQuality,
     String node, String key) {
     // get the delay from range
     int delay = getIntRangeConfigurationValue(influencingMasterDataQuality, node, key, false);
-
-    // calculate time with delay
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(date);
-    calendar.add(Calendar.DATE, delay);
-
-    return calendar.getTimeInMillis();
+    return date.plusDays(delay);
   }
 
   /**
@@ -563,19 +739,10 @@ public class FoodBrokerConfig implements Serializable {
    * @param key the key to load from
    * @return long representation of the new date
    */
-  public long delayDelayConfiguration(long date, Float influencingMasterDataQuality,
+  public LocalDate delayDelayConfiguration(LocalDate date, Float influencingMasterDataQuality,
     String node, String key) {
     List<Float> influencingMasterDataQualities = new ArrayList<>();
     influencingMasterDataQualities.add(influencingMasterDataQuality);
     return delayDelayConfiguration(date, influencingMasterDataQualities, node, key);
-  }
-
-  /**
-   * Returns the path to the config file.
-   *
-   * @return path to config file
-   */
-  public String getPath() {
-    return path;
   }
 }

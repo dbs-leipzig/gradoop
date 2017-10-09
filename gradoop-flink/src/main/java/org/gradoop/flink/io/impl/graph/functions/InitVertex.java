@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.io.impl.graph.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
@@ -26,7 +24,7 @@ import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -47,7 +45,7 @@ public class InitVertex<K extends Comparable<K>>
   /**
    * Used to create new EPGM vertex.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Reduce object instantiation.
@@ -56,15 +54,15 @@ public class InitVertex<K extends Comparable<K>>
 
   /**
    * Creates a new map function
-   * @param vertexFactory       vertex factory
+   * @param epgmVertexFactory       vertex factory
    * @param lineagePropertyKey  property key to store import identifier
    *                            (can be {@code null})
-   * @param keyTypeInfo         type info for the import vertex identifier
+   * @param externalIdType         type info for the import vertex identifier
    */
-  public InitVertex(VertexFactory vertexFactory,
-    String lineagePropertyKey, TypeInformation<K> keyTypeInfo) {
-    super(lineagePropertyKey, keyTypeInfo);
-    this.vertexFactory      = vertexFactory;
+  public InitVertex(EPGMVertexFactory<Vertex> epgmVertexFactory,
+    String lineagePropertyKey, TypeInformation<K> externalIdType) {
+    super(lineagePropertyKey, externalIdType);
+    this.vertexFactory      = epgmVertexFactory;
     this.reuseTuple         = new Tuple3<>();
   }
 

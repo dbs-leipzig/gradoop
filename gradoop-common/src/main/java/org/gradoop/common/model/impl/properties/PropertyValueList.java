@@ -1,31 +1,31 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common.model.impl.properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.io.WritableComparable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -37,7 +37,7 @@ import java.util.Iterator;
  * Represents a list of property values.
  */
 public class PropertyValueList
-  implements Iterable<PropertyValue>, WritableComparable<PropertyValueList>, Serializable {
+  implements Iterable<PropertyValue>, Serializable, Value, Comparable<PropertyValueList> {
 
   /**
    * Class version for serialization.
@@ -84,13 +84,14 @@ public class PropertyValueList
     Collection<PropertyValue> propertyValues) throws IOException {
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-    DataOutputStream out = new DataOutputStream(byteStream);
+    DataOutputStream outputStream = new DataOutputStream(byteStream);
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
 
     for (PropertyValue propertyValue : propertyValues) {
-      propertyValue.write(out);
+      propertyValue.write(outputView);
     }
 
-    out.flush();
+    outputStream.flush();
     return new PropertyValueList(byteStream.toByteArray());
   }
 
@@ -117,13 +118,13 @@ public class PropertyValueList
   }
 
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
+  public void write(DataOutputView dataOutput) throws IOException {
     dataOutput.writeShort(bytes.length);
     dataOutput.write(bytes);
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
+  public void read(DataInputView dataInput) throws IOException {
     bytes = new byte[dataInput.readShort()];
     dataInput.readFully(bytes);
   }
@@ -149,10 +150,10 @@ public class PropertyValueList
     private final ByteArrayInputStream byteStream;
 
     /**
-     * Wraps the {@code byteStream} and is used to access the {@code readFields}
+     * Wraps the {@code byteStream} and is used to access the {@code read}
      * method of PropertyValue.
      */
-    private final DataInputStream in;
+    private final DataInputStream inputStream;
 
     /**
      * Creates new iterator
@@ -164,7 +165,7 @@ public class PropertyValueList
         rawBytes = new byte[0];
       }
       byteStream = new ByteArrayInputStream(rawBytes);
-      in = new DataInputStream(byteStream);
+      inputStream = new DataInputStream(byteStream);
     }
 
     @Override
@@ -175,7 +176,7 @@ public class PropertyValueList
       } else {
         // close the stream if no more data is available
         try {
-          in.close();
+          inputStream.close();
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -188,7 +189,8 @@ public class PropertyValueList
     public PropertyValue next() {
       PropertyValue nextValue = new PropertyValue();
       try {
-        nextValue.readFields(in);
+        DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+        nextValue.read(inputView);
       } catch (IOException e) {
         e.printStackTrace();
       }

@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import com.google.common.collect.Sets;
@@ -24,12 +22,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,9 +47,11 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFields(
     "f0->f0.f0;" +  // vertexId
-    "f3->f0.f3;" +  // label
-    "f4->f0.f4"     // properties
+    "f2->f0.f2;" +  // label
+    "f3->f0.f3;" +  // properties
+    "f6->f0.f6"     // label group
 )
+@FunctionAnnotation.ReadFields("f4")
 public class TransposeVertexGroupItems
   extends ReduceVertexGroupItemBase
   implements GroupReduceFunction<VertexGroupItem, Tuple2<VertexGroupItem, IdWithIdSet>> {
@@ -67,12 +66,10 @@ public class TransposeVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel          true, iff labels are used for grouping
-   * @param vertexAggregators aggregate functions for super vertices
+   * @param useLabel                        true, iff labels are used for grouping
    */
-  public TransposeVertexGroupItems(boolean useLabel,
-    List<PropertyValueAggregator> vertexAggregators) {
-    super(null, useLabel, vertexAggregators);
+  public TransposeVertexGroupItems(boolean useLabel) {
+    super(useLabel);
     this.reuseOuterTuple = new Tuple2<>();
     this.reuseInnerTuple = new IdWithIdSet();
   }
@@ -85,6 +82,7 @@ public class TransposeVertexGroupItems
     GradoopId superVertexId               = null;
     String groupLabel                     = null;
     PropertyValueList groupPropertyValues = null;
+    LabelGroup vertexLabelGroup           = null;
 
     boolean isFirst = true;
 
@@ -95,14 +93,15 @@ public class TransposeVertexGroupItems
         superVertexId = GradoopId.get();
         groupLabel            = groupItem.getGroupLabel();
         groupPropertyValues   = groupItem.getGroupingValues();
+        vertexLabelGroup      = groupItem.getLabelGroup();
 
         isFirst = false;
       }
       // store the super vertex id created in the previous combiner
       superVertexIds.add(groupItem.getSuperVertexId());
 
-      if (doAggregate()) {
-        aggregate(groupItem.getAggregateValues());
+      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
+        aggregate(groupItem.getAggregateValues(), vertexLabelGroup.getAggregators());
       }
     }
 
@@ -110,13 +109,13 @@ public class TransposeVertexGroupItems
     reuseInnerTuple.setIdSet(GradoopIdList.fromExisting(superVertexIds));
 
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
-      groupPropertyValues);
+      groupPropertyValues, vertexLabelGroup.getAggregators());
     reuseOuterTuple.f0.setSuperVertexId(superVertexId);
+    reuseOuterTuple.f0.setLabelGroup(vertexLabelGroup);
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group
+    resetAggregators(reuseOuterTuple.f0.getLabelGroup().getAggregators());
     out.collect(reuseOuterTuple);
-
-    resetAggregators();
   }
 }

@@ -1,38 +1,41 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common.model.impl.properties;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.io.WritableComparable;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
-import org.gradoop.common.util.GConstants;
+import org.gradoop.common.util.GradoopConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,7 +47,7 @@ import java.util.Map;
  *
  * A property value wraps a value that implements a supported data type.
  */
-public class PropertyValue implements WritableComparable<PropertyValue>, Serializable {
+public class PropertyValue implements Value, Serializable, Comparable<PropertyValue> {
 
   /**
    * Represents a property value that is {@code null}.
@@ -52,59 +55,77 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
 
   /**
-   * Class version for serialization.
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
    */
-  private static final transient byte TYPE_NULL         = 0x00;
+  public static final transient byte TYPE_NULL         = 0x00;
   /**
    * {@code <property-type>} for {@link java.lang.Boolean}
    */
-  private static final transient byte TYPE_BOOLEAN      = 0x01;
+  public static final transient byte TYPE_BOOLEAN      = 0x01;
   /**
    * {@code <property-type>} for {@link java.lang.Integer}
    */
-  private static final transient byte TYPE_INTEGER      = 0x02;
+  public static final transient byte TYPE_INTEGER      = 0x02;
   /**
    * {@code <property-type>} for {@link java.lang.Long}
    */
-  private static final transient byte TYPE_LONG         = 0x03;
+  public static final transient byte TYPE_LONG         = 0x03;
   /**
    * {@code <property-type>} for {@link java.lang.Float}
    */
-  private static final transient byte TYPE_FLOAT        = 0x04;
+  public static final transient byte TYPE_FLOAT        = 0x04;
   /**
    * {@code <property-type>} for {@link java.lang.Double}
    */
-  private static final transient byte TYPE_DOUBLE       = 0x05;
+  public static final transient byte TYPE_DOUBLE       = 0x05;
   /**
    * {@code <property-type>} for {@link java.lang.String}
    */
-  private static final transient byte TYPE_STRING       = 0x06;
+  public static final transient byte TYPE_STRING       = 0x06;
   /**
    * {@code <property-type>} for {@link java.lang.String}
    */
-  private static final transient byte TYPE_BIG_DECIMAL  = 0x07;
+  public static final transient byte TYPE_BIG_DECIMAL  = 0x07;
   /**
    * {@code <property-type>} for {@link org.gradoop.common.model.impl.id.GradoopId}
    */
-  private static final transient byte TYPE_GRADOOP_ID   = 0x08;
+  public static final transient byte TYPE_GRADOOP_ID   = 0x08;
   /**
    * {@code <property-type>} for {@link java.util.HashMap}
    */
-  private static final transient byte TYPE_MAP          = 0x09;
+  public static final transient byte TYPE_MAP          = 0x09;
   /**
    * {@code <property-type>} for {@link java.util.List}
    */
-  private static final transient byte TYPE_LIST         = 0x0a;
+  public static final transient byte TYPE_LIST         = 0x0a;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  public static final transient byte TYPE_DATE         = 0x0b;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  public static final transient byte TYPE_TIME         = 0x0c;
+  /**
+   * {@code <property-type>} for {@link java.util.List}
+   */
+  public static final transient byte TYPE_DATETIME     = 0x0d;
 
   /**
    * Value offset in byte
    */
-  private static final transient byte OFFSET            = 0x01;
+  public static final transient byte OFFSET            = 0x01;
+
+  /**
+   * We use a short as length prefix in binary representations of this property.
+   * This value is the maximum viable length.
+   */
+  public static final int MAX_BINARY_LENGTH = Short.MAX_VALUE - OFFSET;
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Stores the type and the value
@@ -244,6 +265,30 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   public boolean isList() {
     return rawBytes[0] == TYPE_LIST;
   }
+  /**
+   * True, if the wrapped value is of type {@code LocalDate}.
+   *
+   * @return true, if {@code LocalDate} value
+   */
+  public boolean isDate() {
+    return rawBytes[0] == TYPE_DATE;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalTime}.
+   *
+   * @return true, if {@code LocalTime} value
+   */
+  public boolean isTime() {
+    return rawBytes[0] == TYPE_TIME;
+  }
+  /**
+   * True, if the wrapped value is of type {@code LocalDateTime}.
+   *
+   * @return true, if {@code LocalDateTime} value
+   */
+  public boolean isDateTime() {
+    return rawBytes[0] == TYPE_DATETIME;
+  }
 
   //----------------------------------------------------------------------------
   // Getter
@@ -265,7 +310,10 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
                   isGradoopId() ? getGradoopId() :
                     isMap() ? getMap() :
                       isList() ? getList() :
-                        null;
+                        isDate() ? getDate() :
+                          isTime() ? getTime() :
+                            isDateTime() ? getDateTime() :
+                              null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -367,6 +415,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
+    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
 
     try {
       if (inputStream.skipBytes(OFFSET) != OFFSET) {
@@ -374,10 +423,10 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       }
       while (inputStream.available() > 0) {
         key = new PropertyValue();
-        key.readFields(inputStream);
+        key.read(inputView);
 
         value = new PropertyValue();
-        value.readFields(inputStream);
+        value.read(inputView);
 
         map.put(key, value);
       }
@@ -400,6 +449,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
+    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
 
     try {
       if (inputStream.skipBytes(OFFSET) != OFFSET) {
@@ -407,7 +457,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       }
       while (inputStream.available() > 0) {
         entry = new PropertyValue();
-        entry.readFields(inputStream);
+        entry.read(inputView);
 
         list.add(entry);
       }
@@ -416,6 +466,33 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     }
 
     return list;
+  }
+  /**
+   * Returns the wrapped List as {@code LocalDate}.
+   *
+   * @return {@code LocalDate} value
+   */
+  public LocalDate getDate() {
+    return DateTimeSerializer.deserializeDate(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalTime}.
+   *
+   * @return {@code LocalTime} value
+   */
+  public LocalTime getTime() {
+    return DateTimeSerializer.deserializeTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));
+  }
+  /**
+   * Returns the wrapped List as {@code LocalDateTime}.
+   *
+   * @return {@code LocalDateTime} value
+   */
+  public LocalDateTime getDateTime() {
+    return DateTimeSerializer.deserializeDateTime(
+      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));
   }
 
   //----------------------------------------------------------------------------
@@ -431,6 +508,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   public void setObject(Object value) {
     if (value == null) {
       rawBytes = new byte[] {TYPE_NULL};
+      validateBytesLength();
     } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
     } else if (value instanceof Integer) {
@@ -451,6 +529,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       setMap((Map) value);
     } else if (value instanceof List) {
       setList((List) value);
+    } else if (value instanceof LocalDate) {
+      setDate((LocalDate) value);
+    } else if (value instanceof LocalTime) {
+      setTime((LocalTime) value);
+    } else if (value instanceof LocalDateTime) {
+      setDateTime((LocalDateTime) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -515,6 +599,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_STRING;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code BigDecimal} value.
@@ -526,6 +611,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_BIG_DECIMAL;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code GradoopId} value.
@@ -552,18 +638,20 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
     DataOutputStream outputStream = new DataOutputStream(byteStream);
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
 
     try {
       outputStream.write(TYPE_MAP);
       for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
-        entry.getKey().write(outputStream);
-        entry.getValue().write(outputStream);
+        entry.getKey().write(outputView);
+        entry.getValue().write(outputView);
       }
     } catch (IOException e) {
       throw new RuntimeException("Error writing PropertyValue");
     }
 
     this.rawBytes = byteStream.toByteArray();
+    validateBytesLength();
   }
 
   /**
@@ -577,17 +665,53 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
     DataOutputStream outputStream = new DataOutputStream(byteStream);
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
 
     try {
       outputStream.write(TYPE_LIST);
       for (PropertyValue entry : list) {
-        entry.write(outputStream);
+        entry.write(outputView);
       }
     } catch (IOException e) {
       throw new RuntimeException("Error writing PropertyValue");
     }
 
     this.rawBytes = byteStream.toByteArray();
+    validateBytesLength();
+  }
+
+  /**
+   * Sets the wrapped value as {@code LocalDate} value.
+   *
+   * @param date value
+   */
+  public void setDate(LocalDate date) {
+    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
+    rawBytes[0] = TYPE_DATE;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalTime} value.
+   *
+   * @param time value
+   */
+  public void setTime(LocalTime time) {
+    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
+    rawBytes[0] = TYPE_TIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+  }
+  /**
+   * Sets the wrapped value as {@code LocalDateTime} value.
+   *
+   * @param dateTime value
+   */
+  public void setDateTime(LocalDateTime dateTime) {
+    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
+    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
+    rawBytes[0] = TYPE_DATETIME;
+    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 
   //----------------------------------------------------------------------------
@@ -605,6 +729,9 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
       GradoopId.class   : rawBytes[0] == TYPE_MAP         ?
       Map.class         : rawBytes[0] == TYPE_LIST        ?
+      LocalDate.class   : rawBytes[0] == TYPE_DATE        ?
+      LocalTime.class   : rawBytes[0] == TYPE_TIME        ?
+      LocalDateTime.class : rawBytes[0] == TYPE_DATETIME  ?
       List.class        : null;
   }
 
@@ -617,6 +744,21 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     return this.rawBytes;
   }
 
+  /**
+   * Set internal byte representation
+   * @param bytes array
+   */
+  @SuppressWarnings("EI_EXPOSE_REP")
+  public void setBytes(byte[] bytes) {
+    this.rawBytes = bytes;
+    validateBytesLength();
+  }
+
+  /**
+   * Create a {@link PropertyValue} that wraps a byte array
+   * @param rawBytes array to wrap
+   * @return new instance of {@link PropertyValue}
+   */
   public static PropertyValue fromRawBytes(byte[] rawBytes) {
     return new PropertyValue(rawBytes);
   }
@@ -692,34 +834,33 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
    * for fixed length types (e.g. int, long, float, ...)
    * byte 2 - end : value bytes
    *
-   * @param dataOutput data output to write data to
+   * @param outputView data output to write data to
    * @throws IOException
    */
   @Override
-  public void write(DataOutput dataOutput) throws IOException {
+  public void write(DataOutputView outputView) throws IOException {
     // null?
     // type
-    dataOutput.writeByte(rawBytes[0]);
+    outputView.writeByte(rawBytes[0]);
     // dynamic type?
     if (rawBytes[0] == TYPE_STRING || rawBytes[0] == TYPE_BIG_DECIMAL ||
       rawBytes[0] == TYPE_MAP || rawBytes[0] == TYPE_LIST) {
       // write length
-      dataOutput.writeShort(rawBytes.length - OFFSET);
+      outputView.writeShort(rawBytes.length - OFFSET);
     }
     // write data
-    dataOutput.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
+    outputView.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
   }
 
   @Override
-  public void readFields(DataInput dataInput) throws IOException {
+  public void read(DataInputView inputView) throws IOException {
     short length = 0;
     // type
-    byte type = dataInput.readByte();
+    byte type = inputView.readByte();
     // dynamic type?
-    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL ||
-      type == TYPE_MAP || type == TYPE_LIST) {
+    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP || type == TYPE_LIST) {
       // read length
-      length = dataInput.readShort();
+      length = inputView.readShort();
     } else if (type == TYPE_NULL) {
       length = 0;
     } else if (type == TYPE_BOOLEAN) {
@@ -734,6 +875,12 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
       length = Bytes.SIZEOF_DOUBLE;
     } else if (type == TYPE_GRADOOP_ID) {
       length = GradoopId.ID_SIZE;
+    } else if (type == TYPE_DATE) {
+      length = DateTimeSerializer.SIZEOF_DATE;
+    } else if (type == TYPE_TIME) {
+      length = DateTimeSerializer.SIZEOF_TIME;
+    } else if (type == TYPE_DATETIME) {
+      length = DateTimeSerializer.SIZEOF_DATETIME;
     }
     // init new array
     rawBytes = new byte[OFFSET + length];
@@ -741,7 +888,7 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
     rawBytes[0] = type;
     // read data
     for (int i = OFFSET; i < rawBytes.length; i++) {
-      rawBytes[i] = dataInput.readByte();
+      rawBytes[i] = inputView.readByte();
     }
   }
 
@@ -749,6 +896,17 @@ public class PropertyValue implements WritableComparable<PropertyValue>, Seriali
   public String toString() {
     return getObject() != null ?
       getObject().toString() :
-      GConstants.NULL_STRING;
+      GradoopConstants.NULL_STRING;
+  }
+
+  /**
+   * Throw a runtime exception if this property value can't be represented
+   * in {@link PropertyValue#MAX_BINARY_LENGTH} bytes.
+   */
+  private void validateBytesLength() {
+    if (rawBytes != null && rawBytes.length > MAX_BINARY_LENGTH) {
+      throw new IllegalStateException("The binary representation of this property is too big: " +
+      rawBytes.length + " > " + MAX_BINARY_LENGTH);
+    }
   }
 }

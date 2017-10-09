@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +21,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import javax.annotation.Nullable;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -100,6 +100,7 @@ public abstract class Element implements EPGMElement {
    * {@inheritDoc}
    */
   @Override
+  @Nullable
   public Properties getProperties() {
     return properties;
   }
@@ -117,6 +118,7 @@ public abstract class Element implements EPGMElement {
    */
   @Override
   public PropertyValue getPropertyValue(String key) {
+    // TODO: return PropertyValue.NULL_VALUE instead?
     return (properties != null) ? properties.get(key) : null;
   }
 
@@ -156,6 +158,14 @@ public abstract class Element implements EPGMElement {
     this.properties.set(key, value);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PropertyValue removeProperty(String key) {
+    return this.properties != null ? properties.remove(key) : null;
+  }
+
   @Override
   public int getPropertyCount() {
     return (this.properties != null) ? this.properties.size() : 0;
@@ -166,7 +176,7 @@ public abstract class Element implements EPGMElement {
    */
   @Override
   public boolean hasProperty(String key) {
-    return getProperties() != null && getProperties().containsKey(key);
+    return this.properties != null && this.properties.containsKey(key);
   }
 
   /**

@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.common;
 
 import com.google.common.collect.Lists;
@@ -25,7 +23,7 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.apache.hadoop.io.Writable;
+import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
@@ -36,15 +34,15 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
-import org.gradoop.common.config.GradoopConfig;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +74,9 @@ public class GradoopTestUtils {
   public static final String KEY_8 = "key8";
   public static final String KEY_9 = "key9";
   public static final String KEY_a = "keya";
+  public static final String KEY_b = "keyb";
+  public static final String KEY_c = "keyc";
+  public static final String KEY_d = "keyd";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;
@@ -86,8 +87,11 @@ public class GradoopTestUtils {
   public static final String      STRING_VAL_6                      = "23";
   public static final BigDecimal  BIG_DECIMAL_VAL_7                 = new BigDecimal(23);
   public static final GradoopId   GRADOOP_ID_VAL_8                  = GradoopId.get();
-  public static final Map<PropertyValue, PropertyValue>  MAP_VAL_9  = new HashMap<>();
-  public static final List<PropertyValue> LIST_VAL_A                = new ArrayList<>();
+  public static final Map<PropertyValue, PropertyValue> MAP_VAL_9   = new HashMap<>();
+  public static final List<PropertyValue> LIST_VAL_a                = new ArrayList<>();
+  public static final LocalDate           DATE_VAL_b                = LocalDate.now();
+  public static final LocalTime           TIME_VAL_c                = LocalTime.now();
+  public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
@@ -101,16 +105,22 @@ public class GradoopTestUtils {
     MAP_VAL_9.put(PropertyValue.create(KEY_6), PropertyValue.create(STRING_VAL_6));
     MAP_VAL_9.put(PropertyValue.create(KEY_7), PropertyValue.create(BIG_DECIMAL_VAL_7));
     MAP_VAL_9.put(PropertyValue.create(KEY_8), PropertyValue.create(GRADOOP_ID_VAL_8));
+    MAP_VAL_9.put(PropertyValue.create(KEY_b), PropertyValue.create(DATE_VAL_b));
+    MAP_VAL_9.put(PropertyValue.create(KEY_c), PropertyValue.create(TIME_VAL_c));
+    MAP_VAL_9.put(PropertyValue.create(KEY_d), PropertyValue.create(DATETIME_VAL_d));
 
-    LIST_VAL_A.add(PropertyValue.create(NULL_VAL_0));
-    LIST_VAL_A.add(PropertyValue.create(BOOL_VAL_1));
-    LIST_VAL_A.add(PropertyValue.create(INT_VAL_2));
-    LIST_VAL_A.add(PropertyValue.create(LONG_VAL_3));
-    LIST_VAL_A.add(PropertyValue.create(FLOAT_VAL_4));
-    LIST_VAL_A.add(PropertyValue.create(DOUBLE_VAL_5));
-    LIST_VAL_A.add(PropertyValue.create(STRING_VAL_6));
-    LIST_VAL_A.add(PropertyValue.create(BIG_DECIMAL_VAL_7));
-    LIST_VAL_A.add(PropertyValue.create(GRADOOP_ID_VAL_8));
+    LIST_VAL_a.add(PropertyValue.create(NULL_VAL_0));
+    LIST_VAL_a.add(PropertyValue.create(BOOL_VAL_1));
+    LIST_VAL_a.add(PropertyValue.create(INT_VAL_2));
+    LIST_VAL_a.add(PropertyValue.create(LONG_VAL_3));
+    LIST_VAL_a.add(PropertyValue.create(FLOAT_VAL_4));
+    LIST_VAL_a.add(PropertyValue.create(DOUBLE_VAL_5));
+    LIST_VAL_a.add(PropertyValue.create(STRING_VAL_6));
+    LIST_VAL_a.add(PropertyValue.create(BIG_DECIMAL_VAL_7));
+    LIST_VAL_a.add(PropertyValue.create(GRADOOP_ID_VAL_8));
+    LIST_VAL_a.add(PropertyValue.create(DATE_VAL_b));
+    LIST_VAL_a.add(PropertyValue.create(TIME_VAL_c));
+    LIST_VAL_a.add(PropertyValue.create(DATETIME_VAL_d));
 
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
     SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
@@ -123,6 +133,9 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_7, BIG_DECIMAL_VAL_7);
     SUPPORTED_PROPERTIES.put(KEY_8, GRADOOP_ID_VAL_8);
     SUPPORTED_PROPERTIES.put(KEY_9, MAP_VAL_9);
+    SUPPORTED_PROPERTIES.put(KEY_b, DATE_VAL_b);
+    SUPPORTED_PROPERTIES.put(KEY_c, TIME_VAL_c);
+    SUPPORTED_PROPERTIES.put(KEY_d, DATETIME_VAL_d);
   }
 
   /**
@@ -196,6 +209,8 @@ public class GradoopTestUtils {
     Collection<? extends EPGMElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
+    assertTrue(String.format("collections of different size: %d and %d", collection1.size(),
+      collection2.size()), collection1.size() == collection2.size());
 
     List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
     List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);
@@ -292,23 +307,24 @@ public class GradoopTestUtils {
    * @param element2 second element
    */
   public static void validateEPGMGraphElements(
-    EPGMGraphElement element1,
-    EPGMGraphElement element2) {
+    EPGMGraphElement element1, EPGMGraphElement element2) {
+
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
-    assertTrue(
-      String.format("graph containment mismatch. expected: %s actual: %s",
-        element1.getGraphIds(), element2.getGraphIds()),
-      element1.getGraphIds().equals(element2.getGraphIds())
+
+    assertTrue(String.format("graph containment mismatch. expected: %s actual: %s",
+      element1.getGraphIds(), element2.getGraphIds()),
+      element1.getGraphIds().containsAll(element2.getGraphIds()) &&
+        element2.getGraphIds().containsAll(element1.getGraphIds())
     );
   }
 
-  public static <T extends Writable> T writeAndReadFields(Class<T> clazz, T in) throws IOException {
+  public static <T extends Value> T writeAndReadFields(Class<T> clazz, T in) throws IOException {
     // write to byte[]
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(outputStream);
-    in.write(dataOut);
-    dataOut.flush();
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+    in.write(outputView);
+    outputStream.flush();
 
     T out;
     try {
@@ -320,8 +336,8 @@ public class GradoopTestUtils {
 
     // read from byte[]
     ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-    DataInputStream dataIn = new DataInputStream(inputStream);
-    out.readFields(dataIn);
+    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+    out.read(inputView);
 
     return out;
   }

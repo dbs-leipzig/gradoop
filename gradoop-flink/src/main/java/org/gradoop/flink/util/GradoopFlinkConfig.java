@@ -1,36 +1,33 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.common.storage.api.EdgeHandler;
-import org.gradoop.common.storage.api.GraphHeadHandler;
-import org.gradoop.common.storage.api.VertexHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseEdgeHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadHandler;
-import org.gradoop.common.storage.impl.hbase.HBaseVertexHandler;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+
+import java.util.Objects;
 
 /**
  * Configuration for Gradoop running on Flink.
@@ -43,23 +40,40 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   private final ExecutionEnvironment executionEnvironment;
 
   /**
+   * Creates instances of {@link org.gradoop.flink.model.api.epgm.LogicalGraph}
+   */
+  private final LogicalGraphFactory logicalGraphFactory;
+
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.api.epgm.GraphCollection}
+   */
+  private final GraphCollectionFactory graphCollectionFactory;
+
+  /**
    * Creates a new Configuration.
    *
-   * @param graphHeadHandler      graph head handler
-   * @param vertexHandler         vertex handler
-   * @param edgeHandler           edge handler
-   * @param executionEnvironment  Flink execution environment
+   * @param executionEnvironment Flink execution environment
+   * @param logicalGraphLayoutFactory Factory for creating logical graphs
+   * @param graphCollectionLayoutFactory Factory for creating graph collections
    */
-  private GradoopFlinkConfig(GraphHeadHandler<GraphHead> graphHeadHandler,
-    VertexHandler<Vertex, Edge> vertexHandler,
-    EdgeHandler<Edge, Vertex> edgeHandler,
-    ExecutionEnvironment executionEnvironment) {
-    super(graphHeadHandler, vertexHandler, edgeHandler);
-    if (executionEnvironment == null) {
-      throw new IllegalArgumentException(
-        "Execution environment must not be null");
-    }
+  protected GradoopFlinkConfig(
+    ExecutionEnvironment executionEnvironment,
+    LogicalGraphLayoutFactory logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
+    super();
+
+    Objects.requireNonNull(executionEnvironment);
+    Objects.requireNonNull(logicalGraphLayoutFactory);
+    Objects.requireNonNull(graphCollectionLayoutFactory);
+
     this.executionEnvironment = executionEnvironment;
+
+    // init with default layout factories
+    this.logicalGraphFactory = new LogicalGraphFactory(this);
+    this.logicalGraphFactory.setLayoutFactory(logicalGraphLayoutFactory);
+
+    this.graphCollectionFactory = new GraphCollectionFactory(this);
+    this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);
   }
 
   /**
@@ -70,14 +84,22 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
-    HBaseVertexHandler<Vertex, Edge> vertexHandler = new HBaseVertexHandler<>(
-      new VertexFactory());
-    HBaseEdgeHandler<Edge, Vertex> edgeHandler = new HBaseEdgeHandler<>(
-      new EdgeFactory());
-    HBaseGraphHeadHandler<GraphHead> graphHandler = new HBaseGraphHeadHandler<>(
-      new GraphHeadFactory());
-    return new GradoopFlinkConfig(graphHandler, vertexHandler, edgeHandler,
-      env);
+    return new GradoopFlinkConfig(env,
+      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
+  }
+
+  /**
+   * Creates a Gradoop Flink configuration using the given parameters.
+   *
+   * @param env Flink execution environment
+   * @param logicalGraphLayoutFactory factory to create logical graph layouts
+   * @param graphCollectionLayoutFactory factory to create graph collection layouts
+   * @return Gradoop Flink configuration
+   */
+  public static GradoopFlinkConfig createConfig(ExecutionEnvironment env,
+    LogicalGraphLayoutFactory logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
+    return new GradoopFlinkConfig(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
   }
 
   /**
@@ -89,18 +111,45 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     return executionEnvironment;
   }
 
-  @Override
-  public GraphHeadFactory getGraphHeadFactory() {
-    return (GraphHeadFactory) super.getGraphHeadFactory();
+  /**
+   * Returns a factory that is able to create logical graph layouts.
+   *
+   * @return factory for logical graph layouts
+   */
+  public LogicalGraphFactory getLogicalGraphFactory() {
+    return logicalGraphFactory;
   }
 
-  @Override
-  public VertexFactory getVertexFactory() {
-    return (VertexFactory) super.getVertexFactory();
+  /**
+   * Returns a factory that is able to create graph collection layouts.
+   *
+   * @return factory for graph collection layouts
+   */
+  public GraphCollectionFactory getGraphCollectionFactory() {
+    return graphCollectionFactory;
   }
 
-  @Override
-  public EdgeFactory getEdgeFactory() {
-    return (EdgeFactory) super.getEdgeFactory();
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link org.gradoop.flink.model.api.epgm.LogicalGraph}.
+   *
+   * @param factory logical graph layout factor
+   */
+  public void setLogicalGraphLayoutFactory(LogicalGraphLayoutFactory factory) {
+    Objects.requireNonNull(factory);
+    factory.setGradoopFlinkConfig(this);
+    logicalGraphFactory.setLayoutFactory(factory);
+  }
+
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link org.gradoop.flink.model.api.epgm.GraphCollection}.
+   *
+   * @param factory graph collection layout factory
+   */
+  public void setGraphCollectionLayoutFactory(GraphCollectionLayoutFactory factory) {
+    Objects.requireNonNull(factory);
+    factory.setGradoopFlinkConfig(this);
+    graphCollectionFactory.setLayoutFactory(factory);
   }
 }

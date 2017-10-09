@@ -1,0 +1,132 @@
+{
+  "MasterData" : {
+    "Customer" : {
+      "offset" : 50,
+      "growth" : 20,
+      "good" : 0.1,
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
+    },
+    "Employee" : {
+      "offset" : 30,
+      "growth" : 10,
+      "good" : 0.1,
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
+    },
+    "Logistics" : {
+      "offset" : 10,
+      "growth" : 0,
+      "good" : 0.1,
+      "bad" : 0.1
+    },
+    "Product" : {
+      "offset" : 1000,
+      "growth" : 10,
+      "good" : 0.1,
+      "bad" : 0.1,
+      "minPrice" : 0.5,
+      "maxPrice" : 8.5
+    },
+    "Vendor" : {
+      "offset" : 10,
+      "growth" : 5,
+      "good" : 0.1,
+      "bad" : 0.1,
+      "type" : {
+        "assistant" : 0.3,
+        "normal" : 0.6,
+        "supervisor" : 0.1
+      }
+    },
+    "Company" : {
+      "companyCount" : 8,
+      "holdingCount" : 3,
+      "branchesMin" : 1,
+      "branchesMax" : 5
+    },
+    "Influence" : {
+      "assistantInfluence" : 0.8,
+      "supervisorInfluence" : 1.2,
+      "sameCityInfluence" : 1.1,
+      "sameHoldingInfluence" : 1.25
+    }
+  },
+  "Process" : {
+    "casesPerScaleFactor" : 10000,
+    "startDate" : "2014-01-01",
+    "endDate" : "2014-12-31"
+  },
+  "TransactionalData" : {
+    "SalesQuotation" : {
+      "linesMin" : 1,
+      "linesMax" : 20,
+      "lineQuantityMin" : 1,
+      "lineQuantityMax" : 100,
+      "salesMargin" : 0.05,
+      "salesMarginInfluence" : 0.02,
+      "salesMarginHigherIsBetter" : true,
+      "confirmationProbability" : 0.6,
+      "confirmationProbabilityInfluence" : 0.2,
+      "confirmationProbabilityHigherIsBetter" : true,
+      "lineConfirmationProbability" : 0.9,
+      "confirmationDelayMin" : 0,
+      "confirmationDelayMax" : 20,
+      "confirmationDelayInfluence" : 5,
+      "confirmationDelayHigherIsBetter" : false
+    },
+    "SalesOrder" : {
+      "deliveryAgreementDelayMin" : 2,
+      "deliveryAgreementDelayMax" : 4,
+      "deliveryAgreementDelayInfluence" : 1,
+      "deliveryAgreementDelayHigherIsBetter" : true,
+      "invoiceDelayMin" : 0,
+      "invoiceDelayMax" : 3,
+      "invoiceDelayInfluence" : 2,
+      "invoiceDelayHigherIsBetter" : false
+    },
+    "PurchOrder" : {
+      "priceVariation" : 0.01,
+      "priceVariationInfluence" : 0.02,
+      "priceVariationHigherIsBetter" : false,
+      "purchaseDelayMin" : 0,
+      "purchaseDelayMax" : 2,
+      "purchaseDelayInfluence" : 1,
+      "purchaseDelayHigherIsBetter" : false,
+      "deliveryDelayMin" : 0,
+      "deliveryDelayMax" : 1,
+      "deliveryDelayInfluence" : 1,
+      "deliveryDelayHigherIsBetter" : false,
+      "invoiceDelayMin" : 2,
+      "invoiceDelayMax" : 5,
+      "invoiceDelayInfluence" : 3,
+      "invoiceDelayHigherIsBetter" : true,
+      "numberOfVendorsMin" : 1,
+      "numberOfVendorsMax" : 3
+    },
+    "Ticket" : {
+      "badQualityProbability" : 0.05,
+      "badQualityProbabilityInfluence" : 0.1,
+      "badQualityProbabilityHigherIsBetter" : false,
+      "salesRefund" : 0.1,
+      "salesRefundInfluence" : 0.05,
+      "salesRefundHigherIsBetter" : false,
+      "purchRefund" : 0.1,
+      "purchRefundInfluence" : 0.05,
+      "purchRefundHigherIsBetter" : true
+    }
+  },
+  "Quality" : {
+    "good" : 0.66,
+    "normal" : 0.33,
+    "bad" : 0.01
+  }
+}

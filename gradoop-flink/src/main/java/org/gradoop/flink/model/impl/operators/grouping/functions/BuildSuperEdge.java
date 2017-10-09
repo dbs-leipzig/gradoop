@@ -1,29 +1,23 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
-import org.gradoop.common.util.GConstants;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Creates a single {@link EdgeGroupItem} from a set of group items.
@@ -36,14 +30,10 @@ abstract class BuildSuperEdge extends BuildBase {
   /**
    * Creates group reducer / combiner
    *
-   * @param groupPropertyKeys edge property keys
-   * @param useLabel          use edge label
-   * @param valueAggregators  aggregate functions for edge values
+   * @param useLabel    use edge label
    */
-  public BuildSuperEdge(List<String> groupPropertyKeys,
-    boolean useLabel,
-    List<PropertyValueAggregator> valueAggregators) {
-    super(groupPropertyKeys, useLabel, valueAggregators);
+  public BuildSuperEdge(boolean useLabel) {
+    super(useLabel);
   }
 
   /**
@@ -56,32 +46,28 @@ abstract class BuildSuperEdge extends BuildBase {
     Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {
 
     EdgeGroupItem edgeGroupItem = new EdgeGroupItem();
-
-    boolean firstElement = true;
+    boolean firstElement        = true;
 
     for (EdgeGroupItem edge : edgeGroupItems) {
       if (firstElement) {
         edgeGroupItem.setSourceId(edge.getSourceId());
         edgeGroupItem.setTargetId(edge.getTargetId());
-        if (useLabel()) {
-          edgeGroupItem.setGroupLabel(edge.getGroupLabel());
-        } else {
-          edgeGroupItem.setGroupLabel(GConstants.DEFAULT_EDGE_LABEL);
-        }
+        edgeGroupItem.setGroupLabel(edge.getGroupLabel());
         edgeGroupItem.setGroupingValues(edge.getGroupingValues());
+        edgeGroupItem.setLabelGroup(edge.getLabelGroup());
         firstElement = false;
       }
 
-      if (doAggregate()) {
-        aggregate(edge.getAggregateValues());
+      if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
+        aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
       } else {
         // no need to iterate further
         break;
       }
     }
 
-    edgeGroupItem.setAggregateValues(getAggregateValues());
-
+    edgeGroupItem.setAggregateValues(
+      getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
     return edgeGroupItem;
   }
 }

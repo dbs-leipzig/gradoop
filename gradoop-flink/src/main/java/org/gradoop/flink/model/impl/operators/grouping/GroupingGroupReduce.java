@@ -1,25 +1,24 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.LogicalGraph;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
@@ -27,10 +26,8 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVe
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
@@ -61,23 +58,18 @@ public class GroupingGroupReduce extends Grouping {
   /**
    * Creates grouping operator instance.
    *
-   * @param vertexGroupingKeys  property key to group vertices
-   * @param useVertexLabels     group on vertex label true/false
-   * @param vertexAggregators   aggregate functions for grouped vertices
-   * @param edgeGroupingKeys    property key to group edges
-   * @param useEdgeLabels       group on edge label true/false
-   * @param edgeAggregators     aggregate functions for grouped edges
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
    */
   GroupingGroupReduce(
-    List<String> vertexGroupingKeys,
     boolean useVertexLabels,
-    List<PropertyValueAggregator> vertexAggregators,
-    List<String> edgeGroupingKeys,
     boolean useEdgeLabels,
-    List<PropertyValueAggregator> edgeAggregators) {
+    List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups) {
     super(
-      vertexGroupingKeys, useVertexLabels, vertexAggregators,
-      edgeGroupingKeys, useEdgeLabels, edgeAggregators);
+      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
   }
 
   /**
@@ -88,20 +80,18 @@ public class GroupingGroupReduce extends Grouping {
 
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
-      .map(new BuildVertexGroupItem(getVertexGroupingKeys(), useVertexLabels(),
-        getVertexAggregators()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function
-      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels(), getVertexAggregators()));
+      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));
 
     DataSet<Vertex> superVertices = vertexGroupItems
       // filter group representative tuples
       .filter(new FilterSuperVertices())
       // build super vertices
-      .map(new BuildSuperVertex(getVertexGroupingKeys(),
-        useVertexLabels(), getVertexAggregators(), config.getVertexFactory()));
+      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
       // filter group element tuples
@@ -112,7 +102,7 @@ public class GroupingGroupReduce extends Grouping {
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return LogicalGraph.fromDataSets(superVertices, superEdges, graph.getConfig());
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   /**

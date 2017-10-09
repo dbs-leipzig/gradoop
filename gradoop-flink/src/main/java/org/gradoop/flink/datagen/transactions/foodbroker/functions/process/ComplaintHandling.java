@@ -1,43 +1,38 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.datagen.transactions.foodbroker.functions.process;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
-import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Employee;
-import org.gradoop.flink.representation.transactional.GraphTransaction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -49,9 +44,8 @@ import java.util.Set;
  * Returns transactional data created in a complaint handling process together with new created
  * master data (user, clients).
  */
-public class ComplaintHandling
-  extends AbstractProcess
-  implements FlatMapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
+public class ComplaintHandling extends AbstractProcess
+  implements MapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
   /**
    * List of employees. Used to create new user.
    */
@@ -80,65 +74,71 @@ public class ComplaintHandling
   /**
    * Valued constructor.
    *
-   * @param graphHeadFactory EPGM graph head factory
-   * @param vertexFactory EPGM vertex factory
-   * @param edgeFactory EPGM edge factory
+   * @param epgmGraphHeadFactory EPGM graph head factory
+   * @param epgmVertexFactory EPGM vertex factory
+   * @param epgmEdgeFactory EPGM edge factory
    * @param config FoodBroker configuration
-   * @param globalSeed global seed
    */
-  public ComplaintHandling(GraphHeadFactory graphHeadFactory,
-    VertexFactory vertexFactory, EdgeFactory edgeFactory,
-    FoodBrokerConfig config, long globalSeed) {
-    super(graphHeadFactory, vertexFactory, edgeFactory, config);
-    this.globalSeed = globalSeed;
+  public ComplaintHandling(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory, EPGMEdgeFactory<Edge> epgmEdgeFactory,
+    FoodBrokerConfig config) {
+    super(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, config);
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    employees = getRuntimeContext().getBroadcastVariable(Employee.CLASS_NAME);
-    customers = getRuntimeContext().getBroadcastVariable(Customer.CLASS_NAME);
+    employees = getRuntimeContext().getBroadcastVariable(Constants.EMPLOYEE_VERTEX_LABEL);
+    customers = getRuntimeContext().getBroadcastVariable(Constants.CUSTOMER_VERTEX_LABEL);
   }
 
   @Override
-  public void flatMap(GraphTransaction transaction,
-    Collector<Tuple2<GraphTransaction, Set<Vertex>>> collector) throws Exception {
-    GraphHead graphHead;
-    GraphTransaction graphTransaction;
-    Set<Vertex> vertices;
-    Set<Edge> edges;
-    Set<Vertex> deliveryNotes;
+  public Tuple2<GraphTransaction, Set<Vertex>> map(GraphTransaction graph) throws Exception {
+
     //init new maps
     vertexMap = Maps.newHashMap();
     masterDataMap = Maps.newHashMap();
     userMap = Maps.newHashMap();
+    graphIds = GradoopIdList.fromExisting(graph.getGraphHead().getId());
 
-    edgeMap = createEdgeMap(transaction);
-    //get needed transactional objects created during brokerage process
-    deliveryNotes = getVertexByLabel(transaction, Constants.DELIVERYNOTE_VERTEX_LABEL);
-    salesOrderLines = getEdgesByLabel(transaction, Constants.SALESORDERLINE_EDGE_LABEL);
-    purchOrderLines = getEdgesByLabel(transaction, Constants.PURCHORDERLINE_EDGE_LABEL);
-    salesOrder = getVertexByLabel(transaction, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
+    boolean confirmed = false;
 
-    //create new graph head
-    graphHead = graphHeadFactory.createGraphHead();
-    graphIds = new GradoopIdList();
-    graphIds.add(graphHead.getId());
-    graphTransaction = new GraphTransaction();
-    //the complaint handling process
-    badQuality(deliveryNotes);
-    lateDelivery(deliveryNotes);
-    //get all created vertices and edges
-    vertices = getVertices();
-    edges = getEdges();
-    //if one or more tickets were created
-    if ((vertices.size() > 0) && (edges.size() > 0)) {
-      graphTransaction.setGraphHead(graphHead);
-      graphTransaction.setVertices(vertices);
-      graphTransaction.setEdges(edges);
-      collector.collect(new Tuple2<>(graphTransaction, getMasterData()));
-      globalSeed++;
+    for (Vertex vertex : graph.getVertices()) {
+      if (vertex.getLabel().equals(Constants.SALESORDER_VERTEX_LABEL)) {
+        confirmed = true;
+        break;
+      }
     }
+
+    if (confirmed) {
+      edgeMap = createEdgeMap(graph);
+      //get needed transactional objects created during brokerage process
+      Set<Vertex> deliveryNotes = getVertexByLabel(graph, Constants.DELIVERYNOTE_VERTEX_LABEL);
+      salesOrderLines = getEdgesByLabel(graph, Constants.SALESORDERLINE_EDGE_LABEL);
+      purchOrderLines = getEdgesByLabel(graph, Constants.PURCHORDERLINE_EDGE_LABEL);
+      salesOrder = getVertexByLabel(graph, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
+
+      //the complaint handling process
+      badQuality(deliveryNotes);
+      lateDelivery(deliveryNotes);
+      //get all created vertices and edges
+      Set<Vertex> transactionalVertices = getVertices();
+      Set<Edge> transactionalEdges = getEdges();
+      //if one or more tickets were created
+      if ((transactionalVertices.size() > 0) && (transactionalEdges.size() > 0)) {
+        graph.getVertices().addAll(transactionalVertices);
+        graph.getEdges().addAll(transactionalEdges);
+        globalSeed++;
+      }
+    }
+
+    for (Edge edge : graph.getEdges()) {
+      if (edge.getGraphIds() == null) {
+        System.out.println(edge);
+      }
+    }
+
+    return new Tuple2<>(graph, getMasterData());
   }
 
   /**
@@ -485,25 +485,27 @@ public class ComplaintHandling
       return masterDataMap.get(employeeId);
     } else {
       //create properties
-      Properties properties;
       Vertex employee = getEmployeeById(employeeId);
-      properties = employee.getProperties();
-      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Employee.ACRONYM, Constants.USER_ACRONYM);
-      sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
-      String email = properties.get(Constants.NAME_KEY).getString();
-      email = email.replace(" ", ".").toLowerCase();
-      email += "@biiig.org";
-      properties.set(Constants.EMAIL_KEY, email);
-      //create the vertex and store it in a map for fast access
-      Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
-      masterDataMap.put(employeeId, user);
-      userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
+      if (employee != null && employee.getProperties() != null) {
+        Properties properties = employee.getProperties();
+        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+        sourceIdKey = sourceIdKey.replace(Constants.EMPLOYEE_ACRONYM, Constants.USER_ACRONYM);
+        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
+        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
+        properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
+        String email = properties.get(Constants.NAME_KEY).getString();
+        email = email.replace(" ", ".").toLowerCase();
+        email += "@biiig.org";
+        properties.set(Constants.EMAIL_KEY, email);
+        //create the vertex and store it in a map for fast access
+        Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
+        masterDataMap.put(employeeId, user);
+        userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
 
-      newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
-      return user;
+        newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
+        return user;
+      }
+      throw new IllegalArgumentException("No employee for id: " + employeeId);
     }
   }
 
@@ -519,23 +521,25 @@ public class ComplaintHandling
       return masterDataMap.get(customerId);
     } else {
       //create properties
-      Properties properties;
       Vertex customer = getCustomerById(customerId);
-      properties = customer.getProperties();
-      String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-      sourceIdKey = sourceIdKey.replace(Customer.ACRONYM, Constants.CLIENT_ACRONYM);
-      sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-      properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
-      properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
-      properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
-      //create the vertex and store it in a map for fast access
-      Vertex client = vertexFactory.createVertex(
-        Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
-      masterDataMap.put(customerId, client);
+      if (customer != null && customer.getProperties() != null) {
+        Properties properties = customer.getProperties();
+        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
+        sourceIdKey = sourceIdKey.replace(Constants.CUSTOMER_ACRONYM, Constants.CLIENT_ACRONYM);
+        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
+        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
+        properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
+        properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
+        properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
+        //create the vertex and store it in a map for fast access
+        Vertex client = vertexFactory.createVertex(
+          Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
+        masterDataMap.put(customerId, client);
 
-      newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
-      return client;
+        newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
+        return client;
+      }
+      throw new IllegalArgumentException("No customer for id: " + customerId);
     }
   }
 

@@ -1,20 +1,18 @@
-/*
- * This file is part of Gradoop.
+/**
+ * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
  *
- * Gradoop is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Gradoop is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with Gradoop. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual;
 
 import org.apache.flink.api.java.DataSet;
@@ -22,19 +20,20 @@ import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.utils.RightSide;
-import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.GraphCollection;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
+import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintDeletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintFatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintMessage;
@@ -50,6 +49,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.fu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
@@ -88,20 +88,21 @@ public class DualSimulation extends PatternMatching {
       .filterVertices(graph, getQuery())
       .project(0);
 
+    LogicalGraphFactory graphFactory = graph.getConfig()
+      .getLogicalGraphFactory();
+    GraphCollectionFactory collectionFactory = graph.getConfig()
+      .getGraphCollectionFactory();
+
     if (doAttachData()) {
-      return GraphCollection.fromGraph(
-        LogicalGraph.fromDataSets(matchingVertexIds
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
             .join(graph.getVertices())
             .where(0).equalTo(new Id<>())
-            .with(new RightSide<>()),
-          graph.getConfig()
-        ));
+            .with(new RightSide<>())));
     } else {
-      return GraphCollection.fromGraph(
-        LogicalGraph.fromDataSets(matchingVertexIds
-            .map(new VertexFromId(graph.getConfig().getVertexFactory())),
-          graph.getConfig()
-        ));
+      return collectionFactory.fromGraph(
+        graphFactory.fromDataSets(matchingVertexIds
+            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));
     }
   }
 
@@ -290,8 +291,8 @@ public class DualSimulation extends PatternMatching {
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 
-    return GraphCollection.fromGraph(
-      LogicalGraph.fromDataSets(matchVertices, matchEdges, config));
+    return config.getGraphCollectionFactory().fromGraph(
+      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
   }
 
   /**
