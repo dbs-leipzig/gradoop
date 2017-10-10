@@ -32,7 +32,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * The result will be the same {@link LogicalGraph} with a component id assigned to each vertex
  * as a Property.
  */
-public class ConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
+public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
 
   /**
    * Property key to store the component id in.
@@ -50,7 +50,7 @@ public class ConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
    * @param propertyKey   Property key to store the component id in.
    * @param maxIterations The maximum number of iterations.
    */
-  public ConnectedComponents(String propertyKey, int maxIterations) {
+  public AnnotateWeaklyConnectedComponents(String propertyKey, int maxIterations) {
     super(new VertexToGellyVertexWithGradoopId(), new EdgeToGellyEdgeWithNullValue());
     this.propertyKey = propertyKey;
     this.maxIterations = maxIterations;

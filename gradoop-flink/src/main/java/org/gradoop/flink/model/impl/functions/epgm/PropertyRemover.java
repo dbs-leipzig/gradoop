@@ -13,46 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.utils;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A map function returning true, as a long as a certain property has as equal value for all input
- * elements.
+ * Remove a property from an EPGM element.
  *
- * @param <E> Type of the Element with Properties.
+ * @param <E> EPGM element type.
  */
-public class EqualsByPropertyValue<E extends Element> implements MapFunction<E, Boolean> {
+public class PropertyRemover<E extends Element> implements MapFunction<E, E> {
 
   /**
-   * Property key to read.
+   * Property key to remove.
    */
   private final String propertyKey;
 
   /**
-   * Value of the first element.
-   */
-  private PropertyValue firstValue;
-
-  /**
    * Initialize.
    *
-   * @param propertyKey Property key to read.
+   * @param propertyKey Property key to remove.
    */
-  public EqualsByPropertyValue(String propertyKey) {
-    this.propertyKey = propertyKey;
-    this.firstValue = null;
+  public PropertyRemover(String propertyKey) {
+    this.propertyKey = checkNotNull(propertyKey);
   }
 
   @Override
-  public Boolean map(E e) throws Exception {
-    if (firstValue == null) {
-      firstValue = e.getPropertyValue(propertyKey);
-      return Boolean.TRUE;
-    }
-    return firstValue.equals(e.getPropertyValue(propertyKey));
+  public E map(E e) throws Exception {
+    e.removeProperty(propertyKey);
+    return e;
   }
 }
