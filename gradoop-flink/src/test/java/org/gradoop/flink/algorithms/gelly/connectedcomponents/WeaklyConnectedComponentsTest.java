@@ -15,12 +15,10 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class WeaklyConnectedComponentsTest extends GradoopFlinkTestBase {
@@ -38,19 +36,6 @@ public class WeaklyConnectedComponentsTest extends GradoopFlinkTestBase {
     "(v2)-[e2]->(v3)" +
     "(v3)-[e3]->(v4 {id:4, component:2})" +
     "(v4)-[e4]->(v5 {id:5, component:2})" +
-    "]" +
-    // Result:
-    // First component
-    "result0[" +
-    "(v0)" +
-    "]" +
-    // Second component
-    "result1[" +
-    "(v1)-[e0]->(v2)" +
-    "(v1)-[e1]->(v3)" +
-    "(v2)-[e2]->(v3)" +
-    "(v3)-[e3]->(v4)" +
-    "(v4)-[e4]->(v5)" +
     "]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
@@ -59,27 +44,6 @@ public class WeaklyConnectedComponentsTest extends GradoopFlinkTestBase {
       .callForCollection(new WeaklyConnectedComponents(propertyKey, 10));
     GraphCollection components = input.splitBy("component");
 
-    dump(result);
-    getExecutionEnvironment().fromElements("##########").print();
-    dump(components);
-
-    collectAndAssertTrue(result.equalsByGraphElementData(components));
+    collectAndAssertTrue(result.equalsByGraphElementIds(components));
   }
-
-  /**
-   * Debug method dumping a GraphCollection.
-   *
-   * @param collection The collection.
-   * @throws Exception ignored
-   */
-  @Ignore
-  private void dump(GraphCollection collection) throws Exception {
-    collection.getGraphHeads().print();
-    getExecutionEnvironment().fromElements("----------").print();
-    collection.getVertices().print();
-    getExecutionEnvironment().fromElements("----------").print();
-    collection.getEdges().print();
-    getExecutionEnvironment().fromElements("----------").print();
-  }
-
 }

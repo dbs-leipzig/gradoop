@@ -70,7 +70,7 @@ public class WeaklyConnectedComponents implements UnaryGraphToCollectionOperator
     LogicalGraph withWccAnnotations = graph
       .callForGraph(new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
     GraphCollection split = withWccAnnotations.splitBy(propertyKey);
-    DataSet<Vertex> vertices = withWccAnnotations.getVertices()
+    DataSet<Vertex> vertices = split.getVertices()
       .map(new PropertyRemover<>(propertyKey));
     return graph.getConfig().getGraphCollectionFactory().fromDataSets(split.getGraphHeads(),
       vertices, split.getEdges());
