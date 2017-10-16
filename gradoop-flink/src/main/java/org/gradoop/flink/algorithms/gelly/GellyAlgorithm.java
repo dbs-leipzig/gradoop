@@ -62,7 +62,11 @@ public abstract class GellyAlgorithm<E, F> implements UnaryGraphToGraphOperator 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     currentGraph = graph;
-    return executeInGelly(transformToGelly(graph));
+    try {
+      return executeInGelly(transformToGelly(graph));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -85,5 +89,5 @@ public abstract class GellyAlgorithm<E, F> implements UnaryGraphToGraphOperator 
    * @param graph The Gelly graph.
    * @return The Gradoop graph.
    */
-  protected abstract LogicalGraph executeInGelly(Graph<GradoopId, E, F> graph);
+  protected abstract LogicalGraph executeInGelly(Graph<GradoopId, E, F> graph) throws Exception;
 }
