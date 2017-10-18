@@ -78,99 +78,99 @@ public class GraphStatisticsDataSink implements DataSink {
   public void write(final LogicalGraph graph, final boolean overwrite) throws IOException {
 
     // VertexCountRunner.main(args)
-    writeCSV(
+    writeCsv(
         new VertexCount()
-        .execute(graph)
-        .map(new ObjectTo1<>()),
+          .execute(graph)
+          .map(new ObjectTo1<>()),
         GraphStatisticsReader.FILE_VERTEX_COUNT,
         overwrite);
     // EdgeCountRunner.main(args)
-    writeCSV(
+    writeCsv(
         new EdgeCount()
-        .execute(graph)
-        .map(new ObjectTo1<>()),
+          .execute(graph)
+          .map(new ObjectTo1<>()),
         GraphStatisticsReader.FILE_EDGE_COUNT,
         overwrite);
     // VertexLabelDistributionRunner.main(args)
-    writeCSV(
+    writeCsv(
         new VertexLabelDistribution()
-        .execute(graph),
+          .execute(graph),
         GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL,
         overwrite);
     //    EdgeLabelDistributionRunner.main(args);
-    writeCSV(
+    writeCsv(
         new EdgeLabelDistribution()
-        .execute(graph) ,
+          .execute(graph) ,
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL,
         overwrite);
     //    DistinctSourceVertexCountRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctSourceIds()
-        .execute(graph)
-        .map(new ObjectTo1<>()),
+          .execute(graph)
+          .map(new ObjectTo1<>()),
         GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT,
         overwrite);
     //    DistinctTargetVertexCountRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctTargetIds()
-        .execute(graph)
-        .map(new ObjectTo1<>()),
+          .execute(graph)
+          .map(new ObjectTo1<>()),
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT,
         overwrite);
     //    DistinctSourceVertexCountByEdgeLabelRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctSourceIdsByEdgeLabel()
-        .execute(graph),
+          .execute(graph),
         GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL,
         overwrite);
     //    DistinctTargetVertexCountByEdgeLabelRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctTargetIdsByEdgeLabel()
-        .execute(graph),
+          .execute(graph),
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL,
         overwrite);
     //    SourceAndEdgeLabelDistributionRunner.main(args);
-    writeCSV(
+    writeCsv(
         new SourceLabelAndEdgeLabelDistribution()
-        .execute(graph)
-        .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-        .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
+          .execute(graph)
+          .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+          .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL,
         overwrite);
     //    TargetAndEdgeLabelDistributionRunner.main(args);
-    writeCSV(
+    writeCsv(
         new TargetLabelAndEdgeLabelDistribution()
-        .execute(graph)
-        .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-        .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
+          .execute(graph)
+          .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+          .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL,
         overwrite);
     //    DistinctEdgePropertiesByLabelRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctEdgePropertiesByLabel()
-        .execute(graph)
-        .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-        .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
+          .execute(graph)
+          .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+          .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
         GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL,
         overwrite);
     //    DistinctVertexPropertiesByLabelRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctVertexPropertiesByLabel()
-        .execute(graph)
-        .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-        .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
+          .execute(graph)
+          .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+          .returns(new TypeHint<Tuple3<String, String, Long>>() { }),
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL,
         overwrite);
     //    DistinctEdgePropertiesRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctEdgeProperties()
-        .execute(graph),
+          .execute(graph),
         GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES,
         overwrite);
     //    DistinctVertexPropertiesRunner.main(args);
-    writeCSV(
+    writeCsv(
         new DistinctVertexProperties()
-        .execute(graph),
+          .execute(graph),
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES,
         overwrite);
   }
@@ -182,7 +182,7 @@ public class GraphStatisticsDataSink implements DataSink {
    * @param overWrite should the target file be overwritten if it already exists?
    * @param <T> type of tuple, necessary to satisfy the Java compiler
    */
-  private <T extends Tuple> void writeCSV(final DataSet<T> tuples,
+  private <T extends Tuple> void writeCsv(final DataSet<T> tuples,
       final String fileName, final boolean overWrite) {
     tuples.writeAsCsv(
         appendSeparator(this.path) + fileName,
