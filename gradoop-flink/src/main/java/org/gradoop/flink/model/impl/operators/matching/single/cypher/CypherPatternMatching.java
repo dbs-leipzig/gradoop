@@ -32,6 +32,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.pl
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.s1ck.gdl.GDLHandler;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -95,6 +96,9 @@ public class CypherPatternMatching extends PatternMatching {
 
     embeddings = log(embeddings, new PrintEmbedding(embeddingMetaData),
       getVertexMapping(), getEdgeMapping());
+
+    // TODO: apply return pattern to embeddings
+
 
     // Post processing
     Map<String, Pair<String, String>> sourceTargetVars = queryHandler.getEdges().stream()

@@ -66,6 +66,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.util.List;
@@ -175,6 +176,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public GraphCollection cypher(String query) {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
+  }
+
+  @Override
+  public GraphCollection cypher(String query, String returnPattern) {
+    throw new NotImplementedException();
   }
 
   /**
