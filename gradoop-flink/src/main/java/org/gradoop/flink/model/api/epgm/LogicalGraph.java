@@ -180,7 +180,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
 
   @Override
   public GraphCollection cypher(String query, String returnPattern) {
-    throw new NotImplementedException();
+    return cypher(query, returnPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
   /**
@@ -192,6 +192,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+  @Override
+  public GraphCollection cypher(String query, String returnPattern, GraphStatistics graphStatistics) {
+    return cypher(query, returnPattern, true,
+            MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+
   /**
    * {@inheritDoc}
    */
@@ -200,6 +207,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching(query, attachData,
       vertexStrategy, edgeStrategy, graphStatistics));
+  }
+
+  @Override
+  public GraphCollection cypher(String query, String returnPattern, boolean attachData, MatchStrategy vertexStrategy,
+                                MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, returnPattern, attachData,
+            vertexStrategy, edgeStrategy, graphStatistics));
   }
 
   /**

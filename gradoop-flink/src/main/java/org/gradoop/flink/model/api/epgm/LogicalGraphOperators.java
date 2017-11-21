@@ -74,6 +74,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   GraphCollection cypher(String query, GraphStatistics graphStatistics);
 
+  GraphCollection cypher(String query, String returnPattern, GraphStatistics graphStatistics);
+
   /**
    * Evaluates the given query using the Cypher query engine.
    *
@@ -86,6 +88,9 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   GraphCollection cypher(String query, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+
+  GraphCollection cypher(String query, String returnPattern, boolean attachData,
+                         MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
    * Evaluates the given GDL query using the Traverser query engine.
