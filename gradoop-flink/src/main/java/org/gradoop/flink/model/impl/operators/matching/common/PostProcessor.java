@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.utils.Cast;
 import org.gradoop.flink.model.impl.functions.utils.IsInstance;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -97,13 +98,14 @@ public class PostProcessor {
 
     // attach data by joining first and merging the graph head ids
     DataSet<Vertex> newVertices = inputGraph.getVertices()
-      .join(collection.getVertices())
+      .rightOuterJoin(collection.getVertices())
       .where(new Id<>()).equalTo(new Id<>())
       .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties;");
 
+
     DataSet<Edge> newEdges = inputGraph.getEdges()
-      .join(collection.getEdges())
+      .rightOuterJoin(collection.getEdges())
       .where(new Id<>()).equalTo(new Id<>())
       .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties");
@@ -157,7 +159,7 @@ public class PostProcessor {
    * @return EPGM vertices
    */
   public static DataSet<Vertex> extractVertices(DataSet<FatVertex> result,
-    EPGMVertexFactory<Vertex> epgmVertexFactory) {
+                                                EPGMVertexFactory<Vertex> epgmVertexFactory) {
     return extractVertexIds(result).map(new VertexFromId(epgmVertexFactory));
   }
 

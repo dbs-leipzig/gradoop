@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.s1ck.gdl.model.Graph;
 
 import java.util.List;
 
@@ -61,6 +62,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   GraphCollection cypher(String query);
 
+  GraphCollection cypher(String query, String returnPattern);
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
@@ -71,6 +73,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing matching subgraphs
    */
   GraphCollection cypher(String query, GraphStatistics graphStatistics);
+
+  GraphCollection cypher(String query, String returnPattern, GraphStatistics graphStatistics);
 
   /**
    * Evaluates the given query using the Cypher query engine.
@@ -84,6 +88,9 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   GraphCollection cypher(String query, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+
+  GraphCollection cypher(String query, String returnPattern, boolean attachData,
+                         MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
    * Evaluates the given GDL query using the Traverser query engine.

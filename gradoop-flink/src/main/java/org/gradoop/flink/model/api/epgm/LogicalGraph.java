@@ -66,6 +66,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.util.List;
@@ -177,6 +178,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
 
+  @Override
+  public GraphCollection cypher(String query, String returnPattern) {
+    return cypher(query, returnPattern, new GraphStatistics(1, 1, 1, 1));
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -186,6 +192,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+  @Override
+  public GraphCollection cypher(String query, String returnPattern, GraphStatistics graphStatistics) {
+    return cypher(query, returnPattern, true,
+            MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+
   /**
    * {@inheritDoc}
    */
@@ -194,6 +207,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching(query, attachData,
       vertexStrategy, edgeStrategy, graphStatistics));
+  }
+
+  @Override
+  public GraphCollection cypher(String query, String returnPattern, boolean attachData, MatchStrategy vertexStrategy,
+                                MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, returnPattern, attachData,
+            vertexStrategy, edgeStrategy, graphStatistics));
   }
 
   /**
