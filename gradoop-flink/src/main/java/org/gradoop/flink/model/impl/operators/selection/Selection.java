@@ -19,6 +19,8 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,13 +46,37 @@ public class Selection extends SelectionBase {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
+    return collection.isTransactionalLayout() ?
+      executeForTxLayout(collection) :
+      executeForGVELayout(collection);
+  }
 
-    // find graph heads matching the predicate
-    DataSet<GraphHead> graphHeads = collection
-      .getGraphHeads()
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForGVELayout(GraphCollection collection) {
+    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
       .filter(predicate);
-
     return selectVerticesAndEdges(collection, graphHeads);
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForTxLayout(GraphCollection collection) {
+    DataSet<GraphTransaction> filteredTransactions = collection.getGraphTransactions()
+      .filter(new FilterTransactions(predicate));
+
+    return collection.getConfig().getGraphCollectionFactory()
+      .fromTransactions(filteredTransactions);
   }
 
   @Override
