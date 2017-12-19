@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.MultiGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.GraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -674,7 +674,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(MultiGraphToGraphOperator operator,
+  public LogicalGraph callForGraph(GraphToGraphOperator operator,
     LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
   }

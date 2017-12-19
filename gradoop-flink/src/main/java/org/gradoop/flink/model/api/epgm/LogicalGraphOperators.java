@@ -25,7 +25,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.MultiGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.GraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
@@ -691,7 +691,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param otherGraphs other graphs
    * @return result of given operator
    */
-  LogicalGraph callForGraph(MultiGraphToGraphOperator operator, LogicalGraph... otherGraphs);
+  LogicalGraph callForGraph(GraphToGraphOperator operator, LogicalGraph... otherGraphs);
 
   /**
    * Creates a graph collection from that graph using the given unary graph
