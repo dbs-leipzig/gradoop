@@ -535,6 +535,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
+     * @param labelGroup label group
+     * @return this builder
+     */
+    public GroupingBuilder addVertexLabelGroup(LabelGroup labelGroup) {
+      vertexLabelGroups.add(labelGroup);
+      return this;
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Note that a label may be used multiple times.
+     *
      * @param label vertex label
      * @param groupingKeys keys used for grouping
      * @return this builder
@@ -571,8 +583,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label,
-      String superVertexLabel,
+      String label, String superVertexLabel,
       List<String> groupingKeys) {
       return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
     }
@@ -588,8 +599,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label,
-      String superVertexLabel,
+      String label, String superVertexLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
@@ -597,7 +607,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
+     * specific label. Note that a label may be used multiple times.
+     *
+     * @param labelGroup
+     * @return
+     */
+    public GroupingBuilder addEdgeLabelGroup(LabelGroup labelGroup) {
+      edgeLabelGroups.add(labelGroup);
+      return this;
+    }
+    /**
+     * Adds an edge label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
      * @param label edge label
@@ -611,7 +632,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
@@ -627,34 +648,32 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Adds an edge label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super edge
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label,
-      String superEdgeLabel,
+      String label, String superEdgeLabel,
       List<String> groupingKeys) {
       return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super edge
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
      * @param groupingKeys keys used for grouping
      * @param aggregators edge aggregators
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label,
-      String superEdgeLabel,
+      String label, String superEdgeLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
@@ -773,7 +792,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           throw new IllegalArgumentException(
             "Using vertex label groups is not allowed with edge centric grouping.");
         }
-      //old grouping or new grouping and vertex centric
+        //old grouping or new grouping and vertex centric
       } else {
         if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
           throw new IllegalArgumentException(

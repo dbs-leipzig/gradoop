@@ -21,6 +21,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Stores grouping keys for a specific label.
@@ -112,5 +113,114 @@ public class LabelGroup
    */
   public void addAggregator(PropertyValueAggregator aggregator) {
     f3.add(aggregator);
+  }
+
+  /**
+   * Used for building a label group.
+   */
+  public class LabelGroupBuilder {
+    /**
+     * Label used for grouping.
+     */
+    private String groupingLabel;
+    /**
+     * Label used after grouping.
+     */
+    private String groupLabel;
+    /**
+     * Variable amount of grouping keys for the label.
+     */
+    private List<String> propertyKeys;
+    /**
+     * Aggregate functions.
+     */
+    private List<PropertyValueAggregator> aggregators;
+
+    /**
+     * Creates new LabelGroupBuilder.
+     */
+    public LabelGroupBuilder() {
+      groupingLabel = null;
+      groupLabel    = null;
+      propertyKeys  = Lists.newArrayList();
+      aggregators   = Lists.newArrayList();
+    }
+
+    /**
+     * Sets the label used for grouping.
+     *
+     * @param groupingLabel label used for grouping
+     * @return this builder
+     */
+    public LabelGroupBuilder setGroupingLabel(String groupingLabel) {
+      this.groupingLabel = groupingLabel;
+      return this;
+    }
+
+    /**
+     * Sets the label used after grouping.
+     *
+     * @param groupLabel label used after grouping
+     * @return this builder
+     */
+    public LabelGroupBuilder setGroupLabel(String groupLabel) {
+      this.groupLabel = groupLabel;
+      return this;
+    }
+
+    /**
+     * Adds a property key for grouping to this group.
+     *
+     * @param propertyKey property key for grouping
+     * @return this builder
+     */
+    public LabelGroupBuilder addPropertyKey(String propertyKey) {
+      this.propertyKeys.add(propertyKey);
+      return this;
+    }
+
+    /**
+     * Adds a aggregate function which is applied on all elements in this group.
+     * @param aggregator
+     * @return this builder
+     */
+    public LabelGroupBuilder addAggregator(PropertyValueAggregator aggregator) {
+      this.aggregators.add(aggregator);
+      return this;
+    }
+
+    /**
+     * Adds property keys for grouping to this group.
+     *
+     * @param propertyKeys property keys for grouping
+     * @return this builder
+     */
+    public LabelGroupBuilder addPropertyKeys(List<String> propertyKeys) {
+      this.propertyKeys.addAll(propertyKeys);
+      return this;
+    }
+
+    /**
+     * Adds a aggregate functions which are applied on all elements in this group.
+     * @param aggregators
+     * @return this builder
+     */
+    public LabelGroupBuilder addAggregators(List<PropertyValueAggregator> aggregators) {
+      this.aggregators.addAll(aggregators);
+      return this;
+    }
+
+    /**
+     * Creates a new label group instance based on the configured parameters.
+     *
+     * @return label group instance
+     */
+    public LabelGroup build() {
+      Objects.requireNonNull(groupingLabel, "Grouping label must not be null");
+      if (groupLabel == null) {
+        groupLabel = groupingLabel;
+      }
+      return new LabelGroup(groupingLabel, groupLabel, propertyKeys, aggregators);
+    }
   }
 }
