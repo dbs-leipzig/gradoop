@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
@@ -78,6 +79,22 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    */
   private final Map<String, String> labelMapping;
 
+  /**
+   * Constructor.
+   *
+   * @param epgmGraphHeadFactory EPGM graph head factory
+   * @param epgmVertexFactory EPGM vertex factory
+   * @param epgmEdgeFactory EPGM edge factory
+   * @param embeddingMetaData meta data for the embedding
+*    @param sourceTargetVariables source and target vertex variables by edge variable
+   */
+  public ElementsFromEmbedding(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory,
+    EPGMEdgeFactory<Edge> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+    Map<String, Pair<String, String>> sourceTargetVariables) {
+    this(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,
+      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));
+  }
   /**
    * Constructor.
    *

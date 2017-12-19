@@ -1,12 +1,12 @@
 /**
  * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -28,24 +27,18 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions
-  .ElementsFromEmbedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.add
-  .AddEmbeddingsElements;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter
-  .FilterEmbeddingsElements;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy
-  .GreedyPlanner;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.add.AddEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.Edge;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
+import static com.google.common.collect.Sets.difference;
+import static com.google.common.collect.Sets.intersection;
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
@@ -56,8 +49,10 @@ public class CypherPatternMatching extends PatternMatching {
    * Logger
    */
   private static final Logger LOG = Logger.getLogger(CypherPatternMatching.class);
-
-  private final String returnPattern;
+  /**
+   * Construction pattern for result transformation.
+   */
+  private final String constructionPattern;
   /**
    * Morphism strategy for vertex mappings
    */
@@ -82,17 +77,23 @@ public class CypherPatternMatching extends PatternMatching {
    */
   public CypherPatternMatching(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    super(query, attachData, LOG);
-    this.returnPattern = null;
-    this.vertexStrategy = vertexStrategy;
-    this.edgeStrategy = edgeStrategy;
-    this.graphStatistics = graphStatistics;
+    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
-  public CypherPatternMatching(String query, String returnPattern, boolean attachData,
+  /**
+   * Instantiates a new operator.
+   *
+   * @param query               Cypher query string
+   * @param constructionPattern Construction pattern
+   * @param attachData          true, if original data shall be attached to the result
+   * @param vertexStrategy      morphism strategy for vertex mappings
+   * @param edgeStrategy        morphism strategy for edge mappings
+   * @param graphStatistics     statistics about the data graph
+   */
+  public CypherPatternMatching(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     super(query, attachData, LOG);
-    this.returnPattern = returnPattern;
+    this.constructionPattern = constructionPattern;
     this.vertexStrategy = vertexStrategy;
     this.edgeStrategy = edgeStrategy;
     this.graphStatistics = graphStatistics;
@@ -118,107 +119,75 @@ public class CypherPatternMatching extends PatternMatching {
     embeddings =
       log(embeddings, new PrintEmbedding(embeddingMetaData), getVertexMapping(), getEdgeMapping());
 
-    // TODO: apply return pattern to embeddings
-    final QueryHandler returnPatternHandler;
-    final List<String> newElementVariables;
-    if (this.returnPattern != null) {
-      returnPatternHandler = new QueryHandler(this.returnPattern);
-      Tuple3<DataSet<Embedding>, EmbeddingMetaData, List<String>> returnPatternResult =
-        applyReturnPattern(embeddings, embeddingMetaData, returnPatternHandler);
-      embeddings = returnPatternResult.f0;
-      embeddingMetaData = returnPatternResult.f1;
-      newElementVariables = returnPatternResult.f2;
-    } else {
-      returnPatternHandler = queryHandler;
-      newElementVariables = null;
-    }
+    // Pattern construction (if necessary)
+    DataSet<Element> finalElements = this.constructionPattern != null ?
+      constructFinalElements(graph, embeddings, embeddingMetaData) :
+      embeddings.flatMap(
+        new ElementsFromEmbedding(
+          graph.getConfig().getGraphHeadFactory(),
+          graph.getConfig().getVertexFactory(),
+          graph.getConfig().getEdgeFactory(),
+          embeddingMetaData,
+          queryHandler.getSourceTargetVariables()));
 
     // Post processing
-    Map<String, Pair<String, String>> sourceTargetVars = returnPatternHandler.getEdges().stream()
-      .map(e -> Pair.of(e.getVariable(), Pair
-        .of(returnPatternHandler.getVertexById(e.getSourceVertexId()).getVariable(),
-          returnPatternHandler.getVertexById(e.getTargetVertexId()).getVariable())))
-      .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    return doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
+      PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);
+  }
 
-    // Map labels to EPGM elements. This is needed for newly created return pattern elements
-    Map<String, String> elementsLabels;
-    if (newElementVariables != null) {
-      elementsLabels = newElementVariables.stream().map(var -> {
-        if (returnPatternHandler.getEdgeByVariable(var) != null) {
-          return Pair.of(var, returnPatternHandler.getEdgeByVariable(var).getLabel());
-        } else {
-          return Pair.of(var, returnPatternHandler.getVertexByVariable(var).getLabel());
-        }
-      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-    } else {
-      elementsLabels = new HashMap<>();
-    }
+  private DataSet<Element> constructFinalElements(LogicalGraph graph, DataSet<Embedding> embeddings,
+    EmbeddingMetaData embeddingMetaData) {
 
-    DataSet<Element> elements = embeddings.flatMap(
+    QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);
+
+    Set<String> queryVars = Sets.newHashSet(embeddingMetaData.getVariables());
+    Set<String> constructionVars = constructionPatternHandler.getAllVariables();
+    Set<String> existingVars = intersection(queryVars, constructionVars).immutableCopy();
+    Set<String> newVars = difference(constructionVars, queryVars).immutableCopy();
+
+    EmbeddingMetaData newMetaData = computeNewMetaData(
+      embeddingMetaData, constructionPatternHandler, existingVars, newVars);
+
+    // project existing embedding elements to new embeddings
+    ProjectEmbeddingsElements projectedEmbeddings =
+      new ProjectEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
+    // add new embedding elements
+    AddEmbeddingsElements addEmbeddingsElements =
+      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());
+
+    return addEmbeddingsElements.evaluate().flatMap(
       new ElementsFromEmbedding(
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),
         graph.getConfig().getEdgeFactory(),
-        embeddingMetaData,
-        sourceTargetVars,
-        elementsLabels));
-
-    return doAttachData() ? PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
-      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
+        newMetaData,
+        constructionPatternHandler.getSourceTargetVariables(),
+        constructionPatternHandler.getLabelsForVariables(newVars)));
   }
 
-  @Override
-  public String getName() {
-    return CypherPatternMatching.class.getName();
-  }
-
-  public Tuple3<DataSet<Embedding>, EmbeddingMetaData, List<String>> applyReturnPattern(
-    DataSet<Embedding> embeddings, EmbeddingMetaData metaData, QueryHandler returnPatternHandler) {
-    List<String> queryVariables = metaData.getVariables();
-    List<String> returnPatternVariables =
-      returnPatternHandler.getVertices().stream().map(v -> v.getVariable())
-        .collect(Collectors.toList());
-    returnPatternVariables.addAll(returnPatternHandler.getEdges().stream().map(e -> e.getVariable())
-      .collect(Collectors.toList()));
-
-    List<String> existingVariables =
-      returnPatternVariables.stream().filter(var -> queryVariables.contains(var))
-        .collect(Collectors.toList());
-    List<String> newVariables =
-      returnPatternVariables.stream().filter(var -> !queryVariables.contains(var))
-        .collect(Collectors.toList());
-
-    DataSet<Embedding> newEmbeddings;
+  private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
+    QueryHandler returnPatternHandler, Set<String> existingVariables, Set<String> newVariables) {
+    // update meta data
     EmbeddingMetaData newMetaData = new EmbeddingMetaData();
-
 
     // case 1: Filter existing embeddings based on return pattern
     for (String var : existingVariables) {
       newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());
     }
 
-    FilterEmbeddingsElements filterEmbeddingsElements =
-      new FilterEmbeddingsElements(embeddings, existingVariables, metaData, newMetaData);
-    newEmbeddings = filterEmbeddingsElements.evaluate();
-
-
     // case 2: Add new vertices and edges
     for (String var : newVariables) {
-      Edge edge = returnPatternHandler.getEdgeByVariable(var);
-      EmbeddingMetaData.EntryType type;
+      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?
+        EmbeddingMetaData.EntryType.EDGE :
+        EmbeddingMetaData.EntryType.VERTEX;
 
-      if (edge != null) {
-        type = EmbeddingMetaData.EntryType.EDGE;
-      } else {
-        type = EmbeddingMetaData.EntryType.VERTEX;
-      }
       newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());
     }
+    return newMetaData;
+  }
 
-    AddEmbeddingsElements addEmbeddingsElements =
-      new AddEmbeddingsElements(newEmbeddings, newVariables);
-    newEmbeddings = addEmbeddingsElements.evaluate();
-
-    return new Tuple3<>(newEmbeddings, newMetaData, newVariables);
+  @Override
+  public String getName() {
+    return CypherPatternMatching.class.getName();
   }
 }
