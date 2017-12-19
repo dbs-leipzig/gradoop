@@ -29,6 +29,8 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateTransactions;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateVertices;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionApplyAggregates;
@@ -61,7 +63,19 @@ public class ApplyAggregation
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
+    return (collection.isTransactionalLayout()) ?
+      executeForTxLayout(collection) :
+      executeForGVELayout(collection);
+  }
 
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForGVELayout(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();
     DataSet<Vertex> vertices = collection.getVertices();
     DataSet<Edge> edges = collection.getEdges();
@@ -69,7 +83,7 @@ public class ApplyAggregation
     DataSet<Tuple2<GradoopId, PropertyValue>> aggregate;
 
     DataSet<GradoopId> graphIds = graphHeads
-      .map(new Id<GraphHead>());
+      .map(new Id<>());
 
     if (this.aggregateFunction instanceof VertexAggregateFunction) {
       aggregate = aggregateVertices(vertices, graphIds);
@@ -83,11 +97,25 @@ public class ApplyAggregation
 
     graphHeads = graphHeads
       .coGroup(aggregate)
-      .where(new Id<GraphHead>()).equalTo(0)
+      .where(new Id<>()).equalTo(0)
       .with(new SetAggregateProperties(aggregateFunction));
 
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForTxLayout(GraphCollection collection) {
+    DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
+      .map(new AggregateTransactions(this.aggregateFunction));
+
+    return collection.getConfig().getGraphCollectionFactory().fromTransactions(updatedTransactions);
   }
 
   /**
@@ -100,7 +128,7 @@ public class ApplyAggregation
   private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateVertices(
     DataSet<Vertex> vertices, DataSet<GradoopId> graphIds) {
     return vertices
-      .flatMap(new ElementsOfSelectedGraphs<Vertex>())
+      .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateVertices(
@@ -117,7 +145,7 @@ public class ApplyAggregation
   private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateEdges(
     DataSet<Edge> edges, DataSet<GradoopId> graphIds) {
     return edges
-      .flatMap(new ElementsOfSelectedGraphs<Edge>())
+      .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateEdges(

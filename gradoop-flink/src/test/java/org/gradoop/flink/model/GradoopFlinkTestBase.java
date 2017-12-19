@@ -24,6 +24,9 @@ import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.flink.model.impl.functions.bool.False;
+import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -67,7 +70,8 @@ public abstract class GradoopFlinkTestBase {
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
-    this.config = GradoopFlinkConfig.createConfig(env);
+    this.config = GradoopFlinkConfig.createConfig(env,
+      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
   }
 
   /**
