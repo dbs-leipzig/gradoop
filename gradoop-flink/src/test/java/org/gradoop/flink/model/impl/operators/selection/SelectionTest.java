@@ -34,13 +34,8 @@ public class SelectionTest extends GradoopFlinkTestBase {
     GraphCollection expectedOutputCollection =
       loader.getGraphCollectionByVariables("g0", "g1");
 
-    FilterFunction<GraphHead> predicateFunc = new FilterFunction<GraphHead>() {
-      @Override
-      public boolean filter(GraphHead entity) throws Exception {
-        return entity.hasProperty("vertexCount") &&
-          entity.getPropertyValue("vertexCount").getInt() == 3;
-      }
-    };
+    FilterFunction<GraphHead> predicateFunc = (FilterFunction<GraphHead>) entity ->
+      entity.hasProperty("vertexCount") && entity.getPropertyValue("vertexCount").getInt() == 3;
 
     GraphCollection outputCollection = inputCollection.select(predicateFunc);
 
@@ -55,13 +50,8 @@ public class SelectionTest extends GradoopFlinkTestBase {
     GraphCollection inputCollection =
       loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
-    FilterFunction<GraphHead> predicateFunc = new FilterFunction<GraphHead>() {
-      @Override
-      public boolean filter(GraphHead entity) throws Exception {
-        return entity.hasProperty("vertexCount") &&
-          entity.getPropertyValue("vertexCount").getInt() > 5;
-      }
-    };
+    FilterFunction<GraphHead> predicateFunc = (FilterFunction<GraphHead>) entity ->
+      entity.hasProperty("vertexCount") && entity.getPropertyValue("vertexCount").getInt() > 5;
 
     GraphCollection outputCollection = inputCollection.select(predicateFunc);
 
