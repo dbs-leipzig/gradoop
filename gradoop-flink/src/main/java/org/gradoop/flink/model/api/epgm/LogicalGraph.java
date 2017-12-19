@@ -178,9 +178,12 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection cypher(String query, String returnPattern) {
-    return cypher(query, returnPattern, new GraphStatistics(1, 1, 1, 1));
+  public GraphCollection cypher(String query, String constructionPattern) {
+    return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
   /**
@@ -192,9 +195,13 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection cypher(String query, String returnPattern, GraphStatistics graphStatistics) {
-    return cypher(query, returnPattern, true,
+  public GraphCollection cypher(String query, String constructionPattern,
+    GraphStatistics graphStatistics) {
+    return cypher(query, constructionPattern, true,
             MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
@@ -205,14 +212,16 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching(query, attachData,
-      vertexStrategy, edgeStrategy, graphStatistics));
+    return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection cypher(String query, String returnPattern, boolean attachData, MatchStrategy vertexStrategy,
-                                MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching(query, returnPattern, attachData,
+  public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
             vertexStrategy, edgeStrategy, graphStatistics));
   }
 
