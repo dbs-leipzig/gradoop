@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} based on an at least one input graph.
  */
-public interface GraphToGraphOperator extends Operator {
+public interface GraphsToGraphOperator extends Operator {
   /**
    * Executes this operator.
    *
