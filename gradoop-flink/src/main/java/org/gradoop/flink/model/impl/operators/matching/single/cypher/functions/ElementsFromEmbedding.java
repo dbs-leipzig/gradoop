@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.functions;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
@@ -27,6 +28,7 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -72,6 +74,10 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    * Stores the identifiers that have already been processed.
    */
   private final Set<GradoopId> processedIds;
+  /**
+   * Stores the mapping between return pattern variables and its labels
+   */
+  private final Map<String, String> labelMapping;
 
   /**
    * Constructor.
@@ -80,17 +86,36 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    * @param epgmVertexFactory EPGM vertex factory
    * @param epgmEdgeFactory EPGM edge factory
    * @param embeddingMetaData meta data for the embedding
-   * @param sourceTargetVariables source and target vertex variables by edge variable
+*    @param sourceTargetVariables source and target vertex variables by edge variable
    */
   public ElementsFromEmbedding(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
     EPGMVertexFactory<Vertex> epgmVertexFactory,
     EPGMEdgeFactory<Edge> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
     Map<String, Pair<String, String>> sourceTargetVariables) {
+    this(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,
+      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));
+  }
+  /**
+   * Constructor.
+   *
+   * @param epgmGraphHeadFactory EPGM graph head factory
+   * @param epgmVertexFactory EPGM vertex factory
+   * @param epgmEdgeFactory EPGM edge factory
+   * @param embeddingMetaData meta data for the embedding
+   * @param sourceTargetVariables source and target vertex variables by edge variable
+   * @param labelMapping mapping between newElementVariables and its labels
+   */
+  public ElementsFromEmbedding(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<Vertex> epgmVertexFactory,
+    EPGMEdgeFactory<Edge> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+    Map<String, Pair<String, String>> sourceTargetVariables,
+    Map<String, String > labelMapping) {
     this.graphHeadFactory = epgmGraphHeadFactory;
     this.vertexFactory = epgmVertexFactory;
     this.edgeFactory = epgmEdgeFactory;
     this.metaData = embeddingMetaData;
     this.sourceTargetVariables = sourceTargetVariables;
+    this.labelMapping = labelMapping;
     this.variableMapping = new HashMap<>(embeddingMetaData.getEntryCount());
     this.processedIds = new HashSet<>(embeddingMetaData.getEntryCount());
   }
@@ -106,7 +131,13 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     // vertices
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
-      initVertex(out, graphHead, id);
+
+      if(labelMapping.containsKey(vertexVariable)) {
+        String label = labelMapping.get(vertexVariable);
+        initVertexWithData(out, graphHead, id, label);
+      } else {
+        initVertex(out, graphHead, id);
+      }
       variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));
     }
 
@@ -121,7 +152,12 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
       targetId = embedding.getId(
         metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
 
-      initEdge(out, graphHead, edgeId, sourceId, targetId);
+      if(labelMapping.containsKey(edgeVariable)) {
+        String label = labelMapping.get(edgeVariable);
+        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);
+      } else {
+        initEdge(out, graphHead, edgeId, sourceId, targetId);
+      }
       variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
     }
 
@@ -183,16 +219,31 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    * @param vertexId vertex identifier
    */
   private void initVertex(Collector<Element> out, GraphHead graphHead, GradoopId vertexId) {
+    initVertexWithData(out, graphHead, vertexId, null);
+  }
+
+  /**
+   * Initializes an EPGM vertex using the specified parameters and adds its label
+   * if the given vertex was created for the return pattern.
+   *
+   * @param out flat map collector
+   * @param graphHead graph head to assign vertex to
+   * @param vertexId vertex identifier
+   * @param label label associated with vertex
+   */
+  private void initVertexWithData(Collector<Element> out, GraphHead graphHead, GradoopId vertexId,
+                                  String label) {
     if (!processedIds.contains(vertexId)) {
       Vertex v = vertexFactory.initVertex(vertexId);
       v.addGraphId(graphHead.getId());
+      v.setLabel(label);
       out.collect(v);
       processedIds.add(vertexId);
     }
   }
 
   /**
-   * Initializes an EPGM edge using the speciified parameters.
+   * Initializes an EPGM edge using the specified parameters.
    *
    * @param out flat map collector
    * @param graphHead graph head to assign edge to
@@ -202,11 +253,28 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    */
   private void initEdge(Collector<Element> out, GraphHead graphHead, GradoopId edgeId,
     GradoopId sourceId, GradoopId targetId) {
-    if (!processedIds.contains(edgeId)) {
-      Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
-      e.addGraphId(graphHead.getId());
-      out.collect(e);
-      processedIds.add(edgeId);
-    }
+    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);
+  }
+
+  /**
+   * Initializes an EPGM edge using the specified parameters and adds its label
+   * if the given edge was created for return pattern
+   *
+   * @param out flat map collector
+   * @param graphHead graph head to assign edge to
+   * @param edgeId edge identifier
+   * @param sourceId source vertex identifier
+   * @param targetId target vertex identifier
+   * @param label label associated with edge
+   */
+  private void initEdgeWithData(Collector<Element> out, GraphHead graphHead, GradoopId edgeId,
+                                GradoopId sourceId, GradoopId targetId, String label) {
+      if (!processedIds.contains(edgeId)) {
+        Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
+        e.addGraphId(graphHead.getId());
+        e.setLabel(label);
+        out.collect(e);
+        processedIds.add(edgeId);
+      }
   }
 }

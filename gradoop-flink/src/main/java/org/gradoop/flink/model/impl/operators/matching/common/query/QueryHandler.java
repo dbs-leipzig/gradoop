@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
@@ -121,6 +122,34 @@ public class QueryHandler {
         getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))
       .collect(Collectors.toList());
   }
+
+  /**
+   * Returns all variables contained in the pattern.
+   *
+   * @return all query variables
+   */
+  public Set<String> getAllVariables() {
+    return Sets.union(getVertexVariables(), getEdgeVariables());
+  }
+
+  /**
+   * Returns all vertex variables contained in the pattern.
+   *
+   * @return all vertex variables
+   */
+  public Set<String> getVertexVariables() {
+    return gdlHandler.getVertexCache().keySet();
+  }
+
+  /**
+   * Returns all edge variables contained in the pattern.
+   *
+   * @return all edge variables
+   */
+  public Set<String> getEdgeVariables() {
+    return gdlHandler.getEdgeCache().keySet();
+  }
+
   /**
    * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
    * predicated defined in the query, a CNF containing zero predicates is returned.
@@ -452,6 +481,38 @@ public class QueryHandler {
       neighbors.add(vertex.getId());
     }
     return neighbors;
+  }
+
+  /**
+   * Returns a mapping between the given variables (if existent) and the corresponding element
+   * label.
+   *
+   * @param variables query variables
+   * @return mapping between existing variables and their corresponding label
+   */
+  public Map<String, String> getLabelsForVariables(Collection<String> variables) {
+    return variables.stream()
+      .filter(var -> isEdge(var) || isVertex(var))
+      .map(var -> {
+        if (isEdge(var)) {
+          return Pair.of(var, getEdgeByVariable(var).getLabel());
+        } else {
+          return Pair.of(var, getVertexByVariable(var).getLabel());
+        }
+      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+  }
+
+  /**
+   * Returns a mapping from edge variable to the corresponding source and target variables.
+   *
+   * @return mapping from edge variable to source/target variable
+   */
+  public Map<String, Pair<String, String>> getSourceTargetVariables() {
+    return getEdges().stream()
+      .map(e -> Pair.of(e.getVariable(), Pair
+        .of(getVertexById(e.getSourceVertexId()).getVariable(),
+          getVertexById(e.getTargetVertexId()).getVariable())))
+      .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
   }
 
   /**

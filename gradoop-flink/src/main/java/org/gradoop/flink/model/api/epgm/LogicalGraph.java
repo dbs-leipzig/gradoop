@@ -67,6 +67,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.util.List;
@@ -182,6 +183,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  public GraphCollection cypher(String query, String constructionPattern) {
+    return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
     return cypher(query, true,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
@@ -191,10 +200,30 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  public GraphCollection cypher(String query, String constructionPattern,
+    GraphStatistics graphStatistics) {
+    return cypher(query, constructionPattern, true,
+            MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching(query, attachData,
-      vertexStrategy, edgeStrategy, graphStatistics));
+    return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+            vertexStrategy, edgeStrategy, graphStatistics));
   }
 
   /**

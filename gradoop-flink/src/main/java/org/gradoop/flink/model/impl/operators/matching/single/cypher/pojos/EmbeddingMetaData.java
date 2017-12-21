@@ -62,6 +62,15 @@ public class EmbeddingMetaData implements Serializable {
    * Stores the mapping of query variables to embedding entries
    */
   private Map<Pair<String, EntryType>, Integer> entryMapping;
+
+  public Map<Pair<String, String>, Integer> getPropertyMapping() {
+    return propertyMapping;
+  }
+
+  public Map<String, ExpandDirection> getDirectionMapping() {
+    return directionMapping;
+  }
+
   /**
    * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
    * the embedding
@@ -93,6 +102,8 @@ public class EmbeddingMetaData implements Serializable {
     this.propertyMapping = propertyMapping;
     this.directionMapping = directionMapping;
   }
+
+  public Map<Pair<String, EntryType>, Integer> getEntryMapping() { return this.entryMapping; }
 
   /**
    * Initializes a new EmbeddingMetaData object using copies of the provided meta data.
