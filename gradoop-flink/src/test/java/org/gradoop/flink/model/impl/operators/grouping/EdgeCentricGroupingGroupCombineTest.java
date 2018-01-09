@@ -15,25 +15,10 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-/**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
- */
-public enum GroupingStrategy {
-  /**
-   * @see CentricalGrouping#groupReduce(LogicalGraph)
-   */
-  GROUP_REDUCE,
-  /**
-   * @see CentricalGrouping#groupCombine(LogicalGraph)
-   */
-  GROUP_COMBINE,
-  /**
-   * @see VertexCentricalGrouping
-   */
-  VERTEX_CENTRIC,
-  /**
-   * @see EdgeCentricalGrouping
-   */
-  EDGE_CENTRIC
+public class EdgeCentricGroupingGroupCombineTest extends EdgeCentricGroupingTestBase {
+
+  @Override
+  public GroupingStrategy getStrategy() {
+    return GroupingStrategy.GROUP_COMBINE;
+  }
 }

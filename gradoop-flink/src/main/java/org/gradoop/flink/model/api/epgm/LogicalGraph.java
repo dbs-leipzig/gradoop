@@ -46,6 +46,7 @@ import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.CentricalGrouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -352,6 +353,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  public LogicalGraph groupBy(CentricalGrouping centricalGrouping) {
+    return callForGraph(centricalGrouping);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
     return groupBy(vertexGroupingKeys, null);
   }
@@ -372,14 +381,31 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
+    return  groupBy(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys,
+      edgeAggregateFunctions, groupingStrategy, GroupingStrategy.VERTEX_CENTRIC);
+  }
 
-    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
-    Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy, GroupingStrategy centricalGroupingStrategy) {
+
+    if (centricalGroupingStrategy.equals(GroupingStrategy.VERTEX_CENTRIC)) {
+      Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
+    } else if (centricalGroupingStrategy.equals(GroupingStrategy.EDGE_CENTRIC)) {
+      Objects.requireNonNull(edgeGroupingKeys, "missing edge grouping key(s)");
+    }
+    Objects.requireNonNull(groupingStrategy, "missing grouping strategy");
 
     Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
 
     builder.addVertexGroupingKeys(vertexGroupingKeys);
     builder.setStrategy(groupingStrategy);
+    builder.setCentricalStrategy(centricalGroupingStrategy);
 
     if (edgeGroupingKeys != null) {
       builder.addEdgeGroupingKeys(edgeGroupingKeys);

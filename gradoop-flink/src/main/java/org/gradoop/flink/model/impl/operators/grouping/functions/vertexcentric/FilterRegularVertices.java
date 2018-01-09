@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
+package org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 
 /**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
+ * Filter those tuples which only contain a vertex and its representative.
  */
-public enum GroupingStrategy {
+@FunctionAnnotation.ReadFields("f5")
+public class FilterRegularVertices implements FilterFunction<VertexGroupItem> {
+
   /**
-   * @see CentricalGrouping#groupReduce(LogicalGraph)
+   * {@inheritDoc}
    */
-  GROUP_REDUCE,
-  /**
-   * @see CentricalGrouping#groupCombine(LogicalGraph)
-   */
-  GROUP_COMBINE,
-  /**
-   * @see VertexCentricalGrouping
-   */
-  VERTEX_CENTRIC,
-  /**
-   * @see EdgeCentricalGrouping
-   */
-  EDGE_CENTRIC
+  @Override
+  public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
+    return !vertexGroupItem.isSuperVertex();
+  }
 }

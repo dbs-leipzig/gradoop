@@ -32,6 +32,7 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.CentricalGrouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
@@ -299,6 +300,17 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   LogicalGraph sampleRandomNodes(float sampleSize);
 
   /**
+   * Creates a condensed version of the logical graph by grouping vertices or edges based on the
+   * specified property keys.
+   *
+   * @param centricalGrouping type of grouping: vertex centric or edge centric
+   *
+   * @return summary graph
+   * @see Grouping
+   */
+  LogicalGraph groupBy(CentricalGrouping centricalGrouping);
+
+  /**
    * Creates a condensed version of the logical graph by grouping vertices based on the specified
    * property keys.
    *
@@ -364,6 +376,39 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
+
+  /**
+   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * property keys.
+   *
+   * Either vertices are grouped by the given property keys and edges are implicitly grouped along
+   * with their incident vertices and explicitly by the specified edge grouping keys. Or edges
+   * are grouped first and the super vertices will be created dependently. Furthermore, one can
+   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
+   * represented by the same super vertex/edge.
+   *
+   * One needs to at least specify a list of vertex/edge grouping keys. Any other argument may be
+   * {@code null}.
+   *
+   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys. To group edge centric with
+   * considering the source or the target, one needs to add the specific symbols
+   * {@link Grouping#SOURCE_SYMBOL} or {@link Grouping#TARGET_SYMBOL}.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys property keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @param groupingStrategy execution strategy for vertex or edge grouping
+   * @param centricalGroupingStrategy execution strategy which defines vertex or edge grouping
+   *
+   * @return summary graph
+   * @see Grouping
+   */
+  LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy, GroupingStrategy centricalGroupingStrategy);
 
   /**
    * Sets the aggregation result of the given function as property for each vertex. All edges where

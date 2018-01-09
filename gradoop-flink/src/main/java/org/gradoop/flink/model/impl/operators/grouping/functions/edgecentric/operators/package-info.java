@@ -13,27 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
 /**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
+ * Contains all operators used explicitly for edge centric grouping.
  */
-public enum GroupingStrategy {
-  /**
-   * @see CentricalGrouping#groupReduce(LogicalGraph)
-   */
-  GROUP_REDUCE,
-  /**
-   * @see CentricalGrouping#groupCombine(LogicalGraph)
-   */
-  GROUP_COMBINE,
-  /**
-   * @see VertexCentricalGrouping
-   */
-  VERTEX_CENTRIC,
-  /**
-   * @see EdgeCentricalGrouping
-   */
-  EDGE_CENTRIC
-}
+package org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators;

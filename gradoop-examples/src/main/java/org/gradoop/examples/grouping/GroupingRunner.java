@@ -23,6 +23,8 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 
+import java.util.Arrays;
+
 /**
  * A dedicated program for parametrized graph grouping.
  */
@@ -52,6 +54,30 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
    * Use edge label option
    */
   public static final String OPTION_USE_EDGE_LABELS = "uel";
+  /**
+   * Use local combine strategy for grouping
+   */
+  public static final String OPTION_GROUP_COMBINE = "gc";
+  /**
+   * Group edge centric
+   */
+  public static final String OPTION_GROUP_EDGE_CENTRIC = "gec";
+  /**
+   * Consider edges source for grouping
+   */
+  public static final String OPTION_USE_EDGE_SOURCE = "ues";
+  /**
+   * Consider edges target for grouping
+   */
+  public static final String OPTION_USE_EDGE_TARGET = "uet";
+  /**
+   * Label group for vertices
+   */
+  public static final String OPTION_VERTEX_LABEL_GROUP = "vlg";
+  /**
+   * Label group for edges
+   */
+  public static final String OPTION_EDGE_LABEL_GROUP = "elg";
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
@@ -66,6 +92,19 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
       "Group on vertex labels");
     OPTIONS.addOption(OPTION_USE_EDGE_LABELS, "use-edge-labels", false,
       "Group on edge labels");
+    OPTIONS.addOption(OPTION_GROUP_COMBINE, "group-combine", false,
+      "Group with local combine");
+    OPTIONS.addOption(OPTION_GROUP_EDGE_CENTRIC, "group-edge-centric", false,
+      "Group edge centric");
+    OPTIONS.addOption(OPTION_USE_EDGE_SOURCE, "use-edge-source", false,
+      "Group on edge labels");
+    OPTIONS.addOption(OPTION_USE_EDGE_TARGET, "use-edge-target", false,
+      "Group on edge labels");
+    OPTIONS.addOption(OPTION_VERTEX_LABEL_GROUP, "vertex-label-group", true,
+      "Vertex label group: label%key%key-labelTwo%keyTwo");
+    OPTIONS.addOption(OPTION_EDGE_LABEL_GROUP, "edge-label-group", true,
+      "Edge label group: label%key%key-labelTwo%keyTwo");
+
   }
 
   /**
@@ -95,12 +134,24 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     boolean useVertexLabels = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
+    boolean groupCombine = cmd.hasOption(OPTION_GROUP_COMBINE);
+    boolean groupEdgeCentric = cmd.hasOption(OPTION_GROUP_EDGE_CENTRIC);
+    boolean useEdgeSource = cmd.hasOption(OPTION_USE_EDGE_SOURCE);
+    boolean useEdgeTarget = cmd.hasOption(OPTION_USE_EDGE_TARGET);
+
+    String[] vertexLabelGroups = cmd.hasOption(OPTION_VERTEX_LABEL_GROUP) ?
+      cmd.getOptionValue(OPTION_VERTEX_LABEL_GROUP).split("-") : null;
+    String[] edgeLabelGroups = cmd.hasOption(OPTION_EDGE_LABEL_GROUP) ?
+      cmd.getOptionValue(OPTION_EDGE_LABEL_GROUP).split("-") : null;
+
     // initialize EPGM database
     LogicalGraph graphDatabase = readLogicalGraph(inputPath);
 
     // initialize grouping method
-    Grouping grouping = getOperator(
-      vertexKey, edgeKey, useVertexLabels, useEdgeLabels);
+    Grouping grouping = getOperator(groupEdgeCentric, groupCombine,
+      vertexKey, edgeKey, useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
+      useEdgeSource, useEdgeTarget);
+
     // call grouping on whole database graph
     LogicalGraph summarizedGraph = graphDatabase.callForGraph(grouping);
 
@@ -114,22 +165,61 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
   /**
    * Returns the grouping operator implementation based on the given strategy.
    *
+   * @param groupEdgeCentric      group edge centric
+   * @param groupCombine          use local combine
    * @param vertexKey             vertex property key used for grouping
    * @param edgeKey               edge property key used for grouping
    * @param useVertexLabels       use vertex label for grouping, true/false
    * @param useEdgeLabels         use edge label for grouping, true/false
+   * @param useEdgeSource         consider edges source
+   * @param useEdgeTarget         consider edges target
+   * @param vertexLabelGroups     vertex label groups
+   * @param edgeLabelGroups     edge label groups
    * @return grouping operator implementation
    */
-  private static Grouping getOperator(String vertexKey,
-    String edgeKey, boolean useVertexLabels, boolean useEdgeLabels) {
-    return new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .addVertexGroupingKey(vertexKey)
-      .addEdgeGroupingKey(edgeKey)
+  private static Grouping getOperator(boolean groupEdgeCentric, boolean groupCombine,
+    String vertexKey, String edgeKey, boolean useVertexLabels, boolean useEdgeLabels,
+    String[] vertexLabelGroups, String[] edgeLabelGroups,
+    boolean useEdgeSource, boolean useEdgeTarget) {
+    GroupingStrategy groupingStrategy = groupCombine ? GroupingStrategy.GROUP_COMBINE :
+      GroupingStrategy.GROUP_REDUCE;
+    GroupingStrategy centricalStrategy = groupEdgeCentric ? GroupingStrategy.EDGE_CENTRIC :
+      GroupingStrategy.VERTEX_CENTRIC;
+
+    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder()
+      .setCentricalStrategy(centricalStrategy)
+      .setStrategy(groupingStrategy)
       .useVertexLabel(useVertexLabels)
       .useEdgeLabel(useEdgeLabels)
-      .addVertexAggregator(new CountAggregator())
-      .addEdgeAggregator(new CountAggregator())
+      .addGlobalVertexAggregator(new CountAggregator())
+      .addGlobalEdgeAggregator(new CountAggregator())
+      .useEdgeSource(useEdgeSource)
+      .useEdgeTarget(useEdgeTarget);
+
+    if (vertexKey != null) {
+      builder.addVertexGroupingKey(vertexKey);
+    }
+    if (edgeKey != null) {
+      builder.addEdgeGroupingKey(edgeKey);
+    }
+    if (vertexLabelGroups != null && vertexLabelGroups.length > 0) {
+      String[] vertexLabelGroupitems;
+      for (String vertexLabelGroup : vertexLabelGroups) {
+        vertexLabelGroupitems = vertexLabelGroup.split("%");
+        builder.addVertexLabelGroup(vertexLabelGroupitems[0], Arrays.asList(
+          Arrays.copyOfRange(vertexLabelGroupitems, 1, vertexLabelGroupitems.length)));
+      }
+    }
+    if (edgeLabelGroups != null && edgeLabelGroups.length > 0) {
+      String[] edgeLabelGroupitems;
+      for (String edgeLabelGroup : edgeLabelGroups) {
+        edgeLabelGroupitems = edgeLabelGroup.split("%");
+        builder.addEdgeLabelGroup(edgeLabelGroupitems[0], Arrays.asList(
+          Arrays.copyOfRange(edgeLabelGroupitems, 1, edgeLabelGroupitems.length)));
+      }
+    }
+
+    return builder
       .build();
   }
 
@@ -142,10 +232,20 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph input directory.");
     }
-    if (!cmd.hasOption(OPTION_VERTEX_GROUPING_KEY) &&
-      !cmd.hasOption(OPTION_USE_VERTEX_LABELS)) {
-      throw new IllegalArgumentException(
-        "Chose at least a vertex grouping key or use vertex labels.");
+    if (!cmd.hasOption(OPTION_GROUP_EDGE_CENTRIC)) {
+      if (!cmd.hasOption(OPTION_VERTEX_GROUPING_KEY) &&
+        !cmd.hasOption(OPTION_USE_VERTEX_LABELS) &&
+        !cmd.hasOption(OPTION_VERTEX_LABEL_GROUP)) {
+        throw new IllegalArgumentException(
+          "Chose at least a vertex grouping key or use vertex labels or add a vertex label group.");
+      }
+    } else {
+      if (!cmd.hasOption(OPTION_EDGE_GROUPING_KEY) &&
+        !cmd.hasOption(OPTION_USE_EDGE_LABELS) &&
+        !cmd.hasOption(OPTION_EDGE_LABEL_GROUP)) {
+        throw new IllegalArgumentException(
+          "Chose at least a vertex grouping key or use vertex labels or add a vertex label group.");
+      }
     }
   }
 

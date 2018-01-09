@@ -52,8 +52,7 @@ public class BuildGroupItemBase extends BuildBase {
    * @param useLabel    true if label shall be used for grouping
    * @param labelGroups all vertex or edge label groups
    */
-  public BuildGroupItemBase(
-    boolean useLabel, List<LabelGroup> labelGroups) {
+  public BuildGroupItemBase(boolean useLabel, List<LabelGroup> labelGroups) {
     super(useLabel);
     this.labelGroups = labelGroups;
     groupingValues = Lists.newArrayList();

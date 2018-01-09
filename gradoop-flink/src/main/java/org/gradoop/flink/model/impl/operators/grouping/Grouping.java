@@ -22,14 +22,16 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.edgecentric.operators.SetInTupleKeySelector;
+import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.BuildEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.CombineEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.ReduceEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.vertexcentric.UpdateEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.edgecentric.SuperEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.vertexcentric.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -81,6 +83,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
    */
   public static final String LABEL_SYMBOL = ":label";
+  /**
+   * Used as property key to declare a source based edge centric grouping.
+   */
+  public static final String SOURCE_SYMBOL = ":source";
+  /**
+   * Used as property key to declare a target based edge centric grouping.
+   */
+  public static final String TARGET_SYMBOL = ":target";
+  /**
+   * Defines the default label separator between aggregated labels in edge centric grouping.
+   */
+  public static final String LABEL_SEPARATOR = "";
   /**
    * Used to verify if a grouping key is used for all vertices.
    */
@@ -244,6 +258,62 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
+   * Group edges by either vertex label, vertex property or both and additionally source specific,
+   * target specific or both.
+   *
+   * @param groupSuperEdges dataset containing edge representation for grouping
+   * @param sourceSpecific true if the source vertex shall be considered for grouping
+   * @param targetSpecific true if the target vertex shall be considered for grouping
+   * @return unsorted edge grouping
+   */
+  protected UnsortedGrouping<SuperEdgeGroupItem> groupSuperEdges(
+    DataSet<SuperEdgeGroupItem> groupSuperEdges, Boolean sourceSpecific, Boolean targetSpecific) {
+    UnsortedGrouping<SuperEdgeGroupItem> edgeGrouping;
+
+    if (useEdgeLabels() && useEdgeProperties()) {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 4, 5));
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 4, 5));
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 4, 5));
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(4, 5);
+      }
+    } else if (useEdgeLabels()) {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 4));
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 4));
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 4));
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(4);
+      }
+    } else {
+      if (sourceSpecific && targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 3, 5));
+      } else if (sourceSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(2, 5));
+      } else if (targetSpecific) {
+        edgeGrouping = groupSuperEdges.groupBy(
+          new SetInTupleKeySelector<SuperEdgeGroupItem>(3, 5));
+      } else {
+        edgeGrouping = groupSuperEdges.groupBy(5);
+      }
+    }
+    return edgeGrouping;
+  }
+
+  /**
    * Build super edges by joining them with vertices and their super vertex.
    *
    * @param graph                     input graph
@@ -285,7 +355,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Overridden by concrete implementations.
    *
-   * @param graph input graphe
+   * @param graph input graph
    * @return grouped output graph
    */
   protected abstract LogicalGraph groupInternal(LogicalGraph graph);
@@ -299,11 +369,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Grouping strategy
      */
     private GroupingStrategy strategy;
+
+    /**
+     * Centrical grouping strategy.
+     */
+    private GroupingStrategy centricalStrategy;
+
     /**
      * True, iff vertex labels shall be considered.
      */
     private boolean useVertexLabel;
-
     /**
      * True, iff edge labels shall be considered.
      */
@@ -312,27 +387,31 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Stores grouping keys for a specific vertex label.
      */
     private List<LabelGroup> vertexLabelGroups;
+    /**
+     * True, iff edge's source shall be considered.
+     */
+    private boolean useEdgeSource;
 
+    /**
+     * True, iff edge's target shall be considered.
+     */
+    private boolean useEdgeTarget;
     /**
      * Stores grouping keys for a specific edge label.
      */
     private List<LabelGroup> edgeLabelGroups;
-
     /**
      * Default vertex label group.
      */
     private LabelGroup defaultVertexLabelGroup;
-
     /**
      * Default edge label group.
      */
     private LabelGroup defaultEdgeLabelGroup;
-
     /**
      * List of all global vertex aggregate functions.
      */
     private List<PropertyValueAggregator> globalVertexAggregators;
-
     /**
      * List of all global edge aggregate functions.
      */
@@ -344,10 +423,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder() {
       this.useVertexLabel           = false;
       this.useEdgeLabel             = false;
+      this.useEdgeSource            = false;
+      this.useEdgeTarget            = false;
       this.vertexLabelGroups        = Lists.newArrayList();
       this.edgeLabelGroups          = Lists.newArrayList();
       this.globalVertexAggregators  = Lists.newArrayList();
       this.globalEdgeAggregators    = Lists.newArrayList();
+      this.centricalStrategy        = GroupingStrategy.VERTEX_CENTRIC;
       this.defaultVertexLabelGroup  = new LabelGroup(
         Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
       this.defaultEdgeLabelGroup    = new LabelGroup(
@@ -366,6 +448,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder setStrategy(GroupingStrategy strategy) {
       Objects.requireNonNull(strategy);
       this.strategy = strategy;
+      return this;
+    }
+
+    /**
+     * Set the grouping strategy. See {@link GroupingStrategy}.
+     *
+     * @param centricalStrategy grouping strategy
+     * @return this builder
+     */
+    public GroupingBuilder setCentricalStrategy(GroupingStrategy centricalStrategy) {
+      Objects.requireNonNull(centricalStrategy);
+      this.centricalStrategy = centricalStrategy;
       return this;
     }
 
@@ -412,6 +506,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       Objects.requireNonNull(key);
       if (key.equals(Grouping.LABEL_SYMBOL)) {
         useEdgeLabel(true);
+      } else if (key.equals(Grouping.SOURCE_SYMBOL)) {
+        useEdgeSource(true);
+      } else if (key.equals(Grouping.TARGET_SYMBOL)) {
+        useEdgeTarget(true);
       } else {
         defaultEdgeLabelGroup.addPropertyKey(key);
       }
@@ -430,6 +528,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       for (String key : keys) {
         this.addEdgeGroupingKey(key);
       }
+      return this;
+    }
+
+    /**
+     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Note that a label may be used multiple times.
+     *
+     * @param labelGroup label group
+     * @return this builder
+     */
+    public GroupingBuilder addVertexLabelGroup(LabelGroup labelGroup) {
+      vertexLabelGroups.add(labelGroup);
       return this;
     }
 
@@ -473,8 +583,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label,
-      String superVertexLabel,
+      String label, String superVertexLabel,
       List<String> groupingKeys) {
       return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
     }
@@ -490,8 +599,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
-      String label,
-      String superVertexLabel,
+      String label, String superVertexLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
@@ -499,7 +607,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
+     * specific label. Note that a label may be used multiple times.
+     *
+     * @param labelGroup
+     * @return
+     */
+    public GroupingBuilder addEdgeLabelGroup(LabelGroup labelGroup) {
+      edgeLabelGroups.add(labelGroup);
+      return this;
+    }
+    /**
+     * Adds an edge label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
      * @param label edge label
@@ -513,7 +632,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
@@ -529,34 +648,32 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys for a specific label.
+     * Adds an edge label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super edge
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label,
-      String superEdgeLabel,
+      String label, String superEdgeLabel,
       List<String> groupingKeys) {
       return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds an edge label group which defines the grouping keys and the aggregators for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super edge
+     * @param superEdgeLabel label of the group and therefore of the new super vertex
      * @param groupingKeys keys used for grouping
      * @param aggregators edge aggregators
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
-      String label,
-      String superEdgeLabel,
+      String label, String superEdgeLabel,
       List<String> groupingKeys,
       List<PropertyValueAggregator> aggregators) {
       edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
@@ -582,6 +699,28 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      */
     public GroupingBuilder useEdgeLabel(boolean useEdgeLabel) {
       this.useEdgeLabel = useEdgeLabel;
+      return this;
+    }
+
+    /**
+     * Define, if the edge's source shall be used for grouping edges.
+     *
+     * @param useEdgeSource true, iff edge's source shall be used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder useEdgeSource(boolean useEdgeSource) {
+      this.useEdgeSource = useEdgeSource;
+      return this;
+    }
+
+    /**
+     * Define, if the edge's target shall be used for grouping edges.
+     *
+     * @param useEdgeTarget true, iff edge's target shall be used for grouping
+     * @return this builder
+     */
+    public GroupingBuilder useEdgeTarget(boolean useEdgeTarget) {
+      this.useEdgeTarget = useEdgeTarget;
       return this;
     }
 
@@ -643,9 +782,22 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @return grouping operator instance
      */
     public Grouping build() {
-      if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
-        throw new IllegalArgumentException(
-          "Provide vertex key(s) and/or use vertex labels for grouping.");
+      //new grouping approach is edge centric
+      if (centricalStrategy.equals(GroupingStrategy.EDGE_CENTRIC)) {
+        if (edgeLabelGroups.isEmpty() && !useEdgeLabel) {
+          throw new IllegalArgumentException(
+            "Provide edge key(s) and/or use edge labels for grouping.");
+        }
+        if (vertexLabelGroups.size() > 1) {
+          throw new IllegalArgumentException(
+            "Using vertex label groups is not allowed with edge centric grouping.");
+        }
+        //old grouping or new grouping and vertex centric
+      } else {
+        if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
+          throw new IllegalArgumentException(
+            "Provide vertex key(s) and/or use vertex labels for grouping.");
+        }
       }
 
       // adding the global aggregators to the associated label groups
@@ -663,17 +815,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       Grouping groupingOperator;
 
-      switch (strategy) {
-      case GROUP_REDUCE:
-        groupingOperator = new GroupingGroupReduce(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+      switch (centricalStrategy) {
+      case VERTEX_CENTRIC:
+        groupingOperator = new VertexCentricalGrouping(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy);
         break;
-      case GROUP_COMBINE:
-        groupingOperator = new GroupingGroupCombine(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+      case EDGE_CENTRIC:
+        groupingOperator = new EdgeCentricalGrouping(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, strategy,
+          useEdgeSource, useEdgeTarget);
         break;
       default:
-        throw new IllegalArgumentException("Unsupported strategy: " + strategy);
+        throw new IllegalArgumentException("Unsupported centrical strategy: " + centricalStrategy);
       }
 
       return groupingOperator;
