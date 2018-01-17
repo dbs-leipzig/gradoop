@@ -22,9 +22,11 @@ import org.apache.flink.types.Value;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a list of {@link GradoopId} instances, possibly containing duplicates.
@@ -36,14 +38,15 @@ import java.util.Objects;
  */
 public class GradoopIdList implements Iterable<GradoopId>, Value {
   /**
-   * Contains the serialized representation of gradoop ids.
+   * Contains the set of gradoop ids.
    */
-  private byte[] bytes;
-
+  private Set<GradoopId> ids;
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIdList() { }
+  public GradoopIdList() { 
+    this.ids = new HashSet<>();
+  }
 
   /**
    * Initializes the list with the given byte array.
@@ -51,9 +54,49 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param bytes bytes representing multiple gradoop ids
    */
   private GradoopIdList(byte[] bytes) {
-    this.bytes = bytes;
+    this.ids = readIds(bytes);
+  }
+  
+  /**
+   * Initializes the list with the given ids.
+   *
+   * @param ids a collection of {@link GradoopId}s
+   */
+  private GradoopIdList(Collection<GradoopId> ids) {
+    this.ids = new HashSet<>(ids);
   }
 
+  /**
+   * Since we will need to do operations on individual ids we need
+   * to reconstruct the {@link GradoopId} instances.
+   * @param bytes serialized sequence of {@link GradoopId}s
+   * @return a set represenation
+   */
+  private Set<GradoopId> readIds(byte[] bytes){
+    Set<GradoopId> ids = new HashSet<>();
+    for (int i = 0; i < bytes.length / GradoopId.ID_SIZE; i++) {
+      byte[] idBytes = new byte[GradoopId.ID_SIZE];
+      System.arraycopy(bytes, i * GradoopId.ID_SIZE, idBytes, 0, GradoopId.ID_SIZE);
+      ids.add(GradoopId.fromByteArray(idBytes));
+    }
+    return ids;
+  }
+  
+  /**
+   * Serialize all ids into a byte array.
+   * @param ids sequence of {@link GradoopId}s
+   * @return a binary representation
+   */
+  private byte[] writeIds(Collection<GradoopId> ids){
+    byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
+
+    int i = 0;
+    for (GradoopId id : ids) {
+      System.arraycopy(id.toByteArray(), 0, bytes, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
+      i++;
+    }
+    return bytes;
+  }
   /**
    * Creates a new instance from multiple GradoopIDs.
    *
@@ -71,15 +114,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @return gradoop id set
    */
   public static GradoopIdList fromExisting(Collection<GradoopId> ids) {
-    byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
-
-    int i = 0;
-    for (GradoopId id : ids) {
-      System.arraycopy(id.toByteArray(), 0, bytes, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
-      i++;
-    }
-
-    return new GradoopIdList(bytes);
+    return new GradoopIdList(ids);
   }
 
   /**
@@ -98,13 +133,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param id the id to add
    */
   public void add(GradoopId id) {
-    if (isEmpty()) {
-      bytes = id.toByteArray();
-    } else {
-      byte[] extended = Arrays.copyOf(bytes, bytes.length + GradoopId.ID_SIZE);
-      System.arraycopy(id.toByteArray(), 0, extended, bytes.length, GradoopId.ID_SIZE);
-      this.bytes = extended;
-    }
+    this.ids.add(id);
   }
 
   /**
@@ -113,13 +142,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids the ids to add
    */
   public void addAll(GradoopIdList ids) {
-    if (isEmpty()) {
-      bytes = ids.toByteArray();
-    } else {
-      byte[] extended = Arrays.copyOf(bytes, bytes.length + ids.bytes.length);
-      System.arraycopy(ids.bytes, 0, extended, bytes.length, ids.bytes.length);
-      this.bytes = extended;
-    }
+    this.ids.addAll(ids.ids);
   }
 
   /**
@@ -128,13 +151,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids the ids to add
    */
   public void addAll(Collection<GradoopId> ids) {
-    byte[] bytesArray = new byte[ids.size() * GradoopId.ID_SIZE];
-    int i = 0;
-    for (GradoopId id : ids) {
-      System.arraycopy(id.toByteArray(), 0, bytesArray, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);
-      i++;
-    }
-    addAll(new GradoopIdList(bytesArray));
+    this.ids.addAll(ids);
   }
 
   /**
@@ -144,16 +161,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @return true, iff the given id is in the list
    */
   public boolean contains(GradoopId identifier) {
-    if (isEmpty()) {
-      return false;
-    }
-    byte[] idBytes = identifier.toByteArray();
-    for (int i = 0; i < bytes.length / GradoopId.ID_SIZE; i++) {
-      if (GradoopId.equals(bytes, idBytes, i * GradoopId.ID_SIZE, 0)) {
-        return true;
-      }
-    }
-    return false;
+    return this.ids.contains(identifier);
   }
 
   /**
@@ -222,7 +230,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @return true, iff the list contains no elements
    */
   public boolean isEmpty() {
-    return bytes == null || bytes.length == 0;
+    return ids.isEmpty();
   }
 
   /**
@@ -230,14 +238,14 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    */
   @Override
   public Iterator<GradoopId> iterator() {
-    return new GradoopIdListIterator(this.bytes);
+    return ids.iterator();
   }
 
   /**
    * Clears the set.
    */
   public void clear() {
-    bytes = null;
+    ids.clear();
   }
 
   /**
@@ -246,7 +254,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @return number of elements in the list
    */
   public int size() {
-    return bytes != null ? bytes.length / GradoopId.ID_SIZE : 0;
+    return ids.size();
   }
 
   /**
@@ -255,24 +263,25 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @return byte array representation
    */
   public byte[] toByteArray() {
-    return bytes != null ? bytes : new byte[0];
+    return writeIds(ids);
   }
 
   @Override
   public void write(DataOutputView out) throws IOException {
-    if (bytes == null) {
+    if (isEmpty()) {
       out.writeInt(0);
     } else {
-      out.writeInt(bytes.length);
-      out.write(bytes);
+      out.writeInt(size());
+      out.write(writeIds(ids));
     }
   }
 
   @Override
   public void read(DataInputView in) throws IOException {
     int n = in.readInt();
-    bytes = new byte[n];
+    byte[] bytes = new byte[n * GradoopId.ID_SIZE];
     in.readFully(bytes);
+    this.ids = readIds(bytes);
   }
 
   @Override
@@ -286,7 +295,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
 
       if (equal) {
         // same ids
-        equal = Objects.deepEquals(this.bytes, that.bytes);
+        equal = this.ids.equals(that.ids);
       }
     }
 
@@ -295,16 +304,12 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
 
   @Override
   public int hashCode() {
-    int h = 0;
-    for (GradoopId id : this) {
-      h += id.hashCode();
-    }
-    return h;
+    return ids.hashCode();
   }
 
   @Override
   public String toString() {
-    if (bytes == null || size() == 0) {
+    if (isEmpty()) {
       return "[]";
     }
 
@@ -319,51 +324,6 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
         return sb.append(']').toString();
       }
       sb.append(',').append(' ');
-    }
-  }
-
-  /**
-   * Iterates through the byte array and returns {@link GradoopId} instances.
-   */
-  private static class GradoopIdListIterator implements Iterator<GradoopId> {
-    /**
-     * current index
-     */
-    private int i;
-    /**
-     * gradoop ids
-     */
-    private final byte[] bytes;
-    /**
-     * number of gradoop ids
-     */
-    private final int size;
-
-    /**
-     * Creates a new iterator.
-     *
-     * @param bytes byte representation of a {@link GradoopIdList}
-     */
-    GradoopIdListIterator(byte[] bytes) {
-      this.i = 0;
-      this.bytes = bytes;
-      this.size = this.bytes != null ? bytes.length / GradoopId.ID_SIZE : 0;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return i < size;
-    }
-
-    @Override
-    public GradoopId next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
-      int from = GradoopId.ID_SIZE * i;
-      int to = from + GradoopId.ID_SIZE;
-      i++;
-      return GradoopId.fromByteArray(Arrays.copyOfRange(bytes, from, to));
     }
   }
 }
