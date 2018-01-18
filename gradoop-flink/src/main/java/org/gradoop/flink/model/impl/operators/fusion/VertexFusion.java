@@ -21,12 +21,13 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.IdNotInBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
@@ -38,8 +39,6 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapFunctionAddGra
 import org.gradoop.flink.model.impl.operators.fusion.functions.MapGraphHeadForNewGraph;
 import org.gradoop.flink.model.impl.operators.fusion.functions.MapVertexToPairWithGraphId;
 import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTuplesWithNullId;
-
-import static org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast.GRAPH_IDS;
 
 
 /**
@@ -71,6 +70,24 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
+    return execute(searchGraph,
+        graphPatterns.getConfig().getGraphCollectionFactory()
+        .fromDataSets(
+            graphPatterns.getGraphHead(),
+            graphPatterns.getVertices(),
+            graphPatterns.getEdges()));
+  }
+
+
+  /**
+   * Fusing the already-combined sources
+   *
+   * @param searchGraph            Logical Graph defining the data lake
+   * @param graphPatterns Collection of elements representing which vertices will be merged into
+   *                      a vertex
+   * @return              A single merged graph
+   */
+  public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
 
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
@@ -78,54 +95,62 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
     DataSet<GraphHead> gh = searchGraph.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
-    DataSet<GradoopId> subgraphIds = graphPatterns.getGraphHead()
-      .map(new Id<>());
+    DataSet<GradoopId> patternVertexIds = graphPatterns.getVertices()
+            .map(new Id<>());
+    DataSet<GradoopId> patternEdgeIds = graphPatterns.getEdges()
+            .map(new Id<>());
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
-    DataSet<Tuple2<Vertex, GradoopId>> vWithGid = graphPatterns.getVertices()
-      .coGroup(searchGraph.getVertices())
-      .where(new Id<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .flatMap(new MapVertexToPairWithGraphId());
+    DataSet<Tuple2<Vertex, GradoopId>> patternVerticesWithGraphIDs =
+        graphPatterns.getVertices()
+        .coGroup(searchGraph.getVertices())
+        .where(new Id<>()).equalTo(new Id<>())
+        .with(new LeftSide<>())
+        .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> nuWithGid  = graphPatterns.getGraphHead()
-      .map(new CoGroupGraphHeadToVertex());
+    DataSet<Tuple2<Vertex, GradoopId>> mergedVertices =
+        graphPatterns.getGraphHeads()
+        .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
     DataSet<Vertex> vi = searchGraph.getVertices()
-      .filter(new NotInGraphsBroadcast<>())
-      .withBroadcastSet(subgraphIds, GRAPH_IDS);
+      .filter(new IdNotInBroadcast<>())
+      .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);
 
-    // PHASE 3: Recreating the edges
-    DataSet<Tuple2<Vertex, GradoopId>> idJoin = vWithGid
-      .coGroup(nuWithGid)
+    DataSet<Tuple2<Vertex, GradoopId>> idJoin = patternVerticesWithGraphIDs
+      .coGroup(mergedVertices)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new CoGroupAssociateOldVerticesWithNewIds())
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
-    DataSet<Vertex> vToRet = nuWithGid
-      .coGroup(vWithGid)
+    DataSet<Vertex> vToRet = mergedVertices
+      .coGroup(patternVerticesWithGraphIDs)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new LeftSide<>())
       .map(new Value0Of2<>())
       .union(vi)
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
+    // PHASE 3: Recreating the edges
     DataSet<Edge> edges = searchGraph.getEdges()
-      .filter(new NotInGraphsBroadcast<>())
-      .withBroadcastSet(subgraphIds, GRAPH_IDS)
+      .filter(new IdNotInBroadcast<>())
+      .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)
       .leftOuterJoin(idJoin)
       .where(new SourceId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(true))
       .leftOuterJoin(idJoin)
       .where(new TargetId<>()).equalTo(new LeftElementId<>())
       .with(new FlatJoinSourceEdgeReference(false))
+      .groupBy(new Id<>())
+      .reduceGroup(new AddNewIdToDuplicatedEdge())
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
     return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
   }
+
+
 
   @Override
   public String getName() {
