@@ -37,7 +37,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * Join an edge tuple with a tuple containing the source vertex id of this edge
@@ -48,20 +48,20 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f1")
 public class JoinWithSourceGraphIdSet
   implements JoinFunction<
-  Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdList>,
-  Tuple2<GradoopId, GradoopIdList>,
-  Tuple4<GradoopId, GradoopIdList, GradoopId, GradoopIdList>> {
+  Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds>,
+  Tuple2<GradoopId, GradoopIds>,
+  Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds>> {
 
   /**
    * Reduce object instantiations
    */
-  private Tuple4<GradoopId, GradoopIdList, GradoopId, GradoopIdList> reuseTuple
+  private Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds> reuseTuple
     = new Tuple4<>();
 
   @Override
-  public Tuple4<GradoopId, GradoopIdList, GradoopId, GradoopIdList> join(
-    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdList> edge,
-    Tuple2<GradoopId, GradoopIdList> vertex) throws
+  public Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds> join(
+    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds> edge,
+    Tuple2<GradoopId, GradoopIds> vertex) throws
     Exception {
     reuseTuple.f0 = edge.f0;
     reuseTuple.f1 = vertex.f1;

@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -53,7 +53,7 @@ public class Edge extends GraphElement implements EPGMEdge {
    */
   public Edge(final GradoopId id, final String label, final GradoopId sourceId,
     final GradoopId targetId, final Properties properties,
-    GradoopIdList graphIds) {
+    GradoopIds graphIds) {
     super(id, label, properties, graphIds);
     this.sourceId = sourceId;
     this.targetId = targetId;

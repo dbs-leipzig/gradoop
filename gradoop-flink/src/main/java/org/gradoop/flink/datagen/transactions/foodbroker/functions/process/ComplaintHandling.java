@@ -25,7 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -99,7 +99,7 @@ public class ComplaintHandling extends AbstractProcess
     vertexMap = Maps.newHashMap();
     masterDataMap = Maps.newHashMap();
     userMap = Maps.newHashMap();
-    graphIds = GradoopIdList.fromExisting(graph.getGraphHead().getId());
+    graphIds = GradoopIds.fromExisting(graph.getGraphHead().getId());
 
     boolean confirmed = false;
 

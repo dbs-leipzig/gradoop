@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -81,8 +81,8 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     Map<String, Object> edge2Props = new HashMap<>();
     edge2Props.put("foo", 42);
 
-    Edge e1 = new Edge(edge1Id, "a", sourceId, targetId, Properties.createFromMap(edge1Props), new GradoopIdList());
-    Edge e2 = new Edge(edge2Id, "b", sourceId, targetId, Properties.createFromMap(edge2Props), new GradoopIdList());
+    Edge e1 = new Edge(edge1Id, "a", sourceId, targetId, Properties.createFromMap(edge1Props), new GradoopIds());
+    Edge e2 = new Edge(edge2Id, "b", sourceId, targetId, Properties.createFromMap(edge2Props), new GradoopIds());
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
 

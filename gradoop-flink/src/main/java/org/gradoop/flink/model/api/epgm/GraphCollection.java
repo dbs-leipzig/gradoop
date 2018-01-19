@@ -19,7 +19,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -197,7 +197,7 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   @Override
   public GraphCollection getGraphs(final GradoopId... identifiers) {
 
-    GradoopIdList graphIds = new GradoopIdList();
+    GradoopIds graphIds = new GradoopIds();
 
     for (GradoopId id : identifiers) {
       graphIds.add(id);
@@ -210,7 +210,7 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection getGraphs(final GradoopIdList identifiers) {
+  public GraphCollection getGraphs(final GradoopIds identifiers) {
 
     DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
       .filter(new FilterFunction<GraphHead>() {

@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -68,7 +68,7 @@ public class EPGMDatabaseTest extends GradoopFlinkTestBase {
       graphIds.add(loader.getGraphHeadByVariable(graphVariable).getId());
     }
 
-    GradoopIdList graphIdSet = GradoopIdList.fromExisting(graphIds);
+    GradoopIds graphIdSet = GradoopIds.fromExisting(graphIds);
 
     GraphCollection collectionFromLoader =
       loader.getGraphCollectionByVariables(graphVariables);

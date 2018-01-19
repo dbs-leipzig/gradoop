@@ -17,7 +17,7 @@ package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 
 /**
@@ -31,12 +31,12 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
   /**
    * EPGMVertex identifiers contained in that logical graph.
    */
-  private GradoopIdList vertexIds;
+  private GradoopIds vertexIds;
 
   /**
    * EPGMEdge identifiers contained in that logical graph.
    */
-  private GradoopIdList edgeIds;
+  private GradoopIds edgeIds;
 
   /**
    * Creates  persistent graph data.
@@ -45,8 +45,8 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
    * @param vertexIds  vertexIds contained in that graph
    * @param edgeIds     edgeIds contained in that graph
    */
-  HBaseGraphHead(G graphHead, GradoopIdList vertexIds,
-    GradoopIdList edgeIds) {
+  HBaseGraphHead(G graphHead, GradoopIds vertexIds,
+    GradoopIds edgeIds) {
     super(graphHead);
     this.vertexIds = vertexIds;
     this.edgeIds = edgeIds;
@@ -56,7 +56,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdList getVertexIds() {
+  public GradoopIds getVertexIds() {
     return vertexIds;
   }
 
@@ -64,7 +64,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
    * {@inheritDoc}
    */
   @Override
-  public void setVertexIds(GradoopIdList vertices) {
+  public void setVertexIds(GradoopIds vertices) {
     this.vertexIds = vertices;
   }
 
@@ -76,7 +76,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
     if (vertexIds != null) {
       vertexIds.add(vertexID);
     } else {
-      vertexIds = GradoopIdList.fromExisting(vertexID);
+      vertexIds = GradoopIds.fromExisting(vertexID);
     }
   }
 
@@ -92,7 +92,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdList getEdgeIds() {
+  public GradoopIds getEdgeIds() {
     return edgeIds;
   }
 
@@ -100,7 +100,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
    * {@inheritDoc}
    */
   @Override
-  public void setEdgeIds(GradoopIdList edgeIds) {
+  public void setEdgeIds(GradoopIds edgeIds) {
     this.edgeIds = edgeIds;
   }
 
@@ -112,7 +112,7 @@ public class HBaseGraphHead<G extends EPGMGraphHead> extends HBaseElement<G>
     if (edgeIds != null) {
       edgeIds.add(edgeID);
     } else {
-      edgeIds = GradoopIdList.fromExisting(edgeID);
+      edgeIds = GradoopIds.fromExisting(edgeID);
     }
   }
 

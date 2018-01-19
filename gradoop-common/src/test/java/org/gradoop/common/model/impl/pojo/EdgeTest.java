@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
@@ -47,7 +47,7 @@ public class EdgeTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    GradoopIdList graphIds = GradoopIdList
+    GradoopIds graphIds = GradoopIds
       .fromExisting(GradoopId.get(), GradoopId.get());
 
     String label = "A";

@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -31,7 +31,7 @@ public abstract class GraphElement
   /**
    * Set of graph identifiers that element is contained in
    */
-  private GradoopIdList graphIds;
+  private GradoopIds graphIds;
 
   /**
    * Default constructor.
@@ -47,7 +47,7 @@ public abstract class GraphElement
    * @param graphIds     graphIds that element is contained in
    */
   protected GraphElement(GradoopId id, String label,
-    Properties properties, GradoopIdList graphIds) {
+    Properties properties, GradoopIds graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;
   }
@@ -56,7 +56,7 @@ public abstract class GraphElement
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdList getGraphIds() {
+  public GradoopIds getGraphIds() {
     return graphIds;
   }
 
@@ -66,7 +66,7 @@ public abstract class GraphElement
   @Override
   public void addGraphId(GradoopId graphId) {
     if (graphIds == null) {
-      graphIds = new GradoopIdList();
+      graphIds = new GradoopIds();
     }
     graphIds.add(graphId);
   }
@@ -75,7 +75,7 @@ public abstract class GraphElement
    * {@inheritDoc}
    */
   @Override
-  public void setGraphIds(GradoopIdList graphIds) {
+  public void setGraphIds(GradoopIds graphIds) {
     this.graphIds = graphIds;
   }
 

@@ -18,7 +18,7 @@ package org.gradoop.common.storage.api;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 import java.io.IOException;
 
@@ -43,5 +43,5 @@ public interface GraphElementHandler extends ElementHandler {
    * @param res HBase row
    * @return graphs identifiers
    */
-  GradoopIdList readGraphIds(final Result res) throws IOException;
+  GradoopIds readGraphIds(final Result res) throws IOException;
 }
