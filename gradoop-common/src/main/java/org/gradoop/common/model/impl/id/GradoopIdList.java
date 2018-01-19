@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents a list of {@link GradoopId} instances, possibly containing duplicates.
+ * Represents a set of {@link GradoopId} instances, ignoring any duplicates.
  *
  * Note that by implementing {@link java.util.List} Flink uses the Kryo serializer for
  * (de-)serializing the list.
@@ -49,7 +49,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Initializes the list with the given byte array.
+   * Initializes the set with the given byte array.
    *
    * @param bytes bytes representing multiple gradoop ids
    */
@@ -58,7 +58,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
   
   /**
-   * Initializes the list with the given ids.
+   * Initializes the set with the given ids.
    *
    * @param ids a collection of {@link GradoopId}s
    */
@@ -128,7 +128,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Adds the given gradoop id to the list.
+   * Adds the given gradoop id to the set.
    *
    * @param id the id to add
    */
@@ -137,7 +137,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Adds the given gradoop ids to the list.
+   * Adds the given gradoop ids to the set.
    *
    * @param ids the ids to add
    */
@@ -146,7 +146,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Adds the given gradoop ids to the list.
+   * Adds the given gradoop ids to the set.
    *
    * @param ids the ids to add
    */
@@ -155,20 +155,20 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Checks if the given id is contained in the list.
+   * Checks if the given id is contained in the set.
    *
    * @param identifier the id to look for
-   * @return true, iff the given id is in the list
+   * @return true, iff the given id is in the set
    */
   public boolean contains(GradoopId identifier) {
     return this.ids.contains(identifier);
   }
 
   /**
-   * Checks if the specified ids are contained in the list.
+   * Checks if the specified ids are contained in the set.
    *
    * @param ids the ids to look for
-   * @return true, iff all specified ids are contained in the list
+   * @return true, iff all specified ids are contained in the set
    */
   public boolean containsAll(GradoopIdList ids) {
     for (GradoopId id : ids) {
@@ -183,7 +183,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * Checks if the specified ids are contained in the set.
    *
    * @param ids the ids to look for
-   * @return true, iff all specified ids are contained in the list
+   * @return true, iff all specified ids are contained in the set
    */
   public boolean containsAll(Collection<GradoopId> ids) {
     for (GradoopId id : ids) {
@@ -195,10 +195,10 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Checks if any of the specified ids is contained in the list.
+   * Checks if any of the specified ids is contained in the set.
    *
    * @param ids the ids to look for
-   * @return true, iff any of the specified ids is contained in the list
+   * @return true, iff any of the specified ids is contained in the set
    */
   public boolean containsAny(GradoopIdList ids) {
     for (GradoopId id : ids) {
@@ -210,10 +210,10 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Checks if any of the specified ids is contained in the list.
+   * Checks if any of the specified ids is contained in the set.
    *
    * @param ids the ids to look for
-   * @return true, iff any of the specified ids is contained in the list
+   * @return true, iff any of the specified ids is contained in the set
    */
   public boolean containsAny(Collection<GradoopId> ids) {
     for (GradoopId id : ids) {
@@ -225,9 +225,9 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   }
 
   /**
-   * Checks if the list is empty.
+   * Checks if the set is empty.
    *
-   * @return true, iff the list contains no elements
+   * @return true, iff the set contains no elements
    */
   public boolean isEmpty() {
     return ids.isEmpty();
@@ -251,14 +251,14 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   /**
    * Returns the number of contained gradoop ids
    *
-   * @return number of elements in the list
+   * @return number of elements in the set
    */
   public int size() {
     return ids.size();
   }
 
   /**
-   * Returns the byte representation of that list.
+   * Returns the byte representation of that set.
    *
    * @return byte array representation
    */
