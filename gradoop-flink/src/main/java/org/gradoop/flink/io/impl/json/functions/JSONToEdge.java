@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -73,7 +73,7 @@ public class JSONToEdge extends JSONToEntity
     GradoopId targetID = getTargetId(jsonEdge);
     Properties properties = Properties.createFromMap(
       getProperties(jsonEdge));
-    GradoopIdList graphs = getGraphs(jsonEdge);
+    GradoopIds graphs = getGraphs(jsonEdge);
 
     return edgeFactory.initEdge(edgeID, edgeLabel, sourceID, targetID,
       properties, graphs);

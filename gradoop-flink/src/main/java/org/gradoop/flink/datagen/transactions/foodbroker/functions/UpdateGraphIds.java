@@ -18,7 +18,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
@@ -26,10 +26,10 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * element is the gradoop id of the vertex.
  */
 public class UpdateGraphIds
-  implements JoinFunction<Tuple2<GradoopId, GradoopIdList>, Vertex, Vertex> {
+  implements JoinFunction<Tuple2<GradoopId, GradoopIds>, Vertex, Vertex> {
 
   @Override
-  public Vertex join(Tuple2<GradoopId, GradoopIdList> pair, Vertex vertex) throws Exception {
+  public Vertex join(Tuple2<GradoopId, GradoopIds> pair, Vertex vertex) throws Exception {
     vertex.setGraphIds(pair.f1);
     return vertex;
   }

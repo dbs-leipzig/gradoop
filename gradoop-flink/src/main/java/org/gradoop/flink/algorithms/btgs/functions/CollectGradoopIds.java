@@ -20,7 +20,7 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * (a,b),(a,c) => (a,{b,c})
@@ -28,17 +28,17 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
  */
 public class CollectGradoopIds implements
   GroupCombineFunction
-    <Tuple2<GradoopId, GradoopIdList>, Tuple2<GradoopId, GradoopIdList>>,
+    <Tuple2<GradoopId, GradoopIds>, Tuple2<GradoopId, GradoopIds>>,
   GroupReduceFunction
-    <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIdList>> {
+    <Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopIds>> {
 
   @Override
   public void reduce(Iterable<Tuple2<GradoopId, GradoopId>> mappings,
-    Collector<Tuple2<GradoopId, GradoopIdList>> collector) throws Exception {
+    Collector<Tuple2<GradoopId, GradoopIds>> collector) throws Exception {
 
     Boolean first = true;
     GradoopId vertexId = null;
-    GradoopIdList btgIds = new GradoopIdList();
+    GradoopIds btgIds = new GradoopIds();
 
     for (Tuple2<GradoopId, GradoopId> pair : mappings) {
       if (first) {
@@ -51,14 +51,14 @@ public class CollectGradoopIds implements
   }
 
   @Override
-  public void combine(Iterable<Tuple2<GradoopId, GradoopIdList>> mappings,
-    Collector<Tuple2<GradoopId, GradoopIdList>> collector) throws Exception {
+  public void combine(Iterable<Tuple2<GradoopId, GradoopIds>> mappings,
+    Collector<Tuple2<GradoopId, GradoopIds>> collector) throws Exception {
 
     Boolean first = true;
     GradoopId vertexId = null;
-    GradoopIdList btgIds = null;
+    GradoopIds btgIds = null;
 
-    for (Tuple2<GradoopId, GradoopIdList> pair : mappings) {
+    for (Tuple2<GradoopId, GradoopIds> pair : mappings) {
       if (first) {
         vertexId = pair.f0;
         btgIds = pair.f1;

@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * Adds new graph ids to the initial vertex set
@@ -30,13 +30,13 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ReadFieldsFirst("graphIds")
 @FunctionAnnotation.ReadFieldsSecond("f1")
 public class AddNewGraphsToVertex<V extends Vertex>
-  implements JoinFunction<V, Tuple2<GradoopId, GradoopIdList>, V> {
+  implements JoinFunction<V, Tuple2<GradoopId, GradoopIds>, V> {
   /**
    * {@inheritDoc}
    */
   @Override
   public V join(V vertex,
-    Tuple2<GradoopId, GradoopIdList> vertexWithGraphIds) {
+    Tuple2<GradoopId, GradoopIds> vertexWithGraphIds) {
     vertex.getGraphIds().addAll(vertexWithGraphIds.f1);
     return vertex;
   }

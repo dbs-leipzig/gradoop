@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * For each edge, collect two tuple 2 containing its source or target id in the
@@ -33,12 +33,12 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ReadFields("sourceId;targetId")
 @FunctionAnnotation.ForwardedFields("graphIds->f1")
 public class SourceTargetIdGraphsTuple<E extends Edge>
-  implements FlatMapFunction<E, Tuple2<GradoopId, GradoopIdList>> {
+  implements FlatMapFunction<E, Tuple2<GradoopId, GradoopIds>> {
 
   @Override
   public void flatMap(
     E e,
-    Collector<Tuple2<GradoopId, GradoopIdList>> collector) throws
+    Collector<Tuple2<GradoopId, GradoopIds>> collector) throws
     Exception {
 
     collector.collect(new Tuple2<>(e.getSourceId(), e.getGraphIds()));

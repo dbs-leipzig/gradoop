@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * Join edge tuples with the graph sets of their targets
@@ -32,22 +32,22 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class JoinEdgeTupleWithTargetGraphs<E extends Edge>
   implements JoinFunction
-  <Tuple2<E, GradoopIdList>, Tuple2<GradoopId, GradoopIdList>,
-    Tuple3<E, GradoopIdList, GradoopIdList>> {
+  <Tuple2<E, GradoopIds>, Tuple2<GradoopId, GradoopIds>,
+    Tuple3<E, GradoopIds, GradoopIds>> {
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple3<E, GradoopIdList, GradoopIdList> reuseTuple =
+  private final Tuple3<E, GradoopIds, GradoopIds> reuseTuple =
     new Tuple3<>();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Tuple3<E, GradoopIdList, GradoopIdList> join(
-    Tuple2<E, GradoopIdList> left,
-    Tuple2<GradoopId, GradoopIdList> right) throws Exception {
+  public Tuple3<E, GradoopIds, GradoopIds> join(
+    Tuple2<E, GradoopIds> left,
+    Tuple2<GradoopId, GradoopIds> right) throws Exception {
     reuseTuple.f0 = left.f0;
     reuseTuple.f1 = left.f1;
     reuseTuple.f2 = right.f1;

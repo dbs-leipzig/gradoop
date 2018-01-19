@@ -16,17 +16,17 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * Reduces GradoopIdSets into a single, distinct one.
  *
  */
 public class IdSetCombiner
-  implements ReduceFunction<GradoopIdList> {
+  implements ReduceFunction<GradoopIds> {
 
   @Override
-  public GradoopIdList reduce(GradoopIdList in1, GradoopIdList in2) {
+  public GradoopIds reduce(GradoopIds in1, GradoopIds in2) {
     in1.addAll(in2);
     return in1;
   }

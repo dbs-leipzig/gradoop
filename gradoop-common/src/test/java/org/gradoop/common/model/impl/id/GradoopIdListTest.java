@@ -40,7 +40,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
 
     assertThat(ids.size(), is(0));
 
@@ -63,7 +63,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.add(id1);
 
     assertThat(ids.size(), is(1));
@@ -77,7 +77,7 @@ public class GradoopIdListTest {
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.addAll(Arrays.asList(id1, id2));
 
     assertThat(ids.size(), is(2));
@@ -93,11 +93,11 @@ public class GradoopIdListTest {
   public void testAddAllGradoopIdList() throws Exception {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
-    GradoopIdList list1 = new GradoopIdList();
+    GradoopIds list1 = new GradoopIds();
     list1.add(id1);
     list1.add(id2);
 
-    GradoopIdList list2 = new GradoopIdList();
+    GradoopIds list2 = new GradoopIds();
     list2.addAll(list1);
 
     assertThat(list2.size(), is(2));
@@ -113,7 +113,7 @@ public class GradoopIdListTest {
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.addAll(Arrays.asList(id1, id2));
 
     assertTrue(ids.containsAll(Arrays.asList(id1)));
@@ -130,14 +130,14 @@ public class GradoopIdListTest {
     GradoopId id3 = GradoopId.get();
 
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.addAll(Arrays.asList(id1, id2));
 
-    assertTrue(ids.containsAll(GradoopIdList.fromExisting(id1)));
-    assertTrue(ids.containsAll(GradoopIdList.fromExisting(id2)));
-    assertTrue(ids.containsAll(GradoopIdList.fromExisting(id1, id2)));
-    assertFalse(ids.containsAll(GradoopIdList.fromExisting(id3)));
-    assertFalse(ids.containsAll(GradoopIdList.fromExisting(id1, id3)));
+    assertTrue(ids.containsAll(GradoopIds.fromExisting(id1)));
+    assertTrue(ids.containsAll(GradoopIds.fromExisting(id2)));
+    assertTrue(ids.containsAll(GradoopIds.fromExisting(id1, id2)));
+    assertFalse(ids.containsAll(GradoopIds.fromExisting(id3)));
+    assertFalse(ids.containsAll(GradoopIds.fromExisting(id1, id3)));
   }
 
   @Test
@@ -147,7 +147,7 @@ public class GradoopIdListTest {
     GradoopId id3 = GradoopId.get();
 
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.addAll(Arrays.asList(id1, id2));
 
     assertTrue(ids.containsAny(Arrays.asList(id1)));
@@ -163,20 +163,20 @@ public class GradoopIdListTest {
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.addAll(Arrays.asList(id1, id2));
 
-    assertTrue(ids.containsAny(GradoopIdList.fromExisting(id1)));
-    assertTrue(ids.containsAny(GradoopIdList.fromExisting(id2)));
-    assertTrue(ids.containsAny(GradoopIdList.fromExisting(id1, id2)));
-    assertFalse(ids.containsAny(GradoopIdList.fromExisting(id3)));
-    assertTrue(ids.containsAny(GradoopIdList.fromExisting(id1, id3)));
+    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1)));
+    assertTrue(ids.containsAny(GradoopIds.fromExisting(id2)));
+    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1, id2)));
+    assertFalse(ids.containsAny(GradoopIds.fromExisting(id3)));
+    assertTrue(ids.containsAny(GradoopIds.fromExisting(id1, id3)));
   }
 
   @Test
   public void testIsEmpty() throws Exception {
-    GradoopIdList set1 = GradoopIdList.fromExisting(GradoopId.get());
-    GradoopIdList set2 = new GradoopIdList();
+    GradoopIds set1 = GradoopIds.fromExisting(GradoopId.get());
+    GradoopIds set2 = new GradoopIds();
 
     assertFalse(set1.isEmpty());
     assertTrue(set2.isEmpty());
@@ -187,7 +187,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList idsWrite = GradoopIdList.fromExisting(id1, id2);
+    GradoopIds idsWrite = GradoopIds.fromExisting(id1, id2);
 
     // write to byte[]
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -195,7 +195,7 @@ public class GradoopIdListTest {
     idsWrite.write(dataOutputView);
 
     // read from byte[]
-    GradoopIdList idsRead = new GradoopIdList();
+    GradoopIds idsRead = new GradoopIds();
     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
     DataInputView dataInputView = new DataInputViewStreamWrapper(in);
     idsRead.read(dataInputView);
@@ -210,7 +210,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList ids = GradoopIdList.fromExisting(id1, id2);
+    GradoopIds ids = GradoopIds.fromExisting(id1, id2);
 
     Iterator<GradoopId> idsIterator = ids.iterator();
 
@@ -223,7 +223,7 @@ public class GradoopIdListTest {
 
   @Test(expected = NoSuchElementException.class)
   public void testIteratorException() throws Exception {
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
 
     Iterator<GradoopId> idsIterator = ids.iterator();
 
@@ -236,7 +236,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     ids.add(id1);
     ids.add(id2);
 
@@ -252,7 +252,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    GradoopIdList ids = new GradoopIdList();
+    GradoopIds ids = new GradoopIds();
     assertThat(ids.size(), is(0));
     ids.add(id1);
     assertThat(ids.size(), is(1));
@@ -267,7 +267,7 @@ public class GradoopIdListTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
-    GradoopIdList ids = GradoopIdList.fromExisting(id1, id2, id3);
+    GradoopIds ids = GradoopIds.fromExisting(id1, id2, id3);
     assertThat(ids.size(), is(3));
   }
 
@@ -277,32 +277,32 @@ public class GradoopIdListTest {
     GradoopId b = GradoopId.get();
     GradoopId c = GradoopId.get();
 
-    GradoopIdList abc = GradoopIdList.fromExisting(a, b, c);
+    GradoopIds abc = GradoopIds.fromExisting(a, b, c);
     assertTrue("equals failed for same object", abc.equals(abc));
     assertTrue("hashCode failed for same object", abc.hashCode() == abc.hashCode());
 
-    GradoopIdList abc2 = GradoopIdList.fromExisting(a, b, c);
+    GradoopIds abc2 = GradoopIds.fromExisting(a, b, c);
     assertTrue("equals failed for same ids in same order", abc.equals(abc2));
     assertTrue("hashCode failed for same ids in same order", abc.hashCode() == abc2.hashCode());
 
-    GradoopIdList cba = GradoopIdList.fromExisting(c, b, a);
+    GradoopIds cba = GradoopIds.fromExisting(c, b, a);
     assertTrue("equals succeeds for same ids in different order", abc.equals(cba));
     assertTrue("hashCode succeeds for same ids in different order", abc.hashCode() == cba.hashCode());
 
-    GradoopIdList aab = GradoopIdList.fromExisting(a, a, b);
-    GradoopIdList abb = GradoopIdList.fromExisting(a, b, b);
+    GradoopIds aab = GradoopIds.fromExisting(a, a, b);
+    GradoopIds abb = GradoopIds.fromExisting(a, b, b);
     assertTrue("equals succeeds for same ids in different cardinality", aab.equals(abb));
     assertTrue("hashCode succeeds for same ids in different cardinality", aab.hashCode() == abb.hashCode());
 
-    GradoopIdList ab = GradoopIdList.fromExisting(a, b);
+    GradoopIds ab = GradoopIds.fromExisting(a, b);
     assertTrue("equals succeeds for same ids but different sizes", aab.equals(ab));
     assertTrue("hashCode succeeds for same ids but different sizes", aab.hashCode() == ab.hashCode());
 
-    GradoopIdList empty = new GradoopIdList();
+    GradoopIds empty = new GradoopIds();
     assertTrue("equals failed for one empty list", !abc.equals(empty));
     assertTrue("hashCode failed for one empty list", abc.hashCode() != empty.hashCode());
 
-    GradoopIdList empty2 = new GradoopIdList();
+    GradoopIds empty2 = new GradoopIds();
     assertTrue("equals failed for two empty lists", empty2.equals(empty));
     assertTrue("hashCode failed two one empty lists", empty2.hashCode() == empty.hashCode());
   }

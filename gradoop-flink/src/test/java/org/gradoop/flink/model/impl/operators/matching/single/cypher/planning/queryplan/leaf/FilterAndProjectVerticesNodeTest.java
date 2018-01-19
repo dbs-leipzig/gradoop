@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.q
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -59,8 +59,8 @@ public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
     Map<String, Object> vertex2Props = new HashMap<>();
     vertex2Props.put("foo", 42);
 
-    Vertex vertex1 = new Vertex(vertex1Id, "A", Properties.createFromMap(vertex1Props), new GradoopIdList());
-    Vertex vertex2 = new Vertex(vertex2Id, "B", Properties.createFromMap(vertex2Props), new GradoopIdList());
+    Vertex vertex1 = new Vertex(vertex1Id, "A", Properties.createFromMap(vertex1Props), new GradoopIds());
+    Vertex vertex2 = new Vertex(vertex2Id, "B", Properties.createFromMap(vertex2Props), new GradoopIds());
 
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(vertex1, vertex2);
 

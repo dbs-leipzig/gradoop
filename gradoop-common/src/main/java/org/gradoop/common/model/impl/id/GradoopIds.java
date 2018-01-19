@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIdList implements Iterable<GradoopId>, Value {
+public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Contains the set of gradoop ids.
    */
@@ -44,7 +44,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIdList() { 
+  public GradoopIds() { 
     this.ids = new HashSet<>();
   }
 
@@ -53,7 +53,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    *
    * @param bytes bytes representing multiple gradoop ids
    */
-  private GradoopIdList(byte[] bytes) {
+  private GradoopIds(byte[] bytes) {
     this.ids = readIds(bytes);
   }
   
@@ -62,7 +62,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    *
    * @param ids a collection of {@link GradoopId}s
    */
-  private GradoopIdList(Collection<GradoopId> ids) {
+  private GradoopIds(Collection<GradoopId> ids) {
     this.ids = new HashSet<>(ids);
   }
 
@@ -103,7 +103,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids array of gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIdList fromExisting(GradoopId... ids) {
+  public static GradoopIds fromExisting(GradoopId... ids) {
     return fromExisting(Arrays.asList(ids));
   }
 
@@ -113,8 +113,8 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids given ids
    * @return gradoop id set
    */
-  public static GradoopIdList fromExisting(Collection<GradoopId> ids) {
-    return new GradoopIdList(ids);
+  public static GradoopIds fromExisting(Collection<GradoopId> ids) {
+    return new GradoopIds(ids);
   }
 
   /**
@@ -123,8 +123,8 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param bytes byte array representing multiple gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIdList fromByteArray(byte[] bytes) {
-    return new GradoopIdList(bytes);
+  public static GradoopIds fromByteArray(byte[] bytes) {
+    return new GradoopIds(bytes);
   }
 
   /**
@@ -141,7 +141,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    *
    * @param ids the ids to add
    */
-  public void addAll(GradoopIdList ids) {
+  public void addAll(GradoopIds ids) {
     this.ids.addAll(ids.ids);
   }
 
@@ -170,7 +170,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(GradoopIdList ids) {
+  public boolean containsAll(GradoopIds ids) {
     for (GradoopId id : ids) {
       if (!this.contains(id)) {
         return false;
@@ -200,7 +200,7 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
    * @param ids the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(GradoopIdList ids) {
+  public boolean containsAny(GradoopIds ids) {
     for (GradoopId id : ids) {
       if (this.contains(id)) {
         return true;
@@ -288,8 +288,8 @@ public class GradoopIdList implements Iterable<GradoopId>, Value {
   public boolean equals(Object o) {
     boolean equal = this == o;
 
-    if (!equal && o instanceof GradoopIdList) {
-      GradoopIdList that = (GradoopIdList) o;
+    if (!equal && o instanceof GradoopIds) {
+      GradoopIds that = (GradoopIds) o;
       // same number of ids
       equal = this.size() == that.size();
 

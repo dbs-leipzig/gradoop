@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
  * Maps an element to a GradoopIdSet, containing the elements id.
@@ -27,10 +27,10 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
  */
 @FunctionAnnotation.ReadFields("id")
 public class IdAsIdSet<EL extends Element>
-  implements MapFunction<EL, GradoopIdList> {
+  implements MapFunction<EL, GradoopIds> {
 
   @Override
-  public GradoopIdList map(EL element) {
-    return GradoopIdList.fromExisting(element.getId());
+  public GradoopIds map(EL element) {
+    return GradoopIds.fromExisting(element.getId());
   }
 }
