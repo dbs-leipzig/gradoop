@@ -22,6 +22,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.model.impl.operators.fusion.VertexFusion;
+import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -270,5 +273,22 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(result.equalsByGraphData(
       loader.getGraphCollectionByVariables(
         "expected0", "expected1", "expected2")));
+  }
+  
+  @Test
+  public void testKeepOnlyRelevantVertices() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" + 
+        "      (a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" + 
+        "      (a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" + 
+        "      (b)-[:cite {difference : 0}]->(c)\n" + 
+        "      (a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" + 
+        "      (b)-[:cite {difference : 5}]->(d)" + 
+        "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" + 
+        "]");
+    GraphCollection sourceGraph = loader.getGraphCollectionByVariables("source");
+    org.junit.Assert.assertEquals(3, sourceGraph
+        .apply(new ApplySubgraph(null, edge -> edge.getPropertyValue("difference").getInt() == 0))
+        .getVertices()
+        .collect().size());
   }
 }
