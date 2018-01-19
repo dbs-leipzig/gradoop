@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class GradoopIdListTest {
+public class GradoopIdsTest {
 
   @Test
   public void testAdd() throws Exception {
@@ -90,7 +90,7 @@ public class GradoopIdListTest {
   }
 
   @Test
-  public void testAddAllGradoopIdList() throws Exception {
+  public void testAddAllGradoopIds() throws Exception {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopIds list1 = new GradoopIds();
@@ -124,7 +124,7 @@ public class GradoopIdListTest {
   }
 
   @Test
-  public void testContainsAllGradoopIdList() throws Exception {
+  public void testContainsAllGradoopIds() throws Exception {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();

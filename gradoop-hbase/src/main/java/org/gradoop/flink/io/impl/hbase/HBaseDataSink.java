@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIds;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -112,7 +112,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
-    DataSet<Tuple3<GradoopId, GradoopIdList, GradoopIdList>>
+    DataSet<Tuple3<GradoopId, GradoopIds, GradoopIds>>
       graphToVertexIdsAndEdgeIds = graphIdToVertexId
         .coGroup(graphIdToEdgeId)
         .where(0)
