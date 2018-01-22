@@ -40,11 +40,15 @@ public class AddGraphsToElementsCoGroup<EL extends GraphElement>
     Iterable<Tuple2<GradoopId, GradoopIds>> graphs,
     Iterable<EL> elements,
     Collector<EL> collector) throws Exception {
+    boolean wasGraphSetEmpty = true;
     for (EL element : elements) {
       for (Tuple2<GradoopId, GradoopIds> graphSet : graphs) {
         element.getGraphIds().addAll(graphSet.f1);
+        wasGraphSetEmpty = false;
       }
-      collector.collect(element);
+      if (!wasGraphSetEmpty) {
+        collector.collect(element);
+      }
     }
   }
 }
