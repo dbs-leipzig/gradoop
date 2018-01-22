@@ -286,6 +286,10 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" + 
         "]");
     GraphCollection sourceGraph = loader.getGraphCollectionByVariables("source");
+    // Caution: We can't use result.equalsByGraphElementIds because it internally uses a cross join
+    // with equality of elements, which means, it ignores elements that are not within the other dataset
+    // This means, the test would succeed even though we have too many vertices as a result of the 
+    // subgraph operator.
     org.junit.Assert.assertEquals(3, sourceGraph
         .apply(new ApplySubgraph(null, edge -> edge.getPropertyValue("difference").getInt() == 0))
         .getVertices()
