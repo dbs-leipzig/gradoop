@@ -5,8 +5,6 @@ cache:
 before_cache:
   - rm -rf $HOME/.m2/repository/org/gradoop/
 
-install: true
-
 language: java
 
 jdk: oraclejdk8
