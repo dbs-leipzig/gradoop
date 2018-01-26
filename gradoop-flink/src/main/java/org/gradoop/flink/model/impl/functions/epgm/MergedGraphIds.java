@@ -19,7 +19,6 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIds;
 
@@ -56,7 +55,7 @@ public class MergedGraphIds<GE extends GraphElement>
 
   @Override
   public GE join(GE first, GE second) throws Exception {
-    if(first == null) {
+    if (first == null) {
       return second;
     }
     first.getGraphIds().addAll(second.getGraphIds());

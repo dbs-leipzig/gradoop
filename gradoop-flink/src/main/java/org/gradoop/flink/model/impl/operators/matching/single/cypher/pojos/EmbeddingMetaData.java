@@ -62,15 +62,6 @@ public class EmbeddingMetaData implements Serializable {
    * Stores the mapping of query variables to embedding entries
    */
   private Map<Pair<String, EntryType>, Integer> entryMapping;
-
-  public Map<Pair<String, String>, Integer> getPropertyMapping() {
-    return propertyMapping;
-  }
-
-  public Map<String, ExpandDirection> getDirectionMapping() {
-    return directionMapping;
-  }
-
   /**
    * Stores where the corresponding PropertyValue of a Variable-PropertyKey-Pair is stored within
    * the embedding
@@ -81,29 +72,13 @@ public class EmbeddingMetaData implements Serializable {
    */
   private Map<String, ExpandDirection> directionMapping;
 
-  /**
-   * Initialises an empty EmbeddingMetaData object
-   */
-  public EmbeddingMetaData() {
-    this(new HashMap<>(), new HashMap<>(), new HashMap<>());
+  public Map<Pair<String, String>, Integer> getPropertyMapping() {
+    return propertyMapping;
   }
 
-  /**
-   * Initializes a new EmbeddingMetaData object from the given mappings
-   *
-   * @param entryMapping maps variables to embedding entries
-   * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
-   * @param directionMapping maps (path) variables to their direction
-   */
-  public EmbeddingMetaData(Map<Pair<String, EntryType>, Integer> entryMapping,
-    Map<Pair<String, String>, Integer> propertyMapping,
-    Map<String, ExpandDirection> directionMapping) {
-    this.entryMapping = entryMapping;
-    this.propertyMapping = propertyMapping;
-    this.directionMapping = directionMapping;
+  public Map<String, ExpandDirection> getDirectionMapping() {
+    return directionMapping;
   }
-
-  public Map<Pair<String, EntryType>, Integer> getEntryMapping() { return this.entryMapping; }
 
   /**
    * Initializes a new EmbeddingMetaData object using copies of the provided meta data.
@@ -126,6 +101,30 @@ public class EmbeddingMetaData implements Serializable {
       }
     );
   }
+
+  /**
+   * Initializes a new EmbeddingMetaData object from the given mappings
+   *
+   * @param entryMapping maps variables to embedding entries
+   * @param propertyMapping maps variable-propertyKey pairs to embedding property data entries
+   * @param directionMapping maps (path) variables to their direction
+   */
+  public EmbeddingMetaData(Map<Pair<String, EntryType>, Integer> entryMapping,
+    Map<Pair<String, String>, Integer> propertyMapping,
+    Map<String, ExpandDirection> directionMapping) {
+    this.entryMapping = entryMapping;
+    this.propertyMapping = propertyMapping;
+    this.directionMapping = directionMapping;
+  }
+
+  /**
+   * Initialises an empty EmbeddingMetaData object
+   */
+  public EmbeddingMetaData() {
+    this(new HashMap<>(), new HashMap<>(), new HashMap<>());
+  }
+
+  public Map<Pair<String, EntryType>, Integer> getEntryMapping() { return this.entryMapping; }
 
   /**
    * Returns the number of entries mapped in this meta data.

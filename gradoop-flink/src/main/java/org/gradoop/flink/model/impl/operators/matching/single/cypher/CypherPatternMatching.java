@@ -131,10 +131,19 @@ public class CypherPatternMatching extends PatternMatching {
           queryHandler.getSourceTargetVariables()));
 
     // Post processing
-    return doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
+    return
+      doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
       PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);
   }
 
+  /**
+   * Method to construct final embedded elements
+   *
+   * @param graph               Used logical graph
+   * @param embeddings          embeddings
+   * @param embeddingMetaData   Meta information
+   * @return                    New set of EmbeddingElements
+   */
   private DataSet<Element> constructFinalElements(LogicalGraph graph, DataSet<Embedding> embeddings,
     EmbeddingMetaData embeddingMetaData) {
 
@@ -165,6 +174,15 @@ public class CypherPatternMatching extends PatternMatching {
         constructionPatternHandler.getLabelsForVariables(newVars)));
   }
 
+  /**
+   * Compute new meta information
+   *
+   * @param metaData              old meta information
+   * @param returnPatternHandler  pattern handler
+   * @param existingVariables     old variables
+   * @param newVariables          new variables
+   * @return                      new EmbeddingMetaData
+   */
   private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
     QueryHandler returnPatternHandler, Set<String> existingVariables, Set<String> newVariables) {
     // update meta data
