@@ -36,7 +36,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
-import org.s1ck.gdl.model.Graph;
 
 import java.util.List;
 

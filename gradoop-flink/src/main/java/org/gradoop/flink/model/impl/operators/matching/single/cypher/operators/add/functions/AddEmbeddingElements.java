@@ -19,8 +19,6 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
-import java.util.List;
-
 /**
  * Adds {@link Embedding} columns based on a given set of variables.
  */
