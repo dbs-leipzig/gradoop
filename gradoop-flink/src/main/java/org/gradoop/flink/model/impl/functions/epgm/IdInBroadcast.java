@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Filters a dataset of EPGM elements to those whose id is contained in an id dataset.
@@ -35,12 +35,12 @@ public class IdInBroadcast<EL extends EPGMElement> extends RichFilterFunction<EL
   /**
    * graph ids
    */
-  protected GradoopIds ids;
+  protected GradoopIdSet ids;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    ids = GradoopIds.fromExisting(getRuntimeContext().getBroadcastVariable(IDS));
+    ids = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(IDS));
   }
 
   @Override

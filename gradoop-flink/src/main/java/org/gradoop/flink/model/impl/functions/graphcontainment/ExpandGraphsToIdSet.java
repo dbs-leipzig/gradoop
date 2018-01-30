@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Maps an element to a GradoopIdSet of all graph ids the element is
@@ -30,10 +30,10 @@ import org.gradoop.common.model.impl.id.GradoopIds;
  */
 @FunctionAnnotation.ForwardedFields("graphIds->*")
 public class ExpandGraphsToIdSet<GE extends GraphElement>
-  implements MapFunction<GE, GradoopIds> {
+  implements MapFunction<GE, GradoopIdSet> {
 
   @Override
-  public GradoopIds map(GE ge) {
+  public GradoopIdSet map(GE ge) {
     return ge.getGraphIds();
   }
 }

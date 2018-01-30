@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
@@ -36,11 +36,11 @@ public abstract class GraphsContainmentFilterBroadcast
   /**
    * graph ids
    */
-  protected GradoopIds graphIds;
+  protected GradoopIdSet graphIds;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    graphIds = GradoopIds.fromExisting(getRuntimeContext().getBroadcastVariable(GRAPH_IDS));
+    graphIds = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(GRAPH_IDS));
   }
 }

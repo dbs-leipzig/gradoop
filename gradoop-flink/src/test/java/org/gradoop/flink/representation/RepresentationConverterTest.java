@@ -17,7 +17,7 @@ package org.gradoop.flink.representation;
 
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -57,7 +57,7 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
   private GraphTransaction getGraphTransaction() {
     GraphHead graphHead = new GraphHead(GradoopId.get(), "Test", null);
 
-    GradoopIds graphIds = GradoopIds.fromExisting(graphHead.getId());
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 

@@ -16,7 +16,7 @@
 package org.gradoop.common.model.api.entities;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -85,7 +85,7 @@ public interface EPGMVertexFactory<V extends EPGMVertex>
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  V createVertex(String label, GradoopIds graphIds);
+  V createVertex(String label, GradoopIdSet graphIds);
 
   /**
    * Initializes a vertex based on the given parameters.
@@ -95,7 +95,7 @@ public interface EPGMVertexFactory<V extends EPGMVertex>
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  V initVertex(GradoopId id, String label, GradoopIds graphIds);
+  V initVertex(GradoopId id, String label, GradoopIdSet graphIds);
 
   /**
    * Creates a new vertex based on the given parameters.
@@ -105,7 +105,7 @@ public interface EPGMVertexFactory<V extends EPGMVertex>
    * @param graphIds     graphIds, that contain the vertex
    * @return vertex data
    */
-  V createVertex(String label, Properties properties, GradoopIds graphIds);
+  V createVertex(String label, Properties properties, GradoopIdSet graphIds);
 
   /**
    * Initializes a vertex based on the given parameters.
@@ -117,5 +117,5 @@ public interface EPGMVertexFactory<V extends EPGMVertex>
    * @return vertex data
    */
   V initVertex(GradoopId id, String label, Properties properties,
-    GradoopIds graphIds);
+    GradoopIdSet graphIds);
 }

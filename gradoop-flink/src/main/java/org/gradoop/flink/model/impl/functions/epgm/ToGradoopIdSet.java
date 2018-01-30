@@ -18,19 +18,19 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * id1,..,idn => {id1,..,idn}
  */
 public class ToGradoopIdSet
-  implements GroupReduceFunction<GradoopId, GradoopIds> {
+  implements GroupReduceFunction<GradoopId, GradoopIdSet> {
 
   @Override
   public void reduce(Iterable<GradoopId> iterable,
-    Collector<GradoopIds> collector) throws Exception {
+    Collector<GradoopIdSet> collector) throws Exception {
 
-    GradoopIds ids = new GradoopIds();
+    GradoopIdSet ids = new GradoopIdSet();
 
     for (GradoopId id : iterable) {
       ids.add(id);

@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Co-groups graph-id, vertex-id) and (graph-id, edge-id) tuples to
@@ -44,21 +44,21 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 @FunctionAnnotation.ReadFieldsSecond("f1")
 public class BuildGraphTransactions implements CoGroupFunction<
   Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>,
-  Tuple3<GradoopId, GradoopIds, GradoopIds>> {
+  Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> {
   /**
    * Reduce object instantiations.
    */
-  private final Tuple3<GradoopId, GradoopIds, GradoopIds> reuseTuple =
+  private final Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> reuseTuple =
     new Tuple3<>();
 
   @Override
   public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>> graphToVertexIds,
     Iterable<Tuple2<GradoopId, GradoopId>> graphToEdgeIds,
-    Collector<Tuple3<GradoopId, GradoopIds, GradoopIds>> collector) throws
+    Collector<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> collector) throws
     Exception {
 
-    GradoopIds vertexIds  = new GradoopIds();
-    GradoopIds edgeIds    = new GradoopIds();
+    GradoopIdSet vertexIds  = new GradoopIdSet();
+    GradoopIdSet edgeIds    = new GradoopIdSet();
     boolean initialized     = false;
 
     for (Tuple2<GradoopId, GradoopId> graphToVertexTuple : graphToVertexIds) {

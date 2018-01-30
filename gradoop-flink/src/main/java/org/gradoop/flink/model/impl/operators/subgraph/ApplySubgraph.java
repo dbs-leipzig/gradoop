@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -129,7 +129,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> vertexIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdsWithNewGraphs =
       collection.getVertices()
         .filter(vertexFilterFunction)
         .flatMap(new ElementIdGraphIdTuple<>())
@@ -155,7 +155,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // edge id, source id, target id, set of new graph ids
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds>> edgeTuple =
+    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> edgeTuple =
       collection.getEdges()
         .flatMap(new IdSourceTargetGraphTuple<>())
         .join(graphIdDictionary)
@@ -173,7 +173,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // edge id, new edge graphs
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> edgeIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgeIdsWithNewGraphs =
       edgeTuple
         .join(vertexIdsWithNewGraphs)
         .where(1).equalTo(0)

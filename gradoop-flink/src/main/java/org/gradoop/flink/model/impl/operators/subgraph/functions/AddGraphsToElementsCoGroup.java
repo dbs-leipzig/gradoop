@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * CoGroups tuples containing gradoop ids and gradoop id sets with graph
@@ -33,16 +33,16 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
 public class AddGraphsToElementsCoGroup<EL extends GraphElement>
-  implements CoGroupFunction<Tuple2<GradoopId, GradoopIds>, EL, EL> {
+  implements CoGroupFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override
   public void coGroup(
-    Iterable<Tuple2<GradoopId, GradoopIds>> graphs,
+    Iterable<Tuple2<GradoopId, GradoopIdSet>> graphs,
     Iterable<EL> elements,
     Collector<EL> collector) throws Exception {
     boolean wasGraphSetEmpty = true;
     for (EL element : elements) {
-      for (Tuple2<GradoopId, GradoopIds> graphSet : graphs) {
+      for (Tuple2<GradoopId, GradoopIdSet> graphSet : graphs) {
         element.getGraphIds().addAll(graphSet.f1);
         wasGraphSetEmpty = false;
       }

@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Add all gradoop ids in the second field of the first tuple to the element.
@@ -30,11 +30,11 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
 public class AddGraphsToElements<EL extends GraphElement>
-  implements JoinFunction<Tuple2<GradoopId, GradoopIds>, EL, EL> {
+  implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override
   public EL join(
-    Tuple2<GradoopId, GradoopIds> left,
+    Tuple2<GradoopId, GradoopIdSet> left,
     EL right) {
     right.getGraphIds().addAll(left.f1);
     return right;

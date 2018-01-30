@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -100,7 +100,7 @@ public class BusinessTransactionGraphs implements
       .runScatterGatherIteration(new BtgMessenger(), new BtgUpdater() , 100);
 
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> btgVerticesMap = gellyTransGraph
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> btgVerticesMap = gellyTransGraph
       .getVerticesAsTuple2()
       .map(new SwitchPair<>())
       .groupBy(0)
@@ -135,7 +135,7 @@ public class BusinessTransactionGraphs implements
       .with(new LeftSide<>())
       .distinct();
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> vertexBtgsMap = vertexBtgMap
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexBtgsMap = vertexBtgMap
       .groupBy(0)
       //.combineGroup(new CollectGradoopIds())
       .reduceGroup(new CollectGradoopIds());

@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * (id, {id, id, ...})
  */
-public class IdWithIdSet extends Tuple2<GradoopId, GradoopIds> {
+public class IdWithIdSet extends Tuple2<GradoopId, GradoopIdSet> {
 
   public GradoopId getId() {
     return f0;
@@ -32,11 +32,11 @@ public class IdWithIdSet extends Tuple2<GradoopId, GradoopIds> {
     f0 = id;
   }
 
-  public GradoopIds getIdSet() {
+  public GradoopIdSet getIdSet() {
     return f1;
   }
 
-  public void setIdSet(GradoopIds idSet) {
+  public void setIdSet(GradoopIdSet idSet) {
     f1 = idSet;
   }
 }

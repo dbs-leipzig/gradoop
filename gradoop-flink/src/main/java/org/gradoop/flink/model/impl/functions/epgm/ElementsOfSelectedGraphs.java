@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 
 /**
@@ -42,7 +42,7 @@ public class ElementsOfSelectedGraphs<EL extends GraphElement> extends
   /**
    * graph ids
    */
-  protected GradoopIds graphIds;
+  protected GradoopIdSet graphIds;
 
   /**
    * reuse tuple
@@ -60,7 +60,7 @@ public class ElementsOfSelectedGraphs<EL extends GraphElement> extends
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    graphIds = GradoopIds.fromExisting(getRuntimeContext().getBroadcastVariable(GRAPH_IDS));
+    graphIds = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(GRAPH_IDS));
   }
 
   @Override

@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIds implements Iterable<GradoopId>, Value {
+public class GradoopIdSet implements Iterable<GradoopId>, Value {
   /**
    * Contains the set of gradoop ids.
    */
@@ -43,7 +43,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIds() {
+  public GradoopIdSet() {
     this.ids = new HashSet<>();
   }
 
@@ -52,7 +52,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param bytes bytes representing multiple gradoop ids
    */
-  private GradoopIds(byte[] bytes) {
+  private GradoopIdSet(byte[] bytes) {
     this.ids = readIds(bytes);
   }
 
@@ -61,7 +61,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param ids a collection of {@link GradoopId}s
    */
-  private GradoopIds(Collection<GradoopId> ids) {
+  private GradoopIdSet(Collection<GradoopId> ids) {
     this.ids = new HashSet<>(ids);
   }
 
@@ -86,7 +86,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids sequence of {@link GradoopId}s
    * @return a binary representation
    */
-  private byte[] writeIds(Collection<GradoopId> ids) {
+  private byte[] writeIds(Set<GradoopId> ids) {
     byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
 
     int i = 0;
@@ -103,7 +103,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids array of gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIds fromExisting(GradoopId... ids) {
+  public static GradoopIdSet fromExisting(GradoopId... ids) {
     return fromExisting(Arrays.asList(ids));
   }
 
@@ -113,8 +113,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids given ids
    * @return gradoop id set
    */
-  public static GradoopIds fromExisting(Collection<GradoopId> ids) {
-    return new GradoopIds(ids);
+  public static GradoopIdSet fromExisting(Collection<GradoopId> ids) {
+    return new GradoopIdSet(ids);
   }
 
   /**
@@ -123,8 +123,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param bytes byte array representing multiple gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIds fromByteArray(byte[] bytes) {
-    return new GradoopIds(bytes);
+  public static GradoopIdSet fromByteArray(byte[] bytes) {
+    return new GradoopIdSet(bytes);
   }
 
   /**
@@ -141,7 +141,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param ids the ids to add
    */
-  public void addAll(GradoopIds ids) {
+  public void addAll(GradoopIdSet ids) {
     this.ids.addAll(ids.ids);
   }
 
@@ -170,7 +170,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(GradoopIds other) {
+  public boolean containsAll(GradoopIdSet other) {
     if (other.size() > this.size()) {
       return false;
     }
@@ -188,7 +188,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(Collection<GradoopId> other) {
+  public boolean containsAll(Set<GradoopId> other) {
     if (other.size() > this.size()) {
       return false;
     }
@@ -206,7 +206,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param other the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(GradoopIds other) {
+  public boolean containsAny(GradoopIdSet other) {
     // Algorithm: the sizes of both lists might be vastly different
     // to prevent the case of iterating multiple times over large collections
     // we make sure to always iterate over the smaller one
@@ -233,7 +233,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(Collection<GradoopId> ids) {
+  public boolean containsAny(Set<GradoopId> ids) {
     // we can't use the same logic as in #containsAny(GradoopIdList)
     // because the #contains method of `ids` might be inefficient
     for (GradoopId id : ids) {
@@ -308,8 +308,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   public boolean equals(Object o) {
     boolean equal = this == o;
 
-    if (!equal && o instanceof GradoopIds) {
-      GradoopIds that = (GradoopIds) o;
+    if (!equal && o instanceof GradoopIdSet) {
+      GradoopIdSet that = (GradoopIdSet) o;
       // same number of ids
       equal = this.size() == that.size();
 

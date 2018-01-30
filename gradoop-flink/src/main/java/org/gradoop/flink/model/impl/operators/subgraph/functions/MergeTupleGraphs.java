@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Reduces groups of tuples 2 containin two gradoop ids into one tuple
@@ -32,12 +32,12 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 public class MergeTupleGraphs implements
   GroupReduceFunction<
     Tuple2<GradoopId, GradoopId>,
-    Tuple2<GradoopId, GradoopIds>> {
+    Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override
   public void reduce(Iterable<Tuple2<GradoopId, GradoopId>> iterable,
-    Collector<Tuple2<GradoopId, GradoopIds>> collector) throws Exception {
-    GradoopIds set = new GradoopIds();
+    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
+    GradoopIdSet set = new GradoopIdSet();
     boolean empty = true;
     GradoopId first = null;
     for (Tuple2<GradoopId, GradoopId> tuple : iterable) {
