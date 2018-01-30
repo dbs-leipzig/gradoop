@@ -167,11 +167,14 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if the specified ids are contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(GradoopIds ids) {
-    for (GradoopId id : ids) {
+  public boolean containsAll(GradoopIds other) {
+    if (other.size() > this.size()) {
+      return false;
+    }
+    for (GradoopId id : other) {
       if (!this.contains(id)) {
         return false;
       }
@@ -182,11 +185,14 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if the specified ids are contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(Collection<GradoopId> ids) {
-    for (GradoopId id : ids) {
+  public boolean containsAll(Collection<GradoopId> other) {
+    if (other.size() > this.size()) {
+      return false;
+    }
+    for (GradoopId id : other) {
       if (!this.contains(id)) {
         return false;
       }
@@ -197,12 +203,24 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if any of the specified ids is contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(GradoopIds ids) {
-    for (GradoopId id : ids) {
-      if (this.contains(id)) {
+  public boolean containsAny(GradoopIds other) {
+    // Algorithm: the sizes of both lists might be vastly different
+    // to prevent the case of iterating multiple times over large collections
+    // we make sure to always iterate over the smaller one
+    Set<GradoopId> iterate = this.ids;
+    Set<GradoopId> contains = other.ids;
+    int thisSize = this.size();
+    int otherSize = other.size();
+    if (thisSize > otherSize) {
+      iterate = other.ids;
+      contains = this.ids;
+    }
+
+    for (GradoopId id : iterate) {
+      if (contains.contains(id)) {
         return true;
       }
     }
@@ -216,6 +234,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @return true, iff any of the specified ids is contained in the set
    */
   public boolean containsAny(Collection<GradoopId> ids) {
+    // we can't use the same logic as in #containsAny(GradoopIdList)
+    // because the #contains method of `ids` might be inefficient
     for (GradoopId id : ids) {
       if (this.contains(id)) {
         return true;

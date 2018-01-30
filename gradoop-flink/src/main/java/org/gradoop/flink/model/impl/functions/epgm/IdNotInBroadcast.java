@@ -13,34 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.matching.transactional.function;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopIds;
 
 /**
- * Filters a set of Tuple2 with GradoopIds in the first field by the
- * containment of this id in a broadcast set.
+ * Filters a dataset of EPGM elements to those whose id is not contained in an id dataset.
  *
- * @param <T> any type
+ * @param <EL> element type
  */
-public class GraphIdFilter<T> extends RichFilterFunction<Tuple2<GradoopId, T>> {
+public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction<EL> {
 
   /**
-   * Broadcast set of gradoop ids
+   * broadcast id set name
    */
-  private GradoopIds graphIds;
+  public static final String IDS = "IdsNotIn";
+
+  /**
+   * graph ids
+   */
+  protected GradoopIds ids;
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.graphIds = GradoopIds.fromExisting(getRuntimeContext().getBroadcastVariable("graph-ids"));
+    super.open(parameters);
+    ids = GradoopIds.fromExisting(getRuntimeContext().getBroadcastVariable(IDS));
   }
 
   @Override
-  public boolean filter(Tuple2<GradoopId, T> tuple2) throws Exception {
-    return graphIds.contains(tuple2.f0);
+  public boolean filter(EL identifiable) throws Exception {
+    return !ids.contains(identifiable.getId());
   }
 }
