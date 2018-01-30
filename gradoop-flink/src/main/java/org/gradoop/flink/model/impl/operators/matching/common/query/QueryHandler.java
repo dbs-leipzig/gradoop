@@ -494,12 +494,12 @@ public class QueryHandler {
     return variables.stream()
       .filter(var -> isEdge(var) || isVertex(var))
       .map(var -> {
-        if (isEdge(var)) {
-          return Pair.of(var, getEdgeByVariable(var).getLabel());
-        } else {
-          return Pair.of(var, getVertexByVariable(var).getLabel());
-        }
-      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+          if (isEdge(var)) {
+            return Pair.of(var, getEdgeByVariable(var).getLabel());
+          } else {
+            return Pair.of(var, getVertexByVariable(var).getLabel());
+          }
+        }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
   }
 
   /**

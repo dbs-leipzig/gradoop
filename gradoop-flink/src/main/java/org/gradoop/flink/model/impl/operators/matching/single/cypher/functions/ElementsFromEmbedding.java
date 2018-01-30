@@ -28,7 +28,6 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -109,7 +108,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     EPGMVertexFactory<Vertex> epgmVertexFactory,
     EPGMEdgeFactory<Edge> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
     Map<String, Pair<String, String>> sourceTargetVariables,
-    Map<String, String > labelMapping) {
+    Map<String, String> labelMapping) {
     this.graphHeadFactory = epgmGraphHeadFactory;
     this.vertexFactory = epgmVertexFactory;
     this.edgeFactory = epgmEdgeFactory;
@@ -132,7 +131,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
 
-      if(labelMapping.containsKey(vertexVariable)) {
+      if (labelMapping.containsKey(vertexVariable)) {
         String label = labelMapping.get(vertexVariable);
         initVertexWithData(out, graphHead, id, label);
       } else {
@@ -152,7 +151,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
       targetId = embedding.getId(
         metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
 
-      if(labelMapping.containsKey(edgeVariable)) {
+      if (labelMapping.containsKey(edgeVariable)) {
         String label = labelMapping.get(edgeVariable);
         initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);
       } else {
@@ -269,12 +268,12 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element
    */
   private void initEdgeWithData(Collector<Element> out, GraphHead graphHead, GradoopId edgeId,
                                 GradoopId sourceId, GradoopId targetId, String label) {
-      if (!processedIds.contains(edgeId)) {
-        Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
-        e.addGraphId(graphHead.getId());
-        e.setLabel(label);
-        out.collect(e);
-        processedIds.add(edgeId);
-      }
+    if (!processedIds.contains(edgeId)) {
+      Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
+      e.addGraphId(graphHead.getId());
+      e.setLabel(label);
+      out.collect(e);
+      processedIds.add(edgeId);
+    }
   }
 }
