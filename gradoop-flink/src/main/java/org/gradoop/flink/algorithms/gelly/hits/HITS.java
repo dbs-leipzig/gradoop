@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
+import org.gradoop.flink.algorithms.gelly.hits.functions.HITSToAttributes;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
@@ -100,11 +101,13 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
 
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph) throws
-    Exception {
+  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+    throws Exception {
 
     DataSet<Vertex> newVertices =
-      hits.run(graph).join(currentGraph.getVertices()).where(0).equalTo(new Id<>())
+      hits.run(graph)
+        .join(currentGraph.getVertices())
+        .where(0).equalTo(new Id<>())
         .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));
 
     return currentGraph.getConfig().getLogicalGraphFactory()
