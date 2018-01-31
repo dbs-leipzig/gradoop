@@ -20,6 +20,7 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
 
 import java.io.IOException;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIdSet implements Iterable<GradoopId>, Value {
+public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
   /**
    * Contains the set of gradoop ids.
    */
@@ -132,8 +133,9 @@ public class GradoopIdSet implements Iterable<GradoopId>, Value {
    *
    * @param id the id to add
    */
-  public void add(GradoopId id) {
-    this.ids.add(id);
+  @Override
+  public boolean add(GradoopId id) {
+    return this.ids.add(id);
   }
 
   /**
@@ -150,8 +152,9 @@ public class GradoopIdSet implements Iterable<GradoopId>, Value {
    *
    * @param ids the ids to add
    */
-  public void addAll(Collection<GradoopId> ids) {
-    this.ids.addAll(ids);
+  @Override
+  public boolean addAll(Collection<? extends GradoopId> ids) {
+    return this.ids.addAll(ids);
   }
 
   /**
@@ -160,7 +163,8 @@ public class GradoopIdSet implements Iterable<GradoopId>, Value {
    * @param identifier the id to look for
    * @return true, iff the given id is in the set
    */
-  public boolean contains(GradoopId identifier) {
+  @Override
+  public boolean contains(Object identifier) {
     return this.ids.contains(identifier);
   }
 
@@ -188,11 +192,12 @@ public class GradoopIdSet implements Iterable<GradoopId>, Value {
    * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(Set<GradoopId> other) {
+  @Override
+  public boolean containsAll(Collection<?> other) {
     if (other.size() > this.size()) {
       return false;
     }
-    for (GradoopId id : other) {
+    for (Object id : other) {
       if (!this.contains(id)) {
         return false;
       }
