@@ -22,8 +22,6 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.PersistentEdgeFactory;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 import org.gradoop.common.storage.api.PersistentVertexFactory;
-import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;

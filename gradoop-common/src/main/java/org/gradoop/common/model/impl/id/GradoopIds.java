@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -41,10 +39,11 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * Contains the set of gradoop ids.
    */
   private Set<GradoopId> ids;
+
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIds() { 
+  public GradoopIds() {
     this.ids = new HashSet<>();
   }
 
@@ -56,7 +55,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   private GradoopIds(byte[] bytes) {
     this.ids = readIds(bytes);
   }
-  
+
   /**
    * Initializes the set with the given ids.
    *
@@ -70,10 +69,10 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * Since we will need to do operations on individual ids we need
    * to reconstruct the {@link GradoopId} instances.
    * @param bytes serialized sequence of {@link GradoopId}s
-   * @return a set represenation
+   * @return a set representation
    */
-  private Set<GradoopId> readIds(byte[] bytes){
-    Set<GradoopId> ids = new HashSet<>();
+  private Set<GradoopId> readIds(byte[] bytes) {
+    ids = new HashSet<>();
     for (int i = 0; i < bytes.length / GradoopId.ID_SIZE; i++) {
       byte[] idBytes = new byte[GradoopId.ID_SIZE];
       System.arraycopy(bytes, i * GradoopId.ID_SIZE, idBytes, 0, GradoopId.ID_SIZE);
@@ -81,13 +80,13 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
     }
     return ids;
   }
-  
+
   /**
    * Serialize all ids into a byte array.
    * @param ids sequence of {@link GradoopId}s
    * @return a binary representation
    */
-  private byte[] writeIds(Collection<GradoopId> ids){
+  private byte[] writeIds(Collection<GradoopId> ids) {
     byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
 
     int i = 0;
@@ -97,6 +96,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
     }
     return bytes;
   }
+
   /**
    * Creates a new instance from multiple GradoopIDs.
    *
