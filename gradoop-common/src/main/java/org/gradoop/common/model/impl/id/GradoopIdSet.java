@@ -194,7 +194,7 @@ public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
    */
   @Override
   public boolean containsAll(Collection<?> other) {
-    if (other.size() > this.size()) {
+    if (other instanceof Set && other.size() > this.size()) {
       return false;
     }
     for (Object id : other) {
@@ -235,14 +235,21 @@ public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
   /**
    * Checks if any of the specified ids is contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(Set<GradoopId> ids) {
-    // we can't use the same logic as in #containsAny(GradoopIdList)
-    // because the #contains method of `ids` might be inefficient
-    for (GradoopId id : ids) {
-      if (this.contains(id)) {
+  public boolean containsAny(Set<GradoopId> other) {
+    Set<GradoopId> iterate = this.ids;
+    Set<GradoopId> contains = other;
+    int thisSize = this.size();
+    int otherSize = other.size();
+    if (thisSize > otherSize) {
+      iterate = other;
+      contains = this.ids;
+    }
+
+    for (GradoopId id : iterate) {
+      if (contains.contains(id)) {
         return true;
       }
     }
