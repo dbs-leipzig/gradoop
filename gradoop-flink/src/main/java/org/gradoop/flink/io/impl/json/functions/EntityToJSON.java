@@ -24,7 +24,7 @@ import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Contains methods used by all entity writers (e.g. write meta, data).
@@ -102,7 +102,7 @@ public class EntityToJSON {
    * @param values identifier set
    * @return json array containing the identifiers
    */
-  private JSONArray writeJsonArray(final GradoopIds values) {
+  private JSONArray writeJsonArray(final GradoopIdSet values) {
     JSONArray jsonArray = new JSONArray();
     for (GradoopId val : values) {
       jsonArray.put(val);

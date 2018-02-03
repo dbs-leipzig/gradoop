@@ -22,7 +22,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.tlf.TLFDataSource;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
@@ -103,7 +103,7 @@ public class TransactionalBenchmark extends AbstractRunner {
         .map(new GraphTransactionMatcher(queryString));
 
     if (returnEmbeddings) {
-      DataSet<Tuple4<GradoopId, GradoopId, GradoopIds, GradoopIds>> embeddings =
+      DataSet<Tuple4<GradoopId, GradoopId, GradoopIdSet, GradoopIdSet>> embeddings =
         graphs.flatMap(
           new FindEmbeddings(new DepthSearchMatching(), queryString));
 

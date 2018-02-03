@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -83,7 +83,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   /**
    * Graph ids, one seperate id for each case.
    */
-  protected GradoopIds graphIds;
+  protected GradoopIdSet graphIds;
   /**
    * Map to quickly receive the target id of an edge.
    * Note that a object may have multiple outgoing edges with the same label.

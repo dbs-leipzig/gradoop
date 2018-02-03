@@ -23,7 +23,7 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -85,7 +85,7 @@ public class Brokerage
     vertexMap = Maps.newHashMap();
     edgeMap = Maps.newHashMap();
     graphHead = graphHeadFactory.createGraphHead();
-    graphIds = new GradoopIds();
+    graphIds = new GradoopIdSet();
     graphIds.add(graphHead.getId());
     graphTransaction = new GraphTransaction();
 

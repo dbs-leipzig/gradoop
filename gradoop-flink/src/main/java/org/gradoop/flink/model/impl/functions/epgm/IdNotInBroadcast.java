@@ -15,22 +15,36 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Maps an element to a GradoopIdSet, containing the elements id.
+ * Filters a dataset of EPGM elements to those whose id is not contained in an id dataset.
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ReadFields("id")
-public class IdAsIdSet<EL extends Element>
-  implements MapFunction<EL, GradoopIdSet> {
+public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction<EL> {
+
+  /**
+   * broadcast id set name
+   */
+  public static final String IDS = "IdsNotIn";
+
+  /**
+   * graph ids
+   */
+  protected GradoopIdSet ids;
 
   @Override
-  public GradoopIdSet map(EL element) {
-    return GradoopIdSet.fromExisting(element.getId());
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    ids = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(IDS));
+  }
+
+  @Override
+  public boolean filter(EL identifiable) throws Exception {
+    return !ids.contains(identifiable.getId());
   }
 }

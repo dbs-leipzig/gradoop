@@ -16,7 +16,7 @@
 package org.gradoop.common.util;
 
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -149,13 +149,13 @@ public class AsciiGraphLoaderTest {
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<Vertex> vertexsG = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(g.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<Vertex> vertexsH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<Vertex> vertexsGH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIds.fromExisting(g.getId(), h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     Vertex a = asciiGraphLoader.getVertexByVariable("a");
     Vertex b = asciiGraphLoader.getVertexByVariable("b");
@@ -252,13 +252,13 @@ public class AsciiGraphLoaderTest {
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<Edge> edgesG = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(g.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<Edge> edgesH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<Edge> edgesGH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIds.fromExisting(g.getId(), h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     Edge a = asciiGraphLoader.getEdgeByVariable("a");
     Edge b = asciiGraphLoader.getEdgeByVariable("b");

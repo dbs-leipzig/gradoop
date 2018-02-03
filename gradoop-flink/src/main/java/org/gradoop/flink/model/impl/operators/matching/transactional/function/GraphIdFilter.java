@@ -19,8 +19,7 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.List;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Filters a set of Tuple2 with GradoopIds in the first field by the
@@ -33,11 +32,12 @@ public class GraphIdFilter<T> extends RichFilterFunction<Tuple2<GradoopId, T>> {
   /**
    * Broadcast set of gradoop ids
    */
-  private List<GradoopId> graphIds;
+  private GradoopIdSet graphIds;
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.graphIds = getRuntimeContext().getBroadcastVariable("graph-ids");
+    this.graphIds = GradoopIdSet.fromExisting(
+        getRuntimeContext().getBroadcastVariable("graph-ids"));
   }
 
   @Override

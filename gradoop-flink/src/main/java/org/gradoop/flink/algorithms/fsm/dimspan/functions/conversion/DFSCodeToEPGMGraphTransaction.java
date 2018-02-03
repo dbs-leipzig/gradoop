@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -107,7 +107,7 @@ public class DFSCodeToEPGMGraphTransaction
     graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);
     graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);
 
-    GradoopIds graphIds = GradoopIds.fromExisting(graphHead.getId());
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
     // VERTICES
     int[] vertexLabels = graphUtils.getVertexLabels(pattern);
