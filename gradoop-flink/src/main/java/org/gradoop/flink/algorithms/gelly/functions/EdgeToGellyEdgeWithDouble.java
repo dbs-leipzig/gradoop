@@ -17,6 +17,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.graph.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
@@ -51,14 +52,15 @@ public class EdgeToGellyEdgeWithDouble implements EdgeToGellyEdge<Double> {
     reuseEdge.setTarget(epgmEdge.getTargetId());
 
     //cast incoming numeric value to double
-    if(epgmEdge.getPropertyValue(propertyKey).isDouble()) {
-    	reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey).getDouble());
-    } else if(epgmEdge.getPropertyValue(propertyKey).isFloat()) {
-    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getFloat());
-    } else if(epgmEdge.getPropertyValue(propertyKey).isInt()) {
-    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getInt());
-    } else if(epgmEdge.getPropertyValue(propertyKey).isLong()) {
-    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getLong());
+    PropertyValue value = epgmEdge.getPropertyValue(propertyKey);
+    if (value.isDouble()) {
+      reuseEdge.setValue(value.getDouble());
+    } else if (value.isFloat()) {
+      reuseEdge.setValue((double) value.getFloat());
+    } else if (value.isInt()) {
+      reuseEdge.setValue((double) value.getInt());
+    } else if (value.isLong()) {
+      reuseEdge.setValue((double) value.getLong());
     }
     return reuseEdge;
   }
