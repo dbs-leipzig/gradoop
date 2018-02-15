@@ -49,7 +49,17 @@ public class EdgeToGellyEdgeWithDouble implements EdgeToGellyEdge<Double> {
     throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
-    reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey).getDouble());
+
+    //cast incoming numeric value to double
+    if(epgmEdge.getPropertyValue(propertyKey).isDouble()) {
+    	reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey).getDouble());
+    } else if(epgmEdge.getPropertyValue(propertyKey).isFloat()) {
+    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getFloat());
+    } else if(epgmEdge.getPropertyValue(propertyKey).isInt()) {
+    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getInt());
+    } else if(epgmEdge.getPropertyValue(propertyKey).isLong()) {
+    	reuseEdge.setValue((double) epgmEdge.getPropertyValue(propertyKey).getLong());
+    }
     return reuseEdge;
   }
 }
