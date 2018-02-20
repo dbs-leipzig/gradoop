@@ -1,5 +1,6 @@
 package org.gradoop.flink.algorithms.gelly.vertexdegrees;
 
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -32,13 +33,13 @@ public class VertexDegreesTest extends GradoopFlinkTestBase {
 		"(v6)-[e8]->(v5)" +
 		"(v7)-[e9]->(v6)" +
 		"]";
-		
+
 		FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 		LogicalGraph input = loader.getLogicalGraphByVariable("input");
 		
-		LogicalGraph outputGraph = input.callForGraph(new VertexDegrees("degree", "inDegree", "outDegree", true));
+		LogicalGraph outputGraph = input.callForGraph(new VertexDegrees("degree", "inDegree", "outDegree", false));
 		LogicalGraph expect = loader.getLogicalGraphByVariable("result");
-		
+    
 		collectAndAssertTrue(outputGraph.equalsByElementData(expect));
 	}
 }

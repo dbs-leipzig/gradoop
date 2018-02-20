@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
   /**
    * Property key to store the sum vertex degree in.
    */
-  private final String propertyKeySum;
+  private final String propertyKey;
   /**
    * Property key to store the in vertex degree in.
    */
@@ -51,19 +51,30 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
   private final boolean includeZeroDegreeVertices;
 
   /**
+   * Constructor for Vertex Degree with in- and out-degree and total of degrees of a graph.
+   *
+   * @param propertyKey Property key to store the sum of in- and out-degrees in.
+   * @param propertyKeyIn Property key to store the in-degree in.
+   * @param propertyKeyOut Property key to store the out-degree in.
+   */
+  public VertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut) {
+    this(propertyKey, propertyKeyIn, propertyKeyOut, true);
+  }
+
+  /**
    * Constructor for Vertex Degree with fixed set of whether to output
    * vertices with an in-degree of zero.
    *
-   * @param propertyKeySum Property key to store the sum of in- and out-degrees in.
+   * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
    * @param propertyKeyOut Property key to store the out-degree in.
    * @param includeZeroDegreeVertices whether to output vertices with an
    *                                  in-degree of zero
    */
-  public VertexDegrees(String propertyKeySum, String propertyKeyIn, String propertyKeyOut,
+  public VertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut,
     boolean includeZeroDegreeVertices) {
     super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
-    this.propertyKeySum = propertyKeySum;
+    this.propertyKey = propertyKey;
     this.propertyKeyIn = propertyKeyIn;
     this.propertyKeyOut = propertyKeyOut;
     this.includeZeroDegreeVertices = includeZeroDegreeVertices;
@@ -75,10 +86,11 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
     DataSet<Vertex> newVertices =
       new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue,
       NullValue>()
+      .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)
       .run(graph).join(currentGraph.getVertices())
       .where(0)
       .equalTo(new Id<>())
-      .with(new VertexDegreesToAttribute(propertyKeySum, propertyKeyIn, propertyKeyOut));
+      .with(new VertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
 
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
       currentGraph.getEdges());
