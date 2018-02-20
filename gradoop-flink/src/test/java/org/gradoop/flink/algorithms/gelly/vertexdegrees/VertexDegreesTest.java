@@ -1,6 +1,5 @@
 package org.gradoop.flink.algorithms.gelly.vertexdegrees;
 
-import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
