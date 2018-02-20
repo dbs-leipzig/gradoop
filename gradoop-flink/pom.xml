@@ -72,9 +72,15 @@
             <artifactId>flink-hbase_2.11</artifactId>
         </dependency>
 
+        <!-- Others -->
         <dependency>
             <groupId>me.lemire.integercompression</groupId>
             <artifactId>JavaFastPFOR</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <dependency>

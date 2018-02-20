@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<datasource xmlns="http://www.gradoop.org/flink/io/impl/xmlbasedcsv/pojo"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.gradoop.org/flink/io/impl/xmlbasedcsv/pojo
+            http://www.gradoop.org/flink/io/impl/xmlbasedcsv/pojo"
+            name="testDatasource">
+
+    <domain name="university">
+
+        <csv name="computerscienceGraph.csv" charset="utf8" separator="\t">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+            </columns>
+            <graphhead>
+                <key class="testGraph">
+                    <ref column_id="0"/>
+                </key>
+                <label separator="_">
+                    <static name="TopicNr"/>
+                    <ref column_id="0"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="Topic"/>
+                </properties>
+            </graphhead>
+        </csv>
+        <csv name="personVertex.csv" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+                <column id="2" pos="2" type="Integer"/>
+                <column id="3" pos="3" type="String"/>
+            </columns>
+            <vertex>
+                <key class="Person">
+                    <ref column_id="0"/>
+                </key>
+                <label>
+                    <static name="Person"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="name"/>
+                    <property column_id="2" name="age"/>
+                    <property column_id="3" name="gender"/>
+                </properties>
+                <graphs>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
+                </graphs>
+            </vertex>
+        </csv>
+        <csv name="isMemberEdge.csv" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Integer"/>
+            </columns>
+            <edge>
+                <key class="isMember">
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
+                </key>
+                <label>
+                    <static name="isMember"/>
+                </label>
+                <properties>
+                    <property column_id="2" name="since"/>
+                </properties>
+                <graphs>
+                    <graph>
+                        <static name="1"/>
+                    </graph>
+                </graphs>
+                <target>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="1"/>
+                        </key>
+                    </reference>
+                </target>
+                <source>
+                    <reference>
+                        <key class="Person">
+                            <ref column_id="0"/>
+                        </key>
+                    </reference>
+                </source>
+            </edge>
+        </csv>
+    </domain>
+
+    <domain name="technicalUniversity">
+
+        <csv name="databasesGraph.csv" charset="utf8" separator="(">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Long"/>
+            </columns>
+            <graphhead>
+                <key class="database">
+                    <ref column_id="0"/>
+                </key>
+                <label separator=":">
+                    <static name="graph"/>
+                    <ref column_id="0"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="Member"/>
+                    <property column_id="2" name="Courses"/>
+                </properties>
+            </graphhead>
+        </csv>
+        <csv name="studentsVertex.csv" charset="utf8" separator="*">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+            </columns>
+            <vertex>
+                <key class="students">
+                    <ref column_id="0"/>
+                </key>
+                <graphs>
+                    <graph>
+                        <static name="2"/>
+                    </graph>
+                    <graph>
+                        <static name="3"/>
+                    </graph>
+                </graphs>
+
+            </vertex>
+        </csv>
+        <csv name="employeeVertex.csv" charset="utf8" separator="*">
+            <columns>
+                <column id="0" pos="0" type="Long"/>
+                <column id="1" pos="1" type="String"/>
+                <column id="2" pos="2" type="Long"/>
+                <column id="3" pos="3" type="Long"/>
+            </columns>
+            <vertex>
+                <key class="employeeVertex">
+                    <ref column_id="0"/>
+                </key>
+                <label>
+                    <ref column_id="1"/>
+                </label>
+                <graphs>
+                    <graph>
+                        <reference domain_name="university">
+                            <key class="Person">
+                                <ref column_id="2"/>
+                            </key>
+                        </reference>
+                    </graph>
+                </graphs>
+                <edges>
+                    <vertexedge>
+                        <key class="employeeVertexEdge">
+                            <ref column_id="0"/>
+                            <ref column_id="3"/>
+                        </key>
+                        <label>
+                            <static name="FKedge"/>
+                        </label>
+                        <graphs>
+                            <graph>
+                                <reference domain_name="university">
+                                    <key class="testGraph">
+                                        <static name="1"/>
+                                    </key>
+                                </reference>
+                            </graph>
+                        </graphs>
+                        <target>
+                            <reference domain_name="university">
+                                <key class="Person">
+                                    <ref column_id="3"/>
+                                </key>
+                            </reference>
+                        </target>
+                    </vertexedge>
+                </edges>
+            </vertex>
+        </csv>
+        <csv name="isWorkingEdge.csv" charset="utf8" separator="|">
+            <columns>
+                <column id="0" pos="0" type="String"/>
+                <column id="1" pos="1" type="Long"/>
+                <column id="2" pos="2" type="Long"/>
+                <column id="3" pos="3" type="Long"/>
+            </columns>
+            <edge>
+                <key class="isWorking">
+                    <ref column_id="1"/>
+                    <ref column_id="2"/>
+                </key>
+                <label>
+                    <ref column_id="0"/>
+                </label>
+                <properties>
+                    <property column_id="1" name="originialSourceID"/>
+                    <property column_id="2" name="originialTargetID"/>
+                </properties>
+                <graphs>
+                    <graph>
+                        <reference datasource_name="Another Datasource">
+                            <key class="AnotherSource">
+                                <ref column_id="3"/>
+                            </key>
+                        </reference>
+                    </graph>
+                </graphs>
+                <target>
+                    <ref column_id="2"/>
+                </target>
+                <source>
+                    <ref column_id="1"/>
+                </source>
+            </edge>
+        </csv>
+    </domain>
+</datasource>
