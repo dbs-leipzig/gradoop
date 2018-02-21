@@ -11,10 +11,10 @@ public class VertexDegreesTest extends GradoopFlinkTestBase {
 	public void testByElementData() throws Exception {
 		
 		String graph = "input[" +
-		"(v0 {id:0, degree:NULL, inDegree:NULL, outDegree:NULL})" +
-		"(v1 {id:1, degree:NULL, inDegree:NULL, outDegree:NULL})" +
-		"(v2 {id:2, degree:NULL, inDegree:NULL, outDegree:NULL})" +
-		"(v3 {id:3, degree:NULL, inDegree:NULL, outDegree:NULL})" +
+		"(v0 {id:0})" +
+		"(v1 {id:1})" +
+		"(v2 {id:2})" +
+		"(v3 {id:3})" +
 		"(v0)-[e0]->(v1)" +
 		"(v0)-[e1]->(v2)" +
 		"(v2)-[e2]->(v3)" +
