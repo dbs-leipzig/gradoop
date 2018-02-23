@@ -7,4 +7,3 @@ dependency-reduced-pom.xml
 .project
 .settings/
 .DS_Store
-gradoop-flink/src/test/resources/data/csv/input_indexed/

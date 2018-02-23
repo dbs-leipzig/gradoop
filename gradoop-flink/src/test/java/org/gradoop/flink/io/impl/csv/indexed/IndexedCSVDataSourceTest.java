@@ -25,19 +25,21 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testRead() throws Exception {
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed")
-      .getFile();
+    try {
+      String csvPath =
+        VertexLabeledEdgeListDataSourceTest.class.getResource("/data/csv/input_indexed").getFile();
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
-      .getFile();
+      String gdlPath =
+        IndexedCSVDataSourceTest.class.getResource("/data/csv/expected/expected.gdl").getFile();
 
-    DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
-    LogicalGraph input = dataSource.getLogicalGraph();
-    LogicalGraph expected = getLoaderFromFile(gdlPath)
-      .getLogicalGraphByVariable("expected");
+      DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
+      LogicalGraph input = dataSource.getLogicalGraph();
+      LogicalGraph expected = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
 
-    collectAndAssertTrue(input.equalsByElementData(expected));
+      collectAndAssertTrue(input.equalsByElementData(expected));
+    } catch (Exception err ){
+      err.printStackTrace();
+      throw err;
+    }
   }
 }
