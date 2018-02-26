@@ -5,7 +5,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.1</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -85,13 +85,16 @@
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
         <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>release_artifacts_gradoop</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>dbleipzig</id>
-            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+            <id>release_artifacts_gradoop</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -124,6 +127,10 @@
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
         <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
         <plugin.maven-shade.version>2.4.3</plugin.maven-shade.version>
+        <plugin.maven-source.version>3.0.1</plugin.maven-source.version>
+        <plugin.maven-javadoc.version>2.9.1</plugin.maven-javadoc.version>
+        <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
+        <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
     </properties>
 
     <build>
@@ -250,9 +257,67 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- deployment plugins -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${plugin.maven-source.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${plugin.maven-javadoc.version}</version>
+                    <configuration>
+                        <additionalparam>-Xdoclint:none</additionalparam>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${plugin.maven-gpg.version}</version>
+                    <executions>
+                        <execution>
+                            <id>sign_artifacts_gradoop</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>${plugin.maven-nexus-staging.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <serverId>release_artifacts_gradoop</serverId>
+                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
 
     <dependencyManagement>
         <dependencies>

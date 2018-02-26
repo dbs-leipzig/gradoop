@@ -99,27 +99,13 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 ### Use gradoop via Maven
 
-* Add repository and dependency to your maven project
+* Add dependency to your maven project
 
 ```
-<repositories>
-  <repository>
-    <id>dbleipzig</id>
-    <name>Database Group Leipzig University</name>
-    <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
-    <releases>
-      <enabled>true</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-   </repository>
-</repositories>
-
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.1</version>
 </dependency>
 ```
 
@@ -178,6 +164,7 @@ Used to maintain the code style for the whole project.
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
 * 0.2.0 Pattern Matching and Frequent Subgraph Mining algorithms
+* 0.3 Bug fixed and support for more Gelly algorithms
 
 ### Disclaimer
 
