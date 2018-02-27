@@ -15,37 +15,45 @@
  */
 package org.gradoop.flink.datagen.transactions.foodbroker;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.codehaus.jettison.json.JSONException;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerEdgeLabels;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InNoGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class FoodBrokerTest extends GradoopFlinkTestBase {
 
+  private GraphCollection cases;
+
   @Test
   public void testGenerate() throws Exception {
-    GraphCollection cases = generateCollection();
+    generateCollection();
 
     assertNotNull(cases);
   }
 
   @Test
   public void testSalesQuotationLineCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotationLine"));
     int min = 1;
@@ -65,7 +73,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSalesOrderCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
       .filter(new ByLabel<Vertex>("SalesQuotation"));
     DataSet<Vertex> salesOrders = cases.getVertices()
@@ -91,7 +99,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxVertexCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     int casesCount = 10;
     double actual = 0;
     // max 1:SalesQuotation, 20:SalesQuotationLines, 1:SalesOrder,
@@ -111,7 +119,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
   @Test
   public void testMaxEdgeCount() throws IOException, JSONException, URISyntaxException {
-    GraphCollection cases = generateCollection();
+    generateCollection();
     int casesCount = 10;
     double actual = 0;
     double max = 1*2 + 20*2 + 1*3 + 20*2 + 20*3 + 20*2 + 20*2 + 20*1 + 1*1 ;
@@ -137,37 +145,121 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
 
     FoodBroker foodBroker = new FoodBroker(getExecutionEnvironment(), getConfig(), config);
 
-    GraphCollection result10K = foodBroker.execute();
+    List<GraphTransaction> result10K = foodBroker.execute().getGraphTransactions().collect();
 
-    assertEquals(10000, result10K.getGraphHeads().count());
+    assertEquals(1000, result10K.size());
 
-    assertEquals(0, result10K
-      .getVertices()
-      .filter(new InNoGraph<>())
-      .count());
+    for (GraphTransaction graph : result10K) {
+      Set<GradoopId> vertexIds = Sets.newHashSetWithExpectedSize(graph.getVertices().size());
 
-    assertEquals(0, result10K
-      .getEdges()
-      .filter(new InNoGraph<>())
-      .count());
+      for (Vertex vertex : graph.getVertices()) {
+        vertexIds.add(vertex.getId());
+        assertTrue(vertex.getGraphIds().size() >= 1);
+      }
+
+      // EDGE CONSISTENCY
+
+      for (Edge edge : graph.getEdges()) {
+        assertTrue("graph does not contain source of " + edge.getLabel(),
+          vertexIds.contains(edge.getSourceId()));
+
+        if (!vertexIds.contains(edge.getTargetId())) {
+          System.out.println(graph.getVertexById(edge.getSourceId()));
+        }
+
+        assertTrue("graph does not contain target of " + edge.getLabel(),
+          vertexIds.contains(edge.getTargetId()));
+      }
+    }
   }
 
-  private GraphCollection generateCollection()
+  @Test
+  public void testSchema() throws Exception {
+
+    Set<String> foundVertexLabels = Sets.newHashSet();
+    Set<String> foundEdgeLabels = Sets.newHashSet();
+
+
+    for (int ignored : new int[] {0, 1, 2}) {
+      generateCollection();
+
+      for (Vertex vertex : cases.getVertices().collect()) {
+        foundVertexLabels.add(vertex.getLabel());
+      }
+
+      for (Edge edge : cases.getEdges().collect()) {
+        foundEdgeLabels.add(edge.getLabel());
+      }
+    }
+
+    Set<String> expectedVertexLabels = Sets.newHashSet(
+      FoodBrokerVertexLabels.CLIENT_VERTEX_LABEL,
+      FoodBrokerVertexLabels.CUSTOMER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.DELIVERYNOTE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.EMPLOYEE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.LOGISTICS_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PRODUCT_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PURCHINVOICE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESINVOICE_VERTEX_LABEL,
+      FoodBrokerVertexLabels.PURCHORDER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESORDER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.SALESQUOTATION_VERTEX_LABEL,
+      FoodBrokerVertexLabels.TICKET_VERTEX_LABEL,
+      FoodBrokerVertexLabels.USER_VERTEX_LABEL,
+      FoodBrokerVertexLabels.VENDOR_VERTEX_LABEL
+    );
+
+    for (String label : expectedVertexLabels) {
+      assertTrue( label + " vertices are missing", foundVertexLabels.contains(label));
+    }
+
+    for (String label : foundVertexLabels) {
+      assertTrue( label + " vertices was not expected", expectedVertexLabels.contains(label));
+    }
+
+    Set<String> expectedEdgeLabels = Sets.newHashSet(
+      FoodBrokerEdgeLabels.ALLOCATEDTO_EDGE_LABEL,
+      FoodBrokerEdgeLabels.BASEDON_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CONCERNS_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CONTAINS_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CREATEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.CREATEDFOR_EDGE_LABEL,
+      FoodBrokerEdgeLabels.OPENEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.OPERATEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PLACEDAT_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PROCESSEDBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.PURCHORDERLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.RECEIVEDFROM_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SALESORDERLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SALESQUOTATIONLINE_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SENTBY_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SENTTO_EDGE_LABEL,
+      FoodBrokerEdgeLabels.SERVES_EDGE_LABEL
+    );
+
+    for (String label : expectedEdgeLabels) {
+      assertTrue( label + " edges are missing", foundEdgeLabels.contains(label));
+    }
+
+    for (String label : foundEdgeLabels) {
+      assertTrue( label + " edges was not expected", expectedEdgeLabels.contains(label));
+    }
+  }
+
+  private void generateCollection()
     throws IOException, JSONException, URISyntaxException {
-    String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
 
-    FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
+    if (cases == null) {
+      String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
 
-    config.setScaleFactor(0);
+      FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 
-    FoodBroker foodBroker =
-      new FoodBroker(getExecutionEnvironment(), getConfig(), config);
+      config.setScaleFactor(0);
 
-    try {
-      return foodBroker.execute();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
+      FoodBroker foodBroker =
+        new FoodBroker(getExecutionEnvironment(), getConfig(), config);
+
+      cases = foodBroker.execute();
     }
   }
 

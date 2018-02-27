@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
+package org.gradoop.flink.datagen.transactions.foodbroker.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
-
-import java.math.BigDecimal;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
- * Creates a product price tuple from the given vertex. The tuple consists of the gradoop id and
- * the price.
+ * Created by peet on 07.07.17.
  */
-public class ProductPriceMapper implements
-  MapFunction<Vertex, Tuple2<GradoopId, BigDecimal>> {
+public class EnsureGraphContainment implements MapFunction<GraphTransaction, GraphTransaction> {
 
   @Override
-  public Tuple2<GradoopId, BigDecimal> map(Vertex v) throws Exception {
-    BigDecimal price = v.getPropertyValue(FoodBrokerPropertyKeys.PRICE_KEY).getBigDecimal();
-    return new Tuple2<>(v.getId(), price);
+  public GraphTransaction map(GraphTransaction graph) throws Exception {
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graph.getGraphHead().getId());
+
+    for (Vertex vertex : graph.getVertices()) {
+      vertex.setGraphIds(graphIds);
+    }
+    return graph;
   }
 }

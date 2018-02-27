@@ -17,8 +17,9 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Customer;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -43,15 +44,15 @@ public class CustomerGenerator extends BusinessRelationGenerator {
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.CUSTOMER_VERTEX_LABEL);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(FoodBrokerVertexLabels.CUSTOMER_VERTEX_LABEL);
     loadData();
     return env.fromCollection(seeds)
       .map(new Customer(vertexFactory, foodBrokerConfig))
-      .withBroadcastSet(env.fromCollection(getAdjectives()), Constants.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(getNouns()), Constants.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(getCities()), Constants.CITIES_BC)
-      .withBroadcastSet(env.fromCollection(getCompanies()), Constants.COMPANIES_BC)
-      .withBroadcastSet(env.fromCollection(getHoldings()), Constants.HOLDINGS_BC)
+      .withBroadcastSet(env.fromCollection(getAdjectives()), FoodBrokerBroadcastNames.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(getNouns()), FoodBrokerBroadcastNames.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(getCities()), FoodBrokerBroadcastNames.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(getCompanies()), FoodBrokerBroadcastNames.COMPANIES_BC)
+      .withBroadcastSet(env.fromCollection(getHoldings()), FoodBrokerBroadcastNames.HOLDINGS_BC)
       .returns(vertexFactory.getType());
   }
 }

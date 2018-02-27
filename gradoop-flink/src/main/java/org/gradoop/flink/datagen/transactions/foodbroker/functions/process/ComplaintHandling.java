@@ -30,8 +30,14 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfigurationKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerEdgeLabels;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyValues;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.math.BigDecimal;
@@ -45,15 +51,8 @@ import java.util.Set;
  * master data (user, clients).
  */
 public class ComplaintHandling extends AbstractProcess
-  implements MapFunction<GraphTransaction, Tuple2<GraphTransaction, Set<Vertex>>> {
-  /**
-   * List of employees. Used to create new user.
-   */
-  private List<Vertex> employees;
-  /**
-   * List of customers. Used to create new clients.
-   */
-  private List<Vertex> customers;
+  implements MapFunction<GraphTransaction, GraphTransaction> {
+
   /**
    * Map wich stores the vertex for each gradoop id.
    */
@@ -88,12 +87,10 @@ public class ComplaintHandling extends AbstractProcess
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    employees = getRuntimeContext().getBroadcastVariable(Constants.EMPLOYEE_VERTEX_LABEL);
-    customers = getRuntimeContext().getBroadcastVariable(Constants.CUSTOMER_VERTEX_LABEL);
   }
 
   @Override
-  public Tuple2<GraphTransaction, Set<Vertex>> map(GraphTransaction graph) throws Exception {
+  public GraphTransaction map(GraphTransaction graph) throws Exception {
 
     //init new maps
     vertexMap = Maps.newHashMap();
@@ -104,7 +101,7 @@ public class ComplaintHandling extends AbstractProcess
     boolean confirmed = false;
 
     for (Vertex vertex : graph.getVertices()) {
-      if (vertex.getLabel().equals(Constants.SALESORDER_VERTEX_LABEL)) {
+      if (vertex.getLabel().equals(FoodBrokerVertexLabels.SALESORDER_VERTEX_LABEL)) {
         confirmed = true;
         break;
       }
@@ -113,14 +110,16 @@ public class ComplaintHandling extends AbstractProcess
     if (confirmed) {
       edgeMap = createEdgeMap(graph);
       //get needed transactional objects created during brokerage process
-      Set<Vertex> deliveryNotes = getVertexByLabel(graph, Constants.DELIVERYNOTE_VERTEX_LABEL);
-      salesOrderLines = getEdgesByLabel(graph, Constants.SALESORDERLINE_EDGE_LABEL);
-      purchOrderLines = getEdgesByLabel(graph, Constants.PURCHORDERLINE_EDGE_LABEL);
-      salesOrder = getVertexByLabel(graph, Constants.SALESORDER_VERTEX_LABEL).iterator().next();
+      Set<Vertex> deliveryNotes =
+        getVertexByLabel(graph, FoodBrokerVertexLabels.DELIVERYNOTE_VERTEX_LABEL);
+      salesOrderLines = getEdgesByLabel(graph, FoodBrokerEdgeLabels.SALESORDERLINE_EDGE_LABEL);
+      purchOrderLines = getEdgesByLabel(graph, FoodBrokerEdgeLabels.PURCHORDERLINE_EDGE_LABEL);
+      salesOrder =
+        getVertexByLabel(graph, FoodBrokerVertexLabels.SALESORDER_VERTEX_LABEL).iterator().next();
 
       //the complaint handling process
-      badQuality(deliveryNotes);
-      lateDelivery(deliveryNotes);
+      badQuality(deliveryNotes, graph);
+      lateDelivery(deliveryNotes, graph);
       //get all created vertices and edges
       Set<Vertex> transactionalVertices = getVertices();
       Set<Edge> transactionalEdges = getEdges();
@@ -138,15 +137,16 @@ public class ComplaintHandling extends AbstractProcess
       }
     }
 
-    return new Tuple2<>(graph, getMasterData());
+    return graph;
   }
 
   /**
    * Creates a ticket if bad quality occurs.
    *
    * @param deliveryNotes all deliverynotes from the brokerage process
+   * @param graph current case
    */
-  private void badQuality(Set<Vertex> deliveryNotes) {
+  private void badQuality(Set<Vertex> deliveryNotes, GraphTransaction graph) {
     GradoopId purchOrderId;
     List<Float> influencingMasterQuality;
     Set<Edge> currentPurchOrderLines;
@@ -156,31 +156,47 @@ public class ComplaintHandling extends AbstractProcess
       influencingMasterQuality = Lists.newArrayList();
       badSalesOrderLines = Sets.newHashSet();
       //get the corresponding purch order and purch order lines
-      purchOrderId = getEdgeTargetId(Constants.CONTAINS_EDGE_LABEL, deliveryNote.getId());
+      purchOrderId =
+        getEdgeTargetId(FoodBrokerEdgeLabels.CONTAINS_EDGE_LABEL, deliveryNote.getId());
       currentPurchOrderLines = getPurchOrderLinesByPurchOrder(purchOrderId);
 
       for (Edge purchOrderLine : currentPurchOrderLines) {
-        influencingMasterQuality.add(productQualityMap.get(purchOrderLine.getTargetId()));
+        influencingMasterQuality.add(getQuality(productIndex, purchOrderLine.getTargetId()));
       }
       int containedProducts = influencingMasterQuality.size();
       // increase relative influence of vendor and logistics
       for (int i = 1; i <= containedProducts / 2; i++) {
-        influencingMasterQuality.add(getEdgeTargetQuality(
-          Constants.OPERATEDBY_EDGE_LABEL, deliveryNote.getId(), Constants.LOGISTIC_MAP_BC));
-        influencingMasterQuality.add(getEdgeTargetQuality(Constants.PLACEDAT_EDGE_LABEL,
-          purchOrderId, Constants.VENDOR_MAP_BC));
+        influencingMasterQuality.add(
+          getEdgeTargetQuality(
+            FoodBrokerEdgeLabels.OPERATEDBY_EDGE_LABEL,
+            deliveryNote.getId(),
+            FoodBrokerBroadcastNames.BC_LOGISTICS)
+        );
+        influencingMasterQuality.add(
+          getEdgeTargetQuality(
+            FoodBrokerEdgeLabels.PLACEDAT_EDGE_LABEL,
+            purchOrderId,
+            FoodBrokerBroadcastNames.BC_VENDORS)
+        );
       }
-      if (config.happensTransitionConfiguration(
-        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
-        Constants.TI_BADQUALITYPROBABILITY_CONFIG_KEY, false)) {
+      if (config
+        .happensTransitionConfiguration(
+          influencingMasterQuality,
+          FoodBrokerVertexLabels.TICKET_VERTEX_LABEL,
+          FoodBrokerConfigurationKeys.TI_BADQUALITYPROBABILITY_CONFIG_KEY,
+          false
+        )) {
 
         for (Edge purchOrderLine : currentPurchOrderLines) {
           badSalesOrderLines.add(getCorrespondingSalesOrderLine(purchOrderLine.getId()));
         }
 
         Vertex ticket = newTicket(
-          Constants.BADQUALITY_TICKET_PROBLEM,
-          deliveryNote.getPropertyValue(Constants.DATE_KEY).getLong());
+          FoodBrokerPropertyValues.BADQUALITY_TICKET_PROBLEM,
+          deliveryNote.getPropertyValue(FoodBrokerPropertyKeys.DATE_KEY).getLong(), graph);
+
+        graph.getVertices().add(ticket);
+
         grantSalesRefund(badSalesOrderLines, ticket);
         claimPurchRefund(currentPurchOrderLines, ticket);
       }
@@ -191,15 +207,16 @@ public class ComplaintHandling extends AbstractProcess
    * Creates a ticket if late delivery occurs.
    *
    * @param deliveryNotes all deliverynotes from the brokerage process
+   * @param graph current case
    */
-  private void lateDelivery(Set<Vertex> deliveryNotes) {
+  private void lateDelivery(Set<Vertex> deliveryNotes, GraphTransaction graph) {
     Set<Edge> lateSalesOrderLines = Sets.newHashSet();
 
     // Iterate over all delivery notes and take the sales order lines of
     // sales orders, which are late
     for (Vertex deliveryNote : deliveryNotes) {
-      if (deliveryNote.getPropertyValue(Constants.DATE_KEY).getLong() >
-        salesOrder.getPropertyValue(Constants.DELIVERYDATE_KEY).getLong()) {
+      if (deliveryNote.getPropertyValue(FoodBrokerPropertyKeys.DATE_KEY).getLong() >
+        salesOrder.getPropertyValue(FoodBrokerPropertyKeys.DELIVERYDATE_KEY).getLong()) {
         lateSalesOrderLines.addAll(salesOrderLines);
       }
     }
@@ -212,12 +229,14 @@ public class ComplaintHandling extends AbstractProcess
         latePurchOrderLines.add(getCorrespondingPurchOrderLine(salesOrderLine.getId()));
       }
       Calendar calendar = Calendar.getInstance();
-      calendar.setTimeInMillis(salesOrder.getPropertyValue(Constants.DELIVERYDATE_KEY).getLong());
+      calendar.setTimeInMillis(
+        salesOrder.getPropertyValue(FoodBrokerPropertyKeys.DELIVERYDATE_KEY).getLong());
       calendar.add(Calendar.DATE, 1);
       long createdDate = calendar.getTimeInMillis();
 
       // Create ticket and process refunds
-      Vertex ticket = newTicket(Constants.LATEDELIVERY_TICKET_PROBLEM, createdDate);
+      Vertex ticket =
+        newTicket(FoodBrokerPropertyValues.LATEDELIVERY_TICKET_PROBLEM, createdDate, graph);
       grantSalesRefund(lateSalesOrderLines, ticket);
       claimPurchRefund(latePurchOrderLines, ticket);
     }
@@ -228,33 +247,39 @@ public class ComplaintHandling extends AbstractProcess
    *
    * @param problem the reason for the ticket, either bad quality or late delivery
    * @param createdAt creation date
+   * @param graph current case
    * @return the ticket
    */
-  private Vertex newTicket(String problem, long createdAt) {
-    String label = Constants.TICKET_VERTEX_LABEL;
+  private Vertex newTicket(String problem, long createdAt, GraphTransaction graph) {
+    String label = FoodBrokerVertexLabels.TICKET_VERTEX_LABEL;
     Properties properties = new Properties();
     // properties
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
-    properties.set(Constants.CREATEDATE_KEY, createdAt);
-    properties.set(Constants.PROBLEM_KEY, problem);
-    properties.set(Constants.ERPSONUM_KEY, salesOrder.getId().toString());
+    properties.set(
+      FoodBrokerPropertyKeys.SUPERTYPE_KEY,
+      FoodBrokerPropertyValues.SUPERCLASS_VALUE_TRANSACTIONAL
+    );
+    properties.set(FoodBrokerPropertyKeys.CREATEDATE_KEY, createdAt);
+    properties.set(FoodBrokerPropertyKeys.PROBLEM_KEY, problem);
+    properties.set(FoodBrokerPropertyKeys.ERPSONUM_KEY, salesOrder.getId().toString());
 
-    GradoopId employeeId = getNextEmployee();
-    GradoopId customerId = getEdgeTargetId(Constants.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId());
+    GradoopId employeeId = getRandomEntryFromArray(employeeList);
+    Vertex employee = employeeIndex.get(employeeId);
+
+    GradoopId customerId =
+      getEdgeTargetId(FoodBrokerEdgeLabels.RECEIVEDFROM_EDGE_LABEL, salesOrder.getId());
 
     Vertex ticket = newVertex(label, properties);
 
-    newEdge(Constants.CONCERNS_EDGE_LABEL, ticket.getId(), salesOrder.getId());
+    newEdge(FoodBrokerEdgeLabels.CONCERNS_EDGE_LABEL, ticket.getId(), salesOrder.getId());
     //new master data, user
-    Vertex user = getUserFromEmployeeId(employeeId);
-    newEdge(Constants.CREATEDBY_EDGE_LABEL, ticket.getId(), user.getId());
+    Vertex user = getUserFromEmployee(employee, graph);
+    newEdge(FoodBrokerEdgeLabels.CREATEDBY_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, user
-    employeeId = getNextEmployee();
-    user = getUserFromEmployeeId(employeeId);
-    newEdge(Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), user.getId());
+    user = getUserFromEmployee(employee, graph);
+    newEdge(FoodBrokerEdgeLabels.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), user.getId());
     //new master data, client
-    Vertex client = getClientFromCustomerId(customerId);
-    newEdge(Constants.OPENEDBY_EDGE_LABEL, ticket.getId(), client.getId());
+    Vertex client = getClientFromCustomerId(customerId, graph);
+    newEdge(FoodBrokerEdgeLabels.OPENEDBY_EDGE_LABEL, ticket.getId(), client.getId());
 
     return ticket;
   }
@@ -268,21 +293,25 @@ public class ComplaintHandling extends AbstractProcess
   private void grantSalesRefund(Set<Edge> salesOrderLines, Vertex ticket) {
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), Constants.USER_MAP));
-    influencingMasterQuality.add(getEdgeTargetQuality(Constants.RECEIVEDFROM_EDGE_LABEL,
-      salesOrder.getId(), Constants.CUSTOMER_MAP_BC));
+      FoodBrokerEdgeLabels.ALLOCATEDTO_EDGE_LABEL,
+      ticket.getId(),
+      FoodBrokerBroadcastNames.USER_MAP)
+    );
+    influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerEdgeLabels.RECEIVEDFROM_EDGE_LABEL,
+      salesOrder.getId(), FoodBrokerBroadcastNames.BC_CUSTOMERS));
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(
-        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
-        Constants.TI_SALESREFUND_CONFIG_KEY, false);
+        influencingMasterQuality, FoodBrokerVertexLabels.TICKET_VERTEX_LABEL,
+        FoodBrokerConfigurationKeys.TI_SALESREFUND_CONFIG_KEY, false);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal salesAmount;
 
     for (Edge salesOrderLine : salesOrderLines) {
       salesAmount = BigDecimal.valueOf(
-        salesOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt())
-        .multiply(salesOrderLine.getPropertyValue(Constants.SALESPRICE_KEY).getBigDecimal())
+        salesOrderLine.getPropertyValue(FoodBrokerPropertyKeys.QUANTITY_KEY).getInt())
+        .multiply(
+          salesOrderLine.getPropertyValue(FoodBrokerPropertyKeys.SALESPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
       refundAmount = refundAmount.add(salesAmount);
     }
@@ -291,20 +320,25 @@ public class ComplaintHandling extends AbstractProcess
         .setScale(2, BigDecimal.ROUND_HALF_UP);
     //create sales invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
-      String label = Constants.SALESINVOICE_VERTEX_LABEL;
+      String label = FoodBrokerVertexLabels.SALESINVOICE_VERTEX_LABEL;
 
       Properties properties = new Properties();
-      properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
       properties.set(
-        Constants.DATE_KEY, ticket.getPropertyValue(Constants.CREATEDATE_KEY).getLong());
-      String bid = createBusinessIdentifier(currentId++, Constants.SALESINVOICE_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
-      properties.set(Constants.REVENUE_KEY, refundAmount);
-      properties.set(Constants.TEXT_KEY, Constants.TEXT_CONTENT + ticket.getId());
+        FoodBrokerPropertyKeys.SUPERTYPE_KEY,
+        FoodBrokerPropertyValues.SUPERCLASS_VALUE_TRANSACTIONAL);
+      properties.set(
+        FoodBrokerPropertyKeys.DATE_KEY,
+        ticket.getPropertyValue(FoodBrokerPropertyKeys.CREATEDATE_KEY).getLong());
+      String bid = createBusinessIdentifier(currentId++, FoodBrokerAcronyms.SALESINVOICE_ACRONYM);
+      properties.set(
+        FoodBrokerPropertyKeys.SOURCEID_KEY, FoodBrokerAcronyms.CIT_ACRONYM + "_" + bid);
+      properties.set(FoodBrokerPropertyKeys.REVENUE_KEY, refundAmount);
+      properties.set(
+        FoodBrokerPropertyKeys.TEXT_KEY, FoodBrokerPropertyValues.TEXT_CONTENT + ticket.getId());
 
       Vertex salesInvoice = newVertex(label, properties);
 
-      newEdge(Constants.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
+      newEdge(FoodBrokerEdgeLabels.CREATEDFOR_EDGE_LABEL, salesInvoice.getId(), salesOrder.getId());
     }
   }
 
@@ -319,21 +353,25 @@ public class ComplaintHandling extends AbstractProcess
 
     List<Float> influencingMasterQuality = Lists.newArrayList();
     influencingMasterQuality.add(getEdgeTargetQuality(
-      Constants.ALLOCATEDTO_EDGE_LABEL, ticket.getId(), Constants.USER_MAP));
-    influencingMasterQuality.add(getEdgeTargetQuality(Constants.PLACEDAT_EDGE_LABEL,
-      purchOrderId, Constants.VENDOR_MAP_BC));
+      FoodBrokerEdgeLabels.ALLOCATEDTO_EDGE_LABEL,
+      ticket.getId(),
+      FoodBrokerBroadcastNames.USER_MAP)
+    );
+    influencingMasterQuality.add(getEdgeTargetQuality(FoodBrokerEdgeLabels.PLACEDAT_EDGE_LABEL,
+      purchOrderId, FoodBrokerBroadcastNames.BC_VENDORS));
     //calculate refund
     BigDecimal refundHeight = config
       .getDecimalVariationConfigurationValue(
-        influencingMasterQuality, Constants.TICKET_VERTEX_LABEL,
-        Constants.TI_PURCHREFUND_CONFIG_KEY, true);
+        influencingMasterQuality, FoodBrokerVertexLabels.TICKET_VERTEX_LABEL,
+        FoodBrokerConfigurationKeys.TI_PURCHREFUND_CONFIG_KEY, true);
     BigDecimal refundAmount = BigDecimal.ZERO;
     BigDecimal purchAmount;
 
     for (Edge purchOrderLine : purchOrderLines) {
       purchAmount = BigDecimal.valueOf(
-        purchOrderLine.getPropertyValue(Constants.QUANTITY_KEY).getInt())
-        .multiply(purchOrderLine.getPropertyValue(Constants.PURCHPRICE_KEY).getBigDecimal())
+        purchOrderLine.getPropertyValue(FoodBrokerPropertyKeys.QUANTITY_KEY).getInt())
+        .multiply(purchOrderLine.getPropertyValue(
+          FoodBrokerPropertyKeys.PURCHPRICE_KEY).getBigDecimal())
         .setScale(2, BigDecimal.ROUND_HALF_UP);
       refundAmount = refundAmount.add(purchAmount);
     }
@@ -342,21 +380,25 @@ public class ComplaintHandling extends AbstractProcess
         .setScale(2, BigDecimal.ROUND_HALF_UP);
     //create purch invoice if refund is negative
     if (refundAmount.floatValue() < 0) {
-      String label = Constants.PURCHINVOICE_VERTEX_LABEL;
+      String label = FoodBrokerVertexLabels.PURCHINVOICE_VERTEX_LABEL;
       Properties properties = new Properties();
 
-      properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_TRANSACTIONAL);
+      properties.set(FoodBrokerPropertyKeys.SUPERTYPE_KEY,
+        FoodBrokerPropertyValues.SUPERCLASS_VALUE_TRANSACTIONAL);
       properties.set(
-        Constants.DATE_KEY, ticket.getPropertyValue(Constants.CREATEDATE_KEY).getLong());
+        FoodBrokerPropertyKeys.DATE_KEY,
+        ticket.getPropertyValue(FoodBrokerPropertyKeys.CREATEDATE_KEY).getLong());
       String bid = createBusinessIdentifier(
-        currentId++, Constants.PURCHINVOICE_ACRONYM);
-      properties.set(Constants.SOURCEID_KEY, Constants.CIT_ACRONYM + "_" + bid);
-      properties.set(Constants.EXPENSE_KEY, refundAmount);
-      properties.set(Constants.TEXT_KEY, Constants.TEXT_CONTENT + ticket.getId());
+        currentId++, FoodBrokerAcronyms.PURCHINVOICE_ACRONYM);
+      properties.set(
+        FoodBrokerPropertyKeys.SOURCEID_KEY, FoodBrokerAcronyms.CIT_ACRONYM + "_" + bid);
+      properties.set(FoodBrokerPropertyKeys.EXPENSE_KEY, refundAmount);
+      properties.set(FoodBrokerPropertyKeys.TEXT_KEY,
+        FoodBrokerPropertyValues.TEXT_CONTENT + ticket.getId());
 
       Vertex purchInvoice = newVertex(label, properties);
 
-      newEdge(Constants.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrderId);
+      newEdge(FoodBrokerEdgeLabels.CREATEDFOR_EDGE_LABEL, purchInvoice.getId(), purchOrderId);
     }
   }
 
@@ -444,68 +486,43 @@ public class ComplaintHandling extends AbstractProcess
   }
 
   /**
-   * Returns the vertex to the given customer id.
-   *
-   * @param id gradoop id of the customer
-   * @return the vertex representing a customer
-   */
-  private Vertex getCustomerById(GradoopId id) {
-    for (Vertex vertex : customers) {
-      if (vertex.getId().equals(id)) {
-        return vertex;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns the vertex to the given employee id.
-   *
-   * @param id gradoop id of the employee
-   * @return the vertex representing an employee
-   */
-  private Vertex getEmployeeById(GradoopId id) {
-    for (Vertex vertex : employees) {
-      if (vertex.getId().equals(id)) {
-        return vertex;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Creates, if not already existing, and returns the corresponding user vertex to the given
    * employee id.
    *
-   * @param employeeId gradoop id of the employee
+   * @param employee gradoop id of the employee
+   * @param graph current case
    * @return the vertex representing an user
    */
-  private Vertex getUserFromEmployeeId(GradoopId employeeId) {
-    if (masterDataMap.containsKey(employeeId)) {
-      return masterDataMap.get(employeeId);
+  private Vertex getUserFromEmployee(Vertex employee, GraphTransaction graph) {
+    if (masterDataMap.containsKey(employee.getId())) {
+      return masterDataMap.get(employee.getId());
     } else {
       //create properties
-      Vertex employee = getEmployeeById(employeeId);
-      if (employee != null && employee.getProperties() != null) {
-        Properties properties = employee.getProperties();
-        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-        sourceIdKey = sourceIdKey.replace(Constants.EMPLOYEE_ACRONYM, Constants.USER_ACRONYM);
-        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-        properties.set(Constants.ERPEMPLNUM_KEY, employee.getId().toString());
-        String email = properties.get(Constants.NAME_KEY).getString();
-        email = email.replace(" ", ".").toLowerCase();
-        email += "@biiig.org";
-        properties.set(Constants.EMAIL_KEY, email);
-        //create the vertex and store it in a map for fast access
-        Vertex user = vertexFactory.createVertex(Constants.USER_VERTEX_LABEL, properties, graphIds);
-        masterDataMap.put(employeeId, user);
-        userMap.put(user.getId(), user.getPropertyValue(Constants.QUALITY_KEY).getFloat());
+      Properties properties;
+      properties = employee.getProperties();
+      String sourceIdKey = properties.get(FoodBrokerPropertyKeys.SOURCEID_KEY).getString();
+      sourceIdKey = sourceIdKey
+        .replace(FoodBrokerAcronyms.EMPLOYEE_ACRONYM, FoodBrokerAcronyms.USER_ACRONYM);
+      sourceIdKey = sourceIdKey
+        .replace(FoodBrokerAcronyms.ERP_ACRONYM, FoodBrokerAcronyms.CIT_ACRONYM);
+      properties.set(FoodBrokerPropertyKeys.SOURCEID_KEY, sourceIdKey);
+      properties.set(FoodBrokerPropertyKeys.ERPEMPLNUM_KEY, employee.getId().toString());
+      String email = properties.get(FoodBrokerPropertyKeys.NAME_KEY).getString();
+      email = email.replace(" ", ".").toLowerCase();
+      email += "@biiig.org";
+      properties.set(FoodBrokerPropertyKeys.EMAIL_KEY, email);
+      //create the vertex and store it in a map for fast access
+      Vertex user = vertexFactory
+        .createVertex(FoodBrokerVertexLabels.USER_VERTEX_LABEL, properties, graphIds);
+      masterDataMap.put(employee.getId(), user);
+      userMap
+        .put(user.getId(), user.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat());
 
-        newEdge(Constants.SAMEAS_EDGE_LABEL, user.getId(), employeeId);
-        return user;
-      }
-      throw new IllegalArgumentException("No employee for id: " + employeeId);
+//      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, user.getId(), employee.getId());
+
+      graph.getVertices().add(user);
+
+      return user;
     }
   }
 
@@ -514,42 +531,39 @@ public class ComplaintHandling extends AbstractProcess
    * customer id.
    *
    * @param customerId gradoop id of the customer
+   * @param graph current case
    * @return the vertex representing a client
    */
-  private Vertex getClientFromCustomerId(GradoopId customerId) {
+  private Vertex getClientFromCustomerId(GradoopId customerId, GraphTransaction graph) {
+    Vertex client;
+
     if (masterDataMap.containsKey(customerId)) {
-      return masterDataMap.get(customerId);
+      client = masterDataMap.get(customerId);
     } else {
       //create properties
-      Vertex customer = getCustomerById(customerId);
-      if (customer != null && customer.getProperties() != null) {
-        Properties properties = customer.getProperties();
-        String sourceIdKey = properties.get(Constants.SOURCEID_KEY).getString();
-        sourceIdKey = sourceIdKey.replace(Constants.CUSTOMER_ACRONYM, Constants.CLIENT_ACRONYM);
-        sourceIdKey = sourceIdKey.replace(Constants.ERP_ACRONYM, Constants.CIT_ACRONYM);
-        properties.set(Constants.SOURCEID_KEY, sourceIdKey);
-        properties.set(Constants.ERPCUSTNUM_KEY, customer.getId().toString());
-        properties.set(Constants.CONTACTPHONE_KEY, "0123456789");
-        properties.set(Constants.ACCOUNT_KEY, "CL" + customer.getId().toString());
-        //create the vertex and store it in a map for fast access
-        Vertex client = vertexFactory.createVertex(
-          Constants.CLIENT_VERTEX_LABEL, properties, graphIds);
-        masterDataMap.put(customerId, client);
+      Properties properties;
+      Vertex customer = graph.getVertexById(customerId);
+      properties = customer.getProperties();
+      String sourceIdKey = properties.get(FoodBrokerPropertyKeys.SOURCEID_KEY).getString();
+      sourceIdKey = sourceIdKey
+        .replace(FoodBrokerAcronyms.CUSTOMER_ACRONYM, FoodBrokerAcronyms.CLIENT_ACRONYM);
+      sourceIdKey = sourceIdKey
+        .replace(FoodBrokerAcronyms.ERP_ACRONYM, FoodBrokerAcronyms.CIT_ACRONYM);
+      properties.set(FoodBrokerPropertyKeys.SOURCEID_KEY, sourceIdKey);
+      properties.set(FoodBrokerPropertyKeys.ERPCUSTNUM_KEY, customer.getId().toString());
+      properties.set(FoodBrokerPropertyKeys.CONTACTPHONE_KEY, "0123456789");
+      properties.set(FoodBrokerPropertyKeys.ACCOUNT_KEY, "CL" + customer.getId().toString());
+      //create the vertex and store it in a map for fast access
+      client = vertexFactory.createVertex(
+        FoodBrokerVertexLabels.CLIENT_VERTEX_LABEL, properties, graphIds);
+      masterDataMap.put(customerId, client);
 
-        newEdge(Constants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
-        return client;
-      }
-      throw new IllegalArgumentException("No customer for id: " + customerId);
+//      newEdge(FoodBrokerConstants.SAMEAS_EDGE_LABEL, client.getId(), customerId);
     }
-  }
 
-  /**
-   * Returns set of vertices which contains all in this process created master data.
-   *
-   * @return set of vertices
-   */
-  private Set<Vertex> getMasterData() {
-    return Sets.newHashSet(masterDataMap.values());
+    graph.getVertices().add(client);
+
+    return client;
   }
 
   /**

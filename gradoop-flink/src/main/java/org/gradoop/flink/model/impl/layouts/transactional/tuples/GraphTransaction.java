@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.layouts.transactional.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -67,5 +68,24 @@ public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> 
 
   public void  setEdges(Set<Edge> edges) {
     this.f2 = edges;
+  }
+
+  /**
+   * Returns a vertex matching a given identifier.
+   *
+   * @param id identifier.
+   * @return vertex
+   */
+  public Vertex getVertexById(GradoopId id) {
+    Vertex match = null;
+
+    for (Vertex vertex : getVertices()) {
+      if (vertex.getId().equals(id)) {
+        match = vertex;
+        break;
+      }
+    }
+
+    return match;
   }
 }
