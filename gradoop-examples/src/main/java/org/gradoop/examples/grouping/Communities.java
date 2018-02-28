@@ -19,11 +19,14 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.gelly.labelpropagation.GellyLabelPropagation;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -68,11 +71,21 @@ public class Communities extends AbstractRunner {
     // apply label propagation to compute communities
     graph = graph.callForGraph(new GellyLabelPropagation(10, communityKey));
 
-    // group the vertices of the graph by their community and count the edges between communities
-    LogicalGraph communities = graph.groupBy(singletonList(communityKey));
+    // group the vertices of the graph by their community, count vertices per group and edges
+    // between groups
+    LogicalGraph communities = graph.groupBy(
+      singletonList(communityKey), // vertex grouping keys
+      singletonList(new CountAggregator("count")), // vertex aggregate functions
+      emptyList(), // edge grouping keys
+      singletonList(new CountAggregator("count")), // edge aggregate functions
+      GroupingStrategy.GROUP_REDUCE);
+
+    // extract vertex induced subgraph only containing communities with more than 10 users
+    communities = communities
+      .vertexInducedSubgraph((vertex) -> vertex.getPropertyValue("count").getLong() > 10);
 
     // instantiate a data sink for the DOT format
-    DataSink dataSink = new CSVDataSink(outputPath, config);
+    DataSink dataSink = new DOTDataSink(outputPath, true);
     dataSink.write(communities, true);
 
     // run the job
