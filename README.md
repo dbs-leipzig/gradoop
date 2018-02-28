@@ -101,8 +101,9 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 * Add one of the following dependencies to your maven project
 
+Stable:
+
 ```
-<!-- stable release-->
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
@@ -110,8 +111,18 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 </dependency>
 ```
 
+Latest nightly build (additional repository is required):
 ```
-<!-- nightly build -->
+    <repositories>
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+```
+```
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
