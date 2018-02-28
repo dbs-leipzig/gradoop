@@ -102,6 +102,18 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 * Add dependency to your maven project
 
 ```
+<!-- nightly build -->
+<dependency>
+  <groupId>org.gradoop</groupId>
+  <artifactId>gradoop-flink</artifactId>
+  <version>0.3.3-SNAPSHOT</version>
+</dependency>
+
+```
+
+
+```
+<!-- stable release-->
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
