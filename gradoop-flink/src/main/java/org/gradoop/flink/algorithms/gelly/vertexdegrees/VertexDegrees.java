@@ -52,7 +52,8 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Constructor for Vertex Degree with in- and out-degree and total of degrees of a graph.
-   * Note: The Gelly implementation count loops between edges like (v1) -> (v2), (v2) -> (v1) as one.
+   * Note: The Gelly implementation count loops between edges like (v1) -> (v2),
+   * (v2) -> (v1) as one.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
