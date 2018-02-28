@@ -105,7 +105,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 ```
 
