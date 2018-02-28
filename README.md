@@ -99,15 +99,27 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 ### Use gradoop via Maven
 
-* Add dependency to your maven project
+* Add one of the following dependencies to your maven project
 
 ```
+<!-- stable release-->
 <dependency>
   <groupId>org.gradoop</groupId>
   <artifactId>gradoop-flink</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 ```
+
+```
+<!-- nightly build -->
+<dependency>
+  <groupId>org.gradoop</groupId>
+  <artifactId>gradoop-flink</artifactId>
+  <version>0.3.3-SNAPSHOT</version>
+</dependency>
+
+```
+
 
 ### Build gradoop from source
 
