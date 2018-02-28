@@ -1,12 +1,12 @@
 /**
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public class Communities extends AbstractRunner {
   /**
    * Loads a social network graph from the specified location, applies label propagation to extract
    * communities and computes a summary graph using the community id. The resulting summary graph is
-   * written using the DOT format.
+   * written using the DOT format and also converted into an PNG image using GraphViz.
    *
    * args[0] - input path (CSV)
    * args[1] - output path
@@ -64,17 +64,16 @@ public class Communities extends AbstractRunner {
     // load the graph and set initial community id
     LogicalGraph graph = dataSource.getLogicalGraph();
     graph = graph.transformVertices((current, transformed) -> {
-        current.setProperty(communityKey, current.getId());
-        return current;
-      });
+      current.setProperty(communityKey, current.getId());
+      return current;
+    });
 
     // apply label propagation to compute communities
     graph = graph.callForGraph(new GellyLabelPropagation(10, communityKey));
 
     // group the vertices of the graph by their community, count vertices per group and edges
     // between groups
-    LogicalGraph communities = graph.groupBy(
-      singletonList(communityKey), // vertex grouping keys
+    LogicalGraph communities = graph.groupBy(singletonList(communityKey), // vertex grouping keys
       singletonList(new CountAggregator("count")), // vertex aggregate functions
       emptyList(), // edge grouping keys
       singletonList(new CountAggregator("count")), // edge aggregate functions
@@ -85,10 +84,13 @@ public class Communities extends AbstractRunner {
       .vertexInducedSubgraph((vertex) -> vertex.getPropertyValue("count").getLong() > 10);
 
     // instantiate a data sink for the DOT format
-    DataSink dataSink = new DOTDataSink(outputPath, true);
+    DataSink dataSink = new DOTDataSink(outputPath, false);
     dataSink.write(communities, true);
 
     // run the job
     getExecutionEnvironment().execute();
+
+    // convert to png
+    convertDotToPNG(outputPath, outputPath + ".png");
   }
 }
