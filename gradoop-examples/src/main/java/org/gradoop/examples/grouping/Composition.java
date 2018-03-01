@@ -97,5 +97,8 @@ public class Composition extends AbstractRunner {
     dataSink.write(summary, true);
 
     getExecutionEnvironment().execute();
+
+    // convert DOT to PNG image
+    convertDotToPNG(outputPath, outputPath + ".png");
   }
 }
