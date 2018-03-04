@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class ApplyTransformationTest extends TransformationTest {
+public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
