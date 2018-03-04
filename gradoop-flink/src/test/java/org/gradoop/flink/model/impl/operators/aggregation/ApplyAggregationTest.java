@@ -43,7 +43,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ApplyAggregationTest extends AggregationTest {
+public abstract class ApplyAggregationTest extends AggregationTest {
 
   @Test
   public void testCollectionVertexAndEdgeMin() throws Exception {

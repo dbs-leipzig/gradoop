@@ -41,12 +41,12 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       .getResource("/data/tlf").getFile() + "/io_test_output";
 
     // read from inputfile
-    DataSource dataSource = new TLFDataSource(tlfFileImport, config);
+    DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport, getConfig());
     dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
-    DataSource dataSource2 = new TLFDataSource(tlfFileExport, config);
+    DataSource dataSource2 = new TLFDataSource(tlfFileExport, getConfig());
 
     getExecutionEnvironment().execute();
 
@@ -71,13 +71,13 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, 
-      tlfVertexDictionaryFileImport, "", config);
+      tlfVertexDictionaryFileImport, "", getConfig());
     // write to output path
     DataSink dataSink = new TLFDataSink(tlfFileExport, 
       tlfVertexDictionaryFileExport, "", getConfig());
     dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
-    dataSource = new TLFDataSource(tlfFileExport, config);
+    dataSource = new TLFDataSource(tlfFileExport, getConfig());
     DataSet<GraphTransaction> graphTransactions = dataSource
       .getGraphCollection()
       .getGraphTransactions();
@@ -122,13 +122,13 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport,
-      tlfVertexDictionaryFileImport, tlfEdgeDictionaryFileImport, config);
+      tlfVertexDictionaryFileImport, tlfEdgeDictionaryFileImport, getConfig());
     // write to ouput path
     DataSink dataSink = new TLFDataSink(tlfFileExport,
       tlfVertexDictionaryFileExport, tlfEdgeDictionaryFileExport, getConfig());
     dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
-    dataSource = new TLFDataSource(tlfFileExport, config);
+    dataSource = new TLFDataSource(tlfFileExport, getConfig());
     DataSet<GraphTransaction> graphTransactions = dataSource.getGraphCollection().getGraphTransactions();
 
     //get first transaction which contains one complete graph

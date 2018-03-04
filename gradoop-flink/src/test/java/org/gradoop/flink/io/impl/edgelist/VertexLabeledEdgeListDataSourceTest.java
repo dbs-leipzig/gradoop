@@ -30,7 +30,7 @@ public class VertexLabeledEdgeListDataSourceTest extends GradoopFlinkTestBase {
     String gdlFile = VertexLabeledEdgeListDataSourceTest.class
       .getResource("/data/edgelist/vertexlabeled/expected.gdl").getFile();
 
-    DataSource dataSource = new VertexLabeledEdgeListDataSource(edgeListFile, " ", "lan", config);
+    DataSource dataSource = new VertexLabeledEdgeListDataSource(edgeListFile, " ", "lan", getConfig());
     LogicalGraph result = dataSource.getLogicalGraph();
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
