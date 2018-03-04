@@ -40,17 +40,17 @@ public class Transformation implements UnaryGraphToGraphOperator {
   /**
    * Modification function for graph heads
    */
-  private final TransformationFunction<GraphHead> graphHeadTransFunc;
+  protected final TransformationFunction<GraphHead> graphHeadTransFunc;
 
   /**
    * Modification function for vertices
    */
-  private final TransformationFunction<Vertex> vertexTransFunc;
+  protected final TransformationFunction<Vertex> vertexTransFunc;
 
   /**
    * Modification function for edges
    */
-  private final TransformationFunction<Edge> edgeTransFunc;
+  protected final TransformationFunction<Edge> edgeTransFunc;
 
   /**
    * Creates a new operator instance.

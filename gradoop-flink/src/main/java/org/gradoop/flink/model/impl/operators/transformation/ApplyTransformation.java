@@ -15,13 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.transformation;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.stream.Collectors;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -61,6 +68,20 @@ public class ApplyTransformation extends Transformation
 
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
-    return null;
+    DataSet<GraphTransaction> graphTransactions = collection.getGraphTransactions();
+
+    GradoopFlinkConfig config = collection.getConfig();
+
+    DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
+      .map(new TransformGraphTransaction(
+        config.getGraphHeadFactory(),
+        graphHeadTransFunc,
+        config.getVertexFactory(),
+        vertexTransFunc,
+        config.getEdgeFactory(),
+        edgeTransFunc
+      ));
+
+    return config.getGraphCollectionFactory().fromTransactions(transformedGraphTransactions);
   }
 }
