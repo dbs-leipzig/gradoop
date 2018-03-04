@@ -32,18 +32,7 @@ import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.*;
 
 /**
  * Takes a collection of logical graphs and a user defined aggregate function as
@@ -85,12 +74,23 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     this.edgeFilterFunction = edgeFilterFunction;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection execute(GraphCollection superGraph) {
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
-      subgraph(superGraph) :
-      vertexFilterFunction != null ? vertexInducedSubgraph(superGraph) :
-        edgeInducedSubgraph(superGraph);
+      subgraph(collection) :
+      vertexFilterFunction != null ? vertexInducedSubgraph(collection) :
+        edgeInducedSubgraph(collection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
+    return executeForGVELayout(collection);
   }
 
   /**

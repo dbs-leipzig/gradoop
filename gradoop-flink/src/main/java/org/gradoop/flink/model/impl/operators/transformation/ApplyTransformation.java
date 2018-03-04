@@ -43,8 +43,9 @@ public class ApplyTransformation extends Transformation
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 
+
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
     // the resulting logical graph holds multiple graph heads
     LogicalGraph modifiedGraph = executeInternal(
       collection.getGraphHeads(),
@@ -56,5 +57,10 @@ public class ApplyTransformation extends Transformation
       modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
       modifiedGraph.getEdges());
+  }
+
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
+    return null;
   }
 }
