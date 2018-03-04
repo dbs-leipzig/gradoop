@@ -92,13 +92,14 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
           transaction.getGraphHead().getId(), GradoopConstants.DEFAULT_GRAPH_LABEL)));
     }
 
-    if (vertexTransFunc != null)
+    if (vertexTransFunc != null) {
       transaction.setVertices(transaction.getVertices().stream()
         .map(vertex -> vertexTransFunc.apply(
           vertex,
           vertexFactory.initVertex(
             vertex.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getGraphIds())))
         .collect(Collectors.toSet()));
+    }
 
     if (edgeTransFunc != null) {
       transaction.setEdges(transaction.getEdges().stream()

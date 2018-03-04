@@ -32,7 +32,18 @@ import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.*;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
 
 /**
  * Takes a collection of logical graphs and a user defined aggregate function as
