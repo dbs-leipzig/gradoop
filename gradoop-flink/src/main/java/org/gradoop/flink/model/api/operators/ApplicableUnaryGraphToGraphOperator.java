@@ -15,10 +15,37 @@
  */
 package org.gradoop.flink.model.api.operators;
 
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+
 /**
  * A marker interface for instances of {@link UnaryGraphToGraphOperator} that
  * support the application on each element in a graph collection.
  */
 public interface ApplicableUnaryGraphToGraphOperator
   extends UnaryCollectionToCollectionOperator {
+
+  @Override
+  default GraphCollection execute(GraphCollection collection) {
+    return (collection.isTransactionalLayout()) ?
+      executeForTxLayout(collection) :
+      executeForGVELayout(collection);
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  GraphCollection executeForGVELayout(GraphCollection collection);
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  GraphCollection executeForTxLayout(GraphCollection collection);
 }
