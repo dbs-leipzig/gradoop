@@ -16,17 +16,17 @@
 package org.gradoop.flink.io.impl.csv.indexed;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.core.fs.FileSystem;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
+import org.apache.flink.core.fs.Path;
+import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -34,6 +34,7 @@ import org.gradoop.flink.io.impl.csv.functions.EdgeToCSVEdge;
 import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
+import org.gradoop.flink.io.impl.csv.indexed.functions.IndexedCSVFileFormat;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
@@ -98,43 +99,48 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
       metaData = MetaData.fromFile(metaDataPath, getConfig());
     }
 
-    Map<String, DataSet<CSVVertex>> vertices = new HashMap<>();
-    Map<String, DataSet<CSVEdge>> edges = new HashMap<>();
+    DataSet<CSVVertex> csvVertices = logicalGraph.getVertices()
+      .map(new VertexToCSVVertex())
+      .withBroadcastSet(metaData, BC_METADATA);
 
-    if (logicalGraph.isGVELayout()) {
-      try {
-        for (Vertex v : logicalGraph.getVertices().collect()) {
-          if (!vertices.containsKey(v.getLabel())) {
-            vertices.put(v.getLabel(), logicalGraph.getVerticesByLabel(v.getLabel())
-                .map(new VertexToCSVVertex())
-                .withBroadcastSet(metaData, BC_METADATA));
-          }
-        }
-        for (Edge e : logicalGraph.getEdges().collect()) {
-          if (!edges.containsKey(e.getLabel())) {
-            edges.put(e.getLabel(), logicalGraph.getEdgesByLabel(e.getLabel())
-              .map(new EdgeToCSVEdge())
-              .withBroadcastSet(metaData, BC_METADATA));
-          }
-        }
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
+    DataSet<CSVEdge> csvEdges = logicalGraph.getEdges()
+        .map(new EdgeToCSVEdge())
+        .withBroadcastSet(metaData, BC_METADATA);
 
     metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
         CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
 
-    for (Map.Entry<String, DataSet<CSVVertex>> vertex : vertices.entrySet()) {
-      vertex.getValue().writeAsCsv(getVertexCSVPath(vertex.getKey()), CSVConstants.ROW_DELIMITER,
-          CSVConstants.TOKEN_DELIMITER, writeMode);
-    }
+    csvVertices.output(internalWriteAsIndexedCsv(csvVertices, new Path(getVertexCSVPath()),
+        CSVConstants.ROW_DELIMITER, CSVConstants.TOKEN_DELIMITER, writeMode));
 
-    for (Map.Entry<String, DataSet<CSVEdge>> edge : edges.entrySet()) {
-      edge.getValue().writeAsCsv(getEdgeCSVPath(edge.getKey()), CSVConstants.ROW_DELIMITER,
-         CSVConstants.TOKEN_DELIMITER, writeMode);
-    }
+    csvEdges.output(internalWriteAsIndexedCsv(csvEdges, new Path(getEdgeCSVPath()),
+        CSVConstants.ROW_DELIMITER, CSVConstants.TOKEN_DELIMITER, writeMode));
+  }
+
+  /**
+   * Writes a {@link Tuple} DataSet as CSV file(s) to the specified location with the specified field and line delimiters.<br>
+   * <b>Note: Only a Tuple DataSet can written as a CSV file.</b><br>
+   * For each Tuple field the result of {@link Object#toString()} is written.
+   *
+   * @param dataSet The Tuple that should be writen in the CSV file.
+   * @param filePath The path pointing to the location the CSV file is written to.
+   * @param rowDelimiter The row delimiter to separate Tuples.
+   * @param fieldDelimiter The field delimiter to separate Tuple fields.
+   * @param wm The behavior regarding existing files. Options are NO_OVERWRITE and OVERWRITE.
+   * @param <X> Tuple for indexed CSV file format.
+   * @return An indexed CSV file format for the tuple.
+   *
+   * references to: {@link org.apache.flink.api.java.DataSet#writeAsCsv(String, String, String, WriteMode)}
+   */
+  @SuppressWarnings("unchecked")
+  private <X extends Tuple> IndexedCSVFileFormat<X> internalWriteAsIndexedCsv(
+      DataSet dataSet, Path filePath, String rowDelimiter, String fieldDelimiter,
+      WriteMode wm) {
+    Preconditions.checkArgument(dataSet.getType().isTupleType(),
+      "The writeAsCsv() method can only be used on data sets of tuples.");
+    IndexedCSVFileFormat<X> of = new IndexedCSVFileFormat<>(filePath, rowDelimiter, fieldDelimiter);
+    of.setWriteMode(wm);
+    return of;
   }
 
   @Override
