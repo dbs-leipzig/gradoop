@@ -60,6 +60,9 @@ import java.util.Set;
 public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   implements DataSink {
 
+  private static final String MAPRED_OUTPUT_PATH = "/tmp/mapred-out/";
+  private static final String MAPRED_OUTPUT_DIR_KEY = "mapred.output.dir";
+
   /**
    * Creates a new HBase data sink.
    *
@@ -137,8 +140,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
-    job.getConfiguration().set(
-      TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName());
+    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName());
+    job.getConfiguration().set(MAPRED_OUTPUT_DIR_KEY, MAPRED_OUTPUT_PATH);
 
     persistentGraphDataSet
     // FIXME remove forced cast...
@@ -182,8 +185,8 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
-    job.getConfiguration()
-      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName());
+    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName());
+    job.getConfiguration().set(MAPRED_OUTPUT_DIR_KEY, MAPRED_OUTPUT_PATH);
 
     persistentVertexDataSet
       .map(new BuildVertexMutation<>(getHBaseConfig().getVertexHandler()))
@@ -215,6 +218,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
     // write (persistent-edge-data) to HBase table
     Job job = Job.getInstance();
     job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName());
+    job.getConfiguration().set(MAPRED_OUTPUT_DIR_KEY, MAPRED_OUTPUT_PATH);
 
     persistentEdgeDataSet
       .map(new BuildEdgeMutation<>(getHBaseConfig().getEdgeHandler()))
