@@ -104,9 +104,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     DataSink dataSink = new HBaseDataSink(epgmStore, config);
     // write social graph to HBase
     dataSink.write(config.getGraphCollectionFactory().fromCollections(
-            loader.getGraphHeads(),
-            loader.getVertices(),
-            loader.getEdges()
+      loader.getGraphHeads(),
+      loader.getVertices(),
+      loader.getEdges()
     ));
     getExecutionEnvironment().execute();
 
