@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.datagen.transactions.foodbroker.config;
 /**
  * Constants used for the FoodBroker data generator
  */
-public class Constants {
+public class FoodBrokerConstants {
   /**
    * Reserved property key referring to master or transactional data.
    */
@@ -422,27 +422,23 @@ public class Constants {
   /**
    * Broadcast variable which is needed to spread the precalculated customer map.
    */
-  public static final String CUSTOMER_MAP_BC = "customerMap";
+  public static final String BC_CUSTOMERS = "customerMap";
   /**
    * Broadcast variable which is needed to spread the precalculated vendor map.
    */
-  public static final String VENDOR_MAP_BC = "vendorMap";
+  public static final String BC_VENDORS = "vendorMap";
   /**
    * Broadcast variable which is needed to spread the precalculated logistic map.
    */
-  public static final String LOGISTIC_MAP_BC = "logisticMap";
+  public static final String BC_LOGISTICS = "logisticMap";
   /**
    * Broadcast variable which is needed to spread the precalculated employee map.
    */
-  public static final String EMPLOYEE_MAP_BC = "employeeMap";
-  /**
-   * Broadcast variable which is needed to spread the precalculated product quality map.
-   */
-  public static final String PRODUCT_QUALITY_MAP_BC = "productQualityMap";
+  public static final String BC_EMPLOYEES = "employeeIndex";
   /**
    * Broadcast variable which is needed to spread the precalculated product price map.
    */
-  public static final String PRODUCT_PRICE_MAP_BC = "productPriceMap";
+  public static final String BC_PRODUCTS = "productPriceMap";
   /**
    * Used to select the map which is then used to get the object from a gradoop id.
    */

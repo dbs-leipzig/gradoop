@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata.Logistics;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -44,7 +45,7 @@ public class LogisticsGenerator
 
   @Override
   public DataSet<Vertex> generate() {
-    List<MasterDataSeed> seeds = getMasterDataSeeds(Constants.LOGISTICS_VERTEX_LABEL);
+    List<MasterDataSeed> seeds = getMasterDataSeeds(FoodBrokerVertexLabels.LOGISTICS_VERTEX_LABEL);
     List<String> cities = foodBrokerConfig
       .getStringValuesFromFile("cities");
     List<String> adjectives = foodBrokerConfig
@@ -54,9 +55,9 @@ public class LogisticsGenerator
 
     return env.fromCollection(seeds)
       .map(new Logistics(vertexFactory))
-      .withBroadcastSet(env.fromCollection(adjectives), Constants.ADJECTIVES_BC)
-      .withBroadcastSet(env.fromCollection(nouns), Constants.NOUNS_BC)
-      .withBroadcastSet(env.fromCollection(cities), Constants.CITIES_BC)
+      .withBroadcastSet(env.fromCollection(adjectives), FoodBrokerBroadcastNames.ADJECTIVES_BC)
+      .withBroadcastSet(env.fromCollection(nouns), FoodBrokerBroadcastNames.NOUNS_BC)
+      .withBroadcastSet(env.fromCollection(cities), FoodBrokerBroadcastNames.CITIES_BC)
       .returns(vertexFactory.getType());
   }
 }

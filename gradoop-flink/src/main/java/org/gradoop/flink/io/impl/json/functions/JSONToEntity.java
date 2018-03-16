@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -83,10 +83,10 @@ public class JSONToEntity {
    * @return graph identifiers
    * @throws JSONException
    */
-  protected GradoopIds getGraphs(JSONObject object) throws JSONException {
-    GradoopIds result;
+  protected GradoopIdSet getGraphs(JSONObject object) throws JSONException {
+    GradoopIdSet result;
     if (!object.getJSONObject(JSONConstants.META).has(JSONConstants.GRAPHS)) {
-      result = new GradoopIds();
+      result = new GradoopIdSet();
     } else {
       result = getArrayValues(object
           .getJSONObject(JSONConstants.META)
@@ -102,10 +102,10 @@ public class JSONToEntity {
    * @return long values
    * @throws JSONException
    */
-  protected GradoopIds getArrayValues(JSONArray array) throws
+  protected GradoopIdSet getArrayValues(JSONArray array) throws
     JSONException {
 
-    GradoopIds result = new GradoopIds();
+    GradoopIdSet result = new GradoopIdSet();
 
     for (int i = 0; i < array.length(); i++) {
       result.add(GradoopId.fromString(array.getString(i)));

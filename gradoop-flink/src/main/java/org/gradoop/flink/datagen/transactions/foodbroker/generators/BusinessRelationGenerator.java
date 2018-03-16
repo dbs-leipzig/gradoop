@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.datagen.transactions.foodbroker.generators;
 
 import org.codehaus.jettison.json.JSONException;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
@@ -86,7 +86,7 @@ public abstract class BusinessRelationGenerator  extends AbstractMasterDataGener
     }
     companies = companies.subList(0, companyCount);
     holdings = holdings.subList(0, holdingCount);
-    holdings.add(Constants.HOLDING_TYPE_PRIVATE);
+    holdings.add(FoodBrokerPropertyKeys.HOLDING_TYPE_PRIVATE);
   }
 
   public List<String> getCities() {

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -94,7 +94,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .map(new PairTupleWithNewId<>());
 
     // build a dataset of the vertex ids and the new associated graph ids
-    DataSet<Tuple2<GradoopId, GradoopIds>> vertexIdWithGraphIds =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdWithGraphIds =
       vertexIdWithSplitValues
         .join(splitValuesWithGraphIds)
         .where(1).equalTo(0)
@@ -125,7 +125,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     //--------------------------------------------------------------------------
 
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<Edge, GradoopIds, GradoopIds>> edgeGraphIdsGraphIds =
+    DataSet<Tuple3<Edge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
         .where(new SourceId<>()).equalTo(0)

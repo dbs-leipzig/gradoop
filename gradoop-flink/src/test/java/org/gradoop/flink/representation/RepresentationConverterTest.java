@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.flink.representation;
 
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -57,7 +57,7 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
   private GraphTransaction getGraphTransaction() {
     GraphHead graphHead = new GraphHead(GradoopId.get(), "Test", null);
 
-    GradoopIds graphIds = GradoopIds.fromExisting(graphHead.getId());
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();
 

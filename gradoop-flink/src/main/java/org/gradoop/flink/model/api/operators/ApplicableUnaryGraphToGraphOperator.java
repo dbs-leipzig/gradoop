@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,37 @@
  */
 package org.gradoop.flink.model.api.operators;
 
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+
 /**
  * A marker interface for instances of {@link UnaryGraphToGraphOperator} that
  * support the application on each element in a graph collection.
  */
 public interface ApplicableUnaryGraphToGraphOperator
   extends UnaryCollectionToCollectionOperator {
+
+  @Override
+  default GraphCollection execute(GraphCollection collection) {
+    return (collection.isTransactionalLayout()) ?
+      executeForTxLayout(collection) :
+      executeForGVELayout(collection);
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  GraphCollection executeForGVELayout(GraphCollection collection);
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  GraphCollection executeForTxLayout(GraphCollection collection);
 }

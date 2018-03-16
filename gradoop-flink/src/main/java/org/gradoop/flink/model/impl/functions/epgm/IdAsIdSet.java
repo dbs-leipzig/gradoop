@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Maps an element to a GradoopIdSet, containing the elements id.
@@ -27,10 +27,10 @@ import org.gradoop.common.model.impl.id.GradoopIds;
  */
 @FunctionAnnotation.ReadFields("id")
 public class IdAsIdSet<EL extends Element>
-  implements MapFunction<EL, GradoopIds> {
+  implements MapFunction<EL, GradoopIdSet> {
 
   @Override
-  public GradoopIds map(EL element) {
-    return GradoopIds.fromExisting(element.getId());
+  public GradoopIdSet map(EL element) {
+    return GradoopIdSet.fromExisting(element.getId());
   }
 }

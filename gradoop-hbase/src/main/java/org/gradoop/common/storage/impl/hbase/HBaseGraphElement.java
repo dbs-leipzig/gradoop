@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Wraps an EPGM graph element data entity.
@@ -40,7 +40,7 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement>
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds getGraphIds() {
+  public GradoopIdSet getGraphIds() {
     return getEpgmElement().getGraphIds();
   }
 
@@ -56,7 +56,7 @@ public abstract class HBaseGraphElement<T extends EPGMGraphElement>
    * {@inheritDoc}
    */
   @Override
-  public void setGraphIds(GradoopIds graphIds) {
+  public void setGraphIds(GradoopIdSet graphIds) {
     getEpgmElement().setGraphIds(graphIds);
   }
 

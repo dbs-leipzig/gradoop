@@ -2,9 +2,8 @@
 
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
-[Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework
-for scalable graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/) 
-and [Apache HBase&trade;](http://hbase.apache.org/). It offers a graph data model which 
+[Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework for scalable 
+graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/). It offers a graph data model which 
 extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
 by the concept of logical graphs and further provides operators that can be applied 
 on single logical graphs and collections of logical graphs. The combination of these 
@@ -99,29 +98,38 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 ### Use gradoop via Maven
 
-* Add repository and dependency to your maven project
+* Add one of the following dependencies to your maven project
+
+Stable:
 
 ```
-<repositories>
-  <repository>
-    <id>dbleipzig</id>
-    <name>Database Group Leipzig University</name>
-    <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
-    <releases>
-      <enabled>true</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-   </repository>
-</repositories>
-
 <dependency>
-  <groupId>org.gradoop</groupId>
-  <artifactId>gradoop-flink</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+    <groupId>org.gradoop</groupId>
+    <artifactId>gradoop-flink</artifactId>
+    <version>0.3.2</version>
 </dependency>
 ```
+
+Latest nightly build (additional repository is required):
+```
+<repositories>
+    <repository>
+        <id>oss.sonatype.org-snapshot</id>
+        <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases><enabled>false</enabled></releases>
+        <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+</repositories>
+```
+```
+<dependency>
+    <groupId>org.gradoop</groupId>
+    <artifactId>gradoop-flink</artifactId>
+    <version>0.3.3-SNAPSHOT</version>
+</dependency>
+
+```
+
 
 ### Build gradoop from source
 
@@ -178,6 +186,7 @@ Used to maintain the code style for the whole project.
  layer and distributed execution engine
 * 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
 * 0.2.0 Pattern Matching and Frequent Subgraph Mining algorithms
+* 0.3.1 Bug fixes and support for more Gelly algorithms
 
 ### Disclaimer
 

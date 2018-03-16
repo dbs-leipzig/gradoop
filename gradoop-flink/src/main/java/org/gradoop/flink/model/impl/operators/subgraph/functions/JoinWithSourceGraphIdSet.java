@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Join an edge tuple with a tuple containing the source vertex id of this edge
@@ -48,20 +48,20 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f1")
 public class JoinWithSourceGraphIdSet
   implements JoinFunction<
-  Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds>,
-  Tuple2<GradoopId, GradoopIds>,
-  Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds>> {
+  Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>,
+  Tuple2<GradoopId, GradoopIdSet>,
+  Tuple4<GradoopId, GradoopIdSet, GradoopId, GradoopIdSet>> {
 
   /**
    * Reduce object instantiations
    */
-  private Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds> reuseTuple
+  private Tuple4<GradoopId, GradoopIdSet, GradoopId, GradoopIdSet> reuseTuple
     = new Tuple4<>();
 
   @Override
-  public Tuple4<GradoopId, GradoopIds, GradoopId, GradoopIds> join(
-    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds> edge,
-    Tuple2<GradoopId, GradoopIds> vertex) throws
+  public Tuple4<GradoopId, GradoopIdSet, GradoopId, GradoopIdSet> join(
+    Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet> edge,
+    Tuple2<GradoopId, GradoopIdSet> vertex) throws
     Exception {
     reuseTuple.f0 = edge.f0;
     reuseTuple.f1 = vertex.f1;

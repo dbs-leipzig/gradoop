@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Adds new graph id's to the edge if source and target vertex are part of
@@ -32,15 +32,15 @@ import org.gradoop.common.model.impl.id.GradoopIds;
 @FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
   "f0.targetId->targetId;f0.label->label;f0.properties->properties")
 public class AddNewGraphsToEdge<E extends Edge>
-  implements FlatMapFunction<Tuple3<E, GradoopIds, GradoopIds>, E> {
+  implements FlatMapFunction<Tuple3<E, GradoopIdSet, GradoopIdSet>, E> {
 
   @Override
   public void flatMap(
-    Tuple3<E, GradoopIds, GradoopIds> triple,
+    Tuple3<E, GradoopIdSet, GradoopIdSet> triple,
     Collector<E> collector) {
-    GradoopIds sourceGraphs = triple.f1;
-    GradoopIds targetGraphs = triple.f2;
-    GradoopIds graphsToBeAdded = new GradoopIds();
+    GradoopIdSet sourceGraphs = triple.f1;
+    GradoopIdSet targetGraphs = triple.f2;
+    GradoopIdSet graphsToBeAdded = new GradoopIdSet();
 
     boolean filter = false;
     for (GradoopId id : sourceGraphs) {

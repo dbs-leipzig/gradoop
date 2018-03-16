@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
 
 import java.io.IOException;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @see GradoopId
  */
-public class GradoopIds implements Iterable<GradoopId>, Value {
+public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
   /**
    * Contains the set of gradoop ids.
    */
@@ -43,7 +44,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-  public GradoopIds() {
+  public GradoopIdSet() {
     this.ids = new HashSet<>();
   }
 
@@ -52,7 +53,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param bytes bytes representing multiple gradoop ids
    */
-  private GradoopIds(byte[] bytes) {
+  private GradoopIdSet(byte[] bytes) {
     this.ids = readIds(bytes);
   }
 
@@ -61,7 +62,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param ids a collection of {@link GradoopId}s
    */
-  private GradoopIds(Collection<GradoopId> ids) {
+  private GradoopIdSet(Collection<GradoopId> ids) {
     this.ids = new HashSet<>(ids);
   }
 
@@ -86,7 +87,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids sequence of {@link GradoopId}s
    * @return a binary representation
    */
-  private byte[] writeIds(Collection<GradoopId> ids) {
+  private byte[] writeIds(Set<GradoopId> ids) {
     byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];
 
     int i = 0;
@@ -103,7 +104,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids array of gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIds fromExisting(GradoopId... ids) {
+  public static GradoopIdSet fromExisting(GradoopId... ids) {
     return fromExisting(Arrays.asList(ids));
   }
 
@@ -113,8 +114,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param ids given ids
    * @return gradoop id set
    */
-  public static GradoopIds fromExisting(Collection<GradoopId> ids) {
-    return new GradoopIds(ids);
+  public static GradoopIdSet fromExisting(Collection<GradoopId> ids) {
+    return new GradoopIdSet(ids);
   }
 
   /**
@@ -123,8 +124,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param bytes byte array representing multiple gradoop ids
    * @return gradoop id set
    */
-  public static GradoopIds fromByteArray(byte[] bytes) {
-    return new GradoopIds(bytes);
+  public static GradoopIdSet fromByteArray(byte[] bytes) {
+    return new GradoopIdSet(bytes);
   }
 
   /**
@@ -132,8 +133,9 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param id the id to add
    */
-  public void add(GradoopId id) {
-    this.ids.add(id);
+  @Override
+  public boolean add(GradoopId id) {
+    return this.ids.add(id);
   }
 
   /**
@@ -141,7 +143,7 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param ids the ids to add
    */
-  public void addAll(GradoopIds ids) {
+  public void addAll(GradoopIdSet ids) {
     this.ids.addAll(ids.ids);
   }
 
@@ -150,8 +152,9 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    *
    * @param ids the ids to add
    */
-  public void addAll(Collection<GradoopId> ids) {
-    this.ids.addAll(ids);
+  @Override
+  public boolean addAll(Collection<? extends GradoopId> ids) {
+    return this.ids.addAll(ids);
   }
 
   /**
@@ -160,18 +163,22 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
    * @param identifier the id to look for
    * @return true, iff the given id is in the set
    */
-  public boolean contains(GradoopId identifier) {
+  @Override
+  public boolean contains(Object identifier) {
     return this.ids.contains(identifier);
   }
 
   /**
    * Checks if the specified ids are contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(GradoopIds ids) {
-    for (GradoopId id : ids) {
+  public boolean containsAll(GradoopIdSet other) {
+    if (other.size() > this.size()) {
+      return false;
+    }
+    for (GradoopId id : other) {
       if (!this.contains(id)) {
         return false;
       }
@@ -182,11 +189,15 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if the specified ids are contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff all specified ids are contained in the set
    */
-  public boolean containsAll(Collection<GradoopId> ids) {
-    for (GradoopId id : ids) {
+  @Override
+  public boolean containsAll(Collection<?> other) {
+    if (other instanceof Set && other.size() > this.size()) {
+      return false;
+    }
+    for (Object id : other) {
       if (!this.contains(id)) {
         return false;
       }
@@ -197,12 +208,24 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if any of the specified ids is contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(GradoopIds ids) {
-    for (GradoopId id : ids) {
-      if (this.contains(id)) {
+  public boolean containsAny(GradoopIdSet other) {
+    // Algorithm: the sizes of both lists might be vastly different
+    // to prevent the case of iterating multiple times over large collections
+    // we make sure to always iterate over the smaller one
+    Set<GradoopId> iterate = this.ids;
+    Set<GradoopId> contains = other.ids;
+    int thisSize = this.size();
+    int otherSize = other.size();
+    if (thisSize > otherSize) {
+      iterate = other.ids;
+      contains = this.ids;
+    }
+
+    for (GradoopId id : iterate) {
+      if (contains.contains(id)) {
         return true;
       }
     }
@@ -212,12 +235,21 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   /**
    * Checks if any of the specified ids is contained in the set.
    *
-   * @param ids the ids to look for
+   * @param other the ids to look for
    * @return true, iff any of the specified ids is contained in the set
    */
-  public boolean containsAny(Collection<GradoopId> ids) {
-    for (GradoopId id : ids) {
-      if (this.contains(id)) {
+  public boolean containsAny(Set<GradoopId> other) {
+    Set<GradoopId> iterate = this.ids;
+    Set<GradoopId> contains = other;
+    int thisSize = this.size();
+    int otherSize = other.size();
+    if (thisSize > otherSize) {
+      iterate = other;
+      contains = this.ids;
+    }
+
+    for (GradoopId id : iterate) {
+      if (contains.contains(id)) {
         return true;
       }
     }
@@ -288,8 +320,8 @@ public class GradoopIds implements Iterable<GradoopId>, Value {
   public boolean equals(Object o) {
     boolean equal = this == o;
 
-    if (!equal && o instanceof GradoopIds) {
-      GradoopIds that = (GradoopIds) o;
+    if (!equal && o instanceof GradoopIdSet) {
+      GradoopIdSet that = (GradoopIdSet) o;
       // same number of ids
       equal = this.size() == that.size();
 

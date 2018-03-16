@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.common.model.api.entities;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * A graph element is part of a logical graph. An element can be part of more
@@ -28,7 +28,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @return all graphs of that element
    */
-  GradoopIds getGraphIds();
+  GradoopIdSet getGraphIds();
 
   /**
    * Adds that element to the given graphId. If the element is already an
@@ -43,7 +43,7 @@ public interface EPGMGraphElement extends EPGMElement {
    *
    * @param graphIds the graphIds to be added
    */
-  void setGraphIds(GradoopIds graphIds);
+  void setGraphIds(GradoopIdSet graphIds);
 
   /**
    * Resets all graph elements.

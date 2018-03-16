@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -31,7 +31,7 @@ public abstract class GraphElement
   /**
    * Set of graph identifiers that element is contained in
    */
-  private GradoopIds graphIds;
+  private GradoopIdSet graphIds;
 
   /**
    * Default constructor.
@@ -47,7 +47,7 @@ public abstract class GraphElement
    * @param graphIds     graphIds that element is contained in
    */
   protected GraphElement(GradoopId id, String label,
-    Properties properties, GradoopIds graphIds) {
+    Properties properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;
   }
@@ -56,7 +56,7 @@ public abstract class GraphElement
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds getGraphIds() {
+  public GradoopIdSet getGraphIds() {
     return graphIds;
   }
 
@@ -66,7 +66,7 @@ public abstract class GraphElement
   @Override
   public void addGraphId(GradoopId graphId) {
     if (graphIds == null) {
-      graphIds = new GradoopIds();
+      graphIds = new GradoopIdSet();
     }
     graphIds.add(graphId);
   }
@@ -75,7 +75,7 @@ public abstract class GraphElement
    * {@inheritDoc}
    */
   @Override
-  public void setGraphIds(GradoopIds graphIds) {
+  public void setGraphIds(GradoopIdSet graphIds) {
     this.graphIds = graphIds;
   }
 

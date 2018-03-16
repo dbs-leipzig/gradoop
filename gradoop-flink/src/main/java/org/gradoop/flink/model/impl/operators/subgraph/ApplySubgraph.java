@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -34,16 +34,16 @@ import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
 
 /**
  * Takes a collection of logical graphs and a user defined aggregate function as
@@ -85,12 +85,23 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     this.edgeFilterFunction = edgeFilterFunction;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public GraphCollection execute(GraphCollection superGraph) {
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
-      subgraph(superGraph) :
-      vertexFilterFunction != null ? vertexInducedSubgraph(superGraph) :
-        edgeInducedSubgraph(superGraph);
+      subgraph(collection) :
+      vertexFilterFunction != null ? vertexInducedSubgraph(collection) :
+        edgeInducedSubgraph(collection);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
+    return executeForGVELayout(collection);
   }
 
   /**
@@ -129,7 +140,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> vertexIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> vertexIdsWithNewGraphs =
       collection.getVertices()
         .filter(vertexFilterFunction)
         .flatMap(new ElementIdGraphIdTuple<>())
@@ -155,7 +166,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // edge id, source id, target id, set of new graph ids
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIds>> edgeTuple =
+    DataSet<Tuple4<GradoopId, GradoopId, GradoopId, GradoopIdSet>> edgeTuple =
       collection.getEdges()
         .flatMap(new IdSourceTargetGraphTuple<>())
         .join(graphIdDictionary)
@@ -173,7 +184,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // edge id, new edge graphs
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<GradoopId, GradoopIds>> edgeIdsWithNewGraphs =
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgeIdsWithNewGraphs =
       edgeTuple
         .join(vertexIdsWithNewGraphs)
         .where(1).equalTo(0)

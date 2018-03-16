@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,21 +61,11 @@ public class ApplyAggregation
     this.aggregateFunction = checkNotNull(aggregateFunction);
   }
 
-  @Override
-  public GraphCollection execute(GraphCollection collection) {
-    return (collection.isTransactionalLayout()) ?
-      executeForTxLayout(collection) :
-      executeForGVELayout(collection);
-  }
-
   /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
+   * {@inheritDoc}
    */
-  private GraphCollection executeForGVELayout(GraphCollection collection) {
+  @Override
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();
     DataSet<Vertex> vertices = collection.getVertices();
     DataSet<Edge> edges = collection.getEdges();
@@ -105,13 +95,10 @@ public class ApplyAggregation
   }
 
   /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
+   * {@inheritDoc}
    */
-  private GraphCollection executeForTxLayout(GraphCollection collection) {
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
       .map(new AggregateTransactions(this.aggregateFunction));
 

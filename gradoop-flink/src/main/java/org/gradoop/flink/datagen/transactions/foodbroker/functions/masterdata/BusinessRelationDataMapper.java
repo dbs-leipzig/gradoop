@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.BusinessRelationData;
 
 /**
@@ -46,9 +46,12 @@ public class BusinessRelationDataMapper
    */
   @Override
   public Tuple2<GradoopId, BusinessRelationData> map(Vertex v) throws Exception {
-    reuseBusinessRelationData.setQuality(v.getPropertyValue(Constants.QUALITY_KEY).getFloat());
-    reuseBusinessRelationData.setCity(v.getPropertyValue(Constants.CITY_KEY).getString());
-    reuseBusinessRelationData.setHolding(v.getPropertyValue(Constants.HOLDING_KEY).getString());
+    reuseBusinessRelationData
+      .setQuality(v.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat());
+    reuseBusinessRelationData
+      .setCity(v.getPropertyValue(FoodBrokerPropertyKeys.CITY_KEY).getString());
+    reuseBusinessRelationData
+      .setHolding(v.getPropertyValue(FoodBrokerPropertyKeys.HOLDING_KEY).getString());
     return new Tuple2<>(v.getId(), reuseBusinessRelationData);
   }
 }

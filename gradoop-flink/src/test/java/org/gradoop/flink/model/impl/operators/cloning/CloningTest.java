@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.cloning;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -76,7 +76,7 @@ public class CloningTest extends GradoopFlinkTestBase {
       .output(new LocalCollectionOutputFormat<>(resultEdgeIds));
 
 
-    List<GradoopIds> resultGraphIds = Lists.newArrayList();
+    List<GradoopIdSet> resultGraphIds = Lists.newArrayList();
 
     result.getVertices()
       .map(new ExpandGraphsToIdSet<>())

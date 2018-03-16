@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.common.storage.api;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Representation of vertex data on the storage level. We additionally store
@@ -29,14 +29,14 @@ public interface PersistentGraphHead extends EPGMGraphHead {
    *
    * @return vertex ids that are contained in that graph
    */
-  GradoopIds getVertexIds();
+  GradoopIdSet getVertexIds();
 
   /**
    * Sets the vertices that are contained in that graph.
    *
    * @param vertices vertex ids
    */
-  void setVertexIds(GradoopIds vertices);
+  void setVertexIds(GradoopIdSet vertices);
 
   /**
    * Adds a vertex identifier to the graph data.
@@ -57,14 +57,14 @@ public interface PersistentGraphHead extends EPGMGraphHead {
    *
    * @return edge ids that are contained in that graph
    */
-  GradoopIds getEdgeIds();
+  GradoopIdSet getEdgeIds();
 
   /**
    * Sets the edges that are contained in that graph.
    *
    * @param edges edge ids
    */
-  void setEdgeIds(GradoopIds edges);
+  void setEdgeIds(GradoopIdSet edges);
 
   /**
    * Adds an edge identifier to the graph data.

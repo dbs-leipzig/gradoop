@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Replaces the graph set of each element by a new one, containing only the
@@ -54,7 +54,7 @@ public class ElementGraphUpdater<EL extends GraphElement>
    */
   @Override
   public EL map(EL element) {
-    element.setGraphIds(GradoopIds.fromExisting(graphId));
+    element.setGraphIds(GradoopIdSet.fromExisting(graphId));
     return element;
   }
 }

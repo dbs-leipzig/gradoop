@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.common.model.api.entities;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -104,7 +104,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
    * @return edge data
    */
   E createEdge(String label, GradoopId sourceVertexId, GradoopId targetVertexId,
-    GradoopIds graphIds);
+    GradoopIdSet graphIds);
 
   /**
    * Initializes an edge based on the given parameters.
@@ -117,7 +117,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
    * @return edge data
    */
   E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, GradoopIds graphIds);
+    GradoopId targetVertexId, GradoopIdSet graphIds);
 
   /**
    * Creates a new edge based on the given parameters.
@@ -130,7 +130,7 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
    * @return edge data
    */
   E createEdge(String label, GradoopId sourceVertexId, GradoopId targetVertexId,
-    Properties properties, GradoopIds graphIds);
+    Properties properties, GradoopIdSet graphIds);
 
   /**
    * Initializes an edge based on the given parameters.
@@ -144,5 +144,5 @@ public interface EPGMEdgeFactory<E extends EPGMEdge>
    * @return edge data
    */
   E initEdge(GradoopId id, String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Properties properties, GradoopIds graphIds);
+    GradoopId targetVertexId, Properties properties, GradoopIdSet graphIds);
 }

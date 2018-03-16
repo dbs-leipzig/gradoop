@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.impl.id.GradoopIds;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.GraphElementHandler;
 import org.gradoop.common.util.HBaseConstants;
 
@@ -55,15 +55,15 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public GradoopIds readGraphIds(Result res) throws IOException {
+  public GradoopIdSet readGraphIds(Result res) throws IOException {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
 
-    GradoopIds graphIds;
+    GradoopIdSet graphIds;
 
     if (graphBytes != null) {
-      graphIds = GradoopIds.fromByteArray(graphBytes);
+      graphIds = GradoopIdSet.fromByteArray(graphBytes);
     } else {
-      graphIds = new GradoopIds();
+      graphIds = new GradoopIdSet();
     }
 
     return graphIds;

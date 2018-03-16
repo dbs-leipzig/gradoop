@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyValues;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 /**
@@ -53,9 +55,12 @@ public abstract class MasterData extends RichMapFunction<MasterDataSeed, Vertex>
     String bid = createBusinessIdentifier(seed, acronym);
     Properties properties = new Properties();
 
-    properties.set(Constants.SUPERTYPE_KEY, Constants.SUPERCLASS_VALUE_MASTER);
-    properties.set(Constants.QUALITY_KEY, seed.getQuality());
-    properties.set(Constants.SOURCEID_KEY, Constants.ERP_ACRONYM + "_" + bid);
+    properties
+      .set(FoodBrokerPropertyKeys.SUPERTYPE_KEY, FoodBrokerPropertyValues.SUPERCLASS_VALUE_MASTER);
+    properties
+      .set(FoodBrokerPropertyKeys.QUALITY_KEY, seed.getQuality());
+    properties
+      .set(FoodBrokerPropertyKeys.SOURCEID_KEY, FoodBrokerAcronyms.ERP_ACRONYM + "_" + bid);
 
     return properties;
   }

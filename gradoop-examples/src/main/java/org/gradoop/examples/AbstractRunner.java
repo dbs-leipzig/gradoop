@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Base class for example runners.
@@ -163,5 +166,20 @@ public abstract class AbstractRunner {
       result = directory + fileSeparator;
     }
     return result;
+  }
+
+  /**
+   * Converts the given DOT file into a PNG image. Note that this method requires the "dot" command
+   * to be available locally.
+   *
+   * @param dotFile path to DOT file
+   * @param pngFile path to PNG file
+   * @throws IOException
+   */
+  protected static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
+    ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
+    File output = new File(pngFile);
+    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(output));
+    pb.start();
   }
 }

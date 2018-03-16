@@ -61,7 +61,7 @@
     }
   },
   "Process" : {
-    "casesPerScaleFactor" : 10000,
+    "casesPerScaleFactor" : 1000,
     "startDate" : "2014-01-01",
     "endDate" : "2014-12-31"
   },
