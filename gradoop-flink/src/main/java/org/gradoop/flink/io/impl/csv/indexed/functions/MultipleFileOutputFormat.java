@@ -17,6 +17,8 @@ package org.gradoop.flink.io.impl.csv.indexed.functions;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.apache.flink.annotation.Public;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
@@ -62,6 +64,11 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
   // -----------------------------------------------------------------------------
 
   /**
+   * The key under which the name of the target path is stored in the configuration.
+   */
+  public static final String FILE_PARAMETER_KEY = "flink.output.file";
+
+  /**
    * The write mode of the output.
    */
   private static WriteMode DEFAULT_WRITE_MODE;
@@ -70,6 +77,59 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
    * The output directory mode
    */
   private static OutputDirectoryMode DEFAULT_OUTPUT_DIRECTORY_MODE;
+
+  /**
+   * The LOG for logging messages in this class.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(MultipleFileOutputFormat.class);
+
+  /**
+   * The path of the file to be written.
+   */
+  protected Path outputFilePath;
+
+  // --------------------------------------------------------------------------------------------
+
+  /** Map all open streams to the file name */
+  protected HashMap<String, FSDataOutputStream> streams;
+
+  /**
+   * The file system for the output.
+   */
+  protected transient FileSystem fs;
+
+  /** The path that is actually written to
+   * (may a a file in a the directory defined by {@code outputFilePath} )
+   */
+  private transient Path actualFilePath;
+
+  /** Flag indicating whether this format actually created a file,
+   * which should be removed on cleanup.
+   */
+  private transient boolean fileCreated;
+
+  // --------------------------------------------------------------------------------------------
+
+  /**
+   * The write mode of the output.
+   */
+  private WriteMode writeMode;
+
+  /**
+   * The output directory mode
+   */
+  private OutputDirectoryMode outputDirectoryMode;
+
+  /**
+   * Create a new instance of a MultipleFileOutputFormat.
+   * @param outputPath The path to the file system.
+   */
+  public MultipleFileOutputFormat(Path outputPath) {
+    this.outputFilePath = outputPath;
+    this.streams = new HashMap<>();
+  }
+
+  // --------------------------------------------------------------------------------------------
 
   static {
     initDefaultsFromConfiguration(GlobalConfiguration.loadConfiguration());
@@ -96,61 +156,6 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
   }
 
   //--------------------------------------------------------------------------------
-
-  /**
-   * The LOG for logging messages in this class.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(MultipleFileOutputFormat.class);
-
-  /**
-   * The key under which the name of the target path is stored in the configuration.
-   */
-  public static final String FILE_PARAMETER_KEY = "flink.output.file";
-
-  /**
-   * The write mode of the output.
-   */
-  private WriteMode writeMode;
-
-  /**
-   * The output directory mode
-   */
-  private OutputDirectoryMode outputDirectoryMode;
-
-  /**
-   * The path of the file to be written.
-   */
-  protected Path outputFilePath;
-
-  // --------------------------------------------------------------------------------------------
-
-  /**
-   * The file system for the output.
-   */
-  protected transient FileSystem fs;
-
-  /** The stream to which the data is written; */
-  protected transient FSDataOutputStream stream;
-
-  /** The path that is actually written to
-   * (may a a file in a the directory defined by {@code outputFilePath} )
-   */
-  private transient Path actualFilePath;
-
-  /** Flag indicating whether this format actually created a file,
-   * which should be removed on cleanup.
-   */
-  private transient boolean fileCreated;
-
-  // --------------------------------------------------------------------------------------------
-
-  /**
-   * Create a new instance of a MultipleFileOutputFormat.
-   * @param outputPath The path to the file system.
-   */
-  public MultipleFileOutputFormat(Path outputPath) {
-    this.outputFilePath = outputPath;
-  }
 
   /**
    * Set the path of the output file.
@@ -200,7 +205,6 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
     return this.outputDirectoryMode;
   }
 
-
   // ----------------------------------------------------------------
 
   @Override
@@ -217,9 +221,9 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
 
       try {
         this.outputFilePath = new Path(filePath);
-      } catch (Exception rex) {
-        throw new RuntimeException(
-           "Could not create a valid URI from the given file path name: " + rex.getMessage());
+      } catch (IllegalArgumentException ex) {
+        throw new IllegalArgumentException(
+           "Could not create a valid URI from the given file path name: " + ex.getMessage());
       }
     }
 
@@ -232,7 +236,6 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
       this.outputDirectoryMode = DEFAULT_OUTPUT_DIRECTORY_MODE;
     }
   }
-
 
   @Override
   public void open(int taskNumber, int numTasks) throws IOException {
@@ -278,24 +281,28 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
   }
 
   /**
-   * Create a actual file path in the filesystem for a csv file with a special label.
-   * @param label the name of the csv file
+   * Create a actual file path in the file system for a file with a special filename.
+   * @param fileName the name of the file
    * @return the output stream for the path
    * @throws IOException - Thrown, if the output could not be opened due to an I/O problem.
    */
-  public FSDataOutputStream getFileStream(String label) throws IOException {
+  public FSDataOutputStream getFileStream(String fileName) throws IOException {
 
-    Path actualFilePath = new Path(this.outputFilePath.getParent(), "/" + label + ".csv");
-    FSDataOutputStream stream = fs.create(actualFilePath, writeMode);
-    return stream;
+    if (!streams.containsKey(fileName)) {
+      actualFilePath = new Path(this.outputFilePath.getParent(), "/" + fileName + ".csv");
+      streams.put(fileName, fs.create(actualFilePath, writeMode));
+    }
+    return streams.get(fileName);
   }
 
   @Override
   public void close() throws IOException {
-    final FSDataOutputStream s = this.stream;
-    if (s != null) {
-      this.stream = null;
-      s.close();
+    for (Entry<String, FSDataOutputStream> e : streams.entrySet()) {
+      final FSDataOutputStream s = e.getValue();
+      if (s != null) {
+        e.setValue(null);
+        s.close();
+      }
     }
   }
 
@@ -349,8 +356,8 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
         FileSystem.get(this.actualFilePath.toUri()).delete(actualFilePath, false);
       } catch (FileNotFoundException e) {
         // ignore, may not be visible yet or may be already removed
-      } catch (Throwable t) {
-        LOG.error("Could not remove the incomplete file " + actualFilePath + '.', t);
+      } catch (IOException ex) {
+        LOG.error("Could not remove the incomplete file " + actualFilePath + '.', ex);
       }
     }
   }

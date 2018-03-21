@@ -19,9 +19,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.flink.api.java.tuple.Tuple;
@@ -45,13 +43,6 @@ import org.slf4j.LoggerFactory;
 public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFormat<T> {
 
   /**
-   * The logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(IndexedCSVFileFormat.class);
-
-  // --------------------------------------------------------------------------------
-
-  /**
    * The default line delimiter if no one is set.
    */
   public static final String DEFAULT_LINE_DELIMITER = IndexedCSVFileFormat.DEFAULT_LINE_DELIMITER;
@@ -66,6 +57,13 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * The key under which the name of the target path is stored in the configuration.
    */
   public static final String FILE_PARAMETER_KEY = "flink.output.file";
+
+  // --------------------------------------------------------------------------------
+
+  /**
+   * The logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(IndexedCSVFileFormat.class);
 
   // --------------------------------------------------------------------------------
 
@@ -92,12 +90,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   /**
    * Map the lable of the tuple to a writer.
    */
-  private Map<String, Writer> labelsToWriter;
-
-  /**
-   * List with all ready existing labels
-   */
-  private ArrayList<String> objectLabels;
+  private HashMap<String, Writer> labelsToWriter;
 
   /**
    * Creates a new instance of an IndexedCSVFileFormat. Use the default record delimiter '\n'
@@ -138,49 +131,26 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
 
     this.fieldDelimiter = fieldDelimiter;
     this.recordDelimiter = recordDelimiter;
-    this.objectLabels = new ArrayList<>();
     this.labelsToWriter = new HashMap<>();
   }
 
   /**
-   * Get the label of a vertex to identify the name of the according output file.
-   * If there is not all ready a writer for the label, it will be created an
-   * map the vertex data to it.
+   * Check the label of a tuple to identify the name of the according output file.
+   * If there is not already a writer for the label, it will map it to the tuple.
    *
-   * @param vertex that will be mapped to writer.
+   * @param fileName Name of the file for the tuple.
+   * @param t Tuple that will be mapped to writer.
    * @throws IOException - Throne if creating writer or output stream fails.
    */
-  public void mapWriterToCSVVertex(CSVVertex vertex) throws IOException {
-    String label = vertex.getLabel();
-    if (objectLabels.contains(label)) {
-      writeToCSV(vertex, labelsToWriter.get(label));
-    } else {
-      FSDataOutputStream stream = super.getFileStream(label);
-      Writer wrt = new OutputStreamWriter(new BufferedOutputStream(stream, 4096));
-      labelsToWriter.put(label, wrt);
-      objectLabels.add(label);
-      writeToCSV(vertex, wrt);
-    }
-  }
+  public void mapWriter(Tuple t, String fileName) throws IOException {
 
-  /**
-   * Get the label of an edge to identify the name of the according output file.
-   * If there is not all ready a writer for the label, it will be created an
-   * map the edge data to it.
-   *
-   * @param edge that will be mapped to writer.
-   * @throws IOException - Throne if creating writer or output stream fails.
-   */
-  public void mapWriterToCSVEdge(CSVEdge edge) throws IOException {
-    String label = edge.getLabel();
-    if (objectLabels.contains(label)) {
-      writeToCSV(edge, labelsToWriter.get(label));
+    if (labelsToWriter.containsKey(fileName)) {
+      writeToCSV(t, labelsToWriter.get(fileName));
     } else {
-      FSDataOutputStream stream = super.getFileStream(label);
+      FSDataOutputStream stream = super.getFileStream(fileName);
       Writer wrt = new OutputStreamWriter(new BufferedOutputStream(stream, 4096));
-      labelsToWriter.put(label, wrt);
-      objectLabels.add(label);
-      writeToCSV(edge, wrt);
+      labelsToWriter.put(fileName, wrt);
+      writeToCSV(t, wrt);
     }
   }
 
@@ -188,6 +158,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * Write every field of the tuple in a csv file.
    * Separates record via record delimiter and every field in a record
    * with field delimiters.
+   *
    * @param t the tuple to write in the output file
    * @param wrt the writer for the tuple
    * @throws IOException - Thrown, if the records could not be added to to an I/O problem.
@@ -229,9 +200,11 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   @Override
   public void writeRecord(T record) throws IOException {
     if (record.getClass().equals(CSVVertex.class)) {
-      mapWriterToCSVVertex((CSVVertex) record);
+      String label = ((CSVVertex) record).getLabel();
+      mapWriter(record, label);
     } else if (record.getClass().equals(CSVEdge.class)) {
-      mapWriterToCSVEdge((CSVEdge) record);
+      String label = ((CSVEdge) record).getLabel();
+      mapWriter(record, label);
     }
   }
 

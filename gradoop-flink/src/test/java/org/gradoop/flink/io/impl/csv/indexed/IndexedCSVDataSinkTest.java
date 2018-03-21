@@ -17,10 +17,6 @@ package org.gradoop.flink.io.impl.csv.indexed;
 
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSourceTest;
-import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -51,8 +47,8 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(input.equalsByElementData(output));
 	}
-	
-	@Test
+
+  @Test
   public void testWriteWithExistingMetaData() throws Exception {
 		String tmpPath = temporaryFolder.getRoot().getPath();
 
