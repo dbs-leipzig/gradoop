@@ -147,7 +147,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
     if (labelsToWriter.containsKey(fileName)) {
       writeToCSV(t, labelsToWriter.get(fileName));
     } else {
-      FSDataOutputStream stream = super.getFileStream(fileName);
+      FSDataOutputStream stream = super.getAndCreateFileStream(fileName);
       Writer wrt = new OutputStreamWriter(new BufferedOutputStream(stream, 4096));
       labelsToWriter.put(fileName, wrt);
       writeToCSV(t, wrt);

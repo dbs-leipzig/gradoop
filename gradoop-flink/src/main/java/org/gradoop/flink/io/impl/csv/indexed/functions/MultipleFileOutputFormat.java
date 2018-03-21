@@ -281,12 +281,15 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
   }
 
   /**
-   * Create a actual file path in the file system for a file with a special filename.
+   * Get the stream to a specific filename. If no stream for this file already exist
+   * it will create a new stream to the actual file path in the file system
+   * for a file with this filename.
+   *
    * @param fileName the name of the file
    * @return the output stream for the path
    * @throws IOException - Thrown, if the output could not be opened due to an I/O problem.
    */
-  public FSDataOutputStream getFileStream(String fileName) throws IOException {
+  public FSDataOutputStream getAndCreateFileStream(String fileName) throws IOException {
 
     if (!streams.containsKey(fileName)) {
       actualFilePath = new Path(this.outputFilePath.getParent(), "/" + fileName + ".csv");
