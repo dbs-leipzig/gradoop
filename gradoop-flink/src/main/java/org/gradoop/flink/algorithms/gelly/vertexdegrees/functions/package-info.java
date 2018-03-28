@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains classes related to the Vertex Degrees algorithm.
+ * Contains classes related to the Distinct Vertex Degrees algorithm.
  */
 package org.gradoop.flink.algorithms.gelly.vertexdegrees.functions;

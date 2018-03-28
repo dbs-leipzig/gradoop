@@ -23,14 +23,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
-import org.gradoop.flink.algorithms.gelly.vertexdegrees.functions.VertexDegreesToAttribute;
+import org.gradoop.flink.algorithms.gelly.vertexdegrees.functions.DistinctVertexDegreesToAttribute;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * A gradoop operator wrapping {@link org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees}.
  */
-public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
+public class DistinctVertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to store the sum vertex degree in.
@@ -59,7 +59,7 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
    * @param propertyKeyIn Property key to store the in-degree in.
    * @param propertyKeyOut Property key to store the out-degree in.
    */
-  public VertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut) {
+  public DistinctVertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut) {
     this(propertyKey, propertyKeyIn, propertyKeyOut, true);
   }
 
@@ -73,7 +73,7 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
    * @param includeZeroDegreeVertices whether to output vertices with an
    *                                  in-degree of zero
    */
-  public VertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut,
+  public DistinctVertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut,
     boolean includeZeroDegreeVertices) {
     super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
     this.propertyKey = propertyKey;
@@ -92,7 +92,7 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
       .run(graph).join(currentGraph.getVertices())
       .where(0)
       .equalTo(new Id<>())
-      .with(new VertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
+      .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
 
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
       currentGraph.getEdges());
@@ -100,6 +100,6 @@ public class VertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
 
   @Override
   public String getName() {
-    return VertexDegrees.class.getName();
+    return DistinctVertexDegrees.class.getName();
   }
 }

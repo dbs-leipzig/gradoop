@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Stores the in-degree, out-degree and the sum of both as a property in vertex
  */
-public class VertexDegreesToAttribute implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, Vertex, Vertex> {
+public class DistinctVertexDegreesToAttribute implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, Vertex, Vertex> {
 
   /**
    * Property to store the sum of vertex degrees in.
@@ -47,8 +47,8 @@ public class VertexDegreesToAttribute implements JoinFunction<org.apache.flink.g
    * @param vertexInDegreesPropery property key to store in degree
    * @param vertexOutDegreesPropery property key to store out degree
    */
-  public VertexDegreesToAttribute(String vertexDegreesPropery, String vertexInDegreesPropery,
-    String vertexOutDegreesPropery) {
+  public DistinctVertexDegreesToAttribute(String vertexDegreesPropery,
+      String vertexInDegreesPropery, String vertexOutDegreesPropery) {
     this.vertexDegreesPropery = vertexDegreesPropery;
     this.vertexInDegreePropery = vertexInDegreesPropery;
     this.vertexOutDegreePropery = vertexOutDegreesPropery;

@@ -1,11 +1,12 @@
 package org.gradoop.flink.algorithms.gelly.vertexdegrees;
 
+import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class VertexDegreesTest extends GradoopFlinkTestBase {
+public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
 
 	@Test
 	public void testByElementData() throws Exception {
@@ -36,7 +37,7 @@ public class VertexDegreesTest extends GradoopFlinkTestBase {
 		FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 		LogicalGraph input = loader.getLogicalGraphByVariable("input");
 		
-		LogicalGraph outputGraph = input.callForGraph(new VertexDegrees("degree", "inDegree", "outDegree", false));
+		LogicalGraph outputGraph = input.callForGraph(new DistinctVertexDegrees("degree", "inDegree", "outDegree", false));
 		LogicalGraph expect = loader.getLogicalGraphByVariable("result");
     
 		collectAndAssertTrue(outputGraph.equalsByElementData(expect));
