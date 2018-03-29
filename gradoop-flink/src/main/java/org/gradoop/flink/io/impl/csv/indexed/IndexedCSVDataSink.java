@@ -107,7 +107,7 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
         .map(new EdgeToCSVEdge())
         .withBroadcastSet(metaData, BC_METADATA);
 
-    if (!getMetaDataPath().equals(metaDataPath) || !reuseMethadata()) {
+    if (!getMetaDataPath().equals(metaDataPath) || !reuseMetadata()) {
       metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
         CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
     }

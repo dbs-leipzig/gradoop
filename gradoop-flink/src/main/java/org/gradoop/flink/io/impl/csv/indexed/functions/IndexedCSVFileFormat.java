@@ -93,6 +93,11 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   private HashMap<String, Writer> labelsToWriter;
 
   /**
+   * The charset that is uses for the output encoding.
+   */
+  private String charsetName;
+
+  /**
    * Creates a new instance of an IndexedCSVFileFormat. Use the default record delimiter '\n'
    * and the default field delimiter ','.
    *
@@ -148,7 +153,9 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
       writeToCSV(t, labelsToWriter.get(fileName));
     } else {
       FSDataOutputStream stream = super.getAndCreateFileStream(fileName);
-      Writer wrt = new OutputStreamWriter(new BufferedOutputStream(stream, 4096));
+      Writer wrt = this.charsetName == null ? new OutputStreamWriter(
+          new BufferedOutputStream(stream, 4096), "UTF8") :
+            new OutputStreamWriter(new BufferedOutputStream(stream, 4096), this.charsetName);
       labelsToWriter.put(fileName, wrt);
       writeToCSV(t, wrt);
     }
@@ -163,7 +170,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * @param wrt the writer for the tuple
    * @throws IOException - Thrown, if the records could not be added to to an I/O problem.
    */
-  public void writeToCSV(Tuple t, Writer wrt) throws IOException { //, boolean firstObject
+  public void writeToCSV(Tuple t, Writer wrt) throws IOException {
 
     int numFields = t.getArity();
     for (int i = 0; i < numFields; i++) {
@@ -217,6 +224,16 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
       }
     }
     super.close();
+  }
+
+  /**
+   * Sets the charset with which the CSV strings are written to the file.
+   * If not specified, the output format uses the systems default character encoding.
+   *
+   * @param charsetName The name of charset to use for encoding the output.
+   */
+  public void setCharsetName(String charsetName) {
+    this.charsetName = charsetName;
   }
 }
 
