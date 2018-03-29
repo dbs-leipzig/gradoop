@@ -40,7 +40,8 @@ public class ComputeScores implements
     }
 
     // TODO hier int overflow abfangen
-    // TODO hier kann dann die Strategie gewählt werden
+    // TODO wenn in GenerateGroupPairs max statt sum gewählt wurde muss hier nichts mehr
+    // abgezogen werden
     int denominator = edge.f2.getValue() - count;
 
     // Create two new edges with JaccardValue

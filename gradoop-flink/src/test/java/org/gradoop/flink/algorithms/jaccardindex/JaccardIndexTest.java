@@ -4,7 +4,7 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Test;
 
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Direction.INDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.INDEGREE;
 
 public class JaccardIndexTest extends GradoopFlinkTestBase {
 
@@ -54,7 +54,7 @@ public class JaccardIndexTest extends GradoopFlinkTestBase {
 
     JaccardIndex jaccardIndex = new JaccardIndex();
     jaccardIndex.setEdgeLabel("ji");
-    jaccardIndex.setDirection(JaccardIndex.Direction.INDEGREE);
+    jaccardIndex.setNeighborhoodType(JaccardIndex.NeighborhoodType.INDEGREE);
 
     LogicalGraph result = input.callForGraph(jaccardIndex);
     collectAndAssertTrue(result.equalsByElementData(expectedResult));
@@ -72,7 +72,7 @@ public class JaccardIndexTest extends GradoopFlinkTestBase {
       getLoaderFromString("input[" + graph + res + "]").getLogicalGraphByVariable("input");
 
     JaccardIndex jaccardIndex = new JaccardIndex();
-    jaccardIndex.setDirection(INDEGREE);
+    jaccardIndex.setNeighborhoodType(INDEGREE);
 
     LogicalGraph result = input.callForGraph(jaccardIndex);
     collectAndAssertTrue(result.equalsByElementData(expectedResult));

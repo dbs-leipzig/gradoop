@@ -3,20 +3,21 @@ package org.gradoop.flink.algorithms.jaccardindex.functions;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Direction;
+import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex;
+import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType;
 
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Direction.OUTDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUTDEGREE;
 
 public class ConfigurableEdgeKeySelector implements KeySelector<Edge, GradoopId> {
 
-  private Direction direction;
+  private JaccardIndex.NeighborhoodType neighborhoodType;
 
-  public ConfigurableEdgeKeySelector(Direction direction) {
-    this.direction = direction;
+  public ConfigurableEdgeKeySelector(NeighborhoodType neighborhoodType) {
+    this.neighborhoodType = neighborhoodType;
   }
 
   @Override
   public GradoopId getKey(Edge value) throws Exception {
-    return direction.equals(OUTDEGREE) ? value.getSourceId() : value.getTargetId();
+    return neighborhoodType.equals(OUTDEGREE) ? value.getSourceId() : value.getTargetId();
   }
 }

@@ -25,13 +25,13 @@ import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegrees;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import static org.apache.flink.api.common.ExecutionConfig.PARALLELISM_DEFAULT;
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Direction.INDEGREE;
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Direction.OUTDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.INDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUTDEGREE;
 
 public class JaccardIndex implements UnaryGraphToGraphOperator{
 
   /**
-   * Default Key for Result
+   * Default Key for Result Edges
    **/
   public static final String DEFAULT_JACCARD_EDGE_PROPERTY = "value";
   /**
@@ -43,10 +43,11 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
    **/
   private static final String DEFAULT_JACCARD_EDGE_LABEL = "jaccardSimilarity";
   private String edgeLabel = DEFAULT_JACCARD_EDGE_LABEL;
-  private Direction direction = OUTDEGREE;
+  private NeighborhoodType neighborhoodType = OUTDEGREE;
+  private Denominator denominator = Denominator.UNION;
 
-  public void setDirection(Direction direction) {
-    this.direction = direction;
+  public void setNeighborhoodType(NeighborhoodType neighborhoodType) {
+    this.neighborhoodType = neighborhoodType;
   }
 
   public void setEdgeLabel(String edgeLabel) {
@@ -55,29 +56,10 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
   private LogicalGraph executeInternal(LogicalGraph inputGraph) throws Exception {
 
-    System.out.println("INPUT");
-    inputGraph.getEdges().print();
-
     // VertexDegrees
-    UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> degreeOperator =
-      getDegreeOperator(direction);
-    DataSet<WithCount<GradoopId>> degrees = degreeOperator.execute(inputGraph);
+    DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree = annotateEdgesWithDegree
+      (inputGraph);
 
-    // TODO als Function
-    DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree =
-      inputGraph.getEdges().join(degrees).where(new ConfigurableEdgeKeySelector(direction))
-        .equalTo(new KeySelector<WithCount<GradoopId>, GradoopId>() {
-          @Override
-          public GradoopId getKey(WithCount<GradoopId> value) {
-            return value.getObject();
-          }
-        }).with(new JoinFunction<Edge, WithCount<GradoopId>, Tuple3<GradoopId, GradoopId, Long>>() {
-        @Override
-        public Tuple3<GradoopId, GradoopId, Long> join(Edge edge,
-          WithCount<GradoopId> vertexDegree) {
-          return new Tuple3<>(edge.getSourceId(), edge.getTargetId(), vertexDegree.getCount());
-        }
-      });
 
     System.out.println("------------ EDGES WITH DEGREES --------------");
     edgesWithDegree.print();
@@ -99,7 +81,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
     // t, u, d(t), d(u)
     System.out.println("------------ NXT GROUPBY --------------");
 
-    groups.groupBy(0, direction.equals(INDEGREE) ? 1 : 2).reduceGroup(
+    groups.groupBy(0, neighborhoodType.equals(INDEGREE) ? 1 : 2).reduceGroup(
       new GroupReduceFunction<Tuple4<IntValue, GradoopId, GradoopId, IntValue>, Tuple2<IntValue,
         String>>() {
         @Override
@@ -117,10 +99,10 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
 
     DataSet<Tuple3<GradoopId, GradoopId, IntValue>> twoPaths = groups
-      .groupBy(0, direction.equals(INDEGREE) ? 1 : 2)  // TODO dieses groupBy ergibt die richtigen
+      .groupBy(0, neighborhoodType.equals(INDEGREE) ? 1 : 2)  // TODO dieses groupBy ergibt die richtigen
       // paare TODO: dafür komme ich in die clean code hölle
       .sortGroup(1, Order.ASCENDING)
-      .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, direction))
+      .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, neighborhoodType))
       .name("Generate group pairs");
     System.out.println("------------ TWO PATHS --------------");
     twoPaths.print();
@@ -139,10 +121,41 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
   }
 
-  private UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> getDegreeOperator(
-    Direction direction) {
+  /**
+   * Returns the Edges from the given LogicalGRaph
+   * @param inputGraph
+   * @return
+   */
+  private DataSet<Tuple3<GradoopId,GradoopId,Long>> annotateEdgesWithDegree(LogicalGraph inputGraph) {
+    UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> degreeOperator =
+      getDegreeOperator(neighborhoodType);
+    DataSet<WithCount<GradoopId>> degrees = degreeOperator.execute(inputGraph);
 
-    if (direction.equals(INDEGREE)) {
+    return inputGraph.getEdges().join(degrees).where(new ConfigurableEdgeKeySelector
+      (neighborhoodType))
+      .equalTo(new KeySelector<WithCount<GradoopId>, GradoopId>() {
+        @Override
+        public GradoopId getKey(WithCount<GradoopId> value) {
+          return value.getObject();
+        }
+      }).with(new JoinFunction<Edge, WithCount<GradoopId>, Tuple3<GradoopId, GradoopId, Long>>() {
+      @Override
+      public Tuple3<GradoopId, GradoopId, Long> join(Edge edge,
+        WithCount<GradoopId> vertexDegree) {
+        return new Tuple3<>(edge.getSourceId(), edge.getTargetId(), vertexDegree.getCount());
+      }
+    });
+  }
+
+  /**
+   * Returns the appropriate Vertex Degree Operator depending on the given Neighborhood Type.
+   * @param neighborhoodType
+   * @return
+   */
+  private UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> getDegreeOperator(
+    NeighborhoodType neighborhoodType) {
+
+    if (neighborhoodType.equals(INDEGREE)) {
       return new IncomingVertexDegrees();
     }
 
@@ -159,7 +172,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
   }
 
-  public enum Direction {INDEGREE, OUTDEGREE}
+  public enum NeighborhoodType {INDEGREE, OUTDEGREE}
 
   public enum Denominator {UNION, MAX}
 
