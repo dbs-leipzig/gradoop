@@ -146,5 +146,36 @@ public class JaccardIndexTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(resultUnion.equalsByElementData(expectedResultUnion));
   }
 
+  /**
+   * Test undirected Graph. Neighborhood type should lead to equal results.
+   * @throws Exception
+   */
+  @Test
+  public void testUndirected() throws Exception {
+    String graph =
+      "(v0:A)-[:e]->(v1:B) " +
+      "(v1)-[:e]->(v0) " +
+      "(v0)-[:e]->(v2:C) " +
+      "(v2)-[:e]->(v0) ";
+
+    String res =
+      "(v1)-[:jaccardSimilarity {value: 1.0d}]->(v2) " +
+      "(v2)-[:jaccardSimilarity {value: 1.0d}]->(v1) ";
+
+    LogicalGraph input =
+      getLoaderFromString("input[" + graph + "]").getLogicalGraphByVariable("input");
+    LogicalGraph expectedResult =
+      getLoaderFromString("input[" + graph + res + "]").getLogicalGraphByVariable("input");
+
+    JaccardIndex jaccardIndexIn = new JaccardIndex("jaccardSimilarity", IN, UNION);
+    JaccardIndex jaccardIndexOut = new JaccardIndex("jaccardSimilarity", OUT, UNION);
+
+    LogicalGraph resultIn = input.callForGraph(jaccardIndexIn);
+    LogicalGraph resultOut = input.callForGraph(jaccardIndexOut);
+
+    collectAndAssertTrue(resultIn.equalsByElementData(expectedResult));
+    collectAndAssertTrue(resultOut.equalsByElementData(expectedResult));
+  }
+
 
 }
