@@ -6,7 +6,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex;
 import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType;
 
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUTDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUT;
 
 public class ConfigurableEdgeKeySelector implements KeySelector<Edge, GradoopId> {
 
@@ -18,6 +18,6 @@ public class ConfigurableEdgeKeySelector implements KeySelector<Edge, GradoopId>
 
   @Override
   public GradoopId getKey(Edge value) throws Exception {
-    return neighborhoodType.equals(OUTDEGREE) ? value.getSourceId() : value.getTargetId();
+    return neighborhoodType.equals(OUT) ? value.getSourceId() : value.getTargetId();
   }
 }

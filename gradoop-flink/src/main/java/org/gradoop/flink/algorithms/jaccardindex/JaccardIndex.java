@@ -1,15 +1,12 @@
 package org.gradoop.flink.algorithms.jaccardindex;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.types.IntValue;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.algorithms.jaccardindex.functions.ComputeScores;
@@ -25,8 +22,8 @@ import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegrees;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import static org.apache.flink.api.common.ExecutionConfig.PARALLELISM_DEFAULT;
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.INDEGREE;
-import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUTDEGREE;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.IN;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUT;
 
 public class JaccardIndex implements UnaryGraphToGraphOperator{
 
@@ -43,11 +40,15 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
    **/
   private static final String DEFAULT_JACCARD_EDGE_LABEL = "jaccardSimilarity";
   private String edgeLabel = DEFAULT_JACCARD_EDGE_LABEL;
-  private NeighborhoodType neighborhoodType = OUTDEGREE;
+  private NeighborhoodType neighborhoodType = OUT;
   private Denominator denominator = Denominator.UNION;
 
   public void setNeighborhoodType(NeighborhoodType neighborhoodType) {
     this.neighborhoodType = neighborhoodType;
+  }
+
+  public void setDenominator(Denominator denominator){
+    this.denominator = denominator;
   }
 
   public void setEdgeLabel(String edgeLabel) {
@@ -60,11 +61,6 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
     DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree = annotateEdgesWithDegree
       (inputGraph);
 
-
-    System.out.println("------------ EDGES WITH DEGREES --------------");
-    edgesWithDegree.print();
-
-
     // group span, source, target, degree(t/s), je nach einstellung
     DataSet<Tuple4<IntValue, GradoopId, GradoopId, IntValue>> groupSpans =
       edgesWithDegree.groupBy(0).sortGroup(1, Order.ASCENDING)
@@ -75,44 +71,17 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
     DataSet<Tuple4<IntValue, GradoopId, GradoopId, IntValue>> groups =
       groupSpans.rebalance().setParallelism(PARALLELISM_DEFAULT).name("Rebalance")
         .flatMap(new GenerateGroups()).setParallelism(PARALLELISM_DEFAULT).name("Generate groups");
-    System.out.println("------------ GROUPS --------------");
-    groups.print();
-
-    // t, u, d(t), d(u)
-    System.out.println("------------ NXT GROUPBY --------------");
-
-    groups.groupBy(0, neighborhoodType.equals(INDEGREE) ? 1 : 2).reduceGroup(
-      new GroupReduceFunction<Tuple4<IntValue, GradoopId, GradoopId, IntValue>, Tuple2<IntValue,
-        String>>() {
-        @Override
-        public void reduce(Iterable<Tuple4<IntValue, GradoopId, GradoopId, IntValue>> values,
-          Collector<Tuple2<IntValue, String>> out) {
-          int groupSize = 0;
-          StringBuilder builder = new StringBuilder();
-          for (Tuple4<IntValue, GradoopId, GradoopId, IntValue> value : values) {
-            groupSize++;
-            builder.append("(" + value.f1 + ")-[" + value.f3 + "]->" + "(" + value.f2 + ") ");
-          }
-          out.collect(new Tuple2<>(new IntValue(groupSize), builder.toString()));
-        }
-      }).print();
-
 
     DataSet<Tuple3<GradoopId, GradoopId, IntValue>> twoPaths = groups
-      .groupBy(0, neighborhoodType.equals(INDEGREE) ? 1 : 2)  // TODO dieses groupBy ergibt die richtigen
-      // paare TODO: dafür komme ich in die clean code hölle
+      .groupBy(0, neighborhoodType.equals(IN) ? 1 : 2) // TODO: dafür komme ich in die clean
+      // code hölle
       .sortGroup(1, Order.ASCENDING)
-      .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, neighborhoodType))
+      .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, neighborhoodType, denominator))
       .name("Generate group pairs");
-    System.out.println("------------ TWO PATHS --------------");
-    twoPaths.print();
 
     // t, u, intersection, union
     DataSet<Edge> scoreEdges =
-      twoPaths.groupBy(0, 1).reduceGroup(new ComputeScores(edgeLabel)).name("Compute scores");
-
-    System.out.println("------------ SCORES --------------");
-    scoreEdges.print();
+      twoPaths.groupBy(0, 1).reduceGroup(new ComputeScores(edgeLabel, denominator)).name("Compute scores");
 
     DataSet<Edge> union = scoreEdges.union(inputGraph.getEdges());
 
@@ -155,7 +124,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
   private UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> getDegreeOperator(
     NeighborhoodType neighborhoodType) {
 
-    if (neighborhoodType.equals(INDEGREE)) {
+    if (neighborhoodType.equals(IN)) {
       return new IncomingVertexDegrees();
     }
 
@@ -172,7 +141,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
   }
 
-  public enum NeighborhoodType {INDEGREE, OUTDEGREE}
+  public enum NeighborhoodType {IN, OUT}
 
   public enum Denominator {UNION, MAX}
 

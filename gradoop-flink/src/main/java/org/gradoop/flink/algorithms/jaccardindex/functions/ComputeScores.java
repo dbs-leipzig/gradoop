@@ -6,6 +6,8 @@ import org.apache.flink.types.IntValue;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex;
+import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Denominator;
 
 import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.DEFAULT_JACCARD_EDGE_PROPERTY;
 
@@ -22,9 +24,11 @@ public class ComputeScores implements
   GroupReduceFunction<Tuple3<GradoopId, GradoopId, IntValue>, Edge> {
 
   private String edgeLabel;
+  private Denominator denominator;
 
-  public ComputeScores(String edgeLabel) {
+  public ComputeScores(String edgeLabel, Denominator denominator) {
     this.edgeLabel = edgeLabel;
+    this.denominator = denominator;
   }
 
   @Override
@@ -39,10 +43,10 @@ public class ComputeScores implements
       count += 1;
     }
 
-    // TODO hier int overflow abfangen
+    // TODO hier int overflow abfangen?
     // TODO wenn in GenerateGroupPairs max statt sum gewählt wurde muss hier nichts mehr
     // abgezogen werden
-    int denominator = edge.f2.getValue() - count;
+    int denominator = computeDenominator(edge.f2.getValue(), count);
 
     // Create two new edges with JaccardValue
     Edge jaccardEdge = new Edge();
@@ -61,5 +65,15 @@ public class ComputeScores implements
     jaccardEdgeMirror.setLabel(edgeLabel);
     out.collect(jaccardEdgeMirror);
 
+  }
+
+  private int computeDenominator(int value, int count) {
+
+    // value - count equals the size of the union since common neighbors are counted double
+    if(denominator.equals(Denominator.UNION)) {
+      return value - count;
+    } else {
+      return value;
+    }
   }
 }
