@@ -22,92 +22,136 @@ import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegrees;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 import static org.apache.flink.api.common.ExecutionConfig.PARALLELISM_DEFAULT;
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Denominator.UNION;
 import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.IN;
 import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType.OUT;
 
+/**
+ * Computes the Jaccard Similarity of all vertices that have at least one common neighbor.
+ * Without further configuration the Jaccard Similarity of two vertices is defined as the number
+ * of common (outgoing) neighbors (intersection of the neighborhoods) divided by the number of total
+ * neighbors of both vertices (size of the union of the neighborhoods).
+ * The definition of the neighborhood can be changed to regard vertices that are connected via
+ * an incoming edge instead. The denominator may be changed towards  the maximum size of both
+ * neighborhoods.
+ *
+ * The results of the algorithm are stored in edge-pairs between each two vertices with
+ * similarity > 0.
+ *
+ */
 public class JaccardIndex implements UnaryGraphToGraphOperator{
 
+  private final String edgeLabel;
+  private final NeighborhoodType neighborhoodType;
+  private final Denominator denominator;
+
   /**
-   * Default Key for Result Edges
+   * Default Key for Result Edges - not configurable
    **/
   public static final String DEFAULT_JACCARD_EDGE_PROPERTY = "value";
+
   /**
-   * Group size for the quadratic expansion of neighbor pairs
+   * Group size for the quadratic expansion of neighbor pairs - not configurable
    **/
   private static final int DEFAULT_GROUP_SIZE = 64;
+
   /**
-   * Default Edge Label for Results
+   * Default label for result edges
    **/
   private static final String DEFAULT_JACCARD_EDGE_LABEL = "jaccardSimilarity";
-  private String edgeLabel = DEFAULT_JACCARD_EDGE_LABEL;
-  private NeighborhoodType neighborhoodType = OUT;
-  private Denominator denominator = Denominator.UNION;
 
-  public void setNeighborhoodType(NeighborhoodType neighborhoodType) {
-    this.neighborhoodType = neighborhoodType;
+  /**
+   * The different types of neighborhoods
+   */
+  public enum NeighborhoodType {IN, OUT}
+
+  /**
+   * The possible denominators
+   */
+  public enum Denominator {UNION, MAX}
+
+  /**
+   * Creates a new JaccardIndex with default configuration.
+   */
+  public JaccardIndex(){
+    this(DEFAULT_JACCARD_EDGE_LABEL, OUT, UNION);
   }
 
-  public void setDenominator(Denominator denominator){
-    this.denominator = denominator;
-  }
-
-  public void setEdgeLabel(String edgeLabel) {
+  /**
+   * Creates a new JaccardIndex with the given configuration.
+   * @param edgeLabel the label for the edges storing results
+   * @param neighborhoodType direction of neighborhood
+   * @param denominator denominator for computing the score
+   */
+  public JaccardIndex(String edgeLabel, NeighborhoodType neighborhoodType, Denominator denominator){
     this.edgeLabel = edgeLabel;
+    this.neighborhoodType = neighborhoodType;
+    this.denominator = denominator;
   }
 
   private LogicalGraph executeInternal(LogicalGraph inputGraph) throws Exception {
 
     // VertexDegrees
-    DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree = annotateEdgesWithDegree
-      (inputGraph);
+    DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree =
+      annotateEdgesWithDegree(inputGraph);
 
-    // group span, source, target, degree(t/s), je nach einstellung
+    // group span, source, target, degree(t/s)
     DataSet<Tuple4<IntValue, GradoopId, GradoopId, IntValue>> groupSpans =
-      edgesWithDegree.groupBy(0).sortGroup(1, Order.ASCENDING)
+      edgesWithDegree
+        .groupBy(0)
+        .sortGroup(1, Order.ASCENDING)
         .reduceGroup(new GenerateGroupSpans(DEFAULT_GROUP_SIZE)).setParallelism(PARALLELISM_DEFAULT)
         .name("Generate group spans");
 
     // group, s, t, d(t)
     DataSet<Tuple4<IntValue, GradoopId, GradoopId, IntValue>> groups =
-      groupSpans.rebalance().setParallelism(PARALLELISM_DEFAULT).name("Rebalance")
-        .flatMap(new GenerateGroups()).setParallelism(PARALLELISM_DEFAULT).name("Generate groups");
+      groupSpans
+        .rebalance()
+        .setParallelism(PARALLELISM_DEFAULT)
+        .name("Rebalance")
+        .flatMap(new GenerateGroups())
+        .setParallelism(PARALLELISM_DEFAULT)
+        .name("Generate groups");
 
     DataSet<Tuple3<GradoopId, GradoopId, IntValue>> twoPaths = groups
-      .groupBy(0, neighborhoodType.equals(IN) ? 1 : 2) // TODO: dafür komme ich in die clean
-      // code hölle
+      .groupBy( 0, neighborhoodType.equals(IN) ? 1 : 2)
       .sortGroup(1, Order.ASCENDING)
       .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, neighborhoodType, denominator))
       .name("Generate group pairs");
 
-    // t, u, intersection, union
     DataSet<Edge> scoreEdges =
-      twoPaths.groupBy(0, 1).reduceGroup(new ComputeScores(edgeLabel, denominator)).name("Compute scores");
+      twoPaths.groupBy(0, 1)
+        .reduceGroup(new ComputeScores(edgeLabel, denominator))
+        .name("Compute scores");
 
-    DataSet<Edge> union = scoreEdges.union(inputGraph.getEdges());
+    DataSet<Edge> allEdges = scoreEdges.union(inputGraph.getEdges());
 
     return inputGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(inputGraph.getVertices(), union);
-
+      .fromDataSets(inputGraph.getVertices(), allEdges);
   }
 
   /**
-   * Returns the Edges from the given LogicalGRaph
+   * Returns the edges from the given logical graph annotated with either the degree of the
+   * source or target vertex (depending on the neighborhood configuration).
    * @param inputGraph
-   * @return
+   * @return edges with vertex degree as Tuple3<Source, Target, Degree>
    */
   private DataSet<Tuple3<GradoopId,GradoopId,Long>> annotateEdgesWithDegree(LogicalGraph inputGraph) {
     UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> degreeOperator =
       getDegreeOperator(neighborhoodType);
     DataSet<WithCount<GradoopId>> degrees = degreeOperator.execute(inputGraph);
 
-    return inputGraph.getEdges().join(degrees).where(new ConfigurableEdgeKeySelector
-      (neighborhoodType))
+    return inputGraph
+      .getEdges()
+      .join(degrees)
+      .where(new ConfigurableEdgeKeySelector(neighborhoodType))
       .equalTo(new KeySelector<WithCount<GradoopId>, GradoopId>() {
         @Override
         public GradoopId getKey(WithCount<GradoopId> value) {
           return value.getObject();
         }
-      }).with(new JoinFunction<Edge, WithCount<GradoopId>, Tuple3<GradoopId, GradoopId, Long>>() {
+      })
+      .with(new JoinFunction<Edge, WithCount<GradoopId>, Tuple3<GradoopId, GradoopId, Long>>() {
       @Override
       public Tuple3<GradoopId, GradoopId, Long> join(Edge edge,
         WithCount<GradoopId> vertexDegree) {
@@ -117,7 +161,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
   }
 
   /**
-   * Returns the appropriate Vertex Degree Operator depending on the given Neighborhood Type.
+   * Returns the appropriate vertex degree Operator depending on the given neighborhood type.
    * @param neighborhoodType
    * @return
    */
@@ -126,9 +170,9 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
 
     if (neighborhoodType.equals(IN)) {
       return new IncomingVertexDegrees();
+    } else {
+      return new OutgoingVertexDegrees();
     }
-
-    return new OutgoingVertexDegrees();
   }
 
   @Override
@@ -140,10 +184,6 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
     }
 
   }
-
-  public enum NeighborhoodType {IN, OUT}
-
-  public enum Denominator {UNION, MAX}
 
   @Override
   public String getName() {
