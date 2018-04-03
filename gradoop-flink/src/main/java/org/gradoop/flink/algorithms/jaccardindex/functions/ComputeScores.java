@@ -6,25 +6,26 @@ import org.apache.flink.types.IntValue;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex;
 import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Denominator;
 
 import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.DEFAULT_JACCARD_EDGE_PROPERTY;
 
 /**
- * COPIED WITH SMALL MODIFICATIONS FROM
+ * COPIED WITH MINOR MODIFICATIONS FROM
  * {@link org.apache.flink.graph.library.similarity.JaccardIndex}
  * Compute the counts of shared and distinct neighbors. A two-path connecting
- * the vertices is emitted for each shared neighbor. The number of distinct
- * neighbors is equal to the sum of degrees of the vertices minus the count
- * of shared numbers, which are double-counted in the degree sum.
+ * the vertices is emitted for each shared neighbor.
  */
-//@FunctionAnnotation.ForwardedFields("0; 1")
-public class ComputeScores implements
-  GroupReduceFunction<Tuple3<GradoopId, GradoopId, IntValue>, Edge> {
+public class ComputeScores implements GroupReduceFunction<Tuple3<GradoopId, GradoopId, IntValue>, Edge> {
+  /**
+   * The label for newly created result edges
+   **/
+  private final String edgeLabel;
 
-  private String edgeLabel;
-  private Denominator denominator;
+  /**
+   * Denominator for computing the score
+   */
+  private final Denominator denominator;
 
   public ComputeScores(String edgeLabel, Denominator denominator) {
     this.edgeLabel = edgeLabel;
@@ -43,37 +44,49 @@ public class ComputeScores implements
       count += 1;
     }
 
-    // TODO hier int overflow abfangen?
-    // TODO wenn in GenerateGroupPairs max statt sum gewählt wurde muss hier nichts mehr
-    // abgezogen werden
-    int denominator = computeDenominator(edge.f2.getValue(), count);
+    int denominator = computeDenominatorValue(edge.f2.getValue(), count);
 
-    // Create two new edges with JaccardValue
-    Edge jaccardEdge = new Edge();
-    jaccardEdge.setId(GradoopId.get());
-    jaccardEdge.setSourceId(edge.f0);
-    jaccardEdge.setTargetId(edge.f1);
-    jaccardEdge.setProperty(DEFAULT_JACCARD_EDGE_PROPERTY, (double) count / denominator);
-    jaccardEdge.setLabel(edgeLabel);
-    out.collect(jaccardEdge);
-
-    Edge jaccardEdgeMirror = new Edge();
-    jaccardEdgeMirror.setId(GradoopId.get());
-    jaccardEdgeMirror.setSourceId(edge.f1);
-    jaccardEdgeMirror.setTargetId(edge.f0);
-    jaccardEdgeMirror.setProperty(DEFAULT_JACCARD_EDGE_PROPERTY, (double) count / denominator);
-    jaccardEdgeMirror.setLabel(edgeLabel);
-    out.collect(jaccardEdgeMirror);
-
+    out.collect(createResultEdge(edge.f0, edge.f1, (double) count / denominator,
+      edgeLabel));
+    out.collect(createResultEdge(edge.f1, edge.f0, (double) count / denominator,
+      edgeLabel));
   }
 
-  private int computeDenominator(int value, int count) {
+  /**
+   * Creates a result edge with given source, target, value and edge label
+   * @param source
+   * @param target
+   * @param value
+   * @param edgeLabel
+   * @return
+   */
+  private Edge createResultEdge(GradoopId source, GradoopId target, double value, String
+    edgeLabel) {
+    Edge edge = new Edge();
+    edge.setId(GradoopId.get());
+    edge.setSourceId(source);
+    edge.setTargetId(target);
+    edge.setProperty(DEFAULT_JACCARD_EDGE_PROPERTY, value);
+    edge.setLabel(edgeLabel);
+    return edge;
+  }
 
-    // value - count equals the size of the union since common neighbors are counted double
+  /**
+   * Returns the denominator value in dependence of the set configuration
+   * The number of common neighbors is equal to the sum of degrees of the vertices minus the count
+   * of shared numbers, which are double-counted in the degree sum.
+   *
+   * In case of the maximum neighborhood size, the value is already stored in the sum variable
+   *
+   * @param sum
+   * @param count
+   * @return
+   */
+  private int computeDenominatorValue(int sum, int count) {
     if(denominator.equals(Denominator.UNION)) {
-      return value - count;
+      return sum - count;
     } else {
-      return value;
+      return sum;
     }
   }
 }

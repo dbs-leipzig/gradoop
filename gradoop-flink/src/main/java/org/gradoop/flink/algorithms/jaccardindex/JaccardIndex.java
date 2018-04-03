@@ -32,7 +32,7 @@ import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Neighborhoo
  * of common (outgoing) neighbors (intersection of the neighborhoods) divided by the number of total
  * neighbors of both vertices (size of the union of the neighborhoods).
  * The definition of the neighborhood can be changed to regard vertices that are connected via
- * an incoming edge instead. The denominator may be changed towards  the maximum size of both
+ * an incoming edge instead. The denominator may be changed towards the maximum size of both
  * neighborhoods.
  *
  * The results of the algorithm are stored in edge-pairs between each two vertices with

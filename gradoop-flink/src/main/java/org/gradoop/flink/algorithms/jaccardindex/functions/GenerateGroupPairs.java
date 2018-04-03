@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * COPIED WITH SMALL MODIFICATIONS FROM
+ * COPIED WITH MINOR MODIFICATIONS FROM
  * {@link org.apache.flink.graph.library.similarity.JaccardIndex}
  * Emits the two-path for all neighbor pairs in this group.
  * <p>

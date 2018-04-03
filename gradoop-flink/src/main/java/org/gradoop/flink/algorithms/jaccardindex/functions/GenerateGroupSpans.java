@@ -1,6 +1,7 @@
 package org.gradoop.flink.algorithms.jaccardindex.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.types.IntValue;
@@ -23,7 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * in between. {@link GenerateGroupSpans} first annotates each edge with the
  * number of groups and {@link GenerateGroups} emits each edge into each group.
  */
-//@FunctionAnnotation.ForwardedFields("0->1; 1->2") // TODO still valid?
+@FunctionAnnotation.ForwardedFields("0->1; 1->2")
 public class GenerateGroupSpans implements
   GroupReduceFunction<Tuple3<GradoopId, GradoopId, Long>, Tuple4<IntValue, GradoopId, GradoopId,
     IntValue>> {
