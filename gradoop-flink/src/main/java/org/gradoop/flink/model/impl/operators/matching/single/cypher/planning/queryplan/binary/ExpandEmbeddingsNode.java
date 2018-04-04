@@ -66,7 +66,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
    */
   private final int closingColumn;
   /**
-   * NeighborhoodType in which to expand the embedding
+   * Direction in which to expand the embedding
    */
   private final ExpandDirection expandDirection;
   /**
