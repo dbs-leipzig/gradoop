@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.algorithms.jaccardindex;
 
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -38,42 +53,48 @@ import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Neighborhoo
  * The results of the algorithm are stored in edge-pairs between each two vertices with
  * similarity > 0.
  *
- */
-public class JaccardIndex implements UnaryGraphToGraphOperator{
-
-  private final String edgeLabel;
-  private final NeighborhoodType neighborhoodType;
-  private final Denominator denominator;
-
-  /**
-   * Default Key for Result Edges - not configurable
-   **/
-  public static final String DEFAULT_JACCARD_EDGE_PROPERTY = "value";
+ **/
+public class JaccardIndex implements UnaryGraphToGraphOperator {
 
   /**
    * Group size for the quadratic expansion of neighbor pairs - not configurable
    **/
-  private static final int DEFAULT_GROUP_SIZE = 64;
+  public static final int DEFAULT_GROUP_SIZE = 64;
 
   /**
    * Default label for result edges
    **/
-  private static final String DEFAULT_JACCARD_EDGE_LABEL = "jaccardSimilarity";
+  private static final  String DEFAULT_JACCARD_EDGE_LABEL = "jaccardSimilarity";
+
+  /**
+   * The label for the result edges
+   */
+  private final String edgeLabel;
+
+  /**
+   * Type of vertex neighborhood to be considered by the algorithm
+   */
+  private final NeighborhoodType neighborhoodType;
+
+  /**
+   * Type of denominator to compute the score
+   */
+  private final Denominator denominator;
 
   /**
    * The different types of neighborhoods
    */
-  public enum NeighborhoodType {IN, OUT}
+  public enum NeighborhoodType { IN, OUT }
 
   /**
    * The possible denominators
    */
-  public enum Denominator {UNION, MAX}
+  public enum Denominator { UNION, MAX }
 
   /**
    * Creates a new JaccardIndex with default configuration.
    */
-  public JaccardIndex(){
+  public JaccardIndex() {
     this(DEFAULT_JACCARD_EDGE_LABEL, OUT, UNION);
   }
 
@@ -83,13 +104,15 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
    * @param neighborhoodType direction of neighborhood
    * @param denominator denominator for computing the score
    */
-  public JaccardIndex(String edgeLabel, NeighborhoodType neighborhoodType, Denominator denominator){
+  public JaccardIndex(String edgeLabel, NeighborhoodType neighborhoodType, Denominator
+    denominator) {
     this.edgeLabel = edgeLabel;
     this.neighborhoodType = neighborhoodType;
     this.denominator = denominator;
   }
 
-  private LogicalGraph executeInternal(LogicalGraph inputGraph) throws Exception {
+  @Override
+  public LogicalGraph execute(LogicalGraph inputGraph) {
 
     // VertexDegrees
     DataSet<Tuple3<GradoopId, GradoopId, Long>> edgesWithDegree =
@@ -100,7 +123,8 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
       edgesWithDegree
         .groupBy(0)
         .sortGroup(1, Order.ASCENDING)
-        .reduceGroup(new GenerateGroupSpans(DEFAULT_GROUP_SIZE)).setParallelism(PARALLELISM_DEFAULT)
+        .reduceGroup(new GenerateGroupSpans())
+        .setParallelism(PARALLELISM_DEFAULT)
         .name("Generate group spans");
 
     // group, s, t, d(t)
@@ -114,9 +138,9 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
         .name("Generate groups");
 
     DataSet<Tuple3<GradoopId, GradoopId, IntValue>> twoPaths = groups
-      .groupBy( 0, neighborhoodType.equals(IN) ? 1 : 2)
+      .groupBy(0, neighborhoodType.equals(IN) ? 1 : 2)
       .sortGroup(1, Order.ASCENDING)
-      .reduceGroup(new GenerateGroupPairs(DEFAULT_GROUP_SIZE, neighborhoodType, denominator))
+      .reduceGroup(new GenerateGroupPairs(neighborhoodType, denominator))
       .name("Generate group pairs");
 
     DataSet<Edge> scoreEdges =
@@ -133,10 +157,11 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
   /**
    * Returns the edges from the given logical graph annotated with either the degree of the
    * source or target vertex (depending on the neighborhood configuration).
-   * @param inputGraph
+   * @param inputGraph the input graph
    * @return edges with vertex degree as Tuple3<Source, Target, Degree>
    */
-  private DataSet<Tuple3<GradoopId,GradoopId,Long>> annotateEdgesWithDegree(LogicalGraph inputGraph) {
+  private DataSet<Tuple3<GradoopId, GradoopId, Long>> annotateEdgesWithDegree(LogicalGraph
+    inputGraph) {
     UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> degreeOperator =
       getDegreeOperator(neighborhoodType);
     DataSet<WithCount<GradoopId>> degrees = degreeOperator.execute(inputGraph);
@@ -152,18 +177,18 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
         }
       })
       .with(new JoinFunction<Edge, WithCount<GradoopId>, Tuple3<GradoopId, GradoopId, Long>>() {
-      @Override
-      public Tuple3<GradoopId, GradoopId, Long> join(Edge edge,
-        WithCount<GradoopId> vertexDegree) {
-        return new Tuple3<>(edge.getSourceId(), edge.getTargetId(), vertexDegree.getCount());
-      }
-    });
+        @Override
+        public Tuple3<GradoopId, GradoopId, Long> join(Edge edge,
+          WithCount<GradoopId> vertexDegree) {
+          return new Tuple3<>(edge.getSourceId(), edge.getTargetId(), vertexDegree.getCount());
+        }
+      });
   }
 
   /**
    * Returns the appropriate vertex degree Operator depending on the given neighborhood type.
-   * @param neighborhoodType
-   * @return
+   * @param neighborhoodType the direction of the neighborhood to be considered by the algorithm
+   * @return a vertice degree operator
    */
   private UnaryGraphToValueOperator<DataSet<WithCount<GradoopId>>> getDegreeOperator(
     NeighborhoodType neighborhoodType) {
@@ -173,16 +198,6 @@ public class JaccardIndex implements UnaryGraphToGraphOperator{
     } else {
       return new OutgoingVertexDegrees();
     }
-  }
-
-  @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    try {
-      return  executeInternal(graph);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
   }
 
   @Override

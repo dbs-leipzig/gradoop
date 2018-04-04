@@ -1,3 +1,19 @@
+/**
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.gradoop.flink.algorithms.jaccardindex.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -12,32 +28,52 @@ import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.NeighborhoodType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.DEFAULT_GROUP_SIZE;
+
 /**
- * COPIED WITH MINOR MODIFICATIONS FROM
+ * COPIED WITH SOME MODIFICATIONS FROM
  * {@link org.apache.flink.graph.library.similarity.JaccardIndex}
  * Emits the two-path for all neighbor pairs in this group.
- * <p>
- * The first {@link #groupSize} vertices are emitted pairwise. Following
- * vertices are only paired with vertices from this initial group.
+ *
+ * The first 64 vertices are emitted pairwise. Following vertices are only paired with vertices
+ * from this initial group.
  *
  * @see GenerateGroupSpans
  */
 public class GenerateGroupPairs implements
   GroupReduceFunction<Tuple4<IntValue, GradoopId, GradoopId, IntValue>, Tuple3<GradoopId,
     GradoopId, IntValue>> {
-  private final int groupSize;
+
+  /**
+   * type of neighborhood
+   */
   private NeighborhoodType neighborhoodType;
+
+  /**
+   * denominator
+   */
   private Denominator denominator;
+
+  /**
+   * triggers the first loop
+   */
   private boolean initialized = false;
 
+  /**
+   * visited edges
+   */
   private List<Tuple3<GradoopId, GradoopId, IntValue>> visited;
 
-  public GenerateGroupPairs(int groupSize, NeighborhoodType neighborhoodType, Denominator
+  /**
+   * Creates a new group reduce function
+   * @param neighborhoodType neighborhood type
+   * @param denominator denominator
+   */
+  public GenerateGroupPairs(NeighborhoodType neighborhoodType, Denominator
     denominator) {
-    this.groupSize = groupSize;
     this.neighborhoodType = neighborhoodType;
     this.denominator = denominator;
-    this.visited = new ArrayList<>(groupSize);
+    this.visited = new ArrayList<>(DEFAULT_GROUP_SIZE);
   }
 
   @Override
@@ -52,7 +88,7 @@ public class GenerateGroupPairs implements
 
         int oldValue = prior.f2.getValue();
 
-        long degreeSum = getDegreeCombination(oldValue,edge.f3.getValue());
+        long degreeSum = getDegreeCombination(oldValue, edge.f3.getValue());
         if (degreeSum > Integer.MAX_VALUE) {
           throw new RuntimeException("Degree sum overflows IntValue");
         }
@@ -64,14 +100,15 @@ public class GenerateGroupPairs implements
         prior.f2.setValue(oldValue);
       }
 
-      if (visitedCount < groupSize) {
+      if (visitedCount < DEFAULT_GROUP_SIZE) {
         if (!initialized) {
           initialized = true;
 
-          for (int i = 0; i < groupSize; i++) {
+          for (int i = 0; i < DEFAULT_GROUP_SIZE; i++) {
             Tuple3<GradoopId, GradoopId, IntValue> tuple = new Tuple3<>();
 
-            tuple.f0 = neighborhoodType.equals(NeighborhoodType.OUT) ? edge.f1.copy() : edge.f2.copy();
+            tuple.f0 = neighborhoodType
+              .equals(NeighborhoodType.OUT) ? edge.f1.copy() : edge.f2.copy();
             tuple.f2 = edge.f3.copy();
 
             visited.add(tuple);
@@ -89,17 +126,17 @@ public class GenerateGroupPairs implements
   }
 
   /**
-   * Returns the combination of th given vertex degrees in dependency of the chosen
+   * Returns the combination of the given vertex degrees in dependency of the chosen
    * {@link Denominator}
-   * @param oldValue
-   * @param value
-   * @return
+   * @param first degree of first vertex
+   * @param second degree of second vertex
+   * @return sum or maximum of given values
    */
-  private long getDegreeCombination(int oldValue, int value) {
-    if(denominator.equals(Denominator.UNION)) {
-      return oldValue + value;
+  private long getDegreeCombination(int first, int second) {
+    if (denominator.equals(Denominator.UNION)) {
+      return first + second;
     } else {
-      return Math.max(oldValue, value);
+      return Math.max(first, second);
     }
   }
 }
