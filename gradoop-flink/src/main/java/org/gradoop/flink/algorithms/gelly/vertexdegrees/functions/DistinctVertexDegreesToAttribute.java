@@ -57,12 +57,15 @@ public class DistinctVertexDegreesToAttribute implements JoinFunction<org.apache
   @Override
   public Vertex join(org.apache.flink.graph.Vertex<GradoopId, Degrees> degree, Vertex vertex)
     throws Exception {
-    vertex.setProperty(vertexDegreesPropery, PropertyValue.create(degree.getValue()
-    .getDegree().getValue()));
-    vertex.setProperty(vertexInDegreePropery, PropertyValue.create(degree.getValue()
-    .getInDegree().getValue()));
-    vertex.setProperty(vertexOutDegreePropery, PropertyValue.create(degree.getValue()
-    .getOutDegree().getValue()));
+    vertex.setProperty(
+        vertexDegreesPropery,
+        PropertyValue.create(degree.getValue().getDegree().getValue()));
+    vertex.setProperty(
+        vertexInDegreePropery,
+        PropertyValue.create(degree.getValue().getInDegree().getValue()));
+    vertex.setProperty(
+        vertexOutDegreePropery,
+        PropertyValue.create(degree.getValue().getOutDegree().getValue()));
     return vertex;
   }
 }

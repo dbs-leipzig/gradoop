@@ -29,6 +29,10 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * A gradoop operator wrapping {@link org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees}.
+ * Multiple edges between two vertices will only be counted once per direction.
+ * <p>
+ * Note: This Gelly implementation count loops between edges like (v1) -> (v2),
+ * (v2) -> (v1) as one.
  */
 public class DistinctVertexDegrees extends GellyAlgorithm<NullValue, NullValue> {
 
@@ -52,8 +56,6 @@ public class DistinctVertexDegrees extends GellyAlgorithm<NullValue, NullValue> 
 
   /**
    * Constructor for Vertex Degree with in- and out-degree and total of degrees of a graph.
-   * Note: The Gelly implementation count loops between edges like (v1) -> (v2),
-   * (v2) -> (v1) as one.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
@@ -89,9 +91,9 @@ public class DistinctVertexDegrees extends GellyAlgorithm<NullValue, NullValue> 
       new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue,
       NullValue>()
       .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)
-      .run(graph).join(currentGraph.getVertices())
-      .where(0)
-      .equalTo(new Id<>())
+      .run(graph)
+      .join(currentGraph.getVertices())
+      .where(0).equalTo(new Id<>())
       .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
 
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
