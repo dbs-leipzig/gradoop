@@ -98,9 +98,11 @@ public class CSVDataSink extends CSVBase implements DataSink {
       .map(new EdgeToCSVEdge())
       .withBroadcastSet(metaData, BC_METADATA);
 
-    // write everything
-    metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
-      CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
+    // Write metadata only if the path is not the same or reuseMetadata is false.
+    if (!getMetaDataPath().equals(metaDataPath) || !reuseMetadata()) {
+      metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
+        CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
+    }
 
     csvVertices.writeAsCsv(getVertexCSVPath(), CSVConstants.ROW_DELIMITER,
       CSVConstants.TOKEN_DELIMITER, writeMode);
