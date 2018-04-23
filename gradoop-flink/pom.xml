@@ -124,7 +124,19 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-hadoop-compatibility_2.11</artifactId>
         </dependency>
-
+        
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>5.1.6</version>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-jdbc -->
+		<dependency>
+		    <groupId>org.apache.flink</groupId>
+		    <artifactId>flink-jdbc</artifactId>
+		    <version>0.8.0-hadoop1</version>
+		</dependency>
         <!-- Test dependencies -->
 
         <!-- Gradoop -->
