@@ -40,13 +40,6 @@ public class EdgeCountRunner extends AbstractRunner implements ProgramDescriptio
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) + GraphStatisticsReader.FILE_EDGE_COUNT);
 
-    /*new EdgeCount()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .map(new ObjectTo1<>())
-      .writeAsCsv(appendSeparator(args[2]) + GraphStatisticsReader.FILE_EDGE_COUNT,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Edge count");
   }
 

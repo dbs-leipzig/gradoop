@@ -40,12 +40,6 @@ public class VertexLabelDistributionRunner extends AbstractRunner implements Pro
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) + GraphStatisticsReader.TOKEN_SEPARATOR);
 
-    /*new VertexLabelDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Vertex label distribution");
   }
 

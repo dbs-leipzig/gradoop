@@ -41,15 +41,6 @@ public class DistinctVertexPropertiesByLabelRunner extends AbstractRunner implem
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
 
-    /*new DistinctVertexPropertiesByLabel()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-      .returns(new TypeHint<Tuple3<String, String, Long>>() { })
-      .writeAsCsv(
-        appendSeparator(args[2]) + GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Distinct vertex properties by label");
   }
 

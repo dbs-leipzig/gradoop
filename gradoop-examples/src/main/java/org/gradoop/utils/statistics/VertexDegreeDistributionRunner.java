@@ -39,11 +39,6 @@ public class VertexDegreeDistributionRunner extends AbstractRunner implements Pr
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) + "vertex_degree_distribution");
 
-    /*new VertexDegreeDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + "vertex_degree_distribution")
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Vertex degree distribution");
   }
 

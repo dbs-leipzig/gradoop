@@ -41,12 +41,6 @@ public class EdgeLabelDistributionRunner extends AbstractRunner implements Progr
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);
 
-    /*new EdgeLabelDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Edge label distribution");
   }
 

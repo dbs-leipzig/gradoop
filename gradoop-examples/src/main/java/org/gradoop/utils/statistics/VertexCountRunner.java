@@ -41,13 +41,6 @@ public class VertexCountRunner extends AbstractRunner implements ProgramDescript
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_VERTEX_COUNT);
 
-    /*new VertexCount()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .map(new ObjectTo1<>())
-      .writeAsCsv(appendSeparator(args[2]) + GraphStatisticsReader.FILE_VERTEX_COUNT,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Vertex count");
   }
 

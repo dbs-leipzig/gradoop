@@ -58,13 +58,6 @@ public class DistinctEdgePropertiesByLabelCalculator {
    */
   public static void writeCSV(final LogicalGraph graph, final String filePath,
       final boolean overWrite) {
-
     StatisticWriter.writeCSV(createStatistic(graph), filePath, overWrite);
-    /*createStatistic(graph).writeAsCsv(
-        filePath,
-        System.lineSeparator(),
-        GraphStatisticsReader.TOKEN_SEPARATOR,
-        overWrite? WriteMode.OVERWRITE : WriteMode.NO_OVERWRITE)
-    .setParallelism(1);*/
   }
 }

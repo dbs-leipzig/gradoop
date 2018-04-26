@@ -41,14 +41,6 @@ public class DistinctSourceVertexCountByEdgeLabelRunner extends AbstractRunner i
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);
 
-    /*new DistinctSourceIdsByEdgeLabel()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(
-        appendSeparator(args[2]) +
-          GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Distinct source vertex count by edge label");
   }
 

@@ -39,11 +39,6 @@ public class VertexOutgoingDegreeDistributionRunner extends AbstractRunner imple
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) + "outgoing_vertex_degree_distribution");
 
-   /* new OutgoingVertexDegreeDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + "outgoing_vertex_degree_distribution")
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Vertex outgoing degree distribution");
   }
 

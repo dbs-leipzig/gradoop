@@ -41,13 +41,6 @@ public class DistinctVertexPropertiesRunner extends AbstractRunner implements Pr
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
 
-    /*new DistinctVertexProperties()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(
-        appendSeparator(args[2]) + GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Distinct vertex properties");
   }
 

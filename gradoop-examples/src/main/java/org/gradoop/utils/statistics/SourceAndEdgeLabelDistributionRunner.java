@@ -41,16 +41,6 @@ public class SourceAndEdgeLabelDistributionRunner extends AbstractRunner impleme
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL);
 
-    /*new SourceLabelAndEdgeLabelDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-      .returns(new TypeHint<Tuple3<String, String, Long>>() { })
-      .writeAsCsv(
-        appendSeparator(args[2]) +
-          GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);*/
-
     getExecutionEnvironment().execute("Statistics: Source and edge label distribution");
   }
 
