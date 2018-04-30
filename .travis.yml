@@ -1,3 +1,7 @@
+# https://docs.travis-ci.com/user/reference/overview/
+sudo: required
+dist: trusty
+
 cache:
   directories:
   - $HOME/.m2
