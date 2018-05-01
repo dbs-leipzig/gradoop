@@ -31,12 +31,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * cache iterator for scanner result
+ * cache iterator for accumulo scanner's result
  *
  * @param <E> EPGM Element as reading result
  * @param <R> ElementRow from iterator rpc result
  */
-public class CacheClosableIteratorIterator<E extends EPGMElement, R extends ElementRow> implements
+public class CacheClosableIterator<E extends EPGMElement, R extends ElementRow> implements
   CloseableIterator<E> {
 
   /**
@@ -76,7 +76,7 @@ public class CacheClosableIteratorIterator<E extends EPGMElement, R extends Elem
    * @param handler result element row handler
    * @param cacheSize result cache size
    */
-  public CacheClosableIteratorIterator(
+  public CacheClosableIterator(
     BatchScanner scanner,
     BaseElementIterator<R> codec,
     AccumuloRowHandler<E, ?, R> handler,

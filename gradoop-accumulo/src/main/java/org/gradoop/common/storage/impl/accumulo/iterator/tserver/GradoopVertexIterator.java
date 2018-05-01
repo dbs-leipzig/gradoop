@@ -23,7 +23,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.row.VertexRow;
-import org.gradoop.common.utils.Json;
+import org.gradoop.common.utils.JsonUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,7 +42,7 @@ public class GradoopVertexIterator extends BaseElementIterator<VertexRow> {
   public VertexRow fromRow(@Nonnull Map.Entry<Key, Value> pair) {
     //TODO: use kryo instead of json for better performance
     //map from serialize content
-    VertexRow content = Json.loads(pair.getValue().get(), VertexRow.class);
+    VertexRow content = JsonUtils.loads(pair.getValue().get(), VertexRow.class);
     content.setId(pair.getKey().getRow().toString());
     //read from content
     return content;
@@ -52,7 +52,7 @@ public class GradoopVertexIterator extends BaseElementIterator<VertexRow> {
   @Override
   public Pair<Key, Value> toRow(@Nonnull VertexRow record) {
     //write to content
-    return new Pair<>(new Key(record.getId()), new Value(Json.dumps(record)));
+    return new Pair<>(new Key(record.getId()), new Value(JsonUtils.dumps(record)));
   }
 
   @Nonnull
@@ -119,7 +119,7 @@ public class GradoopVertexIterator extends BaseElementIterator<VertexRow> {
       source.next();
     }
 
-    LOG.info(String.format("[vertex]readLine=>%s", Json.dumps(row)));
+    LOG.info(String.format("[vertex]readLine=>%s", JsonUtils.dumps(row)));
     return row;
   }
 

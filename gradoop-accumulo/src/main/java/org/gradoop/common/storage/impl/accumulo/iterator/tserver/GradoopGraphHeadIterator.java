@@ -23,7 +23,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.row.GraphHeadRow;
-import org.gradoop.common.utils.Json;
+import org.gradoop.common.utils.JsonUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,7 +42,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<GraphHeadRow> 
   public GraphHeadRow fromRow(@Nonnull Map.Entry<Key, Value> pair) {
     //TODO: use kryo instead of json for better performance
     //map from serialize content
-    GraphHeadRow content = Json.loads(pair.getValue().get(), GraphHeadRow.class);
+    GraphHeadRow content = JsonUtils.loads(pair.getValue().get(), GraphHeadRow.class);
     content.setId(pair.getKey().getRow().toString());
     //read from content
     return content;
@@ -52,7 +52,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<GraphHeadRow> 
   @Override
   public Pair<Key, Value> toRow(@Nonnull GraphHeadRow record) {
     //write to content
-    return new Pair<>(new Key(record.getId()), new Value(Json.dumps(record)));
+    return new Pair<>(new Key(record.getId()), new Value(JsonUtils.dumps(record)));
   }
 
   @Nonnull
@@ -116,7 +116,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<GraphHeadRow> 
       source.next();
     }
 
-    LOG.info(String.format("[graph]readLine=>%s", Json.dumps(row)));
+    LOG.info(String.format("[graph]readLine=>%s", JsonUtils.dumps(row)));
     return row;
   }
 }

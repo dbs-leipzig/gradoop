@@ -46,7 +46,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.EPGMStore;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloRowHandler;
-import org.gradoop.common.storage.impl.accumulo.iterator.client.CacheClosableIteratorIterator;
+import org.gradoop.common.storage.impl.accumulo.iterator.client.CacheClosableIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.client.CloseableIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -211,7 +211,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   public CloseableIterator<V> getVertexSpace(int cacheSize) throws IOException {
     BatchScanner scanner = createBatchScanner(getVertexTableName(), GradoopVertexIterator.class);
     scanner.setRanges(Lists.newArrayList(new Range((Text) null, null)));
-    return new CacheClosableIteratorIterator<>(scanner, new GradoopVertexIterator(), config
+    return new CacheClosableIterator<>(scanner, new GradoopVertexIterator(), config
       .getVertexHandler(), cacheSize);
   }
 
@@ -224,7 +224,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   public CloseableIterator<E> getEdgeSpace(int cacheSize) throws IOException {
     BatchScanner scanner = createBatchScanner(getEdgeTableName(), GradoopEdgeIterator.class);
     scanner.setRanges(Lists.newArrayList(new Range((Text) null, null)));
-    return new CacheClosableIteratorIterator<>(scanner, new GradoopEdgeIterator(), config
+    return new CacheClosableIterator<>(scanner, new GradoopEdgeIterator(), config
       .getEdgeHandler(), cacheSize);
   }
 
@@ -237,7 +237,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   public CloseableIterator<G> getGraphSpace(int cacheSize) throws IOException {
     BatchScanner scanner = createBatchScanner(getGraphHeadName(), GradoopGraphHeadIterator.class);
     scanner.setRanges(Lists.newArrayList(new Range((Text) null, null)));
-    return new CacheClosableIteratorIterator<>(scanner, new GradoopGraphHeadIterator(), config
+    return new CacheClosableIterator<>(scanner, new GradoopGraphHeadIterator(), config
       .getGraphHandler(), cacheSize);
   }
 

@@ -25,7 +25,7 @@ import java.io.IOException;
 /**
  * json serialize utils
  */
-public final class Json {
+public final class JsonUtils {
 
   /**
    * normal mapper
