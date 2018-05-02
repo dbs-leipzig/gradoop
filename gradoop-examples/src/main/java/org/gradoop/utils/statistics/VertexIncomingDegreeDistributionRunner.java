@@ -18,7 +18,7 @@ package org.gradoop.utils.statistics;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.statistics.IncomingVertexDegreeDistribution;
-import org.gradoop.flink.model.impl.operators.statistics.calculation.VertexIncomingDegreeDistributionCalculator;
+import org.gradoop.flink.model.impl.operators.statistics.writer.VertexIncomingDegreeDistributionWriter;
 
 /**
  * Computes {@link IncomingVertexDegreeDistribution} for a given logical graph.
@@ -35,7 +35,7 @@ public class VertexIncomingDegreeDistributionRunner extends AbstractRunner imple
    */
   public static void main(String[] args) throws Exception {
 
-    VertexIncomingDegreeDistributionCalculator.writeCSV(
+    VertexIncomingDegreeDistributionWriter.writeCSV(
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) + "incoming_vertex_degree_distribution");
 

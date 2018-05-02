@@ -19,7 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
-import org.gradoop.flink.model.impl.operators.statistics.calculation.VertexCountCalculator;
+import org.gradoop.flink.model.impl.operators.statistics.writer.VertexCountWriter;
 
 /**
  * Computes {@link VertexCount} for a given logical graph.
@@ -36,7 +36,7 @@ public class VertexCountRunner extends AbstractRunner implements ProgramDescript
    */
   public static void main(String[] args) throws Exception {
 
-    VertexCountCalculator.writeCSV(
+    VertexCountWriter.writeCSV(
         readLogicalGraph(args[0], args[1]),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_VERTEX_COUNT);

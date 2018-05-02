@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
 
 /**
- * Computes {@link VertexCount} for a given logical graph.
+ * Computes {@link DistinctTargetIds} for a given logical graph and write it in a CSV file.
  */
-public class VertexCountCalculator {
+public class DistinctTargetVertexCountWriter {
 
   /**
-   * Calculates the statistic for the vertex count calculator.
+   * Prepares the statistic for a distinct target vertex count.
    * @param graph the logical graph for the calculation.
    * @return tuples with the containing statistics.
    */
-  public static MapOperator<Long, Tuple1<Long>> createStatistic(final LogicalGraph graph) {
-    return new VertexCount()
+  public static MapOperator<Long, Tuple1<Long>> preapreStatistic(final LogicalGraph graph) {
+    return new DistinctTargetIds()
         .execute(graph)
         .map(new ObjectTo1<>());
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    */
@@ -47,13 +47,13 @@ public class VertexCountCalculator {
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    * @param overWrite should the target file be overwritten if it already exists?
    */
   public static void writeCSV(final LogicalGraph graph, final String filePath,
       final boolean overWrite) {
-    StatisticWriter.writeCSV(createStatistic(graph), filePath, overWrite);
+    StatisticWriter.writeCSV(preapreStatistic(graph), filePath, overWrite);
   }
 }

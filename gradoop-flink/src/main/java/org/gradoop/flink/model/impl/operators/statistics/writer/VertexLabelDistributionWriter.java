@@ -13,32 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;
 
-import org.apache.flink.api.java.operators.MapOperator;
-import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
+import org.gradoop.flink.model.impl.operators.statistics.VertexLabelDistribution;
+import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Computes {@link DistinctTargetIds} for a given logical graph.
+ * Computes {@link VertexLabelDistribution} for a given logical graph and write it in CSV file.
  */
-public class DistinctTargetVertexCountCalculator {
+public class VertexLabelDistributionWriter {
 
   /**
-   * Calculates the statistic for a distinct target vertex count.
+   * Prepares the statistic for the vertex label distribution.
    * @param graph the logical graph for the calculation.
    * @return tuples with the containing statistics.
    */
-  public static MapOperator<Long, Tuple1<Long>> createStatistic(final LogicalGraph graph) {
-    return new DistinctTargetIds()
-        .execute(graph)
-        .map(new ObjectTo1<>());
+  public static DataSet<WithCount<String>> prepareStatistic(final LogicalGraph graph) {
+    return new VertexLabelDistribution()
+        .execute(graph);
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    */
@@ -47,13 +45,13 @@ public class DistinctTargetVertexCountCalculator {
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    * @param overWrite should the target file be overwritten if it already exists?
    */
   public static void writeCSV(final LogicalGraph graph, final String filePath,
       final boolean overWrite) {
-    StatisticWriter.writeCSV(createStatistic(graph), filePath, overWrite);
+    StatisticWriter.writeCSV(prepareStatistic(graph), filePath, overWrite);
   }
 }

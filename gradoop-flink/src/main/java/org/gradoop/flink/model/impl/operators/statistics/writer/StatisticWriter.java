@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple;

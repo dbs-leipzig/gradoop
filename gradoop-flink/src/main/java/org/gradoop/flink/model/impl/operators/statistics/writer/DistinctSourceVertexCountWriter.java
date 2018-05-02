@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
 
 /**
- * Computes {@link EdgeCount} for a given logical graph.
+ * Computes {@link DistinctSourceIds} for a given logical graph.
  */
-public class EdgeCountCalculator {
+public class DistinctSourceVertexCountWriter {
 
   /**
-   * Calculates the statistic for a edge count.
+   * Prepares the statistic for distinct source vertex count.
    * @param graph the logical graph for the calculation.
    * @return tuples with the containing statistics.
    */
-  public static MapOperator<Long, Tuple1<Long>> createStatistic(final LogicalGraph graph) {
-    return new EdgeCount()
+  public static MapOperator<Long, Tuple1<Long>> prepareStatistic(final LogicalGraph graph) {
+    return new DistinctSourceIds()
         .execute(graph)
         .map(new ObjectTo1<>());
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    */
@@ -47,13 +47,13 @@ public class EdgeCountCalculator {
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    * @param overWrite should the target file be overwritten if it already exists?
    */
   public static void writeCSV(final LogicalGraph graph, final String filePath,
       final boolean overWrite) {
-    StatisticWriter.writeCSV(createStatistic(graph), filePath, overWrite);
+    StatisticWriter.writeCSV(prepareStatistic(graph), filePath, overWrite);
   }
 }

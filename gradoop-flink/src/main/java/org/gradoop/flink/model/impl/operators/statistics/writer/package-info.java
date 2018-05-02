@@ -16,4 +16,4 @@
 /**
  * Contains classes to compute various graph statistics and write it in csv data.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;

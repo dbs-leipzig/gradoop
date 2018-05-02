@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics.calculation;
+package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexPropertiesByLabel;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertiesByLabel;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Computes {@link DistinctVertexPropertiesByLabel} for a given logical graph.
+ * Computes {@link DistinctEdgePropertiesByLabel} for a given logical graph.
  */
-public class DistinctVertexPropertiesByLabelCalculator {
+public class DistinctEdgePropertiesByLabelWriter {
 
   /**
-   * Calculates the statistic for distinct vertex properties by label.
+   * Prepares the statistic for distinct edge properties by label.
    * @param graph the logical graph for the calculation.
    * @return tuples with the containing statistics.
    */
   public static MapOperator<WithCount<Tuple2<String, String>>, Tuple3<String, String, Long>>
-  createStatistic(final LogicalGraph graph) {
-    return new DistinctVertexPropertiesByLabel()
-        .execute(graph)
-        .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-        .returns(new TypeHint<Tuple3<String, String, Long>>() { });
+  prepareStatistic(final LogicalGraph graph) {
+    return new DistinctEdgePropertiesByLabel()
+    .execute(graph)
+    .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
+    .returns(new TypeHint<Tuple3<String, String, Long>>() { });
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    */
@@ -51,13 +51,13 @@ public class DistinctVertexPropertiesByLabelCalculator {
   }
 
   /**
-   * Compute the statistic for a given logical graph and write it in a CSV file.
+   * Write the statistic for a given logical graph in a CSV file.
    * @param graph logical graph for the calculation
    * @param filePath the path for the CSV file
    * @param overWrite should the target file be overwritten if it already exists?
    */
   public static void writeCSV(final LogicalGraph graph, final String filePath,
       final boolean overWrite) {
-    StatisticWriter.writeCSV(createStatistic(graph), filePath, overWrite);
+    StatisticWriter.writeCSV(prepareStatistic(graph), filePath, overWrite);
   }
 }
