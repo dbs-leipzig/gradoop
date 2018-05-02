@@ -52,11 +52,11 @@ public class ChangePropertyKeys implements TransformationFunction<EPGMElement> {
 
     for (Map.Entry<String, String> mapping : keyMappings.entrySet()) {
       if (current.getPropertyValue(mapping.getKey()) != null) {
-        transformed.removeProperty(mapping.getKey());
-        transformed.setProperty(mapping.getValue(), transformed.getPropertyValue(mapping.getKey()));
+        current.setProperty(mapping.getValue(), current.getPropertyValue(mapping.getKey()));
+        current.removeProperty(mapping.getKey());
       }
     }
 
-    return transformed;
+    return current;
   }
 }

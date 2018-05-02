@@ -51,9 +51,9 @@ public class ChangeLabel implements TransformationFunction<EPGMElement> {
   public EPGMElement apply(EPGMElement current, EPGMElement transformed) {
 
     if (current.getLabel().equals(oldLabel)) {
-      transformed.setLabel(newLabel);
+      current.setLabel(newLabel);
     }
 
-    return transformed;
+    return current;
   }
 }
