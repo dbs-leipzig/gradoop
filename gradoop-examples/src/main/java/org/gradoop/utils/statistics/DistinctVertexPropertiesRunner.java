@@ -19,7 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexProperties;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctVertexProperties} for a given logical graph.
@@ -36,8 +36,8 @@ public class DistinctVertexPropertiesRunner extends AbstractRunner implements Pr
    */
   public static void main(String[] args) throws Exception {
 
-    DistinctVertexPropertiesWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new DistinctVertexProperties()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
 

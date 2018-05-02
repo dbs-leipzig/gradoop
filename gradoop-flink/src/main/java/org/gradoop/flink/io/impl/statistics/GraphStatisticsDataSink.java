@@ -21,23 +21,24 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctEdgePropertiesByLabelWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctEdgePropertiesWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctSourceVertexCountByEdgeLabelWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctSourceVertexCountWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountByEdgeLabelWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesByLabelWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeCountWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeLabelDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.SourceAndEdgeLabelDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.TargetAndEdgeLabelDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.VertexCountWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.VertexDegreeDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.VertexIncomingDegreeDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.VertexLabelDistributionWriter;
-import org.gradoop.flink.model.impl.operators.statistics.writer.VertexOutgoingDegreeDistributionWriter;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgeProperties;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexProperties;
+import org.gradoop.flink.model.impl.operators.statistics.EdgeLabelDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.IncomingVertexDegreeDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegreeDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.VertexDegreeDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.VertexLabelDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctEdgePropertiesByLabelPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctSourceVertexCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesByLabelPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.SourceAndEdgeLabelDistributionPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.TargetAndEdgeLabelDistributionPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.VertexCountPreparer;
 
 /**
  * Estimates all graph statistics containing in {@link org.gradoop.flink.model.impl.operators.statistics.writer}.
@@ -65,55 +66,72 @@ public class GraphStatisticsDataSink implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    DistinctEdgePropertiesByLabelWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctEdgePropertiesByLabelPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL);
-    DistinctEdgePropertiesWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctEdgeProperties()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES);
-    DistinctSourceVertexCountByEdgeLabelWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctSourceIdsByEdgeLabel()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);
-    DistinctSourceVertexCountWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctSourceVertexCountPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT);
-    DistinctTargetVertexCountWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctTargetVertexCountPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT);
-    DistinctTargetVertexCountByEdgeLabelWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctTargetIdsByEdgeLabel()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL);
-    DistinctVertexPropertiesWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctVertexProperties()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
-    DistinctVertexPropertiesByLabelWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new DistinctVertexPropertiesByLabelPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
-    EdgeCountWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new EdgeCountPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_EDGE_COUNT);
-    EdgeLabelDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new EdgeLabelDistribution()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);
-    SourceAndEdgeLabelDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new SourceAndEdgeLabelDistributionPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL);
-    TargetAndEdgeLabelDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new TargetAndEdgeLabelDistributionPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL);
-    VertexCountWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new VertexCountPreparer()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.FILE_VERTEX_COUNT);
-    VertexDegreeDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new VertexDegreeDistribution()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         "vertex_degree_distribution");
-    VertexIncomingDegreeDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new IncomingVertexDegreeDistribution()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         "incoming_vertex_degree_distribution");
-    VertexLabelDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new VertexLabelDistribution()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         GraphStatisticsReader.TOKEN_SEPARATOR);
-    VertexOutgoingDegreeDistributionWriter.writeCSV(logicalGraph,
+    StatisticWriter.writeCSV(new OutgoingVertexDegreeDistribution()
+        .execute(logicalGraph),
         appendSeparator(this.path) +
         "outgoing_vertex_degree_distribution");
   }

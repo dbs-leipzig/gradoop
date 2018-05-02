@@ -19,7 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIdsByEdgeLabel;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountByEdgeLabelWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctTargetIdsByEdgeLabel} for a given logical graph.
@@ -36,8 +36,8 @@ public class DistinctTargetVertexCountByEdgeLabelRunner extends AbstractRunner i
    */
   public static void main(String[] args) throws Exception {
 
-    DistinctTargetVertexCountByEdgeLabelWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new DistinctTargetIdsByEdgeLabel()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL);
 

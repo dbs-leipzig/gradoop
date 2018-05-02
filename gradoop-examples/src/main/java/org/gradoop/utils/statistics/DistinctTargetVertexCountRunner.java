@@ -19,7 +19,8 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctTargetVertexCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctTargetIds} for a given logical graph.
@@ -36,8 +37,8 @@ public class DistinctTargetVertexCountRunner extends AbstractRunner implements P
    */
   public static void main(String[] args) throws Exception {
 
-    DistinctTargetVertexCountWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new DistinctTargetVertexCountPreparer()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT);
 

@@ -19,7 +19,8 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
-import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeCountWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link EdgeCount} for a given logical graph.
@@ -36,8 +37,8 @@ public class EdgeCountRunner extends AbstractRunner implements ProgramDescriptio
    */
   public static void main(String[] args) throws Exception {
 
-    EdgeCountWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new EdgeCountPreparer()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) + GraphStatisticsReader.FILE_EDGE_COUNT);
 
     getExecutionEnvironment().execute("Statistics: Edge count");

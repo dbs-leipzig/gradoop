@@ -19,7 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeLabelDistribution;
-import org.gradoop.flink.model.impl.operators.statistics.writer.EdgeLabelDistributionWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link EdgeLabelDistribution} for a given logical graph.
@@ -36,8 +36,8 @@ public class EdgeLabelDistributionRunner extends AbstractRunner implements Progr
    */
   public static void main(String[] args) throws Exception {
 
-    EdgeLabelDistributionWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new EdgeLabelDistribution()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);
 

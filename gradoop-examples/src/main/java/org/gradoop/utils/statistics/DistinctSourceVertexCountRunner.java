@@ -19,7 +19,8 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctSourceVertexCountWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctSourceVertexCountPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctSourceIds} for a given logical graph.
@@ -36,8 +37,8 @@ public class DistinctSourceVertexCountRunner extends AbstractRunner implements P
    */
   public static void main(String[] args) throws Exception {
 
-    DistinctSourceVertexCountWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new DistinctSourceVertexCountPreparer()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
           GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT);
 

@@ -20,44 +20,28 @@ import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.statistics.SourceLabelAndEdgeLabelDistribution;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Computes {@link SourceLabelAndEdgeLabelDistribution} for a given logical graph and write it in a CSV file.
  */
-public class SourceAndEdgeLabelDistributionWriter {
+public class SourceAndEdgeLabelDistributionPreparer  implements
+UnaryGraphToValueOperator<MapOperator<WithCount<Tuple2<String, String>>,
+Tuple3<String, String, Long>>> {
 
   /**
    * Prepares the statistic a source and edge label distribution.
    * @param graph the logical graph for the calculation.
    * @return tuples with the containing statistics.
    */
-  public static MapOperator<WithCount<Tuple2<String, String>>, Tuple3<String, String, Long>>
-  prepareStatistic(final LogicalGraph graph) {
+  @Override
+  public MapOperator<WithCount<Tuple2<String, String>>, Tuple3<String, String, Long>>
+  execute(final LogicalGraph graph) {
     return new SourceLabelAndEdgeLabelDistribution()
         .execute(graph)
         .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
         .returns(new TypeHint<Tuple3<String, String, Long>>() { });
-  }
-
-  /**
-   * Write the statistic for a given logical graph in a CSV file.
-   * @param graph logical graph for the calculation
-   * @param filePath the path for the CSV file
-   */
-  public static void writeCSV(final LogicalGraph graph, final String filePath) {
-    writeCSV(graph, filePath, false);
-  }
-
-  /**
-   * Write the statistic for a given logical graph in a CSV file.
-   * @param graph logical graph for the calculation
-   * @param filePath the path for the CSV file
-   * @param overWrite should the target file be overwritten if it already exists?
-   */
-  public static void writeCSV(final LogicalGraph graph, final String filePath,
-      final boolean overWrite) {
-    StatisticWriter.writeCSV(prepareStatistic(graph), filePath, overWrite);
   }
 }

@@ -19,7 +19,8 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertiesByLabel;
-import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesByLabelWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctVertexPropertiesByLabelPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctEdgePropertiesByLabel} for a given logical graph.
@@ -36,8 +37,8 @@ public class DistinctVertexPropertiesByLabelRunner extends AbstractRunner implem
    */
   public static void main(String[] args) throws Exception {
 
-    DistinctVertexPropertiesByLabelWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new DistinctVertexPropertiesByLabelPreparer()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
 

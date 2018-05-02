@@ -19,7 +19,8 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.TargetLabelAndEdgeLabelDistribution;
-import org.gradoop.flink.model.impl.operators.statistics.writer.TargetAndEdgeLabelDistributionWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
+import org.gradoop.flink.model.impl.operators.statistics.writer.TargetAndEdgeLabelDistributionPreparer;
 
 /**
  * Computes {@link TargetLabelAndEdgeLabelDistribution} for a given logical graph.
@@ -36,8 +37,8 @@ public class TargetAndEdgeLabelDistributionRunner extends AbstractRunner impleme
    */
   public static void main(String[] args) throws Exception {
 
-    TargetAndEdgeLabelDistributionWriter.writeCSV(
-        readLogicalGraph(args[0], args[1]),
+    StatisticWriter.writeCSV(new TargetAndEdgeLabelDistributionPreparer()
+    .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
         GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL);
 

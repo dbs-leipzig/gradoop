@@ -26,6 +26,17 @@ import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphSt
 public class StatisticWriter {
 
   /**
+   * Write the statistic for a given logical graph in a CSV file.
+   * @param tuples tuples the tuples to write (one row per tuple, tuple fields separated by
+   * GraphStatisticsReader.TOKEN_SEPARATOR).
+   * @param filePath the path for the CSV file
+   * @param <T> the tuple containing statistics
+   */
+  public static <T extends Tuple> void writeCSV(final DataSet<T> tuples, final String filePath) {
+    writeCSV(tuples, filePath, false);
+  }
+
+  /**
    * Writes tuples as CSV file in a filepath.
    * @param tuples the tuples to write (one row per tuple, tuple fields separated by
    * GraphStatisticsReader.TOKEN_SEPARATOR).
