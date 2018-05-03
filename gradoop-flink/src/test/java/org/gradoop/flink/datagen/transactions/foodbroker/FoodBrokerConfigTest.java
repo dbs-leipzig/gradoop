@@ -141,7 +141,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   // additional tests
 
   @Test
-  public void testGetValueHomogenInfluence()
+  public void testGetValueHomogeneousInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
     File file = FileUtils.getFile(configPath);
@@ -157,7 +157,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testGetValueHomogenInfluence2()
+  public void testGetValueHomogeneousInfluence2()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
     File file = FileUtils.getFile(configPath);
@@ -173,7 +173,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testGetValueHomogenInfluence3()
+  public void testGetValueHomogeneousInfluence3()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
     File file = FileUtils.getFile(configPath);
@@ -189,7 +189,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
 
 
   @Test
-  public void testGetValueOnePositivInfluence()
+  public void testGetValueOnePositiveInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
     File file = FileUtils.getFile(configPath);
@@ -207,7 +207,7 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testGetValueTwoPositivInfluence()
+  public void testGetValueTwoPositiveInfluence()
     throws URISyntaxException, IOException, JSONException {
     String configPath = getConfigPath();
     File file = FileUtils.getFile(configPath);
@@ -228,10 +228,9 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
      * Valued constructor.
      *
      * @param content config content
-     * @throws IOException
      * @throws JSONException
      */
-    public TestFoodBrokerConfig(String content) throws IOException, JSONException {
+    public TestFoodBrokerConfig(String content) throws JSONException {
       super(content);
     }
 
