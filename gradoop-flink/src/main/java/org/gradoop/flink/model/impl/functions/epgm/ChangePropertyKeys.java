@@ -26,8 +26,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to rename property keys. If the new property key is already in use
  * the value will also be overwritten
+ *
+ *  @param <T> the {@link EPGMElement} which is target of change, e.g.
+ *  {@link org.gradoop.common.model.impl.pojo.Vertex},
+ *  {@link org.gradoop.common.model.impl.pojo.Edge} or
+ *  {@link org.gradoop.common.model.impl.pojo.GraphHead}
  */
-public class ChangePropertyKeys implements TransformationFunction<EPGMElement> {
+public class ChangePropertyKeys<T extends EPGMElement> implements TransformationFunction<T> {
 
   /**
    * a map containing the mappings from old property key names to the new ones
@@ -48,7 +53,7 @@ public class ChangePropertyKeys implements TransformationFunction<EPGMElement> {
   }
 
   @Override
-  public EPGMElement apply(EPGMElement current, EPGMElement transformed) {
+  public T apply(T current, T transformed) {
 
     for (Map.Entry<String, String> mapping : keyMappings.entrySet()) {
       if (current.getPropertyValue(mapping.getKey()) != null) {

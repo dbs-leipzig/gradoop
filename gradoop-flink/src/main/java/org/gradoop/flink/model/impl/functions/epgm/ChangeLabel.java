@@ -23,8 +23,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to rename a label
+ *
+ * @param <T> the {@link EPGMElement} which is target of change, e.g.
+ * {@link org.gradoop.common.model.impl.pojo.Vertex},
+ * {@link org.gradoop.common.model.impl.pojo.Edge} or
+ * {@link org.gradoop.common.model.impl.pojo.GraphHead}
  */
-public class ChangeLabel implements TransformationFunction<EPGMElement> {
+public class ChangeLabel<T extends EPGMElement> implements TransformationFunction<T> {
 
   /**
    * the old label which will be renamed by the process
@@ -48,7 +53,7 @@ public class ChangeLabel implements TransformationFunction<EPGMElement> {
   }
 
   @Override
-  public EPGMElement apply(EPGMElement current, EPGMElement transformed) {
+  public T apply(T current, T transformed) {
 
     if (current.getLabel().equals(oldLabel)) {
       current.setLabel(newLabel);
