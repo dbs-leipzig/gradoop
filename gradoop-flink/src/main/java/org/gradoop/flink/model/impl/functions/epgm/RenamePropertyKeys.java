@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *  {@link org.gradoop.common.model.impl.pojo.Edge} or
  *  {@link org.gradoop.common.model.impl.pojo.GraphHead}
  */
-public class ChangePropertyKeys<T extends EPGMElement> implements TransformationFunction<T> {
+public class RenamePropertyKeys<T extends EPGMElement> implements TransformationFunction<T> {
 
   /**
    * a map containing the mappings from old property key names to the new ones
@@ -44,7 +44,7 @@ public class ChangePropertyKeys<T extends EPGMElement> implements Transformation
    *
    * @param keyMappings the map consists of <old Key , new Key>
    */
-  public ChangePropertyKeys(Map<String, String> keyMappings) {
+  public RenamePropertyKeys(Map<String, String> keyMappings) {
     this.keyMappings = checkNotNull(keyMappings);
     for (Map.Entry mapping : keyMappings.entrySet()) {
       checkNotNull(mapping.getKey());

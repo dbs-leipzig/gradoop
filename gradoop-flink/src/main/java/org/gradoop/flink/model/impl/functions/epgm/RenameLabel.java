@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link org.gradoop.common.model.impl.pojo.Edge} or
  * {@link org.gradoop.common.model.impl.pojo.GraphHead}
  */
-public class ChangeLabel<T extends EPGMElement> implements TransformationFunction<T> {
+public class RenameLabel<T extends EPGMElement> implements TransformationFunction<T> {
 
   /**
    * the old label which will be renamed by the process
@@ -47,7 +47,7 @@ public class ChangeLabel<T extends EPGMElement> implements TransformationFunctio
    * @param oldLabel the label to be renamed
    * @param newLabel the new label replacing the old one
    */
-  public ChangeLabel(String oldLabel, String newLabel) {
+  public RenameLabel(String oldLabel, String newLabel) {
     this.oldLabel = checkNotNull(oldLabel);
     this.newLabel = checkNotNull(newLabel);
   }
