@@ -1,10 +1,13 @@
 package org.gradoop.flink.io.impl.rdbms.sequential;
 
 import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple4;
@@ -24,6 +27,7 @@ public class SequentialMetaDataParser {
 			String tableName = rsTables.getString("TABLE_NAME");
 			ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
 			ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
+			ResultSet rsAttributes = metadata.getColumns(null, null, tableName, "%");
 
 			String pkString = "";
 			while (rsPrimaryKeys.next()) {
@@ -35,6 +39,12 @@ public class SequentialMetaDataParser {
 					table.setTableName(tableName);
 					table.setPrimaryKey(pkString);
 					table.setForeignKeys(null);
+					LinkedHashMap<String, JDBCType> attr = new LinkedHashMap<String, JDBCType>();
+					while (rsAttributes.next()) {
+						attr.put(rsAttributes.getString("COLUMN_NAME"),
+								JDBCType.valueOf(Integer.parseInt(rsAttributes.getString("DATA_TYPE"))));
+					}
+					table.setAttributes(attr);
 					tables.add(table);
 				} else {
 					RDBMSTable table = new RDBMSTable();
@@ -45,6 +55,12 @@ public class SequentialMetaDataParser {
 						fks.put(rsForeignKeys.getString("FKCOLUMN_NAME"), rsForeignKeys.getString("PKTABLE_NAME"));
 					} while (rsForeignKeys.next());
 					table.setForeignKeys(fks);
+					LinkedHashMap<String, JDBCType> attr = new LinkedHashMap<String, JDBCType>();
+					while (rsAttributes.next()) {
+						attr.put(rsAttributes.getString("COLUMN_NAME"),
+								JDBCType.valueOf(Integer.parseInt(rsAttributes.getString("DATA_TYPE"))));
+					}
+					table.setAttributes(attr);
 					tables.add(table);
 				}
 			}

@@ -6,7 +6,6 @@ import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConfig;
-import org.gradoop.flink.io.impl.rdbms.functions.MetadataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSMetadata;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 import org.gradoop.flink.model.api.epgm.GraphCollection;

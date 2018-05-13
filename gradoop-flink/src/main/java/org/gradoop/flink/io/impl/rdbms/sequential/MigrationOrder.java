@@ -9,42 +9,48 @@ import java.util.Map.Entry;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 
 public class MigrationOrder {
-	ArrayList<String> toNodes;
-	ArrayList<RDBMSTable> tables;
-	ArrayList<String> toEdges;
+	private ArrayList<RDBMSTable> toNodes, tables;
+	private HashSet<String> toEdgesTableNames, toNodesTableNames;
 
-	public MigrationOrder(ArrayList<RDBMSTable> tables, ArrayList<String> toEdges) {
-		this.toNodes = new ArrayList<String>();
+	public MigrationOrder(ArrayList<RDBMSTable> tables, ArrayList<RDBMSTable> toEdges) {
 		this.tables = tables;
-		this.toEdges = toEdges;
+
+		this.toNodes = new ArrayList<RDBMSTable>();
+		this.toNodesTableNames = new HashSet<String>();
+
+		this.toEdgesTableNames = new HashSet<String>();
+		for (RDBMSTable te : toEdges) {
+			this.toEdgesTableNames.add(te.getTableName());
+		}
 	}
 
-	public ArrayList<String> tablesToNodes() {
-		ArrayList<String> candidates = new ArrayList<String>();
+	public ArrayList<RDBMSTable> tablesToNodes() {
+		ArrayList<RDBMSTable> candidates = null;
 		do {
-			candidates.clear();
+			candidates = new ArrayList<RDBMSTable>();
 			for (RDBMSTable table : tables) {
 				String tableName = table.getTableName();
-				if (!toEdges.contains(tableName) && !toNodes.contains(tableName)) {
+				if (!toEdgesTableNames.contains(tableName) && !toNodesTableNames.contains(tableName)) {
 					if (table.getForeignKeys() == null) {
-						candidates.add(tableName);
+						candidates.add(table);
 					} else {
 						boolean containsAll = true;
 						Iterator it = table.getForeignKeys().entrySet().iterator();
 						while (it.hasNext()) {
 							Map.Entry pair = (Entry) it.next();
-							if (!toNodes.contains(pair.getValue())) {
+							if (!toNodesTableNames.contains(pair.getValue())) {
 								containsAll = false;
 							}
 						}
 						if (containsAll) {
-							candidates.add(tableName);
+							candidates.add(table);
 						}
 					}
 				}
 			}
-			for (String c : candidates) {
+			for (RDBMSTable c : candidates) {
 				toNodes.add(c);
+				toNodesTableNames.add(c.getTableName());
 			}
 		} while (!candidates.isEmpty());
 		return toNodes;

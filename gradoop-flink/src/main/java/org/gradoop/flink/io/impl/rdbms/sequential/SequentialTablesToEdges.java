@@ -10,11 +10,10 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 public class SequentialTablesToEdges {
 
 	SequentialTablesToEdges() {
-
 	}
 
-	public static ArrayList<String> getTablesToEdges(ArrayList<RDBMSTable> tables) {
-		ArrayList<String> tablesToEdges = new ArrayList<String>();
+	public static ArrayList<RDBMSTable> getTablesToEdges(ArrayList<RDBMSTable> tables) {
+		ArrayList<RDBMSTable> tablesToEdges = new ArrayList<RDBMSTable>();
 		HashSet<String> referencedTables = new HashSet<String>();
 
 		for (RDBMSTable table : tables) {
@@ -30,7 +29,7 @@ public class SequentialTablesToEdges {
 		for (RDBMSTable table : tables) {
 			if (table.getForeignKeys() != null) {
 				if (!referencedTables.contains(table.getTableName()) && table.getForeignKeys().size() == 2) {
-					tablesToEdges.add(table.getTableName());
+					tablesToEdges.add(table);
 				}
 			}
 		}

@@ -11,34 +11,36 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 public class SequentialCycleFinder {
 	ArrayList<RDBMSTable> tables;
 	ArrayList<RDBMSTable> cleanedTables;
-	public HashSet<String> cyclicTables;
+	public HashSet<RDBMSTable> cyclicTables;
 	HashSet<String> visited;
+	ArrayList<RDBMSTable> returnCyclicTables;
 
 	public SequentialCycleFinder(ArrayList<RDBMSTable> tables) {
 		this.tables = tables;
-		this.cyclicTables = new HashSet<String>();
+		this.cyclicTables = new HashSet<RDBMSTable>();
 		this.cleanedTables = new ArrayList<RDBMSTable>();
+		this.returnCyclicTables = new ArrayList<RDBMSTable>();
 	}
 
-	public HashSet<String> findAllCycles() {
+	public HashSet<RDBMSTable> findAllCycles() {
 		cleanTables();
 		for (RDBMSTable table : cleanedTables) {
 			visited = new HashSet<String>();
 			Iterator it = table.getForeignKeys().entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Entry) it.next();
-				findTableCycle(table.getTableName(), pair);
+				findTableCycle(table, pair);
 				// System.out.println(pair.getValue());
 			}
 		}
 		return cyclicTables;
 	}
 
-	public void findTableCycle(String tableName, Map.Entry<String, String> pair) {
-		String referencing = tableName;
-		String observed = pair.getValue();
+	public void findTableCycle(RDBMSTable refingTable, Map.Entry<String, String> pair) {
+		RDBMSTable referencing = refingTable;
+		RDBMSTable observed = getRefdTable(pair.getValue());
 
-		if (observed.equals(referencing)) {
+		if (observed.getTableName().equals(referencing.getTableName())) {
 			cyclicTables.add(observed);
 		}
 
@@ -49,22 +51,32 @@ public class SequentialCycleFinder {
 					Iterator it = table.getForeignKeys().entrySet().iterator();
 					while (it.hasNext()) {
 						Map.Entry dkPair = (Entry) it.next();
-						findTableCycle(table.getTableName(), pair);
+						findTableCycle(table, pair);
 					}
 				}
 			}
 
 		}
 	}
-
+	
 	public void cleanTables() {
 		for(RDBMSTable table : tables){
 			if(table.getForeignKeys() != null){
 				cleanedTables.add(table);
-			}else{
-				System.out.println();
 			}
 		}
 	}
+	
+	public RDBMSTable getRefdTable(String refdTableStr){
+		RDBMSTable refdTable = null;
+		for(RDBMSTable table : tables){
+			if(table.getTableName().equals(refdTable)){
+				refdTable = table;
+			}
+		}
+		return refdTable;
+	}
+
+	
 
 }
