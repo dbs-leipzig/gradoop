@@ -55,8 +55,7 @@ import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Neighborhoo
  *
  * The implementation of this  algorithm and its functions is based on the Gelly Jaccard Index
  * implementation but extends its configurability
- * @see
- * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.3/api/java/org/apache/flink/graph/library/similarity/JaccardIndex.html">
+ * @see <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.3/api/java/org/apache/flink/graph/library/similarity/JaccardIndex.html">
  * Gelly Jaccard Index </a>
  *
  **/
