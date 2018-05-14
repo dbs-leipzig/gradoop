@@ -19,8 +19,12 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.*;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.VertexHandler;
 import org.gradoop.common.util.HBaseConstants;
 
@@ -32,6 +36,16 @@ import org.gradoop.common.util.HBaseConstants;
  */
 public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   extends TableInputFormat<Tuple1<V>> {
+
+  /**
+   * An optional set of vertex ids to define a filter for HBase.
+   */
+  private GradoopIdSet filterVertexIds = new GradoopIdSet();
+
+  /**
+   * An optional set of edge ids to define a filter for HBase.
+   */
+  private GradoopIdSet filterEdgeIds = new GradoopIdSet();
 
   /**
    * Handles reading of persistent vertex data.
@@ -62,7 +76,106 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   protected Scan getScanner() {
     Scan scan = new Scan();
     scan.setCaching(HBaseConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
+
+    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+    // if vertex ids are given, add a filter
+    if (!filterVertexIds.isEmpty()) {
+      conjunctFilters.addFilter(getVertexIdFilter(filterVertexIds));
+    }
+
+    // if edge ids are given, add a filter
+    if (!filterEdgeIds.isEmpty()) {
+      conjunctFilters.addFilter(getEdgeIdFilter(filterEdgeIds));
+    }
+
+    // if there are filters inside the root list, add it to the Scan object
+    if (!conjunctFilters.getFilters().isEmpty()) {
+      scan.setFilter(conjunctFilters);
+    }
+
     return scan;
+  }
+
+  /**
+   * Creates a HBase Filter object to return only vertices with the given GradoopIds.
+   *
+   * @param vertexIds a set of vertex GradoopIds to filter
+   * @return a HBase Filter object
+   */
+  private Filter getVertexIdFilter(GradoopIdSet vertexIds) {
+    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+    for (GradoopId vertexId : vertexIds) {
+      RowFilter rowFilter = new RowFilter(
+        CompareFilter.CompareOp.EQUAL,
+        new BinaryComparator(vertexId.toByteArray())
+      );
+      filterList.addFilter(rowFilter);
+    }
+
+    return filterList;
+  }
+
+  /**
+   * Creates a HBase Filter object to return only edges with vertices
+   * as source and target that are identified by the given GradoopIds.
+   *
+   * @param edgeIds a set of edge GradoopIds to filter
+   * @return a HBase Filter object
+   */
+  private Filter getEdgeIdFilter(GradoopIdSet edgeIds) {
+    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+    BinaryComparator nullStringComparator = new BinaryComparator(Bytes.toBytes(""));
+    SingleColumnValueFilter ieFilter;
+    SingleColumnValueFilter oeFilter;
+
+    for (GradoopId gradoopId : edgeIds) {
+      byte[] edgeIdBytes = gradoopId.toByteArray();
+
+      ieFilter = new SingleColumnValueExcludeFilter(
+        Bytes.toBytesBinary(HBaseConstants.CF_IN_EDGES),
+        edgeIdBytes,
+        CompareFilter.CompareOp.EQUAL,
+        nullStringComparator
+      );
+      // if row does not have this column, exclude them
+      ieFilter.setFilterIfMissing(true);
+
+      filterList.addFilter(ieFilter);
+
+      oeFilter = new SingleColumnValueExcludeFilter(
+        Bytes.toBytesBinary(HBaseConstants.CF_OUT_EDGES),
+        edgeIdBytes,
+        CompareFilter.CompareOp.EQUAL,
+        nullStringComparator
+      );
+      // if row does not have this column, exclude them
+      oeFilter.setFilterIfMissing(true);
+
+      filterList.addFilter(oeFilter);
+    }
+
+    return filterList;
+  }
+
+  /**
+   * Setter for GradoopIds of vertices to filter. Note that this implies the
+   * extension of the Scan object returned by getScanner() with HBase filters.
+   *
+   * @param filterVertexIds a GradoopIdSet of vertex ids
+   */
+  public void setFilterVertexIds(GradoopIdSet filterVertexIds) {
+    this.filterVertexIds.addAll(filterVertexIds);
+  }
+
+  /**
+   * Setter for GradoopIds of edges to filter. Note that this implies the
+   * extension of the Scan object returned by getScanner() with HBase filters.
+   *
+   * @param filterEdgeIds a GradoopIdSet of edge ids
+   */
+  public void setFilterEdgeIds(GradoopIdSet filterEdgeIds) {
+    this.filterEdgeIds.addAll(filterEdgeIds);
   }
 
   /**
