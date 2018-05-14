@@ -22,6 +22,8 @@ import org.apache.flink.types.IntValue;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Denominator;
 
 /**
@@ -71,30 +73,13 @@ public class ComputeScores implements GroupReduceFunction<Tuple3<GradoopId, Grad
 
     int denominatorValue = computeDenominatorValue(edge.f2.getValue(), count);
 
-    out.collect(createResultEdge(edge.f0, edge.f1, (double) count / denominatorValue,
-      edgeLabel));
-    out.collect(createResultEdge(edge.f1, edge.f0, (double) count / denominatorValue,
-      edgeLabel));
+    Properties valueProperty = Properties.create();
+    valueProperty.set(DEFAULT_JACCARD_EDGE_PROPERTY, (double) count / denominatorValue);
+    EdgeFactory ef = new EdgeFactory();
+    out.collect(ef.createEdge(edgeLabel, edge.f0, edge.f1, valueProperty));
+    out.collect(ef.createEdge(edgeLabel, edge.f1, edge.f0, valueProperty));
   }
 
-  /**
-   * Creates a result edge with given source, target, value and edge label
-   * @param source GradoopId of the source vertex
-   * @param target GradoopId of the target vertex
-   * @param value Jaccard Similarity of both vertices
-   * @param edgeLabel the label for result edges
-   * @return the newly created edge
-   */
-  private Edge createResultEdge(GradoopId source, GradoopId target, double value, String
-    edgeLabel) {
-    Edge edge = new Edge();
-    edge.setId(GradoopId.get());
-    edge.setSourceId(source);
-    edge.setTargetId(target);
-    edge.setProperty(DEFAULT_JACCARD_EDGE_PROPERTY, value);
-    edge.setLabel(edgeLabel);
-    return edge;
-  }
 
   /**
    * Returns the denominator value in dependence of the set configuration

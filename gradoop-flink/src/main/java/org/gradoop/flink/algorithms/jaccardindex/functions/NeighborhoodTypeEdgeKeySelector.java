@@ -27,7 +27,7 @@ import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Neighborhoo
  * Selects the appropriate Key- or SourceId from an edge depending on the given
  * {@link NeighborhoodType}
  */
-public class ConfigurableEdgeKeySelector implements KeySelector<Edge, GradoopId> {
+public class NeighborhoodTypeEdgeKeySelector implements KeySelector<Edge, GradoopId> {
 
   /**
    * The type of neighborhood
@@ -38,7 +38,7 @@ public class ConfigurableEdgeKeySelector implements KeySelector<Edge, GradoopId>
    * Creates a new EdgeKeySelector with the given neighborhood type
    * @param neighborhoodType type of neighborhood
    */
-  public ConfigurableEdgeKeySelector(NeighborhoodType neighborhoodType) {
+  public NeighborhoodTypeEdgeKeySelector(NeighborhoodType neighborhoodType) {
     this.neighborhoodType = neighborhoodType;
   }
 

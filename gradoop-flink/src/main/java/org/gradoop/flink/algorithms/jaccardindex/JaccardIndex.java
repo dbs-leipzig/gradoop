@@ -25,7 +25,7 @@ import org.apache.flink.types.IntValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.algorithms.jaccardindex.functions.ComputeScores;
-import org.gradoop.flink.algorithms.jaccardindex.functions.ConfigurableEdgeKeySelector;
+import org.gradoop.flink.algorithms.jaccardindex.functions.NeighborhoodTypeEdgeKeySelector;
 import org.gradoop.flink.algorithms.jaccardindex.functions.GenerateGroupPairs;
 import org.gradoop.flink.algorithms.jaccardindex.functions.GenerateGroupSpans;
 import org.gradoop.flink.algorithms.jaccardindex.functions.GenerateGroups;
@@ -50,8 +50,14 @@ import static org.gradoop.flink.algorithms.jaccardindex.JaccardIndex.Neighborhoo
  * an incoming edge instead. The denominator may be changed towards the maximum size of both
  * neighborhoods.
  *
- * The results of the algorithm are stored in edge-pairs between each two vertices with
+ * Results of the algorithm are stored in edge-pairs between each two vertices with
  * similarity > 0.
+ *
+ * The implementation of this  algorithm and its functions is based on the Gelly Jaccard Index
+ * implementation but extends its configurability
+ * @see
+ * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.3/api/java/org/apache/flink/graph/library/similarity/JaccardIndex.html">
+ * Gelly Jaccard Index </a>
  *
  **/
 public class JaccardIndex implements UnaryGraphToGraphOperator {
@@ -169,7 +175,7 @@ public class JaccardIndex implements UnaryGraphToGraphOperator {
     return inputGraph
       .getEdges()
       .join(degrees)
-      .where(new ConfigurableEdgeKeySelector(neighborhoodType))
+      .where(new NeighborhoodTypeEdgeKeySelector(neighborhoodType))
       .equalTo(new KeySelector<WithCount<GradoopId>, GradoopId>() {
         @Override
         public GradoopId getKey(WithCount<GradoopId> value) {
