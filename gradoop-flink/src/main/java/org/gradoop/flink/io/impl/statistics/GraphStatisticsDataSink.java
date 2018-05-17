@@ -122,14 +122,14 @@ public class GraphStatisticsDataSink implements DataSink {
         .execute(logicalGraph),
         appendSeparator(this.path) +
         "vertex_degree_distribution");
+    StatisticWriter.writeCSV(new VertexLabelDistribution()
+        .execute(logicalGraph),
+        appendSeparator(this.path) +
+        GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL);
     StatisticWriter.writeCSV(new IncomingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
         "incoming_vertex_degree_distribution");
-    StatisticWriter.writeCSV(new VertexLabelDistribution()
-        .execute(logicalGraph),
-        appendSeparator(this.path) +
-        GraphStatisticsReader.TOKEN_SEPARATOR);
     StatisticWriter.writeCSV(new OutgoingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
