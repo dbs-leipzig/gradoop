@@ -15,7 +15,6 @@ import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.junit.runners.model.InitializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +30,9 @@ import static org.gradoop.common.config.GradoopAccumuloConfig.*;
 @Suite.SuiteClasses({
   AccumuloGraphStoreTest.class, AccumuloDataSinkSourceTest.class,
 })
-public class AccumuloTestSuit {
+public class AccumuloTestSuite {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AccumuloTestSuit.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AccumuloTestSuite.class);
 
   /**
    * accumulo password
@@ -96,7 +95,7 @@ public class AccumuloTestSuit {
     tmp.create();
     File tmpFolder = tmp.newFolder();
     MiniAccumuloConfig config = new MiniAccumuloConfig(tmpFolder, ACCUMULO_PASSWORD);
-    config.setNativeLibPaths(AccumuloTestSuit.class.getResource("/").getFile());
+    config.setNativeLibPaths(AccumuloTestSuite.class.getResource("/").getFile());
     accumulo = new MiniAccumuloCluster(config);
     accumulo.start();
     LOG.info("create mini accumulo start success!");

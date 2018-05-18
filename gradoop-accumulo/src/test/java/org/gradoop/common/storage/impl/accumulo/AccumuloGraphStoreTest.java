@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.gradoop.AccumuloTestSuit;
+import org.gradoop.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopAccumuloConfig;
 import org.gradoop.common.config.GradoopConfig;
@@ -67,7 +67,7 @@ public class AccumuloGraphStoreTest extends GradoopFlinkTestBase {
    */
   @Test
   public void test01_writeCloseOpenReadTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuit.getAcConfig(
+    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuite.getAcConfig(
       getExecutionEnvironment(), TEST01);
 
     AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
@@ -99,7 +99,7 @@ public class AccumuloGraphStoreTest extends GradoopFlinkTestBase {
    */
   @Test
   public void test02_writeFlushReadTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuit.getAcConfig(
+    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuite.getAcConfig(
       getExecutionEnvironment(), TEST02);
 
     AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
@@ -133,7 +133,7 @@ public class AccumuloGraphStoreTest extends GradoopFlinkTestBase {
   @Test
   public void test03_iteratorTest() throws IOException, AccumuloSecurityException,
     AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuit.getAcConfig(
+    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuite.getAcConfig(
       getExecutionEnvironment(), TEST03);
     AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
 
@@ -171,7 +171,7 @@ public class AccumuloGraphStoreTest extends GradoopFlinkTestBase {
    */
   @Test(expected = UnsupportedTypeException.class)
   public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuit.getAcConfig(
+    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuite.getAcConfig(
       getExecutionEnvironment(), TEST04);
     AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
 
@@ -194,7 +194,7 @@ public class AccumuloGraphStoreTest extends GradoopFlinkTestBase {
   @SuppressWarnings("Duplicates")
   @Test
   public void test05_propertyTypeTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuit.getAcConfig(getExecutionEnvironment(), TEST05);
+    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config = AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST05);
     AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
 
     final GradoopId vertexID = GradoopId.get();

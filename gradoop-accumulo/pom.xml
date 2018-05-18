@@ -13,7 +13,7 @@
     <name>Gradoop Accumulo</name>
 
     <properties>
-        <accumuloTestSuite>**/AccumuloTestSuit.class</accumuloTestSuite>
+        <accumuloTestSuite>**/AccumuloTestSuite.class</accumuloTestSuite>
     </properties>
 
     <build>

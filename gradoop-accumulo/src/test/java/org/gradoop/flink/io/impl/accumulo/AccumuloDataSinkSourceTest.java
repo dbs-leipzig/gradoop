@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.accumulo;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.AccumuloTestSuit;
+import org.gradoop.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -52,7 +52,7 @@ public class AccumuloDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void test01_read() throws Exception {
     AccumuloEPGMStore<GraphHead, Vertex, Edge> accumuloStore = new AccumuloEPGMStore<>(
-      AccumuloTestSuit.getAcConfig(getExecutionEnvironment(), TEST_01));
+      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST_01));
 
     Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
     Collection<Vertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
@@ -96,7 +96,7 @@ public class AccumuloDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void test02_write() throws Exception {
     AccumuloEPGMStore<GraphHead, Vertex, Edge> accumuloStore = new AccumuloEPGMStore<>(
-      AccumuloTestSuit.getAcConfig(getExecutionEnvironment(), TEST_02));
+      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST_02));
 
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(
