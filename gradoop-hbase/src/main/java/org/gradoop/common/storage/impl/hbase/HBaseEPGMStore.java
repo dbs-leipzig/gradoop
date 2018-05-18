@@ -25,6 +25,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.common.config.GradoopHBaseConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.api.EPGMStore;
 import org.gradoop.common.storage.api.EdgeHandler;
@@ -32,9 +33,8 @@ import org.gradoop.common.storage.api.GraphHeadHandler;
 import org.gradoop.common.storage.api.PersistentEdge;
 import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
-import org.gradoop.common.util.HBaseConstants;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.api.VertexHandler;
+import org.gradoop.common.util.HBaseConstants;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -47,9 +47,10 @@ import java.util.Iterator;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class HBaseEPGMStore
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements EPGMStore<G, V, E> {
+public class HBaseEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  implements
+  EPGMStore<GradoopHBaseConfig<G, V, E>, PersistentGraphHead, PersistentVertex<E>,
+    PersistentEdge<V>, G, V, E> {
   /**
    * Default value for clearing buffer on fail.
    */
@@ -86,21 +87,20 @@ public class HBaseEPGMStore
    * @param edgeTable       HBase table to store edge data
    * @param config          Gradoop Configuration
    */
-  HBaseEPGMStore(final HTable graphHeadTable,
+  HBaseEPGMStore(
+    final HTable graphHeadTable,
     final HTable vertexTable,
     final HTable edgeTable,
-    final GradoopHBaseConfig<G, V, E> config) {
+    final GradoopHBaseConfig<G, V, E> config
+  ) {
     this.graphHeadTable = Preconditions.checkNotNull(graphHeadTable);
     this.vertexTable = Preconditions.checkNotNull(vertexTable);
     this.edgeTable = Preconditions.checkNotNull(edgeTable);
     this.config = Preconditions.checkNotNull(config);
 
-    this.graphHeadTable
-      .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.vertexTable
-      .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.edgeTable
-      .setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.graphHeadTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.vertexTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.edgeTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
   }
 
   /**

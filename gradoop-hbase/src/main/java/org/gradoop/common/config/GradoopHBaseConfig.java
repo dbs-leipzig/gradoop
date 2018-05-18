@@ -21,14 +21,16 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.storage.api.GraphHeadHandler;
-import org.gradoop.common.util.HBaseConstants;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.api.EdgeHandler;
+import org.gradoop.common.storage.api.GraphHeadHandler;
+import org.gradoop.common.storage.api.PersistentEdgeFactory;
+import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
+import org.gradoop.common.storage.api.PersistentVertexFactory;
 import org.gradoop.common.storage.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.HBaseEdgeFactory;
 import org.gradoop.common.storage.impl.hbase.HBaseEdgeHandler;
@@ -36,6 +38,7 @@ import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadFactory;
 import org.gradoop.common.storage.impl.hbase.HBaseGraphHeadHandler;
 import org.gradoop.common.storage.impl.hbase.HBaseVertexFactory;
 import org.gradoop.common.storage.impl.hbase.HBaseVertexHandler;
+import org.gradoop.common.util.HBaseConstants;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,9 +50,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GradoopHBaseConfig
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GradoopStoreConfig<G, V, E> {
+public class GradoopHBaseConfig<G extends EPGMGraphHead, V extends EPGMVertex, E extends
+  EPGMEdge> extends
+  GradoopStoreConfig<PersistentGraphHeadFactory<G>, PersistentVertexFactory<V, E>,
+    PersistentEdgeFactory<E, V>> {
+
 
   /**
    * Graph table name.
