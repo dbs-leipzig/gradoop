@@ -106,6 +106,19 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
   }
 
   @Test
+  public void testVertexOnlyOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "g1[(a)-[e1]->(b)]" +
+      "g2[(a)-[e2]->(b)]" +
+      "expected[(a)(b)]");
+    LogicalGraph g1 = loader.getLogicalGraphByVariable("g1");
+    LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(g1.overlap(g2).equalsByElementIds(expected));
+  }
+
+  @Test
   public void testGraphContainment() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
