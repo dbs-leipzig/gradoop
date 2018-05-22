@@ -21,8 +21,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
@@ -50,12 +48,8 @@ public class Overlap implements BinaryGraphToGraphOperator {
       .with(new LeftSide<>());
 
     DataSet<Edge> newEdges = firstGraph.getEdges()
-      .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(newVertices)
-      .where(new TargetId<>())
+      .join(secondGraph.getEdges())
+      .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
