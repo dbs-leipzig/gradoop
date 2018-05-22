@@ -123,8 +123,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public static final transient byte FLAG_LARGE = 0x10;
 
   /**
+   * Was previously used to indicate maximum size of the internal byte representation.
+   *
+   * @deprecated The new maximum size is depending on the JVM implementation.
+   */
+  @Deprecated
+  public static final transient int MAX_BINARY_LENGTH = Short.MAX_VALUE - OFFSET;
+
+  /**
    * If the length of the byte representation is larger than this value, the length will be
-   * stored as an {@link int} instead of a {@link short},
+   * stored as an {@code int} instead of a {@code short},
    */
   public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
 
