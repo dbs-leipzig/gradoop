@@ -99,15 +99,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public static final transient byte TYPE_LIST         = 0x0a;
   /**
-   * {@code <property-type>} for {@link java.util.List}
+   * {@code <property-type>} for {@link LocalDate}
    */
   public static final transient byte TYPE_DATE         = 0x0b;
   /**
-   * {@code <property-type>} for {@link java.util.List}
+   * {@code <property-type>} for {@link LocalTime}
    */
   public static final transient byte TYPE_TIME         = 0x0c;
   /**
-   * {@code <property-type>} for {@link java.util.List}
+   * {@code <property-type>} for {@link LocalDateTime}
    */
   public static final transient byte TYPE_DATETIME     = 0x0d;
 
@@ -117,10 +117,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public static final transient byte OFFSET            = 0x01;
 
   /**
-   * We use a short as length prefix in binary representations of this property.
-   * This value is the maximum viable length.
+   * Bit flag indicating a "large" property. The length of the byte representation will be stored
+   * as an {@code int} instead.
    */
-  public static final int MAX_BINARY_LENGTH = Short.MAX_VALUE - OFFSET;
+  public static final transient byte FLAG_LARGE = 0x10;
+
+  /**
+   * If the length of the byte representation is larger than this value, the length will be
+   * stored as an {@link int} instead of a {@link short},
+   */
+  public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
 
   /**
    * Class version for serialization.
@@ -155,7 +161,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param bytes byte array
    */
   private PropertyValue(byte[] bytes) {
-    rawBytes = bytes;
+    setBytes(bytes);
   }
 
   /**
@@ -388,7 +394,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     } else {
       throw new ClassCastException(
         "Cannot covert " + this.getType().getSimpleName() +
-          " to " + Double.class.getSimpleName());
+          " to " + BigDecimal.class.getSimpleName());
     }
     return decimal;
   }
@@ -508,7 +514,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setObject(Object value) {
     if (value == null) {
       rawBytes = new byte[] {TYPE_NULL};
-      validateBytesLength();
     } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
     } else if (value instanceof Integer) {
@@ -599,7 +604,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_STRING;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
-    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code BigDecimal} value.
@@ -611,7 +615,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + valueBytes.length];
     rawBytes[0] = TYPE_BIG_DECIMAL;
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
-    validateBytesLength();
   }
   /**
    * Sets the wrapped value as {@code GradoopId} value.
@@ -651,7 +654,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
 
     this.rawBytes = byteStream.toByteArray();
-    validateBytesLength();
   }
 
   /**
@@ -677,7 +679,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
 
     this.rawBytes = byteStream.toByteArray();
-    validateBytesLength();
   }
 
   /**
@@ -751,7 +752,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
     this.rawBytes = bytes;
-    validateBytesLength();
   }
 
   /**
@@ -840,13 +840,20 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   @Override
   public void write(DataOutputView outputView) throws IOException {
     // null?
-    // type
-    outputView.writeByte(rawBytes[0]);
-    // dynamic type?
-    if (rawBytes[0] == TYPE_STRING || rawBytes[0] == TYPE_BIG_DECIMAL ||
-      rawBytes[0] == TYPE_MAP || rawBytes[0] == TYPE_LIST) {
-      // write length
-      outputView.writeShort(rawBytes.length - OFFSET);
+    // Write type.
+    byte type = rawBytes[0];
+    if (rawBytes.length > LARGE_PROPERTY_THRESHOLD) {
+      type |= FLAG_LARGE;
+    }
+    outputView.writeByte(type);
+    // Write length for types with a variable length.
+    if (isString() || isBigDecimal() || isMap() || isList()) {
+      // Write length as an int if the "large" flag is set.
+      if ((type & FLAG_LARGE) == FLAG_LARGE) {
+        outputView.writeInt(rawBytes.length);
+      } else {
+        outputView.writeShort(rawBytes.length - OFFSET);
+      }
     }
     // write data
     outputView.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
@@ -854,13 +861,19 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public void read(DataInputView inputView) throws IOException {
-    short length = 0;
+    int length = 0;
     // type
-    byte type = inputView.readByte();
+    byte typeByte = inputView.readByte();
+    // Apply bitmask to get the actual type.
+    byte type = (byte) (~FLAG_LARGE & typeByte);
     // dynamic type?
     if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP || type == TYPE_LIST) {
       // read length
-      length = inputView.readShort();
+      if ((typeByte & FLAG_LARGE) == FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
     } else if (type == TYPE_NULL) {
       length = 0;
     } else if (type == TYPE_BOOLEAN) {
@@ -897,16 +910,5 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return getObject() != null ?
       getObject().toString() :
       GradoopConstants.NULL_STRING;
-  }
-
-  /**
-   * Throw a runtime exception if this property value can't be represented
-   * in {@link PropertyValue#MAX_BINARY_LENGTH} bytes.
-   */
-  private void validateBytesLength() {
-    if (rawBytes != null && rawBytes.length > MAX_BINARY_LENGTH) {
-      throw new IllegalStateException("The binary representation of this property is too big: " +
-      rawBytes.length + " > " + MAX_BINARY_LENGTH);
-    }
   }
 }
