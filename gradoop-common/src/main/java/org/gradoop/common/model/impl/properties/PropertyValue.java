@@ -858,7 +858,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (isString() || isBigDecimal() || isMap() || isList()) {
       // Write length as an int if the "large" flag is set.
       if ((type & FLAG_LARGE) == FLAG_LARGE) {
-        outputView.writeInt(rawBytes.length);
+        outputView.writeInt(rawBytes.length - OFFSET);
       } else {
         outputView.writeShort(rawBytes.length - OFFSET);
       }

@@ -781,7 +781,7 @@ public class PropertyValueTest {
   }
   
   @Test
-  public void testLargeArrayValu() {
+  public void testLargeArrayValue() {
     PropertyValue property = new PropertyValue();
     property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 1]);
   }
