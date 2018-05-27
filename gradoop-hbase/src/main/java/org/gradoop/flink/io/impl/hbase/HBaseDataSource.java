@@ -21,11 +21,16 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.config.GradoopHBaseConfig;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.api.FilterableDataSource;
+import org.gradoop.flink.io.filter.Expression;
+import org.gradoop.flink.io.filter.EdgeIdIn;
+import org.gradoop.flink.io.filter.VertexIdIn;
 import org.gradoop.flink.io.impl.hbase.inputformats.EdgeTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.flink.io.impl.hbase.inputformats.VertexTableInputFormat;
@@ -35,11 +40,18 @@ import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.List;
+
 /**
  * Creates an EPGM instance from HBase.
  */
 public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
-  implements DataSource {
+  implements DataSource, FilterableDataSource {
+
+  /**
+   * List of predicates to applean verif
+   */
+  private List<Expression> predicates;
 
   /**
    * Creates a new HBase data source.
@@ -49,7 +61,20 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
    */
   public HBaseDataSource(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
           GradoopFlinkConfig config) {
+    this(epgmStore, config, null);
+  }
+
+  /**
+   * Creates a new HBase data source with predicates to pushing down to the HBase store.
+   *
+   * @param epgmStore  HBase store
+   * @param config     Gradoop Flink configuration
+   * @param predicates Predicates for pushing down to source
+   */
+  public HBaseDataSource(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
+                         GradoopFlinkConfig config, List<Expression> predicates) {
     super(epgmStore, config);
+    this.predicates = predicates;
   }
 
   @Override
@@ -79,17 +104,55 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge>
       .createInput(new GraphHeadTableInputFormat<>(config.getGraphHeadHandler(),
         store.getGraphHeadName()), graphTypeInfo);
 
-    DataSet<Tuple1<Vertex>> vertices = config.getExecutionEnvironment()
-      .createInput(new VertexTableInputFormat<>(config.getVertexHandler(),
-          store.getVertexTableName()), vertexTypeInfo);
+    VertexTableInputFormat vertexTableInputFormat =
+      new VertexTableInputFormat<>(config.getVertexHandler(), store.getVertexTableName());
 
-    DataSet<Tuple1<Edge>> edges = config.getExecutionEnvironment().createInput(
-      new EdgeTableInputFormat<>(config.getEdgeHandler(),
-        store.getEdgeTableName()), edgeTypeInfo);
+    EdgeTableInputFormat edgeTableInputFormat =
+      new EdgeTableInputFormat<>(config.getEdgeHandler(), store.getEdgeTableName());
+
+    if (predicates != null) {
+      GradoopIdSet filterEdgeIds;
+      GradoopIdSet filterVertexIds;
+      for (Expression predicate : predicates) {
+        if (predicate instanceof EdgeIdIn) {
+          filterEdgeIds = ((EdgeIdIn) predicate).getFilterIds();
+          vertexTableInputFormat.setFilterEdgeIds(filterEdgeIds);
+          edgeTableInputFormat.setFilterEdgeIds(filterEdgeIds);
+        } else if (predicate instanceof VertexIdIn) {
+          filterVertexIds = ((VertexIdIn) predicate).getFilterIds();
+          vertexTableInputFormat.setFilterVertexIds(filterVertexIds);
+          edgeTableInputFormat.setFilterVertexIds(filterVertexIds);
+        } else {
+          throw new RuntimeException("Class '" + predicate.getClass().getName() +
+              "' is not a valid predicate for pushing down to the HBase data source.");
+        }
+      }
+    }
+
+    DataSet<Tuple1<Vertex>> vertices = config.getExecutionEnvironment()
+      .createInput(vertexTableInputFormat, vertexTypeInfo);
+    DataSet<Tuple1<Edge>> edges = config.getExecutionEnvironment()
+      .createInput(edgeTableInputFormat, edgeTypeInfo);
 
     return config.getGraphCollectionFactory().fromDataSets(
       graphHeads.map(new ValueOf1<>()),
       vertices.map(new ValueOf1<>()),
       edges.map(new ValueOf1<>()));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSource applyPredicate(List<Expression> predicates) {
+    return new HBaseDataSource(this.getStore(), this.getFlinkConfig(), predicates);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isFilterPushedDown() {
+    return this.predicates != null;
   }
 }
