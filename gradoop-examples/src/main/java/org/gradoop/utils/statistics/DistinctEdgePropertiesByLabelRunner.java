@@ -16,11 +16,11 @@
 package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgePropertiesByLabel;
+import org.gradoop.flink.model.impl.operators.statistics.writer.DistinctEdgePropertiesByLabelPreparer;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctEdgePropertiesByLabel} for a given logical graph.
@@ -36,15 +36,11 @@ public class DistinctEdgePropertiesByLabelRunner extends AbstractRunner implemen
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-    new DistinctEdgePropertiesByLabel()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
-      .returns(new TypeHint<Tuple3<String, String, Long>>() { })
-      .writeAsCsv(
+
+    StatisticWriter.writeCSV(new DistinctEdgePropertiesByLabelPreparer()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
-          GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL);
 
     getExecutionEnvironment().execute("Statistics: Distinct edge properties by label");
   }
