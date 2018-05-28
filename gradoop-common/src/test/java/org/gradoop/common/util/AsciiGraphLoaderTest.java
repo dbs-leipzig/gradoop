@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.common.util;
 
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -149,13 +149,13 @@ public class AsciiGraphLoaderTest {
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<Vertex> vertexsG = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIdList.fromExisting(g.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<Vertex> vertexsH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIdList.fromExisting(h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<Vertex> vertexsGH = asciiGraphLoader
-      .getVerticesByGraphIds(GradoopIdList.fromExisting(g.getId(), h.getId()));
+      .getVerticesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     Vertex a = asciiGraphLoader.getVertexByVariable("a");
     Vertex b = asciiGraphLoader.getVertexByVariable("b");
@@ -252,13 +252,13 @@ public class AsciiGraphLoaderTest {
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
 
     Collection<Edge> edgesG = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIdList.fromExisting(g.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId()));
 
     Collection<Edge> edgesH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIdList.fromExisting(h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(h.getId()));
 
     Collection<Edge> edgesGH = asciiGraphLoader
-      .getEdgesByGraphIds(GradoopIdList.fromExisting(g.getId(), h.getId()));
+      .getEdgesByGraphIds(GradoopIdSet.fromExisting(g.getId(), h.getId()));
 
     Edge a = asciiGraphLoader.getEdgeByVariable("a");
     Edge b = asciiGraphLoader.getEdgeByVariable("b");

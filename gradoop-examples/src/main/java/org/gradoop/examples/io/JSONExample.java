@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.util.Arrays;
+import static java.util.Collections.singletonList;
 
 /**
  * Example program that reads a graph from an EPGM-specific JSON representation
@@ -73,23 +73,19 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
    * Reads an EPGM graph collection from a directory that contains the separate
    * files. Files can be stored in local file system or HDFS.
    *
-   * args[0]: path to graph head file
-   * args[1]: path to vertex file
-   * args[2]: path to edge file
-   * args[3]: path to write output graph
+   * args[0]: path to input graph
+   * args[1]: path to output graph
    *
    * @param args program arguments
    */
   public static void main(String[] args) throws Exception {
-    if (args.length != 4) {
+    if (args.length != 2) {
       throw new IllegalArgumentException(
         "provide graph/vertex/edge paths and output directory");
     }
 
-    final String graphHeadFile  = args[0];
-    final String vertexFile     = args[1];
-    final String edgeFile       = args[2];
-    final String outputDir      = args[3];
+    final String inputPath  = args[0];
+    final String outputPath = args[1];
 
     // init Flink execution environment
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -98,7 +94,7 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
-    JSONDataSource dataSource = new JSONDataSource(graphHeadFile, vertexFile, edgeFile, config);
+    JSONDataSource dataSource = new JSONDataSource(inputPath, config);
 
     // read graph collection from DataSource
     GraphCollection graphCollection = dataSource.getGraphCollection();
@@ -106,14 +102,10 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
     // do some analytics
     LogicalGraph schema = graphCollection
       .reduce(new ReduceCombination())
-      .groupBy(Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(Grouping.LABEL_SYMBOL));
+      .groupBy(singletonList(Grouping.LABEL_SYMBOL), singletonList(Grouping.LABEL_SYMBOL));
 
     // write resulting graph to DataSink
-    schema.writeTo(new JSONDataSink(
-      outputDir + "graphHeads.json",
-      outputDir + "vertices.json",
-      outputDir + "edges.json",
-      config));
+    schema.writeTo(new JSONDataSink(outputPath, config));
 
     // execute program
     env.execute();

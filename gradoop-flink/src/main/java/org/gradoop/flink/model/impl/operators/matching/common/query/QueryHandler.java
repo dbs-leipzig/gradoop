@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -494,12 +494,12 @@ public class QueryHandler {
     return variables.stream()
       .filter(var -> isEdge(var) || isVertex(var))
       .map(var -> {
-        if (isEdge(var)) {
-          return Pair.of(var, getEdgeByVariable(var).getLabel());
-        } else {
-          return Pair.of(var, getVertexByVariable(var).getLabel());
-        }
-      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+          if (isEdge(var)) {
+            return Pair.of(var, getEdgeByVariable(var).getLabel());
+          } else {
+            return Pair.of(var, getVertexByVariable(var).getLabel());
+          }
+        }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
   }
 
   /**

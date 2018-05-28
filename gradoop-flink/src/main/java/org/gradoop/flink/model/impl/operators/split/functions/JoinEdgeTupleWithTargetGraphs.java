@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Join edge tuples with the graph sets of their targets
@@ -32,22 +32,22 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
 public class JoinEdgeTupleWithTargetGraphs<E extends Edge>
   implements JoinFunction
-  <Tuple2<E, GradoopIdList>, Tuple2<GradoopId, GradoopIdList>,
-    Tuple3<E, GradoopIdList, GradoopIdList>> {
+  <Tuple2<E, GradoopIdSet>, Tuple2<GradoopId, GradoopIdSet>,
+    Tuple3<E, GradoopIdSet, GradoopIdSet>> {
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple3<E, GradoopIdList, GradoopIdList> reuseTuple =
+  private final Tuple3<E, GradoopIdSet, GradoopIdSet> reuseTuple =
     new Tuple3<>();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Tuple3<E, GradoopIdList, GradoopIdList> join(
-    Tuple2<E, GradoopIdList> left,
-    Tuple2<GradoopId, GradoopIdList> right) throws Exception {
+  public Tuple3<E, GradoopIdSet, GradoopIdSet> join(
+    Tuple2<E, GradoopIdSet> left,
+    Tuple2<GradoopId, GradoopIdSet> right) throws Exception {
     reuseTuple.f0 = left.f0;
     reuseTuple.f1 = left.f1;
     reuseTuple.f2 = right.f1;

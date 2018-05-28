@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.gradoop.flink.io.impl.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Contains methods used by all entity writers (e.g. write meta, data).
@@ -102,7 +102,7 @@ public class EntityToJSON {
    * @param values identifier set
    * @return json array containing the identifiers
    */
-  private JSONArray writeJsonArray(final GradoopIdList values) {
+  private JSONArray writeJsonArray(final GradoopIdSet values) {
     JSONArray jsonArray = new JSONArray();
     for (GradoopId val : values) {
       jsonArray.put(val);

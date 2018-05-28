@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -99,8 +99,8 @@ public class GradoopHBaseTestUtils {
     for(G graphHead : loader.getGraphHeads()) {
 
       GradoopId graphId = graphHead.getId();
-      GradoopIdList vertexIds = new GradoopIdList();
-      GradoopIdList edgeIds = new GradoopIdList();
+      GradoopIdSet vertexIds = new GradoopIdSet();
+      GradoopIdSet edgeIds = new GradoopIdSet();
 
       for (EPGMVertex vertex : loader.getVertices()) {
         if (vertex.getGraphIds().contains(graphId)) {

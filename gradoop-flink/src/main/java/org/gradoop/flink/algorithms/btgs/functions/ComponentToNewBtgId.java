@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,18 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * replaces a component id by a new graph id
  */
 @FunctionAnnotation.ForwardedFields("f1->f1")
 public class ComponentToNewBtgId implements MapFunction
-  <Tuple2<GradoopId, GradoopIdList>, Tuple2<GradoopId, GradoopIdList>> {
+  <Tuple2<GradoopId, GradoopIdSet>, Tuple2<GradoopId, GradoopIdSet>> {
 
   @Override
-  public Tuple2<GradoopId, GradoopIdList> map(
-    Tuple2<GradoopId, GradoopIdList> pair) throws Exception {
+  public Tuple2<GradoopId, GradoopIdSet> map(
+    Tuple2<GradoopId, GradoopIdSet> pair) throws Exception {
 
     return new Tuple2<>(GradoopId.get(), pair.f1);
   }

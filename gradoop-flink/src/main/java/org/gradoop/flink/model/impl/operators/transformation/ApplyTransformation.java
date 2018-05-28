@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.transformation;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -22,6 +23,9 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -43,8 +47,9 @@ public class ApplyTransformation extends Transformation
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 
+
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
     // the resulting logical graph holds multiple graph heads
     LogicalGraph modifiedGraph = executeInternal(
       collection.getGraphHeads(),
@@ -56,5 +61,24 @@ public class ApplyTransformation extends Transformation
       modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
       modifiedGraph.getEdges());
+  }
+
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
+    DataSet<GraphTransaction> graphTransactions = collection.getGraphTransactions();
+
+    GradoopFlinkConfig config = collection.getConfig();
+
+    DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
+      .map(new TransformGraphTransaction(
+        config.getGraphHeadFactory(),
+        graphHeadTransFunc,
+        config.getVertexFactory(),
+        vertexTransFunc,
+        config.getEdgeFactory(),
+        edgeTransFunc
+      ));
+
+    return config.getGraphCollectionFactory().fromTransactions(transformedGraphTransactions);
   }
 }

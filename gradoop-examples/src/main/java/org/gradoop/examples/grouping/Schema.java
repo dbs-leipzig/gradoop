@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class Schema extends AbstractRunner {
 
   /**
    * Loads the graph from the specified input path, computes its schema via grouping and writes
-   * the result as DOT into the output path.
+   * the result as DOT into the output path and converts it into an PNG image.
    *
    * args[0] - input path (CSV)
    * args[1] - output path
@@ -64,5 +64,8 @@ public class Schema extends AbstractRunner {
 
     // run the job
     getExecutionEnvironment().execute();
+
+    // convert to PNG
+    convertDotToPNG(outputPath, outputPath + ".png");
   }
 }

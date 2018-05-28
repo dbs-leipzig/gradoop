@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,17 +40,17 @@ public class Transformation implements UnaryGraphToGraphOperator {
   /**
    * Modification function for graph heads
    */
-  private final TransformationFunction<GraphHead> graphHeadTransFunc;
+  protected final TransformationFunction<GraphHead> graphHeadTransFunc;
 
   /**
    * Modification function for vertices
    */
-  private final TransformationFunction<Vertex> vertexTransFunc;
+  protected final TransformationFunction<Vertex> vertexTransFunc;
 
   /**
    * Modification function for edges
    */
-  private final TransformationFunction<Edge> edgeTransFunc;
+  protected final TransformationFunction<Edge> edgeTransFunc;
 
   /**
    * Creates a new operator instance.

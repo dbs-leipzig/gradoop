@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.id;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class GradoopIdSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGradoopIdSetSerialization() throws Exception {
-    GradoopIdList idsIn = GradoopIdList.fromExisting(
+    GradoopIdSet idsIn = GradoopIdSet.fromExisting(
       GradoopId.get(), GradoopId.get());
     assertEquals("GradoopIdSets were not equal", idsIn,
       GradoopFlinkTestUtils.writeAndRead(idsIn));

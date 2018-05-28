@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,11 @@ package org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
 import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -60,8 +63,8 @@ public class Customer extends BusinessRelation {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcasted lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NOUNS_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -72,18 +75,19 @@ public class Customer extends BusinessRelation {
     //set rnd name
     Random random = new Random();
     Vertex vertex = super.map(seed);
-    vertex.setProperty(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    vertex.setProperty(
+      FoodBrokerPropertyKeys.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
     return vertex;
   }
 
   @Override
   public String getAcronym() {
-    return Constants.CUSTOMER_ACRONYM;
+    return FoodBrokerAcronyms.CUSTOMER_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return Constants.CUSTOMER_VERTEX_LABEL;
+    return FoodBrokerVertexLabels.CUSTOMER_VERTEX_LABEL;
   }
 }

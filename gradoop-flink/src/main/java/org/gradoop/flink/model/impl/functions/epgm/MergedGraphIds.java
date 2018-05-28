@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.util.Iterator;
 
@@ -47,7 +46,7 @@ public class MergedGraphIds<GE extends GraphElement>
   public void reduce(Iterable<GE> values, Collector<GE> out) throws Exception {
     Iterator<GE> iterator = values.iterator();
     GE result = iterator.next();
-    GradoopIdList graphIds = result.getGraphIds();
+    GradoopIdSet graphIds = result.getGraphIds();
     while (iterator.hasNext()) {
       graphIds.addAll(iterator.next().getGraphIds());
     }
@@ -56,7 +55,7 @@ public class MergedGraphIds<GE extends GraphElement>
 
   @Override
   public GE join(GE first, GE second) throws Exception {
-    if(first == null) {
+    if (first == null) {
       return second;
     }
     first.getGraphIds().addAll(second.getGraphIds());

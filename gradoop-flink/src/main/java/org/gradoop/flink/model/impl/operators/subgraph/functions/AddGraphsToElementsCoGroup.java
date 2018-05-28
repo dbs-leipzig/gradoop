@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * CoGroups tuples containing gradoop ids and gradoop id sets with graph
@@ -33,18 +33,22 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
 public class AddGraphsToElementsCoGroup<EL extends GraphElement>
-  implements CoGroupFunction<Tuple2<GradoopId, GradoopIdList>, EL, EL> {
+  implements CoGroupFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override
   public void coGroup(
-    Iterable<Tuple2<GradoopId, GradoopIdList>> graphs,
+    Iterable<Tuple2<GradoopId, GradoopIdSet>> graphs,
     Iterable<EL> elements,
     Collector<EL> collector) throws Exception {
+    boolean wasGraphSetEmpty = true;
     for (EL element : elements) {
-      for (Tuple2<GradoopId, GradoopIdList> graphSet : graphs) {
+      for (Tuple2<GradoopId, GradoopIdSet> graphSet : graphs) {
         element.getGraphIds().addAll(graphSet.f1);
+        wasGraphSetEmpty = false;
       }
-      collector.collect(element);
+      if (!wasGraphSetEmpty) {
+        collector.collect(element);
+      }
     }
   }
 }

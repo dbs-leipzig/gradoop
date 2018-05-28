@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 
@@ -102,7 +102,7 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
    */
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, GradoopIdList graphIds) {
+    GradoopId targetVertexId, GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, graphIds);
   }
@@ -113,7 +113,7 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
   @Override
   public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    GradoopIdList graphs) {
+    GradoopIdSet graphs) {
     return initEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
   }
 
@@ -123,7 +123,7 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, Properties properties,
-    GradoopIdList graphIds) {
+    GradoopIdSet graphIds) {
     return initEdge(GradoopId.get(),
       label, sourceVertexId, targetVertexId, properties, graphIds);
   }
@@ -134,7 +134,7 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
   @Override
   public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
-    final Properties properties, GradoopIdList graphIds) {
+    final Properties properties, GradoopIdSet graphIds) {
     checkNotNull(id, "Identifier was null");
     checkNotNull(label, "Label was null");
     checkNotNull(sourceVertexId, "Source vertex id was null");

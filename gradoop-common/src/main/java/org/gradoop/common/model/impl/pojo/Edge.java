@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -53,7 +53,7 @@ public class Edge extends GraphElement implements EPGMEdge {
    */
   public Edge(final GradoopId id, final String label, final GradoopId sourceId,
     final GradoopId targetId, final Properties properties,
-    GradoopIdList graphIds) {
+    GradoopIdSet graphIds) {
     super(id, label, properties, graphIds);
     this.sourceId = sourceId;
     this.targetId = targetId;

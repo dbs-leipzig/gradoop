@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.id.GradoopId;
-
-import java.util.Collection;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Filters a dataset of EPGM elements to those whose id is not contained in an id dataset.
@@ -38,13 +35,13 @@ public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction
   /**
    * graph ids
    */
-  protected Collection<GradoopId> ids;
+
+  protected GradoopIdSet ids;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    ids = getRuntimeContext().getBroadcastVariable(IDS);
-    ids = Sets.newHashSet(ids);
+    ids = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(IDS));
   }
 
   @Override

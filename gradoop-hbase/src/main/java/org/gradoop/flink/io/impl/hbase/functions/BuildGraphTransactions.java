@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Co-groups graph-id, vertex-id) and (graph-id, edge-id) tuples to
@@ -44,21 +44,21 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ReadFieldsSecond("f1")
 public class BuildGraphTransactions implements CoGroupFunction<
   Tuple2<GradoopId, GradoopId>, Tuple2<GradoopId, GradoopId>,
-  Tuple3<GradoopId, GradoopIdList, GradoopIdList>> {
+  Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> {
   /**
    * Reduce object instantiations.
    */
-  private final Tuple3<GradoopId, GradoopIdList, GradoopIdList> reuseTuple =
+  private final Tuple3<GradoopId, GradoopIdSet, GradoopIdSet> reuseTuple =
     new Tuple3<>();
 
   @Override
   public void coGroup(Iterable<Tuple2<GradoopId, GradoopId>> graphToVertexIds,
     Iterable<Tuple2<GradoopId, GradoopId>> graphToEdgeIds,
-    Collector<Tuple3<GradoopId, GradoopIdList, GradoopIdList>> collector) throws
+    Collector<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>> collector) throws
     Exception {
 
-    GradoopIdList vertexIds  = new GradoopIdList();
-    GradoopIdList edgeIds    = new GradoopIdList();
+    GradoopIdSet vertexIds  = new GradoopIdSet();
+    GradoopIdSet edgeIds    = new GradoopIdSet();
     boolean initialized     = false;
 
     for (Tuple2<GradoopId, GradoopId> graphToVertexTuple : graphToVertexIds) {

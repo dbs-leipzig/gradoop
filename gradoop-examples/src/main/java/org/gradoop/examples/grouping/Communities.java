@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,14 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.gelly.labelpropagation.GellyLabelPropagation;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -37,7 +40,7 @@ public class Communities extends AbstractRunner {
   /**
    * Loads a social network graph from the specified location, applies label propagation to extract
    * communities and computes a summary graph using the community id. The resulting summary graph is
-   * written using the DOT format.
+   * written using the DOT format and also converted into an PNG image using GraphViz.
    *
    * args[0] - input path (CSV)
    * args[1] - output path
@@ -68,14 +71,26 @@ public class Communities extends AbstractRunner {
     // apply label propagation to compute communities
     graph = graph.callForGraph(new GellyLabelPropagation(10, communityKey));
 
-    // group the vertices of the graph by their community and count the edges between communities
-    LogicalGraph communities = graph.groupBy(singletonList(communityKey));
+    // group the vertices of the graph by their community, count vertices per group and edges
+    // between groups
+    LogicalGraph communities = graph.groupBy(singletonList(communityKey), // vertex grouping keys
+      singletonList(new CountAggregator("count")), // vertex aggregate functions
+      emptyList(), // edge grouping keys
+      singletonList(new CountAggregator("count")), // edge aggregate functions
+      GroupingStrategy.GROUP_REDUCE);
+
+    // extract vertex induced subgraph only containing communities with more than 10 users
+    communities = communities
+      .vertexInducedSubgraph((vertex) -> vertex.getPropertyValue("count").getLong() > 10);
 
     // instantiate a data sink for the DOT format
-    DataSink dataSink = new CSVDataSink(outputPath, config);
+    DataSink dataSink = new DOTDataSink(outputPath, false);
     dataSink.write(communities, true);
 
     // run the job
     getExecutionEnvironment().execute();
+
+    // convert to png
+    convertDotToPNG(outputPath, outputPath + ".png");
   }
 }

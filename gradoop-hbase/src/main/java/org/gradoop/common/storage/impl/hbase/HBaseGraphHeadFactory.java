@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.common.storage.impl.hbase;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,7 +39,7 @@ public class HBaseGraphHeadFactory<G extends EPGMGraphHead>
    */
   @Override
   public HBaseGraphHead<G> createGraphHead(G inputGraphHead,
-    GradoopIdList vertices, GradoopIdList edges) {
+    GradoopIdSet vertices, GradoopIdSet edges) {
     checkNotNull(inputGraphHead, "EPGMGraphHead was null");
     checkNotNull(vertices, "EPGMVertex identifiers were null");
     checkNotNull(edges, "EPGMEdge identifiers were null");

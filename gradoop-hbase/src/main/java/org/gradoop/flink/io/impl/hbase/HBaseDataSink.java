@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -32,7 +32,16 @@ import org.gradoop.common.storage.api.PersistentGraphHead;
 import org.gradoop.common.storage.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.hbase.functions.*;
+import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
+import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentGraphHead;
+import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentVertex;
+import org.gradoop.flink.io.impl.hbase.functions.BuildVertexDataWithEdges;
+import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
+import org.gradoop.flink.io.impl.hbase.functions.EdgeSetBySourceId;
+import org.gradoop.flink.io.impl.hbase.functions.EdgeSetByTargetId;
+import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -112,7 +121,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
 
     // co-group (graph-id, vertex-id) and (graph-id, edge-id) tuples to
     // (graph-id, {vertex-id}, {edge-id}) triples
-    DataSet<Tuple3<GradoopId, GradoopIdList, GradoopIdList>>
+    DataSet<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>>
       graphToVertexIdsAndEdgeIds = graphIdToVertexId
         .coGroup(graphIdToEdgeId)
         .where(0)

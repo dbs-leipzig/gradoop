@@ -1,11 +1,13 @@
+# https://docs.travis-ci.com/user/reference/overview/
+sudo: required
+dist: trusty
+
 cache:
   directories:
   - $HOME/.m2
 
 before_cache:
   - rm -rf $HOME/.m2/repository/org/gradoop/
-
-install: true
 
 language: java
 

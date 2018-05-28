@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,19 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
   }
 
   @Test
+  public void testVertexOnlyOverlappingGraphs() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "g1[(a)-[e1]->(b)]" +
+      "g2[(a)-[e2]->(b)]" +
+      "expected[(a)(b)]");
+    LogicalGraph g1 = loader.getLogicalGraphByVariable("g1");
+    LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(g1.overlap(g2).equalsByElementIds(expected));
+  }
+
+  @Test
   public void testGraphContainment() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -156,8 +169,10 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
   @Test
   public void testReduceCollection() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("" +
-        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)]" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e1]->(b)]" +
+        "g1[(a)-[e1]->(b)]" +
+        "g2[(b)-[e2]->(c)]" +
+        "g3[(c)-[e3]->(d)]" +
+        "g4[(a)-[e1]->(b)]" +
         "exp12[(b)]" +
         "exp13[]" +
         "exp14[(a)-[e1]->(b)]"

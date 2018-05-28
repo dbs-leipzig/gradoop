@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@ import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -63,15 +64,19 @@ public abstract class GradoopFlinkTestBase {
   /**
    * Gradoop Flink configuration
    */
-  protected GradoopFlinkConfig config;
+  private GradoopFlinkConfig config;
+
+  private LogicalGraphLayoutFactory graphLayoutFactory;
+
+  private GraphCollectionLayoutFactory collectionLayoutFactory;
 
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
-    this.config = GradoopFlinkConfig.createConfig(env,
-      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
+    setGraphLayoutFactory(new GVEGraphLayoutFactory());
+    setCollectionLayoutFactory(new GVECollectionLayoutFactory());
   }
 
   /**
@@ -84,12 +89,40 @@ public abstract class GradoopFlinkTestBase {
   }
 
   /**
-   * Returns the default configuration for the test
+   * Returns the configuration for the test
    *
    * @return Gradoop Flink configuration
    */
   protected GradoopFlinkConfig getConfig() {
+    if (config == null) {
+      setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
+        getGraphLayoutFactory(),
+        getCollectionLayoutFactory()));
+    }
     return config;
+  }
+
+  /**
+   * Sets the default configuration for the test
+   */
+  protected void setConfig(GradoopFlinkConfig config) {
+    this.config = config;
+  }
+
+  protected LogicalGraphLayoutFactory getGraphLayoutFactory() {
+    return graphLayoutFactory;
+  }
+
+  protected void setGraphLayoutFactory(LogicalGraphLayoutFactory graphLayoutFactory) {
+    this.graphLayoutFactory = graphLayoutFactory;
+  }
+
+  protected GraphCollectionLayoutFactory getCollectionLayoutFactory() {
+    return collectionLayoutFactory;
+  }
+
+  protected void setCollectionLayoutFactory(GraphCollectionLayoutFactory collectionLayoutFactory) {
+    this.collectionLayoutFactory = collectionLayoutFactory;
   }
 
   //----------------------------------------------------------------------------
@@ -179,7 +212,7 @@ public abstract class GradoopFlinkTestBase {
    * @return uninitialized Flink Ascii graph loader
    */
   private FlinkAsciiGraphLoader getNewLoader() {
-    return new FlinkAsciiGraphLoader(config);
+    return new FlinkAsciiGraphLoader(getConfig());
   }
 
   //----------------------------------------------------------------------------

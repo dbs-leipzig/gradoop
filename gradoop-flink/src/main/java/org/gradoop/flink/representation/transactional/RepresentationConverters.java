@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -139,7 +139,7 @@ public class RepresentationConverters {
     // GRAPH HEAD
     GraphHead graphHead = adjacencyList.getGraphHead();
 
-    GradoopIdList graphIds = GradoopIdList.fromExisting(graphHead.getId());
+    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
     Set<Vertex> vertices = Sets.newHashSet();
     Set<Edge> edges = Sets.newHashSet();

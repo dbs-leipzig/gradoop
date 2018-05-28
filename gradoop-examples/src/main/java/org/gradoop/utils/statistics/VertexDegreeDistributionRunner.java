@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.gradoop.utils.statistics;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegreeDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link VertexDegreeDistribution} for a given logical graph.
@@ -33,10 +34,10 @@ public class VertexDegreeDistributionRunner extends AbstractRunner implements Pr
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-    new VertexDegreeDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + "vertex_degree_distribution")
-      .setParallelism(1);
+
+    StatisticWriter.writeCSV(new VertexDegreeDistribution()
+        .execute(readLogicalGraph(args[0], args[1])),
+        appendSeparator(args[2]) + "vertex_degree_distribution");
 
     getExecutionEnvironment().execute("Statistics: Vertex degree distribution");
   }

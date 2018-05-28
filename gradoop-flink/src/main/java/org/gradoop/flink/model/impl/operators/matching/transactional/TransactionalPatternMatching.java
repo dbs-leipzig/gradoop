@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -177,7 +177,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // run the matching algorithm
     //--------------------------------------------------------------------------
-    DataSet<Tuple4<GradoopId, GradoopId, GradoopIdList, GradoopIdList>> embeddings = graphs
+    DataSet<Tuple4<GradoopId, GradoopId, GradoopIdSet, GradoopIdSet>> embeddings = graphs
       .flatMap(new FindEmbeddings(algorithm, query));
 
     //--------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // update vertex graphs
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, GradoopIdList>> verticesWithGraphs = embeddings
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> verticesWithGraphs = embeddings
       .map(new Project4To0And2AndSwitch<>())
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());
@@ -203,7 +203,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // update edge graphs
     //--------------------------------------------------------------------------
-    DataSet<Tuple2<GradoopId, GradoopIdList>> edgesWithGraphs = embeddings
+    DataSet<Tuple2<GradoopId, GradoopIdSet>> edgesWithGraphs = embeddings
       .map(new Project4To0And3AndSwitch<>())
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());

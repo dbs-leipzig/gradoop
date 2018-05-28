@@ -1,0 +1,44 @@
+// all vertices
+(databases:Tag {name : "Databases"})
+(graphs:Tag {name : "Graphs"})
+(hadoop:Tag {name : "Hadoop"})
+(gdbs:Forum {title : "Graph Databases"})
+(gps:Forum {title : "Graph Processing"})
+(alice:Person {name : "Alice", gender : "f", city : "Leipzig", age : 20})
+(bob:Person {name : "Bob", gender : "m", city : "Leipzig", age : 30})
+(carol:Person {name : "Carol", gender : "f", city : "Dresden", age : 30})
+(dave:Person {name : "Dave", gender : "m", city : "Dresden", age : 40})
+(eve:Person {name : "Eve", gender : "f", city : "Dresden", speaks : "English", age : 35})
+(frank:Person {name : "Frank", gender : "m", city : "Berlin", locIP : "127.0.0.1", age : 35})
+
+// edges outside logical graphs
+(eve)-[:hasInterest]->(databases)
+(alice)-[:hasInterest]->(databases)
+(frank)-[:hasInterest]->(hadoop)
+(dave)-[:hasInterest]->(hadoop)
+(gdbs)-[:hasModerator]->(alice)
+(gdbs)-[:hasMember]->(alice)
+(gdbs)-[:hasMember]->(bob)
+
+(databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag]->(hadoop)
+
+// logical graphs
+g0:Community {interest : "Databases", vertexCount : 3} [
+    (eve)-[eka:knows {since : 2013}]->(alice)-[akb:knows {since : 2014}]->(bob)
+    (eve)-[ekb:knows {since : 2015}]->(bob)-[bka:knows {since : 2014}]->(alice)
+]
+g1:Community {interest : "Hadoop", vertexCount : 3} [
+    (frank)-[fkc:knows {since : 2015}]->(carol)-[ckd:knows {since : 2014}]->(dave)
+    (frank)-[fkd:knows {since : 2015}]->(dave)-[dkc:knows {since : 2014}]->(carol)
+]
+g2:Community {interest : "Graphs", vertexCount : 4} [
+    (alice)-[akb]->(bob)-[bkc:knows {since : 2013}]->(carol)-[ckd]->(dave)
+    (alice)<-[bka]-(bob)<-[ckb:knows {since : 2013}]-(carol)<-[dkc]-(dave)
+]
+g3:Forum [
+    (gps)-[:hasModerator {since : 2013}]->(dave)
+    (gps)-[:hasMember]->(dave)
+    (gps)-[:hasMember]->(carol)-[ckd]->(dave)
+]
+
+

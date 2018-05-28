@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@ import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.datagen.transactions.foodbroker.config.Constants;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerAcronyms;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerBroadcastNames;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerPropertyKeys;
+import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerVertexLabels;
 import org.gradoop.flink.datagen.transactions.foodbroker.tuples.MasterDataSeed;
 
 import java.util.List;
@@ -72,9 +75,9 @@ public class Logistics extends MasterData {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     //load broadcast lists
-    adjectives = getRuntimeContext().getBroadcastVariable(Constants.ADJECTIVES_BC);
-    nouns = getRuntimeContext().getBroadcastVariable(Constants.NOUNS_BC);
-    cities = getRuntimeContext().getBroadcastVariable(Constants.CITIES_BC);
+    adjectives = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.ADJECTIVES_BC);
+    nouns = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.NOUNS_BC);
+    cities = getRuntimeContext().getBroadcastVariable(FoodBrokerBroadcastNames.CITIES_BC);
     //get their sizes
     nounCount = nouns.size();
     adjectiveCount = adjectives.size();
@@ -88,22 +91,23 @@ public class Logistics extends MasterData {
     Random random = new Random();
     //set rnd city and name
     String[] location = cities.get(random.nextInt(cityCount)).split("-");
-    properties.set(Constants.CITY_KEY, location[0]);
-    properties.set(Constants.STATE_KEY, location[1]);
-    properties.set(Constants.COUNTRY_KEY, location[2]);
+    properties.set(FoodBrokerPropertyKeys.CITY_KEY, location[0]);
+    properties.set(FoodBrokerPropertyKeys.STATE_KEY, location[1]);
+    properties.set(FoodBrokerPropertyKeys.COUNTRY_KEY, location[2]);
 
-    properties.set(Constants.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
+    properties.set(
+      FoodBrokerPropertyKeys.NAME_KEY, adjectives.get(random.nextInt(adjectiveCount)) + " " +
       nouns.get(random.nextInt(nounCount)));
     return vertexFactory.createVertex(getClassName(), properties);
   }
 
   @Override
   public String getAcronym() {
-    return Constants.LOGISTICS_ACRONYM;
+    return FoodBrokerAcronyms.LOGISTICS_ACRONYM;
   }
 
   @Override
   public String getClassName() {
-    return Constants.LOGISTICS_VERTEX_LABEL;
+    return FoodBrokerVertexLabels.LOGISTICS_VERTEX_LABEL;
   }
 }

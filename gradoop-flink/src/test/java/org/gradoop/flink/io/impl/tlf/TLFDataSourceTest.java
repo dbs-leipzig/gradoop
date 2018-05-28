@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
       .getResource("/data/tlf/io_test_string.tlf").getFile();
 
     // create datasource
-    DataSource dataSource = new TLFDataSource(tlfFile, config);
+    DataSource dataSource = new TLFDataSource(tlfFile, getConfig());
     // get transactions
     DataSet<GraphTransaction> transactions = dataSource.getGraphCollection().getGraphTransactions();
 
@@ -57,7 +57,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, tlfVertexDictionaryFile,
-      tlfEdgeDictionaryFile, config);
+      tlfEdgeDictionaryFile, getConfig());
     // get transactions
     DataSet<GraphTransaction> transactions = dataSource.getGraphCollection().getGraphTransactions();
 

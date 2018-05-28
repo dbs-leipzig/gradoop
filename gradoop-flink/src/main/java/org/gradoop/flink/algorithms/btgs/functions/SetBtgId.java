@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Associates an edge with an business transaction graph.
@@ -30,7 +30,7 @@ public class SetBtgId<E extends EPGMGraphElement>
 
   @Override
   public E join(E element, Tuple2<GradoopId, GradoopId> mapping) {
-    element.setGraphIds(GradoopIdList.fromExisting(mapping.f1));
+    element.setGraphIds(GradoopIdSet.fromExisting(mapping.f1));
     return element;
   }
 }

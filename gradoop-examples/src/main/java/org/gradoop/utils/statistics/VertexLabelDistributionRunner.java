@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.VertexLabelDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link VertexLabelDistribution} for a given logical graph.
@@ -34,11 +35,10 @@ public class VertexLabelDistributionRunner extends AbstractRunner implements Pro
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-    new VertexLabelDistribution()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(appendSeparator(args[2]) + GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);
+
+    StatisticWriter.writeCSV(new VertexLabelDistribution()
+        .execute(readLogicalGraph(args[0], args[1])),
+        appendSeparator(args[2]) + GraphStatisticsReader.TOKEN_SEPARATOR);
 
     getExecutionEnvironment().execute("Statistics: Vertex label distribution");
   }

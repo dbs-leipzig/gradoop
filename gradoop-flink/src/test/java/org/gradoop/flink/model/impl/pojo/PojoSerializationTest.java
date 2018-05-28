@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -37,7 +37,7 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
     EPGMVertex vertexIn = new VertexFactory().createVertex(
       "Person",
       Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
-      GradoopIdList.fromExisting(GradoopId.get()));
+      GradoopIdSet.fromExisting(GradoopId.get()));
 
     Assert.assertEquals("EPGMVertex POJOs were not equal",
       vertexIn, GradoopFlinkTestUtils.writeAndRead(vertexIn));
@@ -50,7 +50,7 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
       GradoopId.get(),
       GradoopId.get(),
       Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
-      GradoopIdList.fromExisting(GradoopId.get(), GradoopId.get()));
+      GradoopIdSet.fromExisting(GradoopId.get(), GradoopId.get()));
 
     Assert.assertEquals("EPGMEdge POJOs were not equal",
       edgeIn, GradoopFlinkTestUtils.writeAndRead(edgeIn));

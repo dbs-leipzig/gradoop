@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Filter the edge tuples. Check if each new graph the edge is contained in
@@ -33,19 +33,19 @@ import org.gradoop.common.model.impl.id.GradoopIdList;
 @FunctionAnnotation.ForwardedFields("f0->f0")
 public class FilterEdgeGraphs
   implements FlatMapFunction<
-  Tuple4<GradoopId, GradoopIdList, GradoopIdList, GradoopIdList>,
-  Tuple2<GradoopId, GradoopIdList>> {
+  Tuple4<GradoopId, GradoopIdSet, GradoopIdSet, GradoopIdSet>,
+  Tuple2<GradoopId, GradoopIdSet>> {
 
   /**
    * Reduce object instantiations
    */
-  private Tuple2<GradoopId, GradoopIdList> reuseTuple = new Tuple2<>();
+  private Tuple2<GradoopId, GradoopIdSet> reuseTuple = new Tuple2<>();
 
   @Override
   public void flatMap(
-    Tuple4<GradoopId, GradoopIdList, GradoopIdList, GradoopIdList> edgeTuple,
-    Collector<Tuple2<GradoopId, GradoopIdList>> collector) throws Exception {
-    GradoopIdList set = new GradoopIdList();
+    Tuple4<GradoopId, GradoopIdSet, GradoopIdSet, GradoopIdSet> edgeTuple,
+    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
+    GradoopIdSet set = new GradoopIdSet();
     for (GradoopId edgeGraph : edgeTuple.f3) {
       for (GradoopId sourceGraph : edgeTuple.f1) {
         if (edgeGraph.equals(sourceGraph)) {

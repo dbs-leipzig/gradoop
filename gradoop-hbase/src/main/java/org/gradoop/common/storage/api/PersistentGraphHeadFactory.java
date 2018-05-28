@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.gradoop.common.storage.api;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopIdList;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.io.Serializable;
 
@@ -37,5 +37,5 @@ public interface PersistentGraphHeadFactory<G extends EPGMGraphHead>
    * @return graph data
    */
   PersistentGraphHead createGraphHead(G inputGraphData,
-    GradoopIdList vertices, GradoopIdList edges);
+    GradoopIdSet vertices, GradoopIdSet edges);
 }

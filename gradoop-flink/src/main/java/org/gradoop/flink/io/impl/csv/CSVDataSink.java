@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,9 +98,11 @@ public class CSVDataSink extends CSVBase implements DataSink {
       .map(new EdgeToCSVEdge())
       .withBroadcastSet(metaData, BC_METADATA);
 
-    // write everything
-    metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
-      CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
+    // Write metadata only if the path is not the same or reuseMetadata is false.
+    if (!getMetaDataPath().equals(metaDataPath) || !reuseMetadata()) {
+      metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
+        CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
+    }
 
     csvVertices.writeAsCsv(getVertexCSVPath(), CSVConstants.ROW_DELIMITER,
       CSVConstants.TOKEN_DELIMITER, writeMode);

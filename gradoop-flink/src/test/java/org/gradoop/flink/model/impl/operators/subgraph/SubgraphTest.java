@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2017 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.model.impl.operators.fusion.VertexFusion;
+import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -270,5 +273,26 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(result.equalsByGraphData(
       loader.getGraphCollectionByVariables(
         "expected0", "expected1", "expected2")));
+  }
+  
+  @Test
+  public void testKeepOnlyRelevantVertices() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" + 
+        "      (a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" + 
+        "      (a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" + 
+        "      (b)-[:cite {difference : 0}]->(c)\n" + 
+        "      (a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" + 
+        "      (b)-[:cite {difference : 5}]->(d)" + 
+        "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" + 
+        "]");
+    GraphCollection sourceGraph = loader.getGraphCollectionByVariables("source");
+    // Caution: We can't use result.equalsByGraphElementIds because it internally uses a cross join
+    // with equality of elements, which means, it ignores elements that are not within the other dataset
+    // This means, the test would succeed even though we have too many vertices as a result of the 
+    // subgraph operator.
+    org.junit.Assert.assertEquals(3, sourceGraph
+        .apply(new ApplySubgraph(null, edge -> edge.getPropertyValue("difference").getInt() == 0))
+        .getVertices()
+        .collect().size());
   }
 }
