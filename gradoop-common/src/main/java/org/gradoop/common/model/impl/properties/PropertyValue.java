@@ -83,7 +83,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public static final transient byte TYPE_STRING       = 0x06;
   /**
-   * {@code <property-type>} for {@link java.lang.String}
+   * {@code <property-type>} for {@link BigDecimal}
    */
   public static final transient byte TYPE_BIG_DECIMAL  = 0x07;
   /**
@@ -119,20 +119,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * Bit flag indicating a "large" property. The length of the byte representation will be stored
    * as an {@code int} instead.
+   *
+   * @see #write(DataOutputView)
    */
   public static final transient byte FLAG_LARGE = 0x10;
 
   /**
-   * Was previously used to indicate maximum size of the internal byte representation.
-   *
-   * @deprecated The new maximum size is depending on the JVM implementation.
-   */
-  @Deprecated
-  public static final transient int MAX_BINARY_LENGTH = Short.MAX_VALUE - OFFSET;
-
-  /**
    * If the length of the byte representation is larger than this value, the length will be
-   * stored as an {@code int} instead of a {@code short},
+   * stored as an {@code int} instead of a {@code short}.
+   *
+   * @see #write(DataOutputView)
    */
   public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
 
@@ -838,6 +834,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * byte 2       : length (short)
    * byte 3       : length (short)
    * byte 4 - end : value bytes
+   *
+   * If the size of the internal byte representation if larger than
+   * {@link #LARGE_PROPERTY_THRESHOLD} (i.e. if a {@code short} is too small to store the length),
+   * then the {@link #FLAG_LARGE} bit will be set in the first byte and the byte representation
+   * will be:
+   * byte 2       ; length (int)
+   * byte 3       : length (int)
+   * byte 4       : length (int)
+   * byte 5       : length (int)
+   * byte 6 - end : value bytes
    *
    * for fixed length types (e.g. int, long, float, ...)
    * byte 2 - end : value bytes
