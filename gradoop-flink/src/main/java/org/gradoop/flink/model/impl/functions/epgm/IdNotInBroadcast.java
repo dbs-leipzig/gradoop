@@ -35,6 +35,7 @@ public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction
   /**
    * graph ids
    */
+
   protected GradoopIdSet ids;
 
   @Override
