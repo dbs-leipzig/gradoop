@@ -92,7 +92,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
           .reduce(new ReduceCombination());
 
         LogicalGraph groupedGraph  = new Grouping.GroupingBuilder()
-                .setStrategy(GroupingStrategy.GROUP_REDUCE)
+                .setStrategy(GroupingStrategy.GROUP_COMBINE)
                 .addVertexGroupingKey("name")
                 .useEdgeLabel(true).useVertexLabel(true)
                 .addEdgeAggregator(new CountAggregator())
