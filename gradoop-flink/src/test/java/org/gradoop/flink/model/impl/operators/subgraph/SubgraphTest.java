@@ -56,6 +56,33 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(output.equalsByElementData(expected));
   }
 
+  @Test
+  public void testExistingSubgraphWithVerification() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
+      "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
+      "(eve)-[eka]->(alice)" +
+      "(eve)-[ekb]->(bob)" +
+      "(frank)-[fkc]->(carol)" +
+      "(frank)-[fkd]->(dave)" +
+      "]");
+
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+
+    LogicalGraph expected =
+      loader.getLogicalGraphByVariable("expected");
+
+    LogicalGraph output = input
+      .subgraph(
+        v -> v.getLabel().equals("Person"),
+        e -> e.getLabel().equals("knows"),
+        Subgraph.Strategy.BOTH_VERIFIED);
+
+    collectAndAssertTrue(output.equalsByElementData(expected));
+  }
+
   /**
    * Extracts a subgraph where only vertices fulfill the filter function.
    */
@@ -135,6 +162,25 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = input.edgeInducedSubgraph(
       e -> e.getLabel().equals("hasTag"));
+
+    collectAndAssertTrue(output.equalsByElementData(expected));
+  }
+
+  @Test
+  public void testEdgeInducedSubgraphProjectFirst() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString("expected[" +
+      "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
+      "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
+      "]");
+
+    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    LogicalGraph output = input.subgraph(null,
+      e -> e.getLabel().equals("hasTag"), Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST);
 
     collectAndAssertTrue(output.equalsByElementData(expected));
   }

@@ -306,7 +306,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
-    return callForGraph(new Subgraph(vertexFilterFunction, null));
+    return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
   /**
@@ -316,7 +316,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
-    return callForGraph(new Subgraph(null, edgeFilterFunction));
+    return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
   /**
@@ -324,11 +324,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction) {
-    Objects.requireNonNull(vertexFilterFunction);
-    Objects.requireNonNull(edgeFilterFunction);
+    FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
     return callForGraph(
-      new Subgraph(vertexFilterFunction, edgeFilterFunction));
+      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   /**
