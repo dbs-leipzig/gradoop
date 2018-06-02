@@ -36,8 +36,10 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
@@ -275,8 +277,29 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return  logical graph which fulfils the given predicates and is a subgraph
    *          of that graph
    */
+  default LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction) {
+    Objects.requireNonNull(vertexFilterFunction);
+    Objects.requireNonNull(edgeFilterFunction);
+    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);
+  }
+
+  /**
+   * Returns a subgraph of the logical graph which contains only those vertices
+   * and edges that fulfil the given vertex and edge filter function
+   * respectively.
+   *
+   * Note, that the operator does not verify the consistency of the resulting
+   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
+   *
+   * @param vertexFilterFunction  vertex filter function
+   * @param edgeFilterFunction    edge filter function
+   * @param strategy              execution strategy for the operator
+   * @return  logical graph which fulfils the given predicates and is a subgraph
+   *          of that graph
+   */
   LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction);
+    FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy);
 
   /**
    * Applies the given aggregate function to the logical graph and stores the
