@@ -16,6 +16,8 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -27,6 +29,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class RenameLabelTest extends GradoopFlinkTestBase {
@@ -35,9 +38,13 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
   public void testGraphHead() {
 
     GradoopId graphId = GradoopId.get();
-    String label = "A";
 
-    EPGMGraphHead graphHead = new GraphHeadFactory().initGraphHead(graphId, label);
+    String label = "A";
+    Properties props = Properties.create();
+    props.set("k1", "v1");
+    props.set("k2", "v2");
+
+    EPGMGraphHead graphHead = new GraphHeadFactory().initGraphHead(graphId, label, props);
 
     String newLabel = "B";
 
@@ -46,6 +53,8 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(graphHead, graphHead);
 
     assertEquals(newLabel, graphHead.getLabel());
+    assertThat(graphHead.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
+    assertThat(graphHead.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
   }
 
   @Test
@@ -60,7 +69,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMEdge edge = new EdgeFactory().initEdge(edgeId, label, sourceId, targetId);
+    EPGMEdge edge = new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     String newLabel = "B";
 
@@ -69,15 +78,21 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(edge, edge);
 
     assertEquals(newLabel, edge.getLabel());
+    assertThat(edge.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
+    assertThat(edge.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
   }
 
   @Test
   public void testVertex() {
 
     GradoopId vertexId = GradoopId.get();
-    String label = "A";
 
-    EPGMVertex vertex = new VertexFactory().initVertex(vertexId, label);
+    String label = "A";
+    Properties props = Properties.create();
+    props.set("k1", "v1");
+    props.set("k2", "v2");
+
+    EPGMVertex vertex = new VertexFactory().initVertex(vertexId, label, props);
 
     String newLabel = "B";
 
@@ -86,5 +101,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(vertex, vertex);
  
     assertEquals(newLabel, vertex.getLabel());
+    assertThat(vertex.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
+    assertThat(vertex.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
   }
 }
