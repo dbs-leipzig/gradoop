@@ -724,20 +724,20 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   public Class<?> getType() {
-    return rawBytes[0] == TYPE_BOOLEAN ?
-      Boolean.class     : rawBytes[0] == TYPE_INTEGER     ?
-      Integer.class     : rawBytes[0] == TYPE_LONG        ?
-      Long.class        : rawBytes[0] == TYPE_FLOAT       ?
-      Float.class       : rawBytes[0] == TYPE_DOUBLE      ?
-      Double.class      : rawBytes[0] == TYPE_STRING      ?
-      String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
-      BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
-      GradoopId.class   : rawBytes[0] == TYPE_MAP         ?
-      Map.class         : rawBytes[0] == TYPE_LIST        ?
-      LocalDate.class   : rawBytes[0] == TYPE_DATE        ?
-      LocalTime.class   : rawBytes[0] == TYPE_TIME        ?
-      LocalDateTime.class : rawBytes[0] == TYPE_DATETIME  ?
-      List.class        : null;
+    return rawBytes[0] == TYPE_BOOLEAN ? Boolean.class
+        : rawBytes[0] == TYPE_INTEGER ? Integer.class
+        : rawBytes[0] == TYPE_LONG ? Long.class
+        : rawBytes[0] == TYPE_FLOAT ? Float.class
+        : rawBytes[0] == TYPE_DOUBLE ? Double.class
+        : rawBytes[0] == TYPE_STRING ? String.class
+        : rawBytes[0] == TYPE_BIG_DECIMAL ? BigDecimal.class
+        : rawBytes[0] == TYPE_GRADOOP_ID ? GradoopId.class
+        : rawBytes[0] == TYPE_MAP ? Map.class
+        : rawBytes[0] == TYPE_LIST ? List.class
+        : rawBytes[0] == TYPE_DATE ? LocalDate.class
+        : rawBytes[0] == TYPE_TIME ? LocalTime.class
+        : rawBytes[0] == TYPE_DATETIME ? LocalDateTime.class
+        : null;
   }
 
   public int getByteSize() {
