@@ -12,6 +12,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -100,10 +101,15 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
         LogicalGraph subGraph;
 
         if (VERIFICATION) {
-            subGraph = graph.edgeInducedSubgraph(new EdgeLabelFilter("knows"));
+            subGraph = graph.subgraph(
+              new VertexLabelFilter("person"),
+              new EdgeLabelFilter("knows"),
+              Subgraph.Strategy.BOTH_VERIFIED);
         } else {
-            subGraph = graph
-              .subgraph(new VertexLabelFilter("person"), new EdgeLabelFilter("knows"));
+            subGraph = graph.subgraph(
+              new VertexLabelFilter("person"),
+              new EdgeLabelFilter("knows"),
+              Subgraph.Strategy.BOTH);
         }
 
         // write graph
