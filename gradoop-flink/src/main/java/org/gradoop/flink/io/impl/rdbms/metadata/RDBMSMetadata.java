@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+/**
+ * class providing rdbms metadata
+ * @author pc
+ * @return rdbms metadata
+ */
 public class RDBMSMetadata {
 
 	public RDBMSMetadata() {

@@ -4,6 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Class for connecting to a rdbms via jdbc
+ * @author pc
+ * @return valid database connection
+ */
+
 public class RDBMSConnect {
 	public RDBMSConnect() {
 	}

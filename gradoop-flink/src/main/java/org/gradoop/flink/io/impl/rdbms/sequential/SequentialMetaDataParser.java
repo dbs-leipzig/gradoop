@@ -1,68 +1,97 @@
 package org.gradoop.flink.io.impl.rdbms.sequential;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLType;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import java.util.HashSet;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * class to acquire metadata for every table of the connected rdbms
+ * @author pc
+ *
+ */
 public class SequentialMetaDataParser {
+	/*
+	 * empty Constructor
+	 */
 	public SequentialMetaDataParser() {
 	}
 
-	public static ArrayList<RDBMSTable> parse(DatabaseMetaData metadata) throws Exception {
+	public static ArrayList<RDBMSTable> parse(DatabaseMetaData metadata, Connection con) throws Exception {
 		ArrayList<RDBMSTable> tables = new ArrayList<RDBMSTable>();
-
 		ResultSet rsTables = metadata.getTables(null, null, null, null);
+		/*
+		 * iterate over all tables of the connected rdbms
+		 */
 		while (rsTables.next()) {
-			String tableName = rsTables.getString("TABLE_NAME");
-			ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
-			ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
-			ResultSet rsAttributes = metadata.getColumns(null, null, tableName, "%");
+			/*
+			 * only tables going to convert (e.g. no views,...)
+			 */
+			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
+				String tableName = rsTables.getString("TABLE_NAME");
+				/*
+				 * create new rdbms table representation
+				 */
+				RDBMSTable table = new RDBMSTable();
+				table.setTableName(tableName);
 
-			String pkString = "";
-			while (rsPrimaryKeys.next()) {
-				pkString = pkString + RDBMSConstants.PK_DELIMITER + rsPrimaryKeys.getString("COLUMN_NAME");
-			}
-			if (!pkString.isEmpty()) {
-				if (!rsForeignKeys.next()) {
-					RDBMSTable table = new RDBMSTable();
-					table.setTableName(tableName);
-					table.setPrimaryKey(pkString);
-					table.setForeignKeys(null);
-					LinkedHashMap<String, JDBCType> attr = new LinkedHashMap<String, JDBCType>();
-					while (rsAttributes.next()) {
-						attr.put(rsAttributes.getString("COLUMN_NAME"),
-								JDBCType.valueOf(Integer.parseInt(rsAttributes.getString("DATA_TYPE"))));
-					}
-					table.setAttributes(attr);
-					tables.add(table);
-				} else {
-					RDBMSTable table = new RDBMSTable();
-					table.setTableName(tableName);
-					table.setPrimaryKey(pkString);
-					HashMap<String, String> fks = new HashMap<String, String>();
-					do {
-						fks.put(rsForeignKeys.getString("FKCOLUMN_NAME"), rsForeignKeys.getString("PKTABLE_NAME"));
-					} while (rsForeignKeys.next());
-					table.setForeignKeys(fks);
-					LinkedHashMap<String, JDBCType> attr = new LinkedHashMap<String, JDBCType>();
-					while (rsAttributes.next()) {
-						attr.put(rsAttributes.getString("COLUMN_NAME"),
-								JDBCType.valueOf(Integer.parseInt(rsAttributes.getString("DATA_TYPE"))));
-					}
-					table.setAttributes(attr);
-					tables.add(table);
+				/*
+				 * storing primary keys of the table
+				 */
+				ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
+				HashSet<String> primaryKeySet = new HashSet<String>();
+				while (rsPrimaryKeys.next()) {
+					primaryKeySet.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 				}
+
+				/*
+				 * storing foreignkeys of the table 
+				 */
+				ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
+				HashMap<String, String> foreignKeySet = new HashMap<String, String>();
+				while (rsForeignKeys.next()) {
+					foreignKeySet.put(rsForeignKeys.getString("FKCOLUMN_NAME"),
+							rsForeignKeys.getString("PKTABLE_NAME"));
+				}
+
+				/*
+				 * storing every attributename in the table 
+				 */
+				ResultSet rsColumns = metadata.getColumns(null, null, tableName, null);
+				ArrayList<String> columns = new ArrayList<String>();
+				while (rsColumns.next()) {
+					String schemaType = rsColumns.getString("COLUMN_NAME");
+					columns.add(schemaType);
+					table.getAttributes().put(schemaType,
+							JDBCType.valueOf(Integer.parseInt(rsColumns.getString("DATA_TYPE"))));
+				}
+
+				/*
+				 * add primary and foreign key's position in the table (needed for accessing fields via JDBCInputFormat)
+				 */
+				for (String cols : columns) {
+					if (primaryKeySet.contains(cols)) {
+						table.getPrimaryKey().add(cols);
+					}
+					if (foreignKeySet.containsKey(cols)) {
+						table.getForeignKeys().put(cols, foreignKeySet.get(cols));
+					}
+				}
+				
+				/*
+				 * set the number of table's rows (needed for distributing/ pageination in queriing via JDBCInputFormat)
+				 */
+				table.setNumberOfRows(TableRowSize.getTableRowSize(con, tableName));
+				if(table.getForeignKeys().size() == 2){
+					table.setDirectionIndicator(false);
+				}else{
+					table.setDirectionIndicator(true);
+				}
+				tables.add(table);
 			}
 		}
 		return tables;

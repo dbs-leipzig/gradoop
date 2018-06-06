@@ -1,19 +1,16 @@
-package org.gradoop.flink.io.impl.rdbms.connect;
+package org.gradoop.flink.io.impl.rdbms.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 
 public class RDBMSConfig extends Tuple3<String,String,String>{
-	public String url;
-	public String user;
-	public String pw;
-
-	public RDBMSConfig(String url, String user, String pw) {
+	String url;
+	String user;
+	String pw;
+	
+	public RDBMSConfig(String url, String user, String pw){
 		this.url = url;
 		this.user = user;
 		this.pw = pw;
-		this.f0 = url;
-		this.f1 = user;
-		this.f2 = pw;
 	}
 
 	public String getUrl() {

@@ -18,14 +18,13 @@ public class MapTypeInformation {
 
 	public static RowTypeInfo getRowTypeInfo(RDBMSTable table) throws ClassNotFoundException {
 		int i = 0;
-		TypeInformation[] fieldTypes = new TypeInformation[table.getAttributes().size()];
-		Iterator it = table.getAttributes().entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Entry) it.next();
-			JDBCType jdbcType = (JDBCType) pair.getValue();
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(jdbcType);
+		TypeInformation[] fieldTypes = new TypeInformation[table.getSqlTypes().size()];
+		
+		for(JDBCType f : table.getSqlTypes()){
+			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(f);
 			i++;
 		}
+	
 		return new RowTypeInfo(fieldTypes);
 	}
 }
