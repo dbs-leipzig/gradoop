@@ -18,13 +18,12 @@ package org.gradoop.flink.io.impl.csv;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class CSVDataSinkTest extends GradoopFlinkTestBase {
+public class CSVDataSinkTest extends CSVTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -71,5 +70,29 @@ public class CSVDataSinkTest extends GradoopFlinkTestBase {
     LogicalGraph output = csvDataSource.getLogicalGraph();
 
     collectAndAssertTrue(input.equalsByElementData(output));
+  }
+
+  /**
+   * Test CSVDataSink to write a graph with time property values
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testWriteWithTimePropertyValues() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    LogicalGraph logicalGraph = getExtendedLogicalGraph();
+    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
+    csvDataSink.write(logicalGraph, true);
+
+    getExecutionEnvironment().execute();
+
+    DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
+    LogicalGraph output = csvDataSource.getLogicalGraph();
+
+    output.getEdges().collect().forEach(this::checkTimeProperties);
+
+    collectAndAssertTrue(logicalGraph.equalsByElementData(output));
+    collectAndAssertTrue(logicalGraph.equalsByData(output));
   }
 }

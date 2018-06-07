@@ -1,0 +1,3 @@
+User;a:boolean,b:int,c:long,d:float
+Post;e:double,f:string,g:gradoopid
+creatorOf;h:localdate,i:localtime,j:localdatetime
