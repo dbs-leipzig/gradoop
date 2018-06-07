@@ -7,7 +7,7 @@ cache:
   - $HOME/.m2
 
 before_cache:
-  - rm -rf $HOME/.m2/repository/org/gradoop/
+  - rm -rf $HOME/.m2/repository/
 
 language: java
 
