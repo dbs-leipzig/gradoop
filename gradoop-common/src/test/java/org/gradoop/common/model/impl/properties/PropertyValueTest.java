@@ -898,6 +898,52 @@ public class PropertyValueTest {
     p = create(DATETIME_VAL_d);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
+
+  @Test
+  public void testGetType() {
+    PropertyValue p = create(NULL_VAL_0);
+    assertNull(p.getType());
+
+    p = create(BOOL_VAL_1);
+    assertEquals(Boolean.class, p.getType());
+
+    p = create(INT_VAL_2);
+    assertEquals(Integer.class, p.getType());
+
+    p = create(LONG_VAL_3);
+    assertEquals(Long.class, p.getType());
+
+    p = create(FLOAT_VAL_4);
+    assertEquals(Float.class, p.getType());
+
+    p = create(DOUBLE_VAL_5);
+    assertEquals(Double.class, p.getType());
+
+    p = create(STRING_VAL_6);
+    assertEquals(String.class, p.getType());
+
+    p = create(BIG_DECIMAL_VAL_7);
+    assertEquals(BigDecimal.class, p.getType());
+
+    p = create(GRADOOP_ID_VAL_8);
+    assertEquals(GradoopId.class, p.getType());
+
+    p = create(MAP_VAL_9);
+    assertEquals(Map.class, p.getType());
+
+    p = create(LIST_VAL_a);
+    assertEquals(List.class, p.getType());
+
+    p = create(DATE_VAL_b);
+    assertEquals(LocalDate.class, p.getType());
+
+    p = create(TIME_VAL_c);
+    assertEquals(LocalTime.class, p.getType());
+
+    p = create(DATETIME_VAL_d);
+    assertEquals(LocalDateTime.class, p.getType());
+  }
+
   /**
    * Assumes that p1 == p2 < p3
    */

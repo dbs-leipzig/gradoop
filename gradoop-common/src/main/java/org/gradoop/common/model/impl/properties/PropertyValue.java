@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Represents a single property value in the EPGM.
@@ -136,6 +137,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Class version for serialization.
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Mapping from byte value to associated Class
+   */
+  private static final Map<Byte, Class> TYPE_MAPPING = getTypeMap();
 
   /**
    * Stores the type and the value
@@ -723,21 +729,36 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   // Util
   //----------------------------------------------------------------------------
 
+  /**
+   * Get the data type as class object according to the first position of the rawBytes[] array
+   *
+   * @return Class object
+   */
   public Class<?> getType() {
-    return rawBytes[0] == TYPE_BOOLEAN ?
-      Boolean.class     : rawBytes[0] == TYPE_INTEGER     ?
-      Integer.class     : rawBytes[0] == TYPE_LONG        ?
-      Long.class        : rawBytes[0] == TYPE_FLOAT       ?
-      Float.class       : rawBytes[0] == TYPE_DOUBLE      ?
-      Double.class      : rawBytes[0] == TYPE_STRING      ?
-      String.class      : rawBytes[0] == TYPE_BIG_DECIMAL ?
-      BigDecimal.class  : rawBytes[0] == TYPE_GRADOOP_ID  ?
-      GradoopId.class   : rawBytes[0] == TYPE_MAP         ?
-      Map.class         : rawBytes[0] == TYPE_LIST        ?
-      LocalDate.class   : rawBytes[0] == TYPE_DATE        ?
-      LocalTime.class   : rawBytes[0] == TYPE_TIME        ?
-      LocalDateTime.class : rawBytes[0] == TYPE_DATETIME  ?
-      List.class        : null;
+    return TYPE_MAPPING.get(rawBytes[0]);
+  }
+
+  /**
+   * Creates a type mapping HashMap to assign a byte value to its represented Class
+   *
+   * @return a Map with byte to class assignments
+   */
+  private static Map<Byte, Class> getTypeMap() {
+    Map<Byte, Class> map = new HashMap<>();
+    map.put(TYPE_BOOLEAN, Boolean.class);
+    map.put(TYPE_INTEGER, Integer.class);
+    map.put(TYPE_LONG, Long.class);
+    map.put(TYPE_FLOAT, Float.class);
+    map.put(TYPE_DOUBLE, Double.class);
+    map.put(TYPE_STRING, String.class);
+    map.put(TYPE_BIG_DECIMAL, BigDecimal.class);
+    map.put(TYPE_GRADOOP_ID, GradoopId.class);
+    map.put(TYPE_MAP, Map.class);
+    map.put(TYPE_LIST, List.class);
+    map.put(TYPE_DATE, LocalDate.class);
+    map.put(TYPE_TIME, LocalTime.class);
+    map.put(TYPE_DATETIME, LocalDateTime.class);
+    return Collections.unmodifiableMap(map);
   }
 
   public int getByteSize() {
