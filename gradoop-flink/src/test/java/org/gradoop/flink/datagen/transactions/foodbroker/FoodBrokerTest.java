@@ -34,7 +34,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
@@ -52,10 +51,10 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSalesQuotationLineCount() throws IOException, JSONException, URISyntaxException {
+  public void testSalesQuotationLineCount() throws IOException, JSONException {
     generateCollection();
     DataSet<Vertex> salesQuotationLines = cases.getVertices()
-      .filter(new ByLabel<Vertex>("SalesQuotationLine"));
+      .filter(new ByLabel<>("SalesQuotationLine"));
     int min = 1;
     int max = 20;
     int casesCount = 10;
@@ -72,12 +71,12 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testSalesOrderCount() throws IOException, JSONException, URISyntaxException {
+  public void testSalesOrderCount() throws IOException, JSONException {
     generateCollection();
     DataSet<Vertex> salesQuotations = cases.getVertices()
-      .filter(new ByLabel<Vertex>("SalesQuotation"));
+      .filter(new ByLabel<>("SalesQuotation"));
     DataSet<Vertex> salesOrders = cases.getVertices()
-      .filter(new ByLabel<Vertex>("SalesOrder"));
+      .filter(new ByLabel<>("SalesOrder"));
 
     double actual = 0;
     double expected = 0;
@@ -98,7 +97,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMaxVertexCount() throws IOException, JSONException, URISyntaxException {
+  public void testMaxVertexCount() throws IOException, JSONException {
     generateCollection();
     int casesCount = 10;
     double actual = 0;
@@ -108,7 +107,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     double max = 63 * casesCount;
     try {
       actual = cases.getVertices()
-        .filter(new ByProperty<Vertex>("kind", PropertyValue.create("TransData")))
+        .filter(new ByProperty<>("kind", PropertyValue.create("TransData")))
         .count();
     } catch (Exception e) {
       e.printStackTrace();
@@ -118,7 +117,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMaxEdgeCount() throws IOException, JSONException, URISyntaxException {
+  public void testMaxEdgeCount() throws IOException, JSONException {
     generateCollection();
     int casesCount = 10;
     double actual = 0;
@@ -246,11 +245,11 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
     }
   }
 
-  private void generateCollection()
-    throws IOException, JSONException, URISyntaxException {
+  private void generateCollection() throws IOException, JSONException {
 
     if (cases == null) {
-      String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
+      String configPath =
+          FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile();
 
       FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 

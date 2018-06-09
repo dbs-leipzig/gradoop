@@ -17,11 +17,10 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Test;
 
-public class CSVDataSourceTest extends GradoopFlinkTestBase {
+public class CSVDataSourceTest extends CSVTestBase {
 
   @Test
   public void testRead() throws Exception {
@@ -39,5 +38,28 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("expected");
 
     collectAndAssertTrue(input.equalsByElementData(expected));
+  }
+
+  /**
+   * Test reading a logical graph from csv files with properties
+   * that are supported by csv source and sink
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testReadExtendedProperties() throws Exception {
+    String csvPath = VertexLabeledEdgeListDataSourceTest.class
+      .getResource("/data/csv/input_extended_properties")
+      .getFile();
+
+    DataSource dataSource = new CSVDataSource(csvPath, getConfig());
+    LogicalGraph input = dataSource.getLogicalGraph();
+    LogicalGraph expected = getExtendedLogicalGraph();
+
+    collectAndAssertTrue(input.equalsByElementData(expected));
+    collectAndAssertTrue(input.equalsByData(expected));
+
+    dataSource.getLogicalGraph().getEdges().collect()
+      .forEach(this::checkTimeProperties);
   }
 }

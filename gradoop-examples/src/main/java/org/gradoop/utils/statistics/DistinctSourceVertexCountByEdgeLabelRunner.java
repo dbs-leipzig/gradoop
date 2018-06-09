@@ -19,6 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;
+import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DistinctSourceIdsByEdgeLabel} for a given logical graph.
@@ -34,13 +35,11 @@ public class DistinctSourceVertexCountByEdgeLabelRunner extends AbstractRunner i
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-    new DistinctSourceIdsByEdgeLabel()
-      .execute(readLogicalGraph(args[0], args[1]))
-      .writeAsCsv(
+
+    StatisticWriter.writeCSV(new DistinctSourceIdsByEdgeLabel()
+        .execute(readLogicalGraph(args[0], args[1])),
         appendSeparator(args[2]) +
-          GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL,
-        System.lineSeparator(), GraphStatisticsReader.TOKEN_SEPARATOR)
-      .setParallelism(1);
+        GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);
 
     getExecutionEnvironment().execute("Statistics: Distinct source vertex count by edge label");
   }

@@ -20,6 +20,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,6 +119,12 @@ public class MetaDataParser {
       return s -> s;
     } else if (type.equals(TypeString.GRADOOPID.getTypeString())) {
       return GradoopId::fromString;
+    } else if (type.equals(TypeString.LOCALDATE.getTypeString())) {
+      return LocalDate::parse;
+    } else if (type.equals(TypeString.LOCALTIME.getTypeString())) {
+      return LocalTime::parse;
+    } else if (type.equals(TypeString.LOCALDATETIME.getTypeString())) {
+      return LocalDateTime::parse;
     } else {
       throw new IllegalArgumentException("Type " + type + " is not supported");
     }
@@ -142,6 +151,12 @@ public class MetaDataParser {
       return TypeString.STRING.getTypeString();
     } else if (propertyValue.isGradoopId()) {
       return TypeString.GRADOOPID.getTypeString();
+    } else if (propertyValue.isDate()) {
+      return TypeString.LOCALDATE.getTypeString();
+    } else if (propertyValue.isTime()) {
+      return TypeString.LOCALTIME.getTypeString();
+    } else if (propertyValue.isDateTime()) {
+      return TypeString.LOCALDATETIME.getTypeString();
     } else {
       throw new IllegalArgumentException("Type " + propertyValue.getType() + " is not supported");
     }
@@ -178,7 +193,19 @@ public class MetaDataParser {
     /**
      * GradoopId type
      */
-    GRADOOPID("gradoopid");
+    GRADOOPID("gradoopid"),
+    /**
+     * LocalDate type
+     */
+    LOCALDATE("localdate"),
+    /**
+     * LocalTime type
+     */
+    LOCALTIME("localtime"),
+    /**
+     * LocalDateTime type
+     */
+    LOCALDATETIME("localdatetime");
 
     /**
      * String representation

@@ -16,42 +16,34 @@
 package org.gradoop.common.config;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.storage.api.PersistentEdgeFactory;
-import org.gradoop.common.storage.api.PersistentGraphHeadFactory;
-import org.gradoop.common.storage.api.PersistentVertexFactory;
+import org.apache.flink.util.Preconditions;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Basic configuration for Gradoop Stores
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * @param <GF> graph head factory
+ * @param <VF> vertex factory
+ * @param <EF> edge factory
  */
-public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  extends GradoopFlinkConfig {
+public abstract class GradoopStoreConfig<GF, VF, EF> extends GradoopFlinkConfig {
 
   /**
    * Graph head handler.
    */
-  private final PersistentGraphHeadFactory<G> persistentGraphHeadFactory;
+  private final GF persistentGraphHeadFactory;
   /**
    * EPGMVertex handler.
    */
-  private final PersistentVertexFactory<V, E> persistentVertexFactory;
+  private final VF persistentVertexFactory;
   /**
    * Edge handler.
    */
-  private final PersistentEdgeFactory<E, V> persistentEdgeFactory;
+  private final EF persistentEdgeFactory;
 
   /**
    * Creates a new Configuration.
@@ -62,14 +54,13 @@ public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGM
    * @param env                         Flink {@link ExecutionEnvironment}
    */
   protected GradoopStoreConfig(
-    PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
-    PersistentVertexFactory<V, E> persistentVertexFactory,
-    PersistentEdgeFactory<E, V> persistentEdgeFactory,
-    ExecutionEnvironment env) {
-    this(persistentGraphHeadFactory, persistentVertexFactory, persistentEdgeFactory,
-      env,
-      new GVEGraphLayoutFactory(),
-      new GVECollectionLayoutFactory());
+    GF persistentGraphHeadFactory,
+    VF persistentVertexFactory,
+    EF persistentEdgeFactory,
+    ExecutionEnvironment env
+  ) {
+    this(persistentGraphHeadFactory, persistentVertexFactory, persistentEdgeFactory, env,
+      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
   }
 
   /**
@@ -83,34 +74,32 @@ public abstract class GradoopStoreConfig<G extends EPGMGraphHead, V extends EPGM
    * @param env                           Flink {@link ExecutionEnvironment}
    */
   protected GradoopStoreConfig(
-    PersistentGraphHeadFactory<G> persistentGraphHeadFactory,
-    PersistentVertexFactory<V, E> persistentVertexFactory,
-    PersistentEdgeFactory<E, V> persistentEdgeFactory,
+    GF persistentGraphHeadFactory,
+    VF persistentVertexFactory,
+    EF persistentEdgeFactory,
     ExecutionEnvironment env,
     LogicalGraphLayoutFactory logicalGraphLayoutFactory,
-    GraphCollectionLayoutFactory graphCollectionLayoutFactory) {
+    GraphCollectionLayoutFactory graphCollectionLayoutFactory
+  ) {
     super(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
 
-    this.persistentGraphHeadFactory =
-      checkNotNull(persistentGraphHeadFactory,
-        "PersistentGraphHeadFactory was null");
-    this.persistentVertexFactory =
-      checkNotNull(persistentVertexFactory,
-        "PersistentVertexFactory was null");
-    this.persistentEdgeFactory =
-      checkNotNull(persistentEdgeFactory,
-        "PersistentEdgeFactory was null");
+    this.persistentGraphHeadFactory = Preconditions.checkNotNull(persistentGraphHeadFactory,
+      "GraphHeadFactory was null");
+    this.persistentVertexFactory = Preconditions.checkNotNull(persistentVertexFactory,
+      "VertexFactory was null");
+    this.persistentEdgeFactory = Preconditions.checkNotNull(persistentEdgeFactory,
+      "EdgeFactory was null");
   }
 
-  public PersistentGraphHeadFactory<G> getPersistentGraphHeadFactory() {
+  public GF getPersistentGraphHeadFactory() {
     return persistentGraphHeadFactory;
   }
 
-  public PersistentVertexFactory<V, E> getPersistentVertexFactory() {
+  public VF getPersistentVertexFactory() {
     return persistentVertexFactory;
   }
 
-  public PersistentEdgeFactory<E, V> getPersistentEdgeFactory() {
+  public EF getPersistentEdgeFactory() {
     return persistentEdgeFactory;
   }
 }

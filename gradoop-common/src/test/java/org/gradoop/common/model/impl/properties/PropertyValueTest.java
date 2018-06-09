@@ -777,28 +777,28 @@ public class PropertyValueTest {
   @Test
   public void testArrayValueMaxSize() {
     PropertyValue property = new PropertyValue();
-    property.setBytes(new byte[PropertyValue.MAX_BINARY_LENGTH]);
+    property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]);
   }
   
-  @Test(expected = IllegalStateException.class)
-  public void testArrayValueTooBig() {
+  @Test
+  public void testLargeArrayValue() {
     PropertyValue property = new PropertyValue();
-    property.setBytes(new byte[PropertyValue.MAX_BINARY_LENGTH + 1]);
+    property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 1]);
   }
 
   @Test
   public void testStringValueMaxSize() {
-    create(new String(new byte[PropertyValue.MAX_BINARY_LENGTH - 1]));
+    create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]));
   }
   
-  @Test(expected = IllegalStateException.class)
-  public void testStringValueTooBig() {
-    create(new String(new byte[PropertyValue.MAX_BINARY_LENGTH]));
+  @Test
+  public void testLargeString() {
+    create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 10]));
   }
   
   @Test
   public void testListValueMaxSize() {
-    int n = PropertyValue.MAX_BINARY_LENGTH / 9;
+    int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9;
     List<PropertyValue> list = new ArrayList<>(n);
     while ( n-- > 0 ){
       list.add(create(Math.random()));
@@ -806,10 +806,10 @@ public class PropertyValueTest {
     create(list);
   }
   
-  @Test(expected = IllegalStateException.class)
-  public void testListValueTooBig() {
+  @Test
+  public void testLargeListValue() {
     // 8 bytes per double + 1 byte overhead
-    int n = PropertyValue.MAX_BINARY_LENGTH / 9 + 1;
+    int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9 + 1;
     List<PropertyValue> list = new ArrayList<>(n);
     while ( n-- > 0 ){
       list.add(create(Math.random()));
@@ -821,18 +821,18 @@ public class PropertyValueTest {
   public void testMapValueMaxSize() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
     // 8 bytes per double + 1 byte overhead
-    for (int i = 0; i < PropertyValue.MAX_BINARY_LENGTH / 18; i++) {
+    for (int i = 0; i < PropertyValue.LARGE_PROPERTY_THRESHOLD / 18; i++) {
       PropertyValue p = create(Math.random());
       m.put(p, p);
     }
     create(m);
   }
   
-  @Test(expected = IllegalStateException.class)
-  public void testMapValueTooBig() {
+  @Test
+  public void testLargeMapValue() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
     // 8 bytes per double + 1 byte overhead
-    for (int i = 0; i < PropertyValue.MAX_BINARY_LENGTH / 18 + 1; i++) {
+    for (int i = 0; i < PropertyValue.LARGE_PROPERTY_THRESHOLD / 18 + 1; i++) {
       PropertyValue p = create(Math.random());
       m.put(p, p);
     }
@@ -842,14 +842,14 @@ public class PropertyValueTest {
   @Test
   public void testBigDecimalValueMaxSize() {
     // internal representation of BigInteger needs 5 bytes
-    byte [] bigendian = new byte[PropertyValue.MAX_BINARY_LENGTH - 5];
+    byte [] bigendian = new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD];
     Arrays.fill(bigendian, (byte) 121);
     create(new BigDecimal(new BigInteger(bigendian)));
   }
   
-  @Test(expected = IllegalStateException.class)
-  public void testBigDecimalValueTooBig() {
-    byte [] bigendian = new byte[PropertyValue.MAX_BINARY_LENGTH - 4];
+  @Test
+  public void testLargeBigDecimal() {
+    byte [] bigendian = new byte[Short.MAX_VALUE + 10];
     Arrays.fill(bigendian, (byte) 121);
     create(new BigDecimal(new BigInteger(bigendian)));
   }
@@ -898,6 +898,52 @@ public class PropertyValueTest {
     p = create(DATETIME_VAL_d);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
+
+  @Test
+  public void testGetType() {
+    PropertyValue p = create(NULL_VAL_0);
+    assertNull(p.getType());
+
+    p = create(BOOL_VAL_1);
+    assertEquals(Boolean.class, p.getType());
+
+    p = create(INT_VAL_2);
+    assertEquals(Integer.class, p.getType());
+
+    p = create(LONG_VAL_3);
+    assertEquals(Long.class, p.getType());
+
+    p = create(FLOAT_VAL_4);
+    assertEquals(Float.class, p.getType());
+
+    p = create(DOUBLE_VAL_5);
+    assertEquals(Double.class, p.getType());
+
+    p = create(STRING_VAL_6);
+    assertEquals(String.class, p.getType());
+
+    p = create(BIG_DECIMAL_VAL_7);
+    assertEquals(BigDecimal.class, p.getType());
+
+    p = create(GRADOOP_ID_VAL_8);
+    assertEquals(GradoopId.class, p.getType());
+
+    p = create(MAP_VAL_9);
+    assertEquals(Map.class, p.getType());
+
+    p = create(LIST_VAL_a);
+    assertEquals(List.class, p.getType());
+
+    p = create(DATE_VAL_b);
+    assertEquals(LocalDate.class, p.getType());
+
+    p = create(TIME_VAL_c);
+    assertEquals(LocalTime.class, p.getType());
+
+    p = create(DATETIME_VAL_d);
+    assertEquals(LocalDateTime.class, p.getType());
+  }
+
   /**
    * Assumes that p1 == p2 < p3
    */
