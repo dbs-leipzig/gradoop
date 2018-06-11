@@ -1,3 +1,3 @@
-User;a:boolean,b:int,c:long,d:float
-Post;e:double,f:string,g:gradoopid
-creatorOf;h:localdate,i:localtime,j:localdatetime
+User;a:boolean,b:int,c:long,d:float,e:double,f:string,g:gradoopid,h:localdate,i:localtime,j:localdatetime,k:bigdecimal,l:map,m:list
+Post;a:boolean,b:int,c:long,d:float,e:double,f:string,g:gradoopid,h:localdate,i:localtime,j:localdatetime,k:bigdecimal,l:map,m:list
+creatorOf;a:boolean,b:int,c:long,d:float,e:double,f:string,g:gradoopid,h:localdate,i:localtime,j:localdatetime,k:bigdecimal,l:map,m:list

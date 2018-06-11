@@ -73,12 +73,12 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to write a graph with time property values
+   * Test CSVDataSink to write a graph with all supported properties
    *
    * @throws Exception on failure
    */
   @Test
-  public void testWriteWithTimePropertyValues() throws Exception {
+  public void testWriteExtendedProperties() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
@@ -88,11 +88,12 @@ public class CSVDataSinkTest extends CSVTestBase {
     getExecutionEnvironment().execute();
 
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    LogicalGraph sourceLogicalGraph = csvDataSource.getLogicalGraph();
 
-    output.getEdges().collect().forEach(this::checkTimeProperties);
+    collectAndAssertTrue(logicalGraph.equalsByElementData(sourceLogicalGraph));
+    collectAndAssertTrue(logicalGraph.equalsByData(sourceLogicalGraph));
 
-    collectAndAssertTrue(logicalGraph.equalsByElementData(output));
-    collectAndAssertTrue(logicalGraph.equalsByData(output));
+    sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);
+    sourceLogicalGraph.getVertices().collect().forEach(this::checkProperties);
   }
 }
