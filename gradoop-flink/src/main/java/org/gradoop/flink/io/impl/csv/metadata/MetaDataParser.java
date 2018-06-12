@@ -95,8 +95,24 @@ public class MetaDataParser {
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
           String[] propertyTokens = propertyString.split(PROPERTY_TOKEN_DELIMITER);
-          propertyMetaDataList.add(new PropertyMetaData(
-            propertyTokens[0], getValueParser(propertyTokens[1])));
+          if (propertyTokens.length == 3 &&
+            propertyTokens[1].equals(TypeString.LIST.getTypeString())) {
+            // it's a list with one additional data type (type of list items)
+            propertyMetaDataList.add(new PropertyMetaData(
+              propertyTokens[0], getListValueParser(propertyTokens[2])));
+          } else if (propertyTokens.length == 4 &&
+            propertyTokens[1].equals(TypeString.MAP.getTypeString())) {
+            // it's a map with two additional data types (key type + value type)
+            propertyMetaDataList.add(
+              new PropertyMetaData(
+                propertyTokens[0],
+                getMapValueParser(propertyTokens[2], propertyTokens[3])
+              )
+            );
+          } else {
+            propertyMetaDataList.add(new PropertyMetaData(
+              propertyTokens[0], getValueParser(propertyTokens[1])));
+          }
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
@@ -147,12 +163,58 @@ public class MetaDataParser {
   }
 
   /**
+   * Creates a parsing function for list property type.
+   *
+   * @param listItemType string representation of the list item type, e.g. "String"
+   * @return parsing function
+   */
+  private static Function<String, Object> getListValueParser(String listItemType) {
+    final String itemType = listItemType.toLowerCase();
+    // check the validity of the list item type
+    if (!TYPE_PARSER_MAP.containsKey(itemType)) {
+      throw new TypeNotPresentException(itemType, null);
+    }
+
+    return s -> parseListProperty(s, TYPE_PARSER_MAP.get(itemType));
+  }
+
+  /**
+   * Creates a parsing function for map property type.
+   *
+   * @param keyType string representation of the map key type, e.g. "String"
+   * @param valueType string representation of the map value type, e.g. "Double"
+   * @return parsing function
+   */
+  private static Function<String, Object> getMapValueParser(String keyType, String valueType) {
+    final String keyTypeLowerCase = keyType.toLowerCase();
+    // check the validity of the map key type
+    if (!TYPE_PARSER_MAP.containsKey(keyTypeLowerCase)) {
+      throw new TypeNotPresentException(keyTypeLowerCase, null);
+    }
+
+    final String valueTypeLowerCase = valueType.toLowerCase();
+    // check the validity of the map value type
+    if (!TYPE_PARSER_MAP.containsKey(valueTypeLowerCase)) {
+      throw new TypeNotPresentException(keyTypeLowerCase, null);
+    }
+
+    return s -> parseMapProperty(
+      s,
+      TYPE_PARSER_MAP.get(keyTypeLowerCase),
+      TYPE_PARSER_MAP.get(valueTypeLowerCase)
+    );
+  }
+
+  /**
    * Parse function to translate string representation of a List to a list of PropertyValues
+   * Every PropertyValue has the type "string", because there is no parser for the items given
+   * Use {@link #parseListProperty(String, Function)} to specify a parsing function
    *
    * @param s the string to parse as list, e.g. "[myString1, myString2]"
-   * @return the list represented by the argument as list
+   * @return the list represented by the argument
    */
   private static Object parseListProperty(String s) {
+    // no item type given, so use string as type
     s = s.replace("[", "").replace("]", "");
     return Arrays.stream(s.split(LIST_DELIMITER))
       .map(PropertyValue::create)
@@ -160,16 +222,60 @@ public class MetaDataParser {
   }
 
   /**
+   * Parse function to translate string representation of a List to a list of PropertyValues
+   *
+   * @param s the string to parse as list, e.g. "[myString1, myString2]"
+   * @param itemParser the function to parse the list items
+   * @return the list represented by the argument
+   */
+  private static Object parseListProperty(String s, Function<String, Object> itemParser) {
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(itemParser)
+      .map(PropertyValue::create)
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Parse function to translate string representation of a Map to a Map with key and value of
+   * type PropertyValue. Every PropertyValue (key and value) has the type "string", because there
+   * are no parsers for the keys and values given. Use
+   * {@link #parseMapProperty(String, Function, Function)} to specify both parsing functions.
+   *
+   * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
+   * @return the map represented by the argument
+   */
+  private static Object parseMapProperty(String s) {
+    // no key type and value type given, so use string as types
+    s = s.replace("{", "").replace("}", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(st -> st.split("="))
+      .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
+  }
+
+  /**
    * Parse function to translate string representation of a Map to a Map with
    * key and value of type PropertyValue
    *
    * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
-   * @return the map represented by the argument as list
+   * @param keyParser the function to parse the keys
+   * @param valueParser the function to parse the values
+   * @return the map represented by the argument
    */
-  private static Object parseMapProperty(String s) {
+  private static Object parseMapProperty(
+    String s,
+    Function<String, Object> keyParser,
+    Function<String, Object> valueParser
+  ) {
     s = s.replace("{", "").replace("}", "");
     return Arrays.stream(s.split(LIST_DELIMITER))
       .map(st -> st.split("="))
+      .map(strings -> {
+          Object[] objects = new Object[2];
+          objects[0] = keyParser.apply(strings[0]);
+          objects[1] = valueParser.apply(strings[1]);
+          return objects;
+        })
       .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
   }
 
@@ -197,9 +303,17 @@ public class MetaDataParser {
     } else if (propertyValue.isGradoopId()) {
       return TypeString.GRADOOPID.getTypeString();
     } else if (propertyValue.isMap()) {
-      return TypeString.MAP.getTypeString();
+      // map type string is map:{keyType}:{valueType}
+      return TypeString.MAP.getTypeString() +
+        PROPERTY_TOKEN_DELIMITER +
+        getTypeString(propertyValue.getMap().keySet().iterator().next()) +
+        PROPERTY_TOKEN_DELIMITER +
+        getTypeString(propertyValue.getMap().values().iterator().next());
     } else if (propertyValue.isList()) {
-      return TypeString.LIST.getTypeString();
+      // list type string is list:{itemType}
+      return TypeString.LIST.getTypeString() +
+        PROPERTY_TOKEN_DELIMITER +
+        getTypeString(propertyValue.getList().get(0));
     } else if (propertyValue.isDate()) {
       return TypeString.LOCALDATE.getTypeString();
     } else if (propertyValue.isTime()) {

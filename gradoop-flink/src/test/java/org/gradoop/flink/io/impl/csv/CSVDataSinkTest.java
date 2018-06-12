@@ -23,6 +23,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 public class CSVDataSinkTest extends CSVTestBase {
 
   @Rule
@@ -95,5 +98,29 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);
     sourceLogicalGraph.getVertices().collect().forEach(this::checkProperties);
+  }
+
+  /**
+   * Test the content of the metadata.csv file
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testWriteMetadataCsv() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    LogicalGraph logicalGraph = getExtendedLogicalGraph();
+    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
+    csvDataSink.write(logicalGraph, true);
+
+    getExecutionEnvironment().execute();
+
+    String metadataFile = tmpPath + "/metadata.csv";
+    String line;
+
+    BufferedReader br = new BufferedReader(new FileReader(metadataFile));
+    while ((line = br.readLine()) != null) {
+      checkMetadataCsvLine(line);
+    }
   }
 }

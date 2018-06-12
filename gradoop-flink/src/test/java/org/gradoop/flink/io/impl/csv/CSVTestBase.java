@@ -57,9 +57,18 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
   private static String PROP_K = "k";
   private static String PROP_L = "l";
   private static String PROP_M = "m";
+  private static String PROP_N = "n";
 
+  /**
+   * Global map to define properties of vertices and edges
+   */
   private static Map<String, Object> PROP_MAP = getPropertyMap();
 
+  /**
+   * Function to initiate the static property map
+   *
+   * @return a map containing the properties
+   */
   private static Map<String, Object> getPropertyMap() {
     LocalDate localDate = LocalDate.of(2018, 6, 1);
     LocalTime localTime = LocalTime.of(18, 6, 1);
@@ -70,9 +79,13 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     stringList.add(stringValue1);
     stringList.add(stringValue2);
 
+    ArrayList<PropertyValue> intList = new ArrayList<>();
+    intList.add(PropertyValue.create(1234));
+    intList.add(PropertyValue.create(5678));
+
     Map<PropertyValue, PropertyValue> objectMap = new HashMap<>();
-    objectMap.put(stringValue1, PropertyValue.create("myValue1"));
-    objectMap.put(stringValue2, PropertyValue.create("myValue2"));
+    objectMap.put(stringValue1, PropertyValue.create(12.345));
+    objectMap.put(stringValue2, PropertyValue.create(67.89));
 
     Map<String, Object> propertyMap = new HashMap<>();
     propertyMap.put(PROP_A, true);
@@ -88,6 +101,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     propertyMap.put(PROP_K, new BigDecimal("0.33"));
     propertyMap.put(PROP_L, objectMap);
     propertyMap.put(PROP_M, stringList);
+    propertyMap.put(PROP_N, intList);
     return Collections.unmodifiableMap(propertyMap);
   }
 
@@ -140,6 +154,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.hasProperty(PROP_K));
     assertTrue(epgmElement.hasProperty(PROP_L));
     assertTrue(epgmElement.hasProperty(PROP_M));
+    assertTrue(epgmElement.hasProperty(PROP_N));
 
     // assert that the properties have valid data types
     assertTrue(epgmElement.getPropertyValue(PROP_A).isBoolean());
@@ -155,6 +170,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.getPropertyValue(PROP_K).isBigDecimal());
     assertTrue(epgmElement.getPropertyValue(PROP_L).isMap());
     assertTrue(epgmElement.getPropertyValue(PROP_M).isList());
+    assertTrue(epgmElement.getPropertyValue(PROP_N).isList());
 
     // assert that the properties have valid values
     assertEquals(epgmElement.getPropertyValue(PROP_A).getBoolean(), PROP_MAP.get(PROP_A));
@@ -170,5 +186,28 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertEquals(epgmElement.getPropertyValue(PROP_K).getBigDecimal(), PROP_MAP.get(PROP_K));
     assertEquals(epgmElement.getPropertyValue(PROP_L).getMap(), PROP_MAP.get(PROP_L));
     assertEquals(epgmElement.getPropertyValue(PROP_M).getList(), PROP_MAP.get(PROP_M));
+    assertEquals(epgmElement.getPropertyValue(PROP_N).getList(), PROP_MAP.get(PROP_N));
+  }
+
+  /**
+   * Check that a line of the created csv metadata file has all expected data type definitions
+   *
+   * @param line the line of a csv metadata file as string
+   */
+  protected void checkMetadataCsvLine(String line) {
+    assertTrue(line.contains(PROP_A + ":boolean"));
+    assertTrue(line.contains(PROP_B + ":int"));
+    assertTrue(line.contains(PROP_C + ":long"));
+    assertTrue(line.contains(PROP_D + ":float"));
+    assertTrue(line.contains(PROP_E + ":double"));
+    assertTrue(line.contains(PROP_F + ":string"));
+    assertTrue(line.contains(PROP_G + ":gradoopid"));
+    assertTrue(line.contains(PROP_H + ":localdate"));
+    assertTrue(line.contains(PROP_I + ":localtime"));
+    assertTrue(line.contains(PROP_J + ":localdatetime"));
+    assertTrue(line.contains(PROP_K + ":bigdecimal"));
+    assertTrue(line.contains(PROP_L + ":map:string:double"));
+    assertTrue(line.contains(PROP_M + ":list:string"));
+    assertTrue(line.contains(PROP_N + ":list:int"));
   }
 }
