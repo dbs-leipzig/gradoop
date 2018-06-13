@@ -78,8 +78,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     graphStore.close();
   }
 
-
-
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * flushes the tables and reads/validates the data.
@@ -172,7 +170,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   /**
-   * Tries to add an unsupported property type {@link List} as property value.
+   * Tries to add an unsupported property type {@link Set} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() {
@@ -234,38 +232,62 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
-      case KEY_0:
-        assertTrue(v.getPropertyValue(propertyKey).isNull());
-        assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
-        break;
-      case KEY_1:
-        assertTrue(v.getPropertyValue(propertyKey).isBoolean());
-        assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
-        break;
-      case KEY_2:
-        assertTrue(v.getPropertyValue(propertyKey).isInt());
-        assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
-        break;
-      case KEY_3:
-        assertTrue(v.getPropertyValue(propertyKey).isLong());
-        assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
-        break;
-      case KEY_4:
-        assertTrue(v.getPropertyValue(propertyKey).isFloat());
-        assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
-        break;
-      case KEY_5:
-        assertTrue(v.getPropertyValue(propertyKey).isDouble());
-        assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
-        break;
-      case KEY_6:
-        assertTrue(v.getPropertyValue(propertyKey).isString());
-        assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
-        break;
-      case KEY_7:
-        assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
-        assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
-        break;
+        case KEY_0:
+          assertTrue(v.getPropertyValue(propertyKey).isNull());
+          assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
+          break;
+        case KEY_1:
+          assertTrue(v.getPropertyValue(propertyKey).isBoolean());
+          assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
+          break;
+        case KEY_2:
+          assertTrue(v.getPropertyValue(propertyKey).isInt());
+          assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
+          break;
+        case KEY_3:
+          assertTrue(v.getPropertyValue(propertyKey).isLong());
+          assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
+          break;
+        case KEY_4:
+          assertTrue(v.getPropertyValue(propertyKey).isFloat());
+          assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
+          break;
+        case KEY_5:
+          assertTrue(v.getPropertyValue(propertyKey).isDouble());
+          assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
+          break;
+        case KEY_6:
+          assertTrue(v.getPropertyValue(propertyKey).isString());
+          assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
+          break;
+        case KEY_7:
+          assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
+          assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
+          break;
+        case KEY_8:
+          assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
+          assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
+          break;
+        case KEY_9:
+          assertTrue(v.getPropertyValue(propertyKey).isMap());
+          assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
+          break;
+        case KEY_a:
+          assertTrue(v.getPropertyValue(propertyKey).isList());
+          assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
+          break;
+        case KEY_b:
+          assertTrue(v.getPropertyValue(propertyKey).isDate());
+          assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
+          break;
+        case KEY_c:
+          assertTrue(v.getPropertyValue(propertyKey).isTime());
+          assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
+          break;
+        case KEY_d:
+          assertTrue(v.getPropertyValue(propertyKey).isDateTime());
+          assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+          break;
       }
     }
   }
