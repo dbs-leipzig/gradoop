@@ -48,18 +48,21 @@ public class CSVDataSourceTest extends CSVTestBase {
    */
   @Test
   public void testReadExtendedProperties() throws Exception {
+    LogicalGraph expected = getExtendedLogicalGraph();
+
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
       .getResource("/data/csv/input_extended_properties")
       .getFile();
 
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
-    LogicalGraph input = dataSource.getLogicalGraph();
-    LogicalGraph expected = getExtendedLogicalGraph();
+    LogicalGraph sourceLogicalGraph = dataSource.getLogicalGraph();
 
-    collectAndAssertTrue(input.equalsByElementData(expected));
-    collectAndAssertTrue(input.equalsByData(expected));
+    collectAndAssertTrue(sourceLogicalGraph.equalsByElementData(expected));
+    collectAndAssertTrue(sourceLogicalGraph.equalsByData(expected));
 
     dataSource.getLogicalGraph().getEdges().collect()
-      .forEach(this::checkTimeProperties);
+      .forEach(this::checkProperties);
+    dataSource.getLogicalGraph().getVertices().collect()
+      .forEach(this::checkProperties);
   }
 }
