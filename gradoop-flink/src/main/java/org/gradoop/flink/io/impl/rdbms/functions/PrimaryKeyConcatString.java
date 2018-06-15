@@ -1,7 +1,9 @@
 package org.gradoop.flink.io.impl.rdbms.functions;
 
+import java.sql.JDBCType;
 import java.util.ArrayList;
 
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.types.Row;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;

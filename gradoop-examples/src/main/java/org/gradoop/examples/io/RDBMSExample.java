@@ -27,6 +27,7 @@ public class RDBMSExample implements ProgramDescription {
 			final String url = args[0];
 			final String user = args[1];
 			final String pw = args[2];
+			final String outputPath = args[3];
 
 			ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 			
@@ -36,7 +37,9 @@ public class RDBMSExample implements ProgramDescription {
 			
 			LogicalGraph schema = dataSource.getLogicalGraph();
 			
-			schema.writeTo(new JSONDataSink("/home/pc/01 Uni/8. Semester/Bachelorarbeit/Test_Outputs/"+getDateString()+"Test_Graph",gfc));
+			schema.writeTo(new JSONDataSink(outputPath + getDateString() + urlParser(url),gfc));
+			
+			System.out.println("***JSON Output Graph will write to :" + outputPath + getDateString() + urlParser(url));
 			
 			env.execute();
     }	
@@ -46,10 +49,14 @@ public class RDBMSExample implements ProgramDescription {
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
+	
+	public static String urlParser(String url){
+		String dbName = url.replaceAll(".*/", "");
+		return dbName;
+	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "RDBMS to Graph Convertion example";
 	}
 

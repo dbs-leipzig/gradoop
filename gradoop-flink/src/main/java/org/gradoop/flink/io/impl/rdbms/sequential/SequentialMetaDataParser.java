@@ -23,7 +23,8 @@ public class SequentialMetaDataParser {
 
 	public static ArrayList<RDBMSTable> parse(DatabaseMetaData metadata, Connection con) throws Exception {
 		ArrayList<RDBMSTable> tables = new ArrayList<RDBMSTable>();
-		ResultSet rsTables = metadata.getTables(null, null, null, null);
+		ResultSet rsTables = metadata.getTables(null, null, "%", new String[]{"TABLE"});
+		ResultSet schema = metadata.getSchemas();
 		/*
 		 * iterate over all tables of the connected rdbms
 		 */

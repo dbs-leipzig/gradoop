@@ -62,6 +62,13 @@ public class RDBMSTable implements Serializable, Cloneable {
 			sqlTypes.add(attributes.get(pk));
 			i++;
 		}
+		for (Entry<String, String> fk : foreignKeys.entrySet()) {
+			sql += fk.getKey() + ",";
+			RowHeaderTuple rht = new RowHeaderTuple(fk.getKey(), "fk", i);
+			rowHeader.getRowHeader().add(rht);
+			sqlTypes.add(attributes.get(fk.getKey()));
+			i++;
+		}
 		for (String att : getSimpleAttributes()) {
 			sql += att + ",";
 			RowHeaderTuple rht = new RowHeaderTuple(att, "att", i);

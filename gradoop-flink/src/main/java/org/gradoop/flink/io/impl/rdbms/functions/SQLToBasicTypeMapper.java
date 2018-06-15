@@ -65,10 +65,10 @@ public class SQLToBasicTypeMapper {
 			bti = BasicTypeInfo.DATE_TYPE_INFO;
 			break;
 		case "TIME":
-			bti = BasicTypeInfo.STRING_TYPE_INFO;
+			bti = BasicTypeInfo.VOID_TYPE_INFO;
 			break;
 		case "TIMESTAMP":
-			bti = BasicTypeInfo.STRING_TYPE_INFO;
+			bti = BasicTypeInfo.VOID_TYPE_INFO;
 			break;
 		case "CLOB":
 			System.err.println("No Typemapping for Type : CLOB");

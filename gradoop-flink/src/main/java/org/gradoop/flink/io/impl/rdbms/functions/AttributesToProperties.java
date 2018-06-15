@@ -16,6 +16,19 @@ public class AttributesToProperties {
 				props.set(rht.getName(), tuple.getField(rht.getPos()).toString());
 			} else if (rht.getAttType().equals(RDBMSConstants.PK_FIELD)) {
 				props.set(rht.getName(), tuple.getField(rht.getPos()).toString());
+			} else if (rht.getAttType().equals(RDBMSConstants.FK_FIELD)) {
+				props.set(rht.getName(), tuple.getField(rht.getPos()).toString());
+			}
+		}
+		return props;
+	}
+	public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowHeader){
+		Properties props = new Properties();
+		for (RowHeaderTuple rht : rowHeader.getRowHeader()) {
+			if (rht.getAttType().equals(RDBMSConstants.ATTRIBUTE_FIELD)) {
+				props.set(rht.getName(), tuple.getField(rht.getPos()).toString());
+			} else if (rht.getAttType().equals(RDBMSConstants.PK_FIELD)) {
+				props.set(rht.getName(), tuple.getField(rht.getPos()).toString());
 			}
 		}
 		return props;

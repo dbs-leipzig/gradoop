@@ -13,6 +13,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.MapTypeInformation;
+import org.gradoop.flink.io.impl.rdbms.jdbcdriver.RegisterDriver;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
@@ -22,7 +23,7 @@ public class FlinkConnect {
 	public FlinkConnect() {
 	}
 
-	public static DataSet<Row> connect(ExecutionEnvironment env, Tuple3<String,String,String> rdbmsConfig, RDBMSTable table, String tableoredge) throws ClassNotFoundException {
+	public static DataSet<Row> connect(ExecutionEnvironment env,RDBMSConfig rdbmsConfig, RDBMSTable table, String tableoredge) throws ClassNotFoundException {
 
 		int parallelism = env.getParallelism();
 		int partitionNumber = table.getNumberOfRows() / parallelism;
@@ -41,27 +42,25 @@ public class FlinkConnect {
 		}
 
 		if(tableoredge.equals(RDBMSConstants.NODE_TABLE)){
-			System.out.println(table.getTableName() + " : " + parallelism + " : " + partitionNumber);
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()
-					.setDrivername(RDBMSConstants.DRIVER)
+					.setDrivername("org.gradoop.flink.io.impl.rdbms.jdbcdriver.DriverShim")
 					.setDBUrl(rdbmsConfig.f0)
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)
-					.setQuery(table.getNodeSqlQuery() + " limit ?,?")
+					.setQuery(table.getNodeSqlQuery() + " limit ? offset ?")
 					.setRowTypeInfo(new MapTypeInformation().getRowTypeInfo(table))
 					.setParametersProvider(new GenericParameterValuesProvider(parameters))
 					.finish();
 		}
 		if(tableoredge.equals(RDBMSConstants.EDGE_TABLE)){
-			System.out.println(table.getTableName() + " : " + parallelism + " : " + partitionNumber);
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()
-					.setDrivername(RDBMSConstants.DRIVER)
+					.setDrivername("org.gradoop.flink.io.impl.rdbms.jdbcdriver.DriverShim")
 					.setDBUrl(rdbmsConfig.f0)
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)
-					.setQuery(table.getEdgeSqlQuery() + " limit ?,?")
+					.setQuery(table.getEdgeSqlQuery() + " limit ? offset ?")
 					.setRowTypeInfo(new MapTypeInformation().getRowTypeInfo(table))
 					.setParametersProvider(new GenericParameterValuesProvider(parameters))
 					.finish();

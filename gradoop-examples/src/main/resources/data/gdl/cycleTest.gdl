@@ -1,0 +1,12 @@
+cycleTest[
+//Verrices
+(peter:person {name : "Peter", pnr : 0, PrimaryKey : 0 })
+(karla:person {name : "Karla", pnr : 1, PrimaryKey : 1 })
+(joachim:person {name : "Joachim", pnr : 2, PrimaryKey : 2 })
+(steffen:person {name : "Steffen", pnr : 3, PrimaryKey : 3 })
+//Edges
+(peter)-->(karla)
+(karla)-->(peter)
+(joachim)-->(steffen)
+(steffen)-->(joachim)
+]
