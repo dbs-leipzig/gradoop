@@ -18,8 +18,6 @@ package org.gradoop.flink.io.impl.accumulo;
 
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.accumulo.outputformats.EdgeInOutputFormat;
-import org.gradoop.flink.io.impl.accumulo.outputformats.EdgeOutOutputFormat;
 import org.gradoop.flink.io.impl.accumulo.outputformats.EdgeOutputFormat;
 import org.gradoop.flink.io.impl.accumulo.outputformats.GraphHeadOutputFormat;
 import org.gradoop.flink.io.impl.accumulo.outputformats.VertexOutputFormat;
@@ -69,10 +67,10 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
       new VertexOutputFormat(getAccumuloConfig().getAccumuloProperties()));
     graphCollection.getEdges().output(
       new EdgeOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    graphCollection.getEdges().output(
-      new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    graphCollection.getEdges().output(
-      new EdgeInOutputFormat(getAccumuloConfig().getAccumuloProperties()));
+//    graphCollection.getEdges().output(
+//      new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
+//    graphCollection.getEdges().output(
+//      new EdgeInOutputFormat(getAccumuloConfig().getAccumuloProperties()));
   }
 
 }
