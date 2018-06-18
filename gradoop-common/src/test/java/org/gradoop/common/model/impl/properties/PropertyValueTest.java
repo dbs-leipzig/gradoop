@@ -727,35 +727,54 @@ public class PropertyValueTest {
 
   @Test
   public void testCompareTo() throws Exception {
+    // null
     assertTrue(create(null).compareTo(create(null)) == 0);
-
+    // boolean
     validateCompareTo(create(false), create(false), create(true));
-
+    // int
     validateCompareTo(create(-10), create(-10), create(10));
     validateCompareTo(create(10), create(10), create(12));
-
+    // long
     validateCompareTo(create(-10L), create(-10L), create(12L));
     validateCompareTo(create(10L), create(10L), create(12L));
-
+    // float
     validateCompareTo(create(-10F), create(-10F), create(12F));
     validateCompareTo(create(10F), create(10F), create(12F));
-
+    // double
     validateCompareTo(create(-10.), create(-10.), create(12.));
     validateCompareTo(create(10.), create(10.), create(12.));
-
+    //string
     validateCompareTo(create("10"), create("10"), create("12"));
-
+    // BigDecimal
     validateCompareTo(create(new BigDecimal(-10)),
       create(new BigDecimal(-10)),
       create(new BigDecimal(11)));
     validateCompareTo(create(new BigDecimal(10)),
       create(new BigDecimal(10)),
       create(new BigDecimal(11)));
-
+    // GradoopId
     validateCompareTo(
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
       create(GradoopId.fromString("583ff8ffbd7d222690a9099a"))
+    );
+    // Date
+    validateCompareTo(
+      create(DATE_VAL_b),
+      create(DATE_VAL_b),
+      create(DATE_VAL_b.plusDays(1L))
+    );
+    // Time
+    validateCompareTo(
+      create(TIME_VAL_c),
+      create(TIME_VAL_c),
+      create(TIME_VAL_c.plusSeconds(1L))
+    );
+    // DateTime
+    validateCompareTo(
+      create(DATETIME_VAL_d),
+      create(DATETIME_VAL_d),
+      create(DATETIME_VAL_d.plusNanos(1L))
     );
   }
 

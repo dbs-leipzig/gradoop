@@ -827,6 +827,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       result = this.getBigDecimal().compareTo(o.getBigDecimal());
     } else if (this.isGradoopId() && o.isGradoopId()) {
       result = this.getGradoopId().compareTo(o.getGradoopId());
+    } else if (this.isDate() && o.isDate()) {
+      result = this.getDate().compareTo(o.getDate());
+    } else if (this.isTime() && o.isTime()) {
+      result = this.getTime().compareTo(o.getTime());
+    } else if (this.isDateTime() && o.isDateTime()) {
+      result = this.getDateTime().compareTo(o.getDateTime());
     } else if (this.isMap() || o.isMap() || this.isList() || o.isList()) {
       throw new UnsupportedOperationException(String.format(
         "Method compareTo() is not supported for %s, %s", this.getClass(), o.getClass()));
