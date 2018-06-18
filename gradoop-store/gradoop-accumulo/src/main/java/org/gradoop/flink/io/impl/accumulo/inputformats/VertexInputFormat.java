@@ -52,7 +52,7 @@ public class VertexInputFormat extends BaseInputFormat<Vertex> {
   /**
    * graph head handler
    */
-  private transient AccumuloVertexHandler<Vertex> handler;
+  private transient AccumuloVertexHandler handler;
 
   /**
    * vertex input format constructor
@@ -70,7 +70,7 @@ public class VertexInputFormat extends BaseInputFormat<Vertex> {
   @Override
   protected void initiate() {
     iterator = new GradoopVertexIterator();
-    handler = new AccumuloVertexHandler<>(new VertexFactory());
+    handler = new AccumuloVertexHandler(new VertexFactory());
   }
 
   @Override

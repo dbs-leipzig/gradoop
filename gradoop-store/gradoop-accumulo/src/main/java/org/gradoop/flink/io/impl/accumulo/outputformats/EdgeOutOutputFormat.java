@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.accumulo.outputformats;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
@@ -38,7 +37,7 @@ public class EdgeOutOutputFormat extends BaseOutputFormat<Edge> {
   /**
    * vertex handler
    */
-  private transient AccumuloVertexHandler<Vertex> handler;
+  private transient AccumuloVertexHandler handler;
 
   /**
    * base output format constructor
@@ -51,7 +50,7 @@ public class EdgeOutOutputFormat extends BaseOutputFormat<Edge> {
 
   @Override
   protected void initiate() {
-    handler = new AccumuloVertexHandler<>(new VertexFactory());
+    handler = new AccumuloVertexHandler(new VertexFactory());
   }
 
   @Override

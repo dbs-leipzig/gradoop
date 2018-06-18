@@ -50,7 +50,6 @@ import org.gradoop.common.storage.api.EPGMGraphPredictableOutput;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloRowHandler;
-import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import org.gradoop.common.storage.impl.accumulo.iterator.client.CacheClosableIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -58,8 +57,8 @@ import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopVertexIt
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.common.storage.iterator.ClosableIterator;
 import org.gradoop.common.storage.iterator.EmptyClosableIterator;
-import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.storage.predicate.query.ElementQuery;
+import org.gradoop.common.storage.predicate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,16 +72,11 @@ import java.util.stream.Collectors;
 
 /**
  * accumulo store for apache accumulo
- *
- * @param <G> graph head as reading result
- * @param <V> vertex as reading result
- * @param <E> edge as reading result
  */
-public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  implements
-  EPGMConfigProvider<GradoopAccumuloConfig<G, V, E>>,
+public class AccumuloEPGMStore implements
+  EPGMConfigProvider<GradoopAccumuloConfig>,
   EPGMGraphInput<EPGMGraphHead, EPGMVertex, EPGMEdge>,
-  EPGMGraphPredictableOutput<G, V, E,
+  EPGMGraphPredictableOutput<
     AccumuloElementFilter<GraphHead>,
     AccumuloElementFilter<Vertex>,
     AccumuloElementFilter<Edge>> {
@@ -95,7 +89,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   /**
    * graph factory
    */
-  private final GradoopAccumuloConfig<G, V, E> config;
+  private final GradoopAccumuloConfig config;
 
   /**
    * accumulo client conn
@@ -129,7 +123,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
    * @throws AccumuloSecurityException AccumuloSecurityException
    * @throws AccumuloException AccumuloException
    */
-  public AccumuloEPGMStore(GradoopAccumuloConfig<G, V, E> config) throws
+  public AccumuloEPGMStore(GradoopAccumuloConfig config) throws
     AccumuloSecurityException, AccumuloException {
     this.config = config;
     this.conn = createConnector();
@@ -161,7 +155,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   }
 
   @Override
-  public GradoopAccumuloConfig<G, V, E> getConfig() {
+  public GradoopAccumuloConfig getConfig() {
     return config;
   }
 
@@ -181,17 +175,17 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
   }
 
   @Override
-  public void writeGraphHead(EPGMGraphHead record) {
+  public void writeGraphHead(@Nonnull EPGMGraphHead record) {
     writeRecord(record, graphWriter, config.getGraphHandler());
   }
 
   @Override
-  public void writeVertex(EPGMVertex record) {
+  public void writeVertex(@Nonnull EPGMVertex record) {
     writeRecord(record, vertexWriter, config.getVertexHandler());
   }
 
   @Override
-  public void writeEdge(EPGMEdge record) {
+  public void writeEdge(@Nonnull EPGMEdge record) {
     writeRecord(record, edgeWriter, config.getEdgeHandler());
     writeEdgeOut(record);
     writeEdgeIn(record);
@@ -226,43 +220,43 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
 
   @Nullable
   @Override
-  public G readGraph(GradoopId graphId) throws IOException {
+  public GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
     ElementQuery<AccumuloElementFilter<GraphHead>> query = Query
       .elements()
       .fromSets(graphId)
       .noFilter();
-    try (ClosableIterator<G> it = getGraphSpace(query, 1)) {
+    try (ClosableIterator<GraphHead> it = getGraphSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nullable
   @Override
-  public V readVertex(GradoopId vertexId) throws IOException {
+  public Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
     ElementQuery<AccumuloElementFilter<Vertex>> query = Query
       .elements()
       .fromSets(vertexId)
       .noFilter();
-    try (ClosableIterator<V> it = getVertexSpace(query, 1)) {
+    try (ClosableIterator<Vertex> it = getVertexSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nullable
   @Override
-  public E readEdge(GradoopId edgeId) throws IOException {
+  public Edge readEdge(@Nonnull GradoopId edgeId) throws IOException {
     ElementQuery<AccumuloElementFilter<Edge>> query = Query
       .elements()
       .fromSets(edgeId)
       .noFilter();
-    try (ClosableIterator<E> it = getEdgeSpace(query, 1)) {
+    try (ClosableIterator<Edge> it = getEdgeSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nonnull
   @Override
-  public ClosableIterator<G> getGraphSpace(
+  public ClosableIterator<GraphHead> getGraphSpace(
     @Nullable ElementQuery<AccumuloElementFilter<GraphHead>> query,
     int cacheSize
   ) throws IOException {
@@ -293,7 +287,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
 
   @Nonnull
   @Override
-  public ClosableIterator<V> getVertexSpace(
+  public ClosableIterator<Vertex> getVertexSpace(
     @Nullable ElementQuery<AccumuloElementFilter<Vertex>> query,
     int cacheSize
   ) throws IOException {
@@ -324,7 +318,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
 
   @Nonnull
   @Override
-  public ClosableIterator<E> getEdgeSpace(
+  public ClosableIterator<Edge> getEdgeSpace(
     @Nullable ElementQuery<AccumuloElementFilter<Edge>> query,
     int cacheSize
   ) throws IOException {
@@ -471,7 +465,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
     //write out mutation
     try {
       Mutation mutation = new Mutation(record.getSourceId().toString());
-      mutation = ((AccumuloVertexHandler<V>) config.getVertexHandler())
+      mutation = config.getVertexHandler()
         .writeLink(mutation, record, false);
       vertexWriter.addMutation(mutation);
     } catch (MutationsRejectedException e) {
@@ -488,7 +482,7 @@ public class AccumuloEPGMStore<G extends EPGMGraphHead, V extends EPGMVertex, E 
     //write out mutation
     try {
       Mutation mutation = new Mutation(record.getTargetId().toString());
-      mutation = ((AccumuloVertexHandler<V>) config.getVertexHandler())
+      mutation = config.getVertexHandler()
         .writeLink(mutation, record, true);
       vertexWriter.addMutation(mutation);
     } catch (MutationsRejectedException e) {

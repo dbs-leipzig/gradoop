@@ -50,8 +50,8 @@ import java.util.function.Predicate;
  * @see GradoopGraphHeadIterator
  * @see GradoopVertexIterator
  */
-public interface AccumuloElementFilter<T extends EPGMElement> extends
-  Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
+public interface AccumuloElementFilter<T extends EPGMElement>
+  extends Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
 
   /**
    * anti-serialize reducer from base64 encoded string

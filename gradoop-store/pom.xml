@@ -12,7 +12,7 @@
     <artifactId>gradoop-store</artifactId>
     <packaging>pom</packaging>
     <name>Gradoop Store</name>
-    <description>GRADOOP : Graph Store Analytics on NoSQL</description>
+    <description>GRADOOP : Graph Store Analytics on NoSQL Layer</description>
 
     <modules>
         <module>gradoop-store-api</module>
@@ -20,20 +20,4 @@
         <module>gradoop-hbase</module>
     </modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

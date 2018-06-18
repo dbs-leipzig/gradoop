@@ -78,7 +78,7 @@ public class AccumuloTestSuite {
    * @param prefix store prefix
    * @return gradoop accumulo configure
    */
-  public static GradoopAccumuloConfig<GraphHead, Vertex, Edge> getAcConfig(
+  public static GradoopAccumuloConfig getAcConfig(
     ExecutionEnvironment env,
     String prefix
   ) {

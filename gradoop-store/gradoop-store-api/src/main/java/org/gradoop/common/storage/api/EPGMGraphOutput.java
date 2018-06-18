@@ -17,10 +17,10 @@
 package org.gradoop.common.storage.api;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.iterator.ClosableIterator;
 
 import javax.annotation.Nonnull;
@@ -29,15 +29,8 @@ import java.io.IOException;
 
 /**
  * definition of graph store output
- *
- * @param <GOutput> graph head(output)
- * @param <VOutput> graph vertex(output)
- * @param <EOutput> graph edge(output)
  */
-public interface EPGMGraphOutput<
-  GOutput extends EPGMGraphHead,
-  VOutput extends EPGMVertex,
-  EOutput extends EPGMEdge> {
+public interface EPGMGraphOutput {
 
   /**
    * default cache size, if client cache size is not provided
@@ -54,7 +47,7 @@ public interface EPGMGraphOutput<
    * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nullable
-  GOutput readGraph(final GradoopId graphId) throws IOException;
+  GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException;
 
   /**
    * Reads all graphs from the EPGM store.
@@ -63,7 +56,7 @@ public interface EPGMGraphOutput<
    * @throws IOException unexpected IO error (timeout, conn disconnected)
    */
   @NonNull
-  default ClosableIterator<GOutput> getGraphSpace() throws IOException {
+  default ClosableIterator<GraphHead> getGraphSpace() throws IOException {
     return getGraphSpace(DEFAULT_CACHE_SIZE);
   }
 
@@ -72,9 +65,10 @@ public interface EPGMGraphOutput<
    *
    * @param cacheSize cache size for client scan
    * @return all graphs
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nonnull
-  ClosableIterator<GOutput> getGraphSpace(int cacheSize) throws IOException;
+  ClosableIterator<GraphHead> getGraphSpace(int cacheSize) throws IOException;
 
   /**
    * Reads a vertex data entity from the EPGM store using the given vertex
@@ -83,17 +77,19 @@ public interface EPGMGraphOutput<
    * @param vertexId vertex identifier
    * @return vertex data entity or {@code null} if there is no entity with the
    * given {@code vertexId}
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nullable
-  VOutput readVertex(final GradoopId vertexId) throws IOException;
+  Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException;
 
   /**
    * Reads all vertices from the EPGM store.
    *
    * @return all vertices
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nonnull
-  default ClosableIterator<VOutput> getVertexSpace() throws IOException {
+  default ClosableIterator<Vertex> getVertexSpace() throws IOException {
     return getVertexSpace(DEFAULT_CACHE_SIZE);
   }
 
@@ -102,9 +98,10 @@ public interface EPGMGraphOutput<
    *
    * @param cacheSize cache size for client scan
    * @return all vertices
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nonnull
-  ClosableIterator<VOutput> getVertexSpace(int cacheSize) throws IOException;
+  ClosableIterator<Vertex> getVertexSpace(int cacheSize) throws IOException;
 
   /**
    * Reads an edge data entity from the EPGM store using the given edge
@@ -113,17 +110,19 @@ public interface EPGMGraphOutput<
    * @param edgeId edge identifier
    * @return edge data entity or {@code null} if there is no entity with the
    * given {@code edgeId}
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nullable
-  EOutput readEdge(final GradoopId edgeId) throws IOException;
+  Edge readEdge(@Nonnull GradoopId edgeId) throws IOException;
 
   /**
    * Reads all edges from the EPGM store.
    *
    * @return all edges
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nonnull
-  default ClosableIterator<EOutput> getEdgeSpace() throws IOException {
+  default ClosableIterator<Edge> getEdgeSpace() throws IOException {
     return getEdgeSpace(DEFAULT_CACHE_SIZE);
   }
 
@@ -132,8 +131,9 @@ public interface EPGMGraphOutput<
    *
    * @param cacheSize cache size for client scan
    * @return all edges
+   * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nonnull
-  ClosableIterator<EOutput> getEdgeSpace(int cacheSize) throws IOException;
+  ClosableIterator<Edge> getEdgeSpace(int cacheSize) throws IOException;
 
 }

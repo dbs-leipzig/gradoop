@@ -37,7 +37,7 @@ public class GraphHeadOutputFormat extends BaseOutputFormat<GraphHead> {
   /**
    * graph head handler
    */
-  private transient AccumuloGraphHandler<GraphHead> handler;
+  private transient AccumuloGraphHandler handler;
 
   /**
    * graph head output format handler
@@ -50,7 +50,7 @@ public class GraphHeadOutputFormat extends BaseOutputFormat<GraphHead> {
 
   @Override
   protected void initiate() {
-    handler = new AccumuloGraphHandler<>(new GraphHeadFactory());
+    handler = new AccumuloGraphHandler(new GraphHeadFactory());
   }
 
   @Override

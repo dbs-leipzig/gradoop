@@ -22,27 +22,25 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * accumulo vertex handler for row's read/write operator
- *
- * @param <V> vertex element as reading result
  */
-public class AccumuloVertexHandler<V extends EPGMVertex> implements
-  AccumuloRowHandler<V, EPGMVertex> {
+public class AccumuloVertexHandler implements AccumuloRowHandler<Vertex, EPGMVertex> {
 
   /**
    * vertex factory
    */
-  private final EPGMVertexFactory<V> factory;
+  private final EPGMVertexFactory<Vertex> factory;
 
   /**
    * vertex handler factory constructor
    *
    * @param factory vertex factory
    */
-  public AccumuloVertexHandler(EPGMVertexFactory<V> factory) {
+  public AccumuloVertexHandler(EPGMVertexFactory<Vertex> factory) {
     this.factory = factory;
   }
 
@@ -72,7 +70,7 @@ public class AccumuloVertexHandler<V extends EPGMVertex> implements
   }
 
   @Override
-  public V readRow(EPGMVertex origin) {
+  public Vertex readRow(EPGMVertex origin) {
     return factory.initVertex(
       origin.getId(),
       origin.getLabel(),

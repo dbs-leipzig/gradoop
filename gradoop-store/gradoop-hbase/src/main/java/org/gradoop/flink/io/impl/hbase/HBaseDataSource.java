@@ -42,8 +42,7 @@ import javax.annotation.Nonnull;
  * @see FilterableDataSource
  * TODO: make it implement FilterableDataSource
  */
-public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge> implements
-  DataSource {
+public class HBaseDataSource extends HBaseBase implements DataSource {
 
   /**
    * Creates a new HBase data source.
@@ -52,7 +51,7 @@ public class HBaseDataSource extends HBaseBase<GraphHead, Vertex, Edge> implemen
    * @param config    Gradoop Flink configuration
    */
   public HBaseDataSource(
-    @Nonnull HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
+    @Nonnull HBaseEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig config
   ) {
     super(epgmStore, config);

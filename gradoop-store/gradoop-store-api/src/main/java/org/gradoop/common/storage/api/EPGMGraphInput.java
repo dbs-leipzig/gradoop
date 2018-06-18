@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 
+import javax.annotation.Nonnull;
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -40,21 +41,21 @@ public interface EPGMGraphInput<
    *
    * @param graphData graph data to write
    */
-  void writeGraphHead(final GInput graphData) throws IOException;
+  void writeGraphHead(@Nonnull GInput graphData) throws IOException;
 
   /**
    * Writes the given vertex data into the graph store.
    *
    * @param vertexData vertex data to write
    */
-  void writeVertex(final VInput vertexData) throws IOException;
+  void writeVertex(@Nonnull VInput vertexData) throws IOException;
 
   /**
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
    */
-  void writeEdge(final EInput edgeData) throws IOException;
+  void writeEdge(@Nonnull EInput edgeData) throws IOException;
 
   /**
    * Setting this value to true, forces the store implementation to flush the

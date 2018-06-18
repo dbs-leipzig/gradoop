@@ -36,8 +36,8 @@ import java.util.Map;
  * @param <R> EPGM Element as reading result
  * @param <E> EPGM Element as reading src (from remote)
  */
-public class CacheClosableIterator<R extends EPGMElement, E extends EPGMElement> implements
-  ClosableIterator<R> {
+public class CacheClosableIterator<R extends EPGMElement, E extends EPGMElement>
+  implements ClosableIterator<R> {
 
   /**
    * accumulo batch scanner instance

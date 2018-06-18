@@ -63,9 +63,4 @@ public class AccumuloDefault {
    */
   public static final int BATCH_SCANNER_THREADS = 10;
 
-  /**
-   * gradoop accumulo store cache size
-   */
-  public static final int SPACE_CACHE_SIZE = 500;
-
 }

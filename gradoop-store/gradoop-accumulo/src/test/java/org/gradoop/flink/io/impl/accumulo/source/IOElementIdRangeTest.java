@@ -23,7 +23,9 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.flink.io.impl.accumulo.AccumuloDataSource;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOElementIdRangeTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "io_element_id_range_01";

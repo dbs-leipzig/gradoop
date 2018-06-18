@@ -70,10 +70,10 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test01_writeCloseOpenReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
+    GradoopAccumuloConfig config =
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST01);
 
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
 
@@ -87,7 +87,7 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     // re-open
     graphStore.close();
-    graphStore = new AccumuloEPGMStore<>(config);
+    graphStore = new AccumuloEPGMStore(config);
 
     // validate
     validateGraphHead(graphStore, graphHead);
@@ -103,10 +103,10 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test02_writeFlushReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
+    GradoopAccumuloConfig config =
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST02);
 
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
     graphStore.setAutoFlush(false);
 
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
@@ -137,9 +137,9 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test03_iteratorTest() throws IOException, AccumuloSecurityException,
     AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
+    GradoopAccumuloConfig config =
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST03);
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
     Collection<Edge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
@@ -180,9 +180,9 @@ public class StoreTest extends AccumuloStoreTestBase {
    */
   @Test(expected = UnsupportedTypeException.class)
   public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
+    GradoopAccumuloConfig config =
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST04);
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     // Set is not supported by
     final Set<String> value = Sets.newHashSet();
@@ -204,9 +204,9 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test05_propertyTypeTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
+    GradoopAccumuloConfig config =
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST05);
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";

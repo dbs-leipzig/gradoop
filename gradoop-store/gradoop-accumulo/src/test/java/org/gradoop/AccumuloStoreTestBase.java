@@ -42,9 +42,9 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     String namespace,
     SocialTestContext context
   ) throws Throwable {
-    GradoopAccumuloConfig<GraphHead, Vertex, Edge> config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), namespace);
-    AccumuloEPGMStore<GraphHead, Vertex, Edge> graphStore = new AccumuloEPGMStore<>(config);
+    GradoopAccumuloConfig config = AccumuloTestSuite
+      .getAcConfig(getExecutionEnvironment(), namespace);
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     //read vertices by label
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = GradoopTestUtils.getSocialNetworkLoader();
@@ -99,7 +99,7 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
 
     void test(
       AsciiGraphLoader<GraphHead, Vertex, Edge> loader,
-      AccumuloEPGMStore<GraphHead, Vertex, Edge> store
+      AccumuloEPGMStore store
     ) throws Throwable;
 
   }

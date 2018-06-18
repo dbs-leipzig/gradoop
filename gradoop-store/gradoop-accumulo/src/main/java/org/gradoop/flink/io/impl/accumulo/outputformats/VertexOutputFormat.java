@@ -37,7 +37,7 @@ public class VertexOutputFormat extends BaseOutputFormat<Vertex> {
   /**
    * vertex handler
    */
-  private transient AccumuloVertexHandler<Vertex> handler;
+  private transient AccumuloVertexHandler handler;
 
   /**
    * vertex output format constructor
@@ -50,7 +50,7 @@ public class VertexOutputFormat extends BaseOutputFormat<Vertex> {
 
   @Override
   protected void initiate() {
-    handler = new AccumuloVertexHandler<>(new VertexFactory());
+    handler = new AccumuloVertexHandler(new VertexFactory());
   }
 
   @Override

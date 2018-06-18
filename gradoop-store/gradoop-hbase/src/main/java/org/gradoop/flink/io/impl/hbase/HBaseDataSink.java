@@ -24,14 +24,14 @@ import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
-import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
 import org.gradoop.flink.io.impl.hbase.functions.BuildGraphHeadMutation;
 import org.gradoop.flink.io.impl.hbase.functions.BuildGraphTransactions;
 import org.gradoop.flink.io.impl.hbase.functions.BuildPersistentEdge;
@@ -41,7 +41,6 @@ import org.gradoop.flink.io.impl.hbase.functions.BuildVertexDataWithEdges;
 import org.gradoop.flink.io.impl.hbase.functions.BuildVertexMutation;
 import org.gradoop.flink.io.impl.hbase.functions.EdgeSetBySourceId;
 import org.gradoop.flink.io.impl.hbase.functions.EdgeSetByTargetId;
-import org.gradoop.flink.io.impl.hbase.functions.BuildEdgeMutation;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -57,8 +56,7 @@ import java.util.Set;
  * Converts runtime representation of EPGM elements into persistent
  * representations and writes them to HBase.
  */
-public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
-  implements DataSink {
+public class HBaseDataSink extends HBaseBase implements DataSink {
 
   /**
    * Creates a new HBase data sink.
@@ -66,8 +64,10 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @param epgmStore store implementation
    * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSink(HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore,
-      GradoopFlinkConfig config) {
+  public HBaseDataSink(
+    HBaseEPGMStore epgmStore,
+    GradoopFlinkConfig config
+  ) {
     super(epgmStore, config);
   }
 
@@ -82,12 +82,18 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
   }
 
   @Override
-  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+  public void write(
+    LogicalGraph logicalGraph,
+    boolean overwrite
+  ) throws IOException {
     write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
-  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+  public void write(
+    GraphCollection graphCollection,
+    boolean overWrite
+  ) throws IOException {
 
     // TODO: interpret overWrite
 
@@ -109,7 +115,7 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
    * @throws IOException
    */
   private void writeGraphHeads(final GraphCollection collection)
-      throws IOException {
+    throws IOException {
 
     // build (graph-id, vertex-id) tuples from vertices
     DataSet<Tuple2<GradoopId, GradoopId>> graphIdToVertexId = collection.getVertices()
@@ -123,10 +129,10 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
     // (graph-id, {vertex-id}, {edge-id}) triples
     DataSet<Tuple3<GradoopId, GradoopIdSet, GradoopIdSet>>
       graphToVertexIdsAndEdgeIds = graphIdToVertexId
-        .coGroup(graphIdToEdgeId)
-        .where(0)
-        .equalTo(0)
-        .with(new BuildGraphTransactions());
+      .coGroup(graphIdToEdgeId)
+      .where(0)
+      .equalTo(0)
+      .with(new BuildGraphTransactions());
 
     // join (graph-id, {vertex-id}, {edge-id}) triples with
     // (graph-id, graph-data) and build (persistent-graph-data)
@@ -141,9 +147,9 @@ public class HBaseDataSink extends HBaseBase<GraphHead, Vertex, Edge>
       TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName());
 
     persistentGraphDataSet
-    // FIXME remove forced cast...
+      // FIXME remove forced cast...
       .map(new BuildGraphHeadMutation((GraphHeadHandler<PersistentGraphHead>)
-((Object) getHBaseConfig().getGraphHeadHandler())))
+        ((Object) getHBaseConfig().getGraphHeadHandler())))
       .output(new HadoopOutputFormat<>(new TableOutputFormat<>(), job));
   }
 

@@ -20,28 +20,26 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 
 
 /**
  * accumulo graph head handler for row's read/write operator
- *
- * @param <G> graph head as reading result
  */
-public class AccumuloGraphHandler<G extends EPGMGraphHead> implements
-  AccumuloRowHandler<G, EPGMGraphHead> {
+public class AccumuloGraphHandler implements AccumuloRowHandler<GraphHead, EPGMGraphHead> {
 
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory<G> factory;
+  private final EPGMGraphHeadFactory<GraphHead> factory;
 
   /**
    * graph head handler constructor
    *
    * @param factory graph head factory
    */
-  public AccumuloGraphHandler(EPGMGraphHeadFactory<G> factory) {
+  public AccumuloGraphHandler(EPGMGraphHeadFactory<GraphHead> factory) {
     this.factory = factory;
   }
 
@@ -63,7 +61,7 @@ public class AccumuloGraphHandler<G extends EPGMGraphHead> implements
   }
 
   @Override
-  public G readRow(EPGMGraphHead origin) {
+  public GraphHead readRow(EPGMGraphHead origin) {
     return factory.initGraphHead(
       /*edge id*/origin.getId(),
       /*label*/origin.getLabel(),

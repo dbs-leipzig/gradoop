@@ -47,7 +47,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testRead() throws Exception {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
 
     List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
     List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
@@ -69,9 +69,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // read social graph from HBase via EPGMDatabase
     GraphCollection collection = new HBaseDataSource(epgmStore, config).getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads    = Lists.newArrayList();
-    Collection<Vertex>    loadedVertices      = Lists.newArrayList();
-    Collection<Edge>      loadedEdges         = Lists.newArrayList();
+    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<Vertex> loadedVertices = Lists.newArrayList();
+    Collection<Edge> loadedEdges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -92,7 +92,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   public void testWrite() throws Exception {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     // create empty EPGM store
-    HBaseEPGMStore<GraphHead, Vertex, Edge> epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(config);
 

@@ -96,28 +96,22 @@ public abstract class BaseOutputFormat<E extends Element> implements OutputForma
     int taskNumber,
     int numTasks
   ) {
+    String user = (String) properties
+      .getOrDefault(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER);
+    String password = (String) properties
+      .getOrDefault(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault.PASSWORD);
+    String instance = (String) properties
+      .getOrDefault(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE);
+    String zkHosts = (String) properties
+      .getOrDefault(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.INSTANCE);
+    String tableName = getTableName((String) properties
+      .getOrDefault(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX));
     try {
       //create connector
-      Connector conn = new ZooKeeperInstance(
-        /*instannce*/
-        (String) properties
-          .getOrDefault(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),
-        /*zookeepers*/
-        (String) properties
-          .getOrDefault(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS))
-        .getConnector(
-          /*user*/
-          (String) properties
-            .getOrDefault(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),
-          /*password*/
-          new PasswordToken((String) properties
-            .getOrDefault(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault.PASSWORD)));
-
+      Connector conn = new ZooKeeperInstance(instance, zkHosts)
+        .getConnector(user, new PasswordToken(password));
       //create batch writer
-      String prefix = (String) properties.getOrDefault(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX,
-        AccumuloDefault.TABLE_PREFIX);
-      writer = conn.createBatchWriter(getTableName(prefix), new BatchWriterConfig());
-
+      writer = conn.createBatchWriter(tableName, new BatchWriterConfig());
       initiate();
     } catch (AccumuloException | AccumuloSecurityException | TableNotFoundException e) {
       throw new ExceptionInInitializerError(e);

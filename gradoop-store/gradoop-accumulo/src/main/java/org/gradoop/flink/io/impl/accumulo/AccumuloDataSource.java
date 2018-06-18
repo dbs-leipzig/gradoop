@@ -39,8 +39,7 @@ import javax.annotation.Nullable;
 /**
  * Accumulo DataSource
  */
-public class AccumuloDataSource extends AccumuloBase<GraphHead, Vertex, Edge>
-  implements FilterableDataSource<
+public class AccumuloDataSource extends AccumuloBase implements FilterableDataSource<
   ElementQuery<AccumuloElementFilter<GraphHead>>,
   ElementQuery<AccumuloElementFilter<Vertex>>,
   ElementQuery<AccumuloElementFilter<Edge>>> {
@@ -65,9 +64,7 @@ public class AccumuloDataSource extends AccumuloBase<GraphHead, Vertex, Edge>
    *
    * @param store accumulo epgm store
    */
-  public AccumuloDataSource(
-    @Nonnull AccumuloEPGMStore<GraphHead, Vertex, Edge> store
-  ) {
+  public AccumuloDataSource(@Nonnull AccumuloEPGMStore store) {
     this(store, null, null, null);
   }
 
@@ -80,7 +77,7 @@ public class AccumuloDataSource extends AccumuloBase<GraphHead, Vertex, Edge>
    * @param edgeQuery edge filter
    */
   private AccumuloDataSource(
-    @Nonnull AccumuloEPGMStore<GraphHead, Vertex, Edge> store,
+    @Nonnull AccumuloEPGMStore store,
     @Nullable AccumuloQueryHolder<GraphHead> graphQuery,
     @Nullable AccumuloQueryHolder<Vertex> vertexQuery,
     @Nullable AccumuloQueryHolder<Edge> edgeQuery

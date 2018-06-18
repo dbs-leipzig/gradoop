@@ -52,7 +52,7 @@ public class EdgeInputFormat extends BaseInputFormat<Edge> {
   /**
    * graph head handler
    */
-  private transient AccumuloEdgeHandler<Edge> handler;
+  private transient AccumuloEdgeHandler handler;
 
   /**
    * edge input format constructor
@@ -70,7 +70,7 @@ public class EdgeInputFormat extends BaseInputFormat<Edge> {
   @Override
   protected void initiate() {
     iterator = new GradoopEdgeIterator();
-    handler = new AccumuloEdgeHandler<>(new EdgeFactory());
+    handler = new AccumuloEdgeHandler(new EdgeFactory());
   }
 
   @Override

@@ -17,34 +17,23 @@ package org.gradoop.common.config;
 
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.storage.config.GradoopStoreConfig;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloEdgeHandler;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloGraphHandler;
-import org.gradoop.common.storage.impl.accumulo.handler.AccumuloRowHandler;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
 
+import javax.annotation.Nonnull;
 import java.util.Properties;
 
 /**
  * Gradoop Accumulo configuration define
- *
- * @param <G> graph head as output
- * @param <V> vertex as output
- * @param <E> edge as output
  */
-public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex, E extends
-  EPGMEdge> extends
+public class GradoopAccumuloConfig extends
   GradoopStoreConfig<GraphHeadFactory, VertexFactory, EdgeFactory> {
 
   /**
@@ -100,17 +89,17 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
   /**
    * row handler for EPGM GraphHead
    */
-  private transient AccumuloRowHandler<G, EPGMGraphHead> graphHandler;
+  private transient AccumuloGraphHandler graphHandler;
 
   /**
    * row handler for EPGM Vertex
    */
-  private transient AccumuloRowHandler<V, EPGMVertex> vertexHandler;
+  private transient AccumuloVertexHandler vertexHandler;
 
   /**
    * row handler for EPGM Edge
    */
-  private transient AccumuloRowHandler<E, EPGMEdge> edgeHandler;
+  private transient AccumuloEdgeHandler edgeHandler;
 
   /**
    * Creates a new Configuration.
@@ -121,9 +110,9 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
    * @param env                         flink execution environment
    */
   private GradoopAccumuloConfig(
-    AccumuloRowHandler<G, EPGMGraphHead> graphHandler,
-    AccumuloRowHandler<V, EPGMVertex> vertexHandler,
-    AccumuloRowHandler<E, EPGMEdge> edgeHandler,
+    AccumuloGraphHandler graphHandler,
+    AccumuloVertexHandler vertexHandler,
+    AccumuloEdgeHandler edgeHandler,
     ExecutionEnvironment env
   ) {
     super(new GraphHeadFactory(), new VertexFactory(), new EdgeFactory(), env);
@@ -137,7 +126,7 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
    *
    * @param config Gradoop configuration
    */
-  private GradoopAccumuloConfig(GradoopAccumuloConfig<G, V, E> config) {
+  private GradoopAccumuloConfig(GradoopAccumuloConfig config) {
     this(config.graphHandler, config.vertexHandler, config.edgeHandler,
       config.getExecutionEnvironment());
     this.accumuloProperties.putAll(config.accumuloProperties);
@@ -150,16 +139,16 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
    * @param env apache flink execution environment
    * @return Default Gradoop Accumulo configuration.
    */
-  public static GradoopAccumuloConfig<GraphHead, Vertex, Edge> getDefaultConfig(
+  public static GradoopAccumuloConfig getDefaultConfig(
     ExecutionEnvironment env
   ) {
     GraphHeadFactory graphHeadFactory = new GraphHeadFactory();
     EdgeFactory edgeFactory = new EdgeFactory();
     VertexFactory vertexFactory = new VertexFactory();
-    return new GradoopAccumuloConfig<>(
-      new AccumuloGraphHandler<>(graphHeadFactory),
-      new AccumuloVertexHandler<>(vertexFactory),
-      new AccumuloEdgeHandler<>(edgeFactory),
+    return new GradoopAccumuloConfig(
+      new AccumuloGraphHandler(graphHeadFactory),
+      new AccumuloVertexHandler(vertexFactory),
+      new AccumuloEdgeHandler(edgeFactory),
       env);
   }
 
@@ -167,17 +156,11 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
    * Creates a Gradoop Accumulo configuration based on the given arguments.
    *
    * @param gradoopConfig   Gradoop configuration
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    *
    * @return Gradoop HBase configuration
    */
-  public static <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  GradoopAccumuloConfig<G, V, E> createConfig(
-    GradoopAccumuloConfig<G, V, E> gradoopConfig
-  ) {
-    return new GradoopAccumuloConfig<>(gradoopConfig);
+  public static GradoopAccumuloConfig createConfig(@Nonnull GradoopAccumuloConfig gradoopConfig) {
+    return new GradoopAccumuloConfig(gradoopConfig);
   }
 
   /**
@@ -187,7 +170,7 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
    * @param value property value
    * @return configure itself
    */
-  public GradoopAccumuloConfig<G, V, E> set(
+  public GradoopAccumuloConfig set(
     String key,
     Object value
   ) {
@@ -220,15 +203,15 @@ public class GradoopAccumuloConfig<G extends EPGMGraphHead, V extends EPGMVertex
     return accumuloProperties;
   }
 
-  public AccumuloRowHandler<G, EPGMGraphHead> getGraphHandler() {
+  public AccumuloGraphHandler getGraphHandler() {
     return graphHandler;
   }
 
-  public AccumuloRowHandler<V, EPGMVertex> getVertexHandler() {
+  public AccumuloVertexHandler getVertexHandler() {
     return vertexHandler;
   }
 
-  public AccumuloRowHandler<E, EPGMEdge> getEdgeHandler() {
+  public AccumuloEdgeHandler getEdgeHandler() {
     return edgeHandler;
   }
 

@@ -26,22 +26,20 @@ import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * accumulo edge handler for row's read/write operator
- *
- * @param <E> gradoop element as reading result
  */
-public class AccumuloEdgeHandler<E extends Edge> implements AccumuloRowHandler<E, EPGMEdge> {
+public class AccumuloEdgeHandler implements AccumuloRowHandler<Edge, EPGMEdge> {
 
   /**
    * edge factory
    */
-  private final EPGMEdgeFactory<E> factory;
+  private final EPGMEdgeFactory<Edge> factory;
 
   /**
    * accumulo edge handler constructor
    *
    * @param factory edge factory
    */
-  public AccumuloEdgeHandler(EPGMEdgeFactory<E> factory) {
+  public AccumuloEdgeHandler(EPGMEdgeFactory<Edge> factory) {
     this.factory = factory;
   }
 
@@ -76,7 +74,7 @@ public class AccumuloEdgeHandler<E extends Edge> implements AccumuloRowHandler<E
 
 
   @Override
-  public E readRow(EPGMEdge origin) {
+  public Edge readRow(EPGMEdge origin) {
     return factory.initEdge(
       origin.getId(),
       origin.getLabel(),

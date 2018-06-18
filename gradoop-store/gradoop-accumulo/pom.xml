@@ -11,6 +11,7 @@
 
     <artifactId>gradoop-accumulo</artifactId>
     <name>Gradoop Accumulo</name>
+    <description>Read/write graphs from/to Accumulo</description>
 
     <properties>
         <accumuloTestSuite>**/AccumuloTestSuite.class</accumuloTestSuite>
@@ -102,11 +103,6 @@
         <dependency>
             <groupId>org.gradoop</groupId>
             <artifactId>gradoop-store-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-flink</artifactId>
         </dependency>
 
         <dependency>

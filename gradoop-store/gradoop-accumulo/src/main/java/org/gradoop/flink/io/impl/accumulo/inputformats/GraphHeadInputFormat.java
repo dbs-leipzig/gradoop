@@ -52,7 +52,7 @@ public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
   /**
    * graph head handler
    */
-  private transient AccumuloGraphHandler<GraphHead> handler;
+  private transient AccumuloGraphHandler handler;
 
   /**
    * input format constructor
@@ -70,7 +70,7 @@ public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
   @Override
   protected void initiate() {
     iterator = new GradoopGraphHeadIterator();
-    handler = new AccumuloGraphHandler<>(new GraphHeadFactory());
+    handler = new AccumuloGraphHandler(new GraphHeadFactory());
   }
 
   @Override

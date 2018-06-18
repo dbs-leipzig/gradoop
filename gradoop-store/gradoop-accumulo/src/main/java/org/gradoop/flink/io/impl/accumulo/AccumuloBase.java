@@ -17,25 +17,18 @@
 package org.gradoop.flink.io.impl.accumulo;
 
 import org.gradoop.common.config.GradoopAccumuloConfig;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Base class for HBase data source and sink.
- *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-abstract class AccumuloBase<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+abstract class AccumuloBase {
 
   /**
    * Accumulo Store implementation
    */
-  private final AccumuloEPGMStore<G, V, E> epgmStore;
+  private final AccumuloEPGMStore epgmStore;
   /**
    * Gradoop Flink configuration
    */
@@ -48,14 +41,14 @@ abstract class AccumuloBase<G extends EPGMGraphHead, V extends EPGMVertex, E ext
    * @param config    Gradoop Flink configuration
    */
   AccumuloBase(
-    AccumuloEPGMStore<G, V, E> epgmStore,
+    AccumuloEPGMStore epgmStore,
     GradoopFlinkConfig config
   ) {
     this.epgmStore = epgmStore;
     this.config = config;
   }
 
-  AccumuloEPGMStore<G, V, E> getStore() {
+  AccumuloEPGMStore getStore() {
     return epgmStore;
   }
 
@@ -63,7 +56,7 @@ abstract class AccumuloBase<G extends EPGMGraphHead, V extends EPGMVertex, E ext
     return config;
   }
 
-  GradoopAccumuloConfig<G, V, E> getAccumuloConfig() {
+  GradoopAccumuloConfig getAccumuloConfig() {
     return epgmStore.getConfig();
   }
 

@@ -37,7 +37,7 @@ public class EdgeOutputFormat extends BaseOutputFormat<Edge> {
   /**
    * accumulo edge handler
    */
-  private transient AccumuloEdgeHandler<Edge> handler;
+  private transient AccumuloEdgeHandler handler;
 
   /**
    * edge output format
@@ -50,7 +50,7 @@ public class EdgeOutputFormat extends BaseOutputFormat<Edge> {
 
   @Override
   protected void initiate() {
-    handler = new AccumuloEdgeHandler<>(new EdgeFactory());
+    handler = new AccumuloEdgeHandler(new EdgeFactory());
   }
 
   @Override

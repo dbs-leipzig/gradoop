@@ -52,19 +52,13 @@ public class HBaseEPGMStoreFactory {
    * @param config        Hadoop cluster configuration
    * @param gradoopHBaseConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
-   *
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
-   *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
-    final String prefix) {
+    final GradoopHBaseConfig gradoopHBaseConfig,
+    final String prefix
+  ) {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
         prefix + HBaseConstants.DEFAULT_TABLE_GRAPHS,
@@ -81,20 +75,16 @@ public class HBaseEPGMStoreFactory {
    * @param graphTableName      graph table name
    * @param vertexTableName     vertex table name
    * @param edgeTableName       edge table name
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    *
    * @return a graph store instance or {@code null in the case of errors}
    */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig,
+    final GradoopHBaseConfig gradoopHBaseConfig,
     final String graphTableName,
     final String vertexTableName,
-    final String edgeTableName) {
+    final String edgeTableName
+  ) {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
         graphTableName, vertexTableName, edgeTableName));
@@ -106,17 +96,13 @@ public class HBaseEPGMStoreFactory {
    *
    * @param config              Hadoop cluster configuration
    * @param gradoopHBaseConfig  Gradoop HBase configuration
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    *
    * @return EPGM store instance or {@code null in the case of errors}
    */
-  public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  HBaseEPGMStore<G, V, E> createOrOpenEPGMStore(
+  public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig<G, V, E> gradoopHBaseConfig) {
+    final GradoopHBaseConfig gradoopHBaseConfig
+  ) {
     try {
       createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
         gradoopHBaseConfig.getEdgeHandler(),
@@ -132,8 +118,7 @@ public class HBaseEPGMStoreFactory {
       HTable edgeDataTable = new HTable(config,
         gradoopHBaseConfig.getEdgeTableName());
 
-      return new HBaseEPGMStore<>(
-        graphDataTable, vertexDataTable, edgeDataTable, gradoopHBaseConfig);
+      return new HBaseEPGMStore(graphDataTable, vertexDataTable, edgeDataTable, gradoopHBaseConfig);
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -158,9 +143,12 @@ public class HBaseEPGMStoreFactory {
    * @param edgeTableName   edge data table name
    * @param graphTableName  graph data table name
    */
-  public static void deleteEPGMStore(final Configuration config,
-    final String vertexTableName, final String edgeTableName,
-    final String graphTableName) {
+  public static void deleteEPGMStore(
+    final Configuration config,
+    final String vertexTableName,
+    final String edgeTableName,
+    final String graphTableName
+  ) {
     try {
       deleteTablesIfExists(config, vertexTableName, edgeTableName,
         graphTableName);
@@ -182,17 +170,17 @@ public class HBaseEPGMStoreFactory {
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
-   *
-   * @throws IOException
    */
-  private static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  void createTablesIfNotExists(final Configuration config,
+  private static <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  void createTablesIfNotExists(
+    final Configuration config,
     final VertexHandler<V, E> vertexHandler,
     final EdgeHandler<E, V> edgeHandler,
     final GraphHeadHandler<G> graphHeadHandler,
-    final String vertexDataTableName, final String edgeTableName,
-    final String graphDataTableName) throws IOException {
+    final String vertexDataTableName,
+    final String edgeTableName,
+    final String graphDataTableName
+  ) throws IOException {
 
     HTableDescriptor vertexDataTableDescriptor =
       new HTableDescriptor(TableName.valueOf(vertexDataTableName));
@@ -223,11 +211,13 @@ public class HBaseEPGMStoreFactory {
    * @param vertexDataTableName vertex data table name
    * @param edgeDataTableName   edge data table name
    * @param graphDataTableName  graph data table name
-   * @throws IOException
    */
-  private static void deleteTablesIfExists(final Configuration config,
-    final String vertexDataTableName, final String edgeDataTableName,
-    final String graphDataTableName) throws IOException {
+  private static void deleteTablesIfExists(
+    final Configuration config,
+    final String vertexDataTableName,
+    final String edgeDataTableName,
+    final String graphDataTableName
+  ) throws IOException {
 
     HTableDescriptor vertexDataTableDescriptor =
       new HTableDescriptor(TableName.valueOf(vertexDataTableName));
@@ -256,10 +246,11 @@ public class HBaseEPGMStoreFactory {
    *
    * @param admin           HBase admin
    * @param tableDescriptor descriptor for the table to delete
-   * @throws IOException
    */
-  private static void deleteTable(final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor) throws IOException {
+  private static void deleteTable(
+    final HBaseAdmin admin,
+    final HTableDescriptor tableDescriptor
+  ) throws IOException {
     admin.disableTable(tableDescriptor.getName());
     admin.deleteTable(tableDescriptor.getName());
   }

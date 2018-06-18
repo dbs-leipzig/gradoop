@@ -16,9 +16,6 @@
 
 package org.gradoop.flink.io.impl.accumulo;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.accumulo.outputformats.EdgeInOutputFormat;
@@ -32,14 +29,14 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 /**
  * Accumulo DataSink
  */
-public class AccumuloDataSink extends AccumuloBase<GraphHead, Vertex, Edge> implements DataSink {
+public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
   /**
    * Creates a new Accumulo data source/sink.
    *
    * @param store     store implementation
    */
-  public AccumuloDataSink(AccumuloEPGMStore<GraphHead, Vertex, Edge> store) {
+  public AccumuloDataSink(AccumuloEPGMStore store) {
     super(store, store.getConfig());
   }
 

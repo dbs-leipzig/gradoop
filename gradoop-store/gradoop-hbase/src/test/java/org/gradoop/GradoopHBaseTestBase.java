@@ -73,7 +73,7 @@ public class GradoopHBaseTestBase {
    *
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore<GraphHead, Vertex, Edge> createEmptyEPGMStore(ExecutionEnvironment env) {
+  public static HBaseEPGMStore createEmptyEPGMStore(ExecutionEnvironment env) {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
@@ -87,7 +87,7 @@ public class GradoopHBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore<GraphHead, Vertex, Edge> openEPGMStore(ExecutionEnvironment env) {
+  public static HBaseEPGMStore openEPGMStore(ExecutionEnvironment env) {
     Configuration config = utility.getConfiguration();
 
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
