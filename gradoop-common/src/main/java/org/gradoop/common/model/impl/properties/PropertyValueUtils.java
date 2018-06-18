@@ -66,6 +66,10 @@ public class PropertyValueUtils {
   public static class Numeric {
 
     /**
+     * Short type.
+     */
+    private static final int SHORT = 0;
+    /**
      * Float type.
      */
     private static final int FLOAT = 1;
@@ -104,7 +108,10 @@ public class PropertyValueUtils {
 
       int returnType = sameType ? aType : maxType(aType, bType);
 
-      if (returnType == INT)  {
+      if (returnType == SHORT)  {
+        aValue.setInt(aValue.getShort() + bValue.getShort());
+
+      } else if (returnType == INT)  {
         aValue.setInt(aValue.getInt() + bValue.getInt());
 
       } else if (returnType == FLOAT)  {
@@ -214,7 +221,10 @@ public class PropertyValueUtils {
 
       int returnType = sameType ? aType : maxType(aType, bType);
 
-      if (returnType == INT)  {
+      if (returnType == SHORT) {
+        aValue.setInt(aValue.getShort() * bValue.getShort());
+
+      } else if (returnType == INT)  {
         aValue.setInt(aValue.getInt() * bValue.getInt());
 
       } else if (returnType == FLOAT)  {
@@ -328,7 +338,10 @@ public class PropertyValueUtils {
 
       boolean aIsLessOrEqual;
 
-      if (returnType == INT) {
+      if (returnType == SHORT) {
+        aIsLessOrEqual = aValue.getShort() <= bValue.getShort();
+
+      } else if (returnType == INT) {
         aIsLessOrEqual = aValue.getInt() <= bValue.getInt();
 
       } else if (returnType == FLOAT) {
@@ -409,7 +422,9 @@ public class PropertyValueUtils {
 
       int type;
 
-      if (value.isInt()) {
+      if (value.isShort()) {
+        type = SHORT;
+      } else if (value.isInt()) {
         type = INT;
       } else if (value.isLong()) {
         type = LONG;
@@ -436,6 +451,8 @@ public class PropertyValueUtils {
      */
     private static BigDecimal bigDecimalValue(PropertyValue value, int type) {
       switch (type) {
+      case SHORT:
+        return BigDecimal.valueOf(value.getShort());
       case INT:
         return BigDecimal.valueOf(value.getInt());
       case LONG:
@@ -457,6 +474,8 @@ public class PropertyValueUtils {
      */
     private static double doubleValue(PropertyValue value, int type) {
       switch (type) {
+      case SHORT:
+        return value.getShort();
       case INT:
         return value.getInt();
       case LONG:

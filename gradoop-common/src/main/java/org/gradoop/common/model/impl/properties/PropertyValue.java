@@ -111,6 +111,10 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * {@code <property-type>} for {@link LocalDateTime}
    */
   public static final transient byte TYPE_DATETIME     = 0x0d;
+  /**
+   * {@code <property-type>} for {@link java.lang.Short}
+   */
+  public static final transient byte TYPE_SHORT        = 0x0e;
 
   /**
    * Value offset in byte
@@ -207,6 +211,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public boolean isBoolean() {
     return rawBytes[0] == TYPE_BOOLEAN;
+  }
+  /**
+   * True, if the wrapped value is of type {@code short}.
+   *
+   * @return true, if {@code short} value
+   */
+  public boolean isShort() {
+    return rawBytes[0] == TYPE_SHORT;
   }
   /**
    * True, if the wrapped value is of type {@code int}.
@@ -317,19 +329,20 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public Object getObject() {
     return isBoolean() ? getBoolean() :
-      isInt() ? getInt() :
-        isLong() ? getLong() :
-          isFloat() ? getFloat() :
-            isDouble() ? getDouble() :
-              isString() ? getString() :
-                isBigDecimal() ? getBigDecimal() :
-                  isGradoopId() ? getGradoopId() :
-                    isMap() ? getMap() :
-                      isList() ? getList() :
-                        isDate() ? getDate() :
-                          isTime() ? getTime() :
-                            isDateTime() ? getDateTime() :
-                              null;
+      isShort() ? getShort() :
+        isInt() ? getInt() :
+          isLong() ? getLong() :
+            isFloat() ? getFloat() :
+              isDouble() ? getDouble() :
+                isString() ? getString() :
+                  isBigDecimal() ? getBigDecimal() :
+                    isGradoopId() ? getGradoopId() :
+                      isMap() ? getMap() :
+                        isList() ? getList() :
+                          isDate() ? getDate() :
+                            isTime() ? getTime() :
+                              isDateTime() ? getDateTime() :
+                                null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -338,6 +351,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public boolean getBoolean() {
     return rawBytes[1] == -1;
+  }
+
+  /**
+   * Returns the wrapped value as {@code short}.
+   *
+   * @return {@code short} value
+   */
+  public short getShort() {
+    return Bytes.toShort(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code int}.
@@ -392,8 +414,10 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       decimal = Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
     } else if (isFloat()) {
       decimal = BigDecimal.valueOf(Bytes.toFloat(rawBytes, OFFSET));
-    } else if (isDouble())  {
+    } else if (isDouble()) {
       decimal = BigDecimal.valueOf(Bytes.toDouble(rawBytes, OFFSET));
+    } else if (isShort()) {
+      decimal = BigDecimal.valueOf(Bytes.toShort(rawBytes, OFFSET));
     } else if (isInt()) {
       decimal = BigDecimal.valueOf(Bytes.toInt(rawBytes, OFFSET));
     } else if (isLong()) {
@@ -526,6 +550,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       rawBytes = new byte[] {TYPE_NULL};
     } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
+    } else if (value instanceof Short) {
+      setShort((Short) value);
     } else if (value instanceof Integer) {
       setInt((Integer) value);
     } else if (value instanceof Long) {
@@ -563,6 +589,17 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + Bytes.SIZEOF_BOOLEAN];
     rawBytes[0] = TYPE_BOOLEAN;
     Bytes.putByte(rawBytes, OFFSET, (byte) (booleanValue ? -1 : 0));
+  }
+
+  /**
+   * Sets the wrapped value as {@code short} value.
+   *
+   * @param shortValue value
+   */
+  public void setShort(short shortValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_SHORT];
+    rawBytes[0] = TYPE_SHORT;
+    Bytes.putShort(rawBytes, OFFSET, shortValue);
   }
   /**
    * Sets the wrapped value as {@code int} value.
@@ -746,6 +783,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   private static Map<Byte, Class> getTypeMap() {
     Map<Byte, Class> map = new HashMap<>();
     map.put(TYPE_BOOLEAN, Boolean.class);
+    map.put(TYPE_SHORT, Short.class);
     map.put(TYPE_INTEGER, Integer.class);
     map.put(TYPE_LONG, Long.class);
     map.put(TYPE_FLOAT, Float.class);
@@ -813,6 +851,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       result = 0;
     } else if (this.isBoolean() && o.isBoolean()) {
       result = Boolean.compare(this.getBoolean(), o.getBoolean());
+    } else if (this.isShort() && o.isShort()) {
+      result = Short.compare(this.getShort(), o.getShort());
     } else if (this.isInt() && o.isInt()) {
       result = Integer.compare(this.getInt(), o.getInt());
     } else if (this.isLong() && o.isLong()) {
@@ -919,6 +959,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       length = 0;
     } else if (type == TYPE_BOOLEAN) {
       length = Bytes.SIZEOF_BOOLEAN;
+    } else if (type == TYPE_SHORT) {
+      length = Bytes.SIZEOF_SHORT;
     } else if (type == TYPE_INTEGER) {
       length = Bytes.SIZEOF_INT;
     } else if (type == TYPE_LONG) {

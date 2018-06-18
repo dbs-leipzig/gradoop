@@ -77,6 +77,7 @@ public class GradoopTestUtils {
   public static final String KEY_b = "keyb";
   public static final String KEY_c = "keyc";
   public static final String KEY_d = "keyd";
+  public static final String KEY_e = "keye";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;
@@ -92,6 +93,7 @@ public class GradoopTestUtils {
   public static final LocalDate           DATE_VAL_b                = LocalDate.now();
   public static final LocalTime           TIME_VAL_c                = LocalTime.now();
   public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
+  public static final short       SHORT_VAL_e                       = (short)23;
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
@@ -108,6 +110,7 @@ public class GradoopTestUtils {
     MAP_VAL_9.put(PropertyValue.create(KEY_b), PropertyValue.create(DATE_VAL_b));
     MAP_VAL_9.put(PropertyValue.create(KEY_c), PropertyValue.create(TIME_VAL_c));
     MAP_VAL_9.put(PropertyValue.create(KEY_d), PropertyValue.create(DATETIME_VAL_d));
+    MAP_VAL_9.put(PropertyValue.create(KEY_e), PropertyValue.create(SHORT_VAL_e));
 
     LIST_VAL_a.add(PropertyValue.create(NULL_VAL_0));
     LIST_VAL_a.add(PropertyValue.create(BOOL_VAL_1));
@@ -121,6 +124,7 @@ public class GradoopTestUtils {
     LIST_VAL_a.add(PropertyValue.create(DATE_VAL_b));
     LIST_VAL_a.add(PropertyValue.create(TIME_VAL_c));
     LIST_VAL_a.add(PropertyValue.create(DATETIME_VAL_d));
+    LIST_VAL_a.add(PropertyValue.create(SHORT_VAL_e));
 
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
     SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
@@ -137,6 +141,7 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_b, DATE_VAL_b);
     SUPPORTED_PROPERTIES.put(KEY_c, TIME_VAL_c);
     SUPPORTED_PROPERTIES.put(KEY_d, DATETIME_VAL_d);
+    SUPPORTED_PROPERTIES.put(KEY_e, SHORT_VAL_e);
   }
 
   /**
