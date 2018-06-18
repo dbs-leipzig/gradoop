@@ -19,7 +19,6 @@ public class RDBMSDataSourceTest extends GradoopFlinkTestBase{
 	}
 	
 	public static void main(String[] args) throws IOException{
-		 RDBMSDataSourceTest test = new RDBMSDataSourceTest();
-		 test.testRead();
+		new RDBMSDataSourceTest().testRead();
 	}
 }

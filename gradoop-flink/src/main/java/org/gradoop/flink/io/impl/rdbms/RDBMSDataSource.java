@@ -53,7 +53,7 @@ public class RDBMSDataSource implements DataSource {
 	@Override
 	public LogicalGraph getLogicalGraph() {
 		/*
-		 * connection to rdbms via jdbc
+		 * connection to rdbms via jdbc (using drivershim - rdbms depending)
 		 */
 		Connection con = RDBMSConnect.connect(rdbmsConfig);
 		
