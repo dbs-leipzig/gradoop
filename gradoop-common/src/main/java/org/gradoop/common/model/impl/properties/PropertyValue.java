@@ -413,18 +413,17 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (isBigDecimal()) {
       decimal = Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
     } else if (isFloat()) {
-      decimal = BigDecimal.valueOf(Bytes.toFloat(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getFloat());
     } else if (isDouble()) {
-      decimal = BigDecimal.valueOf(Bytes.toDouble(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getDouble());
     } else if (isShort()) {
-      decimal = BigDecimal.valueOf(Bytes.toShort(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getShort());
     } else if (isInt()) {
-      decimal = BigDecimal.valueOf(Bytes.toInt(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getInt());
     } else if (isLong()) {
-      decimal = BigDecimal.valueOf(Bytes.toLong(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getLong());
     } else if (isString()) {
-      decimal = new BigDecimal(
-        Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET));
+      decimal = new BigDecimal(getString());
     } else {
       throw new ClassCastException(
         "Cannot covert " + this.getType().getSimpleName() +

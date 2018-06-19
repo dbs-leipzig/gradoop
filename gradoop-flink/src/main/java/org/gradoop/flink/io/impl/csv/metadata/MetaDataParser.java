@@ -62,6 +62,7 @@ public class MetaDataParser {
    */
   private static Map<String, Function<String, Object>> getTypeParserMap() {
     Map<String, Function<String, Object>> map = new HashMap<>();
+    map.put(TypeString.SHORT.getTypeString(), Short::parseShort);
     map.put(TypeString.INTEGER.getTypeString(), Integer::parseInt);
     map.put(TypeString.LONG.getTypeString(), Long::parseLong);
     map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
@@ -286,7 +287,9 @@ public class MetaDataParser {
    * @return property type string
    */
   private static String getTypeString(PropertyValue propertyValue) {
-    if (propertyValue.isInt()) {
+    if (propertyValue.isShort()) {
+      return TypeString.SHORT.getTypeString();
+    } else if (propertyValue.isInt()) {
       return TypeString.INTEGER.getTypeString();
     } else if (propertyValue.isLong()) {
       return TypeString.LONG.getTypeString();
@@ -333,6 +336,10 @@ public class MetaDataParser {
      * Boolean type
      */
     BOOLEAN("boolean"),
+    /**
+     * Short type
+     */
+    SHORT("short"),
     /**
      * Integer type
      */
