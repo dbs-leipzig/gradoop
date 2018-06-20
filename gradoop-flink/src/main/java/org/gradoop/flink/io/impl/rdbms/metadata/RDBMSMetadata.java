@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class RDBMSMetadata {
 
-	public RDBMSMetadata() {
-	}
-
 	public static DatabaseMetaData getDBMetaData(Connection connection) {
 		DatabaseMetaData dbmetadata = null;
 		try {

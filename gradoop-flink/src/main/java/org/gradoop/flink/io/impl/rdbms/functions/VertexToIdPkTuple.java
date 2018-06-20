@@ -1,16 +1,15 @@
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
-public class VertexToIdPkTuple implements MapFunction<Vertex,Tuple2<GradoopId,String>> {
+public class VertexToIdPkTuple implements MapFunction<Vertex,IdKeyTuple> {
 
 	@Override
-	public Tuple2<GradoopId,String> map(Vertex v) throws Exception {
+	public IdKeyTuple map(Vertex v) throws Exception {
 		// TODO Auto-generated method stub
-		return new Tuple2<GradoopId, String>(v.getId(),v.getProperties().get("PrimaryKey").toString());
+		return new IdKeyTuple(v.getId(),v.getProperties().get("PrimaryKey").toString());
 	}
 
 }

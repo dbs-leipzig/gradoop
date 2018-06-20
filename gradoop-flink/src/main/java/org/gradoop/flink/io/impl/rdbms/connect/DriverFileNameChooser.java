@@ -1,5 +1,10 @@
 package org.gradoop.flink.io.impl.rdbms.connect;
 
+/**
+ * simple parsing from given jdbc url to provided driver jar name 
+ * @author pc
+ *
+ */
 public class DriverFileNameChooser {
 	public static String choose(String url){
 		String driverName = null;

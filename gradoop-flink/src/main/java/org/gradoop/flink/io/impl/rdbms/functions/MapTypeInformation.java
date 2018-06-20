@@ -11,20 +11,21 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 
+/**
+ * creates RowTypeInfo from given JDBCTypes
+ * @author pc
+ *
+ */
 public class MapTypeInformation {
-
-	public MapTypeInformation() {
-	}
 
 	public static RowTypeInfo getRowTypeInfo(RDBMSTable table) throws ClassNotFoundException {
 		int i = 0;
-		TypeInformation[] fieldTypes = new TypeInformation[table.getSqlTypes().size()];
+		TypeInformation[] fieldTypes = new TypeInformation[table.getjdbcTypes().size()];
 		
-		for(JDBCType f : table.getSqlTypes()){
+		for(JDBCType f : table.getjdbcTypes()){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(f);
 			i++;
 		}
-	
 		return new RowTypeInfo(fieldTypes);
 	}
 }

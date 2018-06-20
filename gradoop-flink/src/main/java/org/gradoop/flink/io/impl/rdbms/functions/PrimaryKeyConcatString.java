@@ -17,9 +17,7 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  *
  */
 public class PrimaryKeyConcatString {
-	public PrimaryKeyConcatString() {
-	}
-
+	
 	public static String getPrimaryKeyString(Row tuple, RowHeader rowHeader) {
 		String pkString = "";
 

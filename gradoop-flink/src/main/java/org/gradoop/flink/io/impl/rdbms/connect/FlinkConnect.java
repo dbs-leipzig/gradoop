@@ -18,29 +18,53 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
+/**
+ * connects to a RDBMS via Flinks' JDBC Input Format
+ * @author pc
+ *
+ */
 public class FlinkConnect {
 
 	public FlinkConnect() {
 	}
 
+	/**
+	 * computes best pageination, connects to rdbms via jdbc and run sql query 
+	 * @param env
+	 * @param rdbmsConfig
+	 * @param table
+	 * @param tableoredge
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	public static DataSet<Row> connect(ExecutionEnvironment env,RDBMSConfig rdbmsConfig, RDBMSTable table, String tableoredge) throws ClassNotFoundException {
 
+		// parallelism of running cluster or local mashine
 		int parallelism = env.getParallelism();
+		
+		// divides table data into equal parts
 		int partitionNumber = table.getNumberOfRows() / parallelism;
 		int partitionRest = table.getNumberOfRows() % parallelism;
+		
 		JDBCInputFormat jdbcInput = null;
 
+		/*
+		 * provides parameters for sql query 
+		 */
 		Serializable[][] parameters = new Integer[parallelism][2];
 		int j = 0;
 		for (int i = 0; i < parallelism; i++) {
 			if (i == parallelism - 1) {
-				parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
+				parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
 			} else {
-				parameters[i] = new Integer[] { j, partitionNumber };
+				parameters[i] = new Integer[] { partitionNumber, j };
 				j = j + partitionNumber;
 			}
 		}
 
+		/*
+		 * provides a jdbc input for tables convert to nodes
+		 */
 		if(tableoredge.equals(RDBMSConstants.NODE_TABLE)){
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()
@@ -53,6 +77,10 @@ public class FlinkConnect {
 					.setParametersProvider(new GenericParameterValuesProvider(parameters))
 					.finish();
 		}
+		
+		/*
+		 * provides a jdbc input for a tables convert to edges
+		 */
 		if(tableoredge.equals(RDBMSConstants.EDGE_TABLE)){
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()

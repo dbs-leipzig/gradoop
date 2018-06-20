@@ -6,8 +6,9 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
-public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId,String,Properties>,Tuple2<GradoopId,String>>,Edge> {
+public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId,String,Properties>,IdKeyTuple>,Edge> {
 	String tableName;
 	
 	public Tuple3ToEdge(String tableName){
@@ -15,7 +16,7 @@ public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId,String,
 	}
 	
 	@Override
-	public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, Tuple2<GradoopId, String>> value) throws Exception {
+	public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value) throws Exception {
 		// TODO Auto-generated method stub
 		Edge e = new Edge();
 		e.setId(GradoopId.get());

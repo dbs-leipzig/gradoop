@@ -12,118 +12,152 @@ import java.util.Map.Entry;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 
+/**
+ * basic representation of an rdbms table storing important metadata informations
+ * @author pc
+ *
+ */
 public class RDBMSTable implements Serializable, Cloneable {
 
 	private String tableName;
-	private LinkedHashSet<String> primaryKey;
+	private LinkedHashSet<String> primaryKeys;
 	private LinkedHashMap<String, String> foreignKeys;
 	private LinkedHashMap<String, JDBCType> attributes;
 	private Boolean directionIndicator;
 	private int numberOfRows;
 	private RowHeader rowHeader;
-	private ArrayList<JDBCType> sqlTypes;
+	private ArrayList<JDBCType> jdbcTypes;
 
-	public RDBMSTable(String tableName, LinkedHashSet<String> primaryKey, LinkedHashMap<String, String> foreignKeys,
+	/**
+	 * constructor
+	 * @param tableName name of the rdbms table	
+	 * @param primaryKeys set of primary keys of rdbms table
+	 * @param foreignKeys set of foreign keys of rdbms table
+	 * @param attributes set of attributes of rdbms table (primary/ foreign key included)
+	 * @param directionIndicator true if 1:1,1:n relation, false if n:m relation
+	 * @param numberOfRows number of rows of the rdbms table
+	 * @param jdbcTypes jdbcTypes of attribute values of rdbms table
+	 */
+	public RDBMSTable(String tableName, LinkedHashSet<String> primaryKeys, LinkedHashMap<String, String> foreignKeys,
 			LinkedHashMap<String, JDBCType> attributes, Boolean directionIndicator, int numberOfRows,
-			ArrayList<JDBCType> sqlTypes) {
+			ArrayList<JDBCType> jdbcTypes) {
 		this.tableName = tableName;
-		this.primaryKey = primaryKey;
+		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
 		this.attributes = attributes;
 		this.directionIndicator = directionIndicator;
 		this.numberOfRows = numberOfRows;
-		this.sqlTypes = sqlTypes;
+		this.jdbcTypes = jdbcTypes;
 	}
 
+	/**
+	 * basic constructor
+	 */
 	public RDBMSTable() {
-		this.primaryKey = new LinkedHashSet<String>();
+		this.primaryKeys = new LinkedHashSet<String>();
 		this.foreignKeys = new LinkedHashMap<String, String>();
 		this.attributes = new LinkedHashMap<String, JDBCType>();
-		this.sqlTypes = new ArrayList<JDBCType>();
+		this.jdbcTypes = new ArrayList<JDBCType>();
 	}
 
-	public ArrayList<JDBCType> getSqlTypes() {
-		return sqlTypes;
-	}
-
-	public void setSqlTypes(ArrayList<JDBCType> sqlTypes) {
-		this.sqlTypes = sqlTypes;
-	}
-
+	/**
+	 * computes sql query, row header and belonging jdbctypes for node conversion
+	 * @return
+	 */
 	public String getNodeSqlQuery() {
-		this.sqlTypes.clear();
+		this.jdbcTypes.clear();
 		this.rowHeader = new RowHeader();
+		
 		String sql = "SELECT ";
+		
 		int i = 0;
-		for (String pk : primaryKey) {
+		for (String pk : primaryKeys) {
 			sql = sql + pk + ",";
 			RowHeaderTuple rht = new RowHeaderTuple(pk, "pk", i);
 			rowHeader.getRowHeader().add(rht);
-			sqlTypes.add(attributes.get(pk));
+			jdbcTypes.add(attributes.get(pk));
 			i++;
 		}
 		for (Entry<String, String> fk : foreignKeys.entrySet()) {
 			sql += fk.getKey() + ",";
 			RowHeaderTuple rht = new RowHeaderTuple(fk.getKey(), "fk", i);
 			rowHeader.getRowHeader().add(rht);
-			sqlTypes.add(attributes.get(fk.getKey()));
+			jdbcTypes.add(attributes.get(fk.getKey()));
 			i++;
 		}
 		for (String att : getSimpleAttributes()) {
 			sql += att + ",";
 			RowHeaderTuple rht = new RowHeaderTuple(att, "att", i);
 			rowHeader.getRowHeader().add(rht);
-			sqlTypes.add(attributes.get(att));
+			jdbcTypes.add(attributes.get(att));
 			i++;
 		}
 		return sql = sql.substring(0, sql.length() - 1) + " FROM " + tableName;
 	}
 
+	/**
+	 * computes sql query, row header and belonging jdbctypes for edge conversion
+	 * @return
+	 */
 	public String getEdgeSqlQuery() {
-		this.sqlTypes.clear();
+		this.jdbcTypes.clear();
 		this.rowHeader = new RowHeader();
+	
 		String sql = "SELECT ";
+		
 		int i = 0;
+		
+		/*
+		 * creates sql query for m:n relations
+		 */
 		if (foreignKeys.size() == 2) {
 			for (Entry<String, String> fk : foreignKeys.entrySet()) {
 				sql += fk.getKey() + ",";
 				RowHeaderTuple rht = new RowHeaderTuple(fk.getKey(), "fk", i);
 				rowHeader.getRowHeader().add(rht);
-				sqlTypes.add(attributes.get(fk.getKey()));
+				jdbcTypes.add(attributes.get(fk.getKey()));
 				i++;
 			}
 			for (String att : getSimpleAttributes()) {
 				sql += att + ",";
 				RowHeaderTuple rht = new RowHeaderTuple(att, "att", i);
 				rowHeader.getRowHeader().add(rht);
-				sqlTypes.add(attributes.get(att));
+				jdbcTypes.add(attributes.get(att));
 				i++;
 			}
-		} else {
-			for (String pk : primaryKey) {
+		} else 
+		
+		/*
+		 * creates sql query for 1:1, 1:n relations
+		 */
+		{
+			for (String pk : primaryKeys) {
 				sql += pk + ",";
 				RowHeaderTuple rht = new RowHeaderTuple(pk, "pk", i);
 				rowHeader.getRowHeader().add(rht);
-				sqlTypes.add(attributes.get(pk));
+				jdbcTypes.add(attributes.get(pk));
 				i++;
 			}
 			for (Entry<String, String> fk : foreignKeys.entrySet()) {
 				sql += fk.getKey() + ",";
 				RowHeaderTuple rht = new RowHeaderTuple(fk.getKey(), "fk", i);
 				rowHeader.getRowHeader().add(rht);
-				sqlTypes.add(attributes.get(fk.getKey()));
+				jdbcTypes.add(attributes.get(fk.getKey()));
 				i++;
 			}
 		}
 		return sql = sql.substring(0, sql.length() - 1) + " FROM " + tableName;
 	}
 
+	/**
+	 * collects all non primary key and non foreign key attributes
+	 */
 	public ArrayList<String> getSimpleAttributes() {
 		ArrayList<String> simpleAttributes = new ArrayList<String>();
 		HashSet<String> fkAttributes = new HashSet<String>();
 		HashSet<String> pkAttributes = new HashSet<String>();
 
-		for (String pk : primaryKey) {
+		for (String pk : primaryKeys) {
 			pkAttributes.add(pk);
 		}
 		for (Entry<String, String> fk : foreignKeys.entrySet()) {
@@ -137,6 +171,18 @@ public class RDBMSTable implements Serializable, Cloneable {
 		return simpleAttributes;
 	}
 
+	//******************
+	// getter and setter
+	//******************
+	
+	public ArrayList<JDBCType> getjdbcTypes() {
+		return jdbcTypes;
+	}
+
+	public void setjdbcTypes(ArrayList<JDBCType> jdbcTypes) {
+		this.jdbcTypes = jdbcTypes;
+	}
+	
 	public String getTableName() {
 		return tableName;
 	}
@@ -146,11 +192,11 @@ public class RDBMSTable implements Serializable, Cloneable {
 	}
 
 	public LinkedHashSet<String> getPrimaryKey() {
-		return primaryKey;
+		return primaryKeys;
 	}
 
 	public void setPrimaryKey(LinkedHashSet<String> primaryKey) {
-		this.primaryKey = primaryKey;
+		this.primaryKeys = primaryKey;
 	}
 
 	public LinkedHashMap<String, String> getForeignKeys() {
@@ -193,9 +239,12 @@ public class RDBMSTable implements Serializable, Cloneable {
 		this.rowHeader = rowHeader;
 	}
 
+	/**
+	 * return clone of rdbms table
+	 */
 	public RDBMSTable clone() {
-		return new RDBMSTable(tableName, (LinkedHashSet<String>) primaryKey.clone(),
+		return new RDBMSTable(tableName, (LinkedHashSet<String>) primaryKeys.clone(),
 				(LinkedHashMap<String, String>) foreignKeys.clone(),
-				(LinkedHashMap<String, JDBCType>) attributes.clone(), directionIndicator, numberOfRows, sqlTypes);
+				(LinkedHashMap<String, JDBCType>) attributes.clone(), directionIndicator, numberOfRows, jdbcTypes);
 	}
 }

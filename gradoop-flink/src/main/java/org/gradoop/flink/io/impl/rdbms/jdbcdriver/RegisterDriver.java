@@ -18,7 +18,6 @@ public class RegisterDriver {
 	public static void register(RDBMSConfig config) {
 		String driverFileName = getDriverFileName(config.getUrl());
 		String driverClassName = getDriverClassName(config.getUrl());
-
 		try {
 			URL driverUrl = new URL("jar:file:" + getDriverJarPath() + RDBMSConstants.JARS_PATH + driverFileName);
 			URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });

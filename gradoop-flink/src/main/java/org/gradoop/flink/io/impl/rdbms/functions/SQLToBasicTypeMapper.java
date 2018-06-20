@@ -6,6 +6,11 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 
 import com.google.inject.util.Types;
 
+/**
+ * maps given JDBCType to a flink specific BasicTypeInfo
+ * @author pc
+ *
+ */
 public class SQLToBasicTypeMapper {
 	public SQLToBasicTypeMapper() {
 	}

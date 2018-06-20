@@ -18,6 +18,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.rdbms.connect.FlinkConnect;
 import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConnect;
@@ -33,12 +35,16 @@ import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdFkTuple;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdPkTuple;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSMetadata;
 import org.gradoop.flink.io.impl.rdbms.sequential.SequentialMetaDataParser;
+import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-
+/**
+ * Transforms a relational database into an EPGM database.
+ *
+ */
 public class RDBMSDataSource implements DataSource {
 	private GradoopFlinkConfig config;
 	private RDBMSConfig rdbmsConfig;
@@ -52,27 +58,36 @@ public class RDBMSDataSource implements DataSource {
 
 	@Override
 	public LogicalGraph getLogicalGraph() {
+		
 		/*
-		 * connection to rdbms via jdbc (using drivershim - rdbms depending)
+		 * connection to rdbms via jdbc 
 		 */
 		Connection con = RDBMSConnect.connect(rdbmsConfig);
 		
 		DataSet<Vertex> vertices = null;
+		DataSet<Vertex> finalVertices = null;
 		DataSet<Edge> edges = null;
+		
 		try {
 
 			/*
-			 * set of rdbms' metadata
+			 * representing rdbms' tables metadata
 			 */
 			ArrayList<RDBMSTable> tables = SequentialMetaDataParser.parse(RDBMSMetadata.getDBMetaData(con), con);
-			System.out.println("***Metadata of " + tables.size() + " tables determined");
+		
 			/*
-			 * create two sets of tables - tablesToNodes: tuples of this tables
-			 * are going to convert to nodes of the epgm - tablesToEdges: tuples
-			 * of this tables are going to convert to edges of the epgm
+			 * tables convert to nodes
 			 */
 			ArrayList<RDBMSTable> tablesToNodes = new ArrayList<RDBMSTable>();
+			
+			/*
+			 * tables convert to edges
+			 */
 			ArrayList<RDBMSTable> tablesToEdges = new ArrayList<RDBMSTable>();
+			
+			/*
+			 * assign tables with help of direction indicator 
+			 */
 			for (RDBMSTable table : tables) {
 				if (!table.getDirectionIndicator()) {
 					tablesToEdges.add(table);
@@ -96,9 +111,11 @@ public class RDBMSDataSource implements DataSource {
 			 */
 			int tnPos = 0;
 			for (RDBMSTable table : tablesToNodes) {
+				
+				//queryresult of table querying primary keys, foreign keys and attributes 
 				DataSet<Row> dsSQLResult = new FlinkConnect().connect(env, rdbmsConfig, table,
 						RDBMSConstants.NODE_TABLE);
-
+				
 				DataSet<Vertex> dsTableVertices = dsSQLResult.map(new CreateVertices(tnPos))
 						.withBroadcastSet(dsTablesToNodes, "tables");
 
@@ -109,7 +126,7 @@ public class RDBMSDataSource implements DataSource {
 				}
 				tnPos++;
 			}
-			
+						
 			/*
 			 * convert rdbms table's tuples respectively foreign keys to edges
 			 */
@@ -129,13 +146,15 @@ public class RDBMSDataSource implements DataSource {
 					int fkPos = 0;
 					for (Entry<String, String> fk : table.getForeignKeys().entrySet()) {
 						
-						DataSet<Tuple2<GradoopId,String>> fkTable = vertices.filter(new TableFilter(table.getTableName()))
+						//represents the referencing table
+						DataSet<IdKeyTuple> fkTable = vertices.filter(new TableFilter(table.getTableName()))
 								.map(new VertexToIdFkTuple(fk.getKey()));
 						
-						DataSet<Tuple2<GradoopId,String>> pkTable = vertices.filter(new TableFilter(fk.getValue()))
+						//represents the table been referenced
+						DataSet<IdKeyTuple> pkTable = vertices.filter(new TableFilter(fk.getValue()))
 								.map(new VertexToIdPkTuple());
 						
-						
+						//join tables to get the matches of foreign key and primary key values 
 						DataSet<Edge> dsFKEdges = fkTable.join(pkTable)
 								.where(1)
 								.equalTo(1)
@@ -153,16 +172,18 @@ public class RDBMSDataSource implements DataSource {
 				/*
 				 * tuples to edges
 				 */
-
 				else {
 					
+					//represents (n:m) relation (foreign key one, foreign key two and belonging proerties)
 					DataSet<Tuple3<String,String,Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(tePos))
 							.withBroadcastSet(dsTablesToEdges, "tables");
-										
-					DataSet<Tuple2<GradoopId,String>> idFkTableOne = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(0).getName())))
+									
+					//set of foreign key one vertices representation
+					DataSet<IdKeyTuple> idFkTableOne = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(0).getName())))
 							.map(new VertexToIdPkTuple());
 
-					DataSet<Tuple2<GradoopId,String>> idFkTableTwo = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(1).getName())))
+					//set of foreign key two vertices representation
+					DataSet<IdKeyTuple> idFkTableTwo = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(1).getName())))
 							.map(new VertexToIdPkTuple());
 					
 					DataSet<Edge> dsFKEdges = fkPropsTable.join(idFkTableOne)
@@ -183,19 +204,24 @@ public class RDBMSDataSource implements DataSource {
 				tePos++;
 			}
 			
+			/*
+			 * delete all foreign key properties from vertices 
+			 */
 			for(RDBMSTable table : tablesToNodes){
 				ArrayList<String> fkProps = new ArrayList<String>();
 				for(RowHeaderTuple rht : table.getRowHeader().getForeignKeyHeader()){
 					fkProps.add(rht.getName());
 				}
-				
-				vertices = vertices.map(new DeleteFKs(fkProps));
+				if(finalVertices == null){
+					finalVertices = vertices.filter(new TableFilter(table.getTableName())).map(new DeleteFKs(fkProps));
+				}else{
+					finalVertices = finalVertices.union(vertices.filter(new TableFilter(table.getTableName())).map(new DeleteFKs(fkProps)));
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		return null;
-		return config.getLogicalGraphFactory().fromDataSets(vertices,edges);		
+		return config.getLogicalGraphFactory().fromDataSets(finalVertices,edges);		
 	}
 
 	@Override

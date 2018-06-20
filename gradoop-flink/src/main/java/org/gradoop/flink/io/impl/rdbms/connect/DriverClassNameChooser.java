@@ -1,12 +1,17 @@
 package org.gradoop.flink.io.impl.rdbms.connect;
 
+/**
+ * simple parsing from given jdbc url to jdbc Drivername 
+ * @author pc
+ *
+ */
 public class DriverClassNameChooser {
 	public static String choose(String url){
 		String driverClassName = null;
 		if(url.contains("jdbc:mysql:")){
 			driverClassName = "com.mysql.jdbc.Driver";
 		}
-		if(url.contains("jdbc:postgres:")){
+		if(url.contains("jdbc:postgresql:")){
 			driverClassName = "org.postgresql.Driver";
 		}
 		if(url.contains("jdbc:h2:")){

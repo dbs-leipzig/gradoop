@@ -12,11 +12,12 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeader;
 
 /**
- * class to convert rows to importvertices
+ * converts tuples of sql query result to vertices
  * @author pc
  *
  */
 public class CreateVertices extends RichMapFunction<Row, Vertex> {
+	// tables to nodes metadata
 	private List<RDBMSTable> table;
 	private int tablePosition;
 	
@@ -29,8 +30,8 @@ public class CreateVertices extends RichMapFunction<Row, Vertex> {
 		// TODO Auto-generated method stub
 		RowHeader rowHeader = table.get(tablePosition).getRowHeader();
 		String pkString = new PrimaryKeyConcatString().getPrimaryKeyString(tuple,rowHeader);
-		Vertex v = new Vertex();
 		
+		Vertex v = new Vertex();
 		v.setId(GradoopId.get());
 		v.setLabel(table.get(tablePosition).getTableName());
 		v.setProperties(AttributesToProperties.getProperties(tuple, rowHeader));
