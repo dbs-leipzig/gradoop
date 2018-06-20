@@ -378,7 +378,7 @@ public class PropertyValueUtils {
           b = aType == INT ? bValue.getInt() : bValue.getShort();
         }
 
-          aIsLessOrEqual = a <= b;
+        aIsLessOrEqual = a <= b;
 
       } else if (returnType == FLOAT) {
 
