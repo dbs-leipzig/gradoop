@@ -52,8 +52,13 @@ public class AccumuloPropLargerThan<T extends EPGMElement>
     if (value == null) {
       return false;
     }
-    int result = value.compareTo(getMin());
-    return isInclude() ? result >= 0 : result > 0;
+
+    try {
+      int result = value.compareTo(getMin());
+      return isInclude() ? result >= 0 : result > 0;
+    } catch (UnsupportedOperationException | IllegalArgumentException typeErr) {
+      return false;
+    }
   }
 
 }
