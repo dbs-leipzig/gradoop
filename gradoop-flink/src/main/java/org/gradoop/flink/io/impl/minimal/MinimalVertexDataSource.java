@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -50,7 +51,7 @@ public class MinimalVertexDataSource implements DataSource {
   /**
    * Token delimiter
    */
-  private String tokenSeparator;
+  private static String tokenSeparator;
 
   /**
    * Name of the id column
@@ -65,7 +66,7 @@ public class MinimalVertexDataSource implements DataSource {
   /**
    * Property names of all vertices
    */
-  private List<String> vertexProperties;
+  private static List<String> vertexProperties;
 
   /**
    * Creates a new data source.
@@ -93,35 +94,58 @@ public class MinimalVertexDataSource implements DataSource {
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
- // DataSet<ImportVertex<String>> vertices = env.fromElements(map(
- //     env.readTextFile(vertexCsvPath)));
+   // DataSet<Tuple3<String, String, String>> lineTuples = readCSVFile(config, vertexCsvPath, tokenSeparator);
 
-    DataSet<Tuple3<String, String, String>> lineTuples = env
-     .readTextFile(vertexCsvPath)
-     .map(line -> {
-         String[] tokens = line.split(tokenSeparator, 3);
-         return Tuple3.of(tokens[0], tokens[1], tokens[2]);
-       })
-     .returns(new TypeHint<Tuple3<String, String, String>>() { });
-
-    DataSet<ImportVertex<String>> importVertices = lineTuples
-        .<Tuple2<String, String>>project(0, 1)
-        .map(new CreateLabeledImportVertex<>(vertexLabel));
-
+    DataSet<ImportVertex<String>> importVertices = readCSVFile(config, vertexCsvPath, tokenSeparator);
+    
+    try {
+      System.out.println("import vertices: " + importVertices.collect());
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
     return null;
+  }
+  
+ /* public static DataSet<Tuple3<String, String, String>> readCSVFile(
+      GradoopFlinkConfig config, String vertexCsvPath, String tokenSeparator) {
+    
+    DataSet<Tuple3<String, String, String>> lineTuples = config.getExecutionEnvironment()
+        .readTextFile(vertexCsvPath)
+        .map(line -> {
+            String[] tokens = line.split(tokenSeparator, 3);
+            return Tuple3.of(tokens[0], tokens[1], tokens[2]);
+          })
+        .returns(new TypeHint<Tuple3<String, String, String>>() { });
+    
+    return lineTuples;
+  }*/
+  
+  public static DataSet<ImportVertex<String>> readCSVFile(
+      GradoopFlinkConfig config, String vertexCsvPath, String tokenSeparator) {
+    
+    DataSet<ImportVertex<String>> lineTuples = config.getExecutionEnvironment()
+        .readTextFile(vertexCsvPath)
+        .map(line -> {
+            String[] tokens = line.split(tokenSeparator, 3);
+            ImportVertex<String> vertices = map(tokens);
+            return vertices;
+          }).returns(new TypeHint<ImportVertex<String>>() { });
+    
+    return lineTuples;
   }
 
   /**
    * Map a csv line to a EPMG vertex
-   * @param csvLine external representation of the vertex
+   * @param mapOperator external representation of the vertex
    * @return EPMG vertex
    */
-  public ImportVertex<String> map(String csvLine) {
+  public static ImportVertex<String> map(String[] tokens) {
 
-    String[] tokens = csvLine.split(tokenSeparator, 3);
     return new ImportVertex<String>(tokens[0],
         tokens[1],
-        parseProperties(tokens[1], tokens[2]));
+        parseProperties(tokens[2]));
   }
 
   /**
@@ -130,7 +154,7 @@ public class MinimalVertexDataSource implements DataSource {
    * @param propertyValueString the properties
    * @return Properties as pojo element
    */
-  public Properties parseProperties(String label, String propertyValueString) {
+  public static Properties parseProperties(String propertyValueString) {
 
     Properties properties = new Properties();
 
