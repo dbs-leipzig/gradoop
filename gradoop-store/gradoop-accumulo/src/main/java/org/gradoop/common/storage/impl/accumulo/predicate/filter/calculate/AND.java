@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * disjunctive predicate filter
+ * conjunctive predicate filter
  *
  * @param <T> element type
  */
@@ -37,7 +37,7 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * disjunctive principles
+   * conjunctive principles
    *
    * @param predicates predicates
    */
@@ -50,7 +50,7 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * create a disjunctive formula
+   * create a conjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type

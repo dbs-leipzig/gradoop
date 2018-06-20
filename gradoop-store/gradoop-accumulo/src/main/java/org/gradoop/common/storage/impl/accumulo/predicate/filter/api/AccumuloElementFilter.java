@@ -93,7 +93,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * conjunctive operator
+   * disjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -104,7 +104,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * disjunctive operator
+   * conjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
