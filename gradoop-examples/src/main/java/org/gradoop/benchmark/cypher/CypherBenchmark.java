@@ -8,6 +8,7 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -86,7 +87,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
-    DataSource source = new CSVDataSource(INPUT_PATH, config);
+    DataSource source = new IndexedCSVDataSource(INPUT_PATH, config);
 
     LogicalGraph graph = source.getLogicalGraph();
     GraphCollection collection;

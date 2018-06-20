@@ -4,6 +4,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.conf.Configuration;
 import org.gradoop.benchmark.complex.functions.CountFilter;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.common.functions.VertexLabelFilter;
@@ -12,11 +13,14 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -37,6 +41,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * Option to declare path to statistics csv file
    */
   private static final String OPTION_CSV_PATH = "c";
+  private static final String OPTION_STATISTICS_PATH = "s";
   /**
    * Used input path
    */
@@ -49,6 +54,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * Used csv path
    */
   private static String CSV_PATH;
+  private static String STATISTICS_PATH;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
@@ -76,7 +82,10 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
 
-        DataSource source = new CSVDataSource(INPUT_PATH, conf);
+        DataSource source = new IndexedCSVDataSource(INPUT_PATH, conf);
+
+      GraphStatistics statistics = GraphStatisticsHDFSReader
+        .read(STATISTICS_PATH, new Configuration());
 
         LogicalGraph graph = source
           .getLogicalGraph()
@@ -88,7 +97,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
               "(po)-[:hasTag]->(t:tag)\n" +
               "(c1)-[:isPartOf]->(ca:country)<-[:isPartOf]-(c2)\n" +
               "WHERE p1 != p2",
-            "CONSTRUCT (ca)-[new:hasInterest]->(t)")
+            "CONSTRUCT (ca)-[new:hasInterest]->(t)", statistics)
           .reduce(new ReduceCombination());
 
         LogicalGraph groupedGraph  = new Grouping.GroupingBuilder()
@@ -115,6 +124,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+    STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
   }
 
   /**
@@ -131,6 +141,9 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph output directory.");
+    }
+    if (!cmd.hasOption(OPTION_STATISTICS_PATH)) {
+      throw new IllegalArgumentException("Define a path to generated statistics.");
     }
   }
 

@@ -11,6 +11,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -93,7 +94,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
         GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
 
         // read graph
-        DataSource source = new CSVDataSource(INPUT_PATH, conf);
+        DataSource source = new IndexedCSVDataSource(INPUT_PATH, conf);
 
         LogicalGraph graph = source.getLogicalGraph();
 
