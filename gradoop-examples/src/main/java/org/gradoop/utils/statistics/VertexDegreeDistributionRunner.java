@@ -17,6 +17,7 @@ package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegreeDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
@@ -37,7 +38,7 @@ public class VertexDegreeDistributionRunner extends AbstractRunner implements Pr
 
     StatisticWriter.writeCSV(new VertexDegreeDistribution()
         .execute(readLogicalGraph(args[0], args[1])),
-        appendSeparator(args[2]) + "vertex_degree_distribution");
+        appendSeparator(args[2]) + GraphStatisticsReader.FILE_VERTEX_DEGREE_DISTRIBUTION);
 
     getExecutionEnvironment().execute("Statistics: Vertex degree distribution");
   }

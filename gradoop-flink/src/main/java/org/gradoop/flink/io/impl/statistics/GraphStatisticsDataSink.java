@@ -121,7 +121,7 @@ public class GraphStatisticsDataSink implements DataSink {
     StatisticWriter.writeCSV(new VertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        "vertex_degree_distribution");
+        GraphStatisticsReader.FILE_VERTEX_DEGREE_DISTRIBUTION);
     StatisticWriter.writeCSV(new VertexLabelDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
@@ -129,11 +129,11 @@ public class GraphStatisticsDataSink implements DataSink {
     StatisticWriter.writeCSV(new IncomingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        "incoming_vertex_degree_distribution");
+        GraphStatisticsReader.INCOMING_VERTEX_DEGREE_DISTRIBUTION);
     StatisticWriter.writeCSV(new OutgoingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        "outgoing_vertex_degree_distribution");
+        GraphStatisticsReader.OUTGOING_VERTEX_DEGREE_DISTRIBUTION);
   }
 
   @Override
