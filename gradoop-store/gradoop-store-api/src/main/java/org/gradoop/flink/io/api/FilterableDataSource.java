@@ -20,7 +20,7 @@ import org.gradoop.common.storage.predicate.query.ElementQuery;
 import javax.annotation.Nonnull;
 
 /**
- * Data source in with support for filter push-down. A Source
+ * Data source with support for filter push-down. A Source
  * extending this interface is able to filter records such
  * that the returned DataSet returns fewer records.
  *
@@ -42,7 +42,7 @@ public interface FilterableDataSource<
    * @return a copy of the FilterableDataSource with added predicates
    */
   @Nonnull
-  FilterableDataSource applyGraphPredicate(@Nonnull GQuery query);
+  FilterableDataSource<GQuery, VQuery, EQuery> applyGraphPredicate(@Nonnull GQuery query);
 
   /**
    * Returns a copy of the DataSource with added predicates.
@@ -53,7 +53,7 @@ public interface FilterableDataSource<
    * @return a copy of the FilterableDataSource with added predicates
    */
   @Nonnull
-  FilterableDataSource applyVertexPredicate(@Nonnull VQuery query);
+  FilterableDataSource<GQuery, VQuery, EQuery> applyVertexPredicate(@Nonnull VQuery query);
 
   /**
    * Returns a copy of the DataSource with added predicates.
@@ -64,14 +64,14 @@ public interface FilterableDataSource<
    * @return a copy of the FilterableDataSource with added predicates
    */
   @Nonnull
-  FilterableDataSource applyEdgePredicate(@Nonnull EQuery query);
+  FilterableDataSource<GQuery, VQuery, EQuery> applyEdgePredicate(@Nonnull EQuery query);
 
   /**
-   * Returns true if the applyPredicate() method was called before.
+   * Returns true if the apply*Predicate() method was called before.
    * Hence, isFilterPushedDown() must return true for all
    * TableSource instances returned from a applyPredicate() call.
    *
-   * @return true if the applyPredicate() method was called before
+   * @return true if the apply*Predicate() method was called before
    */
   boolean isFilterPushedDown();
 

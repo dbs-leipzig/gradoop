@@ -86,7 +86,8 @@
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
-        <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git
+        <developerConnection>
+            scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git
         </developerConnection>
     </scm>
 
@@ -122,7 +123,6 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
-        <dep.mongo.version>3.7.1</dep.mongo.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
 
@@ -227,9 +227,11 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
-                        <suppressionsLocation>gradoop/checkstyle-suppressions.xml
+                        <suppressionsLocation>
+                            gradoop/checkstyle-suppressions.xml
                         </suppressionsLocation>
-                        <suppressionsFileExpression>checkstyle.suppressions.file
+                        <suppressionsFileExpression>
+                            checkstyle.suppressions.file
                         </suppressionsFileExpression>
                         <failsOnError>true</failsOnError>
                         <consoleOutput>true</consoleOutput>
@@ -473,13 +475,6 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-hadoop-compat</artifactId>
                 <version>${dep.hbase.version}</version>
-            </dependency>
-
-            <!-- Mongo -->
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>mongodb-driver-sync</artifactId>
-                <version>${dep.mongo.version}</version>
             </dependency>
 
             <!-- Kryo -->

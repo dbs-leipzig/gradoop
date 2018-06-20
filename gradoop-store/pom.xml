@@ -12,7 +12,7 @@
     <artifactId>gradoop-store</artifactId>
     <packaging>pom</packaging>
     <name>Gradoop Store</name>
-    <description>GRADOOP : Graph Store Analytics on NoSQL Layer</description>
+    <description>Extended IO functionalities for NoSQL databases</description>
 
     <modules>
         <module>gradoop-store-api</module>

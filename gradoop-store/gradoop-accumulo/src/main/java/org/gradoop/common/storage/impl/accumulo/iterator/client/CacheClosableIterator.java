@@ -70,7 +70,8 @@ public class CacheClosableIterator<R extends EPGMElement, E extends EPGMElement>
   private List<E> cache = new ArrayList<>();
 
   /**
-   * cache closable iterator contructor
+   * cache closable iterator constructor
+   *
    * @param scanner accumulo batch scanner
    * @param codec iterator decoder
    * @param handler result element row handler

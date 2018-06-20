@@ -115,25 +115,25 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // graph heads
     validateEPGMElementCollections(
       loader.getGraphHeads(),
-      Lists.newArrayList(epgmStore.getGraphSpace())
+      epgmStore.getGraphSpace().readRemainsAndClose()
     );
     // vertices
     validateEPGMElementCollections(
       loader.getVertices(),
-      Lists.newArrayList(epgmStore.getVertexSpace())
+      epgmStore.getVertexSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       loader.getVertices(),
-      Lists.newArrayList(epgmStore.getVertexSpace())
+      epgmStore.getVertexSpace().readRemainsAndClose()
     );
     // edges
     validateEPGMElementCollections(
       loader.getEdges(),
-      Lists.newArrayList(epgmStore.getEdgeSpace())
+      epgmStore.getEdgeSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       loader.getEdges(),
-      Lists.newArrayList(epgmStore.getEdgeSpace())
+      epgmStore.getEdgeSpace().readRemainsAndClose()
     );
 
     epgmStore.close();

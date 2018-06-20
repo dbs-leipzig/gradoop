@@ -116,6 +116,7 @@ public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
 
   /**
    * read next edge element from table store
+   *
    * @param source origin accumulo source
    * @return edge element
    * @throws IOException io err

@@ -40,7 +40,7 @@ public class AccumuloPropLargerThan<T extends EPGMElement>
    */
   public AccumuloPropLargerThan(
     String key,
-    double min,
+    Object min,
     boolean include
   ) {
     super(key, min, include);
@@ -52,21 +52,8 @@ public class AccumuloPropLargerThan<T extends EPGMElement>
     if (value == null) {
       return false;
     }
-
-    double result;
-    if (value.isFloat()) {
-      result = value.getFloat();
-    } else if (value.isDouble()) {
-      result = value.getDouble();
-    } else if (value.isLong()) {
-      result = value.getLong();
-    } else if (value.isInt()) {
-      result = value.getInt();
-    } else {
-      return false;
-    }
-
-    return isInclude() ? result >= getMin() : result > getMin();
+    int result = value.compareTo(getMin());
+    return isInclude() ? result >= 0 : result > 0;
   }
 
 }

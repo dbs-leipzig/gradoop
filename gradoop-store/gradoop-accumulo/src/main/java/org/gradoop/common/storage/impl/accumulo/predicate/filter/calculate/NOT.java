@@ -42,11 +42,11 @@ public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * create a Conjunctive formula
+   * create a negative formula
    *
    * @param predicate negative predicate
    * @param <T> input type
-   * @return Conjunctive filter instance
+   * @return negative filter instance
    */
   public static <T extends EPGMElement> NOT<T> of(AccumuloElementFilter<T> predicate) {
     return new NOT<>(predicate);

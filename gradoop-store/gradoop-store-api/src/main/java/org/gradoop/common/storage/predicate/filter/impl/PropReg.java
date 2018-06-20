@@ -54,7 +54,7 @@ public abstract class PropReg<FilterImpl extends ElementFilter>
 
   @Override
   public String toString() {
-    return String.format("e.prop.%1$s SIMILAR TO `%2$s`", key, reg.pattern());
+    return String.format("e.prop.%1$s REGEXP `%2$s`", key, reg.pattern());
   }
 
   protected Pattern getReg() {
@@ -64,4 +64,5 @@ public abstract class PropReg<FilterImpl extends ElementFilter>
   protected String getKey() {
     return key;
   }
+
 }

@@ -1,6 +1,7 @@
 package org.gradoop.common.storage.impl.accumulo.predicate;
 
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.common.utils.AccumuloFilters;
@@ -23,9 +24,11 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST02 = "label_predicate_02";
   private static final String TEST03 = "label_predicate_03";
   private static final String TEST04 = "label_predicate_04";
+  private static final String TEST05 = "label_predicate_05";
+  private static final String TEST06 = "label_predicate_06";
 
   /**
-   * find all edge that's with label 'hasInterest' or 'hasMember'
+   * find all vertices by label equality
    *
    * @throws Throwable if error
    */
@@ -51,7 +54,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all edge that's with label 'hasInterest' or 'hasMember'
+   * find all edges by label equality
    *
    * @throws Throwable if error
    */
@@ -76,15 +79,17 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all edge that's with label 'hasInterest' or 'hasMember'
+   * find all vertices by label regex
    *
    * @throws Throwable if error
    */
   @Test
   public void test03_vertexLabelRegex() throws Throwable {
     doTest(TEST03, (loader, store) -> {
+      Pattern queryFormula = Pattern.compile("[Pers|Ta].*+");
+
       List<Vertex> inputVertex = loader.getVertices().stream()
-        .filter(it -> Pattern.compile("[Pers|Ta].*+").matcher(it.getLabel()).matches())
+        .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
       //vertex label regex query
@@ -92,7 +97,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
         .getVertexSpace(
           Query.elements()
             .fromAll()
-            .where(AccumuloFilters.labelReg(Pattern.compile("[Pers|Ta].*+"))))
+            .where(AccumuloFilters.labelReg(queryFormula)))
         .readRemainsAndClose();
 
       validateEPGMElementCollections(inputVertex, queryResult);
@@ -100,27 +105,74 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all edge that's with label 'hasInterest' or 'hasMember'
+   * find all edges by label regex
    *
    * @throws Throwable if error
    */
   @Test
   public void test04_edgeLabelRegex() throws Throwable {
     doTest(TEST04, (loader, store) -> {
-      //vertex label query
+      Pattern queryFormula = Pattern.compile("has.*+");
+
+      //graph label query
       List<Edge> inputVertex = loader.getEdges().stream()
-        .filter(it -> Pattern.compile("has.*+").matcher(it.getLabel()).matches())
+        .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
-      //edge label regex query
+      //graph label regex query
       List<Edge> queryResult = store
         .getEdgeSpace(
           Query.elements()
             .fromAll()
-            .where(AccumuloFilters.labelReg(Pattern.compile("has.*+"))))
+            .where(AccumuloFilters.labelReg(queryFormula)))
         .readRemainsAndClose();
 
       validateEPGMElementCollections(inputVertex, queryResult);
+    });
+  }
+
+  /**
+   * find all graphs by label equality
+   */
+  @Test
+  public void test05_graphLabelEquals() throws Throwable {
+    doTest(TEST05, (loader, store) -> {
+      List<GraphHead> inputGraph = loader.getGraphHeads().stream()
+        .filter(it -> Objects.equals(it.getLabel(), "Community") ||
+          Objects.equals(it.getLabel(), "Person"))
+        .collect(Collectors.toList());
+
+      List<GraphHead> queryResult = store
+        .getGraphSpace(
+          Query.elements()
+            .fromAll()
+            .where(AccumuloFilters.labelIn("Community", "Person")))
+        .readRemainsAndClose();
+
+      validateEPGMElementCollections(inputGraph, queryResult);
+    });
+  }
+
+  /**
+   * find all graphs by label regex
+   */
+  @Test
+  public void test06_graphLabelRegex() throws Throwable {
+    doTest(TEST06, (loader, store) -> {
+      Pattern queryFormula = Pattern.compile("Com.*+");
+
+      List<GraphHead> inputGraph = loader.getGraphHeads().stream()
+        .filter(it -> queryFormula.matcher(it.getLabel()).matches())
+        .collect(Collectors.toList());
+
+      List<GraphHead> queryResult = store
+        .getGraphSpace(
+          Query.elements()
+            .fromAll()
+            .where(AccumuloFilters.labelReg(queryFormula)))
+        .readRemainsAndClose();
+
+      validateEPGMElementCollections(inputGraph, queryResult);
     });
   }
 

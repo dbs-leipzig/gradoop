@@ -13,6 +13,8 @@ import org.gradoop.common.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
 import org.gradoop.common.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
 import org.gradoop.common.storage.impl.accumulo.predicate.StorePropPredicateTest;
 import org.gradoop.flink.io.impl.accumulo.IOBasicTest;
+import org.gradoop.flink.io.impl.accumulo.source.IOEdgePredicateTest;
+import org.gradoop.flink.io.impl.accumulo.source.IOGraphPredicateTest;
 import org.gradoop.flink.io.impl.accumulo.source.IOVertexPredicateTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,7 +43,9 @@ import static org.gradoop.common.config.GradoopAccumuloConfig.*;
   StorePropPredicateTest.class,
   //sink and source
   IOBasicTest.class,
-  IOVertexPredicateTest.class
+  IOEdgePredicateTest.class,
+  IOVertexPredicateTest.class,
+  IOGraphPredicateTest.class
 })
 public class AccumuloTestSuite {
 

@@ -17,7 +17,12 @@
 package org.gradoop.common.storage.impl.accumulo.predicate;
 
 import org.gradoop.AccumuloStoreTestBase;
+import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 import org.gradoop.common.utils.AccumuloFilters;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.calculate.OR;
@@ -26,6 +31,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,8 +44,9 @@ import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
 
-  private static final String TEST01 = "basic_cnf_01";
-  private static final String TEST02 = "basic_cnf_02";
+  private static final String TEST01 = "basic_predicate_01";
+  private static final String TEST02 = "basic_predicate_02";
+  private static final String TEST03 = "basic_predicate_03";
 
   /**
    * pick 3 person randomly
@@ -103,6 +110,42 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.propLargerThan("age", 35, true)))
         .readRemainsAndClose();
       validateEPGMElementCollections(inputVertices, queryResult);
+    });
+  }
+
+  /**
+   * find graph by property equality within a certain sample id range
+   *
+   * @throws Throwable if error
+   */
+  @Test
+  public void test03_findGraphByIdsAndProperty() throws Throwable {
+    doTest(TEST03, (loader, store) -> {
+      List<GraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
+
+      GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()
+        .map(Element::getId)
+        .collect(Collectors.toList()));
+
+      List<GraphHead> inputGraph = samples.stream()
+        .filter(it -> Objects.equals(it.getLabel(), "Community"))
+        .filter(it -> it.getPropertyValue("interest") != null)
+        .filter(it ->
+          Objects.equals(it.getPropertyValue("interest").getString(), "Hadoop") ||
+            Objects.equals(it.getPropertyValue("interest").getString(), "Graphs"))
+        .collect(Collectors.toList());
+
+      ElementQuery<AccumuloElementFilter<GraphHead>> queryFormula = Query.elements()
+        .fromSets(sampleRange)
+        .where(AccumuloFilters.<GraphHead>labelIn("Community")
+          .and(AccumuloFilters.<GraphHead>propEquals("interest", "Hadoop")
+            .or(AccumuloFilters.<GraphHead>propEquals("interest", "Graphs"))));
+
+      System.out.println(queryFormula);
+      List<GraphHead> query = store
+        .getGraphSpace(queryFormula)
+        .readRemainsAndClose();
+      GradoopTestUtils.validateEPGMElementCollections(inputGraph, query);
     });
   }
 

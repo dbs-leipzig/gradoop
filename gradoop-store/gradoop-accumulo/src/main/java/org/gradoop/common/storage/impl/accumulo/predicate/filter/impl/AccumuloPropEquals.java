@@ -21,7 +21,6 @@ import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloEle
 import org.gradoop.common.storage.predicate.filter.impl.PropEquals;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 
 /**
  * assert property value equals
@@ -48,8 +47,7 @@ public class AccumuloPropEquals<T extends EPGMElement>
   @Override
   public boolean test(T t) {
     return t.getPropertyValue(getKey()) != null &&
-      Arrays.equals(t.getPropertyValue(getKey()).getRawBytes(), getValue().getRawBytes());
+      t.getPropertyValue(getKey()).equals(getValue());
   }
-
 
 }

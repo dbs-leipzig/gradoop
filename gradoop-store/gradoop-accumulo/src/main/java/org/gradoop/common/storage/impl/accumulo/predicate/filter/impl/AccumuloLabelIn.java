@@ -32,6 +32,7 @@ public class AccumuloLabelIn<T extends EPGMElement>
 
   /**
    * label filter constructor
+   *
    * @param labels label
    */
   public AccumuloLabelIn(String... labels) {

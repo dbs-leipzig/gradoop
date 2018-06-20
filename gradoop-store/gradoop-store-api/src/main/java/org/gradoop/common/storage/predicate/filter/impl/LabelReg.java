@@ -43,7 +43,7 @@ public abstract class LabelReg<FilterImpl extends ElementFilter>
 
   @Override
   public String toString() {
-    return String.format("e.meta.label SIMILAR TO `%s`", reg.pattern());
+    return String.format("e.meta.label REGEXP `%s`", reg.pattern());
   }
 
   protected Pattern getReg() {

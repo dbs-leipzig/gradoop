@@ -16,11 +16,13 @@
 
 package org.gradoop.common.storage.predicate.filter.impl;
 
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 
 /**
- * property larger than min filter
+ * property larger than min value filter
  *
+ * @see PropertyValue#compareTo(PropertyValue) for more detail about value comparing
  * @param <FilterImpl> filter implement type
  */
 public abstract class PropLargerThan<FilterImpl extends ElementFilter>
@@ -34,7 +36,7 @@ public abstract class PropLargerThan<FilterImpl extends ElementFilter>
   /**
    * property value
    */
-  private final double min;
+  private final PropertyValue min;
 
   /**
    * include min flag
@@ -46,29 +48,19 @@ public abstract class PropLargerThan<FilterImpl extends ElementFilter>
    *
    * @param key property key
    * @param min property min value
-   */
-  public PropLargerThan(
-    String key,
-    double min
-  ) {
-    this(key, min, true);
-  }
-
-  /**
-   * property larger than constructor
-   *
-   * @param key property key
-   * @param min property min value
    * @param include include min value
    */
   public PropLargerThan(
     String key,
-    double min,
+    Object min,
     boolean include
   ) {
     this.key = key;
-    this.min = min;
+    this.min = min instanceof PropertyValue ? (PropertyValue) min : PropertyValue.create(min);
     this.include = include;
+
+    //noinspection EqualsWithItself, only for type check
+    this.min.compareTo(this.min);
   }
 
   @Override
@@ -83,11 +75,12 @@ public abstract class PropLargerThan<FilterImpl extends ElementFilter>
     return key;
   }
 
-  protected double getMin() {
+  protected PropertyValue getMin() {
     return min;
   }
 
   protected boolean isInclude() {
     return include;
   }
+
 }

@@ -112,7 +112,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
 
   @Nonnull
   @Override
-  public FilterableDataSource applyGraphPredicate(
+  public AccumuloDataSource applyGraphPredicate(
     @Nonnull ElementQuery<AccumuloElementFilter<GraphHead>> query
   ) {
     AccumuloQueryHolder<GraphHead> newGraphQuery = AccumuloQueryHolder.create(query);
@@ -126,7 +126,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
 
   @Nonnull
   @Override
-  public FilterableDataSource applyVertexPredicate(
+  public AccumuloDataSource applyVertexPredicate(
     @Nonnull ElementQuery<AccumuloElementFilter<Vertex>> query
   ) {
     AccumuloQueryHolder<Vertex> newVertexQuery = AccumuloQueryHolder.create(query);
@@ -140,7 +140,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
 
   @Nonnull
   @Override
-  public FilterableDataSource applyEdgePredicate(
+  public AccumuloDataSource applyEdgePredicate(
     @Nonnull ElementQuery<AccumuloElementFilter<Edge>> query
   ) {
     AccumuloQueryHolder<Edge> newEdgeQuery = AccumuloQueryHolder.create(query);

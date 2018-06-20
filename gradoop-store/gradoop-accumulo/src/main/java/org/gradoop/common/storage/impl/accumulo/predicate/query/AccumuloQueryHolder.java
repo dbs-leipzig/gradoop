@@ -108,6 +108,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
 
   /**
    * get query ranges by anti-encrypt wrapper
+   *
    * @return seek range
    */
   public List<Range> getQueryRanges() {
@@ -142,6 +143,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
 
     /**
      * encrypt as byte array
+     *
      * @return byte array result
      */
     private byte[] encrypt() {

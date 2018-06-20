@@ -40,7 +40,7 @@ import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 
 /**
- * accumulo data read wirte test
+ * accumulo data read write test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOBasicTest extends GradoopFlinkTestBase {

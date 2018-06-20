@@ -70,6 +70,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
 
   /**
    * deserialize from key-value pair
+   *
    * @param pair k-v pair from accumulo row
    * @return gradoop element instance
    */
@@ -86,6 +87,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
 
   /**
    * do seek from accumulo store implements
+   *
    * @param source store source
    * @param range seek range
    * @return element instance list

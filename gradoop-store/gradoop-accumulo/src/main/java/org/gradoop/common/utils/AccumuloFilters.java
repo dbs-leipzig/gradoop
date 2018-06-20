@@ -87,7 +87,7 @@ public class AccumuloFilters {
   @Nonnull
   public static <T extends EPGMElement> AccumuloPropLargerThan<T> propLargerThan(
     @Nonnull String key,
-    double value,
+    Object value,
     boolean include
   ) {
     return new AccumuloPropLargerThan<>(key, value, include);

@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopAccumuloConfig;
@@ -35,7 +36,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
-import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -48,7 +48,6 @@ import java.util.Set;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -64,7 +63,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   private static final String TEST05 = "basic_05";
 
   /**
-   * Creates persistent graph, vertex and edge data. Writes data to HBase,
+   * Creates persistent graph, vertex and edge data. Writes data to Accumulo,
    * closes the store, opens it and reads/validates the data again.
    */
   @Test
@@ -97,7 +96,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * Creates persistent graph, vertex and edge data. Writes data to HBase,
+   * Creates persistent graph, vertex and edge data. Writes data to Accumulo,
    * flushes the tables and reads/validates the data.
    */
   @Test
@@ -160,23 +159,23 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     // graph heads
     validateEPGMElementCollections(graphHeads,
-      Lists.newArrayList(graphStore.getGraphSpace().readRemainsAndClose()));
+      graphStore.getGraphSpace().readRemainsAndClose());
     // vertices
     validateEPGMElementCollections(vertices,
-      Lists.newArrayList(graphStore.getVertexSpace().readRemainsAndClose()));
+      graphStore.getVertexSpace().readRemainsAndClose());
     validateEPGMGraphElementCollections(vertices,
-      Lists.newArrayList(graphStore.getVertexSpace().readRemainsAndClose()));
+      graphStore.getVertexSpace().readRemainsAndClose());
     // edges
     validateEPGMElementCollections(edges,
-      Lists.newArrayList(graphStore.getEdgeSpace().readRemainsAndClose()));
+      graphStore.getEdgeSpace().readRemainsAndClose());
     validateEPGMGraphElementCollections(edges,
-      Lists.newArrayList(graphStore.getEdgeSpace().readRemainsAndClose()));
+      graphStore.getEdgeSpace().readRemainsAndClose());
 
     graphStore.close();
   }
 
   /**
-   * Tries to add an unsupported property type {@link List} as property value.
+   * Tries to add an unsupported property type {@link Set} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
   public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
@@ -223,7 +222,6 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     // read from store
     Vertex v = graphStore.readVertex(vertexID);
-    assert v != null;
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(properties.size(), propertyKeys.size());
 
@@ -260,6 +258,30 @@ public class StoreTest extends AccumuloStoreTestBase {
       case KEY_7:
         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
         assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
+        break;
+      case KEY_8:
+        assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
+        assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
+        break;
+      case KEY_9:
+        assertTrue(v.getPropertyValue(propertyKey).isMap());
+        assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
+        break;
+      case KEY_a:
+        assertTrue(v.getPropertyValue(propertyKey).isList());
+        assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
+        break;
+      case KEY_b:
+        assertTrue(v.getPropertyValue(propertyKey).isDate());
+        assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
+        break;
+      case KEY_c:
+        assertTrue(v.getPropertyValue(propertyKey).isTime());
+        assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
+        break;
+      case KEY_d:
+        assertTrue(v.getPropertyValue(propertyKey).isDateTime());
+        assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
         break;
       }
     }
@@ -304,6 +326,5 @@ public class StoreTest extends AccumuloStoreTestBase {
     assertTrue("target vertex mismatch", originalEdge.getTargetId()
       .equals(loadedEdge.getTargetId()));
   }
-
 
 }

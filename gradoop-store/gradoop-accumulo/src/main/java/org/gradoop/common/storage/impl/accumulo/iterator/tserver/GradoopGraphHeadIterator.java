@@ -113,6 +113,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
 
   /**
    * read next graph head element from table store
+   *
    * @param source origin accumulo source
    * @return edge element
    * @throws IOException io err

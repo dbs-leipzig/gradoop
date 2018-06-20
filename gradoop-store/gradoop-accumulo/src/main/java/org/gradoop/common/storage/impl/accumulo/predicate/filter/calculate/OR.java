@@ -38,7 +38,7 @@ public final class OR<T extends EPGMElement> implements AccumuloElementFilter<T>
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * conjunctive principles
+   * conjunction principles
    *
    * @param predicates predicates
    */
@@ -51,7 +51,7 @@ public final class OR<T extends EPGMElement> implements AccumuloElementFilter<T>
   }
 
   /**
-   * create a Conjunctive formula
+   * create a conjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type

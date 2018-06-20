@@ -16,7 +16,6 @@
 
 package org.gradoop.common.storage.api;
 
-
 import org.gradoop.common.storage.config.GradoopStoreConfig;
 
 /**

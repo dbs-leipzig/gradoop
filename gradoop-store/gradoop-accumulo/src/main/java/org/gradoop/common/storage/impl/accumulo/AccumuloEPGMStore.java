@@ -139,9 +139,10 @@ public class AccumuloEPGMStore implements
 
   /**
    * create a accumulo client connector
+   *
    * @return accumulo client connector instance
-   * @throws AccumuloSecurityException if err
-   * @throws AccumuloException if err
+   * @throws AccumuloSecurityException if error
+   * @throws AccumuloException if error
    */
   public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
     return new ZooKeeperInstance(

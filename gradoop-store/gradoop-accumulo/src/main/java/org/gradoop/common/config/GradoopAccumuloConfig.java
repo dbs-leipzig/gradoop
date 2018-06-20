@@ -156,7 +156,6 @@ public class GradoopAccumuloConfig extends
    * Creates a Gradoop Accumulo configuration based on the given arguments.
    *
    * @param gradoopConfig   Gradoop configuration
-   *
    * @return Gradoop HBase configuration
    */
   public static GradoopAccumuloConfig createConfig(@Nonnull GradoopAccumuloConfig gradoopConfig) {

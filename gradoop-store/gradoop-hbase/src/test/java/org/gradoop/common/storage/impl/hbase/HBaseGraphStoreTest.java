@@ -116,13 +116,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    * Stores social network data, loads it again and checks for element data
    * equality.
    *
-   * @throws InterruptedException
    * @throws IOException
-   * @throws ClassNotFoundException
    */
   @Test
-  public void iteratorTest() throws InterruptedException, IOException,
-    ClassNotFoundException {
+  public void iteratorTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
 
     List<PersistentVertex<Edge>> vertices =
@@ -139,7 +136,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     for (PersistentVertex<Edge> v : vertices) {
       graphStore.writeVertex(v);
     }
-    for (PersistentEdge<Vertex> e : edges) {	
+    for (PersistentEdge<Vertex> e : edges) {
       graphStore.writeEdge(e);
     }
 
@@ -148,25 +145,25 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     // graph heads
     validateEPGMElementCollections(
       graphHeads,
-      Lists.newArrayList(graphStore.getGraphSpace())
+      graphStore.getGraphSpace().readRemainsAndClose()
     );
     // vertices
     validateEPGMElementCollections(
       vertices,
-      Lists.newArrayList(graphStore.getVertexSpace())
+      graphStore.getVertexSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       vertices,
-      Lists.newArrayList(graphStore.getVertexSpace())
+      graphStore.getVertexSpace().readRemainsAndClose()
     );
     // edges
     validateEPGMElementCollections(
       edges,
-      Lists.newArrayList(graphStore.getEdgeSpace())
+      graphStore.getEdgeSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       edges,
-      Lists.newArrayList(graphStore.getEdgeSpace())
+      graphStore.getEdgeSpace().readRemainsAndClose()
     );
 
     graphStore.close();
@@ -195,8 +192,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);
     final GradoopIdSet graphs = new GradoopIdSet();
     PersistentVertex<Edge> v = persistentVertexFactory.createVertex(
-        vertexFactory.initVertex(vertexID, label, props, graphs),
-        outEdges, inEdges);
+      vertexFactory.initVertex(vertexID, label, props, graphs),
+      outEdges, inEdges);
 
     graphStore.writeVertex(v);
   }
@@ -204,6 +201,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Checks if property values are read correctly.
    */
+  @SuppressWarnings("Duplicates")
   @Test
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
@@ -235,62 +233,62 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
-        case KEY_0:
-          assertTrue(v.getPropertyValue(propertyKey).isNull());
-          assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
-          break;
-        case KEY_1:
-          assertTrue(v.getPropertyValue(propertyKey).isBoolean());
-          assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
-          break;
-        case KEY_2:
-          assertTrue(v.getPropertyValue(propertyKey).isInt());
-          assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
-          break;
-        case KEY_3:
-          assertTrue(v.getPropertyValue(propertyKey).isLong());
-          assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
-          break;
-        case KEY_4:
-          assertTrue(v.getPropertyValue(propertyKey).isFloat());
-          assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
-          break;
-        case KEY_5:
-          assertTrue(v.getPropertyValue(propertyKey).isDouble());
-          assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
-          break;
-        case KEY_6:
-          assertTrue(v.getPropertyValue(propertyKey).isString());
-          assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
-          break;
-        case KEY_7:
-          assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
-          assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
-          break;
-        case KEY_8:
-          assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
-          assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
-          break;
-        case KEY_9:
-          assertTrue(v.getPropertyValue(propertyKey).isMap());
-          assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
-          break;
-        case KEY_a:
-          assertTrue(v.getPropertyValue(propertyKey).isList());
-          assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
-          break;
-        case KEY_b:
-          assertTrue(v.getPropertyValue(propertyKey).isDate());
-          assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
-          break;
-        case KEY_c:
-          assertTrue(v.getPropertyValue(propertyKey).isTime());
-          assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
-          break;
-        case KEY_d:
-          assertTrue(v.getPropertyValue(propertyKey).isDateTime());
-          assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
-          break;
+      case KEY_0:
+        assertTrue(v.getPropertyValue(propertyKey).isNull());
+        assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
+        break;
+      case KEY_1:
+        assertTrue(v.getPropertyValue(propertyKey).isBoolean());
+        assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
+        break;
+      case KEY_2:
+        assertTrue(v.getPropertyValue(propertyKey).isInt());
+        assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
+        break;
+      case KEY_3:
+        assertTrue(v.getPropertyValue(propertyKey).isLong());
+        assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
+        break;
+      case KEY_4:
+        assertTrue(v.getPropertyValue(propertyKey).isFloat());
+        assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
+        break;
+      case KEY_5:
+        assertTrue(v.getPropertyValue(propertyKey).isDouble());
+        assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
+        break;
+      case KEY_6:
+        assertTrue(v.getPropertyValue(propertyKey).isString());
+        assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
+        break;
+      case KEY_7:
+        assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
+        assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
+        break;
+      case KEY_8:
+        assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
+        assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
+        break;
+      case KEY_9:
+        assertTrue(v.getPropertyValue(propertyKey).isMap());
+        assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
+        break;
+      case KEY_a:
+        assertTrue(v.getPropertyValue(propertyKey).isList());
+        assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
+        break;
+      case KEY_b:
+        assertTrue(v.getPropertyValue(propertyKey).isDate());
+        assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
+        break;
+      case KEY_c:
+        assertTrue(v.getPropertyValue(propertyKey).isTime());
+        assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
+        break;
+      case KEY_d:
+        assertTrue(v.getPropertyValue(propertyKey).isDateTime());
+        assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+        break;
       }
     }
   }
@@ -304,8 +302,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   private void writeGraphHead(
-    HBaseEPGMStore graphStore, GraphHead graphHead,
-    Vertex vertex, Edge edge) throws IOException {
+    HBaseEPGMStore graphStore,
+    GraphHead graphHead,
+    Vertex vertex,
+    Edge edge
+  ) throws IOException {
     graphStore.writeGraphHead(new HBaseGraphHeadFactory<>().createGraphHead(
       graphHead, GradoopIdSet.fromExisting(vertex.getId()),
       GradoopIdSet.fromExisting(edge.getId())
@@ -313,21 +314,28 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     );
   }
 
-  private void writeVertex(HBaseEPGMStore graphStore,
-    Vertex vertex, Edge edge) throws IOException {
+  private void writeVertex(
+    HBaseEPGMStore graphStore,
+    Vertex vertex,
+    Edge edge
+  ) throws IOException {
     graphStore.writeVertex(new HBaseVertexFactory<Vertex, Edge>().createVertex(
       vertex, Sets.newHashSet(edge), Sets.newHashSet(edge)));
   }
 
-  private void writeEdge(HBaseEPGMStore graphStore,
-    Vertex vertex, Edge edge) throws IOException {
+  private void writeEdge(
+    HBaseEPGMStore graphStore,
+    Vertex vertex,
+    Edge edge
+  ) throws IOException {
     graphStore.writeEdge(new HBaseEdgeFactory<Edge, Vertex>().createEdge(
       edge, vertex, vertex));
   }
 
   private void validateGraphHead(
     HBaseEPGMStore graphStore,
-    GraphHead originalGraphHead) throws IOException {
+    GraphHead originalGraphHead
+  ) throws IOException {
 
     EPGMGraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
 
@@ -336,7 +344,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
   private void validateVertex(
     HBaseEPGMStore graphStore,
-    Vertex originalVertex) throws IOException {
+    Vertex originalVertex
+  ) throws IOException {
 
     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 
@@ -344,8 +353,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
-  private void validateEdge(HBaseEPGMStore graphStore,
-    Edge originalEdge) throws IOException {
+  private void validateEdge(
+    HBaseEPGMStore graphStore,
+    Edge originalEdge
+  ) throws IOException {
 
     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
 

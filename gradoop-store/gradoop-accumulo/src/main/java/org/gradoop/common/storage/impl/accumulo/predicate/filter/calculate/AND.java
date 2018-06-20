@@ -50,7 +50,7 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * create a Conjunctive formula
+   * create a disjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type
