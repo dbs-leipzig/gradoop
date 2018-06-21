@@ -112,7 +112,19 @@ public class PropertyValueUtils {
         aValue.setInt(aValue.getShort() + bValue.getShort());
 
       } else if (returnType == INT)  {
-        aValue.setInt(aValue.getInt() + bValue.getInt());
+
+        int a;
+        int b;
+
+        if (sameType) {
+          a = aValue.getInt();
+          b = bValue.getInt();
+        } else {
+          a = aType == INT ? aValue.getInt() : aValue.getShort();
+          b = aType == INT ? bValue.getInt() : bValue.getShort();
+        }
+
+        aValue.setInt(a + b);
 
       } else if (returnType == FLOAT)  {
 
@@ -225,7 +237,19 @@ public class PropertyValueUtils {
         aValue.setInt(aValue.getShort() * bValue.getShort());
 
       } else if (returnType == INT)  {
-        aValue.setInt(aValue.getInt() * bValue.getInt());
+
+        int a;
+        int b;
+
+        if (sameType) {
+          a = aValue.getInt();
+          b = bValue.getInt();
+        } else {
+          a = aType == INT ? aValue.getInt() : aValue.getShort();
+          b = aType == INT ? bValue.getInt() : bValue.getShort();
+        }
+
+        aValue.setInt(a * b);
 
       } else if (returnType == FLOAT)  {
 
@@ -342,7 +366,19 @@ public class PropertyValueUtils {
         aIsLessOrEqual = aValue.getShort() <= bValue.getShort();
 
       } else if (returnType == INT) {
-        aIsLessOrEqual = aValue.getInt() <= bValue.getInt();
+
+        int a;
+        int b;
+
+        if (sameType) {
+          a = aValue.getInt();
+          b = bValue.getInt();
+        } else {
+          a = aType == INT ? aValue.getInt() : aValue.getShort();
+          b = aType == INT ? bValue.getInt() : bValue.getShort();
+        }
+
+        aIsLessOrEqual = a <= b;
 
       } else if (returnType == FLOAT) {
 
