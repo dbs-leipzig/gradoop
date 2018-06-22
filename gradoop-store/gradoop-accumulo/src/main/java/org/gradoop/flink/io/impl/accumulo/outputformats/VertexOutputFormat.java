@@ -25,7 +25,7 @@ import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import java.util.Properties;
 
 /**
- * gradoop accumulo vertex output format
+ * Vertex output format, write vertex data set into accumulo store
  */
 public class VertexOutputFormat extends BaseOutputFormat<Vertex> {
 
@@ -40,7 +40,7 @@ public class VertexOutputFormat extends BaseOutputFormat<Vertex> {
   private transient AccumuloVertexHandler handler;
 
   /**
-   * vertex output format constructor
+   * Create a new output format for gradoop vertex
    *
    * @param properties accumulo properties
    */

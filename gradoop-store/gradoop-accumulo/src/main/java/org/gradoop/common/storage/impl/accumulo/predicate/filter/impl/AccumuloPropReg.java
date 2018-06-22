@@ -24,16 +24,16 @@ import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
 /**
- * property filter by regex
+ * Accumulo property regex predicate implement
  *
- * @param <T> input row type
+ * @param <T> EPGM element type
  */
 public class AccumuloPropReg<T extends EPGMElement>
   extends PropReg<AccumuloElementFilter<T>>
   implements AccumuloElementFilter<T> {
 
   /**
-   * label regex filter constructor
+   * Create a new label regex filter
    *
    * @param key property key
    * @param reg label regex

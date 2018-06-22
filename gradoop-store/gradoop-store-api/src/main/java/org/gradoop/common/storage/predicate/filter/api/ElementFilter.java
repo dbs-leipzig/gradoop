@@ -22,31 +22,35 @@ import java.io.Serializable;
 
 /**
  * Element Filter Formula
+ * A element filter predicate will be
+ *  - created by client,
+ *  - transform to query options and send to region servers
+ *  - decode query options by region servers,
  *
  * @param <FilterImpl> filter implement type
  */
 public interface ElementFilter<FilterImpl extends ElementFilter> extends Serializable {
 
   /**
-   * conjunctive operator
+   * Conjunctive operator for element filter
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
    */
   @Nonnull
-  FilterImpl or(FilterImpl another);
+  FilterImpl or(@Nonnull FilterImpl another);
 
   /**
-   * disjunctive operator
+   * Disjunctive operator for element filter
    *
    * @param another another reduce filter
-   * @return conjunctive logic filter
+   * @return disjunctive logic filter
    */
   @Nonnull
-  FilterImpl and(FilterImpl another);
+  FilterImpl and(@Nonnull FilterImpl another);
 
   /**
-   * negative operator
+   * Negative operator for element filter
    *
    * @return negative logic for current filter
    */

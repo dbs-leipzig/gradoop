@@ -37,7 +37,7 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * conjunctive principles
+   * Create a new conjunctive principles
    *
    * @param predicates predicates
    */
@@ -50,7 +50,7 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * create a conjunctive formula
+   * Create a conjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type

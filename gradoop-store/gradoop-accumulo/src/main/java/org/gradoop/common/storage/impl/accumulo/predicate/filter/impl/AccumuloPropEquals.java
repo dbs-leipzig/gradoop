@@ -23,16 +23,16 @@ import org.gradoop.common.storage.predicate.filter.impl.PropEquals;
 import javax.annotation.Nonnull;
 
 /**
- * assert property value equals
+ * Accumulo property equality implement
  *
- * @param <T> input type
+ * @param <T> EPGM element type
  */
 public class AccumuloPropEquals<T extends EPGMElement>
   extends PropEquals<AccumuloElementFilter<T>>
   implements AccumuloElementFilter<T> {
 
   /**
-   * property equals filter
+   * Create a new property equals filter
    *
    * @param key property key
    * @param value property value

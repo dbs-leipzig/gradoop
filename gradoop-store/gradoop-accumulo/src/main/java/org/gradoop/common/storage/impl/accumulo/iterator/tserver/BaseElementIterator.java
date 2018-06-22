@@ -24,10 +24,8 @@ import org.apache.accumulo.core.iterators.IteratorEnvironment;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -37,16 +35,18 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * accumulo iterator which will be execute from tserver
+ * Accumulo Tablet Server Iterator
+ * This Iterator will be create in accumulo tablet server runtime, when executing a partition
+ * range query. A Gradoop Element iterator will decode query options as query filter, transform
+ * multi-rows into epgm element and check if this element should be return by predicate. Each
+ * element that fulfill the predicate will be serialized into one row.
+ *
  * @param <E> gradoop epgm element
+ * @see <a href="https://accumulo.apache.org/1.9/accumulo_user_manual.html#_iterator_design">
+ *   accumulo iterator design</a>
  */
 public abstract class BaseElementIterator<E extends EPGMElement> implements
   SortedKeyValueIterator<Key, Value> {
-
-  /**
-   * iterator logger
-   */
-  protected static final Logger LOG = LoggerFactory.getLogger(BaseElementIterator.class);
 
   /**
    * origin accumulo data source

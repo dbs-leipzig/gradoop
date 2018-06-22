@@ -25,7 +25,8 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * definition of graph store input
+ * Definition of graph store input.
+ * A graph input instance provide a set of writing methods for EPGM elements
  *
  * @param <GInput> graph head(output)
  * @param <VInput> graph vertex(output)

@@ -32,6 +32,7 @@ import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.flink.api.common.io.GenericInputFormat;
+import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.core.io.GenericInputSplit;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
@@ -53,7 +54,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * abstract input format for accumulo data source
+ * Common Abstract {@link InputFormat} for gradoop accumulo store
+ *
  * @param <T> element define in gradoop
  */
 public abstract class BaseInputFormat<T extends Element> extends GenericInputFormat<T> {
@@ -84,7 +86,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
   private transient Iterator<Map.Entry<Key, Value>> iterator;
 
   /**
-   * bas input format constructor
+   * Create a new input format for gradoop element
    *
    * @param properties accumulo properties
    * @param predicate scan predicate filter
@@ -98,20 +100,20 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
   }
 
   /**
-   * after connector initiate
+   * Invoke hook after connector initiate
    */
   protected abstract void initiate();
 
   /**
-   * get table name with prefix configuration
+   * Get table by table prefix definition
    *
-   * @param prefix prefix configuration
+   * @param prefix prefix defined in store configuration
    * @return table name
    */
   protected abstract String getTableName(String prefix);
 
   /**
-   * attach iterator setting
+   * Attach scanner iterator setting
    *
    * @param scanner accumulo batch scanner
    * @param iteratorSettingPriority iterator priority from properties
@@ -124,7 +126,8 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
   );
 
   /**
-   * decode record from remote
+   * Decode record instance from result entry
+   * This is a pure client behavior for result decode
    *
    * @param row accumulo result
    * @return gradoop element
@@ -206,7 +209,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
   }
 
   /**
-   * split table ranges according to {@link AccumuloRowInputFormat#getSplits}
+   * Split table into ranges according to {@link AccumuloRowInputFormat#getSplits} suggest
    *
    * @param maxSplit max split size
    * @param tableName split table name
@@ -231,7 +234,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
     JobConf conf = new JobConf();
     AccumuloRowInputFormat.setInputTableName(conf, tableName);
     AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));
-    AccumuloRowInputFormat.setZooKeeperInstance(conf, new ClientConfiguration()
+    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()
       .withInstance(instance)
       .withZkHosts(zkHosts));
     AccumuloRowInputFormat.setScanAuthorizations(conf, auth);

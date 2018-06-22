@@ -1,11 +1,24 @@
-package org.gradoop.flink.io.impl.accumulo.source;
+/**
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package org.gradoop.flink.io.impl.accumulo.source;
 
 import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.utils.AccumuloFilters;
 import org.gradoop.flink.io.impl.accumulo.AccumuloDataSource;
@@ -13,13 +26,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOEdgePredicateTest extends AccumuloStoreTestBase {

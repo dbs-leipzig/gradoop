@@ -113,7 +113,6 @@
                                 <includes>
                                     <include>org.gradoop:gradoop-common</include>
                                     <include>org.gradoop:gradoop-store-api</include>
-                                    <!--<include>com.esotericsoftware:kryo-shaded</include>-->
                                     <include>com.esotericsoftware.minlog:*</include>
                                     <include>com.esotericsoftware.kryo:*</include>
                                     <include>org.apache.flink:flink-core</include>

@@ -139,7 +139,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     DataSet<PersistentGraphHead> persistentGraphDataSet = graphToVertexIdsAndEdgeIds
       .join(collection.getGraphHeads())
       .where(0).equalTo(new Id<>())
-      .with(new BuildPersistentGraphHead<>(getHBaseConfig().getPersistentGraphHeadFactory()));
+      .with(new BuildPersistentGraphHead<>(getHBaseConfig().getStoreGraphHeadFactory()));
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
@@ -184,7 +184,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     DataSet<PersistentVertex<Edge>> persistentVertexDataSet = vertexDataWithOutgoingEdges
       .coGroup(vertexToIncomingEdges)
       .where("f0.id").equalTo(0)
-      .with(new BuildPersistentVertex<>(getHBaseConfig().getPersistentVertexFactory()));
+      .with(new BuildPersistentVertex<>(getHBaseConfig().getStoreVertexFactory()));
 
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
@@ -216,7 +216,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
       .where("f1.targetId")
       .equalTo(new Id<>())
       // ((source-vertex-data, edge-data), target-vertex-data)
-      .with(new BuildPersistentEdge<>(getHBaseConfig().getPersistentEdgeFactory()));
+      .with(new BuildPersistentEdge<>(getHBaseConfig().getStoreEdgeFactory()));
 
     // write (persistent-edge-data) to HBase table
     Job job = Job.getInstance();

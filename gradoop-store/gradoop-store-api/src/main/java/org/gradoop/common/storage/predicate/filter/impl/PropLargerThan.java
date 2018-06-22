@@ -20,10 +20,14 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 
 /**
- * property larger than min value filter
+ * Predicate by property value compare
+ * return element if and only if:
+ *  - contains property key
+ *  - property value type is comparable
+ *  - property value is larger than min value
  *
- * @see PropertyValue#compareTo(PropertyValue) for more detail about value comparing
  * @param <FilterImpl> filter implement type
+ * @see PropertyValue#compareTo(PropertyValue) for more detail about value comparing
  */
 public abstract class PropLargerThan<FilterImpl extends ElementFilter>
   implements ElementFilter<FilterImpl> {
@@ -39,7 +43,7 @@ public abstract class PropLargerThan<FilterImpl extends ElementFilter>
   private final PropertyValue min;
 
   /**
-   * include min flag
+   * allow equality case
    */
   private final boolean include;
 

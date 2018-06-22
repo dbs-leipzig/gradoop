@@ -22,16 +22,16 @@ import org.gradoop.common.storage.predicate.filter.impl.LabelReg;
 import java.util.regex.Pattern;
 
 /**
- * label filter by regex
+ * Accumulo label regex predicate implement
  *
- * @param <T> epgm element type
+ * @param <T> EPGM element type
  */
 public class AccumuloLabelReg<T extends EPGMElement>
   extends LabelReg<AccumuloElementFilter<T>>
   implements AccumuloElementFilter<T> {
 
   /**
-   * label regex filter constructor
+   * Create a new label regex filter
    *
    * @param reg label regex
    */

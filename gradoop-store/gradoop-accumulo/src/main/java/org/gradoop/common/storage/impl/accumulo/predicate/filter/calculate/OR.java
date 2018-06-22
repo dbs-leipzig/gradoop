@@ -16,7 +16,6 @@
 
 package org.gradoop.common.storage.impl.accumulo.predicate.filter.calculate;
 
-
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
@@ -38,7 +37,7 @@ public final class OR<T extends EPGMElement> implements AccumuloElementFilter<T>
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * disjunctive principles
+   * Create a new disjunctive principles
    *
    * @param predicates predicates
    */

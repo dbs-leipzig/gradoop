@@ -222,6 +222,7 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     // read from store
     Vertex v = graphStore.readVertex(vertexID);
+    assert v != null;
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(properties.size(), propertyKeys.size());
 
@@ -321,10 +322,10 @@ public class StoreTest extends AccumuloStoreTestBase {
     validateEPGMElements(originalEdge, loadedEdge);
     validateEPGMGraphElements(originalEdge, loadedEdge);
     assert loadedEdge != null;
-    assertTrue("source vertex mismatch", originalEdge.getSourceId()
-      .equals(loadedEdge.getSourceId()));
-    assertTrue("target vertex mismatch", originalEdge.getTargetId()
-      .equals(loadedEdge.getTargetId()));
+    assertEquals("source vertex mismatch",
+      originalEdge.getSourceId(), loadedEdge.getSourceId());
+    assertEquals("target vertex mismatch",
+      originalEdge.getTargetId(), loadedEdge.getTargetId());
   }
 
 }

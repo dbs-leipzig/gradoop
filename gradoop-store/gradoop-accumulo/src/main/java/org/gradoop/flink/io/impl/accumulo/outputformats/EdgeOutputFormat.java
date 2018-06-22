@@ -25,7 +25,7 @@ import org.gradoop.common.storage.impl.accumulo.handler.AccumuloEdgeHandler;
 import java.util.Properties;
 
 /**
- * gradoop accumulo edge output format
+ * Edge OutputFormat, write edge data set into accumulo store
  */
 public class EdgeOutputFormat extends BaseOutputFormat<Edge> {
 
@@ -40,7 +40,7 @@ public class EdgeOutputFormat extends BaseOutputFormat<Edge> {
   private transient AccumuloEdgeHandler handler;
 
   /**
-   * edge output format
+   * Create a new output format for gradoop edge
    *
    * @param properties accumulo properties
    */

@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * abstract output format for gradoop accumulo
+ * Common Abstract {@link OutputFormat} for gradoop accumulo store
  *
  * @param <E> gradoop element
  */
@@ -48,17 +48,17 @@ public abstract class BaseOutputFormat<E extends Element> implements OutputForma
   private static final int serialVersionUID = 0x1;
 
   /**
-   * accumulo properties
+   * Accumulo client properties
    */
   private final Properties properties;
 
   /**
-   * accumulo batch writer
+   * Accumulo batch writer
    */
   private transient BatchWriter writer;
 
   /**
-   * base output format constructor
+   * Create a new output format for gradoop element
    *
    * @param properties accumulo properties
    */
@@ -67,12 +67,12 @@ public abstract class BaseOutputFormat<E extends Element> implements OutputForma
   }
 
   /**
-   * after connector initiate
+   * Invoke hook after connector initiate
    */
   protected abstract void initiate();
 
   /**
-   * get table name with prefix configuration
+   * Get table name with prefix configuration
    *
    * @param prefix prefix configuration
    * @return table name
@@ -80,7 +80,8 @@ public abstract class BaseOutputFormat<E extends Element> implements OutputForma
   protected abstract String getTableName(String prefix);
 
   /**
-   * write element record to mutation
+   * Write element record to mutation
+   *
    * @param record element record
    * @return mutation after writing
    */

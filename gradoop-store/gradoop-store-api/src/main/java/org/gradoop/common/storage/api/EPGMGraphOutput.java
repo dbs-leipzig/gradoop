@@ -28,29 +28,31 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
- * definition of graph store output
+ * Definition of graph store output.
+ * A graph input instance provide a set of query methods for EPGM Elements
+ * both id query and traversal query are supported
  */
 public interface EPGMGraphOutput {
 
   /**
-   * default cache size, if client cache size is not provided
+   * Default cache size, if client cache size is not provided
    */
   int DEFAULT_CACHE_SIZE = 5000;
 
   /**
-   * Reads a graph data entity from the EPGM store using the given graph
+   * Reads a graph data entity from the EPGMGraphOutput using the given graph
    * identifier. If {@code graphId} does not exist, {@code null} is returned.
    *
-   * @param graphId graph identifier
-   * @return graph data entity or {@code null} if there is no entity with the
-   *         given {@code graphId}
+   * @param graphId   graph identifier
+   * @return graph data entity or {@code null}
+   *         if there is no entity with the given {@code graphId}
    * @throws IOException if error occur on IO error (timeout, conn disconnected)
    */
   @Nullable
   GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException;
 
   /**
-   * Reads all graphs from the EPGM store.
+   * Reads all graphs from the EPGMGraphOutput.
    *
    * @return all graphs
    * @throws IOException unexpected IO error (timeout, conn disconnected)
@@ -61,7 +63,7 @@ public interface EPGMGraphOutput {
   }
 
   /**
-   * Reads all graphs from the EPGM store.
+   * Reads all graphs from the EPGMGraphOutput.
    *
    * @param cacheSize cache size for client scan
    * @return all graphs
@@ -71,7 +73,7 @@ public interface EPGMGraphOutput {
   ClosableIterator<GraphHead> getGraphSpace(int cacheSize) throws IOException;
 
   /**
-   * Reads a vertex data entity from the EPGM store using the given vertex
+   * Reads a vertex data entity from the EPGMGraphOutput using the given vertex
    * identifier. If {@code vertexId} does not exist, {@code null} is returned.
    *
    * @param vertexId vertex identifier
@@ -83,7 +85,7 @@ public interface EPGMGraphOutput {
   Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException;
 
   /**
-   * Reads all vertices from the EPGM store.
+   * Reads all vertices from the EPGMGraphOutput.
    *
    * @return all vertices
    * @throws IOException if error occur on IO error (timeout, conn disconnected)
@@ -94,7 +96,7 @@ public interface EPGMGraphOutput {
   }
 
   /**
-   * Reads all vertices from the EPGM store.
+   * Reads all vertices from the EPGMGraphOutput.
    *
    * @param cacheSize cache size for client scan
    * @return all vertices
@@ -104,7 +106,7 @@ public interface EPGMGraphOutput {
   ClosableIterator<Vertex> getVertexSpace(int cacheSize) throws IOException;
 
   /**
-   * Reads an edge data entity from the EPGM store using the given edge
+   * Reads an edge data entity from the EPGMGraphOutput using the given edge
    * identifier. If {@code edgeId} does not exist, {@code null} is returned.
    *
    * @param edgeId edge identifier
@@ -116,7 +118,7 @@ public interface EPGMGraphOutput {
   Edge readEdge(@Nonnull GradoopId edgeId) throws IOException;
 
   /**
-   * Reads all edges from the EPGM store.
+   * Reads all edges from the EPGMGraphOutput.
    *
    * @return all edges
    * @throws IOException if error occur on IO error (timeout, conn disconnected)
@@ -127,7 +129,7 @@ public interface EPGMGraphOutput {
   }
 
   /**
-   * Reads all edges from the EPGM store.
+   * Reads all edges from the EPGMGraphOutput.
    *
    * @param cacheSize cache size for client scan
    * @return all edges

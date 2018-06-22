@@ -17,7 +17,6 @@
 package org.gradoop.common.storage.impl.accumulo.predicate.filter.api;
 
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.storage.impl.accumulo.iterator.tserver.BaseElementIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
@@ -40,11 +39,6 @@ import java.util.function.Predicate;
 /**
  * Accumulo Element Filter
  *
- * A element filter predicate will be
- * - created by client,
- * - serialized as accumulo options, transport as rpc query parameter to tserver
- * - anti-serialized by tserver runtime {@link BaseElementIterator} and execute as element filter
- *
  * @param <T> epgm element type
  * @see GradoopEdgeIterator
  * @see GradoopGraphHeadIterator
@@ -66,8 +60,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
     byte[] content = Base64.getDecoder().decode(encoded);
     try (
       ByteArrayInputStream arr = new ByteArrayInputStream(content);
-      ObjectInput in = new ObjectInputStream(arr);
-    ) {
+      ObjectInput in = new ObjectInputStream(arr)) {
       //noinspection unchecked
       return (AccumuloElementFilter<T>) in.readObject();
     } catch (IOException | ClassNotFoundException e) {
@@ -99,7 +92,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    * @return conjunctive logic filter
    */
   @Nonnull
-  default AccumuloElementFilter<T> or(AccumuloElementFilter<T> another) {
+  default AccumuloElementFilter<T> or(@Nonnull AccumuloElementFilter<T> another) {
     return OR.create(this, another);
   }
 
@@ -110,7 +103,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    * @return conjunctive logic filter
    */
   @Nonnull
-  default AccumuloElementFilter<T> and(AccumuloElementFilter<T> another) {
+  default AccumuloElementFilter<T> and(@Nonnull AccumuloElementFilter<T> another) {
     return AND.create(this, another);
   }
 

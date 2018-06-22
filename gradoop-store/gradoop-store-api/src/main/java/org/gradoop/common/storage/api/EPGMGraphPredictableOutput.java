@@ -28,11 +28,14 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
- * create graph output iterator with external predicate
+ * Definition of predictable graph store output.
+ * A graph input instance provide a set of predictable query methods for EPGM Elements
+ * Only elements fulfill predicate will be return by table server side
  *
- * @param <GFilter> graph factory
- * @param <VFilter> vertex factory
- * @param <EFilter> edge factory
+ * @param <GFilter>   graph element filter type
+ * @param <VFilter>   vertex element filter type
+ * @param <EFilter>   edge element filter type
+ * @see ElementQuery  EPGM element query formula
  */
 public interface EPGMGraphPredictableOutput<
   GFilter extends ElementFilter,
@@ -58,10 +61,10 @@ public interface EPGMGraphPredictableOutput<
   }
 
   /**
-   * get graphs by filter predicate
+   * Read graph elements from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
-   * @return edges
+   * @param query element query predicate
+   * @return Graph Heads
    */
   @Nonnull
   default ClosableIterator<GraphHead> getGraphSpace(
@@ -71,11 +74,11 @@ public interface EPGMGraphPredictableOutput<
   }
 
   /**
-   * get graphs by filter predicate
+   * Read graph elements from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
-   * @param cacheSize result cache size
-   * @return edges
+   * @param query element query predicate
+   * @param cacheSize client result cache size
+   * @return Graph Heads
    */
   @Nonnull
   ClosableIterator<GraphHead> getGraphSpace(
@@ -84,10 +87,10 @@ public interface EPGMGraphPredictableOutput<
   ) throws IOException;
 
   /**
-   * get vertices by filter predicate
+   * Read vertices from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
-   * @return vertices
+   * @param query element query predicate
+   * @return Vertices
    */
   @Nonnull
   default ClosableIterator<Vertex> getVertexSpace(
@@ -97,11 +100,11 @@ public interface EPGMGraphPredictableOutput<
   }
 
   /**
-   * get vertices by filter predicate
+   * Read vertices from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
+   * @param query element query predicate
    * @param cacheSize result cache size
-   * @return vertices
+   * @return Vertices
    */
   @Nonnull
   ClosableIterator<Vertex> getVertexSpace(
@@ -110,9 +113,9 @@ public interface EPGMGraphPredictableOutput<
   ) throws IOException;
 
   /**
-   * get edges by filter predicate
+   * Read edges from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
+   * @param query element query predicate
    * @return edges
    */
   @Nonnull
@@ -123,9 +126,9 @@ public interface EPGMGraphPredictableOutput<
   }
 
   /**
-   * get edges by filter predicate
+   * Read edges from the EPGMGraphOutput by element query
    *
-   * @param query filter predicate
+   * @param query element query predicate
    * @param cacheSize result cache size
    * @return edges
    */

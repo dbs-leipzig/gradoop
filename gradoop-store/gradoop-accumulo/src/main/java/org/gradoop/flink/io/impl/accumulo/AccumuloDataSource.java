@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Accumulo DataSource
+ * Read logic graph or graph collection from accumulo store
  */
 public class AccumuloDataSource extends AccumuloBase implements FilterableDataSource<
   ElementQuery<AccumuloElementFilter<GraphHead>>,
@@ -82,7 +82,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     @Nullable AccumuloQueryHolder<Vertex> vertexQuery,
     @Nullable AccumuloQueryHolder<Edge> edgeQuery
   ) {
-    super(store, store.getConfig());
+    super(store);
     this.graphHeadQuery = graphQuery;
     this.vertexQuery = vertexQuery;
     this.edgeQuery = edgeQuery;

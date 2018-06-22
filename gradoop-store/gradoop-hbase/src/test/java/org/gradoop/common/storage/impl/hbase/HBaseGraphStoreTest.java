@@ -228,6 +228,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // read from store
     Vertex v = graphStore.readVertex(vertexID);
+    assert v != null;
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(properties.size(), propertyKeys.size());
 
@@ -353,6 +354,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
+  @SuppressWarnings("Duplicates")
   private void validateEdge(
     HBaseEPGMStore graphStore,
     Edge originalEdge
@@ -363,18 +365,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     validateEPGMElements(originalEdge, loadedEdge);
     validateEPGMGraphElements(originalEdge, loadedEdge);
 
-    assertTrue(
-      "source vertex mismatch",
-      originalEdge.getSourceId().equals(
-        loadedEdge.getSourceId())
-    );
-
-    assertTrue(
-      "target vertex mismatch",
-      originalEdge.getTargetId().equals(
-        loadedEdge.getTargetId()
-      )
-    );
+    assert loadedEdge != null;
+    assertEquals("source vertex mismatch",
+      originalEdge.getSourceId(), loadedEdge.getSourceId());
+    assertEquals("target vertex mismatch",
+      originalEdge.getTargetId(), loadedEdge.getTargetId());
   }
 
 }

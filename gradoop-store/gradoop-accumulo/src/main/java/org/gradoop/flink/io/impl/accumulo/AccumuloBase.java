@@ -18,10 +18,9 @@ package org.gradoop.flink.io.impl.accumulo;
 
 import org.gradoop.common.config.GradoopAccumuloConfig;
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Base class for HBase data source and sink.
+ * Base class for Accumulo data source and sink.
  */
 abstract class AccumuloBase {
 
@@ -29,31 +28,18 @@ abstract class AccumuloBase {
    * Accumulo Store implementation
    */
   private final AccumuloEPGMStore epgmStore;
-  /**
-   * Gradoop Flink configuration
-   */
-  private final GradoopFlinkConfig config;
 
   /**
    * Creates a new Accumulo data source/sink.
    *
    * @param epgmStore store implementation
-   * @param config    Gradoop Flink configuration
    */
-  AccumuloBase(
-    AccumuloEPGMStore epgmStore,
-    GradoopFlinkConfig config
-  ) {
+  AccumuloBase(AccumuloEPGMStore epgmStore) {
     this.epgmStore = epgmStore;
-    this.config = config;
   }
 
   AccumuloEPGMStore getStore() {
     return epgmStore;
-  }
-
-  GradoopFlinkConfig getFlinkConfig() {
-    return config;
   }
 
   GradoopAccumuloConfig getAccumuloConfig() {

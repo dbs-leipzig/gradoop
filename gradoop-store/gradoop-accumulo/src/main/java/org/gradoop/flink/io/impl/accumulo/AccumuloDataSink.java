@@ -25,7 +25,7 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 /**
- * Accumulo DataSink
+ * Write graph or graph collection into accumulo store
  */
 public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
@@ -35,7 +35,7 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
    * @param store     store implementation
    */
   public AccumuloDataSink(AccumuloEPGMStore store) {
-    super(store, store.getConfig());
+    super(store);
   }
 
   @Override
@@ -67,10 +67,11 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
       new VertexOutputFormat(getAccumuloConfig().getAccumuloProperties()));
     graphCollection.getEdges().output(
       new EdgeOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-//    graphCollection.getEdges().output(
-//      new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-//    graphCollection.getEdges().output(
-//      new EdgeInOutputFormat(getAccumuloConfig().getAccumuloProperties()));
+    //add Edge-in and edge-out, TBD.
+    //graphCollection.getEdges().output(
+    //  new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
+    //graphCollection.getEdges().output(
+    //  new EdgeInOutputFormat(getAccumuloConfig().getAccumuloProperties()));
   }
 
 }

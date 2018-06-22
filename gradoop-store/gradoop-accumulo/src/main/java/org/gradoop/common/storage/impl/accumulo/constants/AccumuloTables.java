@@ -17,22 +17,22 @@
 package org.gradoop.common.storage.impl.accumulo.constants;
 
 /**
- * accumulo table store constants
+ * Accumulo table constants definition
  */
 public class AccumuloTables {
 
   /**
-   * gradoop edge table
+   * gradoop edge table name
    */
   public static final String EDGE = "edge";
 
   /**
-   * gradoop vertex table
+   * gradoop vertex table name
    */
   public static final String VERTEX = "vertex";
 
   /**
-   * gradoop graph head table
+   * gradoop graph head table name
    */
   public static final String GRAPH = "graph";
 

@@ -19,11 +19,12 @@ package org.gradoop.common.storage.iterator;
 import java.util.NoSuchElementException;
 
 /**
- * empty closable iterator
+ * Empty closable iterator
  *
  * @param <E> iterator element type
  */
 public class EmptyClosableIterator<E> implements ClosableIterator<E> {
+
   @Override
   public void close() {
     //do nothing
@@ -38,4 +39,5 @@ public class EmptyClosableIterator<E> implements ClosableIterator<E> {
   public E next() {
     throw new NoSuchElementException("iterator is empty!");
   }
+
 }

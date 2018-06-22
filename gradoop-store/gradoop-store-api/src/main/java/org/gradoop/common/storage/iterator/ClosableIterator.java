@@ -24,17 +24,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * closable iterator
+ * Common Closable Iterator.
  *
  * @param <E> element template
  */
 public interface ClosableIterator<E> extends Closeable, Iterator<E> {
 
   /**
-   * read element from iterator to list
+   * Read elements from closable iterator to list,
+   * both reading end or reading to max block size will return
    *
-   * @param size read max size
-   * @return read result
+   * @param size max reading size
+   * @return read elements result
    */
   @Nonnull
   default List<E> read(int size) {
@@ -46,9 +47,9 @@ public interface ClosableIterator<E> extends Closeable, Iterator<E> {
   }
 
   /**
-   * read all remains element in iterator
+   * Read all remains element in closable iterator and close
    *
-   * @return read result
+   * @return read elements result
    */
   @Nonnull
   default List<E> readRemainsAndClose() {

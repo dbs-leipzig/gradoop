@@ -25,21 +25,25 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /**
- * label filter predicate
+ * Predicate by label equality
+ * return element if and only if:
+ *  - label if not null
+ *  - given label ranges contain element's label value
  *
  * @param <FilterImpl> filter implement type
  */
-public abstract class LabelIn<FilterImpl extends ElementFilter> implements
-  ElementFilter<FilterImpl> {
+public abstract class LabelIn<FilterImpl extends ElementFilter>
+  implements ElementFilter<FilterImpl> {
 
   /**
-   * labels range
+   * epgm label range
    */
   private final Set<String> labels = new HashSet<>();
 
   /**
-   * label filter constructor
-   * @param labels label
+   * Create a new LabelIn predicate
+   *
+   * @param labels label range
    */
   protected LabelIn(String... labels) {
     assert labels.length > 0;

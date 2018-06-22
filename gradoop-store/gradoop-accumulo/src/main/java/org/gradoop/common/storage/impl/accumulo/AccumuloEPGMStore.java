@@ -50,7 +50,7 @@ import org.gradoop.common.storage.api.EPGMGraphPredictableOutput;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloRowHandler;
-import org.gradoop.common.storage.impl.accumulo.iterator.client.CacheClosableIterator;
+import org.gradoop.common.storage.impl.accumulo.iterator.client.ClientClosableIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
@@ -71,7 +71,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * accumulo store for apache accumulo
+ * Default Accumulo EPGM graph store that handles reading and writing vertices and
+ * graphs from and to Accumulo, It is designed thread-safe.
+ * Store contains instances are divided by {@link GradoopAccumuloConfig#ACCUMULO_TABLE_PREFIX}
+ *
+ * @see EPGMGraphPredictableOutput
  */
 public class AccumuloEPGMStore implements
   EPGMConfigProvider<GradoopAccumuloConfig>,
@@ -82,32 +86,32 @@ public class AccumuloEPGMStore implements
     AccumuloElementFilter<Edge>> {
 
   /**
-   * accumulo store log
+   * accumulo epgm store logger
    */
   private static final Logger LOG = LoggerFactory.getLogger(AccumuloEPGMStore.class);
 
   /**
-   * graph factory
+   * gradoop accumulo configuration
    */
   private final GradoopAccumuloConfig config;
 
   /**
-   * accumulo client conn
+   * accumulo client connector
    */
   private final Connector conn;
 
   /**
-   * graph table batch writer
+   * batch writer for epgm graph head table
    */
   private final BatchWriter graphWriter;
 
   /**
-   * vertex table batch writer
+   * batch writer for epgm vertex table
    */
   private final BatchWriter vertexWriter;
 
   /**
-   * edge table batch writer
+   * batch writer for epgm edge table
    */
   private final BatchWriter edgeWriter;
 
@@ -117,13 +121,17 @@ public class AccumuloEPGMStore implements
   private volatile boolean autoFlush;
 
   /**
-   * accumulo store implements
+   * Creates an AccumuloEPGMStore based on the given parameters.
+   * Tables with given prefix will be auto-create if not exists
    *
-   * @param config accumulo store configuration
-   * @throws AccumuloSecurityException AccumuloSecurityException
-   * @throws AccumuloException AccumuloException
+   * @param config                      accumulo store configuration
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
-  public AccumuloEPGMStore(GradoopAccumuloConfig config) throws
+  public AccumuloEPGMStore(@Nonnull GradoopAccumuloConfig config) throws
     AccumuloSecurityException, AccumuloException {
     this.config = config;
     this.conn = createConnector();
@@ -138,11 +146,14 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * create a accumulo client connector
+   * Create an accumulo client connector with given configuration
    *
    * @return accumulo client connector instance
-   * @throws AccumuloSecurityException if error
-   * @throws AccumuloException if error
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
     return new ZooKeeperInstance(
@@ -279,7 +290,7 @@ public class AccumuloEPGMStore implements
     if (!iterator.hasNext()) {
       return new EmptyClosableIterator<>();
     } else {
-      return new CacheClosableIterator<>(scanner,
+      return new ClientClosableIterator<>(scanner,
         new GradoopGraphHeadIterator(),
         config.getGraphHandler(),
         cacheSize);
@@ -310,7 +321,7 @@ public class AccumuloEPGMStore implements
     if (!iterator.hasNext()) {
       return new EmptyClosableIterator<>();
     } else {
-      return new CacheClosableIterator<>(scanner,
+      return new ClientClosableIterator<>(scanner,
         new GradoopVertexIterator(),
         config.getVertexHandler(),
         cacheSize);
@@ -341,7 +352,7 @@ public class AccumuloEPGMStore implements
     if (!iterator.hasNext()) {
       return new EmptyClosableIterator<>();
     } else {
-      return new CacheClosableIterator<>(scanner,
+      return new ClientClosableIterator<>(scanner,
         new GradoopEdgeIterator(),
         config.getEdgeHandler(),
         cacheSize);
@@ -349,12 +360,12 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * write record to accumulo
+   * Write an EPGM Element instance into table
    *
-   * @param record gradoop element
-   * @param writer  batch writer
+   * @param record  gradoop EPGM element
+   * @param writer  accumulo batch writer
    * @param handler accumulo row handler
-   * @param <T> element type
+   * @param <T>     element type
    */
   private <T extends EPGMElement> void writeRecord(
     @Nonnull T record,
@@ -375,7 +386,7 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * create accumulo batch scanner with element predicate
+   * Create accumulo batch scanner with element predicate
    *
    * @param table  table name
    * @param iterator iterator class
@@ -426,10 +437,13 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * init create tables if they are not exists
+   * Create tables (and their namespaces, if defined by table prefix) if not exists
    *
-   * @throws AccumuloSecurityException AccumuloSecurityException
-   * @throws AccumuloException AccumuloException
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   private void createTablesIfNotExists() throws AccumuloSecurityException, AccumuloException {
     String prefix =
@@ -458,7 +472,7 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * write edge out
+   * Write an edge-out link record into vertex table
    *
    * @param record epgm edge record
    */
@@ -475,7 +489,7 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * write edge in
+   * Write an edge-in link record into vertex table
    *
    * @param record epgm edge record
    */

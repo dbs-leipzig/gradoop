@@ -25,7 +25,7 @@ import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import java.util.Properties;
 
 /**
- * edge out output format
+ * Edge-In OutputFormat
  */
 public class EdgeOutOutputFormat extends BaseOutputFormat<Edge> {
 
@@ -40,7 +40,7 @@ public class EdgeOutOutputFormat extends BaseOutputFormat<Edge> {
   private transient AccumuloVertexHandler handler;
 
   /**
-   * base output format constructor
+   * Create a new output format for gradoop edge-out
    *
    * @param properties accumulo properties
    */

@@ -20,7 +20,10 @@ import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 import java.util.regex.Pattern;
 
 /**
- * label filter by regex
+ * Predicate by label regex matching
+ * return element if and only if:
+ *  - label if not null
+ *  - label match given regex formula
  *
  * @param <FilterImpl> filter implement type
  */
@@ -28,12 +31,12 @@ public abstract class LabelReg<FilterImpl extends ElementFilter>
   implements ElementFilter<FilterImpl> {
 
   /**
-   * regex pattern
+   * epgm label regex pattern
    */
   private final Pattern reg;
 
   /**
-   * label regex filter constructor
+   * Create a new LabelReg predicate
    *
    * @param reg label regex
    */

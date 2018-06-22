@@ -71,7 +71,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
    * create a predicate within a certain id ranges
    *
    * @param query element query
-   * @param <T> epgm element type
+   * @param <T>   epgm element type
    * @return accumulo predicate
    */
   public static <T extends EPGMElement> AccumuloQueryHolder<T> create(
@@ -91,9 +91,9 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
   /**
    * create a predicate within a certain accumulo id ranges
    *
-   * @param idRanges gradoop row-id ranges for query element
-   * @param reduceFilter reducer filter logic
-   * @param <T> epgm element type
+   * @param idRanges      gradoop row-id ranges for query element
+   * @param reduceFilter  reducer filter logic
+   * @param <T>           epgm element type
    * @return accumulo predicate
    */
   public static <T extends EPGMElement> AccumuloQueryHolder<T> create(
@@ -132,7 +132,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
   }
 
   /**
-   * range wrapper definition
+   * range wrapper definition, just for request transport
    */
   private static class RangeWrapper {
 

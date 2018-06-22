@@ -19,7 +19,7 @@ package org.gradoop.common.storage.predicate.query;
 import javax.annotation.Nonnull;
 
 /**
- * common query builder
+ * Common Store Query Builder
  */
 public class Query {
 

@@ -21,7 +21,11 @@ import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
 /**
- * property filter by regex
+ * Predicate by property value regex
+ * return element if and only if:
+ *  - contains property value
+ *  - property value type is string
+ *  - property value match given regex formula
  *
  * @param <FilterImpl> filter implement type
  */

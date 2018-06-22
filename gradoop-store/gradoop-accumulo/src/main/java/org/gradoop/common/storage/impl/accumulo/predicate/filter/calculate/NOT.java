@@ -19,7 +19,6 @@ package org.gradoop.common.storage.impl.accumulo.predicate.filter.calculate;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
-
 /**
  * negative logic filter
  *
@@ -33,7 +32,7 @@ public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T
   private final AccumuloElementFilter<T> predicate;
 
   /**
-   * predicate to be conjunction
+   * Create a new predicate to be conjunction
    *
    * @param predicate predicate
    */
@@ -42,7 +41,7 @@ public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * create a negative formula
+   * Create a negative formula
    *
    * @param predicate negative predicate
    * @param <T> input type

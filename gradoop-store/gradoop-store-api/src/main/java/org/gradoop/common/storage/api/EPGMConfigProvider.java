@@ -19,7 +19,7 @@ package org.gradoop.common.storage.api;
 import org.gradoop.common.storage.config.GradoopStoreConfig;
 
 /**
- * store configuration provider
+ * Definition of gradoop EPGM store configuration holder
  *
  * @param <C> configuration type
  */

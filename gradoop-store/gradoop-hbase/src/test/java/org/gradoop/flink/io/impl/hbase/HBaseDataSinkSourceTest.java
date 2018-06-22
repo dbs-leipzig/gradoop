@@ -27,7 +27,6 @@ import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.Test;
@@ -101,10 +100,13 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     loader.initDatabaseFromStream(inputStream);
 
-    EPGMDatabase epgmDB = loader.getDatabase();
-
-    // write social graph to HBase via EPGM database
-    epgmDB.writeTo(new HBaseDataSink(epgmStore, config));
+    new HBaseDataSink(epgmStore, config).write(epgmStore
+      .getConfig()
+      .getGraphCollectionFactory()
+      .fromCollections(
+        loader.getGraphHeads(),
+        loader.getVertices(),
+        loader.getEdges()));
 
     getExecutionEnvironment().execute();
 

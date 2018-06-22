@@ -25,7 +25,7 @@ import org.gradoop.common.storage.impl.accumulo.handler.AccumuloGraphHandler;
 import java.util.Properties;
 
 /**
- * gradoop accumulo graph head output format
+ * Graph Head OutputFormat, write graph head data set into accumulo store
  */
 public class GraphHeadOutputFormat extends BaseOutputFormat<GraphHead> {
 
@@ -40,7 +40,7 @@ public class GraphHeadOutputFormat extends BaseOutputFormat<GraphHead> {
   private transient AccumuloGraphHandler handler;
 
   /**
-   * graph head output format handler
+   * Create a new output format for gradoop graph head
    *
    * @param properties accumulo properties
    */

@@ -23,7 +23,6 @@ import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 
-
 /**
  * accumulo graph head handler for row's read/write operator
  */

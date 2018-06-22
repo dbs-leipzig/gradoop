@@ -20,10 +20,13 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.storage.api.EPGMGraphOutput;
+import org.gradoop.common.storage.api.EPGMGraphPredictableOutput;
 import org.gradoop.common.storage.iterator.ClosableIterator;
 import org.gradoop.common.storage.impl.accumulo.handler.AccumuloRowHandler;
 import org.gradoop.common.storage.impl.accumulo.iterator.tserver.BaseElementIterator;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,12 +34,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * cache iterator for accumulo scanner's result
+ * Accumulo client closable iterator.
+ * This Iterator will be create in client runtime, when executing a store output query. A client
+ * closable iterator will transform accumulo result entry into required EPGM element type. The
+ * query result will always be fetch block by block for better performance. And the
+ * block size for result is called cache size.
  *
- * @param <R> EPGM Element as reading result
- * @param <E> EPGM Element as reading src (from remote)
+ * @param <R> EPGM Element type for reading result
+ * @param <E> EPGM Element type for reading source (remote definition)
+ * @see EPGMGraphOutput
+ * @see EPGMGraphPredictableOutput
  */
-public class CacheClosableIterator<R extends EPGMElement, E extends EPGMElement>
+public class ClientClosableIterator<R extends EPGMElement, E extends EPGMElement>
   implements ClosableIterator<R> {
 
   /**
@@ -77,10 +86,10 @@ public class CacheClosableIterator<R extends EPGMElement, E extends EPGMElement>
    * @param handler result element row handler
    * @param cacheSize result cache size
    */
-  public CacheClosableIterator(
-    BatchScanner scanner,
-    BaseElementIterator<E> codec,
-    AccumuloRowHandler<R, E> handler,
+  public ClientClosableIterator(
+    @Nonnull BatchScanner scanner,
+    @Nonnull BaseElementIterator<E> codec,
+    @Nonnull AccumuloRowHandler<R, E> handler,
     int cacheSize
   ) {
     this.codec = codec;

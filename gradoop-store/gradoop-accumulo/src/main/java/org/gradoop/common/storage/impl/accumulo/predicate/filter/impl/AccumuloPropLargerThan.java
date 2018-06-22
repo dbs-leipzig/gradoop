@@ -21,18 +21,17 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.common.storage.predicate.filter.impl.PropLargerThan;
 
-
 /**
- * property larger than min filter
+ * Accumulo property value compare predicate implement
  *
- * @param <T> input type
+ * @param <T> EPGM element type
  */
 public class AccumuloPropLargerThan<T extends EPGMElement>
   extends PropLargerThan<AccumuloElementFilter<T>>
   implements AccumuloElementFilter<T> {
 
   /**
-   * property larger than constructor
+   * Create a new property compare filter
    *
    * @param key property key
    * @param min property min value

@@ -22,7 +22,10 @@ import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 import javax.annotation.Nonnull;
 
 /**
- * assert property value equals
+ * Predicate by property equality
+ * return element if and only if:
+ *  - contains property key
+ *  - property value equals to given value
  *
  * @param <FilterImpl> filter implement type
  */

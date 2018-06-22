@@ -16,22 +16,21 @@
 
 package org.gradoop.common.storage.impl.accumulo.predicate.filter.impl;
 
-
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.common.storage.predicate.filter.impl.LabelIn;
 
 /**
- * label filter predicate
+ * Accumulo label equality predicate implement
  *
- * @param <T> epgm element type
+ * @param <T> EPGM element type
  */
 public class AccumuloLabelIn<T extends EPGMElement>
   extends LabelIn<AccumuloElementFilter<T>>
   implements AccumuloElementFilter<T> {
 
   /**
-   * label filter constructor
+   * Create a new label equality filter
    *
    * @param labels label
    */

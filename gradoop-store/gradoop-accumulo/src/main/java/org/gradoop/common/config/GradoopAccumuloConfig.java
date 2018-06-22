@@ -215,7 +215,7 @@ public class GradoopAccumuloConfig extends
   }
 
   /**
-   * get edge table name
+   * Get edge table name
    *
    * @return edge table name
    */
@@ -224,7 +224,7 @@ public class GradoopAccumuloConfig extends
   }
 
   /**
-   * get vertex table name
+   * Get vertex table name
    *
    * @return vertex table name
    */
@@ -233,7 +233,7 @@ public class GradoopAccumuloConfig extends
   }
 
   /**
-   * get graph head table name
+   * Get graph head table name
    *
    * @return graph head table name
    */

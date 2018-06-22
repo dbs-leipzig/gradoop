@@ -26,7 +26,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.FixMethodOrder;
@@ -102,8 +101,13 @@ public class IOBasicTest extends GradoopFlinkTestBase {
       GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
 
     loader.initDatabaseFromStream(inputStream);
-    EPGMDatabase epgmDB = loader.getDatabase();
-    epgmDB.writeTo(new AccumuloDataSink(accumuloStore));
+    new AccumuloDataSink(accumuloStore).write(accumuloStore
+      .getConfig()
+      .getGraphCollectionFactory()
+      .fromCollections(
+        loader.getGraphHeads(),
+        loader.getVertices(),
+        loader.getEdges()));
     getExecutionEnvironment().execute();
     accumuloStore.flush();
 

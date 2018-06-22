@@ -19,7 +19,7 @@ package org.gradoop.common.storage.impl.accumulo.constants;
 import org.apache.accumulo.core.security.Authorizations;
 
 /**
- * default accumulo configure(if without configuration)
+ * Default Accumulo configuration (auto config value)
  */
 public class AccumuloDefault {
 
