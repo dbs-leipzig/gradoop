@@ -2,30 +2,24 @@ package org.gradoop.flink.io.impl.rdbms;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.types.Row;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.rdbms.connect.FlinkConnect;
 import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConnect;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeleteFKs;
+import org.gradoop.flink.io.impl.rdbms.functions.EdgeToEdgeComplement;
 import org.gradoop.flink.io.impl.rdbms.functions.FKandProps;
 import org.gradoop.flink.io.impl.rdbms.functions.TableFilter;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple2ToEdge;
@@ -99,7 +93,7 @@ public class RDBMSDataSource implements DataSource {
 					}
 				}
 			}
-
+			
 			/*
 			 * dataset representation of the created sets
 			 */
@@ -174,19 +168,20 @@ public class RDBMSDataSource implements DataSource {
 				 */
 				else {
 					
-					//represents (n:m) relation (foreign key one, foreign key two and belonging proerties)
+					//represents (n:m) relation (foreign key one, foreign key two and belonging properties)
 					DataSet<Tuple3<String,String,Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(tePos))
 							.withBroadcastSet(dsTablesToEdges, "tables");
 									
-					//set of foreign key one vertices representation
+					//set of node's gradoop id, primary key belonging to foreign key one
 					DataSet<IdKeyTuple> idFkTableOne = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(0).getName())))
 							.map(new VertexToIdPkTuple());
 
-					//set of foreign key two vertices representation
+					//set of node's gradoop id, primary key belonging to foreign key two 
 					DataSet<IdKeyTuple> idFkTableTwo = vertices.filter(new TableFilter(table.getForeignKeys().get(table.getRowHeader().getForeignKeyHeader().get(1).getName())))
 							.map(new VertexToIdPkTuple());
 					
-					DataSet<Edge> dsFKEdges = fkPropsTable.join(idFkTableOne)
+					//join keys with belonging gradoop ids to get new edges
+					DataSet<Edge> dsTupleEdges = fkPropsTable.join(idFkTableOne)
 							.where(0)
 							.equalTo(1)
 							.map(new Tuple2ToIdFkWithProps())
@@ -196,10 +191,15 @@ public class RDBMSDataSource implements DataSource {
 							.map(new Tuple3ToEdge(table.getTableName()));
 										
 					if (edges == null) {
-						edges = dsFKEdges;
+						edges = dsTupleEdges;
 					} else {
-						edges = edges.union(dsFKEdges);
+						edges = edges.union(dsTupleEdges);
 					}
+					
+					//create other direction edges
+					DataSet<Edge> dsTupleEdges2 = dsTupleEdges.map(new EdgeToEdgeComplement());
+					
+					edges = edges.union(dsTupleEdges2);
 				}
 				tePos++;
 			}
