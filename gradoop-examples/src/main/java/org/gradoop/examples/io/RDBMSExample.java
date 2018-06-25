@@ -69,10 +69,12 @@ public class RDBMSExample implements ProgramDescription {
 			schema.writeTo(new JSONDataSink(outputPath + getDateString() + urlParser(url),gfc));
 			
 			// execute program
-			JobExecutionResult result = env.execute();
-			PrintWriter printer = new PrintWriter(new FileWriter("/home/pc/01 Uni/8. Semester/Bachelorarbeit/Out/Time/"+getDateString()+"time"));
-			printer.write(String.valueOf(result.getNetRuntime(TimeUnit.MILLISECONDS)));
-			printer.close();
+			env.execute();
+			
+//			JobExecutionResult result = env.execute();
+//			PrintWriter printer = new PrintWriter(new FileWriter("/home/pc/01 Uni/8. Semester/Bachelorarbeit/Out/Time/"+getDateString()+"time"));
+//			printer.write(String.valueOf(result.getNetRuntime(TimeUnit.MILLISECONDS)));
+//			printer.close();
     }	
 	
 	/*
