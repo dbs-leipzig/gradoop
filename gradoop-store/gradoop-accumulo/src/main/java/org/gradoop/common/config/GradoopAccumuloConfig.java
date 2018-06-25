@@ -241,4 +241,9 @@ public class GradoopAccumuloConfig extends
     return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.GRAPH;
   }
 
+  @Override
+  public String toString() {
+    return accumuloProperties.toString();
+  }
+
 }

@@ -35,7 +35,7 @@ import java.util.Map;
 
 /**
  * Accumulo client closable iterator.
- * This Iterator will be create in client runtime, when executing a store output query. A client
+ * This Iterator will be created in client runtime, when executing a store output query. A client
  * closable iterator will transform accumulo result entry into required EPGM element type. The
  * query result will always be fetch block by block for better performance. And the
  * block size for result is called cache size.

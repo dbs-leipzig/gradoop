@@ -36,7 +36,7 @@ import java.util.Map;
 
 /**
  * Accumulo Tablet Server Iterator
- * This Iterator will be create in accumulo tablet server runtime, when executing a partition
+ * This Iterator will be created in accumulo tablet server runtime, when executing a partition
  * range query. A Gradoop Element iterator will decode query options as query filter, transform
  * multi-rows into epgm element and check if this element should be return by predicate. Each
  * element that fulfill the predicate will be serialized into one row.

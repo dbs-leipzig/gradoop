@@ -22,6 +22,8 @@ import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Element Query Formula
@@ -98,6 +100,19 @@ public class ElementQuery<FilterImpl extends ElementFilter> {
     @Nonnull
     public BuilderWithRange fromAll() {
       return new BuilderWithRange(null);
+    }
+
+    /**
+     * query element in a certain id range set
+     *
+     * @param gradoopIds query range
+     * @return element query with a certain range
+     */
+    @Nonnull
+    public BuilderWithRange fromSets(@Nonnull Collection<String> gradoopIds) {
+      return new BuilderWithRange(GradoopIdSet.fromExisting(gradoopIds.stream()
+        .map(GradoopId::fromString)
+        .collect(Collectors.toSet())));
     }
 
     /**
