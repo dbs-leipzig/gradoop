@@ -23,7 +23,7 @@ public class RDBMSTable implements Serializable, Cloneable {
 	private String tableName;
 	
 	// storing all primary key names 
-	private LinkedHashSet<String> primaryKeys;
+	private ArrayList<String> primaryKeys;
 	
 	// storing all foreign key names and belonging referenced table names
 	private LinkedHashMap<String, String> foreignKeys;
@@ -48,7 +48,7 @@ public class RDBMSTable implements Serializable, Cloneable {
 	 * @param numberOfRows number of rows of the rdbms table
 	 * @param jdbcTypes jdbcTypes of attribute 
 	 */
-	public RDBMSTable(String tableName, LinkedHashSet<String> primaryKeys, LinkedHashMap<String, String> foreignKeys,
+	public RDBMSTable(String tableName, ArrayList<String> primaryKeys, LinkedHashMap<String, String> foreignKeys,
 			LinkedHashMap<String, JDBCType> attributes, Boolean directionIndicator, int numberOfRows,
 			ArrayList<JDBCType> jdbcTypes) {
 		this.tableName = tableName;
@@ -64,7 +64,7 @@ public class RDBMSTable implements Serializable, Cloneable {
 	 * basic constructor
 	 */
 	public RDBMSTable() {
-		this.primaryKeys = new LinkedHashSet<String>();
+		this.primaryKeys = new ArrayList<String>();
 		this.foreignKeys = new LinkedHashMap<String, String>();
 		this.attributes = new LinkedHashMap<String, JDBCType>();
 		this.jdbcTypes = new ArrayList<JDBCType>();
@@ -201,11 +201,11 @@ public class RDBMSTable implements Serializable, Cloneable {
 		this.tableName = tableName;
 	}
 
-	public LinkedHashSet<String> getPrimaryKey() {
+	public ArrayList<String> getPrimaryKey() {
 		return primaryKeys;
 	}
 
-	public void setPrimaryKey(LinkedHashSet<String> primaryKey) {
+	public void setPrimaryKey(ArrayList<String> primaryKey) {
 		this.primaryKeys = primaryKey;
 	}
 
@@ -253,7 +253,7 @@ public class RDBMSTable implements Serializable, Cloneable {
 	 * returns clone of rdbms table
 	 */
 	public RDBMSTable clone() {
-		return new RDBMSTable(tableName, (LinkedHashSet<String>) primaryKeys.clone(),
+		return new RDBMSTable(tableName, (ArrayList<String>) primaryKeys.clone(),
 				(LinkedHashMap<String, String>) foreignKeys.clone(),
 				(LinkedHashMap<String, JDBCType>) attributes.clone(), directionIndicator, numberOfRows, jdbcTypes);
 	}

@@ -67,7 +67,7 @@ public class FlinkConnect {
 		if(tableoredge.equals(RDBMSConstants.NODE_TABLE)){
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()
-					.setDrivername("org.gradoop.flink.io.impl.rdbms.jdbcdriver.DriverShim")
+					.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
 					.setDBUrl(rdbmsConfig.f0)
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)
@@ -83,7 +83,7 @@ public class FlinkConnect {
 		if(tableoredge.equals(RDBMSConstants.EDGE_TABLE)){
 			jdbcInput = JDBCInputFormat
 					.buildJDBCInputFormat()
-					.setDrivername("org.gradoop.flink.io.impl.rdbms.jdbcdriver.DriverShim")
+					.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
 					.setDBUrl(rdbmsConfig.f0)
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)

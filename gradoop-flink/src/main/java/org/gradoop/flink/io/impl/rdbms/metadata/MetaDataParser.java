@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
 
@@ -50,44 +51,49 @@ public class MetaDataParser {
 				 * storing primary keys of the table
 				 */
 				ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
-				HashSet<String> primaryKeySet = new HashSet<String>();
+//				HashSet<String> primaryKeySet = new HashSet<String>();
+				ArrayList<String> primaryKeys = new ArrayList<String>();
 				while (rsPrimaryKeys.next()) {
-					primaryKeySet.add(rsPrimaryKeys.getString("COLUMN_NAME"));
+//					primaryKeySet.add(rsPrimaryKeys.getString("COLUMN_NAME"));
+					primaryKeys.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 				}
+				table.setPrimaryKey(primaryKeys);
 
 				/*
 				 * storing foreignkeys of the table 
 				 */
 				ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
-				HashMap<String, String> foreignKeySet = new HashMap<String, String>();
+				LinkedHashMap<String, String> foreignKeys = new LinkedHashMap<String, String>();
 				while (rsForeignKeys.next()) {
-					foreignKeySet.put(rsForeignKeys.getString("FKCOLUMN_NAME"),
+					foreignKeys.put(rsForeignKeys.getString("FKCOLUMN_NAME"),
 							rsForeignKeys.getString("PKTABLE_NAME"));
 				}
+				table.setForeignKeys(foreignKeys);
+				
 
 				/*
 				 * storing every attributename in the table 
 				 */
 				ResultSet rsColumns = metadata.getColumns(null, null, tableName, null);
-				ArrayList<String> columns = new ArrayList<String>();
+//				ArrayList<String> columns = new ArrayList<String>();
 				while (rsColumns.next()) {
-					String schemaType = rsColumns.getString("COLUMN_NAME");
-					columns.add(schemaType);
-					table.getAttributes().put(schemaType,
+					String attName = rsColumns.getString("COLUMN_NAME");
+//					columns.add(schemaType);
+					table.getAttributes().put(attName,
 							JDBCType.valueOf(Integer.parseInt(rsColumns.getString("DATA_TYPE"))));
 				}
 
-				/*
-				 * add primary and foreign key's position in the table (needed for accessing fields via JDBCInputFormat)
-				 */
-				for (String cols : columns) {
-					if (primaryKeySet.contains(cols)) {
-						table.getPrimaryKey().add(cols);
-					}
-					if (foreignKeySet.containsKey(cols)) {
-						table.getForeignKeys().put(cols, foreignKeySet.get(cols));
-					}
-				}
+//				/*
+//				 * add primary and foreign key's position in the table (needed for accessing fields via JDBCInputFormat)
+//				 */
+//				for (String cols : columns) {
+//					if (primaryKeySet.contains(cols)) {
+//						table.getPrimaryKey().add(cols);
+//					}
+//					if (foreignKeySet.containsKey(cols)) {
+//						table.getForeignKeys().put(cols, foreignKeySet.get(cols));
+//					}
+//				}
 				
 				/*
 				 * set the number of table's rows (needed for distributing/ pageination in queriing via JDBCInputFormat)
