@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.functions;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.sql.JDBCType;
 

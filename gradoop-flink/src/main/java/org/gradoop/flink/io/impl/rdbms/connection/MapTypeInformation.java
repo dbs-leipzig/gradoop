@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.functions;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.sql.JDBCType;
 import java.sql.SQLInput;
@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 
 /**
  * creates RowTypeInfo from given JDBCTypes

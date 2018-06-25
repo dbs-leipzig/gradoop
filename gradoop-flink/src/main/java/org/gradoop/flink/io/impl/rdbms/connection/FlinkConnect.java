@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.connect;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.io.Serializable;
 
@@ -12,9 +12,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
-import org.gradoop.flink.io.impl.rdbms.functions.MapTypeInformation;
-import org.gradoop.flink.io.impl.rdbms.jdbcdriver.RegisterDriver;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 

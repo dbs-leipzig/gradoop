@@ -9,8 +9,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
-import org.gradoop.flink.io.impl.rdbms.tuples.RowHeader;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 
 public class FKandProps extends RichMapFunction<Row, Tuple3<String, String, Properties>> {
 	List<RDBMSTable> table;

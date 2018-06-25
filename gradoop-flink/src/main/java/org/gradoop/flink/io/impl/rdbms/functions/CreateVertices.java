@@ -8,8 +8,8 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
-import org.gradoop.flink.io.impl.rdbms.tuples.RowHeader;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 
 /**
  * converts tuples of sql query result to vertices

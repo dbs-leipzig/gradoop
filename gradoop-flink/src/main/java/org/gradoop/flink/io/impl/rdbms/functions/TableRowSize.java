@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 
 public class TableRowSize {
 	int tableRowSize;

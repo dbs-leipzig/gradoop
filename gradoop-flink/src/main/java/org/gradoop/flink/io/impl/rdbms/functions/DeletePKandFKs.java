@@ -6,11 +6,11 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 
-public class DeleteFKs extends RichMapFunction<Vertex,Vertex> {
+public class DeletePKandFKs extends RichMapFunction<Vertex,Vertex> {
 	int tPos;
 	ArrayList<String> fkProps;
 	
-	public DeleteFKs(ArrayList<String> fkProps){
+	public DeletePKandFKs(ArrayList<String> fkProps){
 		this.tPos = tPos;
 		this.fkProps = fkProps;
 	}
@@ -19,7 +19,7 @@ public class DeleteFKs extends RichMapFunction<Vertex,Vertex> {
 		// TODO Auto-generated method stub
 		Properties newProps = new Properties();
 		for(Property prop : v1.getProperties()){
-			if(!fkProps.contains(prop.getKey())){
+			if(!fkProps.contains(prop.getKey()) && !prop.getKey().equals("PrimaryKey")){
 				newProps.set(prop);
 			}
 		}

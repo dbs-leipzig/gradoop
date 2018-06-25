@@ -21,7 +21,7 @@ import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.io.impl.rdbms.RDBMSDataSource;
-import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConfig;
+import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;

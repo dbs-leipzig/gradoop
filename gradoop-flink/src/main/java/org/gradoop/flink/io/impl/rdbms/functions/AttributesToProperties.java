@@ -7,11 +7,11 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
-import org.gradoop.flink.io.impl.rdbms.tuples.RowHeader;
+import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**
- * collects the arrtibutes of a given database tuple and stores it as properties
+ * collects the attributes of a given database tuple and stores it as properties
  * 
  * @author pc
  *

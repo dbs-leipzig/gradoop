@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.types.Row;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
-import org.gradoop.flink.io.impl.rdbms.tuples.RowHeader;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**

@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.functions;
+package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
 
 /**
  * Determines rdbms' metadata 
  * @author pc
  *
  */
-public class MetaData {
+public class MetaDataParser {
 
 	/**
 	 * Queries rdbms' metadata 
@@ -28,15 +28,18 @@ public class MetaData {
 		ArrayList<RDBMSTable> tables = new ArrayList<RDBMSTable>();
 		ResultSet rsTables = metadata.getTables(null, null, "%", new String[]{"TABLE"});
 		ResultSet schema = metadata.getSchemas();
+		
 		/*
 		 * iterate over all tables of the connected rdbms
 		 */
 		while (rsTables.next()) {
+			
 			/*
 			 * only tables going to convert (e.g. no views,...)
 			 */
 			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
 				String tableName = rsTables.getString("TABLE_NAME");
+				
 				/*
 				 * create new rdbms table representation
 				 */
@@ -90,14 +93,22 @@ public class MetaData {
 				 * set the number of table's rows (needed for distributing/ pageination in queriing via JDBCInputFormat)
 				 */
 				table.setNumberOfRows(TableRowSize.getTableRowSize(con, tableName));
+				
+				/*
+				 * set edge direction
+				 */
 				if(table.getForeignKeys().size() == 2){
+					// for n:m relations
 					table.setDirectionIndicator(false);
 				}else{
+					// for 1:1,1:n relations
 					table.setDirectionIndicator(true);
 				}
+				
 				tables.add(table);
 			}
 		}
+		
 		return tables;
 	}
 }

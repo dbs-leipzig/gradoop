@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.jdbcdriver;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.sql.Connection;
 import java.sql.Driver;

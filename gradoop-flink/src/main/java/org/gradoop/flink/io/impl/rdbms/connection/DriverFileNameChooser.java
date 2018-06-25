@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.connect;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 /**
  * simple parsing from given jdbc url to provided driver jar name 

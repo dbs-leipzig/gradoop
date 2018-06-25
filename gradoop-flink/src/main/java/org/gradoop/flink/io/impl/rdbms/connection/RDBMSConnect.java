@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.connect;
+package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -12,8 +12,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
-import org.gradoop.flink.io.impl.rdbms.jdbcdriver.DriverShim;
-import org.gradoop.flink.io.impl.rdbms.jdbcdriver.RegisterDriver;
+import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 
 /**
  * Class for connecting to a rdbms via jdbc

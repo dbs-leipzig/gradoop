@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.connect;
+package org.gradoop.flink.io.impl.rdbms.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 

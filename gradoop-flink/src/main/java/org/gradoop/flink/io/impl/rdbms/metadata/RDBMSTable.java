@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.tuples;
+package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.io.Serializable;
 import java.sql.JDBCType;
@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**
  * basic representation of an rdbms table storing important metadata informations

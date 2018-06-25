@@ -13,35 +13,41 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.rdbms.connect.FlinkConnect;
-import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConfig;
-import org.gradoop.flink.io.impl.rdbms.connect.RDBMSConnect;
+import org.gradoop.flink.io.impl.rdbms.connection.FlinkConnect;
+import org.gradoop.flink.io.impl.rdbms.connection.RDBMSConnect;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
-import org.gradoop.flink.io.impl.rdbms.functions.DeleteFKs;
+import org.gradoop.flink.io.impl.rdbms.functions.DeletePKandFKs;
 import org.gradoop.flink.io.impl.rdbms.functions.EdgeToEdgeComplement;
 import org.gradoop.flink.io.impl.rdbms.functions.FKandProps;
-import org.gradoop.flink.io.impl.rdbms.functions.SequentialMetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.functions.TableFilter;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple2ToEdge;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple2ToIdFkWithProps;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple3ToEdge;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdFkTuple;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdPkTuple;
-import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSMetadata;
+import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
 /**
  * Transforms a relational database into an EPGM database.
  *
  */
 public class RDBMSDataSource implements DataSource {
+	
+	// standard gradoop flink config
 	private GradoopFlinkConfig config;
+	
+	// config storing rdbms' url,user,pw informations
 	private RDBMSConfig rdbmsConfig;
+	
+	// standard flink execution environment
 	private ExecutionEnvironment env;
 
 	/**
@@ -74,7 +80,7 @@ public class RDBMSDataSource implements DataSource {
 			/*
 			 * list of rdbms tables storing conversion important metadata of every database table
 			 */
-			ArrayList<RDBMSTable> tables = SequentialMetaDataParser.parse(con.getMetaData(), con);
+			ArrayList<RDBMSTable> tables = MetaDataParser.parse(con.getMetaData(), con);
 		
 			/*
 			 * tables convert to nodes
@@ -155,7 +161,7 @@ public class RDBMSDataSource implements DataSource {
 						DataSet<IdKeyTuple> pkTable = vertices.filter(new TableFilter(fk.getValue()))
 								.map(new VertexToIdPkTuple());
 						
-						//join tables to get the matches of foreign key and primary key values 
+						//join tables to get the matches of foreign key and primary key values of referencing and referenced table
 						DataSet<Edge> dsFKEdges = fkTable.join(pkTable)
 								.where(1)
 								.equalTo(1)
@@ -212,7 +218,7 @@ public class RDBMSDataSource implements DataSource {
 			}
 			
 			/*
-			 * delete all foreign key properties from vertices 
+			 * delete all primary key property and foreign key properties from vertices 
 			 */
 			for(RDBMSTable table : tablesToNodes){
 				ArrayList<String> fkProps = new ArrayList<String>();
@@ -220,9 +226,9 @@ public class RDBMSDataSource implements DataSource {
 					fkProps.add(rht.getName());
 				}
 				if(finalVertices == null){
-					finalVertices = vertices.filter(new TableFilter(table.getTableName())).map(new DeleteFKs(fkProps));
+					finalVertices = vertices.filter(new TableFilter(table.getTableName())).map(new DeletePKandFKs(fkProps));
 				}else{
-					finalVertices = finalVertices.union(vertices.filter(new TableFilter(table.getTableName())).map(new DeleteFKs(fkProps)));
+					finalVertices = finalVertices.union(vertices.filter(new TableFilter(table.getTableName())).map(new DeletePKandFKs(fkProps)));
 				}
 			}
 		} catch (Exception e) {
