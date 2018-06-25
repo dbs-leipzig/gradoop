@@ -18,12 +18,21 @@ import org.apache.flink.api.java.tuple.Tuple4;
  *
  */
 public class RDBMSTable implements Serializable, Cloneable {
-
+	
 	private String tableName;
+	
+	// storing all primary key names 
 	private LinkedHashSet<String> primaryKeys;
+	
+	// storing all foreign key names and belonging referenced table names
 	private LinkedHashMap<String, String> foreignKeys;
+	
+	// storing all attribute names and belonging jdbc data type (primary key and foreign key attributes included)
 	private LinkedHashMap<String, JDBCType> attributes;
+	
+	// direction indicator needed to distinguish 1:1/1:n and n:m relations
 	private Boolean directionIndicator;
+	
 	private int numberOfRows;
 	private RowHeader rowHeader;
 	private ArrayList<JDBCType> jdbcTypes;
@@ -32,11 +41,11 @@ public class RDBMSTable implements Serializable, Cloneable {
 	 * constructor
 	 * @param tableName name of the rdbms table	
 	 * @param primaryKeys set of primary keys of rdbms table
-	 * @param foreignKeys set of foreign keys of rdbms table
-	 * @param attributes set of attributes of rdbms table (primary/ foreign key included)
+	 * @param foreignKeys map of foreign key names and belonging referenced table name
+	 * @param attributes map of attribute names and belongign jdbc data type (primary and foreign keys included)
 	 * @param directionIndicator true if 1:1,1:n relation, false if n:m relation
 	 * @param numberOfRows number of rows of the rdbms table
-	 * @param jdbcTypes jdbcTypes of attribute values of rdbms table
+	 * @param jdbcTypes jdbcTypes of attribute 
 	 */
 	public RDBMSTable(String tableName, LinkedHashSet<String> primaryKeys, LinkedHashMap<String, String> foreignKeys,
 			LinkedHashMap<String, JDBCType> attributes, Boolean directionIndicator, int numberOfRows,
@@ -240,7 +249,7 @@ public class RDBMSTable implements Serializable, Cloneable {
 	}
 
 	/**
-	 * return clone of rdbms table
+	 * returns clone of rdbms table
 	 */
 	public RDBMSTable clone() {
 		return new RDBMSTable(tableName, (LinkedHashSet<String>) primaryKeys.clone(),

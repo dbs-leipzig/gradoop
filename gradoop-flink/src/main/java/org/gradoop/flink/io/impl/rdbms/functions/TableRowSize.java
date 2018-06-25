@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.sequential;
+package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

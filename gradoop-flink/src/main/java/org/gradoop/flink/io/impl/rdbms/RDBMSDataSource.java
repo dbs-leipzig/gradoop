@@ -27,6 +27,7 @@ import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeleteFKs;
 import org.gradoop.flink.io.impl.rdbms.functions.FKandProps;
+import org.gradoop.flink.io.impl.rdbms.functions.SequentialMetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.functions.TableFilter;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple2ToEdge;
 import org.gradoop.flink.io.impl.rdbms.functions.Tuple2ToIdFkWithProps;
@@ -34,7 +35,6 @@ import org.gradoop.flink.io.impl.rdbms.functions.Tuple3ToEdge;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdFkTuple;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdPkTuple;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSMetadata;
-import org.gradoop.flink.io.impl.rdbms.sequential.SequentialMetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
@@ -50,12 +50,19 @@ public class RDBMSDataSource implements DataSource {
 	private RDBMSConfig rdbmsConfig;
 	private ExecutionEnvironment env;
 
+	/**
+	 * 
+	 * @param url jdbc standard url - jdbc:[managementsystem name]://[host:port]/[databasename] (e.g. jdbc:mysql://localhost/employees)
+	 * @param user username of database
+	 * @param pw password of database
+	 * @param config standard GradoopFlinkConfig
+	 */
 	public RDBMSDataSource(String url, String user, String pw, GradoopFlinkConfig config) {
 		this.config = config;
 		this.rdbmsConfig = new RDBMSConfig(url, user, pw);
 		this.env = config.getExecutionEnvironment();
 	}
-
+	
 	@Override
 	public LogicalGraph getLogicalGraph() {
 		
@@ -71,9 +78,9 @@ public class RDBMSDataSource implements DataSource {
 		try {
 
 			/*
-			 * representing rdbms' tables metadata
+			 * list of rdbms tables storing conversion important metadata of every database table
 			 */
-			ArrayList<RDBMSTable> tables = SequentialMetaDataParser.parse(RDBMSMetadata.getDBMetaData(con), con);
+			ArrayList<RDBMSTable> tables = SequentialMetaDataParser.parse(con.getMetaData(), con);
 		
 			/*
 			 * tables convert to nodes

@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.sequential;
+package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -7,20 +7,23 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSTable;
 
 /**
- * class to acquire metadata for every table of the connected rdbms
+ * Determines rdbms' metadata 
  * @author pc
  *
  */
-public class SequentialMetaDataParser {
-	/*
-	 * empty Constructor
-	 */
-	public SequentialMetaDataParser() {
-	}
+public class MetaData {
 
+	/**
+	 * Queries rdbms' metadata 
+	 * @param metadata
+	 * @param con
+	 * @return
+	 * @throws Exception
+	 */
 	public static ArrayList<RDBMSTable> parse(DatabaseMetaData metadata, Connection con) throws Exception {
 		ArrayList<RDBMSTable> tables = new ArrayList<RDBMSTable>();
 		ResultSet rsTables = metadata.getTables(null, null, "%", new String[]{"TABLE"});
