@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
- * aggregate and filter function to presence of an edge label in a graph.
+ * Aggregate and filter function to check presence of an edge label in a graph.
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */

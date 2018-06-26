@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * aggregate and filter function to presence of a vertex label in a graph.
+ * Aggregate and filter function to check presence of a vertex label in a graph.
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */

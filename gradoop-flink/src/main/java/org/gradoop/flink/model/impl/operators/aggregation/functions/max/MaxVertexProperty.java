@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Aggregate function returning the minimum of a specified property over all
+ * Aggregate function returning the maximum of a specified property over all
  * vertices.
  */
 public class MaxVertexProperty extends MaxProperty implements VertexAggregateFunction {
