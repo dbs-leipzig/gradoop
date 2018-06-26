@@ -23,9 +23,15 @@ public class FKandProps extends RichMapFunction<Row, Tuple3<String, String, Prop
 	@Override
 	public Tuple3<String, String, Properties> map(Row tuple) throws Exception {
 		RowHeader rowHeader = table.get(tePos).getRowHeader();
-		return new Tuple3(tuple.getField(rowHeader.getForeignKeyHeader().get(0).getPos()).toString(),
+		Tuple3<String,String,Properties> fkproptuple = new Tuple3("","",new Properties());
+		try {
+		 fkproptuple = new Tuple3(tuple.getField(rowHeader.getForeignKeyHeader().get(0).getPos()).toString(),
 				tuple.getField(rowHeader.getForeignKeyHeader().get(1).getPos()).toString(),
 				AttributesToProperties.getPropertiesWithoutFKs(tuple, rowHeader));
+		}catch(Exception e) {
+			System.out.println(table.get(tePos).getTableName());
+		}
+		return fkproptuple;
 	}
 
 	public void open(Configuration parameters) throws Exception {

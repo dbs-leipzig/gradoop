@@ -37,10 +37,10 @@ public class SQLToBasicTypeMapper {
 			bti = BasicTypeInfo.BOOLEAN_TYPE_INFO;
 			break;
 		case "TINYINT":
-			bti = BasicTypeInfo.BYTE_TYPE_INFO;
+			bti = BasicTypeInfo.INT_TYPE_INFO;
 			break;
 		case "SMALLINT":
-			bti = BasicTypeInfo.SHORT_TYPE_INFO;
+			bti = BasicTypeInfo.INT_TYPE_INFO;
 			break;
 		case "INTEGER":
 			bti = BasicTypeInfo.INT_TYPE_INFO;
@@ -58,22 +58,22 @@ public class SQLToBasicTypeMapper {
 			bti = BasicTypeInfo.DOUBLE_TYPE_INFO;
 			break;
 		case "BINARY":
-			System.err.println("No Typemapping for Type : BINARY");
+			bti = BasicTypeInfo.BYTE_TYPE_INFO;
 			break;
 		case "VARBINARY":
-			System.err.println("No Typemapping for Type : VARBINARY");
+			bti = BasicTypeInfo.BYTE_TYPE_INFO;
 			break;
 		case "LONGVARBINARY":
-			System.err.println("No Typemapping for Type : LONGVARBINARY");
+			bti = BasicTypeInfo.LONG_TYPE_INFO;
 			break;
 		case "DATE":
 			bti = BasicTypeInfo.DATE_TYPE_INFO;
 			break;
 		case "TIME":
-			bti = BasicTypeInfo.VOID_TYPE_INFO;
+			bti = BasicTypeInfo.DATE_TYPE_INFO;
 			break;
 		case "TIMESTAMP":
-			bti = BasicTypeInfo.VOID_TYPE_INFO;
+			bti = BasicTypeInfo.DATE_TYPE_INFO;
 			break;
 		case "CLOB":
 			System.err.println("No Typemapping for Type : CLOB");

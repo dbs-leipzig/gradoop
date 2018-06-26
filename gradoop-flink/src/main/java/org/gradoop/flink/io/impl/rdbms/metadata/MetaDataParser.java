@@ -57,7 +57,6 @@ public class MetaDataParser {
 //					primaryKeySet.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 					primaryKeys.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 				}
-				table.setPrimaryKey(primaryKeys);
 
 				/*
 				 * storing foreignkeys of the table 
@@ -68,32 +67,31 @@ public class MetaDataParser {
 					foreignKeys.put(rsForeignKeys.getString("FKCOLUMN_NAME"),
 							rsForeignKeys.getString("PKTABLE_NAME"));
 				}
-				table.setForeignKeys(foreignKeys);
 				
 
 				/*
 				 * storing every attributename in the table 
 				 */
 				ResultSet rsColumns = metadata.getColumns(null, null, tableName, null);
-//				ArrayList<String> columns = new ArrayList<String>();
+				ArrayList<String> columns = new ArrayList<String>();
 				while (rsColumns.next()) {
 					String attName = rsColumns.getString("COLUMN_NAME");
-//					columns.add(schemaType);
+					columns.add(attName);
 					table.getAttributes().put(attName,
 							JDBCType.valueOf(Integer.parseInt(rsColumns.getString("DATA_TYPE"))));
 				}
 
-//				/*
-//				 * add primary and foreign key's position in the table (needed for accessing fields via JDBCInputFormat)
-//				 */
-//				for (String cols : columns) {
-//					if (primaryKeySet.contains(cols)) {
-//						table.getPrimaryKey().add(cols);
-//					}
-//					if (foreignKeySet.containsKey(cols)) {
-//						table.getForeignKeys().put(cols, foreignKeySet.get(cols));
-//					}
-//				}
+				/*
+				 * add primary and foreign key's position in the table (needed for accessing fields via JDBCInputFormat)
+				 */
+				for (String cols : columns) {
+					if (primaryKeys.contains(cols)) {
+						table.getPrimaryKey().add(cols);
+					}
+					if (foreignKeys.containsKey(cols)) {
+						table.getForeignKeys().put(cols, foreignKeys.get(cols));
+					}
+				}
 				
 				/*
 				 * set the number of table's rows (needed for distributing/ pageination in queriing via JDBCInputFormat)

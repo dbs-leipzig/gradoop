@@ -2,6 +2,7 @@ package org.gradoop.flink.io.impl.rdbms;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
@@ -51,8 +52,8 @@ public class RDBMSDataSource implements DataSource {
 	private ExecutionEnvironment env;
 
 	/**
-	 * 
-	 * @param url jdbc standard url - jdbc:[managementsystem name]://[host:port]/[databasename] (e.g. jdbc:mysql://localhost/employees)
+	 * Transforms a relational database with given parameters into an EPGM database
+	 * @param url jdbc standard url - jdbc:[managementsystem identifier]://[host:port]/[databasename] (e.g. jdbc:mysql://localhost/employees)
 	 * @param user username of database
 	 * @param pw password of database
 	 * @param config standard GradoopFlinkConfig
@@ -106,6 +107,15 @@ public class RDBMSDataSource implements DataSource {
 					}
 				}
 			}
+			
+//			for(RDBMSTable table : tablesToEdges) {
+//				table.getEdgeSqlQuery();
+//				System.out.println(table.getTableName());
+//				if(!table.getDirectionIndicator()) {System.out.println("----------------------------------");}
+//				for(RowHeaderTuple rht : table.getRowHeader().getRowHeader()) {
+//					System.out.println(rht.getName() + " " + rht.getPos() + " " + rht.getAttType());
+//				}
+//			}
 			
 			/*
 			 * dataset representation of the created sets
@@ -180,7 +190,7 @@ public class RDBMSDataSource implements DataSource {
 				 * tuples to edges
 				 */
 				else {
-					
+					System.out.println(table.getTableName());
 					//represents (n:m) relation (foreign key one, foreign key two and belonging properties)
 					DataSet<Tuple3<String,String,Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(tePos))
 							.withBroadcastSet(dsTablesToEdges, "tables");
@@ -234,6 +244,8 @@ public class RDBMSDataSource implements DataSource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+//		return null;
 		return config.getLogicalGraphFactory().fromDataSets(finalVertices,edges);		
 	}
 
