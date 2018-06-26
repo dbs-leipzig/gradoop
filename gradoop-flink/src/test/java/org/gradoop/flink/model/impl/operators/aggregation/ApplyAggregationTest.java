@@ -269,7 +269,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
         graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
 
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(1.5d, vertexAggregate.getDouble(), 0.00001);
+        assertEquals(1.5f, vertexAggregate.getFloat(), 0.00001);
         assertEquals(
           new BigDecimal("4.0"),
           edgeAggregate.getBigDecimal()
