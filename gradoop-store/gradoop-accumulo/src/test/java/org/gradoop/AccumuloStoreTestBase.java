@@ -32,7 +32,7 @@ import java.util.Random;
 public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
 
   /**
-   * load social network graph and write it into accumulo graph
+   * Load social network graph and write it into accumulo graph
    *
    * @param namespace store namespace
    * @param context loader context
@@ -64,7 +64,8 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
   }
 
   /**
-   * create random sample
+   * Create random sample
+   *
    * @param population sample s
    * @param sampleSize sample size
    * @param <T> list type

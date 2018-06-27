@@ -44,7 +44,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST06 = "label_predicate_06";
 
   /**
-   * find all vertices by label equality
+   * Find all vertices by label equality
    *
    * @throws Throwable if error
    */
@@ -70,7 +70,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all edges by label equality
+   * Find all edges by label equality
    *
    * @throws Throwable if error
    */
@@ -95,7 +95,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all vertices by label regex
+   * Find all vertices by label regex
    *
    * @throws Throwable if error
    */
@@ -121,7 +121,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all edges by label regex
+   * Find all edges by label regex
    *
    * @throws Throwable if error
    */
@@ -148,7 +148,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all graphs by label equality
+   * Find all graphs by label equality
    */
   @Test
   public void test05_graphLabelEquals() throws Throwable {
@@ -170,7 +170,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all graphs by label regex
+   * Find all graphs by label regex
    */
   @Test
   public void test06_graphLabelRegex() throws Throwable {

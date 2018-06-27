@@ -199,6 +199,7 @@ public class AccumuloEPGMStore implements
   @Override
   public void writeEdge(@Nonnull EPGMEdge record) {
     writeRecord(record, edgeWriter, config.getEdgeHandler());
+    // TODO: [#833] add Edge-in and edge-out
     //writeEdgeOut(record);
     //writeEdgeIn(record);
   }

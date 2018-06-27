@@ -25,7 +25,7 @@ import org.gradoop.common.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import java.util.Properties;
 
 /**
- * Edge-In OutputFormat
+ * Edge-Out OutputFormat
  */
 public class EdgeOutOutputFormat extends BaseOutputFormat<Edge> {
 

@@ -67,7 +67,7 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
       new VertexOutputFormat(getAccumuloConfig().getAccumuloProperties()));
     graphCollection.getEdges().output(
       new EdgeOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    //add Edge-in and edge-out, TBD.
+    // TODO: [#833] add Edge-in and edge-out
     //graphCollection.getEdges().output(
     //  new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
     //graphCollection.getEdges().output(

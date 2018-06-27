@@ -41,7 +41,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST03 = "ids_predicate_03";
 
   /**
-   * find a set of vertices by their ids
+   * Find a set of vertices by their ids
    *
    * @throws Throwable if error
    */
@@ -66,7 +66,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find a set of edges by their ids
+   * Find a set of edges by their ids
    *
    * @throws Throwable if error
    */

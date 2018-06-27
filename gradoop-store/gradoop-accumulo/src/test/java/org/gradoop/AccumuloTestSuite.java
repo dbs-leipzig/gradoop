@@ -65,22 +65,22 @@ public class AccumuloTestSuite {
   private static final Logger LOG = LoggerFactory.getLogger(AccumuloTestSuite.class);
 
   /**
-   * accumulo password
+   * Accumulo password
    */
   private static final String PASSWD = "123456";
 
   /**
-   * test namespace prefix
+   * Test namespace prefix
    */
   private static final String TEST_NAMESPACE_PREFIX = "gradoop_test";
 
   /**
-   * accumulo minicluster for test
+   * Accumulo minicluster for test
    */
   private static MiniAccumuloCluster accumulo;
 
   /**
-   * temporary folder creator
+   * Temporary folder creator
    */
   @ClassRule
   public static TemporaryFolder tmp = new TemporaryFolder();
@@ -90,7 +90,7 @@ public class AccumuloTestSuite {
   }
 
   /**
-   * get gradoop accumulo configure
+   * Get gradoop accumulo configure
    *
    * @param prefix store prefix
    * @return gradoop accumulo configure
@@ -121,7 +121,7 @@ public class AccumuloTestSuite {
   }
 
   /**
-   * create mini cluster accumulo instance for test
+   * Create mini cluster accumulo instance for test
    */
   @BeforeClass
   public static void setupAccumulo() throws Exception {
@@ -137,7 +137,7 @@ public class AccumuloTestSuite {
   }
 
   /**
-   * terminate and remove temporary file
+   * Terminate and remove temporary file
    */
   @AfterClass
   public static void terminateAccumulo() throws Exception {
