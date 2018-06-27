@@ -92,7 +92,7 @@ public class MetaData {
   }
 
   /**
-   * Returns the vertex labels available in the meta data. Only IndexedCSV.
+   * Returns the vertex labels available in the meta data.
    *
    * @return vertex labels
    */
@@ -104,7 +104,7 @@ public class MetaData {
   }
 
   /**
-   * Returns the edge labels available in the meta data.Only IndexedCSV.
+   * Returns the edge labels available in the meta data.
    *
    * @return edge labels
    */
