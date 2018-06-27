@@ -20,6 +20,9 @@ public class DriverClassNameChooser {
 		if(url.contains("jdbc:sqlite:")){
 			driverClassName = "org.sqlite.JDBC";
 		}
+		if(url.contains("jdbc:mariadb:")) {
+			driverClassName = "org.mariadb.jdbc.Driver";
+		}
 		return driverClassName;
 	}
 }

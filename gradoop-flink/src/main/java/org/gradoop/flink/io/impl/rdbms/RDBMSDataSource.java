@@ -58,9 +58,9 @@ public class RDBMSDataSource implements DataSource {
 	 * @param pw password of database
 	 * @param config standard GradoopFlinkConfig
 	 */
-	public RDBMSDataSource(String url, String user, String pw, GradoopFlinkConfig config) {
+	public RDBMSDataSource(String url, String user, String pw, String jdbcDriverPath, GradoopFlinkConfig config) {
 		this.config = config;
-		this.rdbmsConfig = new RDBMSConfig(url, user, pw);
+		this.rdbmsConfig = new RDBMSConfig(url, user, pw, jdbcDriverPath);
 		this.env = config.getExecutionEnvironment();
 	}
 	
@@ -190,7 +190,6 @@ public class RDBMSDataSource implements DataSource {
 				 * tuples to edges
 				 */
 				else {
-					System.out.println(table.getTableName());
 					//represents (n:m) relation (foreign key one, foreign key two and belonging properties)
 					DataSet<Tuple3<String,String,Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(tePos))
 							.withBroadcastSet(dsTablesToEdges, "tables");

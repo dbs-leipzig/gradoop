@@ -44,14 +44,15 @@ public class RDBMSExample implements ProgramDescription {
 	   * @param args program arguments
 	   */
 	public static void main(String[] args) throws Exception {
-		if(args.length != 4){
+		if(args.length != 5){
 			 throw new IllegalArgumentException(
 				        "provide url, user, pasword, output directory");
 		}
 			final String url = args[0];
 			final String user = args[1];
 			final String pw = args[2];
-			final String outputPath = args[3];
+			final String jdbcDriverPath = args[3];
+			final String outputPath = args[4];
 
 		    // init Flink execution environment
 			ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -60,7 +61,7 @@ public class RDBMSExample implements ProgramDescription {
 			GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
 			
 		    // create DataSource
-			RDBMSDataSource dataSource = new RDBMSDataSource(url,user,pw,gfc);
+			RDBMSDataSource dataSource = new RDBMSDataSource(url,user,pw,jdbcDriverPath,gfc);
 		    
 			// get logical graph of datasource
 			LogicalGraph schema = dataSource.getLogicalGraph();

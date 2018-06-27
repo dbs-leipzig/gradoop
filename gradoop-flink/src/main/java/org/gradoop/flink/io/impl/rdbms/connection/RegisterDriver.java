@@ -14,10 +14,10 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 public class RegisterDriver {
 
 	public static void register(RDBMSConfig config) {
-		String driverFileName = getDriverFileName(config.getUrl());
 		String driverClassName = getDriverClassName(config.getUrl());
+		
 		try {
-			URL driverUrl = new URL("jar:file:" + getDriverJarPath() + RDBMSConstants.JARS_PATH + driverFileName);
+			URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath());
 			URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
 			Driver driver = (Driver) Class.forName(driverClassName, true, ucl).newInstance();
 			DriverManager.registerDriver(new DriverShim(driver));
@@ -35,16 +35,7 @@ public class RegisterDriver {
 		}
 	}
 
-	public static String getDriverJarPath() {
-		return new File(System.getProperty("user.dir")).getAbsolutePath().replaceAll("/gradoop-examples|/gradoop-flink",
-				"");
-	}
-
-	public static String getDriverFileName(String url) {
-		return new DriverFileNameChooser().choose(url);
-	}
-
 	public static String getDriverClassName(String url) {
-		return new DriverClassNameChooser().choose(url);
+		return DriverClassNameChooser.choose(url);
 	}
 }
