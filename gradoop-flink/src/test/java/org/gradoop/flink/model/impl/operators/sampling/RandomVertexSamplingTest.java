@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-packamage org.gradoop.flink.model.impl.operators.sampling;
+package org.gradoop.flink.model.impl.operators.sampling;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
