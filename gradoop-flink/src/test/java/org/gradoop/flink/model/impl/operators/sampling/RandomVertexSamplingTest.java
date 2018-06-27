@@ -30,7 +30,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
+public class RandomVertexSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomNodeSamplingTest() throws Exception {
@@ -48,7 +48,7 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     LogicalGraph newGraph = dbGraph.callForGraph(
-      new RandomNodeSampling(0.272f, -4181668494294894490L));
+      new RandomVertexSampling(0.272f, -4181668494294894490L));
 
     validateResult(dbGraph, newGraph);
   }
