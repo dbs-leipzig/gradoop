@@ -417,24 +417,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minBigDecimal), create(maxBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
-    
+    p = min(create(maxBigDecimal), create(minBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+
     p = min(create(minBigDecimal), create(maxDouble));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+    p = min(create(maxDouble), create(minBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
 
     p = min(create(minBigDecimal), create(maxFloat));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+    p = min(create(maxFloat), create(minBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
 
     p = min(create(minBigDecimal), create(maxLong));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
-    
+    p = min(create(maxLong), create(minBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+
     p = min(create(minBigDecimal), create(maxInt));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+    p = min(create(maxInt), create(minBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
 
     p = min(create(minBigDecimal), create(maxShort));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
+    p = min(create(maxShort), create(minBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(minBigDecimal), 0);
 
@@ -442,24 +460,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minDouble), create(maxBigDecimal));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxBigDecimal), create(minDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
 
     p = min(create(minDouble), create(maxDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxDouble), create(minDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
 
     p = min(create(minDouble), create(maxFloat));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxFloat), create(minDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
 
     p = min(create(minDouble), create(maxLong));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxLong), create(minDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
 
     p = min(create(minDouble), create(maxInt));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxInt), create(minDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
 
     p = min(create(minDouble), create(maxShort));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), minDouble, 0);
+    p = min(create(maxShort), create(minDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), minDouble, 0);
 
@@ -467,24 +503,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minFloat), create(maxBigDecimal));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxBigDecimal), create(minFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
 
-    p = min(create(minFloat), create(maxFloat));
+    p = min(create(minFloat), create(maxDouble));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxDouble), create(minFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
 
     p = min(create(minFloat), create(maxFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxFloat), create(minFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
 
     p = min(create(minFloat), create(maxLong));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxLong), create(minFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
 
     p = min(create(minFloat), create(maxInt));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxInt), create(minFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
 
     p = min(create(minFloat), create(maxShort));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), minFloat, 0);
+    p = min(create(maxShort), create(minFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), minFloat, 0);
 
@@ -492,24 +546,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minLong), create(maxBigDecimal));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxBigDecimal), create(minLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
 
-    p = min(create(minLong), create(maxLong));
+    p = min(create(minLong), create(maxDouble));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxDouble), create(minLong));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
 
     p = min(create(minLong), create(maxFloat));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxFloat), create(minLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
 
     p = min(create(minLong), create(maxLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxLong), create(minLong));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
 
     p = min(create(minLong), create(maxInt));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxInt), create(minLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
 
     p = min(create(minLong), create(maxShort));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), minLong, 0);
+    p = min(create(maxShort), create(minLong));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), minLong, 0);
 
@@ -517,24 +589,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minInt), create(maxBigDecimal));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxBigDecimal), create(minInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
 
-    p = min(create(minInt), create(maxInt));
+    p = min(create(minInt), create(maxDouble));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxDouble), create(minInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
 
     p = min(create(minInt), create(maxFloat));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxFloat), create(minInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
 
     p = min(create(minInt), create(maxLong));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxLong), create(minInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
 
     p = min(create(minInt), create(maxInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxInt), create(minInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
 
     p = min(create(minInt), create(maxShort));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), minInt, 0);
+    p = min(create(maxShort), create(minInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), minInt, 0);
 
@@ -542,24 +632,42 @@ public class PropertyValueUtilsTest {
     p = min(create(minShort), create(maxBigDecimal));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxBigDecimal), create(minShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
 
-    p = min(create(minShort), create(maxShort));
+    p = min(create(minShort), create(maxDouble));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxDouble), create(minShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
 
     p = min(create(minShort), create(maxFloat));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxFloat), create(minShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
 
     p = min(create(minShort), create(maxLong));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxLong), create(minShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
 
     p = min(create(minShort), create(maxInt));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxInt), create(minShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
 
     p = min(create(minShort), create(maxShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), minShort, 0);
+    p = min(create(maxShort), create(minShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), minShort, 0);
   }
@@ -580,153 +688,261 @@ public class PropertyValueUtilsTest {
     short minShort = (short)10;
     short maxShort = (short)11;
 
-    // MAX BigDecimal
+    // MIN BigDecimal
     p = max(create(maxBigDecimal), create(minBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minBigDecimal), create(maxBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
     p = max(create(maxBigDecimal), create(minDouble));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minDouble), create(maxBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
     p = max(create(maxBigDecimal), create(minFloat));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minFloat), create(maxBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
     p = max(create(maxBigDecimal), create(minLong));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minLong), create(maxBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
     p = max(create(maxBigDecimal), create(minInt));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minInt), create(maxBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
     p = max(create(maxBigDecimal), create(minShort));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
+    p = max(create(minShort), create(maxBigDecimal));
+    assertTrue(p.isBigDecimal());
+    assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
-    // MAX Double
+    // MIN Double
     p = max(create(maxDouble), create(minBigDecimal));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minBigDecimal), create(maxDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
 
     p = max(create(maxDouble), create(minDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minDouble), create(maxDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
 
     p = max(create(maxDouble), create(minFloat));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minFloat), create(maxDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
 
     p = max(create(maxDouble), create(minLong));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minLong), create(maxDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
 
     p = max(create(maxDouble), create(minInt));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minInt), create(maxDouble));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
 
     p = max(create(maxDouble), create(minShort));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
+    p = max(create(minShort), create(maxDouble));
+    assertTrue(p.isDouble());
+    assertEquals(p.getDouble(), maxDouble, 0);
 
-    // MAX Float
+    // MIN Float
     p = max(create(maxFloat), create(minBigDecimal));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minBigDecimal), create(maxFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
 
-    p = max(create(maxFloat), create(minFloat));
+    p = max(create(maxFloat), create(minDouble));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minDouble), create(maxFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
 
     p = max(create(maxFloat), create(minFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minFloat), create(maxFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
 
     p = max(create(maxFloat), create(minLong));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minLong), create(maxFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
 
     p = max(create(maxFloat), create(minInt));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minInt), create(maxFloat));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
 
     p = max(create(maxFloat), create(minShort));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
+    p = max(create(minShort), create(maxFloat));
+    assertTrue(p.isFloat());
+    assertEquals(p.getFloat(), maxFloat, 0);
 
-    // MAX Long
+    // MIN Long
     p = max(create(maxLong), create(minBigDecimal));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minBigDecimal), create(maxLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
 
-    p = max(create(maxLong), create(minLong));
+    p = max(create(maxLong), create(minDouble));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minDouble), create(maxLong));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
 
     p = max(create(maxLong), create(minFloat));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minFloat), create(maxLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
 
     p = max(create(maxLong), create(minLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minLong), create(maxLong));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
 
     p = max(create(maxLong), create(minInt));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minInt), create(maxLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
 
     p = max(create(maxLong), create(minShort));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
+    p = max(create(minShort), create(maxLong));
+    assertTrue(p.isLong());
+    assertEquals(p.getLong(), maxLong, 0);
 
-    // MAX Int
+    // MIN Int
     p = max(create(maxInt), create(minBigDecimal));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minBigDecimal), create(maxInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
 
-    p = max(create(maxInt), create(minInt));
+    p = max(create(maxInt), create(minDouble));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minDouble), create(maxInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
 
     p = max(create(maxInt), create(minFloat));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minFloat), create(maxInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
 
     p = max(create(maxInt), create(minLong));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minLong), create(maxInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
 
     p = max(create(maxInt), create(minInt));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minInt), create(maxInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
 
     p = max(create(maxInt), create(minShort));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
+    p = max(create(minShort), create(maxInt));
+    assertTrue(p.isInt());
+    assertEquals(p.getInt(), maxInt, 0);
 
-    // MAX Short
+    // MIN Short
     p = max(create(maxShort), create(minBigDecimal));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minBigDecimal), create(maxShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
 
-    p = max(create(maxShort), create(minShort));
+    p = max(create(maxShort), create(minDouble));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minDouble), create(maxShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
 
     p = max(create(maxShort), create(minFloat));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minFloat), create(maxShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
 
     p = max(create(maxShort), create(minLong));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minLong), create(maxShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
 
     p = max(create(maxShort), create(minInt));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minInt), create(maxShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
 
     p = max(create(maxShort), create(minShort));
+    assertTrue(p.isShort());
+    assertEquals(p.getShort(), maxShort, 0);
+    p = max(create(minShort), create(maxShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
   }
