@@ -31,4 +31,12 @@ public class CSVConstants {
    * Used to separate lines in the output CSV files.
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
+  /**
+   * Used to specify labels in metadata (vertex or edge label)
+   */
+  public static final String VERTEX_PREFIX = "v_";
+  /**
+   * Used to specify labels in metadata (vertex or edge label)
+   */
+  public static final String EDGE_PREFIX = "e_";
 }

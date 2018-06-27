@@ -18,8 +18,11 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 
 import java.util.HashSet;
@@ -46,7 +49,14 @@ public class ElementToPropertyMetaData<E extends Element> implements MapFunction
 
   @Override
   public Tuple2<String, Set<String>> map(E e) throws Exception {
-    reuseTuple.f0 = e.getLabel();
+    if (e.getClass() == Edge.class) {
+      reuseTuple.f0 = CSVConstants.EDGE_PREFIX + e.getLabel();
+    } else if (e.getClass() == Vertex.class) {
+      reuseTuple.f0 = CSVConstants.VERTEX_PREFIX + e.getLabel();
+    } else {
+      throw new Exception("Unsupported element class");
+    }
+
     reuseTuple.f1.clear();
     if (e.getProperties() != null) {
       for (Property property : e.getProperties()) {

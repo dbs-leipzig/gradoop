@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
@@ -51,5 +52,10 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
       GradoopId.fromString(tokens[0]),
       tokens[1],
       parseProperties(tokens[1], tokens[2]));
+  }
+
+  @Override
+  String getPrefix() {
+    return CSVConstants.VERTEX_PREFIX;
   }
 }

@@ -98,7 +98,8 @@ public class MetaData {
    */
   public Set<String> getVertexLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isUpperCase(l.charAt(0)))
+      .filter(l -> l.substring(0, 2).equals(CSVConstants.VERTEX_PREFIX))
+      .map(l -> l.substring(2, l.length()))
       .collect(Collectors.toSet());
   }
 
@@ -109,7 +110,8 @@ public class MetaData {
    */
   public Set<String> getEdgeLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isLowerCase(l.charAt(0)))
+      .filter(l -> l.substring(0, 2).equals(CSVConstants.EDGE_PREFIX))
+      .map(l -> l.substring(2, l.length()))
       .collect(Collectors.toSet());
   }
 
