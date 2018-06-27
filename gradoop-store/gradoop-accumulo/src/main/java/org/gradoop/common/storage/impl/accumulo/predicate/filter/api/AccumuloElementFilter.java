@@ -112,7 +112,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    * @return negative logic for current filter
    */
   @Nonnull
-  default AccumuloElementFilter<T> not() {
+  default AccumuloElementFilter<T> negate() {
     return NOT.of(this);
   }
 

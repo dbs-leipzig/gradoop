@@ -141,7 +141,6 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
           .and(AccumuloFilters.<GraphHead>propEquals("interest", "Hadoop")
             .or(AccumuloFilters.<GraphHead>propEquals("interest", "Graphs"))));
 
-      System.out.println(queryFormula);
       List<GraphHead> query = store
         .getGraphSpace(queryFormula)
         .readRemainsAndClose();

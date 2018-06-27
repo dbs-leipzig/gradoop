@@ -55,6 +55,6 @@ public interface ElementFilter<FilterImpl extends ElementFilter> extends Seriali
    * @return negative logic for current filter
    */
   @Nonnull
-  FilterImpl not();
+  FilterImpl negate();
 
 }

@@ -137,7 +137,8 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
           Query.elements()
             .fromAll()
             .where(AccumuloFilters.<Vertex>labelIn("Person")
-              .and(AccumuloFilters.<Vertex>propLargerThan("age", 35, true).not())))
+              .and(AccumuloFilters.<Vertex>propLargerThan("age", 35, true)
+                .negate())))
         .getGraphCollection()
         .getVertices()
         .collect();

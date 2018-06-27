@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.accumulo.source;
 
 import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.utils.AccumuloFilters;
@@ -90,7 +89,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
           .fromAll()
           .where(AccumuloFilters.<GraphHead>labelIn("Community")
             .and(AccumuloFilters.<GraphHead>propLargerThan("vertexCount", 4, true)
-              .not())))
+              .negate())))
         .getGraphCollection()
         .getGraphHeads()
         .collect();
