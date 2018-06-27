@@ -1,12 +1,12 @@
 /**
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,22 +68,16 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Edge> newEdges = graph.getEdges()
-      .filter(new EdgeRandomFilter<>(sampleSize,randomSeed));
+    DataSet<Edge> newEdges =
+      graph.getEdges().filter(new EdgeRandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<Vertex> newSourceVertices = graph.getVertices()
-      .join(newEdges)
-      .where(new Id<>())
-      .equalTo(new SourceId<>())
-      .with(new LeftSide<>())
-      .distinct(new Id<>());
+    DataSet<Vertex> newSourceVertices =
+      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new SourceId<>())
+        .with(new LeftSide<>()).distinct(new Id<>());
 
-    DataSet<Vertex> newTargetVertices = graph.getVertices()
-      .join(newEdges)
-      .where(new Id<>())
-      .equalTo(new TargetId<>())
-      .with(new LeftSide<>())
-      .distinct(new Id<>());
+    DataSet<Vertex> newTargetVertices =
+      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new TargetId<>())
+        .with(new LeftSide<>()).distinct(new Id<>());
 
     DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);

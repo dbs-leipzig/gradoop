@@ -44,8 +44,7 @@ public class EdgeRandomFilter<E extends Edge> implements FilterFunction<E> {
    */
   public EdgeRandomFilter(float sampleSize, long randomSeed) {
     threshold = sampleSize;
-    randomGenerator =
-    (randomSeed != 0L) ? new Random(randomSeed) : new Random();
+    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
   /**
