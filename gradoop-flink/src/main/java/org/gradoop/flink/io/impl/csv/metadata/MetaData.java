@@ -92,24 +92,26 @@ public class MetaData {
   }
 
   /**
-   * Returns the vertex labels available in the meta data.
+   * Returns the vertex labels available in the meta data. Only IndexedCSV.
    *
    * @return vertex labels
    */
   public Set<String> getVertexLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isUpperCase(l.charAt(0)))
+      .filter(l -> l.substring(0, 2).equals(CSVConstants.VERTEX_PREFIX))
+      .map(l -> l.substring(2, l.length()))
       .collect(Collectors.toSet());
   }
 
   /**
-   * Returns the edge labels available in the meta data.
+   * Returns the edge labels available in the meta data.Only IndexedCSV.
    *
    * @return edge labels
    */
   public Set<String> getEdgeLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isLowerCase(l.charAt(0)))
+      .filter(l -> l.substring(0, 2).equals(CSVConstants.EDGE_PREFIX))
+      .map(l -> l.substring(2, l.length()))
       .collect(Collectors.toSet());
   }
 

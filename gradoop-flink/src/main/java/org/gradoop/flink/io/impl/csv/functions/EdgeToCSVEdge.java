@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 
 /**
@@ -41,5 +42,10 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
     csvEdge.setLabel(edge.getLabel());
     csvEdge.setProperties(getPropertyString(edge));
     return csvEdge;
+  }
+
+  @Override
+  String getPrefix() {
+    return CSVConstants.EDGE_PREFIX;
   }
 }
