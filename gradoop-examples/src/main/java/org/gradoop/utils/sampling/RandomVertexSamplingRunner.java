@@ -19,15 +19,16 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.sampling.RandomVertexSampling;
 
 /**
- * Runs {@link org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling} for a given
+ * Runs {@link RandomVertexSampling} for a given
  * graph and writes the sampled output.
  */
-public class RandomNodeSamplingRunner extends AbstractRunner implements ProgramDescription {
+public class RandomVertexSamplingRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Runs the {@link org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling} operator
+   * Runs the {@link RandomVertexSampling} operator
    * on the specified graph and writes the result to the specified output.
    *
    * args[0] - path to input graph
@@ -46,6 +47,6 @@ public class RandomNodeSamplingRunner extends AbstractRunner implements ProgramD
 
   @Override
   public String getDescription() {
-    return RandomNodeSamplingRunner.class.getName();
+    return RandomVertexSamplingRunner.class.getName();
   }
 }

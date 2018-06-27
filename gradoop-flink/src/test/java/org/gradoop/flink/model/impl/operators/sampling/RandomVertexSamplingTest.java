@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling;
+packamage org.gradoop.flink.model.impl.operators.sampling;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -30,7 +30,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
+public class RandomVertexSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomNodeSamplingTest() throws Exception {
@@ -48,7 +48,7 @@ public class RandomNodeSamplingTest extends GradoopFlinkTestBase {
       .getDatabase().getDatabaseGraph();
 
     LogicalGraph newGraph = dbGraph.callForGraph(
-      new RandomNodeSampling(0.272f, -4181668494294894490L));
+      new RandomVertexSampling(0.272f, -4181668494294894490L));
 
     validateResult(dbGraph, newGraph);
   }
