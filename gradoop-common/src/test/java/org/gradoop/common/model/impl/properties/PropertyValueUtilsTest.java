@@ -19,9 +19,9 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-import static org.gradoop.common.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils. * ;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Boolean.or;
-import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric.*;
+import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric. * ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,19 +34,19 @@ public class PropertyValueUtilsTest {
   public void testOr() throws Exception {
     PropertyValue p;
 
-    p = or(create(true),create(true));
+    p = or(create(true), create(true));
     assertTrue(p.isBoolean());
     assertTrue(p.getBoolean());
 
-    p = or(create(true),create(false));
+    p = or(create(true), create(false));
     assertTrue(p.isBoolean());
     assertTrue(p.getBoolean());
 
-    p = or(create(false),create(true));
+    p = or(create(false), create(true));
     assertTrue(p.isBoolean());
     assertTrue(p.getBoolean());
 
-    p = or(create(false),create(false));
+    p = or(create(false), create(false));
     assertTrue(p.isBoolean());
     assertFalse(p.getBoolean());
   }
@@ -108,39 +108,39 @@ public class PropertyValueUtilsTest {
     // double
     p = add(create(DOUBLE_VAL_5), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5+DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 + DOUBLE_VAL_5, p.getDouble(), 0);
 
     // float
     p = add(create(DOUBLE_VAL_5), create(FLOAT_VAL_4));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5+FLOAT_VAL_4,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 + FLOAT_VAL_4, p.getDouble(), 0);
     p = add(create(FLOAT_VAL_4), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(FLOAT_VAL_4+DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(FLOAT_VAL_4 + DOUBLE_VAL_5, p.getDouble(), 0);
 
     // long
     p = add(create(DOUBLE_VAL_5), create(LONG_VAL_3));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5+LONG_VAL_3,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 + LONG_VAL_3, p.getDouble(), 0);
     p = add(create(LONG_VAL_3), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(LONG_VAL_3+DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(LONG_VAL_3 + DOUBLE_VAL_5, p.getDouble(), 0);
 
     // int
     p = add(create(DOUBLE_VAL_5), create(INT_VAL_2));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5+INT_VAL_2,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 + INT_VAL_2, p.getDouble(), 0);
     p = add(create(INT_VAL_2), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(INT_VAL_2+DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(INT_VAL_2 + DOUBLE_VAL_5, p.getDouble(), 0);
 
     // short
     p = add(create(DOUBLE_VAL_5), create(SHORT_VAL_e));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5+SHORT_VAL_e,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 + SHORT_VAL_e, p.getDouble(), 0);
     p = add(create(SHORT_VAL_e), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(SHORT_VAL_e+DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(SHORT_VAL_e + DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
@@ -150,31 +150,31 @@ public class PropertyValueUtilsTest {
     // float
     p = add(create(FLOAT_VAL_4), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4+FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 + FLOAT_VAL_4, p.getFloat(), 0);
 
     // long
     p = add(create(FLOAT_VAL_4), create(LONG_VAL_3));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4+LONG_VAL_3,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 + LONG_VAL_3, p.getFloat(), 0);
     p = add(create(LONG_VAL_3), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(LONG_VAL_3+FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(LONG_VAL_3 + FLOAT_VAL_4, p.getFloat(), 0);
 
     // int
     p = add(create(FLOAT_VAL_4), create(INT_VAL_2));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4+INT_VAL_2,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 + INT_VAL_2, p.getFloat(), 0);
     p = add(create(INT_VAL_2), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(INT_VAL_2+FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(INT_VAL_2 + FLOAT_VAL_4, p.getFloat(), 0);
 
     // short
     p = add(create(FLOAT_VAL_4), create(SHORT_VAL_e));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4+SHORT_VAL_e,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 + SHORT_VAL_e, p.getFloat(), 0);
     p = add(create(SHORT_VAL_e), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(SHORT_VAL_e+FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(SHORT_VAL_e + FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
@@ -184,23 +184,23 @@ public class PropertyValueUtilsTest {
     // long
     p = add(create(LONG_VAL_3), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3+LONG_VAL_3,p.getLong(),0);
+    assertEquals(LONG_VAL_3 + LONG_VAL_3, p.getLong(), 0);
 
     // int
     p = add(create(LONG_VAL_3), create(INT_VAL_2));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3+INT_VAL_2,p.getLong(),0);
+    assertEquals(LONG_VAL_3 + INT_VAL_2, p.getLong(), 0);
     p = add(create(INT_VAL_2), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(INT_VAL_2+LONG_VAL_3,p.getLong(),0);
+    assertEquals(INT_VAL_2 + LONG_VAL_3, p.getLong(), 0);
 
     // short
     p = add(create(LONG_VAL_3), create(SHORT_VAL_e));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3+SHORT_VAL_e,p.getLong(),0);
+    assertEquals(LONG_VAL_3 + SHORT_VAL_e, p.getLong(), 0);
     p = add(create(SHORT_VAL_e), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(SHORT_VAL_e+LONG_VAL_3,p.getLong(),0);
+    assertEquals(SHORT_VAL_e + LONG_VAL_3, p.getLong(), 0);
   }
 
   @Test
@@ -210,18 +210,18 @@ public class PropertyValueUtilsTest {
     // int
     p = add(create(INT_VAL_2), create(INT_VAL_2));
     assertTrue(p.isInt());
-    assertEquals(INT_VAL_2+INT_VAL_2,p.getInt(),0);
+    assertEquals(INT_VAL_2 + INT_VAL_2, p.getInt(), 0);
 
     // short
     p = add(create(INT_VAL_2), create(SHORT_VAL_e));
     assertTrue(p.isInt());
-    assertEquals(INT_VAL_2+SHORT_VAL_e,p.getInt(),0);
+    assertEquals(INT_VAL_2 + SHORT_VAL_e, p.getInt(), 0);
     p = add(create(SHORT_VAL_e), create(INT_VAL_2));
     assertTrue(p.isInt());
-    assertEquals(SHORT_VAL_e+INT_VAL_2,p.getInt(),0);
+    assertEquals(SHORT_VAL_e + INT_VAL_2, p.getInt(), 0);
     p = add(create(SHORT_VAL_e), create(SHORT_VAL_e));
     assertTrue(p.isInt());
-    assertEquals(SHORT_VAL_e+SHORT_VAL_e,p.getInt(),0);
+    assertEquals(SHORT_VAL_e + SHORT_VAL_e, p.getInt(), 0);
   }
 
   @Test
@@ -281,39 +281,39 @@ public class PropertyValueUtilsTest {
     // double
     p = multiply(create(DOUBLE_VAL_5), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5*DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 * DOUBLE_VAL_5, p.getDouble(), 0);
 
     // float
     p = multiply(create(DOUBLE_VAL_5), create(FLOAT_VAL_4));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5*FLOAT_VAL_4,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 * FLOAT_VAL_4, p.getDouble(), 0);
     p = multiply(create(FLOAT_VAL_4), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(FLOAT_VAL_4*DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(FLOAT_VAL_4 * DOUBLE_VAL_5, p.getDouble(), 0);
 
     // long
     p = multiply(create(DOUBLE_VAL_5), create(LONG_VAL_3));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5*LONG_VAL_3,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 * LONG_VAL_3, p.getDouble(), 0);
     p = multiply(create(LONG_VAL_3), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(LONG_VAL_3*DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(LONG_VAL_3 * DOUBLE_VAL_5, p.getDouble(), 0);
 
     // int
     p = multiply(create(DOUBLE_VAL_5), create(INT_VAL_2));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5*INT_VAL_2,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 * INT_VAL_2, p.getDouble(), 0);
     p = multiply(create(INT_VAL_2), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(INT_VAL_2*DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(INT_VAL_2 * DOUBLE_VAL_5, p.getDouble(), 0);
 
     // short
     p = multiply(create(DOUBLE_VAL_5), create(SHORT_VAL_e));
     assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5*SHORT_VAL_e,p.getDouble(),0);
+    assertEquals(DOUBLE_VAL_5 * SHORT_VAL_e, p.getDouble(), 0);
     p = multiply(create(SHORT_VAL_e), create(DOUBLE_VAL_5));
     assertTrue(p.isDouble());
-    assertEquals(SHORT_VAL_e*DOUBLE_VAL_5,p.getDouble(),0);
+    assertEquals(SHORT_VAL_e * DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
@@ -323,31 +323,31 @@ public class PropertyValueUtilsTest {
     // float
     p = multiply(create(FLOAT_VAL_4), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4*FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 * FLOAT_VAL_4, p.getFloat(), 0);
 
     // long
     p = multiply(create(FLOAT_VAL_4), create(LONG_VAL_3));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4*LONG_VAL_3,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 * LONG_VAL_3, p.getFloat(), 0);
     p = multiply(create(LONG_VAL_3), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(LONG_VAL_3*FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(LONG_VAL_3 * FLOAT_VAL_4, p.getFloat(), 0);
 
     // int
     p = multiply(create(FLOAT_VAL_4), create(INT_VAL_2));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4*INT_VAL_2,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 * INT_VAL_2, p.getFloat(), 0);
     p = multiply(create(INT_VAL_2), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(INT_VAL_2*FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(INT_VAL_2 * FLOAT_VAL_4, p.getFloat(), 0);
 
     // short
     p = multiply(create(FLOAT_VAL_4), create(SHORT_VAL_e));
     assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4*SHORT_VAL_e,p.getFloat(),0);
+    assertEquals(FLOAT_VAL_4 * SHORT_VAL_e, p.getFloat(), 0);
     p = multiply(create(SHORT_VAL_e), create(FLOAT_VAL_4));
     assertTrue(p.isFloat());
-    assertEquals(SHORT_VAL_e*FLOAT_VAL_4,p.getFloat(),0);
+    assertEquals(SHORT_VAL_e * FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
@@ -357,23 +357,23 @@ public class PropertyValueUtilsTest {
     // long
     p = multiply(create(LONG_VAL_3), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3*LONG_VAL_3,p.getLong(),0);
+    assertEquals(LONG_VAL_3 * LONG_VAL_3, p.getLong(), 0);
 
     // int
     p = multiply(create(LONG_VAL_3), create(INT_VAL_2));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3*INT_VAL_2,p.getLong(),0);
+    assertEquals(LONG_VAL_3 * INT_VAL_2, p.getLong(), 0);
     p = multiply(create(INT_VAL_2), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(INT_VAL_2*LONG_VAL_3,p.getLong(),0);
+    assertEquals(INT_VAL_2 * LONG_VAL_3, p.getLong(), 0);
 
     // short
     p = multiply(create(LONG_VAL_3), create(SHORT_VAL_e));
     assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3*SHORT_VAL_e,p.getLong(),0);
+    assertEquals(LONG_VAL_3 * SHORT_VAL_e, p.getLong(), 0);
     p = multiply(create(SHORT_VAL_e), create(LONG_VAL_3));
     assertTrue(p.isLong());
-    assertEquals(SHORT_VAL_e*LONG_VAL_3,p.getLong(),0);
+    assertEquals(SHORT_VAL_e * LONG_VAL_3, p.getLong(), 0);
   }
 
   @Test
@@ -383,18 +383,18 @@ public class PropertyValueUtilsTest {
     // int
     p = multiply(create(INT_VAL_2), create(INT_VAL_2));
     assertTrue(p.isInt());
-    assertEquals(INT_VAL_2*INT_VAL_2,p.getInt(),0);
+    assertEquals(INT_VAL_2 * INT_VAL_2, p.getInt(), 0);
 
     // short
     p = multiply(create(INT_VAL_2), create(SHORT_VAL_e));
     assertTrue(p.isInt());
-    assertEquals(INT_VAL_2*SHORT_VAL_e,p.getInt(),0);
+    assertEquals(INT_VAL_2 * SHORT_VAL_e, p.getInt(), 0);
     p = multiply(create(SHORT_VAL_e), create(INT_VAL_2));
     assertTrue(p.isInt());
-    assertEquals(SHORT_VAL_e*INT_VAL_2,p.getInt(),0);
+    assertEquals(SHORT_VAL_e * INT_VAL_2, p.getInt(), 0);
     p = multiply(create(SHORT_VAL_e), create(SHORT_VAL_e));
     assertTrue(p.isInt());
-    assertEquals(SHORT_VAL_e*SHORT_VAL_e,p.getInt(),0);
+    assertEquals(SHORT_VAL_e * SHORT_VAL_e, p.getInt(), 0);
   }
 
   @Test
