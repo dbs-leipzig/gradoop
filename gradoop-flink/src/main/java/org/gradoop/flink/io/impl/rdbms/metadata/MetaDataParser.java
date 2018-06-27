@@ -101,7 +101,7 @@ public class MetaDataParser {
 				/*
 				 * set edge direction
 				 */
-				if(table.getForeignKeys().size() == 2){
+				if(table.getForeignKeys().size() == 2 && table.getPrimaryKey().size() == 2){
 					// for n:m relations
 					table.setDirectionIndicator(false);
 				}else{
