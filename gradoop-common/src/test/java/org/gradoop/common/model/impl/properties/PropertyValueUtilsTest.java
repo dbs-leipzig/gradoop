@@ -688,7 +688,7 @@ public class PropertyValueUtilsTest {
     short minShort = (short)10;
     short maxShort = (short)11;
 
-    // MIN BigDecimal
+    // MAX BigDecimal
     p = max(create(maxBigDecimal), create(minBigDecimal));
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
@@ -731,7 +731,7 @@ public class PropertyValueUtilsTest {
     assertTrue(p.isBigDecimal());
     assertEquals(p.getBigDecimal().compareTo(maxBigDecimal), 0);
 
-    // MIN Double
+    // MAX Double
     p = max(create(maxDouble), create(minBigDecimal));
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
@@ -774,7 +774,7 @@ public class PropertyValueUtilsTest {
     assertTrue(p.isDouble());
     assertEquals(p.getDouble(), maxDouble, 0);
 
-    // MIN Float
+    // MAX Float
     p = max(create(maxFloat), create(minBigDecimal));
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
@@ -817,7 +817,7 @@ public class PropertyValueUtilsTest {
     assertTrue(p.isFloat());
     assertEquals(p.getFloat(), maxFloat, 0);
 
-    // MIN Long
+    // MAX Long
     p = max(create(maxLong), create(minBigDecimal));
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
@@ -860,7 +860,7 @@ public class PropertyValueUtilsTest {
     assertTrue(p.isLong());
     assertEquals(p.getLong(), maxLong, 0);
 
-    // MIN Int
+    // MAX Int
     p = max(create(maxInt), create(minBigDecimal));
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
@@ -903,7 +903,7 @@ public class PropertyValueUtilsTest {
     assertTrue(p.isInt());
     assertEquals(p.getInt(), maxInt, 0);
 
-    // MIN Short
+    // MAX Short
     p = max(create(maxShort), create(minBigDecimal));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
