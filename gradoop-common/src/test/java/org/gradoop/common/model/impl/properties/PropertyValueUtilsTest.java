@@ -19,9 +19,9 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-import static org.gradoop.common.GradoopTestUtils. * ;
+import static org.gradoop.common.GradoopTestUtils.* ;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Boolean.or;
-import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric. * ;
+import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric.* ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
