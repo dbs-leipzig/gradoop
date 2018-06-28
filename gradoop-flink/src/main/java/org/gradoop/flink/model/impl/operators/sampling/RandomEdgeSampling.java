@@ -39,7 +39,7 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
 
   /**
    * seed for the random number generator
-   * if seed is null, the random generator is created without seed
+   * if seed is 0, the random generator is created without seed
    */
   private final long randomSeed;
 
@@ -56,7 +56,7 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
    * Creates new RandomEdgeSampling instance.
    *
    * @param sampleSize relative sample size
-   * @param randomSeed random seed value (can be {@code null})
+   * @param randomSeed random seed value (can be 0)
    */
   public RandomEdgeSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
