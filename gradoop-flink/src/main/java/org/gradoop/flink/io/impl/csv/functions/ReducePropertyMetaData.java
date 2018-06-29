@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * Reduces all property meta data to a single element per label.
  */
-@FunctionAnnotation.ForwardedFields("f0")
+@FunctionAnnotation.ForwardedFields({"f0", "f1"})
 public class ReducePropertyMetaData implements
   GroupCombineFunction<Tuple3<String, String, Set<String>>, Tuple3<String, String, Set<String>>>,
   GroupReduceFunction<Tuple3<String, String, Set<String>>, Tuple3<String, String, Set<String>>> {
