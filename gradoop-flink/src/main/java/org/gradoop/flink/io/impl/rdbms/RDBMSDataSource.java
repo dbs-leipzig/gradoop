@@ -29,6 +29,7 @@ import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdFkTuple;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdPkTuple;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTableBase;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
@@ -78,20 +79,17 @@ public class RDBMSDataSource implements DataSource {
 		
 		try {
 
-			/*
-			 * list of rdbms tables storing conversion important metadata of every database table
-			 */
-			ArrayList<RDBMSTable> tables = MetaDataParser.parse(con.getMetaData(), con);
+			MetaDataParser metadataParser = new MetaDataParser(con);
 		
 			/*
 			 * tables convert to nodes
 			 */
-			ArrayList<RDBMSTable> tablesToNodes = new ArrayList<RDBMSTable>();
+			ArrayList<RDBMSTableBase> tablesToNodes = metadataParser.getToNodesTables();
 			
 			/*
 			 * tables convert to edges
 			 */
-			ArrayList<RDBMSTable> tablesToEdges = new ArrayList<RDBMSTable>();
+			ArrayList<RDBMSTableBase> tablesToEdges = metadataParser.getToEdgesTables();
 			
 			/*
 			 * assign tables with help of direction indicator 
