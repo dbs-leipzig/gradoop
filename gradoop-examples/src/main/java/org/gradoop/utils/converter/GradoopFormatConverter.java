@@ -36,7 +36,7 @@ public class GradoopFormatConverter extends AbstractRunner implements ProgramDes
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    System.out.println(graph.getVertices().count());
+    writeLogicalGraph(graph, args[2], args[3]);
   }
 
   @Override
