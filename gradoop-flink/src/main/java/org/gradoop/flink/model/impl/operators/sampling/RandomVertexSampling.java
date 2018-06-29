@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  */
-public class RandomNodeSampling implements UnaryGraphToGraphOperator {
+public class RandomVertexSampling implements UnaryGraphToGraphOperator {
   /**
    * relative amount of nodes in the result graph
    */
@@ -44,21 +44,21 @@ public class RandomNodeSampling implements UnaryGraphToGraphOperator {
   private final long randomSeed;
 
   /**
-   * Creates new RandomNodeSampling instance.
+   * Creates new RandomVertexSampling instance.
    *
    * @param sampleSize relative sample size
    */
-  public RandomNodeSampling(float sampleSize) {
+  public RandomVertexSampling(float sampleSize) {
     this(sampleSize, 0L);
   }
 
   /**
-   * Creates new RandomNodeSampling instance.
+   * Creates new RandomVertexSampling instance.
    *
    * @param sampleSize relative sample size
    * @param randomSeed random seed value (can be {@code null})
    */
-  public RandomNodeSampling(float sampleSize, long randomSeed) {
+  public RandomVertexSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
   }
@@ -90,6 +90,6 @@ public class RandomNodeSampling implements UnaryGraphToGraphOperator {
    */
   @Override
   public String getName() {
-    return RandomNodeSampling.class.getName();
+    return RandomVertexSampling.class.getName();
   }
 }

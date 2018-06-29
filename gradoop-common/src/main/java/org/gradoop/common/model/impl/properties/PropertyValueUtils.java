@@ -70,21 +70,21 @@ public class PropertyValueUtils {
      */
     private static final int SHORT = 0;
     /**
-     * Float type.
-     */
-    private static final int FLOAT = 1;
-    /**
      * Integer type.
      */
-    private static final int INT = 2;
-    /**
-     * Double type.
-     */
-    private static final int DOUBLE = 3;
+    private static final int INT = 1;
     /**
      * Long type.
      */
-    private static final int LONG = 4;
+    private static final int LONG = 2;
+    /**
+     * Float type.
+     */
+    private static final int FLOAT = 3;
+    /**
+     * Double type.
+     */
+    private static final int DOUBLE = 4;
     /**
      * Big decimal type.
      */
@@ -106,23 +106,12 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
-      if (returnType == SHORT)  {
-        aValue.setInt(aValue.getShort() + bValue.getShort());
+      if (returnType == INT)  {
 
-      } else if (returnType == INT)  {
-
-        int a;
-        int b;
-
-        if (sameType) {
-          a = aValue.getInt();
-          b = bValue.getInt();
-        } else {
-          a = aType == INT ? aValue.getInt() : aValue.getShort();
-          b = aType == INT ? bValue.getInt() : bValue.getShort();
-        }
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
 
         aValue.setInt(a + b);
 
@@ -135,8 +124,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aValue.setFloat(a + b);
@@ -150,8 +139,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aValue.setLong(a + b);
@@ -193,7 +182,7 @@ public class PropertyValueUtils {
     }
 
     /**
-     * returns the maximum of two types
+     * Returns the maximum of two types, at least Integer.
      *
      * @param aType first type
      * @param bType second type
@@ -201,18 +190,7 @@ public class PropertyValueUtils {
      * @return larger compatible type
      */
     private static int maxType(int aType, int bType) {
-
-      int maxType = Math.max(aType, bType);
-
-      if (maxType != BIG_DECIMAL && // not big decimal
-        aType % 2 != bType % 2 && // different supertype
-        maxType % 2 == 0) { // high supertype is integer
-
-        // next decimal type
-        maxType++;
-      }
-
-      return maxType;
+      return Math.max(Math.max(aType, bType), INT);
     }
 
     /**
@@ -231,23 +209,12 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
-      if (returnType == SHORT) {
-        aValue.setInt(aValue.getShort() * bValue.getShort());
+      if (returnType == INT)  {
 
-      } else if (returnType == INT)  {
-
-        int a;
-        int b;
-
-        if (sameType) {
-          a = aValue.getInt();
-          b = bValue.getInt();
-        } else {
-          a = aType == INT ? aValue.getInt() : aValue.getShort();
-          b = aType == INT ? bValue.getInt() : bValue.getShort();
-        }
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
 
         aValue.setInt(a * b);
 
@@ -260,8 +227,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aValue.setFloat(a * b);
@@ -275,8 +242,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aValue.setLong(a * b);
@@ -358,25 +325,14 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
       boolean aIsLessOrEqual;
 
-      if (returnType == SHORT) {
-        aIsLessOrEqual = aValue.getShort() <= bValue.getShort();
+      if (returnType == INT)  {
 
-      } else if (returnType == INT) {
-
-        int a;
-        int b;
-
-        if (sameType) {
-          a = aValue.getInt();
-          b = bValue.getInt();
-        } else {
-          a = aType == INT ? aValue.getInt() : aValue.getShort();
-          b = aType == INT ? bValue.getInt() : bValue.getShort();
-        }
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
 
         aIsLessOrEqual = a <= b;
 
@@ -389,8 +345,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aIsLessOrEqual = a <= b;
@@ -404,8 +360,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aIsLessOrEqual = a <= b;
@@ -518,6 +474,42 @@ public class PropertyValueUtils {
         return value.getLong();
       default:
         return value.getFloat();
+      }
+    }
+
+    /**
+     * Converts a value of a lower domain numerical type to Long.
+     *
+     * @param value value
+     * @param type type
+     *
+     * @return converted value
+     */
+    private static long longValue(PropertyValue value, int type) {
+      switch (type) {
+      case SHORT:
+        return value.getShort();
+      default:
+        return value.getInt();
+      }
+    }
+
+    /**
+     * Converts a value of a lower domain numerical type to Float.
+     *
+     * @param value value
+     * @param type type
+     *
+     * @return converted value
+     */
+    private static float floatValue(PropertyValue value, int type) {
+      switch (type) {
+      case SHORT:
+        return value.getShort();
+      case INT:
+        return value.getInt();
+      default:
+        return value.getLong();
       }
     }
   }
