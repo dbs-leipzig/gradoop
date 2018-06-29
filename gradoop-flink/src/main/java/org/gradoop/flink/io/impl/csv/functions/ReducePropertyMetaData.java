@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 
 import java.util.Iterator;
@@ -27,35 +27,36 @@ import java.util.Set;
 /**
  * Reduces all property meta data to a single element per label.
  */
-@FunctionAnnotation.ForwardedFields("f0")
+@FunctionAnnotation.ForwardedFields({"f0", "f1"})
 public class ReducePropertyMetaData implements
-  GroupCombineFunction<Tuple2<String, Set<String>>, Tuple2<String, Set<String>>>,
-  GroupReduceFunction<Tuple2<String, Set<String>>, Tuple2<String, Set<String>>> {
+  GroupCombineFunction<Tuple3<String, String, Set<String>>, Tuple3<String, String, Set<String>>>,
+  GroupReduceFunction<Tuple3<String, String, Set<String>>, Tuple3<String, String, Set<String>>> {
   /**
    * Reduce object instantiations
    */
-  private final Tuple2<String, Set<String>> tuple = new Tuple2<>();
+  private final Tuple3<String, String, Set<String>> tuple = new Tuple3<>();
 
   @Override
-  public void combine(Iterable<Tuple2<String, Set<String>>> iterable,
-    Collector<Tuple2<String, Set<String>>> collector) throws Exception {
+  public void combine(Iterable<Tuple3<String, String, Set<String>>> iterable,
+    Collector<Tuple3<String, String, Set<String>>> collector) throws Exception {
 
-    Iterator<Tuple2<String, Set<String>>> iterator = iterable.iterator();
-    Tuple2<String, Set<String>> first = iterator.next();
-    Set<String> keys = first.f1;
+    Iterator<Tuple3<String, String, Set<String>>> iterator = iterable.iterator();
+    Tuple3<String, String, Set<String>> first = iterator.next();
+    Set<String> keys = first.f2;
 
     while (iterator.hasNext()) {
-      keys.addAll(iterator.next().f1);
+      keys.addAll(iterator.next().f2);
     }
 
     tuple.f0 = first.f0;
-    tuple.f1 = keys;
+    tuple.f1 = first.f1;
+    tuple.f2 = keys;
     collector.collect(tuple);
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<String, Set<String>>> iterable,
-    Collector<Tuple2<String, Set<String>>> collector) throws Exception {
+  public void reduce(Iterable<Tuple3<String, String, Set<String>>> iterable,
+    Collector<Tuple3<String, String, Set<String>>> collector) throws Exception {
     combine(iterable, collector);
   }
 }

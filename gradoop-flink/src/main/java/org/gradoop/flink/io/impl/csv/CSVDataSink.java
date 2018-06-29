@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.common.model.impl.pojo.Element;
@@ -83,7 +83,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
     FileSystem.WriteMode writeMode = overwrite ?
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
-    DataSet<Tuple2<String, String>> metaData;
+    DataSet<Tuple3<String, String, String>> metaData;
     if (!reuseMetadata()) {
       metaData = createMetaData(logicalGraph);
     } else {
@@ -132,7 +132,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
    * @param graph logical graph
    * @return meta data information
    */
-  private DataSet<Tuple2<String, String>> createMetaData(LogicalGraph graph) {
+  private DataSet<Tuple3<String, String, String>> createMetaData(LogicalGraph graph) {
     return createMetaData(graph.getVertices())
       .union(createMetaData(graph.getEdges()));
   }
@@ -144,15 +144,19 @@ public class CSVDataSink extends CSVBase implements DataSink {
    * @param <E> EPGM element type
    * @return meta data information
    */
-  private <E extends Element> DataSet<Tuple2<String, String>> createMetaData(DataSet<E> elements) {
+  private <E extends Element> DataSet<Tuple3<String, String, String>> createMetaData(
+    DataSet<E> elements) {
     return elements
       .map(new ElementToPropertyMetaData<>())
-      .groupBy(0)
+      .groupBy(1)
       .combineGroup(new ReducePropertyMetaData())
-      .groupBy(0)
+      .groupBy(1)
       .reduceGroup(new ReducePropertyMetaData())
-      .map(tuple -> Tuple2.of(tuple.f0, MetaDataParser.getPropertiesMetaData(tuple.f1)))
-      .returns(new TupleTypeInfo<>(BasicTypeInfo.STRING_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO))
-      .withForwardedFields("f0");
+      .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
+      .returns(new TupleTypeInfo<>(
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO))
+      .withForwardedFields("f1");
   }
 }

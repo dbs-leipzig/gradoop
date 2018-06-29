@@ -32,11 +32,11 @@ public class CSVConstants {
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
   /**
-   * Used to specify labels in metadata (vertex or edge label)
+   * Used to specify entity type (vertex or edge)
    */
-  public static final String VERTEX_PREFIX = "v_";
+  public static final String VERTEX_TYPE = "v";
   /**
-   * Used to specify labels in metadata (vertex or edge label)
+   * Used to specify entity type (vertex or edge)
    */
-  public static final String EDGE_PREFIX = "e_";
+  public static final String EDGE_TYPE = "e";
 }

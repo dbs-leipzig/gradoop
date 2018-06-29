@@ -16,7 +16,7 @@
 package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
@@ -52,7 +52,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    DataSet<Tuple2<String, String>> metaData = MetaData.fromFile(getMetaDataPath(), getConfig());
+    DataSet<Tuple3<String, String, String>> metaData =
+      MetaData.fromFile(getMetaDataPath(), getConfig());
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())

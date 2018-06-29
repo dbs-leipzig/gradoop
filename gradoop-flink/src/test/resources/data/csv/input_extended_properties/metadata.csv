@@ -1,3 +1,3 @@
-v_User;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
-v_Post;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
-e_creatorOf;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
+v;User;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
+v;Post;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
+e;creatorOf;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short
