@@ -15,14 +15,14 @@
  */
 package org.gradoop.flink.model.impl.functions.bool;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
 
 /**
  * Logical false as Flink function.
  *
  * @param <T> data set type
  */
-public class False<T> implements FilterFunction<T> {
+public class False<T> implements CombineableFilter<T> {
 
   @Override
   public boolean filter(T t) throws Exception {

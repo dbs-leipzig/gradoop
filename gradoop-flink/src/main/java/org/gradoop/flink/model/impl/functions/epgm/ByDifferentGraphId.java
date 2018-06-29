@@ -15,16 +15,16 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * Filters graph transactions if their graph head identifier is not equal to the given identifier.
  */
 @FunctionAnnotation.ReadFields("f0")
-public class ByDifferentGraphId implements FilterFunction<GraphTransaction> {
+public class ByDifferentGraphId implements CombineableFilter<GraphTransaction> {
   /**
    * Graph head id
    */

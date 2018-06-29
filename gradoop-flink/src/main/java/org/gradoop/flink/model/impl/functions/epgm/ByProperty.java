@@ -15,18 +15,17 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
 
 /**
  * Accepts all elements which have a property with the specified key or key value combination.
  *
  * @param <E> EPGM element
  */
-public class ByProperty<E extends EPGMElement>
-  implements FilterFunction<E> {
+public class ByProperty<E extends EPGMElement> implements CombineableFilter<E> {
   /**
    * PropertyKey to be filtered on.
    */

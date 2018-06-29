@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.utils;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
 
 /**
  * Checks if a given object of type {@link IN} is instance of a specific class
@@ -24,7 +24,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
  * @param <IN>  input type
  * @param <T>   class type to check
  */
-public class IsInstance<IN, T> implements FilterFunction<IN> {
+public class IsInstance<IN, T> implements CombineableFilter<IN> {
   /**
    * Class for isInstance check
    */
