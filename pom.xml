@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.gradoop</groupId>
@@ -29,8 +31,7 @@
         <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
-        <module>gradoop-hbase</module>
-        <module>gradoop-accumulo</module>
+        <module>gradoop-store</module>
     </modules>
 
     <developers>
@@ -73,8 +74,8 @@
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
-		</developer>
-		<developer>
+        </developer>
+        <developer>
             <id>sdienst</id>
             <name>Steffen Dienst</name>
             <timezone>+1</timezone>
@@ -85,7 +86,9 @@
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
-        <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
+        <developerConnection>
+            scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git
+        </developerConnection>
     </scm>
 
     <distributionManagement>
@@ -118,6 +121,7 @@
         <dep.junit.version>4.11</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
+        <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
@@ -223,8 +227,12 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
-                        <suppressionsLocation>gradoop/checkstyle-suppressions.xml</suppressionsLocation>
-                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                        <suppressionsLocation>
+                            gradoop/checkstyle-suppressions.xml
+                        </suppressionsLocation>
+                        <suppressionsFileExpression>
+                            checkstyle.suppressions.file
+                        </suppressionsFileExpression>
                         <failsOnError>true</failsOnError>
                         <consoleOutput>true</consoleOutput>
                     </configuration>
@@ -404,12 +412,24 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-store-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-core</artifactId>
+                <version>${dep.flink.version}</version>
             </dependency>
 
             <dependency>
@@ -455,6 +475,13 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-hadoop-compat</artifactId>
                 <version>${dep.hbase.version}</version>
+            </dependency>
+
+            <!-- Kryo -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo-shaded</artifactId>
+                <version>${dep.kryo.version}</version>
             </dependency>
 
             <!-- Others -->
@@ -511,6 +538,14 @@
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-examples</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-store-api</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
