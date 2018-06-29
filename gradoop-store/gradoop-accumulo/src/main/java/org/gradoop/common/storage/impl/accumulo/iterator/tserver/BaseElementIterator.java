@@ -28,6 +28,7 @@ import org.gradoop.common.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,27 +50,27 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
   SortedKeyValueIterator<Key, Value> {
 
   /**
-   * origin accumulo data source
+   * Origin accumulo data source
    */
   private SortedKeyValueIterator<Key, Value> source;
 
   /**
-   * mapped element iterator
+   * Mapped element iterator, which will handle "next fulfilled element" instrumentation
    */
-  private Iterator<E> seekIterator;
+  private InnerIterator seekIterator;
 
   /**
-   * serialized top element
+   * Serialized top row
    */
   private Pair<Key, Value> top;
 
   /**
-   * filter predicate
+   * Element filter predicate
    */
   private AccumuloElementFilter<E> filter;
 
   /**
-   * deserialize from key-value pair
+   * Deserialize from key-value pair
    *
    * @param pair k-v pair from accumulo row
    * @return gradoop element instance
@@ -78,7 +79,8 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
   public abstract E fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException;
 
   /**
-   * serialize record to key-value pair
+   * Serialize record to key-value pair
+   *
    * @param record gradoop element instance
    * @return k-v pair as accumulo row
    */
@@ -86,21 +88,19 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
   public abstract Pair<Key, Value> toRow(@Nonnull E record) throws IOException;
 
   /**
-   * do seek from accumulo store implements
+   * Read read next element definition from accumulo store.
+   * Return null if next element does not fulfill filter formula
    *
-   * @param source store source
-   * @param range seek range
-   * @return element instance list
+   * @param source origin store source
+   * @return decoded epgm element
    */
-  @Nonnull
-  public abstract Iterator<E> doSeek(
-    /*origin iterator source*/SortedKeyValueIterator<Key, Value> source,
-    /*origin seek range*/
-    Range range
+  @Nullable
+  public abstract E readLine(
+    @Nonnull SortedKeyValueIterator<Key, Value> source
   ) throws IOException;
 
   /**
-   * get element filter predicate
+   * Get element filter predicate
    *
    * @return iterator element filter
    */
@@ -110,10 +110,8 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
 
   @Override
   public void init(
-    /*origin iterator source*/final SortedKeyValueIterator<Key, Value> source,
-    /*option*/
+    final SortedKeyValueIterator<Key, Value> source,
     final Map<String, String> options,
-    /*iterator env*/
     final IteratorEnvironment env
   ) {
     this.source = source;
@@ -139,15 +137,13 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
 
   @Override
   public void seek(
-    /*origin seek range*/final Range range,
-    /*cf include/exclude*/
+    final Range range,
     final Collection<ByteSequence> columnFamilies,
-    /*include flag*/
     final boolean inclusive
   ) throws IOException {
     //LOG.info("seek range {}", range);
     source.seek(range, new ArrayList<>(), false);
-    seekIterator = doSeek(source, range);
+    seekIterator = new InnerIterator();
     next();
   }
 
@@ -165,4 +161,55 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
   public SortedKeyValueIterator<Key, Value> deepCopy(IteratorEnvironment env) {
     throw new UnsupportedOperationException("deep copy is not supported!");
   }
+
+  /**
+   * Logical iterator for seeking fulfilled element
+   */
+  private class InnerIterator implements Iterator<E> {
+
+    /**
+     * Next element head
+     */
+    private E head;
+
+    /**
+     * Create a new inner iterator instance
+     */
+    private InnerIterator() {
+      this.head = readHead();
+    }
+
+    /**
+     * Read next head element
+     *
+     * @return edge row head
+     */
+    private E readHead() {
+      E next;
+      do {
+        try {
+          next = readLine(source);
+          if (next != null && !getFilter().test(next)) {
+            next = null;
+          }
+        } catch (IOException err) {
+          throw new RuntimeException(err);
+        }
+      } while (source.hasTop() && next == null);
+      return next;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return head != null;
+    }
+
+    @Override
+    public E next() {
+      E result = head;
+      head = readHead();
+      return result;
+    }
+  }
+
 }

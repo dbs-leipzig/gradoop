@@ -17,7 +17,6 @@
 package org.gradoop.common.storage.impl.accumulo.iterator.tserver;
 
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
@@ -33,17 +32,16 @@ import org.gradoop.common.utils.KryoUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-/***
- * accumulo gradoop vertex iterator
+/**
+ * Accumulo gradoop vertex iterator
  */
 public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
 
   /**
-   * vertex factory
+   * Vertex factory
    */
   private final VertexFactory factory = new VertexFactory();
 
@@ -69,60 +67,17 @@ public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
         record.getGraphIds()))));
   }
 
-  @Nonnull
-  @Override
-  public Iterator<EPGMVertex> doSeek(
-    SortedKeyValueIterator<Key, Value> source,
-    Range range
-  ) {
-    return new Iterator<EPGMVertex>() {
-
-      private Vertex head = readHead();
-
-      @Override
-      public boolean hasNext() {
-        return head != null;
-      }
-
-      @Override
-      public Vertex next() {
-        Vertex result = head;
-        head = readHead();
-        return result;
-      }
-
-      /**
-       * read head element
-       *
-       * @return edge row head
-       */
-      @SuppressWarnings("Duplicates")
-      private Vertex readHead() {
-        Vertex next;
-        do {
-          try {
-            next = readLine(source);
-            if (next != null && !getFilter().test(next)) {
-              next = null;
-            }
-          } catch (IOException err) {
-            throw new RuntimeException(err);
-          }
-        } while (source.hasTop() && next == null);
-        return next;
-      }
-    };
-  }
-
   /**
-   * read next edge element from table store
+   * Read read next element definition from accumulo store.
+   * Return null if next element does not fulfill filter formula
    *
-   * @param source origin accumulo source
-   * @return edge element
-   * @throws IOException io err
+   * @param source origin store source
+   * @return decoded epgm element
    */
   @Nullable
-  private Vertex readLine(SortedKeyValueIterator<Key, Value> source) throws IOException {
+  public Vertex readLine(
+    @Nonnull SortedKeyValueIterator<Key, Value> source
+  ) throws IOException {
     if (!source.hasTop()) {
       return null;
     }

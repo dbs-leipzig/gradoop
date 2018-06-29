@@ -17,7 +17,6 @@
 package org.gradoop.common.storage.impl.accumulo.iterator.tserver;
 
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
@@ -32,17 +31,16 @@ import org.gradoop.common.utils.KryoUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * accumulo gradoop graph head iterator
+ * Accumulo gradoop graph head iterator
  */
 public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead> {
 
   /**
-   * graph head factory
+   * Graph head factory
    */
   private final GraphHeadFactory factory = new GraphHeadFactory();
 
@@ -67,59 +65,17 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
         record.getProperties()))));
   }
 
-  @Nonnull
-  @Override
-  public Iterator<EPGMGraphHead> doSeek(
-    SortedKeyValueIterator<Key, Value> source,
-    Range range
-  ) {
-    return new Iterator<EPGMGraphHead>() {
-      private GraphHead head = readHead();
-
-      @Override
-      public boolean hasNext() {
-        return head != null;
-      }
-
-      @Override
-      public EPGMGraphHead next() {
-        GraphHead result = head;
-        head = readHead();
-        return result;
-      }
-
-      /**
-       * read head element
-       *
-       * @return edge row head
-       */
-      @SuppressWarnings("Duplicates")
-      private GraphHead readHead() {
-        GraphHead next;
-        do {
-          try {
-            next = readLine(source);
-            if (next != null && !getFilter().test(next)) {
-              next = null;
-            }
-          } catch (IOException err) {
-            throw new RuntimeException(err);
-          }
-        } while (source.hasTop() && next == null);
-        return next;
-      }
-    };
-  }
-
   /**
-   * read next graph head element from table store
+   * Read read next element definition from accumulo store.
+   * Return null if next element does not fulfill filter formula
    *
-   * @param source origin accumulo source
-   * @return edge element
-   * @throws IOException io err
+   * @param source origin store source
+   * @return decoded epgm element
    */
   @Nullable
-  private GraphHead readLine(SortedKeyValueIterator<Key, Value> source) throws IOException {
+  public GraphHead readLine(
+    @Nonnull SortedKeyValueIterator<Key, Value> source
+  ) throws IOException {
     if (!source.hasTop()) {
       return null;
     }

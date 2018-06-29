@@ -17,7 +17,6 @@
 package org.gradoop.common.storage.impl.accumulo.iterator.tserver;
 
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
@@ -33,17 +32,16 @@ import org.gradoop.common.utils.KryoUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * accumulo gradoop edges iterator
+ * Accumulo gradoop edges iterator
  */
 public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
 
   /**
-   * edge factory
+   * Edge factory
    */
   private final EdgeFactory factory = new EdgeFactory();
 
@@ -71,60 +69,17 @@ public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
         record.getGraphIds()))));
   }
 
-  @Nonnull
-  @Override
-  public Iterator<EPGMEdge> doSeek(
-    SortedKeyValueIterator<Key, Value> source,
-    Range range
-  ) {
-    return new Iterator<EPGMEdge>() {
-
-      private Edge head = readHead();
-
-      @Override
-      public boolean hasNext() {
-        return head != null;
-      }
-
-      @Override
-      public Edge next() {
-        Edge result = head;
-        head = readHead();
-        return result;
-      }
-
-      /**
-       * read head element
-       *
-       * @return edge row head
-       */
-      @SuppressWarnings("Duplicates")
-      private Edge readHead() {
-        Edge next;
-        do {
-          try {
-            next = readLine(source);
-            if (next != null && !getFilter().test(next)) {
-              next = null;
-            }
-          } catch (IOException err) {
-            throw new RuntimeException(err);
-          }
-        } while (source.hasTop() && next == null);
-        return next;
-      }
-    };
-  }
-
   /**
-   * read next edge element from table store
+   * Read read next element definition from accumulo store.
+   * Return null if next element does not fulfill filter formula
    *
-   * @param source origin accumulo source
-   * @return edge element
-   * @throws IOException io err
+   * @param source origin store source
+   * @return decoded epgm element
    */
   @Nullable
-  private Edge readLine(SortedKeyValueIterator<Key, Value> source) throws IOException {
+  public Edge readLine(
+    @Nonnull SortedKeyValueIterator<Key, Value> source
+  ) throws IOException {
     Edge row = new Edge();
     if (!source.hasTop()) {
       return null;
