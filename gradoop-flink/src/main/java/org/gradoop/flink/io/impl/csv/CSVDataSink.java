@@ -144,8 +144,8 @@ public class CSVDataSink extends CSVBase implements DataSink {
    * @param <E> EPGM element type
    * @return meta data information
    */
-  private <E extends Element> DataSet<Tuple3<String, String, String>> createMetaData(DataSet<E>
-    elements) {
+  private <E extends Element> DataSet<Tuple3<String, String, String>> createMetaData(
+    DataSet<E> elements) {
     return elements
       .map(new ElementToPropertyMetaData<>())
       .groupBy(1)
