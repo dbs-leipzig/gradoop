@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.io.impl.csv.metadata;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -86,13 +86,14 @@ public class MetaDataParser {
    * @param metaDataStrings (label, meta-data) tuples
    * @return Meta Data object
    */
-  public static MetaData create(List<Tuple2<String, String>> metaDataStrings) {
-    Map<String, List<PropertyMetaData>> metaDataMap = new HashMap<>(metaDataStrings.size());
+  public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {
+    Map<String, List<PropertyMetaData>> labelPropertiesMap = new HashMap<>(metaDataStrings.size());
+    Map<String, String> labelTypeMap = new HashMap<>(metaDataStrings.size());
 
-    for (Tuple2<String, String> tuple : metaDataStrings) {
+    for (Tuple3<String, String, String> tuple : metaDataStrings) {
       List<PropertyMetaData> propertyMetaDataList;
-      if (tuple.f1.length() > 0) {
-        String[] propertyStrings = tuple.f1.split(PROPERTY_DELIMITER);
+      if (tuple.f2.length() > 0) {
+        String[] propertyStrings = tuple.f2.split(PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
           String[] propertyTokens = propertyString.split(PROPERTY_TOKEN_DELIMITER);
@@ -118,10 +119,11 @@ public class MetaDataParser {
       } else {
         propertyMetaDataList = new ArrayList<>(0);
       }
-      metaDataMap.put(tuple.f0, propertyMetaDataList);
+      labelPropertiesMap.put(tuple.f1, propertyMetaDataList);
+      labelTypeMap.put(tuple.f1, tuple.f0);
     }
 
-    return new MetaData(metaDataMap);
+    return new MetaData(labelPropertiesMap, labelTypeMap);
   }
 
   /**

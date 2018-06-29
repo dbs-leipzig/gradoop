@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.csv.metadata;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -41,14 +41,20 @@ public class MetaData {
    * Mapping between an element label and its associated property meta data.
    */
   private Map<String, List<PropertyMetaData>> metaData;
+  /**
+   * Mapping between an label and its type.
+   */
+  private Map<String, String> labelType;
 
   /**
    * Constructor
    *
-   * @param metaData meta data
+   * @param metaData contains entity label and its property strings
+   * @param labelType contains entity label and its type
    */
-  MetaData(Map<String, List<PropertyMetaData>> metaData) {
+  MetaData(Map<String, List<PropertyMetaData>> metaData, Map<String, String> labelType) {
     this.metaData = metaData;
+    this.labelType = labelType;
   }
 
   /**
@@ -59,14 +65,15 @@ public class MetaData {
    * @param config gradoop configuration
    * @return (label, metadata) tuple dataset
    */
-  public static DataSet<Tuple2<String, String>> fromFile(String path, GradoopFlinkConfig config) {
+  public static DataSet<Tuple3<String, String, String>> fromFile(String path, GradoopFlinkConfig
+    config) {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
-          return Tuple2.of(tokens[0], tokens[1]);
+          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);
+          return Tuple3.of(tokens[0], tokens[1], tokens[2]);
         })
-      .returns(new TypeHint<Tuple2<String, String>>() { });
+      .returns(new TypeHint<Tuple3<String, String, String>>() { });
   }
 
   /**
@@ -85,8 +92,8 @@ public class MetaData {
 
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {
       return MetaDataParser.create(br.lines()
-        .map(line -> line.split(CSVConstants.TOKEN_DELIMITER, 2))
-        .map(tokens -> Tuple2.of(tokens[0], tokens[1]))
+        .map(line -> line.split(CSVConstants.TOKEN_DELIMITER, 3))
+        .map(tokens -> Tuple3.of(tokens[0], tokens[1], tokens[2]))
         .collect(Collectors.toList()));
     }
   }
@@ -97,9 +104,8 @@ public class MetaData {
    * @return vertex labels
    */
   public Set<String> getVertexLabels() {
-    return metaData.keySet().stream()
-      .filter(l -> l.substring(0, 2).equals(CSVConstants.VERTEX_PREFIX))
-      .map(l -> l.substring(2, l.length()))
+    return labelType.keySet().stream()
+      .filter(l -> labelType.get(l).equals(CSVConstants.VERTEX_TYPE))
       .collect(Collectors.toSet());
   }
 
@@ -109,9 +115,8 @@ public class MetaData {
    * @return edge labels
    */
   public Set<String> getEdgeLabels() {
-    return metaData.keySet().stream()
-      .filter(l -> l.substring(0, 2).equals(CSVConstants.EDGE_PREFIX))
-      .map(l -> l.substring(2, l.length()))
+    return labelType.keySet().stream()
+      .filter(l -> labelType.get(l).equals(CSVConstants.EDGE_TYPE))
       .collect(Collectors.toSet());
   }
 
