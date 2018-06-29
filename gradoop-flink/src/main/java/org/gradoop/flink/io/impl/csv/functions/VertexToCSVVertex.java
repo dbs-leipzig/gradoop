@@ -17,7 +17,6 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 
 /**
@@ -40,10 +39,5 @@ public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
     csvVertex.setLabel(vertex.getLabel());
     csvVertex.setProperties(getPropertyString(vertex));
     return csvVertex;
-  }
-
-  @Override
-  String getPrefix() {
-    return CSVConstants.VERTEX_PREFIX;
   }
 }

@@ -1,4 +1,4 @@
-v_A;a:string,b:int,c:float
-v_B;a:long,b:boolean,c:double
-e_a;a:int,b:float
-e_b;a:long
+v;A;a:string,b:int,c:float
+v;B;a:long,b:boolean,c:double
+e;a;a:int,b:float
+e;b;a:long

@@ -55,12 +55,6 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
     this.properties = Properties.create();
   }
 
-  /**
-   * Returns prefix for labels used in metadata
-   *
-   * @return prefix of the given elements
-   */
-  abstract String getPrefix();
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -79,7 +73,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    */
   Properties parseProperties(String label, String propertyValueString) {
     String[] propertyValues = propertyValueString.split(valueDelimiter);
-    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(getPrefix() + label);
+    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(label);
     properties.clear();
     for (int i = 0; i < propertyValues.length; i++) {
       if (propertyValues[i].length() > 0) {

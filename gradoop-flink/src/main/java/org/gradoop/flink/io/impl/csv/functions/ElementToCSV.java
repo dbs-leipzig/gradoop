@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
  * @param <E> EPGM element type
  * @param <T> output tuple type
  */
-public abstract class ElementToCSV<E extends Element, T extends Tuple> extends RichMapFunction<E , T> {
+public abstract class ElementToCSV<E extends Element, T extends Tuple>
+  extends RichMapFunction<E , T> {
   /**
    * Constant for an empty string.
    */
@@ -50,20 +51,13 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple> extends R
   }
 
   /**
-   * Returns prefix for labels used in metadata
-   *
-   * @return prefix of the given elements
-   */
-  abstract String getPrefix();
-
-  /**
    * Returns the concatenated property values of the specified element according to the meta data.
    *
    * @param element EPGM element
    * @return property value string
    */
   String getPropertyString(E element) {
-    return metaData.getPropertyMetaData(getPrefix() + element.getLabel()).stream()
+    return metaData.getPropertyMetaData(element.getLabel()).stream()
       .map(metaData -> element.getPropertyValue(metaData.getKey()))
       .map(value -> value == null ? EMPTY_STRING : value.toString())
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
