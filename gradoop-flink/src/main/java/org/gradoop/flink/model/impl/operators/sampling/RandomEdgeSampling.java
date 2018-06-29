@@ -27,38 +27,38 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
- * Takes a logical graph and a user defined aggregate function as input. The
- * aggregate function is applied on the logical graph and the resulting
- * aggregate is stored as an additional property at the result graph.
+ * Computes an edge sampling of the graph. Retains randomly chosen edges of a given relative amount
+ * and their associated source- and target-vertices. No unconnected vertices will retain in the
+ * sampled graph.
  */
-public class RandomVertexSampling implements UnaryGraphToGraphOperator {
+public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
   /**
-   * relative amount of nodes in the result graph
+   * relative amount of edges in the result graph
    */
   private final float sampleSize;
 
   /**
    * seed for the random number generator
-   * if no seed is null, the random generator is created without seed
+   * if seed is 0, the random generator is created without seed
    */
   private final long randomSeed;
 
   /**
-   * Creates new RandomVertexSampling instance.
+   * Creates new RandomEdgeSampling instance.
    *
-   * @param sampleSize relative sample size
+   * @param sampleSize relative preprocess size
    */
-  public RandomVertexSampling(float sampleSize) {
+  public RandomEdgeSampling(float sampleSize) {
     this(sampleSize, 0L);
   }
 
   /**
-   * Creates new RandomVertexSampling instance.
+   * Creates new RandomEdgeSampling instance.
    *
    * @param sampleSize relative sample size
-   * @param randomSeed random seed value (can be {@code null})
+   * @param randomSeed random seed value (can be 0)
    */
-  public RandomVertexSampling(float sampleSize, long randomSeed) {
+  public RandomEdgeSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
   }
@@ -68,20 +68,18 @@ public class RandomVertexSampling implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
+    DataSet<Edge> newEdges =
+      graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<Vertex> newVertices = graph.getVertices()
-      .filter(new RandomFilter<>(sampleSize, randomSeed));
+    DataSet<Vertex> newSourceVertices =
+      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new SourceId<>())
+        .with(new LeftSide<>()).distinct(new Id<>());
 
-    DataSet<Edge> newEdges = graph.getEdges()
-      .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(newVertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>());
+    DataSet<Vertex> newTargetVertices =
+      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new TargetId<>())
+        .with(new LeftSide<>()).distinct(new Id<>());
 
+    DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
@@ -90,6 +88,6 @@ public class RandomVertexSampling implements UnaryGraphToGraphOperator {
    */
   @Override
   public String getName() {
-    return RandomVertexSampling.class.getName();
+    return RandomEdgeSampling.class.getName();
   }
 }

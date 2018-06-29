@@ -16,20 +16,19 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMElement;
 
 import java.util.Random;
 
 /**
- * Creates a random value for each vertex and filters those that are below a
+ * Creates a random value for each EPGM element and filters those that are below a
  * given threshold.
  *
- * @param <V> EPGM vertex type
+ * @param <E> EPGM edge type
  */
-public class VertexRandomFilter<V extends Vertex>
-  implements FilterFunction<V> {
+public class RandomFilter<E extends EPGMElement> implements FilterFunction<E> {
   /**
-   * Threshold to decide if a vertex needs to be filtered.
+   * Threshold to decide if an EPGM element needs to be filtered.
    */
   private final float threshold;
   /**
@@ -43,17 +42,16 @@ public class VertexRandomFilter<V extends Vertex>
    * @param sampleSize relative sample size
    * @param randomSeed random seed (can be {@code} null)
    */
-  public VertexRandomFilter(float sampleSize, long randomSeed) {
+  public RandomFilter(float sampleSize, long randomSeed) {
     threshold = sampleSize;
-    randomGenerator =
-      (randomSeed != 0L) ? new Random(randomSeed) : new Random();
+    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(V vertex) throws Exception {
-    return randomGenerator.nextFloat() < threshold;
+  public boolean filter(E e) throws Exception {
+    return randomGenerator.nextFloat() <= threshold;
   }
 }
