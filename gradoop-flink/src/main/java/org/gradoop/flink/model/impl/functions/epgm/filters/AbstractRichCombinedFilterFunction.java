@@ -16,55 +16,55 @@ import java.util.Objects;
  * @param <T> The type of elements to filter.
  */
 public abstract class AbstractRichCombinedFilterFunction<T>
-        extends RichFilterFunction<T> implements CombineableFilter<T> {
+  extends RichFilterFunction<T> implements CombineableFilter<T> {
 
-    /**
-     * The filters this filter is composed of.
-     */
-    protected final FilterFunction<? super T>[] components;
+  /**
+   * The filters this filter is composed of.
+   */
+  protected final FilterFunction<? super T>[] components;
 
-    /**
-     * Constructor setting the component filter functions that this filter is
-     * composed of.
-     *
-     * @param filters The filters.
-     */
-    @SafeVarargs
-    public AbstractRichCombinedFilterFunction(
-            FilterFunction<? super T>... filters) {
-        for (FilterFunction<? super T> filter : filters) {
-            Objects.requireNonNull(filter);
-        }
-        components = filters;
+  /**
+   * Constructor setting the component filter functions that this filter is
+   * composed of.
+   *
+   * @param filters The filters.
+   */
+  @SafeVarargs
+  public AbstractRichCombinedFilterFunction(
+  FilterFunction<? super T>... filters) {
+    for (FilterFunction<? super T> filter : filters) {
+      Objects.requireNonNull(filter);
     }
+    components = filters;
+  }
 
-    @Override
-    public void setRuntimeContext(RuntimeContext t) {
-        super.setRuntimeContext(t);
-        for (FilterFunction<? super T> component : components) {
-            if (component instanceof RichFunction) {
-                ((RichFunction) component).setRuntimeContext(t);
-            }
-        }
+  @Override
+  public void setRuntimeContext(RuntimeContext t) {
+    super.setRuntimeContext(t);
+    for (FilterFunction<? super T> component : components) {
+      if (component instanceof RichFunction) {
+        ((RichFunction) component).setRuntimeContext(t);
+      }
     }
+  }
 
-    @Override
-    public void open(Configuration parameters) throws Exception {
-        super.open(parameters);
-        for (FilterFunction<? super T> component : components) {
-            if (component instanceof RichFunction) {
-                ((RichFunction) component).open(parameters);
-            }
-        }
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    super.open(parameters);
+    for (FilterFunction<? super T> component : components) {
+      if (component instanceof RichFunction) {
+        ((RichFunction) component).open(parameters);
+      }
     }
+  }
 
-    @Override
-    public void close() throws Exception {
-        super.close();
-        for (FilterFunction<? super T> component : components) {
-            if (component instanceof RichFunction) {
-                ((RichFunction) component).close();
-            }
-        }
+  @Override
+  public void close() throws Exception {
+    super.close();
+    for (FilterFunction<? super T> component : components) {
+      if (component instanceof RichFunction) {
+        ((RichFunction) component).close();
+      }
     }
+  }
 }
