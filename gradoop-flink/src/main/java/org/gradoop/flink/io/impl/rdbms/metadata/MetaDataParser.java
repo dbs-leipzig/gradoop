@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,30 @@ import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
  *
  */
 public class MetaDataParser {
+	
+	private Connection con;
+	private DatabaseMetaData metadata;
+	private ArrayList<ToNodesTable> toNodesTables;
+	private ArrayList<ToEdgesTable> toEdgesTables;
+	
+	public MetaDataParser(Connection con){
+		this.con = con;
+		try {
+			this.metadata = con.getMetaData();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Can't get Database Metadata !");
+		}
+	}
+	
+	public void parse(){
+		
+	}
+	
+	public ArrayList<ToNodesTable> getToNodesTables(){
+		parse();
+		return toNodesTables;
+	}
 
 	/**
 	 * Queries rdbms' metadata 

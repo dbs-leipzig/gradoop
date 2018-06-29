@@ -72,7 +72,7 @@ public class FlinkConnect {
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)
 					.setQuery(table.getNodeSqlQuery() + " limit ? offset ?")
-					.setRowTypeInfo(new MapTypeInformation().getRowTypeInfo(table))
+					.setRowTypeInfo(MapTypeInformation.getRowTypeInfo(table))
 					.setParametersProvider(new GenericParameterValuesProvider(parameters))
 					.finish();
 		}
@@ -88,7 +88,7 @@ public class FlinkConnect {
 					.setUsername(rdbmsConfig.f1)
 					.setPassword(rdbmsConfig.f2)
 					.setQuery(table.getEdgeSqlQuery() + " limit ? offset ?")
-					.setRowTypeInfo(new MapTypeInformation().getRowTypeInfo(table))
+					.setRowTypeInfo(MapTypeInformation.getRowTypeInfo(table))
 					.setParametersProvider(new GenericParameterValuesProvider(parameters))
 					.finish();
 		}
