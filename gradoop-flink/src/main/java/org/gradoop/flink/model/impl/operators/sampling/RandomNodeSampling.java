@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomFilter;
+import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
  * Takes a logical graph and a user defined aggregate function as input. The
@@ -70,17 +70,17 @@ public class RandomNodeSampling implements UnaryGraphToGraphOperator {
   public LogicalGraph execute(LogicalGraph graph) {
 
     DataSet<Vertex> newVertices = graph.getVertices()
-      .filter(new VertexRandomFilter<>(sampleSize, randomSeed));
+      .filter(new RandomFilter<>(sampleSize, randomSeed));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
       .where(new SourceId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
       .join(newVertices)
       .where(new TargetId<>())
-      .equalTo(new Id<Vertex>())
-      .with(new LeftSide<Edge, Vertex>());
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }

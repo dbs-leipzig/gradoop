@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
-import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeRandomFilter;
+import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
  * Computes an edge sampling of the graph. Retains randomly chosen edges of a given relative amount
@@ -69,7 +69,7 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Edge> newEdges =
-      graph.getEdges().filter(new EdgeRandomFilter<>(sampleSize, randomSeed));
+      graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
 
     DataSet<Vertex> newSourceVertices =
       graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new SourceId<>())
