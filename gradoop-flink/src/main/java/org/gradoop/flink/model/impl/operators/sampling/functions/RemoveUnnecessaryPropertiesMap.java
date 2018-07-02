@@ -20,6 +20,10 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 
 import java.util.Vector;
 
+/**
+ *  maps an element to the same element in which some given properties are removed
+ * @param <E> the given element type
+ */
 public class RemoveUnnecessaryPropertiesMap<E extends EPGMElement> implements MapFunction<E, E> {
   /**
    * the property names which will be removed from the element

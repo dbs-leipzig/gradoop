@@ -19,6 +19,9 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
+/**
+ * A map from a vertex to its degree
+ */
 public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
   /**
    * the property name for degree
