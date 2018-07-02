@@ -37,11 +37,9 @@ import java.util.Map.Entry;
 
 /**
  * The abstract base class for all Rich output formats that are file based. Contains the logic to
- * open/close the target
- * file streams.
- * Feature to open several files concurrent.
+ * open/close the target file streams. Feature to open several files concurrent.
  *
- * @param <IT>
+ * @param <IT> used output format
  *
  * references to: org.apache.flink.api.common.io.FileOutputFormat;
  */
@@ -82,7 +80,7 @@ public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> 
   /**
    * Separator for directories
    */
-  private static String DIRECTORY_SEPARATOR = "/";
+  private static String DIRECTORY_SEPARATOR = CSVConstants.DIRECTORY_SEPARATOR;
 
   /**
    * The LOG for logging messages in this class.

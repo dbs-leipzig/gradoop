@@ -170,6 +170,6 @@ public abstract class CSVBase {
         BasicTypeInfo.STRING_TYPE_INFO,
         BasicTypeInfo.STRING_TYPE_INFO,
         BasicTypeInfo.STRING_TYPE_INFO))
-      .withForwardedFields("f1");
+      .withForwardedFields("f0", "f1");
   }
 }

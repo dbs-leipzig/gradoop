@@ -19,6 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.core.fs.FSDataOutputStream;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.types.StringValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 import org.slf4j.Logger;
@@ -34,9 +35,10 @@ import java.util.Map.Entry;
 /**
  * This is an OutputFormat to serialize {@link Tuple}s to text by there labels.
  * The output is structured by record delimiters and field delimiters as common in CSV files.
- *Record delimiter separate records from each other ('\n' is common). Field
+ * Record delimiter separate records from each other ('\n' is common). Field
  * delimiters separate fields within a record.
- * @param <T>
+ *
+ * @param <T> Tuple that will be written to csv
  *
  * references to: org.apache.flink.api.java.io.CSVOutputFormat
  */
@@ -45,13 +47,12 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   /**
    * The default line delimiter if no one is set.
    */
-  public static final String DEFAULT_LINE_DELIMITER = IndexedCSVFileFormat.DEFAULT_LINE_DELIMITER;
+  public static final String DEFAULT_LINE_DELIMITER = CSVConstants.ROW_DELIMITER;
 
   /**
    * The default field delimiter if no is set.
    */
-  public static final String DEFAULT_FIELD_DELIMITER = String.valueOf(
-      IndexedCSVFileFormat.DEFAULT_FIELD_DELIMITER);
+  public static final String DEFAULT_FIELD_DELIMITER = CSVConstants.TOKEN_DELIMITER;
 
   /**
    * The key under which the name of the target path is stored in the configuration.

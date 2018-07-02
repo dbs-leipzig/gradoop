@@ -134,7 +134,7 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
    * @param filePath The path pointing to the location the CSV file is written to.
    * @param rowDelimiter The row delimiter to separate Tuples.
    * @param fieldDelimiter The field delimiter to separate Tuple fields.
-   * @param wm The behavior regarding existing files. Options are NO_OVERWRITE and OVERWRITE.
+   * @param writeMode The behavior regarding existing files. Options are NO_OVERWRITE and OVERWRITE.
    * @param <X> Tuple for indexed CSV file format.
    * @return An indexed CSV file format for the tuple.
    *
@@ -143,11 +143,11 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
   @SuppressWarnings("unchecked")
   private <X extends Tuple> IndexedCSVFileFormat<X> internalWriteAsIndexedCsv(
     DataSet dataSet, Path filePath, String rowDelimiter, String fieldDelimiter,
-    WriteMode wm) {
+    WriteMode writeMode) {
     Preconditions.checkArgument(dataSet.getType().isTupleType(),
       "The writeAsCsv() method can only be used on data sets of tuples.");
     IndexedCSVFileFormat<X> of = new IndexedCSVFileFormat<>(filePath, rowDelimiter, fieldDelimiter);
-    of.setWriteMode(wm);
+    of.setWriteMode(writeMode);
     return of;
   }
 }
