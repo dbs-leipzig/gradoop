@@ -23,6 +23,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
@@ -128,6 +129,8 @@ public abstract class AbstractRunner {
       graph.writeTo(new JSONDataSink(appendSeparator(directory), graph.getConfig()));
     } else if (format.equals("csv")) {
       graph.writeTo(new CSVDataSink(appendSeparator(directory), graph.getConfig()));
+    } else if (format.equals("indexed")) {
+      graph.writeTo(new IndexedCSVDataSink(appendSeparator(directory), graph.getConfig()));
     }
     getExecutionEnvironment().execute();
   }

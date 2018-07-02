@@ -39,4 +39,12 @@ public class CSVConstants {
    * Used to specify entity type (vertex or edge)
    */
   public static final String EDGE_TYPE = "e";
+  /**
+   * System constant file separator
+   */
+  public static final String DIRECTORY_SEPARATOR = System.getProperty("file.separator");
+  /**
+   * File name for indexed data
+   */
+  public static final String SIMPLE_FILE = "data.csv";
 }
