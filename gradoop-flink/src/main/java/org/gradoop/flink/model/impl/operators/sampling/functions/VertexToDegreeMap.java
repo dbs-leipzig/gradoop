@@ -20,14 +20,26 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
-  String nameOfDegreeProperty;
+  /**
+   * the property name for degree
+   */
+  private String nameOfDegreeProperty;
 
+  /**
+   * constructor
+   *
+   * @param nameOfDegreeProperty the property name for degree
+   */
   public VertexToDegreeMap(String nameOfDegreeProperty) {
     this.nameOfDegreeProperty = nameOfDegreeProperty;
   }
 
+  /**
+   * @param vertex the given vertex
+   * @return the degree of that vertex
+   */
   @Override
-  public Tuple1<Long> map(Vertex vertex) throws Exception {
+  public Tuple1<Long> map(Vertex vertex) {
     return new Tuple1<>(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));
   }
 }

@@ -21,16 +21,31 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import java.util.Vector;
 
 public class RemoveUnnecessaryPropertiesMap<E extends EPGMElement> implements MapFunction<E, E> {
+  /**
+   * the property names which will be removed from the element
+   */
   private Vector<String> propertyNames;
 
+  /**
+   * Constructor
+   * @param propertyNames the names of porperties which should be rempoved
+   */
   public RemoveUnnecessaryPropertiesMap(Vector<String> propertyNames) {
     this.propertyNames = propertyNames;
   }
 
+  /**
+   * maps an element to the same element in which some given properties are removed
+   *
+   * @param epgmElement the element for which the properties should be removed
+   * @return the same element
+   * @throws Exception in which the properties with the given names are removed
+   */
   @Override
   public E map(E epgmElement) throws Exception {
-    for(String propertyName : propertyNames)
+    for (String propertyName : propertyNames) {
       epgmElement.removeProperty(propertyName);
+    }
     return epgmElement;
   }
 }

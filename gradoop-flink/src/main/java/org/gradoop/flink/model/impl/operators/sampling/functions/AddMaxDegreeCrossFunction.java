@@ -20,12 +20,24 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, Vertex, Vertex> {
-  public String nameOfMaxDegreeProperty;
 
+  /**
+   * name of the property for maximum degree
+   */
+  private String nameOfMaxDegreeProperty;
+
+  /**
+   * constructor
+   *
+   * @param nameOfMaxDegreeProperty name of the property for maximum degree
+   */
   public AddMaxDegreeCrossFunction(String nameOfMaxDegreeProperty) {
     this.nameOfMaxDegreeProperty = nameOfMaxDegreeProperty;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Vertex cross(Tuple1<Long> longTuple1, Vertex vertex) {
     vertex.setProperty(nameOfMaxDegreeProperty,longTuple1.f0);
