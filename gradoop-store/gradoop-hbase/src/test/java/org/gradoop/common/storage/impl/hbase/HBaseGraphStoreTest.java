@@ -21,6 +21,7 @@ import org.gradoop.GradoopHBaseTestBase;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -38,12 +39,14 @@ import org.gradoop.common.storage.impl.hbase.api.PersistentVertexFactory;
 import org.gradoop.common.storage.impl.hbase.factory.HBaseEdgeFactory;
 import org.gradoop.common.storage.impl.hbase.factory.HBaseGraphHeadFactory;
 import org.gradoop.common.storage.impl.hbase.factory.HBaseVertexFactory;
+import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.gradoop.common.GradoopTestUtils.*;
@@ -292,6 +295,105 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
         break;
       }
     }
+  }
+
+  @Test
+  public void testGetGraphSpaceWithIdPredicate() throws IOException {
+    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+
+    List<PersistentGraphHead> graphHeads =
+      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentGraphHeads());
+
+    // store some data
+    for (PersistentGraphHead g : graphHeads) {
+      graphStore.writeGraphHead(g);
+    }
+
+    graphStore.flush();
+
+    List<PersistentGraphHead> inputGraphHeads = graphHeads.subList(1, 2);
+
+    //edge id query
+    GradoopIdSet ids = GradoopIdSet.fromExisting(inputGraphHeads.stream()
+      .map(EPGMIdentifiable::getId)
+      .collect(Collectors.toList()));
+
+    List<GraphHead> queryResult = graphStore
+      .getGraphSpace(
+        Query.elements()
+          .fromSets(ids)
+          .noFilter())
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(inputGraphHeads, queryResult);
+
+    graphStore.close();
+  }
+
+  @Test
+  public void testGetVertexSpaceWithIdPredicate() throws IOException {
+    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+
+    List<PersistentVertex<Edge>> vertices =
+      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentVertices());
+
+    // store some data
+    for (PersistentVertex<Edge> v : vertices) {
+      graphStore.writeVertex(v);
+    }
+
+    graphStore.flush();
+
+    List<PersistentVertex<Edge>> inputVertices = vertices.subList(1, 5);
+
+    //edge id query
+    GradoopIdSet ids = GradoopIdSet.fromExisting(inputVertices.stream()
+      .map(EPGMIdentifiable::getId)
+      .collect(Collectors.toList()));
+
+    List<Vertex> queryResult = graphStore
+      .getVertexSpace(
+        Query.elements()
+          .fromSets(ids)
+          .noFilter())
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(inputVertices, queryResult);
+
+    graphStore.close();
+  }
+
+  @Test
+  public void testGetEdgeSpaceWithIdPredicate() throws IOException {
+    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+
+    List<PersistentEdge<Vertex>> edges =
+      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentEdges());
+
+    // store some data
+    for (PersistentEdge<Vertex> e : edges) {
+      graphStore.writeEdge(e);
+    }
+
+    graphStore.flush();
+
+    List<PersistentEdge<Vertex>> inputEdges = edges.subList(3, 8);
+
+    //edge id query
+    GradoopIdSet ids = GradoopIdSet.fromExisting(inputEdges.stream()
+      .map(EPGMIdentifiable::getId)
+      .collect(Collectors.toList()));
+
+    List<Edge> queryResult = graphStore
+      .getEdgeSpace(
+        Query.elements()
+          .fromSets(ids)
+          .noFilter())
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(inputEdges, queryResult);
+
+    graphStore.close();
   }
 
   private AsciiGraphLoader<GraphHead, Vertex, Edge>

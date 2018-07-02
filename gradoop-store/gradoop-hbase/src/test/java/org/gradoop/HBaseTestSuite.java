@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  HBaseGraphStoreTest.class,
+  //HBaseGraphStoreTest.class,
   HBaseDataSinkSourceTest.class
 })
 public class HBaseTestSuite {

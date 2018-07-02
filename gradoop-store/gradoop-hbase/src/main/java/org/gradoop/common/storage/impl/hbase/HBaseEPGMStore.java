@@ -21,6 +21,7 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.config.GradoopHBaseConfig;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -28,7 +29,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.api.EPGMConfigProvider;
 import org.gradoop.common.storage.api.EPGMGraphInput;
-import org.gradoop.common.storage.api.EPGMGraphOutput;
 import org.gradoop.common.storage.api.EPGMGraphPredictableOutput;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
@@ -39,9 +39,13 @@ import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseEdgeIterator;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseGraphIterator;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseVertexIterator;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.common.storage.iterator.ClosableIterator;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
@@ -53,8 +57,10 @@ import java.io.IOException;
 public class HBaseEPGMStore implements
   EPGMConfigProvider<GradoopHBaseConfig>,
   EPGMGraphInput<PersistentGraphHead, PersistentVertex<Edge>, PersistentEdge<Vertex>>,
-  EPGMGraphOutput {
-  //TODO make HBaseEPGMStore implement EPGMGraphPredictableOutput
+  EPGMGraphPredictableOutput<
+    HBaseElementFilter<GraphHead>,
+    HBaseElementFilter<Vertex>,
+    HBaseElementFilter<Edge>> {
 
   /**
    * Default value for clearing buffer on fail.
@@ -229,38 +235,114 @@ public class HBaseEPGMStore implements
   /**
    * {@inheritDoc}
    */
-  @Override
   @Nonnull
-  public ClosableIterator<GraphHead> getGraphSpace(int cacheSize) throws IOException {
+  @Override
+  public ClosableIterator<GraphHead> getGraphSpace(
+    @Nullable ElementQuery<HBaseElementFilter<GraphHead>> query,
+    int cacheSize
+  ) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
+
+    if (query != null) {
+      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+      if (query.getQueryRanges() != null &&
+        !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(
+          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
+        );
+      }
+
+      if (query.getFilterPredicate() != null &&
+        query.getFilterPredicate().toHBaseFilter() != null) {
+        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+      }
+
+      // if there are filters inside the root list, add it to the Scan object
+      if (!conjunctFilters.getFilters().isEmpty()) {
+        scan.setFilter(conjunctFilters);
+      }
+    }
+
     return new HBaseGraphIterator<>(graphHeadTable.getScanner(scan), config.getGraphHeadHandler());
   }
 
   /**
    * {@inheritDoc}
    */
-  @Override
   @Nonnull
-  public ClosableIterator<Vertex> getVertexSpace(int cacheSize) throws IOException {
+  @Override
+  public ClosableIterator<Vertex> getVertexSpace(
+    @Nullable ElementQuery<HBaseElementFilter<Vertex>> query,
+    int cacheSize
+  ) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
+
+    if (query != null) {
+      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+      if (query.getQueryRanges() != null &&
+        !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(
+          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
+        );
+      }
+
+      if (query.getFilterPredicate() != null &&
+        query.getFilterPredicate().toHBaseFilter() != null) {
+        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+      }
+
+      // if there are filters inside the root list, add it to the Scan object
+      if (!conjunctFilters.getFilters().isEmpty()) {
+        scan.setFilter(conjunctFilters);
+      }
+    }
+
     return new HBaseVertexIterator<>(vertexTable.getScanner(scan), config.getVertexHandler());
   }
 
   /**
    * {@inheritDoc}
    */
-  @Override
   @Nonnull
-  public ClosableIterator<Edge> getEdgeSpace(int cacheSize) throws IOException {
+  @Override
+  public ClosableIterator<Edge> getEdgeSpace(
+    @Nullable ElementQuery<HBaseElementFilter<Edge>> query,
+    int cacheSize
+  ) throws IOException {
     Scan scan = new Scan();
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
+
+    if (query != null) {
+      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+      if (query.getQueryRanges() != null &&
+        !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(
+          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
+        );
+      }
+
+      if (query.getFilterPredicate() != null &&
+        query.getFilterPredicate().toHBaseFilter() != null) {
+        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+      }
+
+      // if there are filters inside the root list, add it to the Scan object
+      if (!conjunctFilters.getFilters().isEmpty()) {
+        scan.setFilter(conjunctFilters);
+      }
+    }
+
     return new HBaseEdgeIterator<>(edgeTable.getScanner(scan), config.getEdgeHandler());
   }
+
 
   /**
    * {@inheritDoc}

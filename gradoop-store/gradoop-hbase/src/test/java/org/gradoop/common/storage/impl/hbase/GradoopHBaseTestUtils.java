@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.storage.impl.hbase;
 
+import com.google.common.collect.Lists;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -46,6 +47,10 @@ import java.util.Set;
 
 public class GradoopHBaseTestUtils {
 
+  private static Collection<PersistentGraphHead> socialPersistentGraphHeads;
+  private static Collection<PersistentVertex<Edge>> socialPersistentVertices;
+  private static Collection<PersistentEdge<Vertex>> socialPersistentEdges;
+
   //----------------------------------------------------------------------------
   // Data generation
   //----------------------------------------------------------------------------
@@ -59,7 +64,12 @@ public class GradoopHBaseTestUtils {
    */
   public static Collection<PersistentGraphHead> getSocialPersistentGraphHeads()
     throws IOException {
-    return getPersistentGraphHeads(GradoopTestUtils.getSocialNetworkLoader());
+    if (socialPersistentGraphHeads == null) {
+      socialPersistentGraphHeads = getPersistentGraphHeads(
+        GradoopTestUtils.getSocialNetworkLoader()
+      );
+    }
+    return socialPersistentGraphHeads;
   }
 
   /**
@@ -71,7 +81,10 @@ public class GradoopHBaseTestUtils {
    */
   public static Collection<PersistentVertex<Edge>> getSocialPersistentVertices()
     throws IOException {
-    return getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
+    if (socialPersistentVertices == null) {
+      socialPersistentVertices = getPersistentVertices(GradoopTestUtils.getSocialNetworkLoader());
+    }
+    return socialPersistentVertices;
   }
 
   /**
@@ -83,7 +96,10 @@ public class GradoopHBaseTestUtils {
    */
   public static Collection<PersistentEdge<Vertex>> getSocialPersistentEdges()
     throws IOException {
-    return getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
+    if (socialPersistentEdges == null) {
+      socialPersistentEdges = getPersistentEdges(GradoopTestUtils.getSocialNetworkLoader());
+    }
+    return socialPersistentEdges;
   }
 
   //----------------------------------------------------------------------------
@@ -173,5 +189,30 @@ public class GradoopHBaseTestUtils {
       );
     }
     return persistentEdgeData;
+  }
+
+
+  /**
+   * Writes the example social graph to the HBase store and flushes it.
+   *
+   * @param epgmStore the store instance to write to
+   * @throws IOException if writing to store fails
+   */
+  public static void writeSocialGraphToStore(HBaseEPGMStore epgmStore) throws IOException {
+    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
+    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
+    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
+
+    // write social graph to HBase
+    for (PersistentGraphHead g : graphHeads) {
+      epgmStore.writeGraphHead(g);
+    }
+    for (PersistentVertex<Edge> v : vertices) {
+      epgmStore.writeVertex(v);
+    }
+    for (PersistentEdge<Vertex> e : edges) {
+      epgmStore.writeEdge(e);
+    }
+    epgmStore.flush();
   }
 }
