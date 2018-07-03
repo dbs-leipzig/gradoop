@@ -31,7 +31,8 @@ import java.io.IOException;
  * is documented at {@link GraphHeadToJSON}, {@link VertexToJSON} and
  * {@link EdgeToJSON}.
  *
- * This class is deprecated e.g. use {@link org.gradoop.flink.io.impl.csv.CSVDataSink}
+ * @deprecated This class is deprecated. For example use
+ * {@link org.gradoop.flink.io.impl.csv.CSVDataSink}
  */
 @Deprecated
 public class JSONDataSink extends JSONBase implements DataSink {
