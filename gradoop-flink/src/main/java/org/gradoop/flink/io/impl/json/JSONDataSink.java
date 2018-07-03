@@ -31,6 +31,7 @@ import java.io.IOException;
  * is documented at {@link GraphHeadToJSON}, {@link VertexToJSON} and
  * {@link EdgeToJSON}.
  */
+@Deprecated
 public class JSONDataSink extends JSONBase implements DataSink {
 
   /**

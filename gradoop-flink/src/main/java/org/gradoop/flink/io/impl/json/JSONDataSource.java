@@ -35,6 +35,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Creates an EPGM instance from JSON files. The exact format is documented in
  * {@link JSONToGraphHead}, {@link JSONToVertex}, {@link JSONToEdge}.
  */
+@Deprecated
 public class JSONDataSource extends JSONBase implements DataSource {
 
   /**
