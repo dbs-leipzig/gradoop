@@ -97,7 +97,7 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
     newVertices = graph.getVertices()
       .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed,
         degreePropertyName, maxDegree));
-    
+
     List<String> unnecessaryPropertyNames = new ArrayList<>();
     unnecessaryPropertyNames.add(degreePropertyName);
     unnecessaryPropertyNames.add(inDegreePropertyName);

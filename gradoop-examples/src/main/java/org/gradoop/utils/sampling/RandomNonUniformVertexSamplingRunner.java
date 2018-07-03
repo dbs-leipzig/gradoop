@@ -40,7 +40,8 @@ public class RandomNonUniformVertexSamplingRunner extends AbstractRunner impleme
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample = graph.callForGraph(new RandomNonUniformVertexSampling(Float.parseFloat(args[4])));
+    LogicalGraph sample = graph.callForGraph(
+            new RandomNonUniformVertexSampling(Float.parseFloat(args[4])));
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
