@@ -285,6 +285,100 @@ public class PropertyValueUtils {
     }
 
     /**
+     * Compares two numerical property values
+     *
+     * @param aValue first value
+     * @param bValue second value
+     *
+     * @return 0 if a is equal to b, < 0 if a is less than b and > 0 if a is greater than b
+     */
+    public static int compare(PropertyValue aValue, PropertyValue bValue) {
+
+      int aType = checkNumericalAndGetType(aValue);
+      int bType = checkNumericalAndGetType(bValue);
+
+      boolean sameType = aType == bType;
+
+      int maxType = Math.max(aType, bType);
+
+      int result;
+
+      if (maxType == SHORT) {
+        result = Short.compare(aValue.getShort(), bValue.getShort());
+      } else if (maxType == INT)  {
+
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
+
+        result = Integer.compare(a, b);
+
+      } else if (maxType == FLOAT) {
+
+        float a;
+        float b;
+
+        if (sameType) {
+          a = aValue.getFloat();
+          b = bValue.getFloat();
+        } else {
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
+        }
+
+        result = Float.compare(a, b);
+
+      } else if (maxType == LONG) {
+
+        long a;
+        long b;
+
+        if (sameType) {
+          a = aValue.getLong();
+          b = bValue.getLong();
+        } else {
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
+        }
+
+        result = Long.compare(a, b);
+
+      } else if (maxType == DOUBLE) {
+
+        double a;
+        double b;
+
+        if (sameType) {
+          a = aValue.getDouble();
+          b = bValue.getDouble();
+        } else {
+          a = aType == DOUBLE ? aValue.getDouble() : doubleValue(aValue, aType);
+          b = bType == DOUBLE ? bValue.getDouble() : doubleValue(bValue, bType);
+        }
+
+        result = Double.compare(a, b);
+
+      } else {
+
+        BigDecimal a;
+        BigDecimal b;
+
+        if (sameType) {
+          a = aValue.getBigDecimal();
+          b = bValue.getBigDecimal();
+        } else {
+          a = aType == BIG_DECIMAL ? aValue.getBigDecimal() :
+                  bigDecimalValue(aValue, aType);
+          b = bType == BIG_DECIMAL ? bValue.getBigDecimal() :
+                  bigDecimalValue(bValue, bType);
+        }
+
+        result = a.compareTo(b);
+      }
+
+      return result;
+    }
+
+    /**
      * Compares two numerical property values and returns the smaller one.
      *
      * @param a first value
