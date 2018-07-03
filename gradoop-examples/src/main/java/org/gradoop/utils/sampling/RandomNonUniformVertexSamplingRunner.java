@@ -18,16 +18,16 @@ package org.gradoop.utils.sampling;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.sampling.RandomVertexSampling;
+import org.gradoop.flink.model.impl.operators.sampling.RandomNonUniformVertexSampling;
 
 /**
- * Runs {@link RandomVertexSampling} for a given
+ * Runs {@link RandomNonUniformVertexSampling} for a given
  * graph and writes the sampled output.
  */
-public class RandomVertexSamplingRunner extends AbstractRunner implements ProgramDescription {
+public class RandomNonUniformVertexSamplingRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Runs the {@link RandomVertexSampling} operator
+   * Runs the {@link RandomNonUniformVertexSampling} operator
    * on the specified graph and writes the result to the specified output.
    *
    * args[0] - path to input graph
@@ -40,12 +40,13 @@ public class RandomVertexSamplingRunner extends AbstractRunner implements Progra
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample = graph.callForGraph(new RandomVertexSampling(Float.parseFloat(args[4])));
+    LogicalGraph sample = graph.callForGraph(
+            new RandomNonUniformVertexSampling(Float.parseFloat(args[4])));
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
   @Override
   public String getDescription() {
-    return RandomVertexSamplingRunner.class.getName();
+    return RandomNonUniformVertexSamplingRunner.class.getName();
   }
 }
