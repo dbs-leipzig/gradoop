@@ -23,7 +23,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
  *
  * @param <T> The type of elements to filter.
  */
-public interface CombineableFilter<T> extends FilterFunction<T> {
+public interface CombinableFilter<T> extends FilterFunction<T> {
 
   /**
    * Combine this filter with another filter using a logical {@code and}.
@@ -33,7 +33,7 @@ public interface CombineableFilter<T> extends FilterFunction<T> {
    * @param other The filter that will be combined with this filter.
    * @return The combined filter.
    */
-  default CombineableFilter<T> and(FilterFunction<? super T> other) {
+  default CombinableFilter<T> and(FilterFunction<? super T> other) {
     return new And<>(this, other);
   }
 
@@ -45,7 +45,7 @@ public interface CombineableFilter<T> extends FilterFunction<T> {
    * @param other The filter that will be combined with this filter.
    * @return The combined filter.
    */
-  default CombineableFilter<T> or(FilterFunction<? super T> other) {
+  default CombinableFilter<T> or(FilterFunction<? super T> other) {
     return new Or<>(this, other);
   }
 
@@ -56,7 +56,7 @@ public interface CombineableFilter<T> extends FilterFunction<T> {
    *
    * @return The inverted filter.
    */
-  default CombineableFilter<T> negate() {
+  default CombinableFilter<T> negate() {
     return new Not<>(this);
   }
 }

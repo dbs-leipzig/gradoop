@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
 
 /**
  * Logical "TRUE" as Flink function.
  *
  * @param <T> input element type
  */
-public class True<T> implements MapFunction<T, Boolean>, CombineableFilter<T> {
+public class True<T> implements MapFunction<T, Boolean>, CombinableFilter<T> {
 
   @Override
   public Boolean map(T t) throws Exception {

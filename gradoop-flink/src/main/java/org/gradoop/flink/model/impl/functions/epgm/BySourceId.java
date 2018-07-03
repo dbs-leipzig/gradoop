@@ -17,14 +17,14 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
 
 /**
  * Filters edges having the specified source vertex id.
  *
  * @param <E> EPGM edge type
  */
-public class BySourceId<E extends Edge> implements CombineableFilter<E> {
+public class BySourceId<E extends Edge> implements CombinableFilter<E> {
   /**
    * Vertex id to filter on
    */

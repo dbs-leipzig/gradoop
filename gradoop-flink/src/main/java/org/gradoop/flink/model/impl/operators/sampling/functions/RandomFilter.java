@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
 
 import java.util.Random;
 
@@ -27,7 +27,7 @@ import java.util.Random;
  *
  * @param <E> EPGM edge type
  */
-public class RandomFilter<E extends EPGMElement> implements CombineableFilter<E> {
+public class RandomFilter<E extends EPGMElement> implements CombinableFilter<E> {
   /**
    * Threshold to decide if an EPGM element needs to be filtered.
    */

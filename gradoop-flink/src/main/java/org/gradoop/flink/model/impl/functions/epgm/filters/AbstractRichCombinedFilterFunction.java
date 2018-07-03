@@ -25,13 +25,13 @@ import java.util.Objects;
 
 /**
  * A {@link RichFilterFunction} that can be combined like a
- * {@link CombineableFilter}. The {@link RuntimeContext context} will be
+ * {@link CombinableFilter}. The {@link RuntimeContext context} will be
  * handled for each filter that is part of this combined filter.
  *
  * @param <T> The type of elements to filter.
  */
 public abstract class AbstractRichCombinedFilterFunction<T>
-  extends RichFilterFunction<T> implements CombineableFilter<T> {
+  extends RichFilterFunction<T> implements CombinableFilter<T> {
 
   /**
    * The filters this filter is composed of.

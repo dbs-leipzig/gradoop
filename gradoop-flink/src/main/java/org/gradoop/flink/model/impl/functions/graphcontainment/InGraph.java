@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
 
 /**
  * True, if an element is contained in a give graph.
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
  * @param <EL> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class InGraph<EL extends GraphElement> implements CombineableFilter<EL> {
+public class InGraph<EL extends GraphElement> implements CombinableFilter<EL> {
 
   /**
    * graph id

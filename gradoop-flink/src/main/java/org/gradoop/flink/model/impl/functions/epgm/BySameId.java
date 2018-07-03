@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
+import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
 
 /**
  * Filters elements if their identifier is equal to the given identifier.
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.epgm.filters.CombineableFilter;
  * @param <EL> EPGM element type
  */
 @FunctionAnnotation.ReadFields("id")
-public class BySameId<EL extends Element> implements CombineableFilter<EL> {
+public class BySameId<EL extends Element> implements CombinableFilter<EL> {
 
   /**
    * id
