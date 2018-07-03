@@ -17,7 +17,6 @@ package org.gradoop.utils.sampling;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.RandomEdgeSampling;
 
@@ -41,7 +40,7 @@ public class RandomEdgeSamplingRunner extends AbstractRunner implements ProgramD
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample = graph.callForGraph(new RandomEdgeSampling(Float.parseFloat(args[2])));
-    new CSVDataSink(args[3], args[0] + "/metadata.csv", graph.getConfig()).write(sample);
+    writeLogicalGraph(sample,args[0]);
     getExecutionEnvironment().execute("Random Edge Sampling (" + args[2] + ")");
   }
 

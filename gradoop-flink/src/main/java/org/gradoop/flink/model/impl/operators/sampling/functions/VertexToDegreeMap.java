@@ -24,12 +24,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
   /**
-   * the property name for degree
+   * The property name for degree
    */
   private String nameOfDegreeProperty;
 
   /**
-   * constructor
+   * Constructor
    *
    * @param nameOfDegreeProperty the property name for degree
    */

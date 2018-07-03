@@ -17,29 +17,28 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
-
-import java.util.Vector;
+import java.util.List;
 
 /**
- *  maps an element to the same element in which some given properties are removed
+ *  Maps an element to the same element in which some given properties are removed
  * @param <E> the given element type
  */
 public class RemoveUnnecessaryPropertiesMap<E extends EPGMElement> implements MapFunction<E, E> {
   /**
-   * the property names which will be removed from the element
+   * The property names which will be removed from the element
    */
-  private Vector<String> propertyNames;
+  private List<String> propertyNames;
 
   /**
    * Constructor
    * @param propertyNames the names of porperties which should be rempoved
    */
-  public RemoveUnnecessaryPropertiesMap(Vector<String> propertyNames) {
+  public RemoveUnnecessaryPropertiesMap(List<String> propertyNames) {
     this.propertyNames = propertyNames;
   }
 
   /**
-   * maps an element to the same element in which some given properties are removed
+   * Maps an element to the same element in which some given properties are removed
    *
    * @param epgmElement the element for which the properties should be removed
    * @return the same element

@@ -25,12 +25,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, Vertex, Vertex> {
 
   /**
-   * name of the property for maximum degree
+   * Name of the property for maximum degree
    */
   private String nameOfMaxDegreeProperty;
 
   /**
-   * constructor
+   * Constructor
    *
    * @param nameOfMaxDegreeProperty name of the property for maximum degree
    */

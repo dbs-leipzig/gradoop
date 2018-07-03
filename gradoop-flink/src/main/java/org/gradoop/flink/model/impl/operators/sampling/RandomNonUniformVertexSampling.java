@@ -30,6 +30,8 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.NonUniformVerte
 import org.gradoop.flink.model.impl.operators.sampling.functions.RemoveUnnecessaryPropertiesMap;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -40,13 +42,13 @@ import java.util.Vector;
  */
 public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator {
   /**
-   * relative amount of vertices in the result graph
+   * Relative amount of vertices in the result graph
    */
   private final float sampleSize;
 
   /**
-   * seed for the random number generator
-   * if seed is null, the random generator is created without seed
+   * Seed for the random number generator
+   * If seed is 0, the random generator is created without seed
    */
   private final long randomSeed;
 
@@ -63,7 +65,7 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
    * Creates new RandomNonUniformVertexSampling instance.
    *
    * @param sampleSize relative sample size
-   * @param randomSeed random seed value (can be {@code null})
+   * @param randomSeed random seed value (can be 0)
    */
   public RandomNonUniformVertexSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
@@ -75,28 +77,42 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
+    String degreePropertyName = "_degree";
+    String inDegreePropertyName = "_inDegree";
+    String outDegreePropertyName = "_outDegree";
+    String maxDegree = "_maxDegree";
 
-    graph = new DistinctVertexDegrees("deg", "indeg", "outdeg", true).execute(graph);
+    graph = new DistinctVertexDegrees(degreePropertyName, inDegreePropertyName,
+      outDegreePropertyName, true).execute(graph);
 
-    DataSet<Vertex> newVertices =
-      graph.getVertices().map(new VertexToDegreeMap("deg")).max(0).cross(graph.getVertices())
-        .with(new AddMaxDegreeCrossFunction("maxdeg"));
+    DataSet<Vertex> newVertices = graph.getVertices()
+      .map(new VertexToDegreeMap(degreePropertyName))
+      .max(0)
+      .cross(graph.getVertices())
+      .with(new AddMaxDegreeCrossFunction(maxDegree));
+
+
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
 
     newVertices = graph.getVertices()
-      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed, "deg", "maxdeg"));
-    Vector<String> unnecessaryPropertyNames = new Vector<>();
-    unnecessaryPropertyNames.add("deg");
-    unnecessaryPropertyNames.add("indeg");
-    unnecessaryPropertyNames.add("outdeg");
-    unnecessaryPropertyNames.add("maxdeg");
+      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed, degreePropertyName, maxDegree));
+    List<String> unnecessaryPropertyNames = new ArrayList<>();
+    unnecessaryPropertyNames.add(degreePropertyName);
+    unnecessaryPropertyNames.add(inDegreePropertyName);
+    unnecessaryPropertyNames.add(outDegreePropertyName);
+    unnecessaryPropertyNames.add(maxDegree);
     newVertices = newVertices.map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
 
-    DataSet<Edge> newEdges =
-      graph.getEdges().join(newVertices).where(new SourceId<>()).equalTo(new Id<>())
-        .with(new LeftSide<>()).join(newVertices).where(new TargetId<>()).equalTo(new Id<>())
-        .with(new LeftSide<>());
+    DataSet<Edge> newEdges = graph.getEdges()
+      .join(newVertices)
+      .where(new SourceId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>())
+      .join(newVertices)
+      .where(new TargetId<>())
+      .equalTo(new Id<>())
+      .with(new LeftSide<>());
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
