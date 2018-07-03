@@ -32,7 +32,6 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeM
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
@@ -96,7 +95,9 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
 
     newVertices = graph.getVertices()
-      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed, degreePropertyName, maxDegree));
+      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed,
+        degreePropertyName, maxDegree));
+    
     List<String> unnecessaryPropertyNames = new ArrayList<>();
     unnecessaryPropertyNames.add(degreePropertyName);
     unnecessaryPropertyNames.add(inDegreePropertyName);

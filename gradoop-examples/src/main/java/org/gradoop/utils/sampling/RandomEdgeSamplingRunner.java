@@ -31,17 +31,17 @@ public class RandomEdgeSamplingRunner extends AbstractRunner implements ProgramD
    * on the specified graph and writes the result to the specified output.
    *
    * args[0] - path to input graph
-   * args[1] - format of input graph
-   * args[2] - edge probability
-   * args[3] - path to output
+   * args[1] - format of input graph (csv, json, indexed)
+   * args[2] - path to output graph
+   * args[3] - format of output graph (csv, json, indexed)
+   * args[4] - sampling threshold
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample = graph.callForGraph(new RandomEdgeSampling(Float.parseFloat(args[2])));
-    writeLogicalGraph(sample,args[0]);
-    getExecutionEnvironment().execute("Random Edge Sampling (" + args[2] + ")");
+    LogicalGraph sample = graph.callForGraph(new RandomEdgeSampling(Float.parseFloat(args[4])));
+    writeLogicalGraph(sample, args[2], args[3]);
   }
 
   @Override
