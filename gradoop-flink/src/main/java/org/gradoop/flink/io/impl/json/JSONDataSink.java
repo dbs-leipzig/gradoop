@@ -30,6 +30,8 @@ import java.io.IOException;
  * Write an EPGM representation into three separate JSON files. The format
  * is documented at {@link GraphHeadToJSON}, {@link VertexToJSON} and
  * {@link EdgeToJSON}.
+ *
+ * This class is deprecated e.g. use {@link org.gradoop.flink.io.impl.csv.CSVDataSink}
  */
 @Deprecated
 public class JSONDataSink extends JSONBase implements DataSink {
