@@ -15,11 +15,22 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm.filters;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class CombinableFilterTest {
+public class CombinableFilterTest extends GradoopFlinkTestBase {
 
   private CombinableFilter<Object> alwaysTrue = e -> true;
 
@@ -62,4 +73,26 @@ public class CombinableFilterTest {
     assertFalse(new Not<>(alwaysTrue).filter(testObject));
   }
 
+  @Test
+  public void testWithGraph() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    loader.appendToDatabaseFromString("expected[" +
+      // gender = 'f' and city = 'leipzig'
+      "(alice)" +
+      // label = 'Tag'
+      "(databases)(graphs)(hadoop)" +
+      "]");
+    LogicalGraph databaseGraph = loader.getDatabase().getDatabaseGraph();
+    // Filter vertices where
+    // (gender = 'f' AND city = 'Leipzig') OR NOT(label = 'Person' OR label = 'Forum')
+    FilterFunction<Vertex> vertexFilterFunction =
+      new ByProperty<Vertex>("gender", PropertyValue.create("f"))
+      .and(new ByProperty<>("city", PropertyValue.create("Leipzig"))).or(
+        new ByLabel<>("Person").or(new ByLabel<>("Forum")).negate());
+    // Filter edges where
+    // label <> 'hasInterest'
+    LogicalGraph subgraph = databaseGraph.subgraph(vertexFilterFunction,
+      new ByLabel<Edge>("hasInterest").negate(), Subgraph.Strategy.BOTH);
+    collectAndAssertTrue(subgraph.equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
+  }
 }
