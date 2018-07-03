@@ -305,15 +305,22 @@ public class PropertyValueUtils {
 
       if (maxType == SHORT) {
         result = Short.compare(aValue.getShort(), bValue.getShort());
-      } else if (maxType == INT)  {
 
-        int a = aType == INT ? aValue.getInt() : aValue.getShort();
-        int b = bType == INT ? bValue.getInt() : bValue.getShort();
+      } else if (maxType == INT)  {
+        int a;
+        int b;
+
+        if (sameType) {
+          a = aValue.getInt();
+          b = bValue.getInt();
+        } else {
+          a = aType == INT ? aValue.getInt() : aValue.getShort();
+          b = bType == INT ? bValue.getInt() : bValue.getShort();
+        }
 
         result = Integer.compare(a, b);
 
       } else if (maxType == FLOAT) {
-
         float a;
         float b;
 
@@ -328,7 +335,6 @@ public class PropertyValueUtils {
         result = Float.compare(a, b);
 
       } else if (maxType == LONG) {
-
         long a;
         long b;
 
@@ -343,7 +349,6 @@ public class PropertyValueUtils {
         result = Long.compare(a, b);
 
       } else if (maxType == DOUBLE) {
-
         double a;
         double b;
 
@@ -358,7 +363,6 @@ public class PropertyValueUtils {
         result = Double.compare(a, b);
 
       } else {
-
         BigDecimal a;
         BigDecimal b;
 
