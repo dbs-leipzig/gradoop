@@ -935,7 +935,7 @@ public class PropertyValueTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCompareToWithIncompatibleTypes() {
-    create(10).compareTo(create(10L));
+    create(10).compareTo(create("10"));
   }
 
   @Test(expected = UnsupportedOperationException.class)
