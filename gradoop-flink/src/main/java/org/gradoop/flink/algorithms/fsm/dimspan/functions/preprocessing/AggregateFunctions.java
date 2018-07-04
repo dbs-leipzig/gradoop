@@ -41,7 +41,7 @@ public class AggregateFunctions
   /**
    * Calculates sum aggregate of multiple AggregationFunction.
    *
-   * @param aggregationFunctions hui hui
+   * @param aggregationFunctions TODO: add proper java doc
    * @param field hui hui
    */
   public AggregateFunctions(AggregationFunction<Long>[] aggregationFunctions, int[] field) {
