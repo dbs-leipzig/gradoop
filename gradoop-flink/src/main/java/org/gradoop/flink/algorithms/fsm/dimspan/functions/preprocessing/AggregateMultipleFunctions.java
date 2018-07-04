@@ -18,14 +18,15 @@ package org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.RichGroupReduceFunction;
 import org.apache.flink.api.java.aggregation.AggregationFunction;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
+import java.util.Arrays;
+
 /**
- * Calculates sum aggregates of multiple AggregateFunctions.
+ * Calculates sum aggregates of multiple AggregateMultipleFunctions.
  */
-public class AggregateFunctions
+public class AggregateMultipleFunctions
   extends RichGroupReduceFunction<WithCount<int[]>, WithCount<int[]>>
   implements GroupCombineFunction<WithCount<int[]>, WithCount<int[]>> {
 
@@ -41,19 +42,12 @@ public class AggregateFunctions
   /**
    * Calculates sum aggregate of multiple AggregationFunction.
    *
-   * @param aggregationFunctions TODO: add proper java doc
-   * @param field hui hui
+   * @param aggregationFunctions array of AggregateFunctions
+   * @param field value fields
    */
-  public AggregateFunctions(AggregationFunction<Long>[] aggregationFunctions, int[] field) {
-    this.field = field;
-    this.aggregationFunctions = aggregationFunctions;
-  }
-
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    for (AggregationFunction<Long> aggFunction : aggregationFunctions) {
-      aggFunction.initializeAggregate();
-    }
+  public AggregateMultipleFunctions(AggregationFunction<Long>[] aggregationFunctions, int[] field) {
+    this.field = Arrays.copyOf(field, field.length);
+    this.aggregationFunctions = Arrays.copyOf(aggregationFunctions, aggregationFunctions.length);
   }
 
   @Override
@@ -69,17 +63,17 @@ public class AggregateFunctions
     for (WithCount<int[]> tuple : iterable) {
       result = tuple;
 
+      // calculates aggregates
       for (int i = 0; i < field.length; i++) {
         Long value = tuple.getField(field[i]);
         aggregationFunctions[i].aggregate(value);
       }
     }
 
+    // forward new WithCount with aggregated value
     for (int i = 0; i < field.length; i++) {
-      Long aggVal = aggregationFunctions[i].getAggregate();
-      assert result != null;
-      result.setField(aggVal, field[i]);
-      aggregationFunctions[i].initializeAggregate();
+      Long aggregatedValue = aggregationFunctions[i].getAggregate();
+      result.setField(aggregatedValue, field[i]);
     }
 
     collector.collect(result);

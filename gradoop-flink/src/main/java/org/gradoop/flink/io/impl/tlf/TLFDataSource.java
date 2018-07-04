@@ -106,6 +106,7 @@ public class TLFDataSource extends TLFBase implements DataSource {
     }
 
     // load tlf graphs from file
+    assert input != null;
     transactions = input
       .map(new GraphTransactionFromText(
         getConfig().getGraphHeadFactory(),

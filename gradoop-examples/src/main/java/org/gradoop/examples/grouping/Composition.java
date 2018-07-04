@@ -77,7 +77,8 @@ public class Composition extends AbstractRunner {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(birthday);
         current.setProperty("yob", calendar.get(Calendar.YEAR));
-        current.setProperty("decade", calendar.get(Calendar.YEAR) - calendar.get(Calendar.YEAR) % 10);
+        current.setProperty(
+          "decade", calendar.get(Calendar.YEAR) - calendar.get(Calendar.YEAR) % 10);
         return current;
       });
 

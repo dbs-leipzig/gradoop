@@ -39,7 +39,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.NotObsolete;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ReportSupportedPatterns;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.VerifyPattern;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CompressPattern;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.AggregateFunctions;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.AggregateMultipleFunctions;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.CreateDictionary;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneEdges;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneVertices;
@@ -364,7 +364,7 @@ public class DIMSpan {
 
     int[] fields = { 1 };
 
-    return new AggregateFunctions(sum, fields);
+    return new AggregateMultipleFunctions(sum, fields);
   }
 
   public String getName() {
