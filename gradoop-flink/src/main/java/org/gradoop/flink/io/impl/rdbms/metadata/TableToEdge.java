@@ -1,4 +1,4 @@
-package org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing;
+package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
 
@@ -6,8 +6,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
-import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
-import org.gradoop.flink.io.impl.rdbms.metadata.SQLQuery;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 

@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.sql.Connection;
@@ -8,53 +23,72 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
-import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToEdge;
-import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToNode;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
 /**
- * Determines rdbms' metadata
- * 
- * @author pc
- *
+ * Relational database schema.
  */
 public class MetaDataParser {
+	
+	/**
+	 * Database connection
+	 */
 	private Connection con;
+	
+	/**
+	 * Relational database metadata
+	 */
 	private DatabaseMetaData metadata;
+	
+	/**
+	 * Parsed relational database tables
+	 */
 	private ArrayList<RDBMSTableBase> tableBase;
 
+	/**
+	 * Parses the schema of a relational database and provides base classes for graph conversation
+	 * @param con Database connection
+	 * @throws SQLException
+	 */
 	public MetaDataParser(Connection con) throws SQLException {
 		this.con = con;
 		this.metadata = con.getMetaData();
 		this.tableBase = new ArrayList<RDBMSTableBase>();
 	}
 
+	/**
+	 * Parses the schema of a relational database to a relational database metadata representation
+	 * @throws SQLException
+	 */
 	public void parse() throws SQLException {
 		ResultSet rsTables = metadata.getTables(null, null, "%", new String[] { "TABLE" });
 
 		while (rsTables.next()) {
-
-			/*
-			 * only tables going to convert (e.g. no views,...)
-			 */
 			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
 
 				String tableName = rsTables.getString("TABLE_NAME");
+				//used to store primary key metadata representation
 				ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
+				//used to store foreign key metadata representation
 				ArrayList<Tuple2<NameTypeTuple, String>> foreignKeys = new ArrayList<Tuple2<NameTypeTuple, String>>();
+				//used to store further attributes metadata representation
 				ArrayList<NameTypeTuple> furtherAttributes = new ArrayList<NameTypeTuple>();
+				//used to find further attributes, respectively no primary or foreign key attributes 
 				ArrayList<String> pkfkAttributes = new ArrayList<String>();
 
 				ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
 				ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
 				ResultSet rsAttributes = metadata.getColumns(null, null, tableName, null);
 
+				//parses primary keys
 				if (rsPrimaryKeys != null) {
 
+					//setting primary key name 
 					while (rsPrimaryKeys.next()) {
 						primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
 						pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 					}
+					//setting primary key data type
 					for (NameTypeTuple pk : primaryKeys) {
 						ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
 						rsColumns.next();
@@ -62,6 +96,7 @@ public class MetaDataParser {
 					}
 				}
 
+				//parses foreign keys if exists
 				if (rsForeignKeys != null) {
 
 					while (rsForeignKeys.next()) {
@@ -76,6 +111,7 @@ public class MetaDataParser {
 					}
 				}
 
+				//parses further attributes if exists
 				if (rsAttributes != null) {
 
 					while (rsAttributes.next()) {

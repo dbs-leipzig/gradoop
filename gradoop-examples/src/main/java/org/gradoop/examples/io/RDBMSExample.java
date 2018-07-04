@@ -21,8 +21,8 @@ import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.io.impl.rdbms.RDBMSDataSource;
+import org.gradoop.flink.io.impl.rdbms.connection.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TEMPDataSource;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -53,7 +53,8 @@ public class RDBMSExample implements ProgramDescription {
 			final String user = args[1];
 			final String pw = args[2];
 			final String jdbcDriverPath = args[3];
-			final String outputPath = args[4];
+			final String jdbcDriverClassName = args[4];
+			final String outputPath = args[5];
 
 		    // init Flink execution environment
 			ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -62,7 +63,7 @@ public class RDBMSExample implements ProgramDescription {
 			GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
 			
 		    // create DataSource
-			RDBMSDataSource dataSource = new RDBMSDataSource(url,user,pw,jdbcDriverPath,gfc);
+			RDBMSDataSource dataSource = new RDBMSDataSource(url,user,pw,jdbcDriverPath, jdbcDriverClassName,gfc);
 		    
 			// get logical graph of datasource
 			LogicalGraph schema = dataSource.getLogicalGraph();

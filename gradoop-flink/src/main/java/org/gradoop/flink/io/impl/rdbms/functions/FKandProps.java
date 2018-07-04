@@ -11,7 +11,7 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
-import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToEdge;
+import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 
 public class FKandProps extends RichMapFunction<Row, Tuple3<String, String, Properties>> {
 	private List<TableToEdge> tables;

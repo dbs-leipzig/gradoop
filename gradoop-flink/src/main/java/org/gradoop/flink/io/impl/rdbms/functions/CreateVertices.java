@@ -10,7 +10,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
-import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToNode;
+import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 
 /**
  * converts tuples of sql query result to vertices

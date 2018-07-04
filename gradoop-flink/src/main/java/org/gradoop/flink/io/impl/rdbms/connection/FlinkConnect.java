@@ -8,7 +8,6 @@ import org.apache.flink.api.java.io.jdbc.JDBCInputFormat;
 import org.apache.flink.api.java.io.jdbc.split.GenericParameterValuesProvider;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
-import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 
 /**
  * connects to a RDBMS via Flinks' JDBC Input Format
@@ -58,8 +57,8 @@ public class FlinkConnect {
 		}
 
 		jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
-				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.f0)
-				.setUsername(rdbmsConfig.f1).setPassword(rdbmsConfig.f2).setQuery(sqlQuery + " limit ? offset ?")
+				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
+				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw()).setQuery(sqlQuery + " limit ? offset ?")
 				.setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(parameters))
 				.finish();
 
