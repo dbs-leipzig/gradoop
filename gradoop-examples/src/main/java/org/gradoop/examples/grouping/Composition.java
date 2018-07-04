@@ -29,8 +29,10 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Demo program that combines the grouping operator with
@@ -69,10 +71,13 @@ public class Composition extends AbstractRunner {
       e -> e.getLabel().equals("knows"));
 
     // use the transformation operator to classify the 'birthday' property for the users
+
     LogicalGraph transformed = subgraph.transformVertices((current, modified) -> {
         Date birthday = new Date(current.getPropertyValue("birthday").getLong());
-        current.setProperty("yob", birthday.getYear());
-        current.setProperty("decade", birthday.getYear() - birthday.getYear() % 10);
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(birthday);
+        current.setProperty("yob", calendar.get(Calendar.YEAR));
+        current.setProperty("decade", calendar.get(Calendar.YEAR) - calendar.get(Calendar.YEAR) % 10);
         return current;
       });
 

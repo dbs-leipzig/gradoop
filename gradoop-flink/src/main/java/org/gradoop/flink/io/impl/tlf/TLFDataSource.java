@@ -17,6 +17,8 @@ package org.gradoop.flink.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.hadoopcompatibility.HadoopInputs;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.TextInputFormat;
@@ -30,11 +32,12 @@ import org.gradoop.flink.io.impl.tlf.functions.VertexLabelDecoder;
 import org.gradoop.flink.io.impl.tlf.inputformats.TLFInputFormat;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Creates an EPGM instance from one TLF file. The exact format is
@@ -62,38 +65,48 @@ public class TLFDataSource extends TLFBase implements DataSource {
    * @param config Gradoop Flink configuration
    */
   public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath,
-    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) throws Exception {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
     ExecutionEnvironment env = config.getExecutionEnvironment();
     if (hasVertexDictionary()) {
-      setVertexDictionary(env
-        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
-          .class, getTLFVertexDictionaryPath())
-          .map(new DictionaryEntry())
-          .reduceGroup(new Dictionary()));
+      DataSet<Map<Integer, String>> dictionary =  env.createInput(HadoopInputs.readHadoopFile(
+        new TextInputFormat(), LongWritable.class, Text.class, getTLFVertexDictionaryPath()))
+        .map(new DictionaryEntry())
+        .reduceGroup(new Dictionary());
+
+      setVertexDictionary(dictionary);
     }
     if (hasEdgeDictionary()) {
-      setEdgeDictionary(env
-        .readHadoopFile(new TextInputFormat(), LongWritable.class, Text
-          .class, getTLFEdgeDictionaryPath())
+      DataSet<Map<Integer, String>> dictionary = env.createInput(HadoopInputs.readHadoopFile(
+          new TextInputFormat(), LongWritable.class, Text.class, getTLFEdgeDictionaryPath()))
           .map(new DictionaryEntry())
-          .reduceGroup(new Dictionary()));
+          .reduceGroup(new Dictionary());
+
+      setEdgeDictionary(dictionary);
     }
   }
 
   @Override
-  public LogicalGraph getLogicalGraph() throws IOException {
+  public LogicalGraph getLogicalGraph() {
     return getGraphCollection().reduce(new ReduceCombination());
   }
 
   @Override
-  public GraphCollection getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() {
     DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
+    DataSet<Tuple2<LongWritable, Text>> input = null;
+
+    try {
+      input = env.createInput(HadoopInputs.readHadoopFile(
+        new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath()));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     // load tlf graphs from file
-    transactions = env.readHadoopFile(
-      new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath())
+    transactions = input
       .map(new GraphTransactionFromText(
         getConfig().getGraphHeadFactory(),
         getConfig().getVertexFactory(),
