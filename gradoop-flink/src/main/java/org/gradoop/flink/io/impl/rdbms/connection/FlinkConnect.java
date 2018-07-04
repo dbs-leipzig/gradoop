@@ -13,12 +13,14 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToNodes;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 /**
  * connects to a RDBMS via Flinks' JDBC Input Format
+ * 
  * @author pc
  *
  */
@@ -36,15 +38,15 @@ public class FlinkConnect {
 	 * @return
 	 * @throws ClassNotFoundException
 	 */
-	public static DataSet<Row> connect(ExecutionEnvironment env,RDBMSConfig rdbmsConfig, RDBMSTable table, String tableoredge) throws ClassNotFoundException {
+	public static DataSet<Row> connect(ExecutionEnvironment env,RDBMSConfig rdbmsConfig, int rowCount, String sqlQuery, RowTypeInfo typeInfo) throws ClassNotFoundException {
 
 		// parallelism of running cluster or local mashine
 		int parallelism = env.getParallelism();
-		
+
 		// divides table data into equal parts
-		int partitionNumber = table.getNumberOfRows() / parallelism;
-		int partitionRest = table.getNumberOfRows() % parallelism;
-		
+		int partitionNumber = rowCount / parallelism;
+		int partitionRest = rowCount % parallelism;
+
 		JDBCInputFormat jdbcInput = null;
 
 		/*
@@ -62,38 +64,35 @@ public class FlinkConnect {
 		}
 
 		/*
-		 * provides a jdbc input for tables convert to nodes
+		 * 
 		 */
-		if(tableoredge.equals(RDBMSConstants.NODE_TABLE)){
-			jdbcInput = JDBCInputFormat
-					.buildJDBCInputFormat()
-					.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
-					.setDBUrl(rdbmsConfig.f0)
-					.setUsername(rdbmsConfig.f1)
-					.setPassword(rdbmsConfig.f2)
-					.setQuery(table.getNodeSqlQuery() + " limit ? offset ?")
-					.setRowTypeInfo(MapTypeInformation.getRowTypeInfo(table))
-					.setParametersProvider(new GenericParameterValuesProvider(parameters))
-					.finish();
-		}
-		
-		/*
-		 * provides a jdbc input for a tables convert to edges
-		 */
-		if(tableoredge.equals(RDBMSConstants.EDGE_TABLE)){
-			jdbcInput = JDBCInputFormat
-					.buildJDBCInputFormat()
-					.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
-					.setDBUrl(rdbmsConfig.f0)
-					.setUsername(rdbmsConfig.f1)
-					.setPassword(rdbmsConfig.f2)
-					.setQuery(table.getEdgeSqlQuery() + " limit ? offset ?")
-					.setRowTypeInfo(MapTypeInformation.getRowTypeInfo(table))
-					.setParametersProvider(new GenericParameterValuesProvider(parameters))
-					.finish();
-		}
-		return env.createInput(jdbcInput);
+		jdbcInput = JDBCInputFormat
+				.buildJDBCInputFormat()
+				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
+				.setDBUrl(rdbmsConfig.f0)
+				.setUsername(rdbmsConfig.f1)
+				.setPassword(rdbmsConfig.f2)
+				.setQuery(sqlQuery + " limit ? offset ?")
+				.setRowTypeInfo(typeInfo)
+				.setParametersProvider(new GenericParameterValuesProvider(parameters))
+				.finish();
+	
+
+	// /*
+	// * provides a jdbc input for a tables convert to edges
+	// */
+	// if(tableoredge.equals(RDBMSConstants.EDGE_TABLE)){
+	// jdbcInput = JDBCInputFormat
+	// .buildJDBCInputFormat()
+	// .setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
+	// .setDBUrl(rdbmsConfig.f0)
+	// .setUsername(rdbmsConfig.f1)
+	// .setPassword(rdbmsConfig.f2)
+	// .setQuery(table.getEdgeSqlQuery() + " limit ? offset ?")
+	// .setRowTypeInfo(MapTypeInformation.getRowTypeInfo(table))
+	// .setParametersProvider(new GenericParameterValuesProvider(parameters))
+	// .finish();
+	// }
+	return env.createInput(jdbcInput);
 	}
 }
-
-

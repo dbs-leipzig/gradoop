@@ -20,7 +20,6 @@ public class PrimaryKeyConcatString {
 	
 	public static String getPrimaryKeyString(Row tuple, RowHeader rowHeader) {
 		String pkString = "";
-
 		for (RowHeaderTuple rht : rowHeader.getRowHeader()) {
 			if (rht.getAttType().equals(RDBMSConstants.PK_FIELD)) {
 				pkString += tuple.getField(rht.getPos()).toString();

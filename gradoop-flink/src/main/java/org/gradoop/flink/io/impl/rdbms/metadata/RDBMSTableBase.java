@@ -5,60 +5,27 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import org.gradoop.flink.io.impl.rdbms.tuples.AttTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.FKTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.PKTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.TableTuple;
 
 public class RDBMSTableBase {
 	private String tableName;
-	private boolean toNodesTable;
-	private ArrayList<TableTuple> primaryKeys;
-	private LinkedHashMap<TableTuple, String> foreignKeys;
-	private ArrayList<TableTuple> furtherAttributes;
-	private boolean directionIndicator;
+	private ArrayList<PKTuple> primaryKeys;
+	private ArrayList<FKTuple> foreignKeys;
+	private ArrayList<AttTuple> furtherAttributes;
 	private int rowCount;
 
-	public RDBMSTableBase(String tableName, boolean toNodesTable, ArrayList<TableTuple> primaryKeys,
-			LinkedHashMap<TableTuple, String> foreignKeys, ArrayList<TableTuple> furtherAttributes,
-			boolean directionIndicator, int rowCount) {
+	public RDBMSTableBase(String tableName, ArrayList<PKTuple> primaryKeys,
+			ArrayList<FKTuple> foreignKeys, ArrayList<AttTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
-		this.toNodesTable = toNodesTable;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
 		this.furtherAttributes = furtherAttributes;
-		this.directionIndicator = directionIndicator;
 		this.rowCount = rowCount;
 	}
 
-	public String getSqlQuery() {
-		String sqlQuery = "";
-		if (toNodesTable) {
-			sqlQuery = SQLQuery.getNodeTableQuery(tableName, primaryKeys, foreignKeys, furtherAttributes);
-		} else {
-			sqlQuery = SQLQuery.getEdgeTableQuery(tableName, primaryKeys, foreignKeys, furtherAttributes);
-		}
-		return sqlQuery;
-	}
-
-	public ArrayList<JDBCType> getTypes() {
-		ArrayList<JDBCType> types = new ArrayList<JDBCType>();
-		for (TableTuple pks : primaryKeys) {
-			types.add(pks.f3);
-		}
-		if (!foreignKeys.isEmpty()) {
-			for (Entry<TableTuple, String> fks : foreignKeys.entrySet()) {
-				types.add(fks.getKey().f3);
-			}
-		}
-		if (!furtherAttributes.isEmpty()) {
-			for (TableTuple att : furtherAttributes) {
-				types.add(att.f3);
-			}
-		}
-		return types;
-	}
-
-	/*
-	 * Getter and Setter
-	 */
 	public String getTableName() {
 		return tableName;
 	}
@@ -67,44 +34,28 @@ public class RDBMSTableBase {
 		this.tableName = tableName;
 	}
 
-	public boolean isToNodesTable() {
-		return toNodesTable;
-	}
-
-	public void setToNodesTable(boolean toNodesTable) {
-		this.toNodesTable = toNodesTable;
-	}
-
-	public ArrayList<TableTuple> getPrimaryKeys() {
+	public ArrayList<PKTuple> getPrimaryKeys() {
 		return primaryKeys;
 	}
 
-	public void setPrimaryKeys(ArrayList<TableTuple> primaryKeys) {
+	public void setPrimaryKeys(ArrayList<PKTuple> primaryKeys) {
 		this.primaryKeys = primaryKeys;
 	}
 
-	public LinkedHashMap<TableTuple, String> getForeignKeys() {
+	public ArrayList<FKTuple> getForeignKeys() {
 		return foreignKeys;
 	}
 
-	public void setForeignKeys(LinkedHashMap<TableTuple, String> foreignKeys) {
+	public void setForeignKeys(ArrayList<FKTuple> foreignKeys) {
 		this.foreignKeys = foreignKeys;
 	}
 
-	public ArrayList<TableTuple> getFurtherAttributes() {
+	public ArrayList<AttTuple> getFurtherAttributes() {
 		return furtherAttributes;
 	}
 
-	public void setFurtherAttributes(ArrayList<TableTuple> furtherAttributes) {
+	public void setFurtherAttributes(ArrayList<AttTuple> furtherAttributes) {
 		this.furtherAttributes = furtherAttributes;
-	}
-
-	public boolean isDirectionIndicator() {
-		return directionIndicator;
-	}
-
-	public void setDirectionIndicator(boolean directionIndicator) {
-		this.directionIndicator = directionIndicator;
 	}
 
 	public int getRowCount() {
@@ -114,4 +65,26 @@ public class RDBMSTableBase {
 	public void setRowCount(int rowCount) {
 		this.rowCount = rowCount;
 	}
+
+//	public ArrayList<JDBCType> getTypes() {
+//		ArrayList<JDBCType> types = new ArrayList<JDBCType>();
+//		for (TableTuple pks : primaryKeys) {
+//			types.add(pks.f3);
+//		}
+//		if (!foreignKeys.isEmpty()) {
+//			for (Entry<TableTuple, String> fks : foreignKeys.entrySet()) {
+//				types.add(fks.getKey().f3);
+//			}
+//		}
+//		if (!furtherAttributes.isEmpty()) {
+//			for (TableTuple att : furtherAttributes) {
+//				types.add(att.f3);
+//			}
+//		}
+//		return types;
+//	}
+
+	/*
+	 * Getter and Setter
+	 */
 }

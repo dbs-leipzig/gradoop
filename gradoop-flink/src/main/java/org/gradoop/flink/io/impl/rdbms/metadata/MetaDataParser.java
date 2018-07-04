@@ -14,8 +14,17 @@ import java.util.Map.Entry;
 import org.gradoop.flink.io.impl.rdbms.connection.RDBMSConnect;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToNode;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToEdges;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToNodes;
+import org.gradoop.flink.io.impl.rdbms.tuples.AttTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.FKTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.PKTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.tuples.TableTuple;
+
+import scala.Array;
 
 /**
  * Determines rdbms' metadata
@@ -24,26 +33,17 @@ import org.gradoop.flink.io.impl.rdbms.tuples.TableTuple;
  *
  */
 public class MetaDataParser {
-
 	private Connection con;
 	private DatabaseMetaData metadata;
-	private ArrayList<RDBMSTableBase> toNodesTables;
-	private ArrayList<RDBMSTableBase> toEdgesTables;
+	private ArrayList<RDBMSTableBase> tableBase;
 
-	public MetaDataParser(Connection con) {
+	public MetaDataParser(Connection con) throws SQLException {
 		this.con = con;
-		try {
-			this.metadata = con.getMetaData();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Can't get Database Metadata !");
-		}
-		this.toNodesTables = new ArrayList<RDBMSTableBase>();
-		this.toEdgesTables = new ArrayList<RDBMSTableBase>();
+		this.metadata = con.getMetaData();
+		this.tableBase = new ArrayList<RDBMSTableBase>();
 	}
 
 	public void parse() throws SQLException {
-
 		ResultSet rsTables = metadata.getTables(null, null, "%", new String[] { "TABLE" });
 
 		while (rsTables.next()) {
@@ -54,9 +54,9 @@ public class MetaDataParser {
 			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
 
 				String tableName = rsTables.getString("TABLE_NAME");
-				ArrayList<TableTuple> primaryKeys = new ArrayList<TableTuple>();
-				LinkedHashMap<TableTuple, String> foreignKeys = new LinkedHashMap<TableTuple, String>();
-				ArrayList<TableTuple> furtherAttributes = new ArrayList<TableTuple>();
+				ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
+				ArrayList<NameTypeTuple> foreignKeys = new ArrayList<NameTypeTuple>();
+				ArrayList<NameTypeTuple> furtherAttributes = new ArrayList<NameTypeTuple>();
 				ArrayList<String> pkfkAttributes = new ArrayList<String>();
 
 				int pos = 0;
@@ -68,12 +68,12 @@ public class MetaDataParser {
 				if (rsPrimaryKeys != null) {
 
 					while (rsPrimaryKeys.next()) {
-						primaryKeys.add(new TableTuple(rsPrimaryKeys.getString("COLUMN_NAME"), RDBMSConstants.PK_FIELD,
+						primaryKeys.add(new PKTuple(rsPrimaryKeys.getString("COLUMN_NAME"), RDBMSConstants.PK_FIELD,
 								pos, null));
 						pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 						pos++;
 					}
-					for (TableTuple pk : primaryKeys) {
+					for (PKTuple pk : primaryKeys) {
 						ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
 						rsColumns.next();
 						pk.f3 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
@@ -83,15 +83,16 @@ public class MetaDataParser {
 				if (rsForeignKeys != null) {
 
 					while (rsForeignKeys.next()) {
-						foreignKeys.put(new TableTuple(rsForeignKeys.getString("FKCOLUMN_NAME"),
-								RDBMSConstants.FK_FIELD, pos, null), rsForeignKeys.getString("PKTABLE_NAME"));
-						pkfkAttributes.add(rsForeignKeys.getString("COLUMN_NAME"));
+						foreignKeys.add(new FKTuple(tableName, rsForeignKeys.getString("PKTABLE_NAME"),
+								rsForeignKeys.getString("FKCOLUMN_NAME"), rsForeignKeys.getString("PKCOLUMN_NAME"), 0,
+								null));
+						pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
 						pos++;
 					}
-					for (Entry<TableTuple, String> fk : foreignKeys.entrySet()) {
-						ResultSet rsColumns = metadata.getColumns(null, null, tableName, fk.getKey().f0);
+					for (FKTuple fk : foreignKeys) {
+						ResultSet rsColumns = metadata.getColumns(null, null, tableName, fk.f2);
 						rsColumns.next();
-						fk.getKey().f3 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
+						fk.f5 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
 					}
 				}
 
@@ -99,9 +100,9 @@ public class MetaDataParser {
 
 					while (rsAttributes.next()) {
 						if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))) {
-							furtherAttributes.add(new TableTuple(rsAttributes.getString("COLUMN_NAME"),
-									RDBMSConstants.ATTRIBUTE_FIELD, pos,
-									JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE"))));
+							furtherAttributes.add(
+									new AttTuple(rsAttributes.getString("COLUMN_NAME"), RDBMSConstants.ATTRIBUTE_FIELD,
+											pos, JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE"))));
 							pos++;
 						}
 					}
@@ -109,79 +110,112 @@ public class MetaDataParser {
 
 				int rowCount = TableRowSize.getTableRowSize(con, tableName);
 
-				if (primaryKeys.size() == 2 && foreignKeys.size() == 2) {
-					toEdgesTables.add(new RDBMSTableBase(tableName, false, primaryKeys, foreignKeys, furtherAttributes,
-							false, rowCount));
+				tableBase.add(new RDBMSTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+			}
+		}
+	}
+
+	public ArrayList<TableToNode> getTablesToNodes() {
+		ArrayList<TableToNode> tablesToNodes = new ArrayList<TableToNode>();
+		for (RDBMSTableBase tables : tableBase) {
+			if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
+				tablesToNodes.add(new TableToNode(tables.getTableName(), tables.getPrimaryKeys(),tables.getForeignKeys(),
+						tables.getFurtherAttributes(), tables.getRowCount()));
+			}
+		}
+		return tablesToNodes;
+	}
+
+	public ArrayList<TablesToEdges> getTablesToEdges() {
+		ArrayList<TablesToEdges> tablesToEdges = new ArrayList<TablesToEdges>();
+
+		for (RDBMSTableBase table : tableBase) {
+			if (table.getForeignKeys() != null) {
+				int rowCount = table.getRowCount();
+				if (table.getForeignKeys().size() == 2 && table.getPrimaryKeys().size() == 2) {
+					String tableName = table.getTableName();
+					String fk1Table = table.getForeignKeys().get(0).getRefdTable();
+					String fk2Table = table.getForeignKeys().get(1).getRefdTable();
+					NameTypeTuple fk1Att = new NameTypeTuple(table.getForeignKeys().get(0).getRefingAttribute(),table.getForeignKeys().get(0).f5);
+					NameTypeTuple fk2Att = new NameTypeTuple(table.getForeignKeys().get(1).getRefingAttribute(),table.getForeignKeys().get(1).f5);
+					tablesToEdges.add(new TablesToEdges(tableName, fk1Table, fk2Table, null, fk1Att, fk2Att, false,
+							table.getFurtherAttributes(), rowCount));
 				} else {
-					toNodesTables.add(new RDBMSTableBase(tableName, true, primaryKeys, foreignKeys, furtherAttributes,
-							true, rowCount));
-					if (!foreignKeys.isEmpty()) {
-						toEdgesTables
-								.add(new RDBMSTableBase(tableName, false, (ArrayList<TableTuple>) primaryKeys.clone(),
-										(LinkedHashMap<TableTuple, String>) foreignKeys.clone(), null, true, rowCount));
+					for (FKTuple fk : table.getForeignKeys()) {
+						String pkConcat = concatPK(table);
+						tablesToEdges.add(new TablesToEdges(null, table.getTableName(), fk.getRefdTable(),table.getPrimaryKeys(),new NameTypeTuple(fk.getRefingAttribute(),fk.f5),
+								new NameTypeTuple(fk.getRefdAttribute(),fk.f5), true, null, rowCount));
 					}
 				}
 			}
 		}
+		return tablesToEdges;
 	}
 
-	public ArrayList<RDBMSTableBase> getToNodesTables() throws SQLException {
-		return toNodesTables;
-	}
-
-	public ArrayList<RDBMSTableBase> getToEdgesTables() {
-		return toEdgesTables;
-	}
-
-	public static void main(String[] args) throws SQLException {
-		RDBMSConfig rdbmsConfig = new RDBMSConfig("jdbc:mariadb://localhost/employees_small", "hr73vexy",
-				"UrlaubsReisen",
-				"/home/hr73vexy/01 Uni/gradoop_RdbmsToGraph/jdbcDrivers/mariadb-java-client-2.2.5.jar!/");
-
-		Connection con = RDBMSConnect.connect(rdbmsConfig);
-
-		MetaDataParser mp = new MetaDataParser(con);
-
-		mp.parse();
-
-		System.out.println("To Nodes !");
-
-		ArrayList<RDBMSTableBase> toNodesTables = mp.getToNodesTables();
-
-		for (RDBMSTableBase table : toNodesTables) {
-			System.out.println(table.getTableName());
-			for (TableTuple tt : table.getPrimaryKeys()) {
-				System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
+	public String concatPK(RDBMSTableBase table) {
+		String pkConcat = "";
+		if (table.getPrimaryKeys().size() > 1) {
+			for (PKTuple pk : table.getPrimaryKeys()) {
+				pkConcat += pk.getName() + RDBMSConstants.PK_DELIMITER;
 			}
-			for (Entry<TableTuple, String> tt : table.getForeignKeys().entrySet()) {
-				System.out.println(tt.getKey().f0 + " " + tt.getKey().f1 + " " + tt.getKey().f2 + " " + tt.getKey().f3
-						+ " " + tt.getValue());
-			}
-			for (TableTuple tt : table.getFurtherAttributes()) {
-				System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
-			}
+		} else {
+			pkConcat = table.getPrimaryKeys().get(0).getName();
 		}
-
-		System.out.println("To Edges !");
-
-		ArrayList<RDBMSTableBase> toEdgesTables = mp.getToEdgesTables();
-
-		for (RDBMSTableBase table : toEdgesTables) {
-			System.out.println(table.getTableName());
-			for (TableTuple tt : table.getPrimaryKeys()) {
-				System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
-			}
-			for (Entry<TableTuple, String> tt : table.getForeignKeys().entrySet()) {
-				System.out.println(tt.getKey().f0 + " " + tt.getKey().f1 + " " + tt.getKey().f2 + " " + tt.getKey().f3
-						+ " " + tt.getValue());
-			}
-			if (table.getFurtherAttributes() != null) {
-				for (TableTuple tt : table.getFurtherAttributes()) {
-					System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
-				}
-			}
-		}
+		return pkConcat;
 	}
+	// public static void main(String[] args) throws SQLException {
+	// RDBMSConfig rdbmsConfig = new
+	// RDBMSConfig("jdbc:mariadb://localhost/employees_small", "hr73vexy",
+	// "UrlaubsReisen",
+	// "/home/hr73vexy/01
+	// Uni/gradoop_RdbmsToGraph/jdbcDrivers/mariadb-java-client-2.2.5.jar!/");
+	//
+	// Connection con = RDBMSConnect.connect(rdbmsConfig);
+	//
+	// MetaDataParser mp = new MetaDataParser(con);
+	//
+	// mp.parse();
+	//
+	// System.out.println("To Nodes !");
+	//
+	// ArrayList<RDBMSTableBase> toNodesTables = mp.getToNodesTables();
+	//
+	// for (RDBMSTableBase table : toNodesTables) {
+	// System.out.println(table.getTableName());
+	// for (TableTuple tt : table.getPrimaryKeys()) {
+	// System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
+	// }
+	// for (Entry<TableTuple, String> tt : table.getForeignKeys().entrySet()) {
+	// System.out.println(tt.getKey().f0 + " " + tt.getKey().f1 + " " +
+	// tt.getKey().f2 + " " + tt.getKey().f3
+	// + " " + tt.getValue());
+	// }
+	// for (TableTuple tt : table.getFurtherAttributes()) {
+	// System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
+	// }
+	// }
+	//
+	// System.out.println("To Edges !");
+	//
+	// ArrayList<RDBMSTableBase> toEdgesTables = mp.getToEdgesTables();
+	//
+	// for (RDBMSTableBase table : toEdgesTables) {
+	// System.out.println(table.getTableName());
+	// for (TableTuple tt : table.getPrimaryKeys()) {
+	// System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
+	// }
+	// for (Entry<TableTuple, String> tt : table.getForeignKeys().entrySet()) {
+	// System.out.println(tt.getKey().f0 + " " + tt.getKey().f1 + " " +
+	// tt.getKey().f2 + " " + tt.getKey().f3
+	// + " " + tt.getValue());
+	// }
+	// if (table.getFurtherAttributes() != null) {
+	// for (TableTuple tt : table.getFurtherAttributes()) {
+	// System.out.println(tt.f0 + " " + tt.f1 + " " + tt.f2 + " " + tt.f3);
+	// }
+	// }
+	// }
+	// }
 
 	// /**
 	// * Queries rdbms' metadata
@@ -228,7 +262,8 @@ public class MetaDataParser {
 	// /*
 	// * storing foreignkeys of the table
 	// */
-	// ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
+	// ResultSet rsForeignKeys = metadata.getImportedKeys(null, null,
+	// tableName);
 	// LinkedHashMap<String, String> foreignKeys = new LinkedHashMap<String,
 	// String>();
 	// while (rsForeignKeys.next()) {
@@ -250,7 +285,8 @@ public class MetaDataParser {
 	// }
 	//
 	// /*
-	// * add primary and foreign key's position in the table (needed for accessing
+	// * add primary and foreign key's position in the table (needed for
+	// accessing
 	// fields via JDBCInputFormat)
 	// */
 	// for (String cols : columns) {
@@ -271,7 +307,8 @@ public class MetaDataParser {
 	// /*
 	// * set edge direction
 	// */
-	// if(table.getForeignKeys().size() == 2 && table.getPrimaryKey().size() == 2){
+	// if(table.getForeignKeys().size() == 2 && table.getPrimaryKey().size() ==
+	// 2){
 	// // for n:m relations
 	// table.setDirectionIndicator(false);
 	// }else{

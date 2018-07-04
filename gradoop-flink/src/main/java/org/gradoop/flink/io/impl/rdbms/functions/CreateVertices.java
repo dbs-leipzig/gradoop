@@ -10,6 +10,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToNodes;
 
 /**
  * converts tuples of sql query result to vertices
@@ -18,28 +19,30 @@ import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
  */
 public class CreateVertices extends RichMapFunction<Row, Vertex> {
 	// tables to nodes metadata
-	private List<RDBMSTable> table;
-	private int tablePosition;
+	private List<TablesToNodes> tables;
+	private int tablePos;
+	private TablesToNodes currentTable;
 	
-	public CreateVertices(int tablePosition){
-		this.tablePosition = tablePosition;
+	public CreateVertices(int tablePos){
+		this.tablePos = tablePos;
 	}
 	
 	@Override
 	public Vertex map(Row tuple) throws Exception {
 		// TODO Auto-generated method stub
-		RowHeader rowHeader = table.get(tablePosition).getRowHeader();
-		String pkString = new PrimaryKeyConcatString().getPrimaryKeyString(tuple,rowHeader);
+		this.currentTable = tables.get(tablePos);
+		RowHeader rowheader = currentTable.getRowheader();
+		String pkString = new PrimaryKeyConcatString().getPrimaryKeyString(tuple,rowheader);
 		
 		Vertex v = new Vertex();
 		v.setId(GradoopId.get());
-		v.setLabel(table.get(tablePosition).getTableName());
-		v.setProperties(AttributesToProperties.getProperties(tuple, rowHeader));
+		v.setLabel(currentTable.getTableName());
+		v.setProperties(AttributesToProperties.getProperties(tuple, rowheader));
 		v.getProperties().set("PrimaryKey",pkString);
 		return v;
 	}
 
 	public void open(Configuration parameters) throws Exception {
-		this.table = getRuntimeContext().getBroadcastVariable("tables");
+		this.tables = getRuntimeContext().getBroadcastVariable("tables");
 	}
 }
