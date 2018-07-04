@@ -10,7 +10,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
-import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToNodes;
+import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TableToNode;
 
 /**
  * converts tuples of sql query result to vertices
@@ -19,9 +19,9 @@ import org.gradoop.flink.io.impl.rdbms.tempGraphDSUsing.TablesToNodes;
  */
 public class CreateVertices extends RichMapFunction<Row, Vertex> {
 	// tables to nodes metadata
-	private List<TablesToNodes> tables;
+	private List<TableToNode> tables;
 	private int tablePos;
-	private TablesToNodes currentTable;
+	private TableToNode currentTable;
 	
 	public CreateVertices(int tablePos){
 		this.tablePos = tablePos;

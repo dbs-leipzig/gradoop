@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
-public class RowHeader implements Cloneable{
+public class RowHeader {
 	private ArrayList<RowHeaderTuple> rowHeader;
 	
 	public RowHeader(){

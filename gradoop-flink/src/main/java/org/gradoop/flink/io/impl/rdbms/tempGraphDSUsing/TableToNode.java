@@ -4,6 +4,7 @@ import java.sql.JDBCType;
 import java.util.ArrayList;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
@@ -20,13 +21,13 @@ import com.sun.tools.javac.main.Option.PkgInfo;
 public class TableToNode {
 	private String tableName;
 	private ArrayList<NameTypeTuple> primaryKeys;
-	private ArrayList<NameTypeTuple> foreignKeys;
+	private ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys;
 	private ArrayList<NameTypeTuple> furtherAttributes;
 	private int rowCount;
 	private String sqlQuery;
 	private RowHeader rowheader;
 	
-	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<NameTypeTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes,
+	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes,
 			int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
@@ -39,16 +40,16 @@ public class TableToNode {
 	
 	public RowTypeInfo getRowTypeInfo(){
 		int i = 0;
-		TypeInformation[] fieldTypes = new TypeInformation[primaryKeys.size()+furtherAttributes.size()];
+		TypeInformation[] fieldTypes = new TypeInformation[primaryKeys.size()+foreignKeys.size()+furtherAttributes.size()];
 		
 		for(NameTypeTuple pk : primaryKeys){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(pk.f1);
 			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RDBMSConstants.PK_FIELD,i));
 			i++;
 		}
-		for(NameTypeTuple fk : foreignKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RDBMSConstants.FK_FIELD,i));
+		for(Tuple2<NameTypeTuple,String> fk : foreignKeys){
+			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f0.f1);
+			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0.f0,RDBMSConstants.FK_FIELD,i));
 			i++;
 		}
 		for(NameTypeTuple att : furtherAttributes){
@@ -59,11 +60,14 @@ public class TableToNode {
 		return new RowTypeInfo(fieldTypes);
 	}
 	
-	public ArrayList<NameTypeTuple> getForeignKeys() {
+	/*
+	 * Getter and Setter
+	 */
+	public ArrayList<Tuple2<NameTypeTuple,String>> getForeignKeys() {
 		return foreignKeys;
 	}
 
-	public void setForeignKeys(ArrayList<NameTypeTuple> foreignKeys) {
+	public void setForeignKeys(ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys) {
 		this.foreignKeys = foreignKeys;
 	}
 

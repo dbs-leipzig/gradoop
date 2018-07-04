@@ -5,20 +5,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.tuples.AttTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.FKTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.PKTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.TableTuple;
 
 public class RDBMSTableBase {
 	private String tableName;
-	private ArrayList<PKTuple> primaryKeys;
-	private ArrayList<FKTuple> foreignKeys;
-	private ArrayList<AttTuple> furtherAttributes;
+	private ArrayList<NameTypeTuple> primaryKeys;
+	private ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys;
+	private ArrayList<NameTypeTuple> furtherAttributes;
 	private int rowCount;
 
-	public RDBMSTableBase(String tableName, ArrayList<PKTuple> primaryKeys,
-			ArrayList<FKTuple> foreignKeys, ArrayList<AttTuple> furtherAttributes, int rowCount) {
+	public RDBMSTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
+			ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
@@ -26,6 +28,9 @@ public class RDBMSTableBase {
 		this.rowCount = rowCount;
 	}
 
+	/*
+	 * Getter and Setter
+	 */
 	public String getTableName() {
 		return tableName;
 	}
@@ -34,27 +39,27 @@ public class RDBMSTableBase {
 		this.tableName = tableName;
 	}
 
-	public ArrayList<PKTuple> getPrimaryKeys() {
+	public ArrayList<NameTypeTuple> getPrimaryKeys() {
 		return primaryKeys;
 	}
 
-	public void setPrimaryKeys(ArrayList<PKTuple> primaryKeys) {
+	public void setPrimaryKeys(ArrayList<NameTypeTuple> primaryKeys) {
 		this.primaryKeys = primaryKeys;
 	}
 
-	public ArrayList<FKTuple> getForeignKeys() {
+	public ArrayList<Tuple2<NameTypeTuple,String>> getForeignKeys() {
 		return foreignKeys;
 	}
 
-	public void setForeignKeys(ArrayList<FKTuple> foreignKeys) {
+	public void setForeignKeys(ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys) {
 		this.foreignKeys = foreignKeys;
 	}
 
-	public ArrayList<AttTuple> getFurtherAttributes() {
+	public ArrayList<NameTypeTuple> getFurtherAttributes() {
 		return furtherAttributes;
 	}
 
-	public void setFurtherAttributes(ArrayList<AttTuple> furtherAttributes) {
+	public void setFurtherAttributes(ArrayList<NameTypeTuple> furtherAttributes) {
 		this.furtherAttributes = furtherAttributes;
 	}
 
@@ -65,26 +70,4 @@ public class RDBMSTableBase {
 	public void setRowCount(int rowCount) {
 		this.rowCount = rowCount;
 	}
-
-//	public ArrayList<JDBCType> getTypes() {
-//		ArrayList<JDBCType> types = new ArrayList<JDBCType>();
-//		for (TableTuple pks : primaryKeys) {
-//			types.add(pks.f3);
-//		}
-//		if (!foreignKeys.isEmpty()) {
-//			for (Entry<TableTuple, String> fks : foreignKeys.entrySet()) {
-//				types.add(fks.getKey().f3);
-//			}
-//		}
-//		if (!furtherAttributes.isEmpty()) {
-//			for (TableTuple att : furtherAttributes) {
-//				types.add(att.f3);
-//			}
-//		}
-//		return types;
-//	}
-
-	/*
-	 * Getter and Setter
-	 */
 }
