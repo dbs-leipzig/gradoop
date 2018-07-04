@@ -57,7 +57,7 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
     unnecessaryPropertyNames.add(degreePropertyName);
     unnecessaryPropertyNames.add(inDegreePropertyName);
     unnecessaryPropertyNames.add(outDegreePropertyName);
-    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree))
+    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree, degreePropertyName))
       .map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());

@@ -28,14 +28,19 @@ public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<
    * the given degree to be filtered
    */
   private final long degree;
-
+  /**
+   *
+   */
+  private final String degreePropertyName;
   /**
    * Constructor
    *
    * @param degree the given degree
+   * @param degreePropertyName the name of property of degree
    */
-  public VertexWithDegreeFilter(long degree) {
+  public VertexWithDegreeFilter(long degree, String degreePropertyName) {
     this.degree = degree;
+    this.degreePropertyName = degreePropertyName;
   }
 
   /**
@@ -43,6 +48,6 @@ public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<
    */
   @Override
   public boolean filter(V vertex) throws Exception {
-    return Long.parseLong(vertex.getPropertyValue("deg").toString()) != degree;
+    return Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString()) != degree;
   }
 }
