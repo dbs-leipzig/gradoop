@@ -74,6 +74,7 @@ public class AggregateMultipleFunctions
     for (int i = 0; i < field.length; i++) {
       Long aggregatedValue = aggregationFunctions[i].getAggregate();
       result.setField(aggregatedValue, field[i]);
+      aggregationFunctions[i].initializeAggregate();
     }
 
     collector.collect(result);
