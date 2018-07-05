@@ -81,6 +81,13 @@
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
         </developer>
+        <developer>
+            <id>crost</id>
+            <name>Christopher Rost</name>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
     </developers>
 
     <scm>

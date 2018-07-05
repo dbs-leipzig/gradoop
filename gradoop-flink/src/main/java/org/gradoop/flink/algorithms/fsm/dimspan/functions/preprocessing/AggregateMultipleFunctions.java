@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.Arrays;
 
 /**
- * Calculates sum aggregates of multiple AggregateMultipleFunctions.
+ * Calculates sum aggregates of multiple AggregateFunctions.
  */
 public class AggregateMultipleFunctions
   extends RichGroupReduceFunction<WithCount<int[]>, WithCount<int[]>>
