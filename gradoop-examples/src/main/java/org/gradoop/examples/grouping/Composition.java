@@ -64,28 +64,25 @@ public class Composition extends AbstractRunner {
     LogicalGraph socialNetwork = dataSource.getLogicalGraph();
 
     // use the subgraph operator to filter the graph
-    LogicalGraph subgraph = socialNetwork.subgraph(
-      v -> v.getLabel().equals("person"),
-      e -> e.getLabel().equals("knows"));
+    LogicalGraph subgraph =
+      socialNetwork.subgraph(v -> v.getLabel().equals("person"), e -> e.getLabel().equals("knows"));
 
     // use the transformation operator to classify the 'birthday' property for the users
 
     LogicalGraph transformed = subgraph.transformVertices((current, modified) -> {
-      LocalDate birthDayDate = current.getPropertyValue("birthday").getDate();
+        LocalDate birthDayDate = current.getPropertyValue("birthday").getDate();
         current.setProperty("yob", birthDayDate.getYear());
         current.setProperty("decade", birthDayDate.getYear() - birthDayDate.getYear() % 10);
         return current;
       });
 
     // group the transformed graph by users decade and apply several aggregate functions
-    LogicalGraph summary = transformed.groupBy(
-      Collections.singletonList("decade"), Arrays.asList(
-        new CountAggregator("count"),
-        new MinAggregator("yob", "min_yob"),
-        new MaxAggregator("yob", "max_yob")),
-      Collections.emptyList(),
-      Collections.singletonList(new CountAggregator("count")),
-      GroupingStrategy.GROUP_COMBINE);
+    LogicalGraph summary = transformed.groupBy(Collections.singletonList("decade"), Arrays
+        .asList(new CountAggregator("count"),
+          new MinAggregator("yob", "min_yob"),
+          new MaxAggregator("yob", "max_yob")), Collections.emptyList(),
+      Collections.singletonList(
+        new CountAggregator("count")), GroupingStrategy.GROUP_COMBINE);
 
     // use the decade as label information for the DOT sink
     summary = summary.transformVertices((current, modified) -> {
