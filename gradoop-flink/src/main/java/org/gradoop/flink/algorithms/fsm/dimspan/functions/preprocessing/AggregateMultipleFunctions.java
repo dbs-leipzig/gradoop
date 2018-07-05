@@ -50,7 +50,8 @@ public class AggregateMultipleFunctions
 // NOTE: The code in this file is based on code from the
 // Apache Flink project, licensed under the Apache License v 2.0
 //
-// https://github.com/apache/flink/blob/master/flink-java/src/main/java/org/apache/flink/api/java/operators/AggregateOperator.java#L244
+// (https://github.com/apache/flink/blob/master/flink-java/src/main/java/org/apache/flink/api
+// /java/operators/AggregateOperator.java#L244)
 
   public AggregateMultipleFunctions(AggregationFunction<Long>[] aggregationFunctions, int[] field) {
     Preconditions.checkArgument(aggregationFunctions.length == field.length);
