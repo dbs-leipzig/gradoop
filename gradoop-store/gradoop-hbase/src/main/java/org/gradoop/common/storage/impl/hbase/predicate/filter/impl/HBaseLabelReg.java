@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.common.storage.predicate.filter.impl.LabelReg;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
 import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.CF_META;
@@ -35,7 +35,7 @@ import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.COL
  *
  * @param <T> EPGM element type
  */
-public class HBaseLabelReg <T extends EPGMElement> extends LabelReg<HBaseElementFilter<T>>
+public class HBaseLabelReg<T extends EPGMElement> extends LabelReg<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {
 
   /**
@@ -47,10 +47,10 @@ public class HBaseLabelReg <T extends EPGMElement> extends LabelReg<HBaseElement
     super(reg);
   }
 
-  @Nullable
+  @Nonnull
   @Override
   public Filter toHBaseFilter() {
-   return new SingleColumnValueFilter(
+    return new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_META),
       Bytes.toBytesBinary(COL_LABEL),
       CompareFilter.CompareOp.EQUAL,

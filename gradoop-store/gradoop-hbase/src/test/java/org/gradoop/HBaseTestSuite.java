@@ -22,7 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-
 /**
  * Test Suite class to make sure HBase and Flink test instances are started only once for all tests.
  *
@@ -30,7 +29,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  //HBaseGraphStoreTest.class,
+  HBaseGraphStoreTest.class,
   HBaseDataSinkSourceTest.class
 })
 public class HBaseTestSuite {

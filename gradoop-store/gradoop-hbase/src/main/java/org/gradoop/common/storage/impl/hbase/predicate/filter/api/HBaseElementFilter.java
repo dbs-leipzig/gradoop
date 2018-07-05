@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.storage.impl.hbase.predicate.filter.api;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
@@ -33,22 +34,22 @@ public interface HBaseElementFilter<T extends EPGMElement>
   @Nonnull
   @Override
   default HBaseElementFilter<T> or(@Nonnull HBaseElementFilter<T> another) {
-    // TODO: implement
-    return null;
+    // this will be implemented at issue #857
+    throw new NotImplementedException("Logical 'or' not implemented.");
   }
 
   @Nonnull
   @Override
   default HBaseElementFilter<T> and(@Nonnull HBaseElementFilter<T> another) {
-    // TODO: implement
-    return null;
+    // this will be implemented at issue #857
+    throw new NotImplementedException("Logical 'and' not implemented.");
   }
 
   @Nonnull
   @Override
   default HBaseElementFilter<T> negate() {
-    // TODO: implement
-    return null;
+    // this will be implemented at issue #857
+    throw new NotImplementedException("Logical negation not implemented.");
   }
 
   /**
@@ -57,5 +58,6 @@ public interface HBaseElementFilter<T extends EPGMElement>
    *
    * @return the translated filter instance
    */
+  @Nonnull
   Filter toHBaseFilter();
 }

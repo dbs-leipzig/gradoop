@@ -245,6 +245,7 @@ public class HBaseEPGMStore implements
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
 
+    // check if there is a predicate defined
     if (query != null) {
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
@@ -255,8 +256,7 @@ public class HBaseEPGMStore implements
         );
       }
 
-      if (query.getFilterPredicate() != null &&
-        query.getFilterPredicate().toHBaseFilter() != null) {
+      if (query.getFilterPredicate() != null) {
         conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
       }
 

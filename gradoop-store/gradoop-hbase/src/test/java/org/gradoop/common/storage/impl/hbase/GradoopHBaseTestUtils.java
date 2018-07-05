@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.storage.impl.hbase;
 
-import com.google.common.collect.Lists;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -199,18 +198,14 @@ public class GradoopHBaseTestUtils {
    * @throws IOException if writing to store fails
    */
   public static void writeSocialGraphToStore(HBaseEPGMStore epgmStore) throws IOException {
-    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
-    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
-    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
-
     // write social graph to HBase
-    for (PersistentGraphHead g : graphHeads) {
+    for (PersistentGraphHead g : getSocialPersistentGraphHeads()) {
       epgmStore.writeGraphHead(g);
     }
-    for (PersistentVertex<Edge> v : vertices) {
+    for (PersistentVertex<Edge> v : getSocialPersistentVertices()) {
       epgmStore.writeVertex(v);
     }
-    for (PersistentEdge<Vertex> e : edges) {
+    for (PersistentEdge<Vertex> e : getSocialPersistentEdges()) {
       epgmStore.writeEdge(e);
     }
     epgmStore.flush();

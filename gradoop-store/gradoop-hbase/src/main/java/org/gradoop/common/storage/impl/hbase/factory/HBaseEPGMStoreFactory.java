@@ -136,6 +136,21 @@ public class HBaseEPGMStoreFactory {
   }
 
   /**
+   * Deletes the graph store which table names have the specified prefix.
+   *
+   * @param config Hadoop configuration
+   * @param prefix table prefix
+   */
+  public static void deleteEPGMStore(final Configuration config, String prefix) {
+    deleteEPGMStore(
+      config,
+      prefix + HBaseConstants.DEFAULT_TABLE_VERTICES,
+      prefix + HBaseConstants.DEFAULT_TABLE_EDGES,
+      prefix + HBaseConstants.DEFAULT_TABLE_GRAPHS
+    );
+  }
+
+  /**
    * Deletes the graph store based on the given table names.
    *
    * @param config          Hadoop configuration
@@ -150,8 +165,7 @@ public class HBaseEPGMStoreFactory {
     final String graphTableName
   ) {
     try {
-      deleteTablesIfExists(config, vertexTableName, edgeTableName,
-        graphTableName);
+      deleteTablesIfExists(config, vertexTableName, edgeTableName, graphTableName);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -191,13 +205,13 @@ public class HBaseEPGMStoreFactory {
 
     HBaseAdmin admin = new HBaseAdmin(config);
 
-    if (!admin.tableExists(vertexDataTableDescriptor.getName())) {
+    if (!admin.tableExists(vertexDataTableDescriptor.getTableName())) {
       vertexHandler.createTable(admin, vertexDataTableDescriptor);
     }
-    if (!admin.tableExists(edgeDataTableDescriptor.getName())) {
+    if (!admin.tableExists(edgeDataTableDescriptor.getTableName())) {
       edgeHandler.createTable(admin, edgeDataTableDescriptor);
     }
-    if (!admin.tableExists(graphDataTableDescriptor.getName())) {
+    if (!admin.tableExists(graphDataTableDescriptor.getTableName())) {
       graphHeadHandler.createTable(admin, graphDataTableDescriptor);
     }
 
@@ -228,13 +242,13 @@ public class HBaseEPGMStoreFactory {
 
     HBaseAdmin admin = new HBaseAdmin(config);
 
-    if (admin.tableExists(vertexDataTableDescriptor.getName())) {
+    if (admin.tableExists(vertexDataTableDescriptor.getTableName())) {
       deleteTable(admin, vertexDataTableDescriptor);
     }
-    if (admin.tableExists(edgeDataTableDescriptor.getName())) {
+    if (admin.tableExists(edgeDataTableDescriptor.getTableName())) {
       deleteTable(admin, edgeDataTableDescriptor);
     }
-    if (admin.tableExists(graphsTableDescriptor.getName())) {
+    if (admin.tableExists(graphsTableDescriptor.getTableName())) {
       deleteTable(admin, graphsTableDescriptor);
     }
 
@@ -251,7 +265,7 @@ public class HBaseEPGMStoreFactory {
     final HBaseAdmin admin,
     final HTableDescriptor tableDescriptor
   ) throws IOException {
-    admin.disableTable(tableDescriptor.getName());
-    admin.deleteTable(tableDescriptor.getName());
+    admin.disableTable(tableDescriptor.getTableName());
+    admin.deleteTable(tableDescriptor.getTableName());
   }
 }

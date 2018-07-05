@@ -16,50 +16,44 @@
 package org.gradoop.common.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
-import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
-import org.gradoop.common.storage.predicate.filter.impl.LabelIn;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.junit.Test;
 
-import javax.annotation.Nonnull;
+import java.util.Arrays;
 
 import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
+import static org.junit.Assert.assertEquals;
 
 /**
- * HBase label equality predicate implementation
- *
- * @param <T> EPGM element type
+ * Test class for {@link HBaseLabelIn}
  */
-public class HBaseLabelIn<T extends EPGMElement> extends LabelIn<HBaseElementFilter<T>>
-  implements HBaseElementFilter<T> {
+public class HBaseLabelInTest {
 
   /**
-   * Create a new label equality filter
-   *
-   * @param labels label
+   * Test the toHBaseFilter function
    */
-  public HBaseLabelIn(String... labels) {
-    super(labels);
-  }
+  @Test
+  public void testToHBaseFilter() {
+    String testLabel1 = "test1";
+    String testLabel2 = "test2";
 
-  @Nonnull
-  @Override
-  public Filter toHBaseFilter() {
-    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+    HBaseLabelIn<Edge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
 
-    for (String label : getLabels()) {
+    FilterList expectedFilterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+
+    for (String label : Arrays.asList(testLabel2, testLabel1)) {
       SingleColumnValueFilter valueFilter = new SingleColumnValueFilter(
         Bytes.toBytesBinary(CF_META),
         Bytes.toBytesBinary(COL_LABEL),
         CompareFilter.CompareOp.EQUAL,
         Bytes.toBytesBinary(label)
       );
-      filterList.addFilter(valueFilter);
+      expectedFilterList.addFilter(valueFilter);
     }
-    return filterList;
+    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter().toString());
   }
 }
