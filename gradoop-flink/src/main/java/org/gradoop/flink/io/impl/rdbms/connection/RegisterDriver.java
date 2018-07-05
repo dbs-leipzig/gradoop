@@ -24,7 +24,6 @@ import java.sql.SQLException;
 
 /**
  * Register jdbc driver
- *
  */
 public class RegisterDriver {
 	

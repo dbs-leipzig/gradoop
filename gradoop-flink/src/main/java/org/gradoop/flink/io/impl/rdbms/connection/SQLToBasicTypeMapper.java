@@ -7,14 +7,15 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import com.google.inject.util.Types;
 
 /**
- * maps given JDBCType to a flink specific BasicTypeInfo
- * @author pc
- *
+ * JDBC type to BasiTypeInfo Mapper
  */
 public class SQLToBasicTypeMapper {
-	public SQLToBasicTypeMapper() {
-	}
-
+	
+	/**
+	 * Maps jdbc types to flink compatible BasicTypeInfos
+	 * @param jdbcType Valid jdbc type
+	 * @return
+	 */
 	public static BasicTypeInfo getBasicTypeInfo(JDBCType jdbcType) {
 		BasicTypeInfo bti = null;
 		switch (jdbcType.name()) {
@@ -97,7 +98,6 @@ public class SQLToBasicTypeMapper {
 			System.err.println("No Typemapping for Type : JAVA_OBJECT");
 			break;
 		}
-
 		return bti;
 	}
 }

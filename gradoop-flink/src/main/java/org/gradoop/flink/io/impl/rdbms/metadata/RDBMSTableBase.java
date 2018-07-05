@@ -1,24 +1,47 @@
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
-import java.sql.JDBCType;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.io.impl.rdbms.tuples.AttTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.FKTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.PKTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.TableTuple;
 
+/**
+ * Represents the relational database schema
+ */
 public class RDBMSTableBase {
+	
+	/**
+	 * Name of database table
+	 */
 	private String tableName;
+	
+	/**
+	 * List of primary keys of database table
+	 */
 	private ArrayList<NameTypeTuple> primaryKeys;
+	
+	/**
+	 * List of foreign key of database table
+	 */
 	private ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys;
+	
+	/**
+	 * List of further attributes (no primary, foreign key attributes) of database table
+	 */
 	private ArrayList<NameTypeTuple> furtherAttributes;
+	
+	/**
+	 * Number of rows of table
+	 */
 	private int rowCount;
 
+	/**
+	 * Constructor
+	 * @param tableName Name of database table
+	 * @param primaryKeys List of primary keys
+	 * @param foreignKeys List of foreign keys
+	 * @param furtherAttributes List of further attributes
+	 * @param rowCount Number of rows
+	 */
 	public RDBMSTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
 			ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
@@ -28,9 +51,6 @@ public class RDBMSTableBase {
 		this.rowCount = rowCount;
 	}
 
-	/*
-	 * Getter and Setter
-	 */
 	public String getTableName() {
 		return tableName;
 	}

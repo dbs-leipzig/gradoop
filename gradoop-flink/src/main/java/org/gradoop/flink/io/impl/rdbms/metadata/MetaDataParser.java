@@ -83,12 +83,13 @@ public class MetaDataParser {
 				//parses primary keys
 				if (rsPrimaryKeys != null) {
 
-					//setting primary key name 
+					//assigning primary key name 
 					while (rsPrimaryKeys.next()) {
 						primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
 						pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
 					}
-					//setting primary key data type
+					
+					//assigning primary key data type
 					for (NameTypeTuple pk : primaryKeys) {
 						ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
 						rsColumns.next();
@@ -99,11 +100,14 @@ public class MetaDataParser {
 				//parses foreign keys if exists
 				if (rsForeignKeys != null) {
 
+					//assigning foreign key name and name of belonging primary and foreign key table
 					while (rsForeignKeys.next()) {
-						foreignKeys.add(new Tuple2(new NameTypeTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null),
+						foreignKeys.add(new Tuple2<NameTypeTuple,String>(new NameTypeTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null),
 								rsForeignKeys.getString("PKTABLE_NAME")));
 						pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
 					}
+					
+					//assigning foreign key data type
 					for (Tuple2<NameTypeTuple, String> fk : foreignKeys) {
 						ResultSet rsColumns = metadata.getColumns(null, null, tableName, fk.f0.f0);
 						rsColumns.next();
@@ -113,7 +117,8 @@ public class MetaDataParser {
 
 				//parses further attributes if exists
 				if (rsAttributes != null) {
-
+					
+					//assigning attribute name and belonging data type
 					while (rsAttributes.next()) {
 						if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))) {
 							furtherAttributes.add(new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
@@ -122,6 +127,7 @@ public class MetaDataParser {
 					}
 				}
 
+				//number of rows (needed for distributed data querying via flink)
 				int rowCount = TableRowSize.getTableRowSize(con, tableName);
 
 				tableBase.add(new RDBMSTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
@@ -129,8 +135,14 @@ public class MetaDataParser {
 		}
 	}
 
+	/**
+	 * Creates metadata representations of tables, which will be convert to vertices
+	 * 
+	 * @return ArrayList containing metadata representations of rdbms tables going to convert to vertices
+	 */
 	public ArrayList<TableToNode> getTablesToNodes() {
 		ArrayList<TableToNode> tablesToNodes = new ArrayList<TableToNode>();
+		
 		for (RDBMSTableBase tables : tableBase) {
 			if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
 				tablesToNodes.add(new TableToNode(tables.getTableName(), tables.getPrimaryKeys(),
@@ -140,16 +152,26 @@ public class MetaDataParser {
 		return tablesToNodes;
 	}
 
+	/**
+	 * Creates metadata representations of tables, which will be convert to edges
+	 * 
+	 * @return ArrayList containing metadata representations of rdbms tables going to convert to edges
+	 */
 	public ArrayList<TableToEdge> getTablesToEdges() {
 		ArrayList<TableToEdge> tablesToEdges = new ArrayList<TableToEdge>();
 
 		for (RDBMSTableBase table : tableBase) {
 			if (table.getForeignKeys() != null) {
 				int rowCount = table.getRowCount();
+				
+				//table tuples going to convert to edges
 				if (table.getForeignKeys().size() == 2 && table.getPrimaryKeys().size() == 2) {
 					tablesToEdges.add(new TableToEdge(table.getTableName(), table.getForeignKeys().get(0).f1, table.getForeignKeys().get(1).f1, table.getForeignKeys().get(0).f0,
 							table.getForeignKeys().get(1).f0, null, table.getFurtherAttributes(), false, rowCount));
-				} else {
+				} 
+				
+				//foreign keys going to convert to edges
+				else {
 					for (Tuple2<NameTypeTuple, String> fk : table.getForeignKeys()) {
 						tablesToEdges.add(new TableToEdge(null, table.getTableName(), fk.f1, null, fk.f0, table.getPrimaryKeys(), null, true, rowCount));
 					}

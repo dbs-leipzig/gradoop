@@ -10,41 +10,32 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
 /**
- * connects to a RDBMS via Flinks' JDBC Input Format
- * 
- * @author pc
- *
+ * Queries the relational data 
  */
 public class FlinkConnect {
 
-	public FlinkConnect() {
-	}
-
 	/**
-	 * computes best pageination, connects to rdbms via jdbc and run sql query
+	 * Connects to a relational database and querying data in a distributed manner.
 	 * 
-	 * @param env
-	 * @param rdbmsConfig
-	 * @param table
-	 * @param tableoredge
-	 * @return
+	 * @param env Flink Execution Environment
+	 * @param rdbmsConfig Configuration of the used database management system
+	 * @param rowCount Number of table rows
+	 * @param sqlQuery Valid sql query
+	 * @param typeInfo Database row type information 
+	 * @return DataSet of type row, consisting of queried relational data
 	 * @throws ClassNotFoundException
 	 */
 	public static DataSet<Row> connect(ExecutionEnvironment env, RDBMSConfig rdbmsConfig, int rowCount, String sqlQuery,
 			RowTypeInfo typeInfo) throws ClassNotFoundException {
 
-		// parallelism of running cluster or local mashine
+		//used for best database pagination
 		int parallelism = env.getParallelism();
-
-		// divides table data into equal parts
 		int partitionNumber = rowCount / parallelism;
 		int partitionRest = rowCount % parallelism;
 
 		JDBCInputFormat jdbcInput = null;
 
-		/*
-		 * provides parameters for sql query
-		 */
+		//computes the parameter array for ParametersProvider 
 		Serializable[][] parameters = new Integer[parallelism][2];
 		int j = 0;
 		for (int i = 0; i < parallelism; i++) {
@@ -56,6 +47,7 @@ public class FlinkConnect {
 			}
 		}
 
+		//run jdbc input format with pagination 
 		jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
 				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
 				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw()).setQuery(sqlQuery + " limit ? offset ?")

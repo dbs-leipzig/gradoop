@@ -4,6 +4,9 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 
+/**
+ * Creates edges with opposite direction
+ */
 public class EdgeToEdgeComplement implements MapFunction<Edge,Edge> {
 
 	@Override

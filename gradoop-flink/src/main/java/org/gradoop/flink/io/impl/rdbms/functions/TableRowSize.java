@@ -5,14 +5,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.gradoop.flink.io.impl.rdbms.metadata.RDBMSTable;
-
+/**
+ * Provides the number of rows of a relational database
+ */
 public class TableRowSize {
-	int tableRowSize;
-
-	public TableRowSize() {
-	}
-
+	
+	/**
+	 * Queries a relational database to get the number of rows 
+	 * @param con Valid jdbc database connection
+	 * @param tableName Name of database table
+	 * @return Number of rows of database
+	 * @throws SQLException
+	 */
 	public static int getTableRowSize(Connection con, String tableName) throws SQLException {
 		int rowNumber;
 		Statement st = con.createStatement();

@@ -9,19 +9,78 @@ import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
+/**
+ * Stores metadata for tuple-to-edge conversation
+ */
 public class TableToEdge {
+	
+	/**
+	 * Relationship type
+	 */
 	private String relationshipType;
+	
+	/**
+	 * Name of relation start table
+	 */
 	private String startTableName;
+	
+	/**
+	 * Name of relation end table
+	 */
 	private String endTableName;
+	
+	/**
+	 * Name and datatype of relation start attribute
+	 */
 	private NameTypeTuple startAttribute;
+	
+	/**
+	 * Name and datatype of relation end attribute
+	 */
 	private NameTypeTuple endAttribute;
+	
+	/**
+	 * List of primary key names and belonging datatypes
+	 */
 	private ArrayList<NameTypeTuple> primaryKeys;
+	
+	/**
+	 * List of further attribute names and belonging datatypes
+	 */
 	private ArrayList<NameTypeTuple> furtherAttributes;
+	
+	/**
+	 * Direction indicator
+	 */
 	private boolean directionIndicator;
+	
+	/**
+	 * Number of rows
+	 */
 	private int rowCount;
+	
+	/**
+	 * Valid sql query for querying needed relational data
+	 */
 	private String sqlQuery;
+	
+	/**
+	 * Rowheader for row data representation of relational data
+	 */
 	private RowHeader rowheader;
 
+	/**
+	 * Conctructor
+	 * @param relationshipType Relationship type
+	 * @param startTableName Name of relation start table
+	 * @param endTableName Name of relation end table
+	 * @param startAttribute Name and type of relation start attribute
+	 * @param endAttribute Name and datatype of relation end attribute
+	 * @param primaryKeys List of primary key names and datatypes
+	 * @param furtherAttributes List of further attribute names and datatypes
+	 * @param directionIndicator Direction indicator
+	 * @param rowCount Number of rows
+	 */
 	public TableToEdge(String relationshipType, String startTableName, String endTableName, NameTypeTuple startAttribute,
 			NameTypeTuple endAttribute, ArrayList<NameTypeTuple> primaryKeys,
 			ArrayList<NameTypeTuple> furtherAttributes, boolean directionIndicator, int rowCount) {
@@ -41,22 +100,14 @@ public class TableToEdge {
 		}
 	}
 
+	/**
+	 * Creates a valid type information for belonging sql query
+	 * @return Row type information for belonging sql query
+	 */
 	public RowTypeInfo getRowTypeInfo() {
-		TypeInformation[] fieldTypes = null;
+		TypeInformation<RowTypeInfo>[] fieldTypes = null;
 
-		if (directionIndicator) {
-			int i = 0;
-			fieldTypes = new TypeInformation[primaryKeys.size() + 1];
-
-			for (NameTypeTuple pk : primaryKeys) {
-				fieldTypes[i] = SQLToBasicTypeMapper.getBasicTypeInfo(pk.f1);
-				rowheader.getRowHeader().add(new RowHeaderTuple(pk.getName(), RDBMSConstants.PK_FIELD, i));
-				i++;
-			}
-			fieldTypes[i] = SQLToBasicTypeMapper.getBasicTypeInfo(endAttribute.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0, RDBMSConstants.ATTRIBUTE_FIELD, i));
-
-		} else {
+		if(!directionIndicator) {
 			int i = 2;
 			fieldTypes = new TypeInformation[furtherAttributes.size() + 2];
 			fieldTypes[0] = SQLToBasicTypeMapper.getBasicTypeInfo(startAttribute.f1);
@@ -72,9 +123,6 @@ public class TableToEdge {
 		return new RowTypeInfo(fieldTypes);
 	}
 
-	/*
-	 * Getter and Setter
-	 */
 	public String getstartTableName() {
 		return startTableName;
 	}

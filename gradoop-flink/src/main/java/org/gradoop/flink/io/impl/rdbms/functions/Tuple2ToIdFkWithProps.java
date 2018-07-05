@@ -7,13 +7,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
+/**
+ * Creates tuples of gradoop id of foreign key one, value of foreign key two and belonging properties 
+ */
 public class Tuple2ToIdFkWithProps implements MapFunction<Tuple2<Tuple3<String,String,Properties>,IdKeyTuple>,Tuple3<GradoopId,String,Properties>>{
 
 	@Override
 	public Tuple3<GradoopId, String, Properties> map(
 			Tuple2<Tuple3<String, String, Properties>, IdKeyTuple> value) throws Exception {
-		// TODO Auto-generated method stub
-		return new Tuple3(value.f1.f0,value.f0.f1,value.f0.f2);
+		return new Tuple3<GradoopId,String,Properties>(value.f1.f0,value.f0.f1,value.f0.f2);
 	}
-
 }

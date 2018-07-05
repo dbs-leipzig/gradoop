@@ -3,19 +3,29 @@ package org.gradoop.flink.io.impl.rdbms.tuples;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
-
 /**
- * tuple representing a key string and a belonging gradoop id
- * @author pc
- *
+ * Tuple representing a gradoop id, key string pair
  */
 public class IdKeyTuple extends Tuple2<GradoopId, String> {
+	/**
+	 * Gradoop id
+	 */
 	GradoopId id;
+	
+	/**
+	 * Key string
+	 */
 	String key;
 
 	public IdKeyTuple() {
+		
 	}
-
+	
+	/**
+	 * Constructor
+	 * @param id Gradoop id
+	 * @param key Key string
+	 */
 	public IdKeyTuple(GradoopId id, String key) {
 		this.id = id;
 		this.f0 = id;
