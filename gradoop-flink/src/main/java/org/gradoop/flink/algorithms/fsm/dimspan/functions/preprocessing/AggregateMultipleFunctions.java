@@ -72,7 +72,7 @@ public class AggregateMultipleFunctions
     for (WithCount<int[]> tuple : iterable) {
       result = tuple;
 
-      // calculates aggregates
+      // calculates new aggregates
       for (int i = 0; i < field.length; i++) {
         Long value = tuple.getField(field[i]);
         aggregationFunctions[i].aggregate(value);
