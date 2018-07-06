@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.hits.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.graph.library.link_analysis.HITS;
+import org.apache.flink.graph.library.linkanalysis.HITS;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
