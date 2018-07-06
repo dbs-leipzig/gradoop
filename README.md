@@ -1,5 +1,5 @@
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Maven Central](https://img.shields.io/badge/Maven_Central-0.3.2-blue.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cgradoop)
+[![Maven Central](https://img.shields.io/badge/Maven_Central-0.4.0-blue.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cgradoop)
 [![Build Status](https://travis-ci.org/dbs-leipzig/gradoop.svg?branch=master)](https://travis-ci.org/dbs-leipzig/gradoop)
 
 ## Gradoop: Distributed Graph Analytics on Hadoop
@@ -127,11 +127,23 @@ Latest nightly build (additional repository is required):
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
-    <version>0.3.3-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
 </dependency>
 
 ```
-
+In any case you also need Apache Flink (version 1.5.0):
+```
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-java</artifactId>
+    <version>1.5.0</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-clients_2.11</artifactId>
+    <version>1.5.0</version>
+</dependency>
+```
 
 ### Build gradoop from source
 
