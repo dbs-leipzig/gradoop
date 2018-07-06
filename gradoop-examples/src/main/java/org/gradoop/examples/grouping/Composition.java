@@ -79,11 +79,12 @@ public class Composition extends AbstractRunner {
     // group the transformed graph by users decade and apply several aggregate functions
     LogicalGraph summary = transformed.groupBy(
         Collections.singletonList("decade"),
-        Arrays.asList(new CountAggregator("count"),
-        new MinAggregator("yob", "min_yob"),
-        new MaxAggregator("yob", "max_yob")), Collections.emptyList(),
-        Collections.singletonList(
-          new CountAggregator("count")),
+        Arrays.asList(
+          new CountAggregator("count"),
+          new MinAggregator("yob", "min_yob"),
+          new MaxAggregator("yob", "max_yob")),
+        Collections.emptyList(),
+        Collections.singletonList(new CountAggregator("count")),
         GroupingStrategy.GROUP_COMBINE);
 
     // use the decade as label information for the DOT sink

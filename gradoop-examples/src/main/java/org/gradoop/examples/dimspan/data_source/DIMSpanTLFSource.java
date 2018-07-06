@@ -66,9 +66,8 @@ public class DIMSpanTLFSource {
   public DataSet<LabeledGraphStringString> getGraphs() throws IOException {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
-    return env
-      .createInput(HadoopInputs.readHadoopFile(
-        new TLFInputFormat(), LongWritable.class, Text.class, getFilePath()))
+    return env.createInput(HadoopInputs.readHadoopFile(
+      new TLFInputFormat(), LongWritable.class, Text.class, getFilePath()))
       .map(new DIMSpanGraphFromText());
   }
 

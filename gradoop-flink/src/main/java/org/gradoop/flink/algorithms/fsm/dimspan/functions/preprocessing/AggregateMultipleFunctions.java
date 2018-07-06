@@ -54,6 +54,7 @@ public class AggregateMultipleFunctions
    */
   public AggregateMultipleFunctions(AggregationFunction<Long>[] aggregationFunctions, int[] field) {
     Preconditions.checkArgument(aggregationFunctions.length == field.length);
+    Preconditions.checkArgument(aggregationFunctions.length > 0);
     this.field = Arrays.copyOf(field, field.length);
     this.aggregationFunctions = Arrays.copyOf(aggregationFunctions, aggregationFunctions.length);
   }
