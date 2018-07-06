@@ -120,12 +120,10 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
 
     DataSet<Edge> ds = edgeSourceIdTargetId
             .join(sampledVerticesWithId)
-            .where(1)
-            .equalTo(1)
+            .where(1).equalTo(1)
             .with(new EdgeSourceVertexJoin())
             .join(sampledVerticesWithId)
-            .where(2)
-            .equalTo(1)
+            .where(2).equalTo(1)
             .with(new EdgeTargetVertexJoin())
             .filter(new EdgesWithSampledVerticesFilter(propertyNameForSampled, neighborType))
             .map(new Value0Of3<>());
