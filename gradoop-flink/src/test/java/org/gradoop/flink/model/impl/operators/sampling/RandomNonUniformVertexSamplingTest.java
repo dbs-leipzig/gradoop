@@ -15,82 +15,17 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import com.google.common.collect.Lists;
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.junit.Test;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraphSampling {
 
-import static org.junit.Assert.*;
-
-public class RandomNonUniformVertexSamplingTest extends GradoopFlinkTestBase {
-
-  @Test
-  public void randomNonUniformVertexSamplingTest() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
-
-    LogicalGraph newGraph = new RandomNonUniformVertexSampling(0.272f).execute(dbGraph);
-
-    validateResult(dbGraph, newGraph);
+  @Override
+  public UnaryGraphToGraphOperator getSamplingOperator() {
+    return new RandomNonUniformVertexSampling(0.272f);
   }
 
-  @Test
-  public void randomNonUniformVertexSamplingTestWithSeed() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader()
-    .getDatabase().getDatabaseGraph();
-
-    LogicalGraph newGraph = dbGraph.callForGraph(
-    new RandomNonUniformVertexSampling(0.272f, -4181668494294894490L));
-
-    validateResult(dbGraph, newGraph);
-  }
-
-  private void validateResult(LogicalGraph input, LogicalGraph output)
-  throws Exception {
-    List<Vertex> dbVertices = Lists.newArrayList();
-    List<Edge> dbEdges = Lists.newArrayList();
-    List<Vertex> newVertices = Lists.newArrayList();
-    List<Edge> newEdges = Lists.newArrayList();
-
-    input.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
-    input.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
-
-    output.getVertices().output(new LocalCollectionOutputFormat<>(newVertices));
-    output.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
-
-    getExecutionEnvironment().execute();
-
-    // Test, if there is a result graph
-    assertNotNull("graph was null", output);
-    Set<GradoopId> newVertexIDs = new HashSet<>();
-    for (Vertex vertex : newVertices) {
-      // Test, if all new vertices are taken from the original graph
-      assertTrue("sampled vertex is not part of the original graph", dbVertices.contains(vertex));
-      newVertexIDs.add(vertex.getId());
-    }
-
-    for (Edge edge : newEdges) {
-      // Test, if all new edges are taken from the original graph
-      assertTrue("sampled edge is not part of the original graph", dbEdges.contains(edge));
-      // Test, if all source- and target-vertices from new edges are part of the new graph
-      assertTrue("sampled edge has source vertex which is not part of the sampled graph",
-      newVertexIDs.contains(edge.getSourceId()));
-      assertTrue("sampled edge has target vertex which is not part of the sampled graph",
-      newVertexIDs.contains(edge.getTargetId()));
-    }
-
-    // Test, if there aren't any source- and target-vertices from not sampled edges left
-    dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
-      assertFalse("there are vertices from edges, which are not part of the sampled graph",
-      newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
-    }
+  @Override
+  public UnaryGraphToGraphOperator getSamplingWithSeedOperator() {
+    return new RandomNonUniformVertexSampling(0.272f, -4181668494294894490L);
   }
 }

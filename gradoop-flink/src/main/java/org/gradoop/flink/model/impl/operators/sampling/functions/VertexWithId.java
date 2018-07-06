@@ -17,17 +17,32 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Map a vertex to a tuple of the vertex and its id
  */
-public class VertexWithId implements MapFunction<Vertex, Tuple2<Vertex, String>> {
+public class VertexWithId implements MapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
+  /**
+   * Reduce object instantiations
+   */
+  private Tuple2<Vertex, GradoopId> reuse;
+
+  /**
+   * Constructor
+   */
+  public VertexWithId() {
+    this.reuse = new Tuple2<>();
+  }
+
    /**
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<Vertex, String> map(Vertex vertex) throws Exception {
-    return new Tuple2<>(vertex, vertex.getId().toString());
+  public Tuple2<Vertex, GradoopId> map(Vertex vertex) throws Exception {
+    reuse.f0 = vertex;
+    reuse.f1 = vertex.getId();
+    return reuse;
   }
 }

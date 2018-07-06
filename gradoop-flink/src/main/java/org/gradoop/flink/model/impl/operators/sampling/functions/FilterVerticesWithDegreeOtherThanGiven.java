@@ -29,6 +29,19 @@ import java.util.List;
  */
 public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraphOperator {
   /**
+   * Degree property name
+   */
+  private final String degreePropertyName = "_degree";
+  /**
+   * In-degree property name
+   */
+  private final String inDegreePropertyName = "_inDegree";
+  /**
+   * Out-degree property name
+   */
+  private final String outDegreePropertyName = "_outDegree";
+
+  /**
    * the given degree
    */
   private long degree;
@@ -47,9 +60,6 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    String degreePropertyName = "_degree";
-    String inDegreePropertyName = "_inDegree";
-    String outDegreePropertyName = "_outDegree";
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(degreePropertyName,
     inDegreePropertyName, outDegreePropertyName, true);
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();

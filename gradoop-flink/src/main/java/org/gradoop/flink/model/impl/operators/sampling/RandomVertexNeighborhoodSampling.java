@@ -18,10 +18,12 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeWithSourceTarget;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomMarkedMap;
@@ -29,7 +31,6 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexWithId;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
-import org.gradoop.flink.model.impl.operators.sampling.functions.Tuple3ToFirstValueMap;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;
 
 /**
@@ -110,22 +111,24 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
   public LogicalGraph execute(LogicalGraph graph) {
     String propertyNameForSampled = "sampled";
 
-    DataSet<Tuple2<Vertex, String>> sampledVerticesWithId = graph.getVertices()
+    DataSet<Tuple2<Vertex, GradoopId>> sampledVerticesWithId = graph.getVertices()
             .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, propertyNameForSampled))
             .map(new VertexWithId());
 
-    DataSet<Tuple3<Edge, String, String>> edgeSourceIdTargetId = graph.getEdges()
+    DataSet<Tuple3<Edge, GradoopId, GradoopId>> edgeSourceIdTargetId = graph.getEdges()
             .map(new EdgeWithSourceTarget());
 
-    DataSet<Edge> ds;
-    ds = edgeSourceIdTargetId
-            .join(sampledVerticesWithId).where(1).equalTo(1)
+    DataSet<Edge> ds = edgeSourceIdTargetId
+            .join(sampledVerticesWithId)
+            .where(1)
+            .equalTo(1)
             .with(new EdgeSourceVertexJoin())
-            .join(sampledVerticesWithId).where(2).equalTo(1)
+            .join(sampledVerticesWithId)
+            .where(2)
+            .equalTo(1)
             .with(new EdgeTargetVertexJoin())
             .filter(new EdgesWithSampledVerticesFilter(propertyNameForSampled, neighborType))
-            .map(new Tuple3ToFirstValueMap());
-
+            .map(new Value0Of3<>());
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), ds);
     graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);

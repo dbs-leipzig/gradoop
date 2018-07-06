@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
   /**
-   * property name which shows if a vertex is sampled
+   * Property name which shows if a vertex is sampled
    */
   private String propertyNameForSampled;
   /**

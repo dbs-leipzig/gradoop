@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<V> {
   /**
-   * the given degree to be filtered
+   * Given degree to be filtered
    */
   private final long degree;
   /**

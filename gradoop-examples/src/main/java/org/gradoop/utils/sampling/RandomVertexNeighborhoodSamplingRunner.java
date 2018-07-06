@@ -36,23 +36,24 @@ public class RandomVertexNeighborhoodSamplingRunner extends AbstractRunner imple
    * args[2] - path to output graph
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold
-   * args[5] - type of neighborhood
+   * args[5] - type of neighborhood (input, output, both)
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
     Neighborhood.NeighborType neighborType = null;
     String neighborhood = args[5];
-    if (neighborhood.equals("input")) {
+    if (neighborhood.equals(Neighborhood.NeighborType.Input.toString())) {
       neighborType = Neighborhood.NeighborType.Input;
-    } else if (neighborhood.equals("output")) {
+    } else if (neighborhood.equals(Neighborhood.NeighborType.Output.toString())) {
       neighborType = Neighborhood.NeighborType.Output;
     } else {
       neighborType = Neighborhood.NeighborType.Both;
     }
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample = new RandomVertexNeighborhoodSampling(Float.parseFloat(args[4]),
-            neighborType).execute(graph);
+    LogicalGraph sample =
+            new RandomVertexNeighborhoodSampling(Float.parseFloat(args[4]), neighborType)
+                    .execute(graph);
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
