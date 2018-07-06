@@ -25,14 +25,17 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestBase {
 
+  private final String testName;
+
   protected final long seed;
 
   protected final float sampleSize;
 
   protected final Neighborhood.NeighborType neighborType;
 
-  public ParametrizedTestForGraphSampling(String seed, String sampleSize,
+  public ParametrizedTestForGraphSampling(String testName, String seed, String sampleSize,
                                              String neighborType) {
+    this.testName = testName;
     this.seed = Long.parseLong(seed);
     this.sampleSize = Float.parseFloat(sampleSize);
     this.neighborType = Neighborhood.fromString(neighborType);
@@ -88,21 +91,25 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
   public static Iterable data() {
     return Arrays.asList(
             new String[] {
+                    "With seed and both neighborhood",
                     "-4181668494294894490",
                     "0.272f",
                     "Both"
             },
             new String[] {
+                    "Without seed and both neighborhood",
                     "-4181668494294894490",
                     "0",
                     "Both"
             },
             new String[] {
+                    "With seed and input neighborhood",
                     "-4181668494294894490",
                     "0.272f",
                     "Input"
             },
             new String[] {
+                    "With seed and output neighborhood",
                     "-4181668494294894490",
                     "0.272f",
                     "Output"

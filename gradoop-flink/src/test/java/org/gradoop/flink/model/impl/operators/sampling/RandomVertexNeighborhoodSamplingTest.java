@@ -19,9 +19,9 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGraphSampling {
 
-  public RandomVertexNeighborhoodSamplingTest(String seed, String sampleSize,
+  public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
                                               String neighborType) {
-    super(seed, sampleSize, neighborType);
+    super(testName, seed, sampleSize, neighborType);
   }
 
   @Override
