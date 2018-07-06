@@ -19,6 +19,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,15 +40,23 @@ public class CSVDataSinkTest extends CSVTestBase {
       .getDatabase()
       .getDatabaseGraph(true);
 
-    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
-    csvDataSink.write(input, true);
+    checkCSVWrite(tmpPath, input);
+  }
 
-    getExecutionEnvironment().execute();
+  @Test
+  public void testWriteWithDifferentPropertyTypes() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
 
-    DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "intFloat[(v1 {key:1})-->(v2 {key:1.1})]" +
+      "intStr[(v3 {key:1})-->(v4 {key:\"Test\"})]" +
+      "floatStr[(v5 {key:\"Test\"})-->(v6 {key:1.1})]" +
+      "intFloatStr[(v7 {key:1})-->(v8 {key:1.1})-->(v9 {key:\"Test\"})]");
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloat"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intStr"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("floatStr"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloatStr"));
   }
 
   @Test
@@ -122,5 +131,17 @@ public class CSVDataSinkTest extends CSVTestBase {
     while ((line = br.readLine()) != null) {
       checkMetadataCsvLine(line);
     }
+  }
+
+  private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
+    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
+    csvDataSink.write(input, true);
+
+    getExecutionEnvironment().execute();
+
+    DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
+    LogicalGraph output = csvDataSource.getLogicalGraph();
+
+    collectAndAssertTrue(input.equalsByElementData(output));
   }
 }
