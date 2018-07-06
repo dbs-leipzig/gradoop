@@ -709,6 +709,40 @@ public class PropertyValueTest {
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
+  @Test
+  public void testIsNumber() throws Exception {
+    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(INT_VAL_2);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(LONG_VAL_3);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(FLOAT_VAL_4);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(DOUBLE_VAL_5);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(BIG_DECIMAL_VAL_7);
+    assertTrue(p.isNumber());
+
+    p = PropertyValue.create(NULL_VAL_0);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(BOOL_VAL_1);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(STRING_VAL_6);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(GRADOOP_ID_VAL_8);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(MAP_VAL_9);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(LIST_VAL_a);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(DATE_VAL_b);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(TIME_VAL_c);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(DATETIME_VAL_d);
+    assertFalse(p.isNumber());
+  }
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
@@ -782,41 +816,97 @@ public class PropertyValueTest {
     assertEquals(p1, p2);
     assertNotEquals(p1, p3);
 
-    assertTrue(p1.hashCode() == p1.hashCode());
-    assertTrue(p1.hashCode() == p2.hashCode());
-    assertFalse(p1.hashCode() == p3.hashCode());
+    assertEquals(p1.hashCode(), p1.hashCode());
+    assertEquals(p1.hashCode(), p2.hashCode());
+    assertNotEquals(p1.hashCode(), p3.hashCode());
   }
 
   @Test
   public void testCompareTo() throws Exception {
     // null
-    assertTrue(create(null).compareTo(create(null)) == 0);
+    assertEquals(create(null).compareTo(create(null)), 0);
     // boolean
     validateCompareTo(create(false), create(false), create(true));
     // short
-    validateCompareTo(create((short)-10), create((short)-10), create((short)10));
+    validateCompareTo(create((short)-10), create((short)-10), create((short)12));
     validateCompareTo(create((short)10), create((short)10), create((short)12));
+    validateCompareTo(create((short)-10), create(-10), create(12));
+    validateCompareTo(create((short)10), create(10), create(12));
+    validateCompareTo(create((short)-10), create(-10L), create(12L));
+    validateCompareTo(create((short)10), create(10L), create(12L));
+    validateCompareTo(create((short)-10), create(-10F), create(12F));
+    validateCompareTo(create((short)10), create(10F), create(12F));
+    validateCompareTo(create((short)-10), create(-10D), create(12D));
+    validateCompareTo(create((short)10), create(10D), create(12D));
+    validateCompareTo(create((short)-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create((short)10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // int
-    validateCompareTo(create(-10), create(-10), create(10));
+    validateCompareTo(create(-10), create((short)-10), create((short)12));
+    validateCompareTo(create(10), create((short)10), create((short)12));
+    validateCompareTo(create(-10), create(-10), create(12));
     validateCompareTo(create(10), create(10), create(12));
+    validateCompareTo(create(-10), create(-10L), create(12L));
+    validateCompareTo(create(10), create(10L), create(12L));
+    validateCompareTo(create(-10), create(-10F), create(12F));
+    validateCompareTo(create(10), create(10F), create(12F));
+    validateCompareTo(create(-10), create(-10D), create(12D));
+    validateCompareTo(create(10), create(10D), create(12D));
+    validateCompareTo(create(-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // long
+    validateCompareTo(create(-10L), create((short)-10), create((short)12));
+    validateCompareTo(create(10L), create((short)10), create((short)12));
+    validateCompareTo(create(-10L), create(-10), create(12));
+    validateCompareTo(create(10L), create(10), create(12));
     validateCompareTo(create(-10L), create(-10L), create(12L));
     validateCompareTo(create(10L), create(10L), create(12L));
+    validateCompareTo(create(-10L), create(-10F), create(12F));
+    validateCompareTo(create(10L), create(10F), create(12F));
+    validateCompareTo(create(-10L), create(-10D), create(12D));
+    validateCompareTo(create(10L), create(10D), create(12D));
+    validateCompareTo(create(-10L), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10L), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // float
+    validateCompareTo(create(-10F), create((short)-10), create((short)12));
+    validateCompareTo(create(10F), create((short)10), create((short)12));
+    validateCompareTo(create(-10F), create(-10), create(12));
+    validateCompareTo(create(10F), create(10), create(12));
+    validateCompareTo(create(-10F), create(-10L), create(12L));
+    validateCompareTo(create(10F), create(10L), create(12L));
     validateCompareTo(create(-10F), create(-10F), create(12F));
     validateCompareTo(create(10F), create(10F), create(12F));
+    validateCompareTo(create(-10F), create(-10D), create(12D));
+    validateCompareTo(create(10F), create(10D), create(12D));
+    validateCompareTo(create(-10F), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10F), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // double
-    validateCompareTo(create(-10.), create(-10.), create(12.));
-    validateCompareTo(create(10.), create(10.), create(12.));
+    validateCompareTo(create(-10D), create((short)-10), create((short)12));
+    validateCompareTo(create(10D), create((short)10), create((short)12));
+    validateCompareTo(create(-10D), create(-10), create(12));
+    validateCompareTo(create(10D), create(10), create(12));
+    validateCompareTo(create(-10D), create(-10L), create(12L));
+    validateCompareTo(create(10D), create(10L), create(12L));
+    validateCompareTo(create(-10D), create(-10F), create(12F));
+    validateCompareTo(create(10D), create(10F), create(12F));
+    validateCompareTo(create(-10D), create(-10D), create(12D));
+    validateCompareTo(create(10D), create(10D), create(12D));
+    validateCompareTo(create(-10D), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10D), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     //string
     validateCompareTo(create("10"), create("10"), create("12"));
     // BigDecimal
-    validateCompareTo(create(new BigDecimal(-10)),
-      create(new BigDecimal(-10)),
-      create(new BigDecimal(11)));
-    validateCompareTo(create(new BigDecimal(10)),
-      create(new BigDecimal(10)),
-      create(new BigDecimal(11)));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create((short)-10), create((short)12));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create((short)10), create((short)12));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10), create(12));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10), create(12));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10L), create(12L));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10L), create(12L));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10F), create(12F));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10F), create(12F));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10D), create(12D));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10D), create(12D));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // GradoopId
     validateCompareTo(
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
@@ -845,7 +935,7 @@ public class PropertyValueTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCompareToWithIncompatibleTypes() {
-    create(10).compareTo(create(10L));
+    create(10).compareTo(create("10"));
   }
 
   @Test(expected = UnsupportedOperationException.class)

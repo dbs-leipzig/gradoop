@@ -33,13 +33,13 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  */
 public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
   /**
-   * relative amount of edges in the result graph
+   * Relative amount of edges in the result graph
    */
   private final float sampleSize;
 
   /**
-   * seed for the random number generator
-   * if seed is 0, the random generator is created without seed
+   * Seed for the random number generator
+   * If seed is 0, the random generator is created without seed
    */
   private final long randomSeed;
 

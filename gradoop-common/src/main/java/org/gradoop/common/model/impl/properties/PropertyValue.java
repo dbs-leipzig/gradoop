@@ -318,6 +318,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return rawBytes[0] == TYPE_DATETIME;
   }
 
+  /**
+   * True, if the wrapped value is a subtype of {@code Number}.
+   *
+   * @return true, if {@code Number} value
+   */
+  public boolean isNumber() {
+    return !isNull() && Number.class.isAssignableFrom(getType());
+  }
+
   //----------------------------------------------------------------------------
   // Getter
   //----------------------------------------------------------------------------
@@ -848,22 +857,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
     if (this.isNull() && o.isNull()) {
       result = 0;
+    } else if (this.isNumber() && o.isNumber()) {
+      result = PropertyValueUtils.Numeric.compare(this, o);
     } else if (this.isBoolean() && o.isBoolean()) {
       result = Boolean.compare(this.getBoolean(), o.getBoolean());
-    } else if (this.isShort() && o.isShort()) {
-      result = Short.compare(this.getShort(), o.getShort());
-    } else if (this.isInt() && o.isInt()) {
-      result = Integer.compare(this.getInt(), o.getInt());
-    } else if (this.isLong() && o.isLong()) {
-      result = Long.compare(this.getLong(), o.getLong());
-    } else if (this.isFloat() && o.isFloat()) {
-      result = Float.compare(this.getFloat(), o.getFloat());
-    } else if (this.isDouble() && o.isDouble()) {
-      result = Double.compare(this.getDouble(), o.getDouble());
     } else if (this.isString() && o.isString()) {
       result = this.getString().compareTo(o.getString());
-    } else if (this.isBigDecimal() && o.isBigDecimal()) {
-      result = this.getBigDecimal().compareTo(o.getBigDecimal());
     } else if (this.isGradoopId() && o.isGradoopId()) {
       result = this.getGradoopId().compareTo(o.getGradoopId());
     } else if (this.isDate() && o.isDate()) {
