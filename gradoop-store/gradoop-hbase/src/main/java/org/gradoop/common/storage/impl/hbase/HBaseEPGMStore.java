@@ -249,11 +249,8 @@ public class HBaseEPGMStore implements
     if (query != null) {
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
-      if (query.getQueryRanges() != null &&
-        !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
-        );
+      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
       }
 
       if (query.getFilterPredicate() != null) {
@@ -285,15 +282,11 @@ public class HBaseEPGMStore implements
     if (query != null) {
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
-      if (query.getQueryRanges() != null &&
-        !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
-        );
+      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
       }
 
-      if (query.getFilterPredicate() != null &&
-        query.getFilterPredicate().toHBaseFilter() != null) {
+      if (query.getFilterPredicate() != null) {
         conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
       }
 
@@ -322,15 +315,11 @@ public class HBaseEPGMStore implements
     if (query != null) {
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
-      if (query.getQueryRanges() != null &&
-        !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(query.getQueryRanges())
-        );
+      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
+        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
       }
 
-      if (query.getFilterPredicate() != null &&
-        query.getFilterPredicate().toHBaseFilter() != null) {
+      if (query.getFilterPredicate() != null) {
         conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
       }
 
@@ -342,7 +331,6 @@ public class HBaseEPGMStore implements
 
     return new HBaseEdgeIterator<>(edgeTable.getScanner(scan), config.getEdgeHandler());
   }
-
 
   /**
    * {@inheritDoc}

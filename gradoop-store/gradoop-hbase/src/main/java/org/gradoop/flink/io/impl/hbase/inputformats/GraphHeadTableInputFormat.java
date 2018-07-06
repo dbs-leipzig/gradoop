@@ -56,9 +56,10 @@ public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
   }
 
   /**
-   * TODO: doc
+   * Get the scanner instance. If a query was applied to the elementHandler,
+   * the Scan will be extended with a HBase filter representation of that query.
    *
-   * @return
+   * @return the Scan instance with an optional HBase filter applied
    */
   @Override
   protected Scan getScanner() {

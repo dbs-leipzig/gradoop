@@ -22,7 +22,6 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
@@ -35,16 +34,6 @@ import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
  */
 public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   extends TableInputFormat<Tuple1<V>> {
-
-  /**
-   * An optional set of vertex ids to define a filter for HBase.
-   */
-  private GradoopIdSet filterVertexIds = new GradoopIdSet();
-
-  /**
-   * An optional set of edge ids to define a filter for HBase.
-   */
-  private GradoopIdSet filterEdgeIds = new GradoopIdSet();
 
   /**
    * Handles reading of persistent vertex data.
@@ -69,9 +58,10 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   }
 
   /**
-   * TODO: doc
+   * Get the scanner instance. If a query was applied to the elementHandler,
+   * the Scan will be extended with a HBase filter representation of that query.
    *
-   * @return
+   * @return the Scan instance with an optional HBase filter applied
    */
   @Override
   protected Scan getScanner() {
