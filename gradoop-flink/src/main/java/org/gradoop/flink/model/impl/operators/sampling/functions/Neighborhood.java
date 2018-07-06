@@ -36,4 +36,19 @@ public class Neighborhood {
      */
     Both
   }
+
+  /**
+   * Build an instance of NieghborType from a given string
+   * @param neighborType type of neighborhood
+   * @return an instace of NieghborType
+   */
+  public static NeighborType fromString(String neighborType) {
+    if (neighborType.equals(Neighborhood.NeighborType.Input.toString())) {
+      return NeighborType.Input;
+    } else if (neighborType.equals(NeighborType.Output.toString())) {
+      return NeighborType.Output;
+    } else {
+      return NeighborType.Both;
+    }
+  }
 }

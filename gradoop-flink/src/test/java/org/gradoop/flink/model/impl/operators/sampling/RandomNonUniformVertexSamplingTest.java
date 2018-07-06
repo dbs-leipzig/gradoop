@@ -19,13 +19,13 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraphSampling {
 
-  @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
-    return new RandomNonUniformVertexSampling(0.272f);
+  public RandomNonUniformVertexSamplingTest(String seed, String sampleSize,
+                                            String neighborType) {
+    super(seed, sampleSize, neighborType);
   }
 
   @Override
-  public UnaryGraphToGraphOperator getSamplingWithSeedOperator() {
-    return new RandomNonUniformVertexSampling(0.272f, -4181668494294894490L);
+  public UnaryGraphToGraphOperator getSamplingOperator() {
+    return new RandomNonUniformVertexSampling(sampleSize,seed);
   }
 }

@@ -18,13 +18,13 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 public class RandomVertexSamplingTest extends ParametrizedTestForGraphSampling {
-  @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
-    return new RandomVertexSampling(0.272f);
+  public RandomVertexSamplingTest(String seed, String sampleSize,
+                                  String neighborType) {
+    super(seed, sampleSize, neighborType);
   }
 
   @Override
-  public UnaryGraphToGraphOperator getSamplingWithSeedOperator() {
-    return new RandomVertexSampling(0.272f, -4181668494294894490L);
+  public UnaryGraphToGraphOperator getSamplingOperator() {
+    return new RandomVertexSampling(sampleSize,seed);
   }
 }

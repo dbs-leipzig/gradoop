@@ -8,10 +8,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,29 +22,29 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-//public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlinkTestBase {
-
 @RunWith(Parameterized.class)
 public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestBase {
-  public abstract UnaryGraphToGraphOperator getSamplingOperator();
 
-  public abstract UnaryGraphToGraphOperator getSamplingWithSeedOperator();
+  protected final long seed;
+
+  protected final float sampleSize;
+
+  protected final Neighborhood.NeighborType neighborType;
+
+  public ParametrizedTestForGraphSampling(String seed, String sampleSize,
+                                             String neighborType) {
+    this.seed = Long.parseLong(seed);
+    this.sampleSize = Float.parseFloat(sampleSize);
+    this.neighborType = Neighborhood.fromString(neighborType);
+  }
+
+  public abstract UnaryGraphToGraphOperator getSamplingOperator();
 
   @Test
   public void randomSamplingTest() throws Exception {
     LogicalGraph dbGraph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     LogicalGraph newGraph = getSamplingOperator().execute(dbGraph); //dbGraph.sampleRandomNodes(0.272f);
-
-    validateResult(dbGraph, newGraph);
-  }
-
-  @Test
-  public void randomSamplingTestWithSeed() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader()
-            .getDatabase().getDatabaseGraph();
-
-    LogicalGraph newGraph = getSamplingOperator().execute(dbGraph);
 
     validateResult(dbGraph, newGraph);
   }
@@ -80,5 +82,30 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
               newVertexIDs.contains(edge.getSourceId()) &&
                       newVertexIDs.contains(edge.getTargetId()));
     }
+  }
+
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(
+            new String[] {
+                    "-4181668494294894490",
+                    "0.272f",
+                    "Both"
+            },
+            new String[] {
+                    "-4181668494294894490",
+                    "0",
+                    "Both"
+            },
+            new String[] {
+                    "-4181668494294894490",
+                    "0.272f",
+                    "Input"
+            },
+            new String[] {
+                    "-4181668494294894490",
+                    "0.272f",
+                    "Output"
+            });
   }
 }
