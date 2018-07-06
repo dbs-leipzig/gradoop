@@ -43,8 +43,16 @@ import java.util.Map.Entry;
  *
  * references to: org.apache.flink.api.common.io.FileOutputFormat;
  */
+//
+// NOTE: The code in this file is based on code from the
+// Apache Flink project, licensed under the Apache License v 2.0
+//
+// (https://github.com/apache/flink/blob/master/flink-core/src/main/java/org/apache/flink/api
+// /common/io/FileOutputFormat.java)
+
 @Public
-public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT> implements InitializeOnMaster, CleanupWhenUnsuccessful {
+public abstract class MultipleFileOutputFormat<IT>
+  extends RichOutputFormat<IT> implements InitializeOnMaster, CleanupWhenUnsuccessful {
 
   /**
    * Behavior for creating output directories.
