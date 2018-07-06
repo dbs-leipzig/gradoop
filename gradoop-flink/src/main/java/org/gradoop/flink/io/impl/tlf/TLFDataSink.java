@@ -98,7 +98,9 @@ public class TLFDataSink extends TLFBase implements DataSink {
       // write the vertex dictionary
       vertexDictionary
         .writeAsFormattedText(
-          getTLFVertexDictionaryPath(), writeMode, new TLFDictionaryFileFormat());
+          getTLFVertexDictionaryPath(),
+          writeMode,
+          new TLFDictionaryFileFormat());
     }
 
     if (hasEdgeDictionary()) {
@@ -110,7 +112,10 @@ public class TLFDataSink extends TLFBase implements DataSink {
         .reduceGroup(new TLFDictionaryMapGroupReducer());
       // write the edge dictionary
       edgeDictionary
-        .writeAsFormattedText(getTLFEdgeDictionaryPath(), writeMode, new TLFDictionaryFileFormat());
+        .writeAsFormattedText(
+          getTLFEdgeDictionaryPath(),
+          writeMode,
+          new TLFDictionaryFileFormat());
     }
 
     if (hasVertexDictionary() || hasEdgeDictionary()) {

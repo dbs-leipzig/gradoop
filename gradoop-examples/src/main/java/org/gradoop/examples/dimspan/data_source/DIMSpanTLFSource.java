@@ -17,6 +17,7 @@ package org.gradoop.examples.dimspan.data_source;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.hadoopcompatibility.HadoopInputs;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
@@ -64,8 +65,9 @@ public class DIMSpanTLFSource {
    */
   public DataSet<LabeledGraphStringString> getGraphs() throws IOException {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    return env
-      .readHadoopFile(new TLFInputFormat(), LongWritable.class, Text.class, getFilePath())
+
+    return env.createInput(HadoopInputs.readHadoopFile(
+      new TLFInputFormat(), LongWritable.class, Text.class, getFilePath()))
       .map(new DIMSpanGraphFromText());
   }
 

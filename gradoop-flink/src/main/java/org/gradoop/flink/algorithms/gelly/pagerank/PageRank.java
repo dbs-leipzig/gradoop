@@ -28,7 +28,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * A gradoop operator wrapping {@link org.apache.flink.graph.library.link_analysis.PageRank}.
+ * A gradoop operator wrapping {@link org.apache.flink.graph.library.linkanalysis.PageRank}.
  */
 public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
 
@@ -65,7 +65,7 @@ public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
   protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
     DataSet<Vertex> newVertices =
-      new org.apache.flink.graph.library.link_analysis.PageRank<GradoopId, NullValue, NullValue>(
+      new org.apache.flink.graph.library.linkanalysis.PageRank<GradoopId, NullValue, NullValue>(
         dampingFactor, iterations)
       .run(graph)
       .join(currentGraph.getVertices())

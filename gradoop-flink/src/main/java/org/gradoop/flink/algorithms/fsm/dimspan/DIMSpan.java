@@ -17,8 +17,8 @@ package org.gradoop.flink.algorithms.fsm.dimspan;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.aggregation.AggregationFunction;
 import org.apache.flink.api.java.aggregation.SumAggregationFunction;
-import org.apache.flink.api.java.operators.AggregateOperator;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.algorithms.fsm.dimspan.comparison.AlphabeticalLabelComparator;
 import org.gradoop.flink.algorithms.fsm.dimspan.comparison.InverseProportionalLabelComparator;
@@ -29,15 +29,17 @@ import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DictionaryType;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.DFSCodeToEPGMGraphTransaction;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CompressPattern;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CreateCollector;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ExpandFrequentPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.GrowFrequentPatterns;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.InitSingleEdgePatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.IsFrequentPatternCollector;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.NotObsolete;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ReportSupportedPatterns;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.VerifyPattern;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CompressPattern;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.AggregateMultipleFunctions;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.CreateDictionary;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneEdges;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneVertices;
@@ -51,10 +53,9 @@ import org.gradoop.flink.algorithms.fsm.dimspan.gspan.UndirectedGSpanLogic;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
-import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
  * abstract superclass of different implementations of the gSpan frequent
@@ -353,14 +354,17 @@ public class DIMSpan {
    *
    * @return sum group combine function
    */
-  protected GroupCombineFunction<WithCount<int[]>, WithCount<int[]>>
-  sumPartition() {
+  private GroupCombineFunction<WithCount<int[]>, WithCount<int[]>> sumPartition() {
 
-    SumAggregationFunction.LongSumAgg[] sum = { new SumAggregationFunction.LongSumAgg() };
+    @SuppressWarnings("unchecked")
+    AggregationFunction<Long>[] sum = new AggregationFunction[] {
+      new SumAggregationFunction.SumAggregationFunctionFactory()
+        .createAggregationFunction(Long.class)
+    };
 
     int[] fields = { 1 };
 
-    return new AggregateOperator.AggregatingUdf(sum, fields);
+    return new AggregateMultipleFunctions(sum, fields);
   }
 
   public String getName() {
