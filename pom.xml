@@ -7,7 +7,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.3-SNAPSHOT</version>
+    <version>0.4.0</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -198,7 +198,7 @@
                         <configuration>
                             <serverId>release_artifacts_gradoop</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                 </plugins>

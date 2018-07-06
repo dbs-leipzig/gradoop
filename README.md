@@ -108,7 +108,7 @@ Stable:
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
@@ -185,14 +185,7 @@ Used to maintain the code style for the whole project.
     
 ### Version History
 
-* 0.0.1 first prototype using Hadoop MapReduce and Apache Giraph for operator
- processing
-* 0.0.2 support for HBase as distributed graph storage
-* 0.0.3 Apache Flink replaces MapReduce and Giraph as operator implementation
- layer and distributed execution engine
-* 0.1 Major refactoring of internal EPGM representation (e.g. ID and property handling), Equality Operators, GDL-based unit testing
-* 0.2.0 Pattern Matching and Frequent Subgraph Mining algorithms
-* 0.3.1 Bug fixes and support for more Gelly algorithms
+See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at the Wiki pages. 
 
 ### Disclaimer
 
