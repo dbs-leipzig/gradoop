@@ -29,7 +29,7 @@ public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<
    */
   private final long degree;
   /**
-   *
+   * Name of property of degree
    */
   private final String degreePropertyName;
   /**
