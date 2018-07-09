@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Retains all vertices which do not have the given degree.
+ * If a vertex does not have the degree property, it will be filtered.
  *
  * @param <V> EPGM vertex type with property for degree ("deg")
  */
@@ -48,6 +49,10 @@ public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<
    */
   @Override
   public boolean filter(V vertex) throws Exception {
-    return Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString()) != degree;
+    if (vertex.hasProperty(degreePropertyName)) {
+      return Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString()) != degree;
+    } else {
+      return true;
+    }
   }
 }

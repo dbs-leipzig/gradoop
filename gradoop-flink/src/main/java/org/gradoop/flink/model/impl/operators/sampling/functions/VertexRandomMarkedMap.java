@@ -30,7 +30,7 @@ public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
-  private final float threshold;
+  private final float sampleSize;
   /**
    * Random instance
    */
@@ -49,16 +49,16 @@ public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V
    */
   public VertexRandomMarkedMap(float sampleSize, long randomSeed, String mark) {
     this.mark = mark;
-    threshold = sampleSize;
-    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
+    this.sampleSize = sampleSize;
+    this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
-    /**
-     * {@inheritDoc}
-     */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public V map(V vertex) throws Exception {
-    if (randomGenerator.nextFloat() <= threshold) {
+    if (randomGenerator.nextFloat() <= sampleSize) {
       vertex.setProperty(mark, true);
     } else {
       vertex.setProperty(mark, false);

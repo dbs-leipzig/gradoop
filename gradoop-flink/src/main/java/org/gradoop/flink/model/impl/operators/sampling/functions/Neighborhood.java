@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
+import java.security.InvalidParameterException;
+
 /**
  * Keeps the types of neighborhood
  */
@@ -43,12 +45,14 @@ public class Neighborhood {
    * @return an instace of NieghborType
    */
   public static NeighborType fromString(String neighborType) {
-    if (neighborType.equals(Neighborhood.NeighborType.Input.toString())) {
+    if (neighborType.equals(NeighborType.Input.toString())) {
       return NeighborType.Input;
     } else if (neighborType.equals(NeighborType.Output.toString())) {
       return NeighborType.Output;
-    } else {
+    } else if (neighborType.equals(NeighborType.Both.toString())) {
       return NeighborType.Both;
+    } else {
+      throw new InvalidParameterException();
     }
   }
 }

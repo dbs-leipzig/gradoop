@@ -21,6 +21,8 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.RandomVertexNeighborhoodSampling;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 
+import java.security.InvalidParameterException;
+
 /**
  * Runs {@link RandomVertexNeighborhoodSampling} for a given
  * graph and writes the sampled output.
@@ -41,14 +43,16 @@ public class RandomVertexNeighborhoodSamplingRunner extends AbstractRunner imple
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
-    Neighborhood.NeighborType neighborType = null;
+    Neighborhood.NeighborType neighborType;
     String neighborhood = args[5];
     if (neighborhood.equals(Neighborhood.NeighborType.Input.toString())) {
       neighborType = Neighborhood.NeighborType.Input;
     } else if (neighborhood.equals(Neighborhood.NeighborType.Output.toString())) {
       neighborType = Neighborhood.NeighborType.Output;
-    } else {
+    } else if (neighborhood.equals(Neighborhood.NeighborType.Both.toString())) {
       neighborType = Neighborhood.NeighborType.Both;
+    } else {
+      throw new InvalidParameterException();
     }
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample =

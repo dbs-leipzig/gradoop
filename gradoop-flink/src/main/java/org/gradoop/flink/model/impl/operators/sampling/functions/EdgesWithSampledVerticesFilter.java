@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Filters the edges with sampled vertices
+ * If any vertices of the edge does not have any related property for sampling,
+ * we consider that vertex as not sampled.
  */
 public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
   /**
@@ -50,10 +52,16 @@ public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edg
    */
   @Override
   public boolean filter(Tuple3<Edge, Vertex, Vertex> t3) {
-    boolean isSourceVertexMarked = Boolean.getBoolean(
-            t3.f1.getPropertyValue(propertyNameForSampled).toString());
-    boolean isTargetVertexMarked = Boolean.getBoolean(
-            t3.f2.getPropertyValue(propertyNameForSampled).toString());
+    boolean isSourceVertexMarked = false;
+    boolean isTargetVertexMarked = false;
+    if (t3.f1.hasProperty(propertyNameForSampled)) {
+      isSourceVertexMarked = Boolean.getBoolean(
+              t3.f1.getPropertyValue(propertyNameForSampled).toString());
+    }
+    if (t3.f2.hasProperty(propertyNameForSampled)) {
+      isTargetVertexMarked = Boolean.getBoolean(
+              t3.f2.getPropertyValue(propertyNameForSampled).toString());
+    }
     boolean ret = false;
     if (neighborType.equals(Neighborhood.NeighborType.Both)) {
       ret = isSourceVertexMarked || isTargetVertexMarked;
