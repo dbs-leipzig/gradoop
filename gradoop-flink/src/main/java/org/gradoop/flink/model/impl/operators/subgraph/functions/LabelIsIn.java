@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 import java.util.Collection;
 

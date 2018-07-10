@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.utils;
 
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Checks if a given object of type {@link IN} is instance of a specific class

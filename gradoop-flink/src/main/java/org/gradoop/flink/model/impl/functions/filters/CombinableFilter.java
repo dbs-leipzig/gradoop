@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.epgm.filters;
+package org.gradoop.flink.model.impl.functions.filters;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 

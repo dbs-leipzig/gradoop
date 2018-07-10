@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.bool;
 
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Logical false as Flink function.

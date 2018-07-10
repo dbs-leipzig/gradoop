@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * True, if the element has not graph ids.

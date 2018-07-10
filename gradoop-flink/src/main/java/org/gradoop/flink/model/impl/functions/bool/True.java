@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.bool;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Logical "TRUE" as Flink function.

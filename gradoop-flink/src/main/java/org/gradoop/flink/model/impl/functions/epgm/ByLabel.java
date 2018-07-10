@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.gradoop.common.model.api.entities.EPGMLabeled;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Accepts all elements which have the same label as specified.

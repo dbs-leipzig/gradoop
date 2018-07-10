@@ -13,30 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.epgm.filters;
+package org.gradoop.flink.model.impl.functions.filters;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 
 /**
- * A filter that inverts a filter by using a logical {@code not}.
- * This filter will therefore accept all objects that are not accepted by
- * the original filter.
+ * A filter that combines multiple filters using a logical {@code and}.
+ * This filter will therefore accept all objects that are accepted by
+ * every component filter.
  *
  * @param <T> The type of objects to filter.
  */
-public class Not<T> extends AbstractRichCombinedFilterFunction<T> {
+public class And<T> extends AbstractRichCombinedFilterFunction<T> {
 
   /**
-   * Constructor setting the filter to invert using a logical {@code not}.
+   * Constructor setting the filter to be combined with a logical {@code and}.
    *
-   * @param filter The filter.
+   * @param filters The filters.
    */
-  public Not(FilterFunction<? super T> filter) {
-    super(filter);
+  @SafeVarargs
+  public And(FilterFunction<? super T>... filters) {
+    super(filters);
   }
 
   @Override
   public boolean filter(T value) throws Exception {
-    return !components[0].filter(value);
+    for (FilterFunction<? super T> componentFilter : components) {
+      if (!componentFilter.filter(value)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.functions.epgm.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 import java.util.Random;
 

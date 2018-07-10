@@ -16,4 +16,4 @@
 /**
  * Contains common filter functions and wrappers combining multiple filters.
  */
-package org.gradoop.flink.model.impl.functions.epgm.filters;
+package org.gradoop.flink.model.impl.functions.filters;
