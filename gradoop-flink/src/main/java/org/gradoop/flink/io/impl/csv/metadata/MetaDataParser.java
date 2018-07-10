@@ -97,23 +97,25 @@ public class MetaDataParser {
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
           String[] propertyTokens = propertyString.split(PROPERTY_TOKEN_DELIMITER);
+          String propertyType = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2)[1];
           if (propertyTokens.length == 3 &&
             propertyTokens[1].equals(TypeString.LIST.getTypeString())) {
             // it's a list with one additional data type (type of list items)
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], getListValueParser(propertyTokens[2])));
+              propertyTokens[0], propertyType, getListValueParser(propertyTokens[2])));
           } else if (propertyTokens.length == 4 &&
             propertyTokens[1].equals(TypeString.MAP.getTypeString())) {
             // it's a map with two additional data types (key type + value type)
             propertyMetaDataList.add(
               new PropertyMetaData(
                 propertyTokens[0],
+                propertyType,
                 getMapValueParser(propertyTokens[2], propertyTokens[3])
               )
             );
           } else {
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], getValueParser(propertyTokens[1])));
+              propertyTokens[0], propertyType, getValueParser(propertyTokens[1])));
           }
         }
       } else {
@@ -288,7 +290,7 @@ public class MetaDataParser {
    * @param propertyValue property value
    * @return property type string
    */
-  private static String getTypeString(PropertyValue propertyValue) {
+  public static String getTypeString(PropertyValue propertyValue) {
     if (propertyValue.isShort()) {
       return TypeString.SHORT.getTypeString();
     } else if (propertyValue.isInt()) {

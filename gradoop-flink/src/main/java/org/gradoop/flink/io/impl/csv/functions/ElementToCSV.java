@@ -19,12 +19,15 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 
 import java.util.stream.Collectors;
+
+import static org.gradoop.flink.io.impl.csv.metadata.MetaDataParser.getTypeString;
 
 /**
  * Base class to convert an EPGM element into a CSV representation.
@@ -58,8 +61,11 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    */
   String getPropertyString(E element) {
     return metaData.getPropertyMetaData(element.getLabel()).stream()
-      .map(metaData -> element.getPropertyValue(metaData.getKey()))
-      .map(value -> value == null ? EMPTY_STRING : value.toString())
+      .map(propertyMetaData -> {
+          PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
+          return (p == null || !getTypeString(p).equals(propertyMetaData.getTypeString())) ?
+            EMPTY_STRING : p.toString();
+        })
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
   }
 }
