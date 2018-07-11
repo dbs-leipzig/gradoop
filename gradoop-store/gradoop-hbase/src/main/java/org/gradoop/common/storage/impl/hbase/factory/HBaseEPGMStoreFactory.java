@@ -18,8 +18,10 @@ package org.gradoop.common.storage.impl.hbase.factory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.Table;
 import org.gradoop.common.config.GradoopHBaseConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -60,10 +62,13 @@ public class HBaseEPGMStoreFactory {
     final String prefix
   ) {
     return createOrOpenEPGMStore(config,
-      GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
+      GradoopHBaseConfig.createConfig(
+        gradoopHBaseConfig,
         prefix + HBaseConstants.DEFAULT_TABLE_GRAPHS,
         prefix + HBaseConstants.DEFAULT_TABLE_VERTICES,
-        prefix + HBaseConstants.DEFAULT_TABLE_EDGES));
+        prefix + HBaseConstants.DEFAULT_TABLE_EDGES
+      )
+    );
   }
 
   /**
@@ -104,21 +109,29 @@ public class HBaseEPGMStoreFactory {
     final GradoopHBaseConfig gradoopHBaseConfig
   ) {
     try {
-      createTablesIfNotExists(config, gradoopHBaseConfig.getVertexHandler(),
+      Connection connection = ConnectionFactory.createConnection(config);
+
+      createTablesIfNotExists(
+        connection.getAdmin(),
+        gradoopHBaseConfig.getVertexHandler(),
         gradoopHBaseConfig.getEdgeHandler(),
         gradoopHBaseConfig.getGraphHeadHandler(),
         gradoopHBaseConfig.getVertexTableName(),
         gradoopHBaseConfig.getEdgeTableName(),
-        gradoopHBaseConfig.getGraphTableName());
+        gradoopHBaseConfig.getGraphTableName()
+      );
 
-      HTable graphDataTable = new HTable(config,
-        gradoopHBaseConfig.getGraphTableName());
-      HTable vertexDataTable = new HTable(config,
-        gradoopHBaseConfig.getVertexTableName());
-      HTable edgeDataTable = new HTable(config,
-        gradoopHBaseConfig.getEdgeTableName());
+      Table graphDataTable = connection.getTable(gradoopHBaseConfig.getGraphTableName());
+      Table vertexDataTable = connection.getTable(gradoopHBaseConfig.getVertexTableName());
+      Table edgeDataTable = connection.getTable(gradoopHBaseConfig.getEdgeTableName());
 
-      return new HBaseEPGMStore(graphDataTable, vertexDataTable, edgeDataTable, gradoopHBaseConfig);
+      return new HBaseEPGMStore(
+        graphDataTable,
+        vertexDataTable,
+        edgeDataTable,
+        gradoopHBaseConfig,
+        connection.getAdmin()
+      );
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -150,8 +163,14 @@ public class HBaseEPGMStoreFactory {
     final String graphTableName
   ) {
     try {
-      deleteTablesIfExists(config, vertexTableName, edgeTableName,
-        graphTableName);
+      Connection connection = ConnectionFactory.createConnection(config);
+
+      deleteTablesIfExists(
+        connection.getAdmin(),
+        TableName.valueOf(vertexTableName),
+        TableName.valueOf(edgeTableName),
+        TableName.valueOf(graphTableName)
+      );
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -160,45 +179,36 @@ public class HBaseEPGMStoreFactory {
   /**
    * Creates the tables used by the graph store.
    *
-   * @param config              Hadoop configuration
+   * @param admin HBAse admin instance
    * @param vertexHandler   vertex storage handler
    * @param edgeHandler     edge storage handler
-   * @param graphHeadHandler    graph storage handler
-   * @param vertexDataTableName vertex data table name
-   * @param edgeTableName       edge data table name
-   * @param graphDataTableName  graph data table name
+   * @param graphHeadHandler graph storage handler
+   * @param vertexTableName vertex data table name
+   * @param edgeTableName edge data table name
+   * @param graphTableName  graph data table name
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
    */
   private static <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   void createTablesIfNotExists(
-    final Configuration config,
+    final Admin admin,
     final VertexHandler<V, E> vertexHandler,
     final EdgeHandler<E, V> edgeHandler,
     final GraphHeadHandler<G> graphHeadHandler,
-    final String vertexDataTableName,
-    final String edgeTableName,
-    final String graphDataTableName
+    final TableName vertexTableName,
+    final TableName edgeTableName,
+    final TableName graphTableName
   ) throws IOException {
 
-    HTableDescriptor vertexDataTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(vertexDataTableName));
-    HTableDescriptor edgeDataTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(edgeTableName));
-    HTableDescriptor graphDataTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(graphDataTableName));
-
-    HBaseAdmin admin = new HBaseAdmin(config);
-
-    if (!admin.tableExists(vertexDataTableDescriptor.getName())) {
-      vertexHandler.createTable(admin, vertexDataTableDescriptor);
+    if (!admin.tableExists(vertexTableName)) {
+      vertexHandler.createTable(admin, new HTableDescriptor(vertexTableName));
     }
-    if (!admin.tableExists(edgeDataTableDescriptor.getName())) {
-      edgeHandler.createTable(admin, edgeDataTableDescriptor);
+    if (!admin.tableExists(edgeTableName)) {
+      edgeHandler.createTable(admin, new HTableDescriptor(edgeTableName));
     }
-    if (!admin.tableExists(graphDataTableDescriptor.getName())) {
-      graphHeadHandler.createTable(admin, graphDataTableDescriptor);
+    if (!admin.tableExists(graphTableName)) {
+      graphHeadHandler.createTable(admin, new HTableDescriptor(graphTableName));
     }
 
     admin.close();
@@ -207,35 +217,26 @@ public class HBaseEPGMStoreFactory {
   /**
    * Deletes the tables given tables.
    *
-   * @param config              cluster configuration
+   * @param admin               HBase admin instance
    * @param vertexDataTableName vertex data table name
    * @param edgeDataTableName   edge data table name
    * @param graphDataTableName  graph data table name
    */
   private static void deleteTablesIfExists(
-    final Configuration config,
-    final String vertexDataTableName,
-    final String edgeDataTableName,
-    final String graphDataTableName
+    final Admin admin,
+    final TableName vertexDataTableName,
+    final TableName edgeDataTableName,
+    final TableName graphDataTableName
   ) throws IOException {
 
-    HTableDescriptor vertexDataTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(vertexDataTableName));
-    HTableDescriptor edgeDataTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(edgeDataTableName));
-    HTableDescriptor graphsTableDescriptor =
-      new HTableDescriptor(TableName.valueOf(graphDataTableName));
-
-    HBaseAdmin admin = new HBaseAdmin(config);
-
-    if (admin.tableExists(vertexDataTableDescriptor.getName())) {
-      deleteTable(admin, vertexDataTableDescriptor);
+    if (admin.tableExists(vertexDataTableName)) {
+      deleteTable(admin, vertexDataTableName);
     }
-    if (admin.tableExists(edgeDataTableDescriptor.getName())) {
-      deleteTable(admin, edgeDataTableDescriptor);
+    if (admin.tableExists(edgeDataTableName)) {
+      deleteTable(admin, edgeDataTableName);
     }
-    if (admin.tableExists(graphsTableDescriptor.getName())) {
-      deleteTable(admin, graphsTableDescriptor);
+    if (admin.tableExists(graphDataTableName)) {
+      deleteTable(admin, graphDataTableName);
     }
 
     admin.close();
@@ -244,14 +245,11 @@ public class HBaseEPGMStoreFactory {
   /**
    * Deletes a HBase table.
    *
-   * @param admin           HBase admin
-   * @param tableDescriptor descriptor for the table to delete
+   * @param admin HBase admin
+   * @param tableName name of the table to delete
    */
-  private static void deleteTable(
-    final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor
-  ) throws IOException {
-    admin.disableTable(tableDescriptor.getName());
-    admin.deleteTable(tableDescriptor.getName());
+  private static void deleteTable(final Admin admin, final TableName tableName) throws IOException {
+    admin.disableTable(tableName);
+    admin.deleteTable(tableName);
   }
 }
