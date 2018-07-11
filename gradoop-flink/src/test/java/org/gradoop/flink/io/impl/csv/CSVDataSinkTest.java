@@ -55,7 +55,7 @@ public class CSVDataSinkTest extends CSVTestBase {
       "]" +
       "edges[" +
       "(v1)-[e1:a {keya:14, keyb:3, keyc:\"Foo\"}]->(v1)," +
-      "(v1)-[e2:b {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v1)" +
+      "(v1)-[e2:b {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v1)," +
       "(v1)-[e3:c {keya:true, keyb:3.13f}]->(v1)" +
       "]");
 
