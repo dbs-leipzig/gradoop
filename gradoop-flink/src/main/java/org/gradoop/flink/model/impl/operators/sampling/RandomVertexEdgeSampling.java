@@ -33,7 +33,7 @@ public class RandomVertexEdgeSampling implements UnaryGraphToGraphOperator {
    */
   public enum VertexEdgeSamplingType {
     /**
-     * Simple version (uniform version for both vertices and edges
+     * Simple version (uniform version for both vertices and edges)
      */
     SimpleVersion,
     /**
@@ -52,18 +52,19 @@ public class RandomVertexEdgeSampling implements UnaryGraphToGraphOperator {
   private final VertexEdgeSamplingType vertexEdgeSamplingType;
 
   /**
-   * Relative amount of vertices in the result graph
+   * Relative amount of vertices in the result graph, e.g. 0.8
    */
   private final float vertexSampleSize;
 
   /**
-   * Relative amount of edges in the result graph
+   * Relative amount of edges in the result graph, e.g. 0.6
+   * It should be 1 - vertexSampleSize in NonuniformHybridVersion
    */
   private final float edgeSampleSize;
 
   /**
    * Seed for the random number generator
-   * If seed is 0, the random generator is created without seed
+   * If seed is 0, the random generator is created without seed, e.g. 0L
    */
   private final long randomSeed;
 

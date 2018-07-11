@@ -25,6 +25,6 @@ public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampli
 
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
-    return new RandomVertexSampling(sampleSize,seed);
+    return new RandomVertexSampling(sampleSize, seed);
   }
 }
