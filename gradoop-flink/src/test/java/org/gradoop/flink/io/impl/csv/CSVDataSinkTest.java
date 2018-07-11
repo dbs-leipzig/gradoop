@@ -43,6 +43,12 @@ public class CSVDataSinkTest extends CSVTestBase {
     checkCSVWrite(tmpPath, input);
   }
 
+  /**
+   * Test CSVDataSink to write a graph with different property types
+   * using the same label on different elements with the same label.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testWriteWithDifferentPropertyTypes() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
@@ -137,6 +143,13 @@ public class CSVDataSinkTest extends CSVTestBase {
     }
   }
 
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input logical graph
+   * @throws Exception on failure
+   */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
     DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
     csvDataSink.write(input, true);
