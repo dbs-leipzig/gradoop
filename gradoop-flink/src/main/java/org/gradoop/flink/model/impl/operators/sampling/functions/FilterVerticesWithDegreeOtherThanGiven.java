@@ -28,18 +28,6 @@ import java.util.List;
  * Retains all vertices which do not have the given degree.
  */
 public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraphOperator {
-  /**
-   * Degree property name
-   */
-  private final String degreePropertyName = "_degree";
-  /**
-   * In-degree property name
-   */
-  private final String inDegreePropertyName = "_inDegree";
-  /**
-   * Out-degree property name
-   */
-  private final String outDegreePropertyName = "_outDegree";
 
   /**
    * the given degree
@@ -60,14 +48,16 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(degreePropertyName,
-    inDegreePropertyName, outDegreePropertyName, true);
+    DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
+    VertexDegree.DEGREE_PROPERTY_NAME, VertexDegree.IN_DEGREE_PROPERTY_NAME,
+    VertexDegree.OUT_DEGREE_PROPERTY_NAME, true);
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
     List<String> unnecessaryPropertyNames = new ArrayList<>();
-    unnecessaryPropertyNames.add(degreePropertyName);
-    unnecessaryPropertyNames.add(inDegreePropertyName);
-    unnecessaryPropertyNames.add(outDegreePropertyName);
-    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree, degreePropertyName))
+    unnecessaryPropertyNames.add(VertexDegree.DEGREE_PROPERTY_NAME);
+    unnecessaryPropertyNames.add(VertexDegree.IN_DEGREE_PROPERTY_NAME);
+    unnecessaryPropertyNames.add(VertexDegree.OUT_DEGREE_PROPERTY_NAME);
+    newVertices = newVertices
+      .filter(new VertexWithDegreeFilter<>(degree, VertexDegree.DEGREE_PROPERTY_NAME))
       .map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
