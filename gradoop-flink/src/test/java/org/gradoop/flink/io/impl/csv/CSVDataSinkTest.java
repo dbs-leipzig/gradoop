@@ -48,15 +48,20 @@ public class CSVDataSinkTest extends CSVTestBase {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "intFloat[(v1:a {a:1})-->(v2:a {a:1})]" +
-      "intStr[(v3:a {key:1})-->(v4:a {key:\"Test\"})]" +
-      "strFloat[(v5:a {key:\"Test\"})-->(v6:a {key:1.1})]" +
-      "intFloatStr[(v7:a {key:1})-->(v8:a {key:1.1})-->(v9:a {key:\"Test\"})]");
+      "intFloat[(v1:a {key:1})-->(v2:a {key:1})]" +
+      "intStr[(v3:a {key:1})-->(v4:a {key:\"Foo\"})]" +
+      "strFloat[(v5:a {key:\"Bar\"})-->(v6:a {key:1.1})]" +
+      "intFloatStr[(v7:a {key:1})-->(v8:a {key:1.1})-->(v9:a {key:\"BarBar\"})]" +
+      "edges[" +
+      "(v10:A)-[e1:a {keya:14, keyb:3, keyc:\"Foo\"}]->(v10:B)," +
+      "(v11:B)-[e2:b {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v11:A)" +
+      "]");
 
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloat"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intStr"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("strFloat"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloatStr"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("edges"));
   }
 
   @Test
