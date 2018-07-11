@@ -48,14 +48,14 @@ public class CSVDataSinkTest extends CSVTestBase {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "intFloat[(v1 {key:1})-->(v2 {key:1.1})]" +
-      "intStr[(v3 {key:1})-->(v4 {key:\"Test\"})]" +
-      "floatStr[(v5 {key:\"Test\"})-->(v6 {key:1.1})]" +
-      "intFloatStr[(v7 {key:1})-->(v8 {key:1.1})-->(v9 {key:\"Test\"})]");
+      "intFloat[(v1:a {a:1})-->(v2:a {a:1})]" +
+      "intStr[(v3:a {key:1})-->(v4:a {key:\"Test\"})]" +
+      "strFloat[(v5:a {key:\"Test\"})-->(v6:a {key:1.1})]" +
+      "intFloatStr[(v7:a {key:1})-->(v8:a {key:1.1})-->(v9:a {key:\"Test\"})]");
 
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloat"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intStr"));
-    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("floatStr"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("strFloat"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("intFloatStr"));
   }
 
