@@ -96,26 +96,26 @@ public class MetaDataParser {
         String[] propertyStrings = tuple.f2.split(PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
-          String[] propertyTokens = propertyString.split(PROPERTY_TOKEN_DELIMITER);
-          String propertyType = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2)[1];
-          if (propertyTokens.length == 3 &&
-            propertyTokens[1].equals(TypeString.LIST.getTypeString())) {
+          String[] propertyMetadata = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2);
+          String[] propertyTypeTokens = propertyMetadata[1].split(PROPERTY_TOKEN_DELIMITER);
+          if (propertyTypeTokens.length == 2 &&
+            propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
             // it's a list with one additional data type (type of list items)
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], propertyType, getListValueParser(propertyTokens[2])));
-          } else if (propertyTokens.length == 4 &&
-            propertyTokens[1].equals(TypeString.MAP.getTypeString())) {
+              propertyMetadata[0], propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
+          } else if (propertyTypeTokens.length == 3 &&
+            propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
             // it's a map with two additional data types (key type + value type)
             propertyMetaDataList.add(
               new PropertyMetaData(
-                propertyTokens[0],
-                propertyType,
-                getMapValueParser(propertyTokens[2], propertyTokens[3])
+                propertyMetadata[0],
+                propertyMetadata[1],
+                getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2])
               )
             );
           } else {
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], propertyType, getValueParser(propertyTokens[1])));
+              propertyMetadata[0], propertyMetadata[1], getValueParser(propertyMetadata[1])));
           }
         }
       } else {
