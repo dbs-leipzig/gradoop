@@ -74,7 +74,8 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    */
   private String getPropertyValueString(PropertyMetaData propertyMetaData, E element) {
     PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
-    // Only properties with matching type get returned to prevent writing values with the wrong type metadata
+    // Only properties with matching type get returned
+    // to prevent writing values with the wrong type metadata
     if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
       return p.toString();
     }
