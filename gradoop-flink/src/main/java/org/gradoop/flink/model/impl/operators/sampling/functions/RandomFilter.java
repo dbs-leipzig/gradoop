@@ -40,7 +40,7 @@ public class RandomFilter<E extends EPGMElement> implements FilterFunction<E> {
    * Creates a new filter instance.
    *
    * @param sampleSize relative sample size
-   * @param randomSeed random seed (can be {@code} null)
+   * @param randomSeed random seed (can be 0)
    */
   public RandomFilter(float sampleSize, long randomSeed) {
     threshold = sampleSize;
