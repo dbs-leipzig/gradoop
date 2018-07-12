@@ -28,17 +28,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RandomEdgeSamplingTest extends GradoopFlinkTestBase {
 
   @Test
   public void randomEdgeSamplingTest() throws Exception {
     LogicalGraph dbGraph = getSocialNetworkLoader()
-    .getDatabase().getDatabaseGraph();
+            .getDatabase().getDatabaseGraph();
 
-    LogicalGraph newGraph = dbGraph.callForGraph(new RandomEdgeSampling(0.272f));
+    LogicalGraph newGraph = new RandomEdgeSampling(0.272f).execute(dbGraph);
 
     validateResult(dbGraph, newGraph);
   }
@@ -46,16 +45,17 @@ public class RandomEdgeSamplingTest extends GradoopFlinkTestBase {
   @Test
   public void randomEdgeSamplingTestWithSeed() throws Exception {
     LogicalGraph dbGraph = getSocialNetworkLoader()
-    .getDatabase().getDatabaseGraph();
+            .getDatabase().getDatabaseGraph();
 
-    LogicalGraph newGraph = dbGraph.callForGraph(
-    new RandomEdgeSampling(0.272f, -4181668494294894490L));
+    LogicalGraph newGraph =
+            new RandomEdgeSampling(0.272f, -4181668494294894490L)
+            .execute(dbGraph);
 
     validateResult(dbGraph, newGraph);
   }
 
   private void validateResult(LogicalGraph input, LogicalGraph output)
-    throws Exception {
+          throws Exception {
     List<Vertex> dbVertices = Lists.newArrayList();
     List<Edge> dbEdges = Lists.newArrayList();
     List<Vertex> newVertices = Lists.newArrayList();
@@ -85,10 +85,10 @@ public class RandomEdgeSamplingTest extends GradoopFlinkTestBase {
       assertTrue("sampled edge is not part of the original graph", dbEdges.contains(edge));
       // Test, if all source- and target-vertices from new edges are part of the sampled graph, too
       assertTrue("sampled edge has source vertex which is not part of the sampled graph",
-        newVertexIDs.contains(edge.getSourceId()));
+              newVertexIDs.contains(edge.getSourceId()));
       connectedVerticesIDs.add(edge.getSourceId());
       assertTrue("sampled edge has target vertex which is not part of the sampled graph",
-        newVertexIDs.contains(edge.getTargetId()));
+              newVertexIDs.contains(edge.getTargetId()));
       connectedVerticesIDs.add(edge.getTargetId());
     }
 
