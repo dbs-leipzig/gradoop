@@ -27,8 +27,6 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 
 import java.util.stream.Collectors;
 
-import static org.gradoop.flink.io.impl.csv.metadata.MetaDataParser.getTypeString;
-
 /**
  * Base class to convert an EPGM element into a CSV representation.
  *
@@ -63,8 +61,9 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
     return metaData.getPropertyMetaData(element.getLabel()).stream()
       .map(propertyMetaData -> {
           PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
-          return (p == null || !getTypeString(p).equals(propertyMetaData.getTypeString())) ?
-            EMPTY_STRING : p.toString();
+          return (p == null ||
+            !MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) ?
+              EMPTY_STRING : p.toString();
         })
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
   }
