@@ -24,6 +24,7 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
+import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
 import java.util.stream.Collectors;
 
@@ -59,12 +60,24 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    */
   String getPropertyString(E element) {
     return metaData.getPropertyMetaData(element.getLabel()).stream()
-      .map(propertyMetaData -> {
-          PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
-          return (p == null ||
-            !MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) ?
-              EMPTY_STRING : p.toString();
-        })
+      .map(propertyMetaData -> this.getPropertyValueString(propertyMetaData, element))
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
+  }
+
+  /**
+   * Returns the string representation of the property value matching the given property metadata.
+   * If no matching property is found, an empty string is returned.
+   *
+   * @param propertyMetaData property metadata of the wanted property value
+   * @param element EPGM element containing the property value
+   * @return string representation of matched property value or empty string
+   */
+  private String getPropertyValueString(PropertyMetaData propertyMetaData, E element) {
+    PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
+    // Only properties with matching type get returned to prevent writing values with the wrong type metadata
+    if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
+      return p.toString();
+    }
+    return EMPTY_STRING;
   }
 }
