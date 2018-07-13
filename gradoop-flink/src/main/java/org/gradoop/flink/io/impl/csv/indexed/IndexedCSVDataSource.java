@@ -19,10 +19,13 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
@@ -94,12 +97,22 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
         .map(new CSVLineToVertex(vertexFactory))
         .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
+    if(vertices.isEmpty()) {
+      Vertex dummyVertex = new Vertex(new GradoopId(), "dummy", new Properties(), new GradoopIdSet());
+      DataSet<Vertex> emptyVertexSet = env.fromElements(dummyVertex).filter(elem -> false);
+      vertices.put("dummyLabel", emptyVertexSet);
+    }
 
     Map<String, DataSet<Edge>> edges = metaData.getEdgeLabels().stream()
       .map(l -> Tuple2.of(l, env.readTextFile(getEdgeCSVPath(l))
         .map(new CSVLineToEdge(edgeFactory))
         .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
+    if(edges.isEmpty()) {
+      Edge dummyEdge = new Edge(new GradoopId(), "dummy", new GradoopId(), new GradoopId(), new Properties(), new GradoopIdSet());
+      DataSet<Edge> emptyEdgeSet = env.fromElements(dummyEdge).filter(elem -> false);
+      edges.put("dummyLabel", emptyEdgeSet);
+    }
 
     return getConfig().getLogicalGraphFactory().fromIndexedDataSets(vertices, edges);
   }
