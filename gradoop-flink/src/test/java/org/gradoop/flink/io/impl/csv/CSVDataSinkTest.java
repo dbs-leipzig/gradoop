@@ -19,6 +19,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,15 +40,33 @@ public class CSVDataSinkTest extends CSVTestBase {
       .getDatabase()
       .getDatabaseGraph(true);
 
-    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
-    csvDataSink.write(input, true);
+    checkCSVWrite(tmpPath, input);
+  }
 
-    getExecutionEnvironment().execute();
+  /**
+   * Test CSVDataSink to write a graph with different property types
+   * using the same label on different elements with the same label.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testWriteWithDifferentPropertyTypes() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
 
-    DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "vertices[" +
+      "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})," +
+      "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})," +
+      "(v3:A {keya:\"Bar\", keyb:true})" +
+      "]" +
+      "edges[" +
+      "(v1)-[e1:a {keya:14, keyb:3, keyc:\"Foo\"}]->(v1)," +
+      "(v1)-[e2:a {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v1)," +
+      "(v1)-[e3:a {keya:true, keyb:3.13f}]->(v1)" +
+      "]");
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("vertices"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("edges"));
   }
 
   @Test
@@ -122,5 +141,24 @@ public class CSVDataSinkTest extends CSVTestBase {
     while ((line = br.readLine()) != null) {
       checkMetadataCsvLine(line);
     }
+  }
+
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input logical graph
+   * @throws Exception on failure
+   */
+  private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
+    DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
+    csvDataSink.write(input, true);
+
+    getExecutionEnvironment().execute();
+
+    DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
+    LogicalGraph output = csvDataSource.getLogicalGraph();
+
+    collectAndAssertTrue(input.equalsByElementData(output));
   }
 }

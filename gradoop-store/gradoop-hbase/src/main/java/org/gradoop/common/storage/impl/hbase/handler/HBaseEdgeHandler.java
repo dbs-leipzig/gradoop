@@ -18,7 +18,7 @@ package org.gradoop.common.storage.impl.hbase.handler;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -91,7 +91,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public void createTable(final HBaseAdmin admin, final HTableDescriptor tableDescriptor)
+  public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
@@ -103,8 +103,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    */
   @Override
   public Put writeSource(Put put, V vertexData) throws IOException {
-    return put.add(CF_META_BYTES, COL_SOURCE_BYTES,
-      createVertexIdentifier(vertexData));
+    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, createVertexIdentifier(vertexData));
   }
 
   /**
@@ -120,8 +119,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    */
   @Override
   public Put writeTarget(Put put, V vertexData) throws IOException {
-    return put.add(CF_META_BYTES, COL_TARGET_BYTES,
-      createVertexIdentifier(vertexData));
+    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, createVertexIdentifier(vertexData));
   }
 
   /**
