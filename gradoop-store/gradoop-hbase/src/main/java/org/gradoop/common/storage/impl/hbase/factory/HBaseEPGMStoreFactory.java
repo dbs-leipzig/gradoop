@@ -76,30 +76,6 @@ public class HBaseEPGMStoreFactory {
    * parameters. If something goes wrong, {@code null} is returned.
    *
    * @param config              Hadoop cluster configuration
-   * @param gradoopHBaseConfig  Gradoop configuration
-   * @param graphTableName      graph table name
-   * @param vertexTableName     vertex table name
-   * @param edgeTableName       edge table name
-   *
-   * @return a graph store instance or {@code null in the case of errors}
-   */
-  public static HBaseEPGMStore createOrOpenEPGMStore(
-    final Configuration config,
-    final GradoopHBaseConfig gradoopHBaseConfig,
-    final String graphTableName,
-    final String vertexTableName,
-    final String edgeTableName
-  ) {
-    return createOrOpenEPGMStore(config,
-      GradoopHBaseConfig.createConfig(gradoopHBaseConfig,
-        graphTableName, vertexTableName, edgeTableName));
-  }
-
-  /**
-   * Creates a graph store or opens an existing one based on the given
-   * parameters. If something goes wrong, {@code null} is returned.
-   *
-   * @param config              Hadoop cluster configuration
    * @param gradoopHBaseConfig  Gradoop HBase configuration
    *
    * @return EPGM store instance or {@code null in the case of errors}
@@ -171,7 +147,7 @@ public class HBaseEPGMStoreFactory {
    * @param edgeTableName   edge data table name
    * @param graphTableName  graph data table name
    */
-  public static void deleteEPGMStore(
+  private static void deleteEPGMStore(
     final Configuration config,
     final String vertexTableName,
     final String edgeTableName,
