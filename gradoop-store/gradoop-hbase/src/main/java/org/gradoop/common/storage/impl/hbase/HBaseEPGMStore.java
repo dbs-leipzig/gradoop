@@ -16,11 +16,12 @@
 package org.gradoop.common.storage.impl.hbase;
 
 import com.google.common.base.Preconditions;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
 import org.gradoop.common.config.GradoopHBaseConfig;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -57,55 +58,52 @@ public class HBaseEPGMStore implements
   //TODO make HBaseEPGMStore implement EPGMGraphPredictableOutput
 
   /**
-   * Default value for clearing buffer on fail.
-   */
-  private static final boolean DEFAULT_CLEAR_BUFFER_ON_FAIL = true;
-  /**
-   * Default value for enabling auto flush in HBase.
-   */
-  private static final boolean DEFAULT_ENABLE_AUTO_FLUSH = true;
-
-  /**
    * Gradoop configuration.
    */
   private final GradoopHBaseConfig config;
-
   /**
    * HBase table for storing graphs.
    */
-  private final HTable graphHeadTable;
+  private final Table graphHeadTable;
   /**
    * HBase table for storing vertex data.
    */
-  private final HTable vertexTable;
+  private final Table vertexTable;
   /**
    * HBase table for storing edge data.
    */
-  private final HTable edgeTable;
+  private final Table edgeTable;
+  /**
+   * HBase admin instance
+   */
+  private final Admin admin;
+  /**
+   * Auto flush flag, default false
+   */
+  private volatile boolean autoFlush;
 
   /**
    * Creates a HBaseEPGMStore based on the given parameters. All parameters
    * are mandatory and must not be {@code null}.
    *
-   * @param graphHeadTable  HBase table to store graph data
-   * @param vertexTable     HBase table to store vertex data
-   * @param edgeTable       HBase table to store edge data
-   * @param config          Gradoop Configuration
+   * @param graphHeadTable HBase table to store graph data
+   * @param vertexTable HBase table to store vertex data
+   * @param edgeTable HBase table to store edge data
+   * @param config Gradoop Configuration
+   * @param admin HBase admin instance
    */
   public HBaseEPGMStore(
-    final HTable graphHeadTable,
-    final HTable vertexTable,
-    final HTable edgeTable,
-    final GradoopHBaseConfig config
+    final Table graphHeadTable,
+    final Table vertexTable,
+    final Table edgeTable,
+    final GradoopHBaseConfig config,
+    final Admin admin
   ) {
     this.graphHeadTable = Preconditions.checkNotNull(graphHeadTable);
     this.vertexTable = Preconditions.checkNotNull(vertexTable);
     this.edgeTable = Preconditions.checkNotNull(edgeTable);
     this.config = Preconditions.checkNotNull(config);
-
-    this.graphHeadTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.vertexTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
-    this.edgeTable.setAutoFlush(DEFAULT_ENABLE_AUTO_FLUSH, DEFAULT_CLEAR_BUFFER_ON_FAIL);
+    this.admin = Preconditions.checkNotNull(admin);
   }
 
   /**
@@ -152,6 +150,9 @@ public class HBaseEPGMStore implements
     put = graphHeadHandler.writeGraphHead(put, graphHead);
     // write to table
     graphHeadTable.put(put);
+    if (autoFlush) {
+      admin.flush(graphHeadTable.getName());
+    }
   }
 
   /**
@@ -166,6 +167,9 @@ public class HBaseEPGMStore implements
     put = vertexHandler.writeVertex(put, vertexData);
     // write to table
     vertexTable.put(put);
+    if (autoFlush) {
+      admin.flush(vertexTable.getName());
+    }
   }
 
   /**
@@ -180,6 +184,9 @@ public class HBaseEPGMStore implements
     // write edge data to Put
     put = edgeHandler.writeEdge(put, edgeData);
     edgeTable.put(put);
+    if (autoFlush) {
+      admin.flush(edgeTable.getName());
+    }
   }
 
   /**
@@ -267,9 +274,7 @@ public class HBaseEPGMStore implements
    */
   @Override
   public void setAutoFlush(boolean autoFlush) {
-    vertexTable.setAutoFlush(autoFlush, true);
-    edgeTable.setAutoFlush(autoFlush, true);
-    graphHeadTable.setAutoFlush(autoFlush, true);
+    this.autoFlush = autoFlush;
   }
 
   /**
@@ -277,9 +282,9 @@ public class HBaseEPGMStore implements
    */
   @Override
   public void flush() throws IOException {
-    vertexTable.flushCommits();
-    edgeTable.flushCommits();
-    graphHeadTable.flushCommits();
+    admin.flush(vertexTable.getName());
+    admin.flush(edgeTable.getName());
+    admin.flush(graphHeadTable.getName());
   }
 
   /**

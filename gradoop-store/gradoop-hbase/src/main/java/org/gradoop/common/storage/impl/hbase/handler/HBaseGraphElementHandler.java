@@ -41,11 +41,13 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws
-    IOException {
-
+  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws IOException {
     if (graphElement.getGraphCount() > 0) {
-      put = put.add(CF_META_BYTES, COL_GRAPHS_BYTES, graphElement.getGraphIds().toByteArray());
+      put = put.addColumn(
+        CF_META_BYTES,
+        COL_GRAPHS_BYTES,
+        graphElement.getGraphIds().toByteArray()
+      );
     }
 
     return put;
