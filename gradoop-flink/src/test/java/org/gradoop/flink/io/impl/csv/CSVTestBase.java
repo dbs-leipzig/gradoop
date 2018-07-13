@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
  * Abstract parent class of csv test classes with common functions for source and sink tests
  */
 abstract class CSVTestBase extends GradoopFlinkTestBase {
-  
+
   /**
    * Global map to define properties of vertices and edges
    */

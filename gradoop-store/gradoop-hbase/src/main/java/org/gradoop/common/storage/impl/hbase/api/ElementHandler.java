@@ -16,7 +16,7 @@
 package org.gradoop.common.storage.impl.hbase.api;
 
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -109,12 +109,8 @@ public interface ElementHandler extends Serializable {
    * Creates table based on the given table descriptor.
    *
    * @param admin           HBase admin
-   * @param tableDescriptor description of the table used by that specific
-   *                        handler
-   * @throws IOException
+   * @param tableDescriptor description of the table used by that specific handler
+   * @throws IOException on failure
    */
-  void createTable(
-    final HBaseAdmin admin,
-    final HTableDescriptor tableDescriptor
-  ) throws IOException;
+  void createTable(final Admin admin, final HTableDescriptor tableDescriptor) throws IOException;
 }

@@ -15,44 +15,54 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
-
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Random;
 
 /**
- * Creates a random value for each EPGM element and filters those that are below a
+ * Creates a random value for each vertex and marks those that are below a
  * given threshold.
  *
- * @param <E> EPGM edge type
+ * @param <V> EPGM vertex type
  */
-public class RandomFilter<E extends EPGMElement> implements CombinableFilter<E> {
+public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V> {
   /**
-   * Threshold to decide if an EPGM element needs to be filtered.
+   * Threshold to decide if a vertex needs to be filtered.
    */
-  private final float threshold;
+  private final float sampleSize;
   /**
    * Random instance
    */
   private final Random randomGenerator;
+  /**
+   * Property name for marking the vertex
+   */
+  private final String mark;
 
   /**
    * Creates a new filter instance.
    *
    * @param sampleSize relative sample size
    * @param randomSeed random seed (can be 0)
+   * @param mark the name of property for sampled vertices
    */
-  public RandomFilter(float sampleSize, long randomSeed) {
-    threshold = sampleSize;
-    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
+  public VertexRandomMarkedMap(float sampleSize, long randomSeed, String mark) {
+    this.mark = mark;
+    this.sampleSize = sampleSize;
+    this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(E e) throws Exception {
-    return randomGenerator.nextFloat() <= threshold;
+  public V map(V vertex) throws Exception {
+    if (randomGenerator.nextFloat() <= sampleSize) {
+      vertex.setProperty(mark, true);
+    } else {
+      vertex.setProperty(mark, false);
+    }
+    return vertex;
   }
 }

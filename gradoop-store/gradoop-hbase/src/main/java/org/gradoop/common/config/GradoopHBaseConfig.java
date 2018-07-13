@@ -17,6 +17,7 @@ package org.gradoop.common.config;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.hbase.TableName;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -53,16 +54,16 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
   /**
    * Graph table name.
    */
-  private final String graphTableName;
+  private final TableName graphTableName;
   /**
    * EPGMVertex table name.
    */
-  private final String vertexTableName;
+  private final TableName vertexTableName;
 
   /**
    * EPGMEdge table name.
    */
-  private final String edgeTableName;
+  private final TableName edgeTableName;
 
   /**
    * Graph head handler.
@@ -108,16 +109,13 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
     checkArgument(!StringUtils.isEmpty(edgeTableName),
       "EPGMEdge table name was null or empty");
 
-    this.graphTableName = graphTableName;
-    this.vertexTableName = vertexTableName;
-    this.edgeTableName = edgeTableName;
+    this.graphTableName = TableName.valueOf(graphTableName);
+    this.vertexTableName = TableName.valueOf(vertexTableName);
+    this.edgeTableName = TableName.valueOf(edgeTableName);
 
-    this.graphHeadHandler =
-      checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
-    this.vertexHandler =
-      checkNotNull(vertexHandler, "VertexHandler was null");
-    this.edgeHandler =
-      checkNotNull(edgeHandler, "EdgeHandler was null");
+    this.graphHeadHandler = checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
+    this.vertexHandler = checkNotNull(vertexHandler, "VertexHandler was null");
+    this.edgeHandler = checkNotNull(edgeHandler, "EdgeHandler was null");
   }
 
   /**
@@ -130,9 +128,9 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
    */
   private GradoopHBaseConfig(
     GradoopHBaseConfig config,
+    String graphTableName,
     String vertexTableName,
-    String edgeTableName,
-    String graphTableName
+    String edgeTableName
   ) {
     this(config.getGraphHeadHandler(),
       config.getVertexHandler(),
@@ -147,11 +145,10 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
    * Creates a default Configuration using POJO handlers for vertices, edges
    * and graph heads and default table names.
    *
-   *@param env apache flink execution environment
+   * @param env apache flink execution environment
    * @return Default Gradoop HBase configuration.
    */
-  public static GradoopHBaseConfig
-  getDefaultConfig(ExecutionEnvironment env) {
+  public static GradoopHBaseConfig getDefaultConfig(ExecutionEnvironment env) {
     GraphHeadHandler<GraphHead> graphHeadHandler =
       new HBaseGraphHeadHandler<>(new GraphHeadFactory());
     VertexHandler<Vertex, Edge> vertexHandler =
@@ -166,7 +163,8 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
       env,
       HBaseConstants.DEFAULT_TABLE_GRAPHS,
       HBaseConstants.DEFAULT_TABLE_VERTICES,
-      HBaseConstants.DEFAULT_TABLE_EDGES);
+      HBaseConstants.DEFAULT_TABLE_EDGES
+    );
   }
 
   /**
@@ -181,23 +179,22 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
    */
   public static GradoopHBaseConfig createConfig(
     GradoopHBaseConfig gradoopConfig,
+    String graphTableName,
     String vertexTableName,
-    String edgeTableName,
-    String graphTableName
+    String edgeTableName
   ) {
-    return new GradoopHBaseConfig(gradoopConfig, graphTableName,
-      vertexTableName, edgeTableName);
+    return new GradoopHBaseConfig(gradoopConfig, graphTableName, vertexTableName, edgeTableName);
   }
 
-  public String getVertexTableName() {
+  public TableName getVertexTableName() {
     return vertexTableName;
   }
 
-  public String getEdgeTableName() {
+  public TableName getEdgeTableName() {
     return edgeTableName;
   }
 
-  public String getGraphTableName() {
+  public TableName getGraphTableName() {
     return graphTableName;
   }
 

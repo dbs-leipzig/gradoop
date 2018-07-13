@@ -143,8 +143,8 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
     // write (persistent-graph-data) to HBase table
     Job job = Job.getInstance();
-    job.getConfiguration().set(
-      TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName());
+    job.getConfiguration()
+      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName().getNameAsString());
 
     persistentGraphDataSet
       // FIXME remove forced cast...
@@ -189,7 +189,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     // write (persistent-vertex-data) to HBase table
     Job job = Job.getInstance();
     job.getConfiguration()
-      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName());
+      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName().getNameAsString());
 
     persistentVertexDataSet
       .map(new BuildVertexMutation<>(getHBaseConfig().getVertexHandler()))
@@ -220,7 +220,8 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
     // write (persistent-edge-data) to HBase table
     Job job = Job.getInstance();
-    job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName());
+    job.getConfiguration()
+      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName().getNameAsString());
 
     persistentEdgeDataSet
       .map(new BuildEdgeMutation<>(getHBaseConfig().getEdgeHandler()))
