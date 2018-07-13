@@ -17,6 +17,7 @@ package org.gradoop.examples.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -25,6 +26,9 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An example for the subgraph operator using combined filter functions.
@@ -69,7 +73,18 @@ public class SubgraphExample {
     // Use these filters with a subgraph call:
     LogicalGraph filteredGraph = inputGraph.subgraph(vertexFilter, edgeFilter);
 
-    // Print the resulting vertices:
-    filteredGraph.getVertices().print();
+    // Collect vertices and edges to a local collection to output them both:
+    List<Vertex> resultVertices = new ArrayList<>();
+    List<Edge> resultEdges = new ArrayList<>();
+    filteredGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
+    filteredGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
+    executionEnvironment.execute();
+
+    // Print results:
+    System.out.println("Vertices:");
+    resultVertices.forEach(System.out::println);
+    System.out.println("Edges:");
+    resultEdges.forEach(System.out::println);
+
   }
 }
