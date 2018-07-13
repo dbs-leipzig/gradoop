@@ -189,6 +189,7 @@ public class HBaseEPGMStoreFactory {
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
+   * @throws IOException if checking for the existence of the tables fails
    */
   private static <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   void createTablesIfNotExists(
@@ -221,6 +222,7 @@ public class HBaseEPGMStoreFactory {
    * @param vertexDataTableName vertex data table name
    * @param edgeDataTableName   edge data table name
    * @param graphDataTableName  graph data table name
+   * @throws IOException if checking for the existence of the tables fails
    */
   private static void deleteTablesIfExists(
     final Admin admin,
