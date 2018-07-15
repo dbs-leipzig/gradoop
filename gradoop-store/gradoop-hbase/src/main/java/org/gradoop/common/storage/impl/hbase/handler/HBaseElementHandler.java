@@ -78,7 +78,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   @Override
   public Put writeLabel(final Put put, final EPGMElement entity) {
     return (entity.getLabel() == null) ? put :
-      put.add(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
+      put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
 
   /**
@@ -86,12 +86,13 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public Put writeProperty(final Put put, Property property) throws IOException {
-    PropertyValue value = property.getValue();
-    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(value);
-
-    put.add(CF_PROPERTIES_BYTES,
+    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(property.getValue());
+    put.addColumn(
+      CF_PROPERTIES_BYTES,
       Bytes.toBytes(property.getKey()),
-      Writables.getBytes(wrapper));
+      Writables.getBytes(wrapper)
+    );
+
     return put;
   }
 

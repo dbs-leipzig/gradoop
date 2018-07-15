@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.bool;
-
-import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
-
 /**
- * Logical false as Flink function.
- *
- * @param <T> data set type
+ * An example for the {@link org.gradoop.flink.model.api.epgm.LogicalGraph#subgraph(
+ * org.apache.flink.api.common.functions.FilterFunction,
+ * org.apache.flink.api.common.functions.FilterFunction) subgraph} operator and the use of
+ * {@link org.gradoop.flink.model.impl.functions.filters.CombinableFilter combinable filters},
  */
-public class False<T> implements CombinableFilter<T> {
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return false;
-  }
-}
+package org.gradoop.examples.subgraph;

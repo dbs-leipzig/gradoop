@@ -19,13 +19,15 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Filters a dataset of EPGM elements to those whose id is not contained in an id dataset.
  *
  * @param <EL> element type
  */
-public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction<EL> {
+public class IdNotInBroadcast<EL extends EPGMElement> extends RichFilterFunction<EL>
+  implements CombinableFilter<EL> {
 
   /**
    * broadcast id set name

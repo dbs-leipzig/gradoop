@@ -13,19 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.bool;
-
-import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
-
 /**
- * Logical false as Flink function.
- *
- * @param <T> data set type
+ * Contains common filter functions and wrappers combining multiple filters.
  */
-public class False<T> implements CombinableFilter<T> {
-
-  @Override
-  public boolean filter(T t) throws Exception {
-    return false;
-  }
-}
+package org.gradoop.flink.model.impl.functions.filters;

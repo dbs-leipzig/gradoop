@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import com.google.common.collect.Sets;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 import java.util.Collection;
 
@@ -26,7 +26,7 @@ import java.util.Collection;
  *
  * @param <EL> element type
  */
-public class LabelIsIn<EL extends Element> implements FilterFunction<EL> {
+public class LabelIsIn<EL extends Element> implements CombinableFilter<EL> {
 
   /**
    * White list of labels.
