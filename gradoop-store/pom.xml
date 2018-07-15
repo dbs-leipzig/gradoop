@@ -13,7 +13,7 @@
     <artifactId>gradoop-store</artifactId>
     <packaging>pom</packaging>
     <name>Gradoop Store</name>
-    <description>Extended IO functionalities for NoSQL databases</description>
+    <description>Extended IO functionality for NoSQL databases</description>
 
     <modules>
         <module>gradoop-store-api</module>
