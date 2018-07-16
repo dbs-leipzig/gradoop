@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.functions.epgm;
+package org.gradoop.flink.model.impl.functions.filters;
 
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
+import org.apache.flink.api.common.functions.FilterFunction;
 
 /**
- * Filters edges having the specified source vertex id.
+ * A filter that inverts a filter by using a logical {@code not}.
+ * This filter will therefore accept all objects that are not accepted by
+ * the original filter.
  *
- * @param <E> EPGM edge type
+ * @param <T> The type of objects to filter.
  */
-public class BySourceId<E extends Edge> implements CombinableFilter<E> {
-  /**
-   * Vertex id to filter on
-   */
-  private final GradoopId sourceId;
+public class Not<T> extends AbstractRichCombinedFilterFunction<T> {
 
   /**
-   * Constructor
+   * Constructor setting the filter to invert using a logical {@code not}.
    *
-   * @param sourceId vertex id to filter on
+   * @param filter The filter.
    */
-  public BySourceId(GradoopId sourceId) {
-    this.sourceId = sourceId;
+  public Not(FilterFunction<? super T> filter) {
+    super(filter);
   }
 
   @Override
-  public boolean filter(E e) throws Exception {
-    return e.getSourceId().equals(sourceId);
+  public boolean filter(T value) throws Exception {
+    return !components[0].filter(value);
   }
 }

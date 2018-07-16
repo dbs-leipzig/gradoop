@@ -15,10 +15,10 @@
  */
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * True, if an element is contained in any of a set of given graphs.
@@ -26,8 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * @param <GE> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class InAnyGraph<GE extends GraphElement>
-  implements FilterFunction<GE> {
+public class InAnyGraph<GE extends GraphElement> implements CombinableFilter<GE> {
 
   /**
    * graph ids
