@@ -204,66 +204,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>javadoc</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <version>3.4</version>
-                        <configuration>
-                            <skip>true</skip>
-                            <skipDeploy>true</skipDeploy>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <doclint>none</doclint>
-                            <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-                            <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>javadoc</id>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                            <!--<execution>-->
-                                <!--<id>aggregate</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>aggregate</goal>-->
-                                <!--</goals>-->
-                                <!--<phase>site</phase>-->
-                            <!--</execution>-->
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-scm-publish-plugin</artifactId>
-                        <version>1.1</version>
-                        <configuration>
-                            <serverId>github</serverId>
-                            <pubScmUrl>scm:git:https://github.com/galpha/gradoop.git</pubScmUrl>
-                            <scmBranch>gh-pages</scmBranch>
-                            <checkinComment>Updated JavaDocs via Maven</checkinComment>
-                            <content>${project.build.directory}/apidocs</content>
-                            <siteOutputEncoding>UTF-8</siteOutputEncoding>
-                            <tryUpdate>true</tryUpdate>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>publish-scm</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
     <build>
@@ -417,7 +357,26 @@
                         <quiet>true</quiet>
                         <doclint>none</doclint>
                         <detectOfflineLinks>false</detectOfflineLinks>
+                        <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+                        <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>javadoc</id>
+                            <goals>
+                                <goal>javadoc</goal>
+                                <goal>aggregate</goal>
+                            </goals>
+                            <phase>site</phase>
+                        </execution>
+                        <!--<execution>-->
+                            <!--<id>aggregate</id>-->
+                            <!--<goals>-->
+                                <!--<goal>aggregate</goal>-->
+                            <!--</goals>-->
+                            <!--<phase>site</phase>-->
+                        <!--</execution>-->
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -443,6 +402,36 @@
                         <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                         <autoReleaseAfterClose>false</autoReleaseAfterClose>
                     </configuration>
+                </plugin>
+                <!-- JavaDoc plugins-->
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.4</version>
+                    <configuration>
+                        <skip>true</skip>
+                        <skipDeploy>true</skipDeploy>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-scm-publish-plugin</artifactId>
+                    <version>1.1</version>
+                    <configuration>
+                        <serverId>github</serverId>
+                        <pubScmUrl>scm:git:https://github.com/galpha/gradoop.git</pubScmUrl>
+                        <scmBranch>gh-pages</scmBranch>
+                        <checkinComment>Updated JavaDocs via Maven</checkinComment>
+                        <content>${project.build.directory}/apidocs</content>
+                        <siteOutputEncoding>UTF-8</siteOutputEncoding>
+                        <tryUpdate>true</tryUpdate>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>publish-scm</goal>
+                            </goals>
+                            <phase>site</phase>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
