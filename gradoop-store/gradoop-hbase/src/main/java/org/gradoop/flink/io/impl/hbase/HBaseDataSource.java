@@ -105,7 +105,6 @@ public class HBaseDataSource extends HBaseBase
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public GraphCollection getGraphCollection() {
     GradoopHBaseConfig config = getHBaseConfig();
     HBaseEPGMStore store = getStore();
@@ -114,63 +113,47 @@ public class HBaseDataSource extends HBaseBase
       .createInput(
         new GraphHeadTableInputFormat<>(
           config.getGraphHeadHandler().applyQuery(graphHeadQuery),
-          store.getGraphHeadName()
-        ),
-        new TupleTypeInfo<>(
-          TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())
-        )
-      )
+          store.getGraphHeadName()),
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Vertex> vertices = config.getExecutionEnvironment()
       .createInput(
         new VertexTableInputFormat<>(
-          getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
-          getStore().getVertexTableName()
-        ),
-        new TupleTypeInfo<>(
-          TypeExtractor.createTypeInfo(config.getVertexFactory().getType())
-        )
-      )
+          config.getVertexHandler().applyQuery(vertexQuery),
+          store.getVertexTableName()),
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Edge> edges = config.getExecutionEnvironment()
       .createInput(
         new EdgeTableInputFormat<>(
-          getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
-          getStore().getEdgeTableName()
-        ),
-        new TupleTypeInfo<>(
-          TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())
-        )
-      )
+          config.getEdgeHandler().applyQuery(edgeQuery),
+          store.getEdgeTableName()),
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))
       .map(new ValueOf1<>());
 
-    return config.getGraphCollectionFactory()
-      .fromDataSets(graphHeads, vertices, edges);
+    return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
   }
 
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query
-  ) {
+    @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
   }
 
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query
-  ) {
+    @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
   }
 
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Edge>> query
-  ) {
+    @Nonnull ElementQuery<HBaseElementFilter<Edge>> query) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
   }
 
