@@ -69,6 +69,25 @@ public class CSVDataSinkTest extends CSVTestBase {
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("edges"));
   }
 
+  /**
+   * Test CSVDataSink to properly separate the metadata
+   * of edges and vertices using the same label.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testWriteWithSameLabel() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    // The properties are intentionally incompatible
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "graph[" +
+        "(v1:A {keya:2})" +
+        "(v1)-[e1:A {keya:false}]->(v1)," +
+        "]");
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("graph"));
+  }
+
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
