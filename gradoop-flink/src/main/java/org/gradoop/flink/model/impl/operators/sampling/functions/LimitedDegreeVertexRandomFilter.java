@@ -48,7 +48,7 @@ public class LimitedDegreeVertexRandomFilter<V extends Vertex>
    * Type of vertex-degree to be considered in sampling:
    * input degree, output degree, sum of both.
    */
-  private final VertexDegree.DegreeType degreeType;
+  private final VertexDegree degreeType;
 
   /**
    * Creates a new filter instance.
@@ -56,11 +56,10 @@ public class LimitedDegreeVertexRandomFilter<V extends Vertex>
    * @param sampleSize relative sample size, e.g. 0.5
    * @param randomSeed random seed (can be {@code} null)
    * @param degreeThreshold the threshold for the vertex degree, e.g. 3
-   * @param degreeType the degree type considered for sampling,
-   *                   e.g. VertexDegree.DegreeType.InputDegree
+   * @param degreeType the degree type considered for sampling, e.g. VertexDegree.IN
    */
   public LimitedDegreeVertexRandomFilter(float sampleSize, long randomSeed, long degreeThreshold,
-    VertexDegree.DegreeType degreeType) {
+    VertexDegree degreeType) {
     this.threshold = sampleSize;
     this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
     this.degreeThreshold = degreeThreshold;
@@ -72,17 +71,8 @@ public class LimitedDegreeVertexRandomFilter<V extends Vertex>
    */
   @Override
   public boolean filter(V vertex) throws Exception {
-    long degree = 0L;
-    if (degreeType.equals(VertexDegree.DegreeType.Degree)) {
-      degree =
-        Long.parseLong(vertex.getPropertyValue(VertexDegree.DEGREE_PROPERTY_NAME).toString());
-    } else if (degreeType.equals(VertexDegree.DegreeType.InputDegree)) {
-      degree =
-        Long.parseLong(vertex.getPropertyValue(VertexDegree.IN_DEGREE_PROPERTY_NAME).toString());
-    } else if (degreeType.equals(VertexDegree.DegreeType.OutputDegree)) {
-      degree =
-        Long.parseLong(vertex.getPropertyValue(VertexDegree.OUT_DEGREE_PROPERTY_NAME).toString());
-    }
+    long degree = Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString());
+
     if (degree > degreeThreshold) {
       return true;
     } else {

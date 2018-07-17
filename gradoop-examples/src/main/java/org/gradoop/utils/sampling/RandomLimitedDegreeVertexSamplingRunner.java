@@ -21,8 +21,6 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.RandomLimitedDegreeVertexSampling;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 
-import java.security.InvalidParameterException;
-
 /**
  * Runs {@link org.gradoop.flink.model.impl.operators.sampling.RandomLimitedDegreeVertexSampling}
  * for a given graph and writes the sampled output.
@@ -41,29 +39,14 @@ public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner impl
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold
    * args[5] - vertex degree threshold
-   * args[6] - vertex degree type (input, output, sum)
-   *
+   * args[6] - vertex degree type (IN, OUT, IN_OUT)
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
-    VertexDegree.DegreeType degreeType;
-    switch (args[6]) {
-    case "input":
-      degreeType = VertexDegree.DegreeType.InputDegree;
-      break;
-    case "output":
-      degreeType = VertexDegree.DegreeType.OutputDegree;
-      break;
-    case "sum":
-      degreeType = VertexDegree.DegreeType.Degree;
-      break;
-    default:
-      throw new InvalidParameterException();
-    }
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample = graph.callForGraph(new RandomLimitedDegreeVertexSampling(
-      Float.parseFloat(args[4]), Long.parseLong(args[5]), degreeType));
+      Float.parseFloat(args[4]), Long.parseLong(args[5]), VertexDegree.valueOf(args[6])));
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

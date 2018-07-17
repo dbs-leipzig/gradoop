@@ -15,60 +15,42 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
-import java.security.InvalidParameterException;
-
 /**
- * Keeps the types of vertex-degrees and the respective property names.
+ * Keeps the types of vertex-degrees and their respective property names.
+ * Available degree-types: input (IN), output (OUT), sum of both (IN_OUT).
  */
-public class VertexDegree {
+public enum VertexDegree {
+  /**
+   * The input degree
+   */
+  IN("_InDegree"),
+  /**
+   * The output degree
+   */
+  OUT("_OutDegree"),
+  /**
+   * The sum of input and output degree
+   */
+  IN_OUT("_InOutDegree");
 
   /**
-   * Types of vertex degrees
+   * The property name of a vertex degree type
    */
-  public enum DegreeType {
-    /**
-     * Input degree
-     */
-    InputDegree,
-    /**
-     * Output degree
-     */
-    OutputDegree,
-    /**
-     * Sum of both
-     */
-    Degree
+  private String degreePropertyName;
+
+  /**
+   * Enum constructor for degree type with property name.
+   * @param degreePropertyName The property name for a degree type
+   */
+  VertexDegree(String degreePropertyName) {
+    this.degreePropertyName = degreePropertyName;
   }
 
   /**
-   * In-degree property name
+   * Get the property name for an instance of VertexDegree.
+   * @return The degree property name
    */
-  public static final String IN_DEGREE_PROPERTY_NAME = "_inDegree";
-
-  /**
-   * Out-degree property name
-   */
-  public static final String OUT_DEGREE_PROPERTY_NAME = "_outDegree";
-
-  /**
-   * Degree property name
-   */
-  public static final String DEGREE_PROPERTY_NAME = "_degree";
-
-  /**
-   * Build an instance of DegreeType from a given string
-   * @param degreeType The vertex degree type, e.g. "InputDegree"
-   * @return An instance for DegreeType
-   */
-  public static DegreeType fromString(String degreeType) {
-    if (degreeType.equals(DegreeType.InputDegree.toString())) {
-      return DegreeType.InputDegree;
-    } else if (degreeType.equals(DegreeType.OutputDegree.toString())) {
-      return DegreeType.OutputDegree;
-    } else if (degreeType.equals(DegreeType.Degree.toString())) {
-      return DegreeType.Degree;
-    } else {
-      throw new InvalidParameterException();
-    }
+  public String getName() {
+    return degreePropertyName;
   }
 }

@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -45,29 +44,20 @@ public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase 
 
   private final float sampleSize;
 
-  private final VertexDegree.DegreeType degreeType;
+  private final VertexDegree degreeType;
 
   private final long degreeThreshold;
 
-  private final String degreePropertyKey;
+  private final String degreePropertyName;
 
   public RandomLimitedDegreeVertexSamplingTest(String testName, String randomSeed,
     String sampleSize, String degreeType, String degreeThreshold) {
     this.testName = testName;
     this.randomSeed = Long.parseLong(randomSeed);
     this.sampleSize = Float.parseFloat(sampleSize);
-    this.degreeType = VertexDegree.fromString(degreeType);
+    this.degreeType = VertexDegree.valueOf(degreeType);
     this.degreeThreshold = Long.parseLong(degreeThreshold);
-
-    if(this.degreeType == VertexDegree.DegreeType.InputDegree) {
-      this.degreePropertyKey = VertexDegree.IN_DEGREE_PROPERTY_NAME;
-    } else if(this.degreeType == VertexDegree.DegreeType.OutputDegree) {
-      this.degreePropertyKey = VertexDegree.OUT_DEGREE_PROPERTY_NAME;
-    } else if(this.degreeType == VertexDegree.DegreeType.Degree) {
-      this.degreePropertyKey = VertexDegree.DEGREE_PROPERTY_NAME;
-    } else {
-      throw new InvalidParameterException();
-    }
+    this.degreePropertyName = this.degreeType.getName();
   }
 
   @Test
@@ -88,9 +78,8 @@ public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase 
     List<Vertex> newVertices = Lists.newArrayList();
     List<Edge> newEdges = Lists.newArrayList();
 
-    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(VertexDegree.DEGREE_PROPERTY_NAME,
-      VertexDegree.IN_DEGREE_PROPERTY_NAME,VertexDegree.OUT_DEGREE_PROPERTY_NAME,
-      true).execute(input);
+    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(VertexDegree.IN_OUT.getName(),
+      VertexDegree.IN.getName(),VertexDegree.OUT.getName(),true).execute(input);
 
     inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
     inputWithDegrees.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
@@ -132,7 +121,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase 
     // Test, if all vertices with degree higher the given threshold were sampled
     List<Vertex> verticesSampledByDegree = Lists.newArrayList();
     for (Vertex vertex : dbVertices) {
-      if ((Long.parseLong(vertex.getPropertyValue(degreePropertyKey).toString())
+      if ((Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString())
         > degreeThreshold) && newVertices.contains(vertex)) {
         verticesSampledByDegree.add(vertex);
       }
@@ -140,7 +129,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase 
     dbVertices.removeAll(verticesSampledByDegree);
     for (Vertex vertex : dbVertices) {
       assertFalse("vertex with degree higher than degree threshold was not sampled",
-        Long.parseLong(vertex.getPropertyValue(degreePropertyKey).toString())
+        Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString())
           > degreeThreshold);
     }
   }
@@ -149,32 +138,60 @@ public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase 
   public static Iterable data() {
     return Arrays.asList(
       new String[] {
-        "With seed and the sum of both vertex degrees",
+        "With seed and the sum of in- and out-degree with value = 3",
         "-4181668494294894490",
         "0.272f",
-        "Degree",
+        "IN_OUT",
         "3"
       },
       new String[] {
-        "Without seed and the sum of both vertex degrees",
+        "Without seed and the sum of in- and out-degree with value = 3",
         "0",
         "0.272f",
-        "Degree",
+        "IN_OUT",
         "3"
       },
       new String[] {
-        "With seed and vertex input degree",
+        "With seed and vertex input degree for value = 3",
         "-4181668494294894490",
         "0.272f",
-        "InputDegree",
+        "IN",
         "3"
       },
       new String[] {
-        "With seed and vertex output degree",
+        "With seed and vertex input degree for value = 0",
         "-4181668494294894490",
         "0.272f",
-        "OutputDegree",
+        "IN",
+        "0"
+      },
+      new String[] {
+        "With seed and vertex input degree for value = -1",
+        "-4181668494294894490",
+        "0.272f",
+        "IN",
+        "-1"
+      },
+      new String[] {
+        "With seed and vertex output degree for value = 3",
+        "-4181668494294894490",
+        "0.272f",
+        "OUT",
         "3"
+      },
+      new String[] {
+        "With seed and vertex output degree for value = 0",
+        "-4181668494294894490",
+        "0.272f",
+        "OUT",
+        "0"
+      },
+      new String[] {
+        "With seed and vertex output degree for value = -1",
+        "-4181668494294894490",
+        "0.272f",
+        "OUT",
+        "-1"
       });
   }
 }

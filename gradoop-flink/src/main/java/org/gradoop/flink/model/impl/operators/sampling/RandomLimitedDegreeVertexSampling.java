@@ -22,15 +22,12 @@ import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.LimitedDegreeVertexRandomFilter;
-import org.gradoop.flink.model.impl.operators.sampling.functions.RemoveUnnecessaryPropertiesMap;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Computes a vertex sampling of the graph. Retains all vertices with a degree higher a given
@@ -60,7 +57,7 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
    * Type of vertex degree to be considered in sampling:
    * input degree, output degree, sum of both.
    */
-  private final VertexDegree.DegreeType degreeType;
+  private final VertexDegree degreeType;
 
   /**
    * Creates new RandomLimitedDegreeVertexSampling instance.
@@ -81,7 +78,7 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
     this.degreeThreshold = 2L;
-    this.degreeType = VertexDegree.DegreeType.Degree;
+    this.degreeType = VertexDegree.IN_OUT;
   }
 
   /**
@@ -93,7 +90,7 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
    * @param degreeType type of degree for sampling, e.g. VertexDegree.DegreeType.InputDegree
    */
   public RandomLimitedDegreeVertexSampling(float sampleSize, long randomSeed, long degreeThreshold,
-    VertexDegree.DegreeType degreeType) {
+    VertexDegree degreeType) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
     this.degreeThreshold = degreeThreshold;
@@ -108,7 +105,7 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
    * @param degreeType type of degree for sampling, e.g. VertexDegree.DegreeType.InputDegree
    */
   public RandomLimitedDegreeVertexSampling(float sampleSize, long degreeThreshold,
-    VertexDegree.DegreeType degreeType) {
+    VertexDegree degreeType) {
     this.sampleSize = sampleSize;
     this.randomSeed = 0L;
     this.degreeThreshold = degreeThreshold;
@@ -121,19 +118,15 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-    graph = new DistinctVertexDegrees(VertexDegree.DEGREE_PROPERTY_NAME,
-      VertexDegree.IN_DEGREE_PROPERTY_NAME, VertexDegree.OUT_DEGREE_PROPERTY_NAME,
-      true).execute(graph);
-
-    List<String> unnecessaryPropertyNames = new ArrayList<>();
-    unnecessaryPropertyNames.add(VertexDegree.DEGREE_PROPERTY_NAME);
-    unnecessaryPropertyNames.add(VertexDegree.IN_DEGREE_PROPERTY_NAME);
-    unnecessaryPropertyNames.add(VertexDegree.OUT_DEGREE_PROPERTY_NAME);
+    graph = new DistinctVertexDegrees(VertexDegree.IN_OUT.getName(), VertexDegree.IN.getName(),
+      VertexDegree.OUT.getName(), true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new LimitedDegreeVertexRandomFilter<>(sampleSize, randomSeed, degreeThreshold,
         degreeType))
-      .map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
+      .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
+      .map(new PropertyRemover<>(VertexDegree.IN.getName()))
+      .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
@@ -145,7 +138,8 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
+      newVertices, newEdges);
   }
 
   /**
