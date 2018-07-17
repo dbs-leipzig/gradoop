@@ -18,6 +18,7 @@ package org.gradoop.common.storage.impl.hbase;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.GradoopHBaseTestBase;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -31,13 +32,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
-import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
-import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
-import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
-import org.gradoop.common.storage.impl.hbase.api.PersistentVertexFactory;
-import org.gradoop.common.storage.impl.hbase.factory.HBaseEdgeFactory;
-import org.gradoop.common.storage.impl.hbase.factory.HBaseGraphHeadFactory;
-import org.gradoop.common.storage.impl.hbase.factory.HBaseVertexFactory;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.junit.Test;
 
@@ -66,9 +60,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     Vertex vertex = loader.getVertices().iterator().next();
     Edge edge = loader.getEdges().iterator().next();
 
-    writeGraphHead(graphStore, graphHead, vertex, edge);
-    writeVertex(graphStore, vertex, edge);
-    writeEdge(graphStore, vertex, edge);
+    graphStore.writeGraphHead(graphHead);
+    graphStore.writeVertex(vertex);
+    graphStore.writeEdge(edge);
 
     // re-open
     graphStore.close();
@@ -97,9 +91,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     Vertex vertex = loader.getVertices().iterator().next();
     Edge edge = loader.getEdges().iterator().next();
 
-    writeGraphHead(graphStore, graphHead, vertex, edge);
-    writeVertex(graphStore, vertex, edge);
-    writeEdge(graphStore, vertex, edge);
+    graphStore.writeGraphHead(graphHead);
+    graphStore.writeVertex(vertex);
+    graphStore.writeEdge(edge);
 
     // flush changes
     graphStore.flush();
@@ -122,21 +116,24 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   public void iteratorTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
 
-    List<PersistentVertex<Edge>> vertices =
-      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentVertices());
-    List<PersistentEdge<Vertex>> edges =
-      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentEdges());
-    List<PersistentGraphHead> graphHeads =
-      Lists.newArrayList(GradoopHBaseTestUtils.getSocialPersistentGraphHeads());
+    List<Vertex> vertices = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getVertices()
+    );
+    List<Edge> edges = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getEdges()
+    );
+    List<GraphHead> graphHeads = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getGraphHeads()
+    );
 
-    // store some data
-    for (PersistentGraphHead g : graphHeads) {
+    // write social graph to HBase
+    for (GraphHead g : graphHeads) {
       graphStore.writeGraphHead(g);
     }
-    for (PersistentVertex<Edge> v : vertices) {
+    for (Vertex v : vertices) {
       graphStore.writeVertex(v);
     }
-    for (PersistentEdge<Vertex> e : edges) {
+    for (Edge e : edges) {
       graphStore.writeEdge(e);
     }
 
@@ -176,8 +173,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   public void wrongPropertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
 
-    PersistentVertexFactory<Vertex, Edge> persistentVertexFactory =
-      new HBaseVertexFactory<>();
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
     // Set is not supported by
@@ -188,14 +183,11 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     Properties props = Properties.create();
     props.set("k1", value);
 
-    final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
-    final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);
     final GradoopIdSet graphs = new GradoopIdSet();
-    PersistentVertex<Edge> v = persistentVertexFactory.createVertex(
-      vertexFactory.initVertex(vertexID, label, props, graphs),
-      outEdges, inEdges);
 
-    graphStore.writeVertex(v);
+    Vertex vertex = vertexFactory.initVertex(vertexID, label, props, graphs);
+
+    graphStore.writeVertex(vertex);
   }
 
   /**
@@ -206,8 +198,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
 
-    PersistentVertexFactory<Vertex, Edge> persistentVertexFactory =
-      new HBaseVertexFactory<>();
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
     final GradoopId vertexID = GradoopId.get();
@@ -215,15 +205,10 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
-    final Set<Edge> outEdges = Sets.newHashSetWithExpectedSize(0);
-    final Set<Edge> inEdges = Sets.newHashSetWithExpectedSize(0);
     final GradoopIdSet graphs = new GradoopIdSet();
 
     // write to store
-    graphStore.writeVertex(persistentVertexFactory.createVertex(
-      vertexFactory.initVertex(vertexID, label, properties, graphs), outEdges,
-      inEdges));
-
+    graphStore.writeVertex(vertexFactory.initVertex(vertexID, label, properties, graphs));
     graphStore.flush();
 
     // read from store
@@ -300,37 +285,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     return AsciiGraphLoader.fromString(
       asciiGraph, GradoopConfig.getDefaultConfig());
-  }
-
-  private void writeGraphHead(
-    HBaseEPGMStore graphStore,
-    GraphHead graphHead,
-    Vertex vertex,
-    Edge edge
-  ) throws IOException {
-    graphStore.writeGraphHead(new HBaseGraphHeadFactory<>().createGraphHead(
-      graphHead, GradoopIdSet.fromExisting(vertex.getId()),
-      GradoopIdSet.fromExisting(edge.getId())
-      )
-    );
-  }
-
-  private void writeVertex(
-    HBaseEPGMStore graphStore,
-    Vertex vertex,
-    Edge edge
-  ) throws IOException {
-    graphStore.writeVertex(new HBaseVertexFactory<Vertex, Edge>().createVertex(
-      vertex, Sets.newHashSet(edge), Sets.newHashSet(edge)));
-  }
-
-  private void writeEdge(
-    HBaseEPGMStore graphStore,
-    Vertex vertex,
-    Edge edge
-  ) throws IOException {
-    graphStore.writeEdge(new HBaseEdgeFactory<Edge, Vertex>().createEdge(
-      edge, vertex, vertex));
   }
 
   private void validateGraphHead(

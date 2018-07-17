@@ -20,21 +20,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 
 /**
  * Creates HBase {@link Mutation} from persistent vertex data using vertex
  * data handler.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class BuildVertexMutation<V extends EPGMVertex, E extends EPGMEdge>
-  extends RichMapFunction<PersistentVertex<E>, Tuple2<GradoopId, Mutation>> {
+public class BuildVertexMutation extends RichMapFunction<Vertex, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -49,14 +43,14 @@ public class BuildVertexMutation<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Vertex data handler to create Mutations.
    */
-  private final VertexHandler<V, E> vertexHandler;
+  private final VertexHandler vertexHandler;
 
   /**
    * Creates rich map function.
    *
    * @param vertexHandler vertex data handler
    */
-  public BuildVertexMutation(VertexHandler<V, E> vertexHandler) {
+  public BuildVertexMutation(VertexHandler vertexHandler) {
     this.vertexHandler = vertexHandler;
   }
 
@@ -73,13 +67,10 @@ public class BuildVertexMutation<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(
-    PersistentVertex<E> persistentVertexData)
-      throws Exception {
-    GradoopId key = persistentVertexData.getId();
-    Put put =
-      new Put(vertexHandler.getRowKey(persistentVertexData.getId()));
-    put = vertexHandler.writeVertex(put, persistentVertexData);
+  public Tuple2<GradoopId, Mutation> map(Vertex vertex) throws Exception {
+    GradoopId key = vertex.getId();
+    Put put = new Put(vertexHandler.getRowKey(vertex.getId()));
+    put = vertexHandler.writeVertex(put, vertex);
 
     reuseTuple.f0 = key;
     reuseTuple.f1 = put;

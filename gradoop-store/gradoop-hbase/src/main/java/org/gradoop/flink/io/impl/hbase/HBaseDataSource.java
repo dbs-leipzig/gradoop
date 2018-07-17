@@ -63,55 +63,29 @@ public class HBaseDataSource extends HBaseBase implements DataSource {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public GraphCollection getGraphCollection() {
     GradoopHBaseConfig config = getHBaseConfig();
     HBaseEPGMStore store = getStore();
 
-    VertexTableInputFormat<Vertex, Edge> vertexTableInputFormat = createVertexInput();
-    EdgeTableInputFormat edgeTableInputFormat = createEdgeInput();
-
     DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
-      .createInput(new GraphHeadTableInputFormat<>(config.getGraphHeadHandler(),
+      .createInput(new GraphHeadTableInputFormat(config.getGraphHeadHandler(),
         store.getGraphHeadName()), new TupleTypeInfo<>(
         TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
     DataSet<Vertex> vertices = config.getExecutionEnvironment()
-      .createInput(vertexTableInputFormat, new TupleTypeInfo<>(
+      .createInput(new VertexTableInputFormat(
+        getHBaseConfig().getVertexHandler(),
+        getStore().getVertexTableName()), new TupleTypeInfo<>(
         TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
       .map(new ValueOf1<>());
     DataSet<Edge> edges = config.getExecutionEnvironment()
-      .createInput(edgeTableInputFormat, new TupleTypeInfo<>(
+      .createInput(new EdgeTableInputFormat(
+        getHBaseConfig().getEdgeHandler(),
+        getStore().getEdgeTableName()), new TupleTypeInfo<>(
         TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))
       .map(new ValueOf1<>());
 
     return config.getGraphCollectionFactory()
       .fromDataSets(graphHeads, vertices, edges);
   }
-
-  /**
-   * create a vertex input format with filter predicate
-   * @return vertex input instance
-   */
-  private VertexTableInputFormat<Vertex, Edge> createVertexInput() {
-    VertexTableInputFormat<Vertex, Edge> input = new VertexTableInputFormat<>(
-      getHBaseConfig().getVertexHandler(),
-      getStore().getVertexTableName());
-    //TODO: add your filter predicate expression handler here
-    return input;
-  }
-
-  /**
-   * create a edge input format with filter predicate
-   * @return edge input instance
-   */
-  private EdgeTableInputFormat<Edge, Vertex> createEdgeInput() {
-    EdgeTableInputFormat<Edge, Vertex> input =
-      new EdgeTableInputFormat<>(
-        getHBaseConfig().getEdgeHandler(),
-        getStore().getEdgeTableName());
-    //TODO: add your filter predicate expression handler here
-    return input;
-  }
-
 }

@@ -22,9 +22,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
-import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
-import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -38,7 +35,6 @@ import java.util.List;
 import static org.gradoop.GradoopHBaseTestBase.createEmptyEPGMStore;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.*;
 
 public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
@@ -48,18 +44,24 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     HBaseEPGMStore epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
 
-    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
-    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
-    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
+    List<Vertex> vertices = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getVertices()
+    );
+    List<Edge> edges = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getEdges()
+    );
+    List<GraphHead> graphHeads = Lists.newArrayList(
+      GradoopTestUtils.getSocialNetworkLoader().getGraphHeads()
+    );
 
     // write social graph to HBase
-    for (PersistentGraphHead g : graphHeads) {
+    for (GraphHead g : graphHeads) {
       epgmStore.writeGraphHead(g);
     }
-    for (PersistentVertex<Edge> v : vertices) {
+    for (Vertex v : vertices) {
       epgmStore.writeVertex(v);
     }
-    for (PersistentEdge<Vertex> e : edges) {
+    for (Edge e : edges) {
       epgmStore.writeEdge(e);
     }
 

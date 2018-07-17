@@ -27,21 +27,16 @@ import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueExcludeFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 
 /**
  * Reads vertex data from HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
-  extends TableInputFormat<Tuple1<V>> {
+public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
 
   /**
    * An optional set of vertex ids to define a filter for HBase.
@@ -56,7 +51,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Handles reading of persistent vertex data.
    */
-  private final VertexHandler<V, E> vertexHandler;
+  private final VertexHandler vertexHandler;
 
   /**
    * Table to read from.
@@ -69,8 +64,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
    * @param vertexHandler   vertex data handler
    * @param vertexTableName vertex data table name
    */
-  public VertexTableInputFormat(VertexHandler<V, E> vertexHandler,
-    String vertexTableName) {
+  public VertexTableInputFormat(VertexHandler vertexHandler, String vertexTableName) {
     this.vertexHandler = vertexHandler;
     this.vertexTableName = vertexTableName;
   }
@@ -196,7 +190,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<V> mapResultToTuple(Result result) {
+  protected Tuple1<Vertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

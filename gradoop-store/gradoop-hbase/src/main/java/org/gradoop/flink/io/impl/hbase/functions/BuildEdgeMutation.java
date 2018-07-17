@@ -20,21 +20,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 
 /**
  * Creates HBase {@link Mutation} from persistent edge data using edge
  * data handler.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
-  extends RichMapFunction<PersistentEdge<V>, Tuple2<GradoopId, Mutation>> {
+public class BuildEdgeMutation extends RichMapFunction<Edge, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -49,14 +43,14 @@ public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Edge data handler to create Mutations.
    */
-  private final EdgeHandler<E, V> edgeHandler;
+  private final EdgeHandler edgeHandler;
 
   /**
    * Creates rich map function.
    *
    * @param edgeHandler edge data handler
    */
-  public BuildEdgeMutation(EdgeHandler<E, V> edgeHandler) {
+  public BuildEdgeMutation(EdgeHandler edgeHandler) {
     this.edgeHandler = edgeHandler;
   }
 
@@ -64,11 +58,10 @@ public class BuildEdgeMutation<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(PersistentEdge<V> persistentEdgeData)
-      throws Exception {
-    GradoopId key = persistentEdgeData.getId();
-    Put put = new Put(edgeHandler.getRowKey(persistentEdgeData.getId()));
-    put = edgeHandler.writeEdge(put, persistentEdgeData);
+  public Tuple2<GradoopId, Mutation> map(Edge edge) throws Exception {
+    GradoopId key = edge.getId();
+    Put put = new Put(edgeHandler.getRowKey(edge.getId()));
+    put = edgeHandler.writeEdge(put, edge);
 
     reuseTuple.f0 = key;
     reuseTuple.f1 = put;

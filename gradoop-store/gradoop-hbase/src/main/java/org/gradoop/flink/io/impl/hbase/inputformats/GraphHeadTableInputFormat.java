@@ -19,22 +19,19 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 
 /**
  * Reads graph data from HBase.
- *
- * @param <G> EPGM graph head type
  */
-public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
-  extends TableInputFormat<Tuple1<G>> {
+public class GraphHeadTableInputFormat extends TableInputFormat<Tuple1<GraphHead>> {
 
   /**
    * Handles reading of persistent graph data.
    */
-  private final GraphHeadHandler<G> graphHeadHandler;
+  private final GraphHeadHandler graphHeadHandler;
 
   /**
    * Table to read from.
@@ -47,7 +44,7 @@ public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
    * @param graphHeadHandler   graph data handler
    * @param graphHeadTableName graph data table name
    */
-  public GraphHeadTableInputFormat(GraphHeadHandler<G> graphHeadHandler,
+  public GraphHeadTableInputFormat(GraphHeadHandler graphHeadHandler,
     String graphHeadTableName) {
     this.graphHeadHandler = graphHeadHandler;
     this.graphHeadTableName = graphHeadTableName;
@@ -75,7 +72,7 @@ public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<G> mapResultToTuple(Result result) {
+  protected Tuple1<GraphHead> mapResultToTuple(Result result) {
     return new Tuple1<>(graphHeadHandler.readGraphHead(result));
   }
 }

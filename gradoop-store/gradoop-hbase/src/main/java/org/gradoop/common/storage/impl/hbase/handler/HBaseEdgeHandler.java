@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.storage.impl.hbase.handler;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Admin;
@@ -24,10 +23,9 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 
 import java.io.IOException;
@@ -44,13 +42,8 @@ import java.io.IOException;
  * |         |----------|------------|------------|--------|-------|
  * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
  * |---------|----------|------------|------------|--------|-------|
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
-  extends HBaseGraphElementHandler
-  implements EdgeHandler<E, V> {
+public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHandler {
 
   /**
    * serial version uid
@@ -69,14 +62,14 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Creates an edge data handler.
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory<E> edgeFactory) {
+  public HBaseEdgeHandler(EPGMEdgeFactory<Edge> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -95,8 +88,8 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeSource(Put put, V vertexData) throws IOException {
-    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, createVertexIdentifier(vertexData));
+  public Put writeSource(final Put put, final GradoopId sourceId) {
+    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());
   }
 
   /**
@@ -111,8 +104,8 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeTarget(Put put, V vertexData) throws IOException {
-    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, createVertexIdentifier(vertexData));
+  public Put writeTarget(Put put, GradoopId targetId) {
+    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());
   }
 
   /**
@@ -127,10 +120,10 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws IOException {
+  public Put writeEdge(Put put, EPGMEdge edgeData) throws IOException {
     writeLabel(put, edgeData);
-    writeSource(put, edgeData.getSource());
-    writeTarget(put, edgeData.getTarget());
+    writeSource(put, edgeData.getSourceId());
+    writeTarget(put, edgeData.getTargetId());
     writeProperties(put, edgeData);
     writeGraphIds(put, edgeData);
     return put;
@@ -140,8 +133,8 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public E readEdge(Result res) {
-    E edge = null;
+  public Edge readEdge(Result res) {
+    Edge edge = null;
     try {
       edge = edgeFactory
         .initEdge(readId(res), readLabel(res), readSourceId(res),
@@ -151,30 +144,5 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
     }
 
     return edge;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public EPGMEdgeFactory<E> getEdgeFactory() {
-    return edgeFactory;
-  }
-
-  /**
-   * Serializes a vertex to a vertex identifier in the following format:
-   *
-   * <vertex-identifier> ::= <vertex-id><vertex-label>
-   *
-   * @param vertex vertex
-   * @return byte representation of the vertex identifier
-   */
-  private byte[] createVertexIdentifier(final V vertex) throws IOException {
-    byte[] vertexKeyBytes = vertex.getId().toByteArray();
-    byte[] labelBytes = Bytes.toBytes(vertex.getLabel());
-
-    ArrayUtils.addAll(vertexKeyBytes, labelBytes);
-
-    return vertexKeyBytes;
   }
 }

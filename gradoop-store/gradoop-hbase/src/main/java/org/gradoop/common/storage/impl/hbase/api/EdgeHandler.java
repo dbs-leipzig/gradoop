@@ -18,32 +18,24 @@ package org.gradoop.common.storage.impl.hbase.api;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.Edge;
 
 import java.io.IOException;
 
 /**
  * Responsible for reading and writing edge data from and to HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
-  extends GraphElementHandler {
+public interface EdgeHandler extends GraphElementHandler {
 
   /**
    * Adds the source vertex data to the given {@link Put} and returns it.
    *
-   * @param put        HBase {@link Put}
-   * @param vertexData vertex data
+   * @param put HBase {@link Put}
+   * @param sourceId source vertex id
    * @return put with vertex data
    */
-  Put writeSource(
-    final Put put,
-    final V vertexData
-  ) throws IOException;
+  Put writeSource(final Put put, final GradoopId sourceId);
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -56,14 +48,11 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
    *
-   * @param put        HBase HBase {@link Put}
-   * @param vertexData vertex data
+   * @param put HBase {@link Put}
+   * @param targetId target vertex id
    * @return put with vertex data
    */
-  Put writeTarget(
-    final Put put,
-    final V vertexData
-  ) throws IOException;
+  Put writeTarget(final Put put, final GradoopId targetId);
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -80,11 +69,7 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(
-    final Put put,
-    final PersistentEdge<V> edgeData
-  ) throws
-    IOException;
+  Put writeEdge(final Put put, final EPGMEdge edgeData) throws IOException;
 
   /**
    * Reads the edge data from the given {@link Result}.
@@ -92,12 +77,5 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  E readEdge(final Result res);
-
-  /**
-   * Returns the edge data factory used by this handler.
-   *
-   * @return edge data factory
-   */
-  EPGMEdgeFactory<E> getEdgeFactory();
+  Edge readEdge(final Result res);
 }

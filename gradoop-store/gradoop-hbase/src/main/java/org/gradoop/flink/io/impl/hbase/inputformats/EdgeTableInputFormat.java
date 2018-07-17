@@ -26,10 +26,9 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 
@@ -38,12 +37,8 @@ import java.util.List;
 
 /**
  * Reads edge data from HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
-  extends TableInputFormat<Tuple1<E>> {
+public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
 
   /**
    * An optional set of vertex ids to define a filter for HBase.
@@ -58,7 +53,7 @@ public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Handles reading of persistent edge data.
    */
-  private final EdgeHandler<E, V> edgeHandler;
+  private final EdgeHandler edgeHandler;
 
   /**
    * Table to read from.
@@ -71,8 +66,7 @@ public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
    * @param edgeHandler   edge data handler
    * @param edgeTableName edge data table name
    */
-  public EdgeTableInputFormat(EdgeHandler<E, V> edgeHandler,
-    String edgeTableName) {
+  public EdgeTableInputFormat(EdgeHandler edgeHandler, String edgeTableName) {
     this.edgeHandler = edgeHandler;
     this.edgeTableName = edgeTableName;
   }
@@ -198,7 +192,7 @@ public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<E> mapResultToTuple(Result result) {
+  protected Tuple1<Edge> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));
   }
 }

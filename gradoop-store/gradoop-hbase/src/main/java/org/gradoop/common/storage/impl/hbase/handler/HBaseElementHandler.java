@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.storage.impl.hbase.handler;
 
-import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -31,7 +30,6 @@ import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Handler is used to write label and properties into HBase tables. This is
@@ -133,21 +131,6 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   /**
-   * Returns all column keys inside a column family.
-   *
-   * @param res          HBase row result
-   * @param columnFamily column family to get keys from
-   * @return all keys inside column family.
-   */
-  protected Set<Long> getColumnKeysFromFamily(final Result res, final byte[] columnFamily) {
-    Set<Long> keys = Sets.newHashSet();
-    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily).entrySet()) {
-      keys.add(Bytes.toLong(column.getKey()));
-    }
-    return keys;
-  }
-
-  /**
    * Reads the property key from the given byte array.
    *
    * @param encKey encoded property key
@@ -175,9 +158,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
    *
    * @param res HBase row
    * @return gradoop id
-   * @throws IOException
    */
-  protected GradoopId readId(Result res) throws IOException {
+  GradoopId readId(Result res) {
     return GradoopId.fromByteArray(res.getRow());
   }
 }
