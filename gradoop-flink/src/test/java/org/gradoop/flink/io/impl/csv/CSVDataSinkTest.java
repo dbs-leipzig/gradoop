@@ -79,7 +79,8 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWriteWithSameLabel() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    // The properties are intentionally incompatible
+    // The properties are incompatible to get a conversion error
+    // if the metadata is not separated
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "graph[" +
         "(v1:A {keya:2})" +
