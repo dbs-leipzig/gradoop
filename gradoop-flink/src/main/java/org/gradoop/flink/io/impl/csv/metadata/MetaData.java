@@ -119,8 +119,9 @@ public class MetaData {
   }
 
   /**
-   * Returns the property meta data associated with the specified label.
+   * Returns the property meta data associated with the specified label and type.
    *
+   * @param type element type
    * @param label element label
    * @return property meta data for the element
    */

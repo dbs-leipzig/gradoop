@@ -20,7 +20,6 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -89,7 +88,8 @@ public class MetaDataParser {
    * @return Meta Data object
    */
   public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {
-    Map<Tuple2<String, String>, List<PropertyMetaData>> metaDataMap = new HashMap<>(metaDataStrings.size());
+    Map<Tuple2<String, String>, List<PropertyMetaData>> metaDataMap
+      = new HashMap<>(metaDataStrings.size());
 
     for (Tuple3<String, String, String> tuple : metaDataStrings) {
       List<PropertyMetaData> propertyMetaDataList;

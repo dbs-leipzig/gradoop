@@ -56,6 +56,7 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * Returns the concatenated property values of the specified element according to the meta data.
    *
    * @param element EPGM element
+   * @param type element type
    * @return property value string
    */
   String getPropertyString(E element, String type) {
