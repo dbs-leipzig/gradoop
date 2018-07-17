@@ -101,8 +101,8 @@ public class MetaData {
    */
   public Set<String> getVertexLabels() {
     return metaData.keySet().stream()
-      .filter(e -> e.f0.equals(CSVConstants.VERTEX_TYPE))
-      .map(e -> e.f1)
+      .filter(key -> key.f0.equals(CSVConstants.VERTEX_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
@@ -113,8 +113,8 @@ public class MetaData {
    */
   public Set<String> getEdgeLabels() {
     return metaData.keySet().stream()
-      .filter(e -> e.f0.equals(CSVConstants.EDGE_TYPE))
-      .map(e -> e.f1)
+      .filter(key -> key.f0.equals(CSVConstants.EDGE_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
