@@ -34,7 +34,6 @@ import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
@@ -61,7 +60,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param query Cypher query
    * @return graph collection containing matching subgraphs
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query);
 
   /**
@@ -90,7 +92,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param query Cypher query string
    * @param constructionPattern Construction pattern
    * @return graph collection containing the output of the construct pattern
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String, String)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query, String constructionPattern);
 
   /**
@@ -101,7 +106,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param query Cypher query
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String, GraphStatistics)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query, GraphStatistics graphStatistics);
 
   /**
@@ -127,7 +135,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param constructionPattern Construction pattern
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing the output of the construct pattern
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String, String, GraphStatistics)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query, String constructionPattern, GraphStatistics graphStatistics);
 
   /**
@@ -139,7 +150,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeStrategy morphism setting for edge mapping
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String, boolean, MatchStrategy, MatchStrategy, GraphStatistics)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
@@ -153,47 +167,120 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeStrategy morphism setting for edge mapping
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
+   * @deprecated because of API restructuring.
+   * Please use {@link LogicalGraph#query(String, String, boolean, MatchStrategy, MatchStrategy, GraphStatistics)} instead.
    */
+  @Deprecated
   GraphCollection cypher(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
    *
-   * @param pattern  GDL graph pattern
+   * Note, that this method used no statistics about the data graph which may result in bad
+   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
+   * provide statistics for the query planner.
    *
-   * @return subgraphs of the input graph that match the given graph pattern
+   * @param query Cypher query
+   * @return graph collection containing matching subgraphs
    */
-  GraphCollection match(String pattern);
+  GraphCollection query(String query);
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
    *
-   * This method allows to control if the original vertex and edge data
-   * (labels and properties) shall be attached to the resulting subgraphs.
-   * Note that this requires additional JOIN operations.
+   * Note, that this method used no statistics about the data graph which may result in bad
+   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
+   * provide statistics for the query planner.
    *
-   * @param pattern     GDL graph pattern
+   * In addition, the operator can be supplied with a construction pattern allowing the creation
+   * of new graph elements based on variable bindings of the match pattern. Consider the following
+   * example:
+   *
+   * <pre>
+   * <code>graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")
+   * </code>
+   * </pre>
+   *
+   * The query pattern is looking for pairs of authors that worked on the same paper. The
+   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query Cypher query string
+   * @param constructionPattern Construction pattern
+   * @return graph collection containing the output of the construct pattern
+   */
+  GraphCollection query(String query, String constructionPattern);
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
+   * @param query Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  GraphCollection query(String query, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
+   * the data graph elements is attached to the resulting vertices.
+   *
+   * In addition, the operator can be supplied with a construction pattern allowing the creation
+   * of new graph elements based on variable bindings of the match pattern. Consider the following
+   * example:
+   *
+   * <pre>
+   * <code>graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")
+   * </code>
+   * </pre>
+   *
+   * The query pattern is looking for pairs of authors that worked on the same paper. The
+   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query Cypher query
+   * @param constructionPattern Construction pattern
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing the output of the construct pattern
+   */
+  GraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query Cypher query
    * @param attachData  attach original vertex and edge data to the result
-   * @return subgraphs of the input graph that match the given graph pattern
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
    */
-  GraphCollection match(String pattern, boolean attachData);
+  GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
+                        MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
-   * Evaluates the given GDL query using the Traverser query engine.
+   * Evaluates the given query using the Cypher query engine.
    *
-   * This method allows to control the match strategy. This influences mostly
-   * if vertices and edges can be matched to multiple vertices/edges in the
-   * query.
-   *
-   * @param pattern           GDL graph pattern
-   * @param attachData        attach original vertex and edge data to the result
-   * @param matchStrategy     strategy for vertex and edge mappings
-   * @param iterationStrategy strategy for internal iteration
-   * @return subgraphs of the input graph that match the given graph pattern
+   * @param query Cypher query
+   * @param constructionPattern Construction pattern
+   * @param attachData  attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
    */
-  GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, TraverserStrategy iterationStrategy);
+  GraphCollection query(String query, String constructionPattern, boolean attachData,
+                         MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+                        GraphStatistics graphStatistics);
 
   /**
    * Creates a copy of the logical graph.

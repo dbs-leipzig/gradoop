@@ -84,7 +84,7 @@ public class EdgeListExample implements ProgramDescription {
 
     // do some analytics (e.g. match two-node cycles)
     GraphCollection matches = logicalGraph
-      .match("(a:Node)-[:link]->(b:Node)-[:link]->(a)");
+      .query("MATCH (a:Node)-[:link]->(b:Node)-[:link]->(a)");
 
     // print number of matching subgraphs
     System.out.println(matches.getGraphHeads().count());
