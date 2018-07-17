@@ -316,7 +316,7 @@
                         <inherited>false</inherited>
                         <configuration>
                             <serverId>github</serverId>
-                            <pubScmUrl>scm:git:https://github.com/galpha/gradoop.git</pubScmUrl>
+                            <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
                             <scmBranch>gh-pages</scmBranch>
                             <checkinComment>Updated JavaDocs via Maven</checkinComment>
                             <content>${project.build.directory}/apidocs</content>
