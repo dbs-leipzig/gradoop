@@ -1,0 +1,5 @@
+Forum,hasMember,4
+Forum,hasModerator,2
+Forum,hasTag,4
+Person,hasInterest,4
+Person,knows,10
