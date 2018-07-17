@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,6 +125,6 @@ public class MetaData {
    * @return property meta data for the element
    */
   public List<PropertyMetaData> getPropertyMetaData(String type, String label) {
-    return metaData.get(new Tuple2<>(type, label));
+    return metaData.getOrDefault(new Tuple2<>(type, label), new ArrayList<>());
   }
 }
