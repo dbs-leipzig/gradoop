@@ -25,8 +25,9 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -155,17 +156,10 @@ public class FrequentLossPatterns
 
     // (1) read data from source
 
-    String graphHeadPath = FrequentLossPatterns.class
-      .getResource("/data/json/foodbroker/graphs.json").getFile();
+    String csvPath = FrequentLossPatterns.class
+      .getResource("/data/csv/foodbroker").getFile();
 
-    String vertexPath = FrequentLossPatterns.class.
-      getResource("/data/json/foodbroker/nodes.json").getFile();
-
-    String edgePath = FrequentLossPatterns.class
-      .getResource("/data/json/foodbroker/edges.json").getFile();
-
-    JSONDataSource dataSource = new JSONDataSource(
-      graphHeadPath, vertexPath, edgePath, config);
+    DataSource dataSource = new CSVDataSource(csvPath, config);
 
     LogicalGraph iig = dataSource.getLogicalGraph();
 
