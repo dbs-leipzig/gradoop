@@ -82,11 +82,22 @@ public class CSVDataSinkTest extends CSVTestBase {
     // The properties are incompatible to get a conversion error
     // if the metadata is not separated
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "graph[" +
-        "(v1:A {keya:2})" +
-        "(v1)-[e1:A {keya:false}]->(v1)," +
-        "]");
-    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("graph"));
+      "single[" +
+      "(v1:A {keya:2})" +
+      "(v1)-[e1:A {keya:false}]->(v1)," +
+      "]" +
+      "multiple[" +
+      "(v2:B {keya:true, keyb:1, keyc:\"Foo\"})," +
+      "(v3:B {keya:false, keyb:2})," +
+      "(v4:C {keya:2.3f, keyb:\"Bar\"})," +
+      "(v5:C {keya:1.1f})," +
+      "(v2)-[e2:B {keya:1, keyb:2.23d, keyc:3.3d}]->(v3)," +
+      "(v3)-[e3:B {keya:2, keyb:7.2d}]->(v2)," +
+      "(v4)-[e4:C {keya:false}]->(v4)," +
+      "(v5)-[e5:C {keya:true, keyb:13}]->(v5)" +
+      "]");
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("single"));
+    checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
   }
 
   @Test
