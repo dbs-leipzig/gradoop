@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,8 @@ import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 import java.util.Set;
@@ -69,6 +71,11 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
    * Creates vertex data objects from the rows.
    */
   private final EPGMVertexFactory<V> vertexFactory;
+
+  /**
+   * An optional query to define predicates for the graph store.
+   */
+  private ElementQuery<HBaseElementFilter<V>> vertexQuery;
 
   /**
    * Creates a vertex handler.
@@ -158,6 +165,23 @@ public class HBaseVertexHandler<V extends EPGMVertex, E extends EPGMEdge>
   @Override
   public EPGMVertexFactory<V> getVertexFactory() {
     return vertexFactory;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public VertexHandler<V, E> applyQuery(ElementQuery<HBaseElementFilter<V>> query) {
+    this.vertexQuery = query;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ElementQuery<HBaseElementFilter<V>> getQuery() {
+    return this.vertexQuery;
   }
 
   /**

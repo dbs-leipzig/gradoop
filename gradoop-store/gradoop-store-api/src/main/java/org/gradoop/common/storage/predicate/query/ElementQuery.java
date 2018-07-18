@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.common.storage.predicate.query;
 
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -22,6 +21,7 @@ import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @see Query#elements()
  * @param <FilterImpl> filter implement type
  */
-public class ElementQuery<FilterImpl extends ElementFilter> {
+public class ElementQuery<FilterImpl extends ElementFilter> implements Serializable {
 
   /**
    * gradoop id range
