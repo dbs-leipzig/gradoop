@@ -79,8 +79,11 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
     String outDegreePropertyName = VertexDegree.OUT.getName();
     String maxDegree = "_maxDegree";
 
-    graph = new DistinctVertexDegrees(degreePropertyName, inDegreePropertyName,
-      outDegreePropertyName, true).execute(graph);
+    graph = new DistinctVertexDegrees(
+      degreePropertyName,
+      inDegreePropertyName,
+      outDegreePropertyName,
+      true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .map(new VertexToDegreeMap(degreePropertyName))
@@ -88,12 +91,11 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
       .cross(graph.getVertices())
       .with(new AddMaxDegreeCrossFunction(maxDegree));
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
-      newVertices, graph.getEdges());
+    graph = graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 
-    newVertices = graph.getVertices()
-      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed, degreePropertyName,
-        maxDegree));
+    newVertices = graph.getVertices().filter(new NonUniformVertexRandomFilter<>(
+        sampleSize, randomSeed, degreePropertyName, maxDegree));
 
     newVertices = newVertices
       .map(new PropertyRemover<>(degreePropertyName))
@@ -103,16 +105,14 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
+      .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
       .join(newVertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
+      .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
-      newVertices, newEdges);
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
   /**

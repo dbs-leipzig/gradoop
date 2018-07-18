@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import java.util.Random;
 
 /**
- * Retains all vertices with degrees higher the degree threshold. Also creates a random value for
- * other vertices and retains those that are below the given threshold for sampleSize.
+ * Retains all vertices with degrees greater than the degree threshold.
+ * Also creates a random value for other vertices and retains those that are below the given
+ * threshold for sampleSize.
  *
  * @param <V> EPGM vertex type
  */

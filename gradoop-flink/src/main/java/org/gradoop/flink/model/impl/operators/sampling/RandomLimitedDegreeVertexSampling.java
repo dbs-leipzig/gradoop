@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.LimitedDegreeVe
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 
 /**
- * Computes a vertex sampling of the graph. Retains all vertices with a degree higher a given
+ * Computes a vertex sampling of the graph. Retains all vertices with a degree greater than a given
  * degree threshold and degree type. Also retains randomly chosen vertices with a degree smaller
  * or equal this threshold. Retains all edges which source- and target-vertices where chosen.
  */
@@ -118,28 +118,29 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-    graph = new DistinctVertexDegrees(VertexDegree.IN_OUT.getName(), VertexDegree.IN.getName(),
-      VertexDegree.OUT.getName(), true).execute(graph);
+    graph = new DistinctVertexDegrees(
+      VertexDegree.IN_OUT.getName(),
+      VertexDegree.IN.getName(),
+      VertexDegree.OUT.getName(),
+      true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
-      .filter(new LimitedDegreeVertexRandomFilter<>(sampleSize, randomSeed, degreeThreshold,
-        degreeType))
+      .filter(new LimitedDegreeVertexRandomFilter<>(
+        sampleSize, randomSeed, degreeThreshold, degreeType))
       .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
       .map(new PropertyRemover<>(VertexDegree.IN.getName()))
       .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
+      .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
       .join(newVertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
+      .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
-      newVertices, newEdges);
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
   /**

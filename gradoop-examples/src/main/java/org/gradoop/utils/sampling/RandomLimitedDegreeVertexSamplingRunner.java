@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
  * Runs {@link org.gradoop.flink.model.impl.operators.sampling.RandomLimitedDegreeVertexSampling}
  * for a given graph and writes the sampled output.
  */
-public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner implements
-  ProgramDescription {
+public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner implements ProgramDescription {
 
   /**
    * Runs the

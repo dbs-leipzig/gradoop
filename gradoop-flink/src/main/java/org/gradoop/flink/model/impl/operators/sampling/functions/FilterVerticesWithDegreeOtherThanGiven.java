@@ -46,19 +46,21 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DistinctVertexDegrees distinctVertexDegrees =
-      new DistinctVertexDegrees(VertexDegree.IN_OUT.getName(), VertexDegree.IN.getName(),
-        VertexDegree.OUT.getName(), true);
+    DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
+      VertexDegree.IN_OUT.getName(),
+      VertexDegree.IN.getName(),
+      VertexDegree.OUT.getName(),
+      true);
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
 
-    newVertices = newVertices
-      .filter(new VertexWithDegreeFilter<>(degree, VertexDegree.IN_OUT.getName()))
+    newVertices = newVertices.filter(
+      new VertexWithDegreeFilter<>(degree, VertexDegree.IN_OUT.getName()))
       .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
       .map(new PropertyRemover<>(VertexDegree.IN.getName()))
       .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
-      newVertices, graph.getEdges());
+    return graph.getConfig().getLogicalGraphFactory().fromDataSets(
+      graph.getGraphHead(), newVertices, graph.getEdges());
   }
 
   /**
