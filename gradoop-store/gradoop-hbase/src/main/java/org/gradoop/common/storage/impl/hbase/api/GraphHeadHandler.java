@@ -19,6 +19,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 import java.util.Set;
@@ -103,4 +105,19 @@ public interface GraphHeadHandler<G extends EPGMGraphHead>
    * @return graph data factory
    */
   EPGMGraphHeadFactory<G> getGraphHeadFactory();
+
+  /**
+   * Applies the given ElementQuery to the handler.
+   *
+   * @param query the element query to apply
+   * @return the GraphHeadHandler instance with the query applied
+   */
+  GraphHeadHandler<G> applyQuery(ElementQuery<HBaseElementFilter<G>> query);
+
+  /**
+   * Returns the element query or {@code null}, if no query was applied before.
+   *
+   * @return the element query or {@code null}, if no query was applied before
+   */
+  ElementQuery<HBaseElementFilter<G>> getQuery();
 }

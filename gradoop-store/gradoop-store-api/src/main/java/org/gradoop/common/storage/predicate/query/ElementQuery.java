@@ -22,6 +22,7 @@ import org.gradoop.common.storage.predicate.filter.api.ElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
  * @see Query#elements()
  * @param <FilterImpl> filter implement type
  */
-public class ElementQuery<FilterImpl extends ElementFilter> {
+public class ElementQuery<FilterImpl extends ElementFilter> implements Serializable {
 
   /**
    * gradoop id range

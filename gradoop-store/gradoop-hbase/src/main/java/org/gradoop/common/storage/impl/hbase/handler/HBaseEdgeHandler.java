@@ -29,6 +29,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 
@@ -70,6 +72,11 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * Creates edge data objects from the rows.
    */
   private final EPGMEdgeFactory<E> edgeFactory;
+
+  /**
+   * An optional query to define predicates for the graph store.
+   */
+  private ElementQuery<HBaseElementFilter<E>> edgeQuery;
 
   /**
    * Creates an edge data handler.
@@ -159,6 +166,23 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   @Override
   public EPGMEdgeFactory<E> getEdgeFactory() {
     return edgeFactory;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query) {
+    this.edgeQuery = query;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ElementQuery<HBaseElementFilter<E>> getQuery() {
+    return this.edgeQuery;
   }
 
   /**
