@@ -13,12 +13,30 @@
     <artifactId>gradoop-store</artifactId>
     <packaging>pom</packaging>
     <name>Gradoop Store</name>
-    <description>Extended IO functionalities for NoSQL databases</description>
+    <description>Extended IO functionality for NoSQL databases</description>
 
     <modules>
         <module>gradoop-store-api</module>
         <module>gradoop-accumulo</module>
         <module>gradoop-hbase</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
