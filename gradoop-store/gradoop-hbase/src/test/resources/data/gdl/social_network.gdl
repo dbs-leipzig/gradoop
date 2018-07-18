@@ -17,7 +17,7 @@
 (frank)-[:hasInterest]->(hadoop)
 (dave)-[:hasInterest]->(hadoop)
 (gdbs)-[:hasModerator]->(alice)
-(gdbs)-[:hasMember]->(alice)
+(gdbs)-[:hasMember {status : "gold"}]->(alice)
 (gdbs)-[:hasMember]->(bob)
 
 (databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag]->(hadoop)

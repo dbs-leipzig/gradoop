@@ -23,8 +23,8 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
+import org.gradoop.common.storage.impl.hbase.api.FilterUtils;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 
 /**
  * Reads edge data from HBase.
@@ -33,7 +33,7 @@ import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
  * @param <E> EPGM edge type
  */
 public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
-  extends TableInputFormat<Tuple1<E>> {
+  extends TableInputFormat<Tuple1<E>> implements FilterUtils {
 
   /**
    * Handles reading of persistent edge data.
@@ -73,9 +73,7 @@ public class EdgeTableInputFormat<E extends EPGMEdge, V extends EPGMVertex>
 
       if (edgeHandler.getQuery().getQueryRanges() != null &&
         !edgeHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(edgeHandler.getQuery().getQueryRanges())
-        );
+        conjunctFilters.addFilter(getIdFilter(edgeHandler.getQuery().getQueryRanges()));
       }
 
       if (edgeHandler.getQuery().getFilterPredicate() != null) {

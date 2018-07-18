@@ -22,9 +22,9 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.storage.impl.hbase.api.FilterUtils;
 import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 
 /**
  * Reads vertex data from HBase.
@@ -33,7 +33,7 @@ import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
  * @param <E> EPGM edge type
  */
 public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
-  extends TableInputFormat<Tuple1<V>> {
+  extends TableInputFormat<Tuple1<V>> implements FilterUtils {
 
   /**
    * Handles reading of persistent vertex data.
@@ -73,9 +73,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
 
       if (vertexHandler.getQuery().getQueryRanges() != null &&
         !vertexHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(vertexHandler.getQuery().getQueryRanges())
-        );
+        conjunctFilters.addFilter(getIdFilter(vertexHandler.getQuery().getQueryRanges()));
       }
 
       if (vertexHandler.getQuery().getFilterPredicate() != null) {

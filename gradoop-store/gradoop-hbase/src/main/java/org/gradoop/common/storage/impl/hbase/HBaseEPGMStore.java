@@ -33,6 +33,7 @@ import org.gradoop.common.storage.api.EPGMGraphInput;
 import org.gradoop.common.storage.api.EPGMGraphPredictableOutput;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
+import org.gradoop.common.storage.impl.hbase.api.FilterUtils;
 import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
@@ -40,7 +41,6 @@ import org.gradoop.common.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseEdgeIterator;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseGraphIterator;
 import org.gradoop.common.storage.impl.hbase.iterator.HBaseVertexIterator;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.common.storage.iterator.ClosableIterator;
 import org.gradoop.common.storage.predicate.query.ElementQuery;
@@ -55,7 +55,7 @@ import java.io.IOException;
  *
  * @see EPGMGraphPredictableOutput
  */
-public class HBaseEPGMStore implements
+public class HBaseEPGMStore implements FilterUtils,
   EPGMConfigProvider<GradoopHBaseConfig>,
   EPGMGraphInput<PersistentGraphHead, PersistentVertex<Edge>, PersistentEdge<Vertex>>,
   EPGMGraphPredictableOutput<
@@ -257,7 +257,7 @@ public class HBaseEPGMStore implements
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
       if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
+        conjunctFilters.addFilter(getIdFilter(query.getQueryRanges()));
       }
 
       if (query.getFilterPredicate() != null) {
@@ -290,7 +290,7 @@ public class HBaseEPGMStore implements
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
       if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
+        conjunctFilters.addFilter(getIdFilter(query.getQueryRanges()));
       }
 
       if (query.getFilterPredicate() != null) {
@@ -323,7 +323,7 @@ public class HBaseEPGMStore implements
       FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
       if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
+        conjunctFilters.addFilter(getIdFilter(query.getQueryRanges()));
       }
 
       if (query.getFilterPredicate() != null) {

@@ -22,8 +22,8 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
+import org.gradoop.common.storage.impl.hbase.api.FilterUtils;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 
 /**
  * Reads graph data from HBase.
@@ -31,7 +31,7 @@ import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
  * @param <G> EPGM graph head type
  */
 public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
-  extends TableInputFormat<Tuple1<G>> {
+  extends TableInputFormat<Tuple1<G>> implements FilterUtils {
 
   /**
    * Handles reading of persistent graph data.
@@ -71,9 +71,7 @@ public class GraphHeadTableInputFormat<G extends EPGMGraphHead>
 
       if (graphHeadHandler.getQuery().getQueryRanges() != null &&
         !graphHeadHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(graphHeadHandler.getQuery().getQueryRanges())
-        );
+        conjunctFilters.addFilter(getIdFilter(graphHeadHandler.getQuery().getQueryRanges()));
       }
 
       if (graphHeadHandler.getQuery().getFilterPredicate() != null) {

@@ -39,6 +39,11 @@ public class GradoopHBaseTestBase {
   public static final Pattern PATTERN_VERTEX = Pattern.compile("^(Per|Ta).*");
   public static final Pattern PATTERN_EDGE = Pattern.compile("^has.*");
 
+  public static final String PROP_AGE = "age";
+  public static final String PROP_SINCE = "since";
+  public static final String PROP_CITY = "city";
+  public static final String PROP_VERTEX_COUNT = "vertexCount";
+
   //----------------------------------------------------------------------------
   // Cluster related
   //----------------------------------------------------------------------------

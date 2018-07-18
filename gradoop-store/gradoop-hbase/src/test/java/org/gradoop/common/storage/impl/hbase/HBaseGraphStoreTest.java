@@ -31,6 +31,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
 import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
@@ -41,8 +42,11 @@ import org.gradoop.common.storage.impl.hbase.factory.HBaseGraphHeadFactory;
 import org.gradoop.common.storage.impl.hbase.factory.HBaseVertexFactory;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThan;
 import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.common.utils.HBaseFilters;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -429,19 +433,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_FORUM)))
+        .where(HBaseFilters.labelIn(LABEL_FORUM)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
+        .where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM)))
+        .where(HBaseFilters.labelIn(LABEL_TAG, LABEL_FORUM)))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(testGraphs, graphHeadResult);
@@ -475,19 +479,130 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_GRAPH)))
+        .where(HBaseFilters.labelReg(PATTERN_GRAPH)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_EDGE)))
+        .where(HBaseFilters.labelReg(PATTERN_EDGE)))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_VERTEX)))
+        .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(testGraphs, graphHeadResult);
+    validateEPGMElementCollections(testVertices, vertexResult);
+    validateEPGMElementCollections(testEdges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBasePropEquals} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithPropEqualsPredicate() throws IOException {
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2013);
+    PropertyValue propertyValueCity = PropertyValue.create("Leipzig");
+
+    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+      .stream()
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
+      .collect(Collectors.toList());
+
+    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+      .stream()
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).equals(propertyValueSince))
+      .collect(Collectors.toList());
+
+    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+      .stream()
+      .filter(v -> v.hasProperty(PROP_CITY))
+      .filter(v -> v.getPropertyValue(PROP_CITY).equals(propertyValueCity))
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(testGraphs, graphHeadResult);
+    validateEPGMElementCollections(testVertices, vertexResult);
+    validateEPGMElementCollections(testEdges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBasePropLargerThan} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithPropLargerThanPredicate() throws IOException {
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2014);
+    PropertyValue propertyValueAge = PropertyValue.create(30);
+
+    // Extract parts of social graph to filter for
+    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+      .stream()
+      // graph with property "vertexCount" and value >= 3
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).compareTo(propertyValueVertexCount) >= 0)
+      .collect(Collectors.toList());
+
+    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+      .stream()
+      // edge with property "since" and value > 2014
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).compareTo(propertyValueSince) > 0)
+      .collect(Collectors.toList());
+
+    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+      .stream()
+      // vertex with property "age" and value > 30
+      .filter(v -> v.hasProperty(PROP_AGE))
+      .filter(v -> v.getPropertyValue(PROP_AGE).compareTo(propertyValueAge) > 0)
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_VERTEX_COUNT,
+          propertyValueVertexCount, true)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false)))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(testGraphs, graphHeadResult);
