@@ -456,6 +456,9 @@
                             <exclude>src/main/resources/**</exclude>
                             <exclude>**/dev-support/**</exclude>
                         </excludes>
+                        <mapping>
+                            <java>SLASHSTAR_STYLE</java>
+                        </mapping>
                     </configuration>
                     <executions>
                         <execution>
