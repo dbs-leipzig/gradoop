@@ -67,13 +67,14 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * Parses the given property values according to the meta data associated with the specified
    * label.
    *
+   * @param type element type
    * @param label element label
    * @param propertyValueString string representation of elements' property values
    * @return parsed properties
    */
-  Properties parseProperties(String label, String propertyValueString) {
+  Properties parseProperties(String type, String label, String propertyValueString) {
     String[] propertyValues = propertyValueString.split(valueDelimiter);
-    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(label);
+    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(type, label);
     properties.clear();
     for (int i = 0; i < propertyValues.length; i++) {
       if (propertyValues[i].length() > 0) {
