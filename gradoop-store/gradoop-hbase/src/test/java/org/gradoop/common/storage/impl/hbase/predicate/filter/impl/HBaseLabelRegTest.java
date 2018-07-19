@@ -21,11 +21,12 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
 import org.junit.Test;
 
 import static org.gradoop.GradoopHBaseTestBase.PATTERN_VERTEX;
-import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.CF_META;
-import static org.gradoop.common.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
+import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
+import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
 import static org.junit.Assert.assertEquals;
 
 /**

@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 
 import java.math.BigDecimal;
 
