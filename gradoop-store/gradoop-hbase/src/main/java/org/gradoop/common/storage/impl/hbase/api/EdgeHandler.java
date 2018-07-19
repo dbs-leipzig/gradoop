@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,8 @@ import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 
@@ -78,4 +80,19 @@ public interface EdgeHandler extends GraphElementHandler {
    * @return edge data contained in the given result
    */
   Edge readEdge(final Result res);
+
+  /**
+   * Applies the given ElementQuery to the handler.
+   *
+   * @param query the element query to apply
+   * @return the EdgeHandler instance with the query applied
+   */
+  EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query);
+
+  /**
+   * Returns the element query or {@code null}, if no query was applied before.
+   *
+   * @return the element query or {@code null}, if no query was applied before
+   */
+  ElementQuery<HBaseElementFilter<E>> getQuery();
 }

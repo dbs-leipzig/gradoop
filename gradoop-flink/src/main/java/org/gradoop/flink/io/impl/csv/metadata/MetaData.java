@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.csv.metadata;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,23 +40,17 @@ import java.util.stream.Collectors;
  */
 public class MetaData {
   /**
-   * Mapping between an element label and its associated property meta data.
+   * Mapping between an entity tuple(type, label) to their associated property meta data.
    */
-  private Map<String, List<PropertyMetaData>> metaData;
-  /**
-   * Mapping between an label and its type.
-   */
-  private Map<String, String> labelType;
+  private Map<Tuple2<String, String>, List<PropertyMetaData>> metaData;
 
   /**
    * Constructor
    *
-   * @param metaData contains entity label and its property strings
-   * @param labelType contains entity label and its type
+   * @param metaData contains entity tuple(type, label) and its property strings
    */
-  MetaData(Map<String, List<PropertyMetaData>> metaData, Map<String, String> labelType) {
+  MetaData(Map<Tuple2<String, String>, List<PropertyMetaData>> metaData) {
     this.metaData = metaData;
-    this.labelType = labelType;
   }
 
   /**
@@ -104,8 +100,9 @@ public class MetaData {
    * @return vertex labels
    */
   public Set<String> getVertexLabels() {
-    return labelType.keySet().stream()
-      .filter(l -> labelType.get(l).equals(CSVConstants.VERTEX_TYPE))
+    return metaData.keySet().stream()
+      .filter(key -> key.f0.equals(CSVConstants.VERTEX_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
@@ -115,18 +112,20 @@ public class MetaData {
    * @return edge labels
    */
   public Set<String> getEdgeLabels() {
-    return labelType.keySet().stream()
-      .filter(l -> labelType.get(l).equals(CSVConstants.EDGE_TYPE))
+    return metaData.keySet().stream()
+      .filter(key -> key.f0.equals(CSVConstants.EDGE_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
   /**
-   * Returns the property meta data associated with the specified label.
+   * Returns the property meta data associated with the specified label and type.
    *
+   * @param type element type
    * @param label element label
    * @return property meta data for the element
    */
-  public List<PropertyMetaData> getPropertyMetaData(String label) {
-    return metaData.get(label);
+  public List<PropertyMetaData> getPropertyMetaData(String type, String label) {
+    return metaData.getOrDefault(new Tuple2<>(type, label), new ArrayList<>());
   }
 }

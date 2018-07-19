@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 
@@ -52,6 +54,11 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * Creates graph data objects from the rows.
    */
   private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+
+  /**
+   * An optional query to define predicates for the graph store.
+   */
+  private ElementQuery<HBaseElementFilter<G>> graphQuery;
 
   /**
    * Creates a graph handler.
@@ -98,5 +105,22 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
       e.printStackTrace();
     }
     return graphHead;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphHeadHandler<G> applyQuery(ElementQuery<HBaseElementFilter<G>> query) {
+    this.graphQuery = query;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ElementQuery<HBaseElementFilter<G>> getQuery() {
+    return this.graphQuery;
   }
 }

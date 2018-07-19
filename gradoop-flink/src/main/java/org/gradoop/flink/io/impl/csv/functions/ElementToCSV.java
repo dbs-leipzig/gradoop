@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,10 +56,11 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * Returns the concatenated property values of the specified element according to the meta data.
    *
    * @param element EPGM element
+   * @param type element type
    * @return property value string
    */
-  String getPropertyString(E element) {
-    return metaData.getPropertyMetaData(element.getLabel()).stream()
+  String getPropertyString(E element, String type) {
+    return metaData.getPropertyMetaData(type, element.getLabel()).stream()
       .map(propertyMetaData -> this.getPropertyValueString(propertyMetaData, element))
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
   }

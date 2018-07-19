@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.common.storage.predicate.query.ElementQuery;
 
 import java.io.IOException;
 
@@ -63,6 +65,11 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * Creates edge data objects from the rows.
    */
   private final EPGMEdgeFactory<Edge> edgeFactory;
+
+  /**
+   * An optional query to define predicates for the graph store.
+   */
+  private ElementQuery<HBaseElementFilter<E>> edgeQuery;
 
   /**
    * Creates an edge data handler.
@@ -144,5 +151,22 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     }
 
     return edge;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query) {
+    this.edgeQuery = query;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ElementQuery<HBaseElementFilter<E>> getQuery() {
+    return this.edgeQuery;
   }
 }
