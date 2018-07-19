@@ -33,10 +33,10 @@ public class AccumuloPropReg<T extends EPGMElement>
   implements AccumuloElementFilter<T> {
 
   /**
-   * Create a new label regex filter
+   * Create a new property value regex filter. Only usable with String type of PropertyValue.
    *
    * @param key property key
-   * @param reg label regex
+   * @param reg property value regex
    */
   public AccumuloPropReg(
     @Nonnull String key,

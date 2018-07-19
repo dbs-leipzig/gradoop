@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase.predicate.filter;
+package org.gradoop.common.storage.impl.hbase.api;
 
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
@@ -26,8 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 /**
  * Utility class for common HBase filter tasks
  */
-public class HBaseFilterUtils {
-
+public interface FilterUtils {
   /**
    * Creates a HBase Filter object to return only graph elements that are equal to the given
    * GradoopIds.
@@ -35,7 +34,7 @@ public class HBaseFilterUtils {
    * @param elementIds a set of graph element GradoopIds to filter
    * @return a HBase Filter object
    */
-  public static Filter getIdFilter(GradoopIdSet elementIds) {
+  default Filter getIdFilter(GradoopIdSet elementIds) {
     FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
 
     for (GradoopId gradoopId : elementIds) {

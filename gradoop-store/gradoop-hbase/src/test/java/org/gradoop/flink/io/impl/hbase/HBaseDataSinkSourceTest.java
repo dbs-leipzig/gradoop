@@ -17,20 +17,23 @@ package org.gradoop.flink.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.GradoopHBaseTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.common.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.common.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.PersistentVertex;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThan;
 import org.gradoop.common.storage.predicate.query.Query;
+import org.gradoop.common.utils.HBaseFilters;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -289,17 +292,17 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_FORUM))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_FORUM))
     );
 
     // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER))
     );
 
     // Apply vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_TAG, LABEL_FORUM))
     );
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
@@ -342,19 +345,159 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // Define HBase source
     HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
 
-    // Apply empty graph predicate
+    // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_GRAPH))
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_GRAPH))
     );
 
-    // Apply empty edge predicate
+    // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_EDGE))
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_EDGE))
     );
 
-    // Apply empty vertex predicate
+    // Apply vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_VERTEX))
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_VERTEX))
+    );
+
+    assertTrue(hBaseDataSource.isFilterPushedDown());
+
+    GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
+
+    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+
+    validateEPGMElementCollections(testGraphs, loadedGraphHeads);
+    validateEPGMElementCollections(testVertices, loadedVertices);
+    validateEPGMGraphElementCollections(testVertices, loadedVertices);
+    validateEPGMElementCollections(testEdges, loadedEdges);
+    validateEPGMGraphElementCollections(testEdges, loadedEdges);
+  }
+
+  /**
+   * Test reading a graph collection from {@link HBaseDataSource}
+   * with a {@link HBasePropEquals} predicate on each graph element
+   */
+  @Test
+  public void testReadWithPropEqualsPredicate() throws Exception {
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    HBaseEPGMStore epgmStore = createEmptyEPGMStore(getExecutionEnvironment());
+
+    writeSocialGraphToStore(epgmStore);
+
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2013);
+    PropertyValue propertyValueCity = PropertyValue.create("Leipzig");
+
+    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+      .stream()
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
+      .collect(Collectors.toList());
+
+    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+      .stream()
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).equals(propertyValueSince))
+      .collect(Collectors.toList());
+
+    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+      .stream()
+      .filter(v -> v.hasProperty(PROP_CITY))
+      .filter(v -> v.getPropertyValue(PROP_CITY).equals(propertyValueCity))
+      .collect(Collectors.toList());
+
+    // Define HBase source
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
+
+    // Apply graph predicate
+    hBaseDataSource = hBaseDataSource.applyGraphPredicate(
+      Query.elements().fromAll()
+        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount))
+    );
+
+    // Apply edge predicate
+    hBaseDataSource = hBaseDataSource.applyEdgePredicate(
+      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince))
+    );
+
+    // Apply vertex predicate
+    hBaseDataSource = hBaseDataSource.applyVertexPredicate(
+      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity))
+    );
+
+    assertTrue(hBaseDataSource.isFilterPushedDown());
+
+    GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
+
+    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+
+    validateEPGMElementCollections(testGraphs, loadedGraphHeads);
+    validateEPGMElementCollections(testVertices, loadedVertices);
+    validateEPGMGraphElementCollections(testVertices, loadedVertices);
+    validateEPGMElementCollections(testEdges, loadedEdges);
+    validateEPGMGraphElementCollections(testEdges, loadedEdges);
+
+    epgmStore.close();
+  }
+
+  /**
+   * Test reading a graph collection from {@link HBaseDataSource}
+   * with a {@link HBasePropLargerThan} predicate on each graph element
+   */
+  @Test
+  public void testReadWithPropLargerThanPredicate() throws Exception {
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2014);
+    PropertyValue propertyValueAge = PropertyValue.create(30);
+
+    // Extract parts of social graph to filter for
+    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+      .stream()
+      // graph with property "vertexCount" and value >= 3
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).compareTo(propertyValueVertexCount) >= 0)
+      .collect(Collectors.toList());
+
+    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+      .stream()
+      // edge with property "since" and value > 2014
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).compareTo(propertyValueSince) > 0)
+      .collect(Collectors.toList());
+
+    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+      .stream()
+      // vertex with property "age" and value > 30
+      .filter(v -> v.hasProperty(PROP_AGE))
+      .filter(v -> v.getPropertyValue(PROP_AGE).compareTo(propertyValueAge) > 0)
+      .collect(Collectors.toList());
+
+    // Define HBase source
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
+
+    // Apply graph predicate
+    hBaseDataSource = hBaseDataSource.applyGraphPredicate(
+      Query.elements().fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_VERTEX_COUNT,
+          propertyValueVertexCount, true))
+    );
+
+    // Apply edge predicate
+    hBaseDataSource = hBaseDataSource.applyEdgePredicate(
+      Query.elements().fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false))
+    );
+
+    // Apply vertex predicate
+    hBaseDataSource = hBaseDataSource.applyVertexPredicate(
+      Query.elements().fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false))
     );
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
@@ -393,10 +536,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     new HBaseDataSink(epgmStore, config).write(epgmStore
       .getConfig()
       .getGraphCollectionFactory()
-      .fromCollections(
-        loader.getGraphHeads(),
-        loader.getVertices(),
-        loader.getEdges()));
+      .fromCollections(loader.getGraphHeads(), loader.getVertices(), loader.getEdges()));
 
     getExecutionEnvironment().execute();
 
