@@ -87,12 +87,12 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param query the element query to apply
    * @return the EdgeHandler instance with the query applied
    */
-  EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query);
+  EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<E>> getQuery();
+  ElementQuery<HBaseElementFilter<Edge>> getQuery();
 }

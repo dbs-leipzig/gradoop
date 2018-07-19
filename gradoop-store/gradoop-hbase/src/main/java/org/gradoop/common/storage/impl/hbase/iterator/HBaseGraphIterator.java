@@ -83,5 +83,4 @@ public class HBaseGraphIterator implements ClosableIterator<GraphHead> {
     return handler.readGraphHead(result);
   }
 
-
 }

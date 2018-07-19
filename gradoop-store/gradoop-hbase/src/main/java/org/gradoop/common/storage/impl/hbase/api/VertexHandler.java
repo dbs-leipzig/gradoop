@@ -19,7 +19,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.common.storage.predicate.query.ElementQuery;
 
@@ -54,12 +53,12 @@ public interface VertexHandler extends GraphElementHandler {
    * @param query the element query to apply
    * @return the VertexHandler instance with the query applied
    */
-  VertexHandler applyQuery(ElementQuery<HBaseElementFilter<V>> query);
+  VertexHandler applyQuery(ElementQuery<HBaseElementFilter<Vertex>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<V>> getQuery();
+  ElementQuery<HBaseElementFilter<Vertex>> getQuery();
 }

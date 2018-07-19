@@ -111,7 +111,7 @@ public class HBaseDataSource extends HBaseBase
 
     DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
       .createInput(
-        new GraphHeadTableInputFormat<>(
+        new GraphHeadTableInputFormat(
           config.getGraphHeadHandler().applyQuery(graphHeadQuery),
           store.getGraphHeadName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
@@ -119,7 +119,7 @@ public class HBaseDataSource extends HBaseBase
 
     DataSet<Vertex> vertices = config.getExecutionEnvironment()
       .createInput(
-        new VertexTableInputFormat<>(
+        new VertexTableInputFormat(
           config.getVertexHandler().applyQuery(vertexQuery),
           store.getVertexTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
@@ -127,7 +127,7 @@ public class HBaseDataSource extends HBaseBase
 
     DataSet<Edge> edges = config.getExecutionEnvironment()
       .createInput(
-        new EdgeTableInputFormat<>(
+        new EdgeTableInputFormat(
           config.getEdgeHandler().applyQuery(edgeQuery),
           store.getEdgeTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))

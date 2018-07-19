@@ -18,7 +18,6 @@ package org.gradoop.common.storage.impl.hbase;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.GradoopHBaseTestBase;
-import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -33,6 +32,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
+import org.gradoop.common.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
+import org.gradoop.common.storage.predicate.query.Query;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,14 +43,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.gradoop.common.GradoopTestUtils.*;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -181,15 +181,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   public void iteratorTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
 
-    List<Vertex> vertices = Lists.newArrayList(
-      GradoopTestUtils.getSocialNetworkLoader().getVertices()
-    );
-    List<Edge> edges = Lists.newArrayList(
-      GradoopTestUtils.getSocialNetworkLoader().getEdges()
-    );
-    List<GraphHead> graphHeads = Lists.newArrayList(
-      GradoopTestUtils.getSocialNetworkLoader().getGraphHeads()
-    );
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices());
+    List<Edge> edges = Lists.newArrayList(getSocialEdges());
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
 
     // write social graph to HBase
     for (GraphHead g : graphHeads) {
@@ -352,7 +346,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetGraphSpaceWithIdPredicate() throws IOException {
     // Fetch all graph heads from gdl file
-    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
     // Select only a subset
     graphHeads = graphHeads.subList(1, 2);
     // Extract the graph ids
@@ -375,7 +369,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetGraphSpaceWithoutIdPredicate() throws IOException {
     // Fetch all graph heads from gdl file
-    List<PersistentGraphHead> graphHeads = Lists.newArrayList(getSocialPersistentGraphHeads());
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
     // Query the graph store with an empty predicate
     List<GraphHead> queryResult = socialNetworkStore.getGraphSpace(
       Query.elements()
@@ -393,18 +387,18 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetElementSpaceWithLabelInPredicate() throws IOException {
     // Extract parts of social graph to filter for
-    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(e -> e.getLabel().equals(LABEL_FORUM))
       .collect(Collectors.toList());
 
-    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(
         e -> e.getLabel().equals(LABEL_HAS_MODERATOR) || e.getLabel().equals(LABEL_HAS_MEMBER))
       .collect(Collectors.toList());
 
-    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
       .collect(Collectors.toList());
@@ -428,9 +422,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
         .where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM)))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(testGraphs, graphHeadResult);
-    validateEPGMElementCollections(testVertices, vertexResult);
-    validateEPGMElementCollections(testEdges, edgeResult);
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
   }
 
   /**
@@ -440,17 +434,17 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetElementSpaceWithLabelRegPredicate() throws IOException {
     // Extract parts of social graph to filter for
-    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> PATTERN_GRAPH.matcher(g.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(v -> PATTERN_VERTEX.matcher(v.getLabel()).matches())
       .collect(Collectors.toList());
@@ -474,9 +468,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
         .where(new HBaseLabelReg<>(PATTERN_VERTEX)))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(testGraphs, graphHeadResult);
-    validateEPGMElementCollections(testVertices, vertexResult);
-    validateEPGMElementCollections(testEdges, edgeResult);
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
   }
 
   /**
@@ -485,7 +479,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetVertexSpaceWithIdPredicate() throws IOException {
     // Fetch all vertices from gdl file
-    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices());
     // Select only a subset
     vertices = vertices.subList(1, 5);
 
@@ -509,7 +503,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetVertexSpaceWithoutIdPredicate() throws IOException {
     // Fetch all vertices from gdl file
-    List<PersistentVertex<Edge>> vertices = Lists.newArrayList(getSocialPersistentVertices());
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices());
     // Query the graph store with an empty predicate
     List<Vertex> queryResult = socialNetworkStore.getVertexSpace(
       Query.elements()
@@ -526,7 +520,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetEdgeSpaceWithIdPredicate() throws IOException {
     // Fetch all edges from gdl file
-    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
+    List<Edge> edges = Lists.newArrayList(getSocialEdges());
     // Select only a subset
     edges = edges.subList(3, 8);
     // Extract the edge ids
@@ -549,7 +543,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void testGetEdgeSpaceWithoutIdPredicate() throws IOException {
     // Fetch all edges from gdl file
-    List<PersistentEdge<Vertex>> edges = Lists.newArrayList(getSocialPersistentEdges());
+    List<Edge> edges = Lists.newArrayList(getSocialEdges());
     // Query the graph store with an empty predicate
     List<Edge> queryResult = socialNetworkStore.getEdgeSpace(
       Query.elements()

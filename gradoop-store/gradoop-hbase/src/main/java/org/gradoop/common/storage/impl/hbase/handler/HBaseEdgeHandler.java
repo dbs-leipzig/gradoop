@@ -69,7 +69,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<E>> edgeQuery;
+  private ElementQuery<HBaseElementFilter<Edge>> edgeQuery;
 
   /**
    * Creates an edge data handler.
@@ -157,7 +157,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query) {
+  public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query) {
     this.edgeQuery = query;
     return this;
   }
@@ -166,7 +166,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public ElementQuery<HBaseElementFilter<E>> getQuery() {
+  public ElementQuery<HBaseElementFilter<Edge>> getQuery() {
     return this.edgeQuery;
   }
 }

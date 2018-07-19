@@ -53,12 +53,12 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param query the element query to apply
    * @return the GraphHeadHandler instance with the query applied
    */
-  GraphHeadHandler<G> applyQuery(ElementQuery<HBaseElementFilter<G>> query);
+  GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<GraphHead>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<G>> getQuery();
+  ElementQuery<HBaseElementFilter<GraphHead>> getQuery();
 }

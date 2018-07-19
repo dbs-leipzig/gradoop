@@ -83,5 +83,4 @@ public class HBaseVertexIterator implements ClosableIterator<Vertex> {
     return handler.readVertex(result);
   }
 
-
 }

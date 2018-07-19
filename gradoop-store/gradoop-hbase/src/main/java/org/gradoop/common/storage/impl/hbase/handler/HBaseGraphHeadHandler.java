@@ -58,7 +58,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<G>> graphQuery;
+  private ElementQuery<HBaseElementFilter<GraphHead>> graphQuery;
 
   /**
    * Creates a graph handler.
@@ -111,7 +111,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * {@inheritDoc}
    */
   @Override
-  public GraphHeadHandler<G> applyQuery(ElementQuery<HBaseElementFilter<G>> query) {
+  public GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<GraphHead>> query) {
     this.graphQuery = query;
     return this;
   }
@@ -120,7 +120,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * {@inheritDoc}
    */
   @Override
-  public ElementQuery<HBaseElementFilter<G>> getQuery() {
+  public ElementQuery<HBaseElementFilter<GraphHead>> getQuery() {
     return this.graphQuery;
   }
 }

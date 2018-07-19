@@ -19,10 +19,16 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopHBaseConfig;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.common.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
@@ -39,6 +45,10 @@ public class GradoopHBaseTestBase {
   public static final Pattern PATTERN_VERTEX = Pattern.compile("^(Per|Ta).*");
   public static final Pattern PATTERN_EDGE = Pattern.compile("^has.*");
 
+  private static Collection<GraphHead> socialGraphHeads;
+  private static Collection<Vertex> socialVertices;
+  private static Collection<Edge> socialEdges;
+
   //----------------------------------------------------------------------------
   // Cluster related
   //----------------------------------------------------------------------------
@@ -51,7 +61,7 @@ public class GradoopHBaseTestBase {
   /**
    * Starts the mini cluster for all tests.
    *
-   * @throws Exception
+   * @throws Exception if setting up HBase test cluster fails
    */
   public static void setUpHBase() throws Exception {
     if (utility == null) {
@@ -63,7 +73,7 @@ public class GradoopHBaseTestBase {
   /**
    * Stops the test cluster after the test.
    *
-   * @throws Exception
+   * @throws Exception if closing HBase test cluster fails
    */
   public static void tearDownHBase() throws Exception {
     if (utility != null) {
@@ -137,4 +147,73 @@ public class GradoopHBaseTestBase {
       prefix
     );
   }
+
+
+
+  //----------------------------------------------------------------------------
+  // Data generation
+  //----------------------------------------------------------------------------
+
+  /**
+   * Creates a collection of graph heads according to the social network test graph in
+   * gradoop/dev-support/social-network.pdf.
+   *
+   * @return collection of graph heads
+   * @throws IOException if fetching graph elements failed
+   */
+  public static Collection<GraphHead> getSocialGraphHeads() throws IOException {
+    if (socialGraphHeads == null) {
+      socialGraphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
+    }
+    return socialGraphHeads;
+  }
+
+  /**
+   * Creates a collection of vertices according to the social
+   * network test graph in gradoop/dev-support/social-network.pdf.
+   *
+   * @return collection of vertices
+   * @throws IOException if fetching graph elements failed
+   */
+  public static Collection<Vertex> getSocialVertices() throws IOException {
+    if (socialVertices == null) {
+      socialVertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
+    }
+    return socialVertices;
+  }
+
+  /**
+   * Creates a collection of edges according to the social
+   * network test graph in gradoop/dev-support/social-network.pdf.
+   *
+   * @return collection of edges
+   * @throws IOException if fetching graph elements failed
+   */
+  public static Collection<Edge> getSocialEdges() throws IOException {
+    if (socialEdges == null) {
+      socialEdges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
+    }
+    return socialEdges;
+  }
+
+  /**
+   * Writes the example social graph to the HBase store and flushes it.
+   *
+   * @param epgmStore the store instance to write to
+   * @throws IOException if writing to store fails
+   */
+  public static void writeSocialGraphToStore(HBaseEPGMStore epgmStore) throws IOException {
+    // write social graph to HBase
+    for (GraphHead g : getSocialGraphHeads()) {
+      epgmStore.writeGraphHead(g);
+    }
+    for (Vertex v : getSocialVertices()) {
+      epgmStore.writeVertex(v);
+    }
+    for (Edge e : getSocialEdges()) {
+      epgmStore.writeEdge(e);
+    }
+    epgmStore.flush();
+  }
+
 }

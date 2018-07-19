@@ -58,7 +58,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<V>> vertexQuery;
+  private ElementQuery<HBaseElementFilter<Vertex>> vertexQuery;
 
   /**
    * Creates a vertex handler.
@@ -112,7 +112,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public VertexHandler<V, E> applyQuery(ElementQuery<HBaseElementFilter<V>> query) {
+  public VertexHandler applyQuery(ElementQuery<HBaseElementFilter<Vertex>> query) {
     this.vertexQuery = query;
     return this;
   }
@@ -121,7 +121,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public ElementQuery<HBaseElementFilter<V>> getQuery() {
+  public ElementQuery<HBaseElementFilter<Vertex>> getQuery() {
     return this.vertexQuery;
   }
 }

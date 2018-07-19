@@ -17,7 +17,6 @@ package org.gradoop.flink.io.impl.hbase;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.GradoopHBaseTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -48,7 +47,6 @@ import java.util.stream.Collectors;
 import static org.gradoop.GradoopHBaseTestBase.*;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.gradoop.common.storage.impl.hbase.GradoopHBaseTestUtils.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -73,10 +71,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Before
   public void setUp() throws IOException {
-    epgmStore = openEPGMStore(
-      getExecutionEnvironment(),
-      "HBaseDataSinkSourceTest."
-    );
+    epgmStore = openEPGMStore(getExecutionEnvironment(), "HBaseDataSinkSourceTest.");
     writeSocialGraphToStore(epgmStore);
   }
 
@@ -108,11 +103,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(getSocialPersistentGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialPersistentEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialPersistentEdges(), loadedEdges);
+    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
+    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -146,11 +141,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(getSocialPersistentGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialPersistentEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialPersistentEdges(), loadedEdges);
+    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
+    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
 
   }
 
@@ -159,7 +154,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithGraphIdPredicate() throws Throwable {
-    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+    List<GraphHead> testGraphs = new ArrayList<>(getSocialGraphHeads())
       .subList(1, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -182,10 +177,10 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(testGraphs, loadedGraphHeads);
-    validateEPGMElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialPersistentEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialPersistentEdges(), loadedEdges);
+    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
+    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -193,7 +188,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithVertexIdPredicate() throws Throwable {
-    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+    List<Vertex> testVertices = new ArrayList<>(getSocialVertices())
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -216,11 +211,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(getSocialPersistentGraphHeads(), loadedGraphHeads);
+    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
     validateEPGMElementCollections(testVertices, loadedVertices);
     validateEPGMGraphElementCollections(testVertices, loadedVertices);
-    validateEPGMElementCollections(getSocialPersistentEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialPersistentEdges(), loadedEdges);
+    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
+    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -228,7 +223,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithEdgeIdPredicate() throws Throwable {
-    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+    List<Edge> testEdges = new ArrayList<>(getSocialEdges())
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -251,9 +246,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(getSocialPersistentGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialPersistentVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialPersistentVertices(), loadedVertices);
+    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
+    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
     validateEPGMElementCollections(testEdges, loadedEdges);
     validateEPGMGraphElementCollections(testEdges, loadedEdges);
   }
@@ -265,18 +260,18 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithLabelInPredicate() throws Exception {
     // Extract parts of social graph to filter for
-    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(e -> e.getLabel().equals(LABEL_FORUM))
       .collect(Collectors.toList());
 
-    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> (e.getLabel().equals(LABEL_HAS_MODERATOR) ||
         e.getLabel().equals(LABEL_HAS_MEMBER)))
       .collect(Collectors.toList());
 
-    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
       .collect(Collectors.toList());
@@ -307,11 +302,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(testGraphs, loadedGraphHeads);
-    validateEPGMElementCollections(testVertices, loadedVertices);
-    validateEPGMGraphElementCollections(testVertices, loadedVertices);
-    validateEPGMElementCollections(testEdges, loadedEdges);
-    validateEPGMGraphElementCollections(testEdges, loadedEdges);
+    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
+    validateEPGMElementCollections(vertices, loadedVertices);
+    validateEPGMGraphElementCollections(vertices, loadedVertices);
+    validateEPGMElementCollections(edges, loadedEdges);
+    validateEPGMGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -321,17 +316,17 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithLabelRegPredicate() throws Exception {
     // Extract parts of social graph to filter for
-    List<PersistentGraphHead> testGraphs = new ArrayList<>(getSocialPersistentGraphHeads())
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> PATTERN_GRAPH.matcher(g.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<PersistentEdge<Vertex>> testEdges = new ArrayList<>(getSocialPersistentEdges())
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<PersistentVertex<Edge>> testVertices = new ArrayList<>(getSocialPersistentVertices())
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(v -> PATTERN_VERTEX.matcher(v.getLabel()).matches())
       .collect(Collectors.toList());
@@ -362,11 +357,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(testGraphs, loadedGraphHeads);
-    validateEPGMElementCollections(testVertices, loadedVertices);
-    validateEPGMGraphElementCollections(testVertices, loadedVertices);
-    validateEPGMElementCollections(testEdges, loadedEdges);
-    validateEPGMGraphElementCollections(testEdges, loadedEdges);
+    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
+    validateEPGMElementCollections(vertices, loadedVertices);
+    validateEPGMGraphElementCollections(vertices, loadedVertices);
+    validateEPGMElementCollections(edges, loadedEdges);
+    validateEPGMGraphElementCollections(edges, loadedEdges);
   }
 
   /**

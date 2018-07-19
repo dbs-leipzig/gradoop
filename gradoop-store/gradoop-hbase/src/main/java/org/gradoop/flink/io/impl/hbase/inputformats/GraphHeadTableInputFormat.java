@@ -21,7 +21,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
