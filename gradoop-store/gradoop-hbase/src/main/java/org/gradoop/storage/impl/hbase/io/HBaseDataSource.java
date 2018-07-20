@@ -30,7 +30,6 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.impl.hbase.io.inputformats.EdgeTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.VertexTableInputFormat;
@@ -68,32 +67,28 @@ public class HBaseDataSource extends HBaseBase
    * Creates a new HBase data source.
    *
    * @param epgmStore HBase store
-   * @param config    Gradoop Flink configuration
    */
   public HBaseDataSource(
-    @Nonnull HBaseEPGMStore epgmStore,
-    @Nonnull GradoopFlinkConfig config
+    @Nonnull HBaseEPGMStore epgmStore
   ) {
-    this(epgmStore, config, null, null, null);
+    this(epgmStore, null, null, null);
   }
 
   /**
    * Private constructor to create a data source instance with predicates.
    *
    * @param epgmStore HBase store
-   * @param config Gradoop Flink configuration
    * @param graphHeadQuery A predicate to apply to graph head elements
    * @param vertexQuery A predicate to apply to vertices
    * @param edgeQuery A predicate to apply to edges
    */
   private HBaseDataSource(
     @Nonnull HBaseEPGMStore epgmStore,
-    @Nonnull GradoopFlinkConfig config,
     @Nullable ElementQuery<HBaseElementFilter<GraphHead>> graphHeadQuery,
     @Nullable ElementQuery<HBaseElementFilter<Vertex>> vertexQuery,
     @Nullable ElementQuery<HBaseElementFilter<Edge>> edgeQuery
   ) {
-    super(epgmStore, config);
+    super(epgmStore);
     this.graphHeadQuery = graphHeadQuery;
     this.vertexQuery = vertexQuery;
     this.edgeQuery = edgeQuery;
@@ -140,21 +135,21 @@ public class HBaseDataSource extends HBaseBase
   @Override
   public HBaseDataSource applyGraphPredicate(
     @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query) {
-    return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
+    return new HBaseDataSource(getStore(), query, vertexQuery, edgeQuery);
   }
 
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
     @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query) {
-    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
+    return new HBaseDataSource(getStore(), graphHeadQuery, query, edgeQuery);
   }
 
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
     @Nonnull ElementQuery<HBaseElementFilter<Edge>> query) {
-    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
+    return new HBaseDataSource(getStore(), graphHeadQuery, vertexQuery, query);
   }
 
   @Override

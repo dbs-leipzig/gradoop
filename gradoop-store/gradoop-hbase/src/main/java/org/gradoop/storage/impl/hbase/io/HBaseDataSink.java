@@ -21,7 +21,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.io.functions.BuildEdgeMutation;
 import org.gradoop.storage.impl.hbase.io.functions.BuildGraphHeadMutation;
@@ -39,10 +38,9 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
    * Creates a new HBase data sink.
    *
    * @param epgmStore store implementation
-   * @param config    Gradoop Flink configuration
    */
-  public HBaseDataSink(HBaseEPGMStore epgmStore, GradoopFlinkConfig config) {
-    super(epgmStore, config);
+  public HBaseDataSink(HBaseEPGMStore epgmStore) {
+    super(epgmStore);
   }
 
   @Override
@@ -57,7 +55,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+    write(getHBaseConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override

@@ -91,7 +91,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadFromSource() throws Exception {
     // read social graph from HBase via EPGMDatabase
-    GraphCollection collection = new HBaseDataSource(epgmStore, config).getGraphCollection();
+    GraphCollection collection = new HBaseDataSource(epgmStore).getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();
@@ -116,7 +116,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadFromSourceWithEmptyPredicates() throws Exception {
     // Define HBase source
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore);
 
     // Apply empty graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(Query.elements().fromAll().noFilter());
@@ -161,7 +161,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testGraphs.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    HBaseDataSource source = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource source = new HBaseDataSource(epgmStore);
 
     source = source.applyGraphPredicate(
       Query.elements()
@@ -195,7 +195,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testVertices.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    HBaseDataSource source = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource source = new HBaseDataSource(epgmStore);
 
     // Apply Vertex-Id predicate
     source = source.applyVertexPredicate(
@@ -230,7 +230,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testEdges.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    HBaseDataSource source = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource source = new HBaseDataSource(epgmStore);
 
     // Apply Edge-Id predicate
     source = source.applyEdgePredicate(
@@ -277,7 +277,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore);
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -332,7 +332,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, config);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore);
 
     // Apply empty graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -382,7 +382,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     loader.initDatabaseFromStream(inputStream);
 
-    new HBaseDataSink(epgmStore, config).write(epgmStore
+    new HBaseDataSink(epgmStore).write(epgmStore
       .getConfig()
       .getGraphCollectionFactory()
       .fromCollections(
