@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase;
+package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.gradoop.GradoopHBaseTestBase;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
@@ -34,7 +33,6 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
 import org.junit.AfterClass;

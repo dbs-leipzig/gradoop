@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop;
+package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
@@ -24,10 +24,10 @@ import org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest;
 import org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
 import org.gradoop.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
 import org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest;
-import org.gradoop.flink.io.impl.accumulo.IOBasicTest;
-import org.gradoop.flink.io.impl.accumulo.source.IOEdgePredicateTest;
-import org.gradoop.flink.io.impl.accumulo.source.IOGraphPredicateTest;
-import org.gradoop.flink.io.impl.accumulo.source.IOVertexPredicateTest;
+import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
+import org.gradoop.storage.impl.accumulo.io.source.IOEdgePredicateTest;
+import org.gradoop.storage.impl.accumulo.io.source.IOGraphPredicateTest;
+import org.gradoop.storage.impl.accumulo.io.source.IOVertexPredicateTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;

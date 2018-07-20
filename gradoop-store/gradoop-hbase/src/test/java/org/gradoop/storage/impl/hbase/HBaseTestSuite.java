@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop;
+package org.gradoop.storage.impl.hbase;
 
-import org.gradoop.common.storage.impl.hbase.HBaseGraphStoreTest;
-import org.gradoop.flink.io.impl.hbase.HBaseDataSinkSourceTest;
+import org.gradoop.storage.impl.hbase.io.HBaseDataSinkSourceTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

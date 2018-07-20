@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.accumulo.source;
+package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.AccumuloStoreTestBase;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.predicate.query.Query;

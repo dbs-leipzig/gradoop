@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase.predicate.filter.impl;
+package org.gradoop.storage.impl.hbase.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.junit.Test;
 
 import java.util.Arrays;

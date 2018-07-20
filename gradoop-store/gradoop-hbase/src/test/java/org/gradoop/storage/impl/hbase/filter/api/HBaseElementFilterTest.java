@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase.predicate.filter.api;
+package org.gradoop.storage.impl.hbase.filter.api;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;

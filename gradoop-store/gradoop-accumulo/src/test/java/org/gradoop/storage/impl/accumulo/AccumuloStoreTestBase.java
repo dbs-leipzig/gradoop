@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop;
+package org.gradoop.storage.impl.accumulo;
 
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 

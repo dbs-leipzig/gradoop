@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop;
+package org.gradoop.storage.impl.hbase;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;

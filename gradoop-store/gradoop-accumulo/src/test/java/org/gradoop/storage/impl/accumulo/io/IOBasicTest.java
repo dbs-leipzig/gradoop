@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.accumulo;
+package org.gradoop.storage.impl.accumulo.io;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.AccumuloTestSuite;
+import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;

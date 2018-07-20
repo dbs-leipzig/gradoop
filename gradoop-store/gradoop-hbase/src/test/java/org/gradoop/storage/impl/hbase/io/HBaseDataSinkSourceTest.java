@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.hbase;
+package org.gradoop.storage.impl.hbase.io;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -31,8 +31,6 @@ import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
-import org.gradoop.storage.impl.hbase.io.HBaseDataSink;
-import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -46,7 +44,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.GradoopHBaseTestBase.*;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.*;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertTrue;

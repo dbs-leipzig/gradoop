@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.storage.impl.hbase.predicate.filter.impl;
+package org.gradoop.storage.impl.hbase.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
@@ -21,10 +21,9 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
 import org.junit.Test;
 
-import static org.gradoop.GradoopHBaseTestBase.PATTERN_VERTEX;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
 import static org.junit.Assert.assertEquals;
