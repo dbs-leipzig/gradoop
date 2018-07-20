@@ -63,6 +63,37 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("g"));
   }
 
+  /**
+   * Test IndexedCSVDataSink to properly separate the metadata
+   * of edges and vertices using the same label.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testWriteWithSameLabel() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    // The properties are incompatible to get a conversion error
+    // if the metadata is not separated
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "single[" +
+      "(v1:A {keya:2})" +
+      "(v1)-[e1:A {keya:false}]->(v1)," +
+      "]" +
+      "multiple[" +
+      "(v2:B {keya:true, keyb:1, keyc:\"Foo\"})," +
+      "(v3:B {keya:false, keyb:2})," +
+      "(v4:C {keya:2.3f, keyb:\"Bar\"})," +
+      "(v5:C {keya:1.1f})," +
+      "(v2)-[e2:B {keya:1, keyb:2.23d, keyc:3.3d}]->(v3)," +
+      "(v3)-[e3:B {keya:2, keyb:7.2d}]->(v2)," +
+      "(v4)-[e4:C {keya:false}]->(v4)," +
+      "(v5)-[e5:C {keya:true, keyb:13}]->(v5)" +
+      "]");
+    checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("single"));
+    checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
+  }
+
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
