@@ -19,9 +19,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.gradoop.common.config.GradoopHBaseConfig;
-import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.common.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 
 import java.util.regex.Pattern;
 

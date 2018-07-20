@@ -18,12 +18,12 @@ package org.gradoop;
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.config.GradoopAccumuloConfig;
-import org.gradoop.common.storage.impl.accumulo.basic.StoreTest;
-import org.gradoop.common.storage.impl.accumulo.predicate.StoreBasicPredicateTest;
-import org.gradoop.common.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
-import org.gradoop.common.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
-import org.gradoop.common.storage.impl.accumulo.predicate.StorePropPredicateTest;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.impl.accumulo.basic.StoreTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest;
 import org.gradoop.flink.io.impl.accumulo.IOBasicTest;
 import org.gradoop.flink.io.impl.accumulo.source.IOEdgePredicateTest;
 import org.gradoop.flink.io.impl.accumulo.source.IOGraphPredicateTest;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-import static org.gradoop.common.config.GradoopAccumuloConfig.*;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.*;
 
 /**
  * gradoop accumulo test suit

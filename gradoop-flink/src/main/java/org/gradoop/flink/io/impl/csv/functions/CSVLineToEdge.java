@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
@@ -50,6 +51,6 @@ public class CSVLineToEdge extends CSVLineToElement<Edge> {
       tokens[3],
       GradoopId.fromString(tokens[1]),
       GradoopId.fromString(tokens[2]),
-      parseProperties(tokens[3], tokens[4]));
+      parseProperties(CSVConstants.EDGE_TYPE, tokens[3], tokens[4]));
   }
 }

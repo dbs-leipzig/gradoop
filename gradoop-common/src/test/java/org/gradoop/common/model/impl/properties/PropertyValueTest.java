@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
