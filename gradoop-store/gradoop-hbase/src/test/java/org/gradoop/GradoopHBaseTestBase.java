@@ -20,12 +20,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.config.GradoopHBaseConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.common.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 
 import java.io.IOException;
 import java.util.Collection;

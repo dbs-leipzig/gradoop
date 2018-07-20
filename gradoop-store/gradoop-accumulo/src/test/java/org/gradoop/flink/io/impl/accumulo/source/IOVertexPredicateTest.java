@@ -17,10 +17,10 @@ package org.gradoop.flink.io.impl.accumulo.source;
 
 import org.gradoop.AccumuloStoreTestBase;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.utils.AccumuloFilters;
-import org.gradoop.common.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
-import org.gradoop.common.storage.predicate.query.Query;
-import org.gradoop.flink.io.impl.accumulo.AccumuloDataSource;
+import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+import org.gradoop.storage.utils.AccumuloFilters;
+import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;

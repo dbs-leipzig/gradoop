@@ -16,11 +16,11 @@
 package org.gradoop;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.config.GradoopAccumuloConfig;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 
