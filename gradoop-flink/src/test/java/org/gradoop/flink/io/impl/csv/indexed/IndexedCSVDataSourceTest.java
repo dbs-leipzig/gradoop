@@ -42,7 +42,7 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testEmptyEdgeRead() throws Exception{
+  public void testEmptyEdgeRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
       .getResource("/data/csv/input_indexed_no_edges")
       .getFile();
@@ -57,6 +57,5 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("expectedEmptyEdges");
 
     collectAndAssertTrue(input.equalsByElementData(expected));
-
   }
 }
