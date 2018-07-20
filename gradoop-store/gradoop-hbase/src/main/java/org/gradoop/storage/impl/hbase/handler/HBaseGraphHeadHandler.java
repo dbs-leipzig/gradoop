@@ -21,16 +21,12 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
 
 import java.io.IOException;
 

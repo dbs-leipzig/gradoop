@@ -18,9 +18,6 @@ package org.gradoop.storage.impl.hbase.iterator;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.common.storage.iterator.ClosableIterator;
-import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 

@@ -18,12 +18,10 @@ package org.gradoop.storage.impl.hbase.api;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
-import org.gradoop.common.storage.predicate.query.ElementQuery;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
 import java.io.IOException;
 

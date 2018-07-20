@@ -25,15 +25,10 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
-import org.gradoop.common.storage.predicate.query.ElementQuery;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
 
 import java.io.IOException;
 

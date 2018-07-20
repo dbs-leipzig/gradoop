@@ -18,7 +18,6 @@ package org.gradoop.storage.impl.hbase.api;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;

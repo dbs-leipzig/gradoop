@@ -21,8 +21,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;

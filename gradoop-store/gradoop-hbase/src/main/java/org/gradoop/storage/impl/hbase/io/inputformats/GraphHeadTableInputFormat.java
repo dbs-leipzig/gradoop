@@ -19,15 +19,11 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
-import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.common.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 
 /**
  * Reads graph data from HBase.

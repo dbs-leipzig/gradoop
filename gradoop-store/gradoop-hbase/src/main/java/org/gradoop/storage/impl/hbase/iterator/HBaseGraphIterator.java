@@ -17,12 +17,9 @@ package org.gradoop.storage.impl.hbase.iterator;
 
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.common.storage.iterator.ClosableIterator;
 
 import java.util.Iterator;
 

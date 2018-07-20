@@ -19,9 +19,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
-import org.gradoop.common.storage.predicate.query.ElementQuery;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 
