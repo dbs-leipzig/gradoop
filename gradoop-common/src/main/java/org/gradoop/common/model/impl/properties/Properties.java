@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -206,6 +207,7 @@ public class Properties implements Iterable<Property>, Value, Serializable {
   }
 
   /**
+  /**
    * Returns the number of properties.
    *
    * @return number of properties
@@ -259,9 +261,18 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
   @Override
   public Iterator<Property> iterator() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()))
-      .collect(Collectors.toList()).iterator();
+    return toList().iterator();
+  }
+
+  /**
+   * Returns a list of properties.
+   *
+   * @return List of properties
+   */
+  public List<Property> toList() {
+    return  properties.entrySet().stream()
+            .map(e -> Property.create(e.getKey(), e.getValue()))
+            .collect(Collectors.toList());
   }
 
   @Override
@@ -292,8 +303,23 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
   @Override
   public String toString() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()).toString())
+    return toList().stream()
+      .map(Property::toString)
       .collect(Collectors.joining(","));
+  }
+
+  /**
+   * Returns the properties as a GDL formatted String.
+   *
+   * @return A GDL formatted string that represents the properties.
+   */
+  public String toGDLString() {
+    if (properties.isEmpty()) {
+      return "";
+    } else {
+      return toList().stream()
+        .map(Property::toGDLString)
+        .collect(Collectors.joining(",", "{", "}"));
+    }
   }
 }

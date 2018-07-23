@@ -33,6 +33,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Property implements Value, Serializable, Comparable<Property> {
 
   /**
+   * Suffix for GDL double representation.
+   */
+  private static final String DOUBLE_SUFFIX = "d";
+
+  /**
+   * Suffix for GDL float representation.
+   */
+  private static final String FLOAT_SUFFIX = "f";
+
+  /**
+   * Suffix for GDL long representation.
+   */
+  private static final String LONG_SUFFIX = "L";
+
+  /**
+   * GDL null representation.
+   */
+  private static final String NULL_STRING = "NULL";
+
+  /**
+   * GDL string prefix
+   */
+  private static final String STRING_PREFIX = "\"";
+
+  /**
+   * GDL string suffix
+   */
+  private static final String STRING_SUFFIX = "\"";
+
+  /**
    * Property key
    */
   private String key;
@@ -166,5 +196,31 @@ public class Property implements Value, Serializable, Comparable<Property> {
   public String toString() {
     return String.format("%s=%s:%s", key, value, value.getType() != null ?
       value.getType().getSimpleName() : "null");
+  }
+
+  /**
+   * Returns this property as a GDL formatted String.
+   * @return A GDL formatted string that represents the property.
+   */
+  public String toGDLString() {
+    StringBuilder result = new StringBuilder()
+      .append(key)
+      .append(":");
+
+    if (value.isString()) {
+      result.append(STRING_PREFIX).append(value.toString()).append(STRING_SUFFIX);
+    } else if (value.isNull()) {
+      result.append(NULL_STRING);
+    } else if (value.isDouble()) {
+      result.append(value.toString()).append(DOUBLE_SUFFIX);
+    } else if (value.isFloat()) {
+      result.append(value.toString()).append(FLOAT_SUFFIX);
+    } else if (value.isLong()) {
+      result.append(value.toString()).append(LONG_SUFFIX);
+    } else {
+      result.append(value.toString());
+    }
+
+    return result.toString();
   }
 }
