@@ -15,20 +15,17 @@
  */
 package org.gradoop.storage.impl.hbase.io.inputformats;
 
-import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
 
 /**
  * Reads edge data from HBase.
  */
-public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
+public class EdgeTableInputFormat extends BaseTableInputFormat<Edge> {
 
   /**
    * Handles reading of persistent edge data.
@@ -60,26 +57,10 @@ public class EdgeTableInputFormat extends TableInputFormat<Tuple1<Edge>> {
   @Override
   protected Scan getScanner() {
     Scan scan = new Scan();
-    scan.setCaching(HBaseConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
+    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (edgeHandler.getQuery() != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (edgeHandler.getQuery().getQueryRanges() != null &&
-        !edgeHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(edgeHandler.getQuery().getQueryRanges())
-        );
-      }
-
-      if (edgeHandler.getQuery().getFilterPredicate() != null) {
-        conjunctFilters.addFilter(edgeHandler.getQuery().getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(edgeHandler.getQuery(), scan);
     }
 
     return scan;

@@ -24,6 +24,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -57,7 +58,7 @@ import java.io.IOException;
  */
 public class HBaseEPGMStore implements
   EPGMConfigProvider<GradoopHBaseConfig>,
-  EPGMGraphInput<EPGMGraphHead, EPGMVertex, EPGMEdge>,
+  EPGMGraphInput,
   EPGMGraphPredictableOutput<
     HBaseElementFilter<GraphHead>,
     HBaseElementFilter<Vertex>,
@@ -252,22 +253,8 @@ public class HBaseEPGMStore implements
     scan.setCaching(cacheSize);
     scan.setMaxVersions(1);
 
-    // check if there is a predicate defined
     if (query != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
-      }
-
-      if (query.getFilterPredicate() != null) {
-        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(query, scan);
     }
 
     return new HBaseGraphIterator(graphHeadTable.getScanner(scan), config.getGraphHeadHandler());
@@ -287,20 +274,7 @@ public class HBaseEPGMStore implements
     scan.setMaxVersions(1);
 
     if (query != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
-      }
-
-      if (query.getFilterPredicate() != null) {
-        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(query, scan);
     }
 
     return new HBaseVertexIterator(vertexTable.getScanner(scan), config.getVertexHandler());
@@ -320,20 +294,7 @@ public class HBaseEPGMStore implements
     scan.setMaxVersions(1);
 
     if (query != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
-      }
-
-      if (query.getFilterPredicate() != null) {
-        conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(query, scan);
     }
 
     return new HBaseEdgeIterator(edgeTable.getScanner(scan), config.getEdgeHandler());
@@ -365,6 +326,33 @@ public class HBaseEPGMStore implements
     vertexTable.close();
     edgeTable.close();
     graphHeadTable.close();
+  }
+
+  /**
+   * Attach a HBase filter represented by the given query to the given scan instance.
+   *
+   * @param query the query that represents a filter
+   * @param scan the HBase scan instance on which the filter will be applied
+   * @param <T> the type of the EPGM element
+   */
+  private <T extends EPGMElement> void attachFilter(
+    @Nonnull ElementQuery<HBaseElementFilter<T>> query,
+    @Nonnull Scan scan
+  ) {
+    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+    if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
+      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
+    }
+
+    if (query.getFilterPredicate() != null) {
+      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+    }
+
+    // if there are filters inside the root list, add it to the Scan object
+    if (!conjunctFilters.getFilters().isEmpty()) {
+      scan.setFilter(conjunctFilters);
+    }
   }
 
 }

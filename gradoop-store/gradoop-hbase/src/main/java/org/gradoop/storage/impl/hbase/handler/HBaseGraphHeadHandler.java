@@ -77,8 +77,6 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_VERTICES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_EDGES));
     admin.createTable(tableDescriptor);
   }
 
@@ -97,14 +95,8 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    */
   @Override
   public GraphHead readGraphHead(final Result res) {
-    GraphHead graphHead = null;
-    try {
-      graphHead = graphHeadFactory
-        .initGraphHead(readId(res), readLabel(res), readProperties(res));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return graphHead;
+    return graphHeadFactory
+      .initGraphHead(readId(res), readLabel(res), readProperties(res));
   }
 
   /**

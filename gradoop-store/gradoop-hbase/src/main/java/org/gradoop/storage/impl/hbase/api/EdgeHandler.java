@@ -45,7 +45,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase {@link Result}
    * @return source vertex identifier
    */
-  GradoopId readSourceId(final Result res) throws IOException;
+  GradoopId readSourceId(final Result res);
 
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
@@ -62,7 +62,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase {@link Result}
    * @return target vertex identifier
    */
-  GradoopId readTargetId(final Result res) throws IOException;
+  GradoopId readTargetId(final Result res);
 
   /**
    * Writes the complete edge data to the given {@link Put} and returns it.

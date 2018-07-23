@@ -103,7 +103,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public GradoopId readSourceId(Result res) throws IOException {
+  public GradoopId readSourceId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));
   }
 
@@ -119,7 +119,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public GradoopId readTargetId(Result res) throws IOException {
+  public GradoopId readTargetId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));
   }
 
@@ -141,16 +141,9 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    */
   @Override
   public Edge readEdge(Result res) {
-    Edge edge = null;
-    try {
-      edge = edgeFactory
-        .initEdge(readId(res), readLabel(res), readSourceId(res),
-          readTargetId(res), readProperties(res), readGraphIds(res));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return edge;
+    return edgeFactory
+      .initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
+        readProperties(res), readGraphIds(res));
   }
 
   /**

@@ -46,5 +46,5 @@ public interface GraphElementHandler extends ElementHandler {
    * @param res HBase row
    * @return graphs identifiers
    */
-  GradoopIdSet readGraphIds(final Result res) throws IOException;
+  GradoopIdSet readGraphIds(final Result res);
 }

@@ -57,7 +57,7 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdSet readGraphIds(Result res) throws IOException {
+  public GradoopIdSet readGraphIds(Result res) {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
 
     GradoopIdSet graphIds;

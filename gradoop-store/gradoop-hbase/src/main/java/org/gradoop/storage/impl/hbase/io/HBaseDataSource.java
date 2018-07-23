@@ -105,26 +105,23 @@ public class HBaseDataSource extends HBaseBase
     HBaseEPGMStore store = getStore();
 
     DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
-      .createInput(
-        new GraphHeadTableInputFormat(
-          config.getGraphHeadHandler().applyQuery(graphHeadQuery),
-          store.getGraphHeadName()),
+      .createInput(new GraphHeadTableInputFormat(
+        config.getGraphHeadHandler().applyQuery(graphHeadQuery),
+        store.getGraphHeadName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Vertex> vertices = config.getExecutionEnvironment()
-      .createInput(
-        new VertexTableInputFormat(
-          config.getVertexHandler().applyQuery(vertexQuery),
-          store.getVertexTableName()),
+      .createInput(new VertexTableInputFormat(
+        config.getVertexHandler().applyQuery(vertexQuery),
+        store.getVertexTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Edge> edges = config.getExecutionEnvironment()
-      .createInput(
-        new EdgeTableInputFormat(
-          config.getEdgeHandler().applyQuery(edgeQuery),
-          store.getEdgeTableName()),
+      .createInput(new EdgeTableInputFormat(
+        config.getEdgeHandler().applyQuery(edgeQuery),
+        store.getEdgeTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))
       .map(new ValueOf1<>());
 

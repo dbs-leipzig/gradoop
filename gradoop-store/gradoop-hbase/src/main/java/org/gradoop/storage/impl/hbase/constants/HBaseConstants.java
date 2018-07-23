@@ -49,32 +49,11 @@ public final class HBaseConstants {
    */
   public static final String CF_PROPERTIES = "p";
   /**
-   * Column family name for vertices.
-   */
-  public static final String CF_VERTICES = "v";
-  /**
-   * Column family for edges.
-   */
-  public static final String CF_EDGES = "e";
-  /**
-   * Column family name for outgoing edges.
-   */
-  public static final String CF_OUT_EDGES = "oe";
-  /**
-   * Column family name for incoming edges.
-   */
-  public static final String CF_IN_EDGES = "ie";
-  /**
    * Column identifier for source vertex identifier.
    */
   public static final String COL_SOURCE = "s";
   /**
-   * Column identifier for target vertex identifier.s
+   * Column identifier for target vertex identifier.
    */
   public static final String COL_TARGET = "t";
-
-  /**
-   * Default cache size for scans in HBase.
-   */
-  public static final int HBASE_DEFAULT_SCAN_CACHE_SIZE = 500;
 }

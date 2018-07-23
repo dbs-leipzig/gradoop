@@ -78,7 +78,7 @@ import java.util.stream.Collectors;
  */
 public class AccumuloEPGMStore implements
   EPGMConfigProvider<GradoopAccumuloConfig>,
-  EPGMGraphInput<EPGMGraphHead, EPGMVertex, EPGMEdge>,
+  EPGMGraphInput,
   EPGMGraphPredictableOutput<
     AccumuloElementFilter<GraphHead>,
     AccumuloElementFilter<Vertex>,

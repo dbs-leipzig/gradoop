@@ -15,20 +15,17 @@
  */
 package org.gradoop.storage.impl.hbase.io.inputformats;
 
-import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
 
 /**
  * Reads vertex data from HBase.
  */
-public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
+public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
 
   /**
    * Handles reading of persistent vertex data.
@@ -60,26 +57,10 @@ public class VertexTableInputFormat extends TableInputFormat<Tuple1<Vertex>> {
   @Override
   protected Scan getScanner() {
     Scan scan = new Scan();
-    scan.setCaching(HBaseConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
+    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (vertexHandler.getQuery() != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (vertexHandler.getQuery().getQueryRanges() != null &&
-        !vertexHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(vertexHandler.getQuery().getQueryRanges())
-        );
-      }
-
-      if (vertexHandler.getQuery().getFilterPredicate() != null) {
-        conjunctFilters.addFilter(vertexHandler.getQuery().getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(vertexHandler.getQuery(), scan);
     }
 
     return scan;

@@ -77,8 +77,6 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_OUT_EDGES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_IN_EDGES));
     admin.createTable(tableDescriptor);
   }
 
@@ -98,14 +96,8 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    */
   @Override
   public Vertex readVertex(final Result res) {
-    Vertex vertex = null;
-    try {
-      vertex = vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
-        readGraphIds(res));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return vertex;
+    return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
+      readGraphIds(res));
   }
 
   /**

@@ -25,8 +25,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
 /**
- * Creates HBase {@link Mutation} from persistent vertex data using vertex
- * data handler.
+ * Creates HBase {@link Mutation} from vertex data using vertex data handler.
  */
 public class BuildVertexMutation extends RichMapFunction<Vertex, Tuple2<GradoopId, Mutation>> {
 

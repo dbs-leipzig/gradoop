@@ -44,12 +44,12 @@ public abstract class HBaseElementHandler implements ElementHandler {
   /**
    * Byte representation of the label column identifier.
    */
-  static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);
+  private static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);
 
   /**
    * Byte representation of the properties column family.
    */
-  static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(HBaseConstants.CF_PROPERTIES);
+  private static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(HBaseConstants.CF_PROPERTIES);
 
   /**
    * {@inheritDoc}
@@ -99,7 +99,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
    */
   @Override
   public Put writeProperties(final Put put, final EPGMElement entity) throws IOException {
-    if (entity.getPropertyCount() > 0) {
+    if (entity.getProperties() != null && entity.getPropertyCount() > 0) {
       for (Property property : entity.getProperties()) {
         writeProperty(put, property);
       }
@@ -119,14 +119,19 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Properties readProperties(final Result res) throws IOException {
+  public Properties readProperties(final Result res) {
     Properties properties = Properties.create();
-    Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
-    for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
-      properties.set(
-        readPropertyKey(propertyColumn.getKey()),
-        readPropertyValue(propertyColumn.getValue()));
+    try {
+      Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
+      for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
+        properties.set(
+          readPropertyKey(propertyColumn.getKey()),
+          readPropertyValue(propertyColumn.getValue()));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+
     return properties;
   }
 
