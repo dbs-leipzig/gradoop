@@ -20,6 +20,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
+import java.util.Map;
+
 /**
  * POJO Implementation of an EPGM edge.
  */
@@ -100,5 +102,19 @@ public class Edge extends GraphElement implements EPGMEdge {
   public String toString() {
     return String.format("(%s)-[%s]->(%s)",
       sourceId, super.toString(), targetId);
+  }
+
+  /**
+   * Returns a GDL formatted edge string.
+   * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl
+   *                       variable name
+   * @return A GDL formatted edge string.
+   */
+  public String toGDLString(Map<GradoopId, String> idToVertexName) {
+    return String.format("(%s)-[:%s%s]->(%s)",
+      idToVertexName.get(sourceId),
+      getLabel(),
+      getProperties().toGDLString(),
+      idToVertexName.get(targetId));
   }
 }

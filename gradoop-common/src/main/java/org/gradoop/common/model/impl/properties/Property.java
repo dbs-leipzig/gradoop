@@ -45,6 +45,16 @@ public class Property implements Value, Serializable, Comparable<Property> {
   private PropertyValue value;
 
   /**
+   * Identifiers to print different data types in GDL format.
+   */
+  private static final String STRING_PREFIX = "\"";
+  private static final String STRING_SUFFIX = "\"";;
+  private static final String DOUBLE_SUFFIX = "d";
+  private static final String FLOAT_SUFFIX = "f";
+  private static final String LONG_SUFFIX = "L";
+  private static final String NULL_STRING = "NULL";
+
+  /**
    * Creates a new property.
    */
   public Property() {
@@ -170,23 +180,29 @@ public class Property implements Value, Serializable, Comparable<Property> {
       value.getType().getSimpleName() : "null");
   }
 
+  /**
+   * Returns this property as a GDL formatted String.
+   * @return A GDL formatted string that represents the property.
+   */
   public String toGDLString() {
-    String result;
-// TODO string builder
+    StringBuilder result = new StringBuilder()
+      .append(key)
+      .append(":");
+
     if(value.isString()) {
-      result = key + ":\"" + value.toString() + "\"";
+      result.append(STRING_PREFIX).append(value.toString()).append(STRING_SUFFIX);
     } else if (value.isNull()) {
-      result = key + ":" + "NULL";
+      result.append(NULL_STRING);
     } else if (value.isDouble()) {
-      result = key + ":" + value.toString() + "d";
+      result.append(value.toString()).append(DOUBLE_SUFFIX);
     } else if (value.isFloat()) {
-      result = key + ":" + value.toString() + "f";
+      result.append(value.toString()).append(FLOAT_SUFFIX);
     } else if (value.isLong()) {
-      result = key + ":" + value.toString() + "L";
+      result.append(value.toString()).append(FLOAT_SUFFIX);
     } else {
-      result = key + ":" + value.toString();
+      result.append(value.toString());
     }
 
-    return result;
+    return result.toString();
   }
 }
