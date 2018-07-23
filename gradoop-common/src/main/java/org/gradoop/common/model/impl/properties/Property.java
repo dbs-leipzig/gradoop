@@ -15,9 +15,11 @@
  */
 package org.gradoop.common.model.impl.properties;
 
+import com.sun.xml.bind.v2.TODO;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -166,5 +168,25 @@ public class Property implements Value, Serializable, Comparable<Property> {
   public String toString() {
     return String.format("%s=%s:%s", key, value, value.getType() != null ?
       value.getType().getSimpleName() : "null");
+  }
+
+  public String toGDLString() {
+    String result;
+// TODO string builder
+    if(value.isString()) {
+      result = key + ":\"" + value.toString() + "\"";
+    } else if (value.isNull()) {
+      result = key + ":" + "NULL";
+    } else if (value.isDouble()) {
+      result = key + ":" + value.toString() + "d";
+    } else if (value.isFloat()) {
+      result = key + ":" + value.toString() + "f";
+    } else if (value.isLong()) {
+      result = key + ":" + value.toString() + "L";
+    } else {
+      result = key + ":" + value.toString();
+    }
+
+    return result;
   }
 }

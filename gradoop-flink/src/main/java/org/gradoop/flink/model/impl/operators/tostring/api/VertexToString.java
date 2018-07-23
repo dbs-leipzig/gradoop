@@ -21,7 +21,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**
  * string representation of a vertex
- * @param <V> graph head type
+ * @param <V> vertex type
  */
 public interface VertexToString<V extends Vertex>
   extends FlatMapFunction<V, VertexString> {

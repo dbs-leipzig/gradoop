@@ -21,10 +21,7 @@ import org.apache.flink.types.Value;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -259,9 +256,13 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
   @Override
   public Iterator<Property> iterator() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()))
-      .collect(Collectors.toList()).iterator();
+    return toList().iterator();
+  }
+
+  public List<Property> toList() {
+    return  properties.entrySet().stream()
+            .map(e -> Property.create(e.getKey(), e.getValue()))
+            .collect(Collectors.toList());
   }
 
   @Override
@@ -292,8 +293,14 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
   @Override
   public String toString() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()).toString())
-      .collect(Collectors.joining(","));
+      return toList().stream()
+        .map(Property::toString)
+        .collect(Collectors.joining(","));
+  }
+
+  public String toGDLString() {
+    return toList().stream()
+      .map(Property::toGDLString)
+      .collect(Collectors.joining(",", "{", "}"));
   }
 }

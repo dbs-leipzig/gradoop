@@ -770,4 +770,12 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
   }
+
+  public void print() throws Exception {
+    List<Vertex> vertices = getVertices().collect();
+    getVertices().print();
+    vertices.stream()
+            .map(v -> "(" + v.getId() + ":" + v.getLabel() + " " + v.getProperties().toGDLString() + ")")
+            .forEach(System.out::println);
+  }
 }
