@@ -762,7 +762,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Map<GradoopId, String> idToVertexName = new HashMap<>();
     for (int i = 0; i < vertices.size(); i++) {
       Vertex v = vertices.get(i);
-      String vName = String.format("v_%s_%s", v.getLabel(), i );
+      String vName = String.format("v_%s_%s", v.getLabel(), i);
       idToVertexName.put(v.getId(), vName);
     }
 

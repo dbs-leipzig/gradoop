@@ -15,11 +15,9 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import com.sun.xml.bind.v2.TODO;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,6 +33,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Property implements Value, Serializable, Comparable<Property> {
 
   /**
+   * Suffix for GDL double representation.
+   */
+  private static final String DOUBLE_SUFFIX = "d";
+
+  /**
+   * Suffix for GDL float representation.
+   */
+  private static final String FLOAT_SUFFIX = "f";
+
+  /**
+   * Suffix for GDL long representation.
+   */
+  private static final String LONG_SUFFIX = "L";
+
+  /**
+   * GDL null representation.
+   */
+  private static final String NULL_STRING = "NULL";
+
+  /**
+   * GDL string prefix
+   */
+  private static final String STRING_PREFIX = "\"";
+
+  /**
+   * GDL string suffix
+   */
+  private static final String STRING_SUFFIX = "\"";
+
+  /**
    * Property key
    */
   private String key;
@@ -43,16 +71,6 @@ public class Property implements Value, Serializable, Comparable<Property> {
    * Property value
    */
   private PropertyValue value;
-
-  /**
-   * Identifiers to print different data types in GDL format.
-   */
-  private static final String STRING_PREFIX = "\"";
-  private static final String STRING_SUFFIX = "\"";;
-  private static final String DOUBLE_SUFFIX = "d";
-  private static final String FLOAT_SUFFIX = "f";
-  private static final String LONG_SUFFIX = "L";
-  private static final String NULL_STRING = "NULL";
 
   /**
    * Creates a new property.
@@ -189,7 +207,7 @@ public class Property implements Value, Serializable, Comparable<Property> {
       .append(key)
       .append(":");
 
-    if(value.isString()) {
+    if (value.isString()) {
       result.append(STRING_PREFIX).append(value.toString()).append(STRING_SUFFIX);
     } else if (value.isNull()) {
       result.append(NULL_STRING);
@@ -198,7 +216,7 @@ public class Property implements Value, Serializable, Comparable<Property> {
     } else if (value.isFloat()) {
       result.append(value.toString()).append(FLOAT_SUFFIX);
     } else if (value.isLong()) {
-      result.append(value.toString()).append(FLOAT_SUFFIX);
+      result.append(value.toString()).append(LONG_SUFFIX);
     } else {
       result.append(value.toString());
     }
