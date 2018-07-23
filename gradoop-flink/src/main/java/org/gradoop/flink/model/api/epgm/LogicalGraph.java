@@ -66,8 +66,11 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
@@ -771,11 +774,44 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     dataSink.write(this);
   }
 
+  /**
+   * Prints the GDL formatted graph to the standard output.
+   *
+   * @throws Exception
+   */
   public void print() throws Exception {
     List<Vertex> vertices = getVertices().collect();
-    getVertices().print();
-    vertices.stream()
-            .map(v -> "(" + v.getId() + ":" + v.getLabel() + " " + v.getProperties().toGDLString() + ")")
-            .forEach(System.out::println);
+    List<Edge> edges = getEdges().collect();
+    GraphHead graphHead = getGraphHead().collect().get(0);
+
+    Map<GradoopId, String> idToVertexName = new HashMap<>();
+    for (int i = 0; i < vertices.size(); i++) {
+      Vertex v = vertices.get(i);
+      String vName = String.format("v_%s_%s", v.getLabel(), i);
+      idToVertexName.put(v.getId(), vName);
+    }
+
+    String vertexString =
+      vertices.stream()
+        .map(v -> v.toGDLString(idToVertexName.get(v.getId())))
+        .collect(Collectors.joining("\n"));
+
+    String edgeString = edges.stream()
+      .map(e -> e.toGDLString(idToVertexName))
+      .collect(Collectors.joining("\n"));
+
+    StringBuilder result = new StringBuilder()
+      .append("g")
+      .append(graphHead.getId())
+      .append(":")
+      .append(graphHead.getLabel())
+      .append(graphHead.getProperties().toGDLString())
+      .append("[\n")
+      .append(vertexString)
+      .append("\n")
+      .append(edgeString)
+      .append("\n]");
+
+    System.out.println(result);
   }
 }
