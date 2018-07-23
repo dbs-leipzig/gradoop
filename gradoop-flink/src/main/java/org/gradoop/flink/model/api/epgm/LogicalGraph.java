@@ -45,16 +45,13 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
+import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative
-  .ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser
-  .TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
@@ -78,19 +75,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.toIntExact;
-
 /**
  * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
  * encapsulates three concepts:
- * <p>
+ *
  * - a so-called graph head, that stores information about the graph (i.e. label and properties)
  * - a set of vertices assigned to the graph
  * - a set of directed, possibly parallel edges assigned to the graph
- * <p>
+ *
  * Furthermore, a logical graph provides operations that are performed on the underlying data. These
  * operations result in either another logical graph or in a {@link GraphCollection}.
- * <p>
+ *
  * A logical graph is wrapping a {@link LogicalGraphLayout} which defines, how the graph is
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
@@ -199,8 +194,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
-    return cypher(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
-      graphStatistics);
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
   /**
@@ -209,8 +204,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public GraphCollection cypher(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
-    return cypher(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
-      MatchStrategy.ISOMORPHISM, graphStatistics);
+    return cypher(query, constructionPattern, true,
+            MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
 
@@ -229,9 +224,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(
-      new CypherPatternMatching(query, constructionPattern, attachData, vertexStrategy,
-        edgeStrategy, graphStatistics));
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+            vertexStrategy, edgeStrategy, graphStatistics));
   }
 
   /**
@@ -255,13 +249,15 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection match(String pattern, boolean attachData, MatchStrategy matchStrategy,
-    TraverserStrategy traverserStrategy) {
+  public GraphCollection match(String pattern, boolean attachData,
+    MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
 
-    ExplorativePatternMatching op =
-      new ExplorativePatternMatching.Builder().setQuery(pattern).setAttachData(attachData)
-        .setMatchStrategy(matchStrategy).setTraverserStrategy(traverserStrategy)
-        .setTraverser(new DFSTraverser()).build();
+    ExplorativePatternMatching op = new ExplorativePatternMatching.Builder()
+      .setQuery(pattern)
+      .setAttachData(attachData)
+      .setMatchStrategy(matchStrategy)
+      .setTraverserStrategy(traverserStrategy)
+      .setTraverser(new DFSTraverser()).build();
 
     return callForCollection(op);
   }
@@ -278,12 +274,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph transform(TransformationFunction<GraphHead> graphHeadTransformationFunction,
+  public LogicalGraph transform(
+    TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
     TransformationFunction<Edge> edgeTransformationFunction) {
-    return callForGraph(
-      new Transformation(graphHeadTransformationFunction, vertexTransformationFunction,
-        edgeTransformationFunction));
+    return callForGraph(new Transformation(
+      graphHeadTransformationFunction,
+      vertexTransformationFunction,
+      edgeTransformationFunction));
   }
 
   @Override
@@ -299,7 +297,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   }
 
   @Override
-  public LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction) {
+  public LogicalGraph transformEdges(
+    TransformationFunction<Edge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
   }
 
@@ -307,7 +306,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph vertexInducedSubgraph(FilterFunction<Vertex> vertexFilterFunction) {
+  public LogicalGraph vertexInducedSubgraph(
+    FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
     return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
@@ -316,7 +316,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph edgeInducedSubgraph(FilterFunction<Edge> edgeFilterFunction) {
+  public LogicalGraph edgeInducedSubgraph(
+    FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
@@ -327,7 +328,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
-    return callForGraph(new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
+    return callForGraph(
+      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   /**
@@ -366,9 +368,10 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph groupBy(List<String> vertexGroupingKeys,
-    List<PropertyValueAggregator> vertexAggregateFunctions, List<String> edgeGroupingKeys,
-    List<PropertyValueAggregator> edgeAggregateFunctions, GroupingStrategy groupingStrategy) {
+  public LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy) {
 
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
     Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
@@ -394,8 +397,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph reduceOnEdges(EdgeAggregateFunction function,
-    Neighborhood.EdgeDirection edgeDirection) {
+  public LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
   }
 
@@ -403,8 +406,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph reduceOnNeighbors(VertexAggregateFunction function,
-    Neighborhood.EdgeDirection edgeDirection) {
+  public LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
   }
 
@@ -420,8 +423,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(String vertexLabel, String propertyKey,
-    DrillFunction function) {
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
     return drillUpVertex(vertexLabel, propertyKey, function, null);
   }
 
@@ -429,8 +432,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function,
-    String newPropertyKey) {
+  public LogicalGraph drillUpVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
     Objects.requireNonNull(function, "missing drill function");
@@ -471,8 +474,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function,
-    String newPropertyKey) {
+  public LogicalGraph drillUpEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
     Objects.requireNonNull(function, "missing drill function");
@@ -521,8 +524,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillDownVertex(String vertexLabel, String propertyKey,
-    DrillFunction function) {
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function) {
     return drillDownVertex(vertexLabel, propertyKey, function, null);
   }
 
@@ -530,8 +533,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillDownVertex(String vertexLabel, String propertyKey,
-    DrillFunction function, String newPropertyKey) {
+  public LogicalGraph drillDownVertex(
+    String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
 
@@ -591,8 +594,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillDownEdge(String edgeLabel, String propertyKey, DrillFunction function,
-    String newPropertyKey) {
+  public LogicalGraph drillDownEdge(
+    String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
 
@@ -648,7 +651,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToEmptyString(), new VertexToIdString(),
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
       new EdgeToIdString(), true).execute(this, other);
   }
 
@@ -657,7 +662,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToEmptyString(), new VertexToDataString(),
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
@@ -666,7 +673,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> equalsByData(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToDataString(), new VertexToDataString(),
+    return new GraphEquality(
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
@@ -694,7 +703,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs) {
+  public LogicalGraph callForGraph(GraphsToGraphOperator operator,
+    LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
   }
 
@@ -723,8 +733,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public DataSet<Boolean> isEmpty() {
-    return getVertices().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
+    return getVertices()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
       .map(new Not());
   }
 
