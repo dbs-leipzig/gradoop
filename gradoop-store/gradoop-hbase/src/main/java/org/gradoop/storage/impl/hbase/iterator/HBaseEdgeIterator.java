@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
@@ -77,7 +78,10 @@ public class HBaseEdgeIterator implements ClosableIterator<Edge> {
 
   @Override
   public Edge next() {
-    return handler.readEdge(result);
+    try {
+      return handler.readEdge(result);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
-
 }

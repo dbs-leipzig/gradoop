@@ -44,8 +44,9 @@ public interface GraphHeadHandler extends ElementHandler {
    *
    * @param res HBase row
    * @return graph entity
+   * @throws IOException if reading the result as {@link GraphHead} instance fails
    */
-  GraphHead readGraphHead(final Result res);
+  GraphHead readGraphHead(final Result res) throws IOException;
 
   /**
    * Applies the given ElementQuery to the handler.

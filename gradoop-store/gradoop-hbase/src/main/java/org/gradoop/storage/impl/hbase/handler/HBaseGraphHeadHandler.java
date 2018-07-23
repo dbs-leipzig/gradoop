@@ -94,7 +94,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * {@inheritDoc}
    */
   @Override
-  public GraphHead readGraphHead(final Result res) {
+  public GraphHead readGraphHead(final Result res) throws IOException {
     return graphHeadFactory
       .initGraphHead(readId(res), readLabel(res), readProperties(res));
   }

@@ -44,8 +44,9 @@ public interface VertexHandler extends GraphElementHandler {
    *
    * @param res HBase row
    * @return vertex data contained in the given result.
+   * @throws IOException if reading the result as {@link Vertex} instance fails
    */
-  Vertex readVertex(final Result res);
+  Vertex readVertex(final Result res) throws IOException;
 
   /**
    * Applies the given ElementQuery to the handler.

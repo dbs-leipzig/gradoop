@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 
+import java.io.IOException;
+
 /**
  * Reads graph data from HBase.
  */
@@ -80,6 +82,10 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat<GraphHead> {
    */
   @Override
   protected Tuple1<GraphHead> mapResultToTuple(Result result) {
-    return new Tuple1<>(graphHeadHandler.readGraphHead(result));
+    try {
+      return new Tuple1<>(graphHeadHandler.readGraphHead(result));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

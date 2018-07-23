@@ -140,7 +140,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public Edge readEdge(Result res) {
+  public Edge readEdge(Result res) throws IOException {
     return edgeFactory
       .initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
         readProperties(res), readGraphIds(res));

@@ -95,7 +95,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public Vertex readVertex(final Result res) {
+  public Vertex readVertex(final Result res) throws IOException {
     return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
       readGraphIds(res));
   }

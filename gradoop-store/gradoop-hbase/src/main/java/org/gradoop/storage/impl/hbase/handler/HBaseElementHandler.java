@@ -119,17 +119,14 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Properties readProperties(final Result res) {
+  public Properties readProperties(final Result res) throws IOException {
     Properties properties = Properties.create();
-    try {
-      Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
-      for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
-        properties.set(
-          readPropertyKey(propertyColumn.getKey()),
-          readPropertyValue(propertyColumn.getValue()));
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+
+    Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
+    for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
+      properties.set(
+        readPropertyKey(propertyColumn.getKey()),
+        readPropertyValue(propertyColumn.getValue()));
     }
 
     return properties;

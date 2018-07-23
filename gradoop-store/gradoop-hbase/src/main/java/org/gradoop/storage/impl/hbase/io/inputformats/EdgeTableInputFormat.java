@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 
+import java.io.IOException;
+
 /**
  * Reads edge data from HBase.
  */
@@ -79,6 +81,10 @@ public class EdgeTableInputFormat extends BaseTableInputFormat<Edge> {
    */
   @Override
   protected Tuple1<Edge> mapResultToTuple(Result result) {
-    return new Tuple1<>(edgeHandler.readEdge(result));
+    try {
+      return new Tuple1<>(edgeHandler.readEdge(result));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

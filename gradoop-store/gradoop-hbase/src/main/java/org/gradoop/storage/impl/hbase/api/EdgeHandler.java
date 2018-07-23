@@ -78,8 +78,9 @@ public interface EdgeHandler extends GraphElementHandler {
    *
    * @param res HBase row
    * @return edge data contained in the given result
+   * @throws IOException if reading the result as {@link Edge} instance fails
    */
-  Edge readEdge(final Result res);
+  Edge readEdge(final Result res) throws IOException;
 
   /**
    * Applies the given ElementQuery to the handler.

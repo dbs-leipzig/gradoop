@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
+import java.io.IOException;
+
 /**
  * Reads vertex data from HBase.
  */
@@ -79,6 +81,10 @@ public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
    */
   @Override
   protected Tuple1<Vertex> mapResultToTuple(Result result) {
-    return new Tuple1<>(vertexHandler.readVertex(result));
+    try {
+      return new Tuple1<>(vertexHandler.readVertex(result));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

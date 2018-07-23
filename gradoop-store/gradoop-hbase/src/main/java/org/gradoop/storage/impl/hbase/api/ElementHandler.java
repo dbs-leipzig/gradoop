@@ -102,8 +102,9 @@ public interface ElementHandler extends Serializable {
    *
    * @param res row result
    * @return all properties contained in the row
+   * @throws IOException if reading result to Properties failed
    */
-  Properties readProperties(final Result res);
+  Properties readProperties(final Result res) throws IOException;
 
   /**
    * Creates table based on the given table descriptor.
