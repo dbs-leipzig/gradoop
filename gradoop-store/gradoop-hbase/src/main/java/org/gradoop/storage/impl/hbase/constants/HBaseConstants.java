@@ -33,24 +33,6 @@ public final class HBaseConstants {
   public static final String DEFAULT_TABLE_EDGES = "edges";
 
   /**
-   * Default label for unlabeled vertices.
-   */
-  public static final String DEFAULT_VERTEX_LABEL = "";
-  /**
-   * Default label for unlabeled graphs.
-   */
-  public static final String DEFAULT_GRAPH_LABEL = "";
-  /**
-   * Default label for unlabeled edges.
-   */
-  public static final String DEFAULT_EDGE_LABEL = "";
-
-  /**
-   * String representation of {@code null}.
-   */
-  public static final String NULL_STRING = "NULL";
-
-  /**
    * Column family name for label.
    */
   public static final String CF_META = "m";
@@ -67,36 +49,11 @@ public final class HBaseConstants {
    */
   public static final String CF_PROPERTIES = "p";
   /**
-   * Column family name for vertices.
-   */
-  public static final String CF_VERTICES = "v";
-  /**
-   * Column family for edges.
-   */
-  public static final String CF_EDGES = "e";
-  /**
-   * Column family name for outgoing edges.
-   */
-  public static final String CF_OUT_EDGES = "oe";
-  /**
-   * Column family name for incoming edges.
-   */
-  public static final String CF_IN_EDGES = "ie";
-  /**
    * Column identifier for source vertex identifier.
    */
   public static final String COL_SOURCE = "s";
   /**
-   * Column identifier for target vertex identifier.s
+   * Column identifier for target vertex identifier.
    */
   public static final String COL_TARGET = "t";
-
-  /**
-   * Default cache size for scans in HBase.
-   */
-  public static final int HBASE_DEFAULT_SCAN_CACHE_SIZE = 500;
-  /**
-   * Default label of an EPGM database graph.
-   */
-  public static final String DB_GRAPH_LABEL = "_DB";
 }

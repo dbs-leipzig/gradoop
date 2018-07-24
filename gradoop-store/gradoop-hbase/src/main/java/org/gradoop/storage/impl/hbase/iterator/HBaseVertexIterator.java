@@ -17,17 +17,17 @@ package org.gradoop.storage.impl.hbase.iterator;
 
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * HBase client iterator for Graph Head
- * @param <V>
+ * HBase client iterator for Vertices
  */
-public class HBaseVertexIterator<V extends EPGMVertex> implements ClosableIterator<V> {
+public class HBaseVertexIterator implements ClosableIterator<Vertex> {
 
   /**
    * HBase result scanner
@@ -37,7 +37,7 @@ public class HBaseVertexIterator<V extends EPGMVertex> implements ClosableIterat
   /**
    * Gradoop graph head handler
    */
-  private final VertexHandler<V, ?> handler;
+  private final VertexHandler handler;
 
   /**
    * inner result iterator_
@@ -57,7 +57,7 @@ public class HBaseVertexIterator<V extends EPGMVertex> implements ClosableIterat
    */
   public HBaseVertexIterator(
     ResultScanner scanner,
-    VertexHandler<V, ?> handler
+    VertexHandler handler
   ) {
     this.scanner = scanner;
     this.handler = handler;
@@ -80,9 +80,12 @@ public class HBaseVertexIterator<V extends EPGMVertex> implements ClosableIterat
   }
 
   @Override
-  public V next() {
-    return handler.readVertex(result);
+  public Vertex next() {
+    try {
+      return handler.readVertex(result);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
-
 
 }

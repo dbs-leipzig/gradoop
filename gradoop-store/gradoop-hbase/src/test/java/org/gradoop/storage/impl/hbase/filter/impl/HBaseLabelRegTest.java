@@ -20,41 +20,34 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.common.predicate.filter.impl.LabelReg;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.junit.Test;
 
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
-
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
+import static org.junit.Assert.assertEquals;
 
 /**
- * HBase label regex predicate implementation
- *
- * @param <T> EPGM element type
+ * Test class for {@link HBaseLabelReg}
  */
-public class HBaseLabelReg<T extends EPGMElement> extends LabelReg<HBaseElementFilter<T>>
-  implements HBaseElementFilter<T> {
+public class HBaseLabelRegTest {
 
   /**
-   * Create a new LabelReg predicate
-   *
-   * @param reg label regex pattern
+   * Test the toHBaseFilter function
    */
-  public HBaseLabelReg(Pattern reg) {
-    super(reg);
-  }
+  @Test
+  public void testToHBaseFilter() {
 
-  @Nonnull
-  @Override
-  public Filter toHBaseFilter() {
-    return new SingleColumnValueFilter(
+    HBaseLabelReg<Vertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
+
+    Filter expectedFilter = new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_META),
       Bytes.toBytesBinary(COL_LABEL),
       CompareFilter.CompareOp.EQUAL,
-      new RegexStringComparator(getReg().pattern())
+      new RegexStringComparator(PATTERN_VERTEX.pattern())
     );
+
+    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
   }
 }

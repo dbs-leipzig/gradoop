@@ -58,7 +58,7 @@ public class HBasePropertyValueWrapper implements Writable {
    * byte 2 - end : value bytes
    *
    * @param dataOutput data output to write data to
-   * @throws IOException
+   * @throws IOException if writing to output fails
    */
   @Override
   public void write(DataOutput dataOutput) throws IOException {
