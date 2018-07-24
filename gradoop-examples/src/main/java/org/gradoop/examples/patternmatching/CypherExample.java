@@ -61,7 +61,7 @@ public class CypherExample {
 
     // run a Cypher query (vertex homomorphism, edge isomorphism)
     // the result is a graph collection containing all matching subgraphs
-    GraphCollection matches = socialNetwork.cypher(
+    GraphCollection matches = socialNetwork.query(
       "MATCH (u1:Person)<-[:hasModerator]-(f:Forum)" +
       "(u2:Person)<-[:hasMember]-(f)" +
       "WHERE u1.name = \"Alice\"", statistics);
