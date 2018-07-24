@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -180,7 +180,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * the data graph elements is attached to the resulting vertices.
    *
    * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
+   * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
    *
    * @param query Cypher query
@@ -194,7 +194,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * the data graph elements is attached to the resulting vertices.
    *
    * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
+   * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
    *
    * In addition, the operator can be supplied with a construction pattern allowing the creation
@@ -279,8 +279,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing matching subgraphs
    */
   GraphCollection query(String query, String constructionPattern, boolean attachData,
-                         MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-                        GraphStatistics graphStatistics);
+      MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
    * Creates a copy of the logical graph.

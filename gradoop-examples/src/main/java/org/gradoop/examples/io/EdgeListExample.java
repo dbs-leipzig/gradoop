@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,10 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.EdgeListDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -83,8 +87,14 @@ public class EdgeListExample implements ProgramDescription {
       });
 
     // do some analytics (e.g. match two-node cycles)
-    GraphCollection matches = logicalGraph
-      .query("MATCH (a:Node)-[:link]->(b:Node)-[:link]->(a)");
+    String query = "(a:Node)-[:link]->(b:Node)-[:link]->(a)";
+    ExplorativePatternMatching patternMatchingOperator = new ExplorativePatternMatching.Builder()
+      .setQuery(query)
+      .setAttachData(true)
+      .setMatchStrategy(MatchStrategy.ISOMORPHISM)
+      .setTraverserStrategy(TraverserStrategy.SET_PAIR_BULK_ITERATION)
+      .setTraverser(new DFSTraverser()).build();
+    GraphCollection matches = logicalGraph.callForCollection(patternMatchingOperator);
 
     // print number of matching subgraphs
     System.out.println(matches.getGraphHeads().count());
