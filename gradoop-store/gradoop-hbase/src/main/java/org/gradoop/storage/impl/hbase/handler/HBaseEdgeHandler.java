@@ -15,7 +15,6 @@
  */
 package org.gradoop.storage.impl.hbase.handler;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Admin;
@@ -24,13 +23,12 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentEdge;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
 
 import java.io.IOException;
 
@@ -46,13 +44,8 @@ import java.io.IOException;
  * |         |----------|------------|------------|--------|-------|
  * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
  * |---------|----------|------------|------------|--------|-------|
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
-  extends HBaseGraphElementHandler
-  implements EdgeHandler<E, V> {
+public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHandler {
 
   /**
    * serial version uid
@@ -71,19 +64,19 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<E>> edgeQuery;
+  private ElementQuery<HBaseElementFilter<Edge>> edgeQuery;
 
   /**
    * Creates an edge data handler.
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory<E> edgeFactory) {
+  public HBaseEdgeHandler(EPGMEdgeFactory<Edge> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -102,15 +95,15 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeSource(Put put, V vertexData) throws IOException {
-    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, createVertexIdentifier(vertexData));
+  public Put writeSource(final Put put, final GradoopId sourceId) {
+    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GradoopId readSourceId(Result res) throws IOException {
+  public GradoopId readSourceId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));
   }
 
@@ -118,15 +111,15 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeTarget(Put put, V vertexData) throws IOException {
-    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, createVertexIdentifier(vertexData));
+  public Put writeTarget(Put put, GradoopId targetId) {
+    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GradoopId readTargetId(Result res) throws IOException {
+  public GradoopId readTargetId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));
   }
 
@@ -134,10 +127,10 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, PersistentEdge<V> edgeData) throws IOException {
+  public Put writeEdge(Put put, EPGMEdge edgeData) throws IOException {
     writeLabel(put, edgeData);
-    writeSource(put, edgeData.getSource());
-    writeTarget(put, edgeData.getTarget());
+    writeSource(put, edgeData.getSourceId());
+    writeTarget(put, edgeData.getTargetId());
     writeProperties(put, edgeData);
     writeGraphIds(put, edgeData);
     return put;
@@ -147,32 +140,17 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public E readEdge(Result res) {
-    E edge = null;
-    try {
-      edge = edgeFactory
-        .initEdge(readId(res), readLabel(res), readSourceId(res),
-          readTargetId(res), readProperties(res), readGraphIds(res));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return edge;
+  public Edge readEdge(Result res) throws IOException {
+    return edgeFactory
+      .initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
+        readProperties(res), readGraphIds(res));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EPGMEdgeFactory<E> getEdgeFactory() {
-    return edgeFactory;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query) {
+  public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query) {
     this.edgeQuery = query;
     return this;
   }
@@ -181,24 +159,7 @@ public class HBaseEdgeHandler<E extends EPGMEdge, V extends EPGMVertex>
    * {@inheritDoc}
    */
   @Override
-  public ElementQuery<HBaseElementFilter<E>> getQuery() {
+  public ElementQuery<HBaseElementFilter<Edge>> getQuery() {
     return this.edgeQuery;
-  }
-
-  /**
-   * Serializes a vertex to a vertex identifier in the following format:
-   *
-   * <vertex-identifier> ::= <vertex-id><vertex-label>
-   *
-   * @param vertex vertex
-   * @return byte representation of the vertex identifier
-   */
-  private byte[] createVertexIdentifier(final V vertex) throws IOException {
-    byte[] vertexKeyBytes = vertex.getId().toByteArray();
-    byte[] labelBytes = Bytes.toBytes(vertex.getLabel());
-
-    ArrayUtils.addAll(vertexKeyBytes, labelBytes);
-
-    return vertexKeyBytes;
   }
 }

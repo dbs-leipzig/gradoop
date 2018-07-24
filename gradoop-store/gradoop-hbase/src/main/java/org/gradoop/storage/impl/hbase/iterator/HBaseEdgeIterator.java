@@ -17,17 +17,17 @@ package org.gradoop.storage.impl.hbase.iterator;
 
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
  * HBase client iterator for Edge
- * @param <E>
  */
-public class HBaseEdgeIterator<E extends EPGMEdge> implements ClosableIterator<E> {
+public class HBaseEdgeIterator implements ClosableIterator<Edge> {
 
   /**
    * HBase result scanner
@@ -35,12 +35,12 @@ public class HBaseEdgeIterator<E extends EPGMEdge> implements ClosableIterator<E
   private final ResultScanner scanner;
 
   /**
-   * Gradoop graph head handler
+   * Gradoop edge handler
    */
-  private final EdgeHandler<E, ?> handler;
+  private final EdgeHandler handler;
 
   /**
-   * inner result iterator_
+   * Inner result iterator
    */
   private final Iterator<Result> it;
 
@@ -55,10 +55,7 @@ public class HBaseEdgeIterator<E extends EPGMEdge> implements ClosableIterator<E
    * @param scanner HBase result scanner
    * @param handler element handler for gradoop
    */
-  public HBaseEdgeIterator(
-    ResultScanner scanner,
-    EdgeHandler<E, ?> handler
-  ) {
+  public HBaseEdgeIterator(ResultScanner scanner, EdgeHandler handler) {
     this.scanner = scanner;
     this.handler = handler;
     this.it = scanner.iterator();
@@ -80,8 +77,11 @@ public class HBaseEdgeIterator<E extends EPGMEdge> implements ClosableIterator<E
   }
 
   @Override
-  public E next() {
-    return handler.readEdge(result);
+  public Edge next() {
+    try {
+      return handler.readEdge(result);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
-
 }

@@ -21,14 +21,13 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.filter.impl.LabelIn;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-
 
 /**
  * HBase label equality predicate implementation

@@ -98,10 +98,11 @@ public interface ElementHandler extends Serializable {
   String readLabel(final Result res);
 
   /**
-   * Reads all properties from the given row {@link Result}..
+   * Reads all properties from the given row {@link Result}.
    *
    * @param res row result
    * @return all properties contained in the row
+   * @throws IOException if reading result to Properties failed
    */
   Properties readProperties(final Result res) throws IOException;
 

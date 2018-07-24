@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.accumulo.predicate;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.AccumuloStoreTestBase;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.utils.AccumuloFilters;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.junit.FixMethodOrder;
