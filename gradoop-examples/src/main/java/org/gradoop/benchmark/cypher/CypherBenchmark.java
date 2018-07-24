@@ -10,6 +10,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
+import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -125,11 +126,10 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       collection = graph.cypher(query);
     }
 
-    System.out.println(collection.getGraphHeads().count());
-//    DataSink sink = new CSVDataSink(OUTPUT_PATH, config);
-//    sink.write(collection);
+    DataSink sink = new JSONDataSink(OUTPUT_PATH, config);
+    sink.write(collection);
 
-    //env.execute();
+    env.execute();
     writeCSV(env);
   }
 

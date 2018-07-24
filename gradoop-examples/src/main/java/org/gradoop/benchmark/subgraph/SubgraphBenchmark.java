@@ -10,7 +10,6 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
@@ -42,6 +41,14 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
      */
     private static final String OPTION_VERIFICATION = "v";
     /**
+     * Option to declare used vertex label
+     */
+    private static final String OPTION_VERTEX_LABEL = "vl";
+    /**
+     * Option to declare used edge label
+     */
+    private static final String OPTION_EDGE_LABEL = "el";
+    /**
      * Used input path
      */
     private static String INPUT_PATH;
@@ -54,9 +61,18 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
      */
     private static String CSV_PATH;
     /**
+     * Used vertex label
+     */
+    private static String VERTEX_LABEL;
+    /**
+     * Used edge label
+     */
+    private static String EDGE_LABEL;
+    /**
      * Used verification flag
      */
     private static boolean VERIFICATION;
+
 
     static {
         OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
@@ -67,6 +83,10 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
           "Path to csv statistics");
         OPTIONS.addOption(OPTION_VERIFICATION, "verification", false,
           "Verify Subgraph with join.");
+        OPTIONS.addOption(OPTION_VERTEX_LABEL, "vertex-label", true,
+          "Used vertex label");
+        OPTIONS.addOption(OPTION_EDGE_LABEL, "edge-label", true,
+          "Used edge label");
     }
 
 
@@ -103,13 +123,13 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
         if (VERIFICATION) {
             subGraph = graph.subgraph(
-              new VertexLabelFilter("person"),
-              new EdgeLabelFilter("knows"),
+              new VertexLabelFilter(VERTEX_LABEL),
+              new EdgeLabelFilter(EDGE_LABEL),
               Subgraph.Strategy.BOTH_VERIFIED);
         } else {
             subGraph = graph.subgraph(
-              new VertexLabelFilter("person"),
-              new EdgeLabelFilter("knows"),
+              new VertexLabelFilter(VERTEX_LABEL),
+              new EdgeLabelFilter(EDGE_LABEL),
               Subgraph.Strategy.BOTH);
         }
 
@@ -127,11 +147,11 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
      * @param cmd command line
      */
     private static void readCMDArguments(CommandLine cmd) {
-        // read input output paths
         INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
         OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
         CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
-        // set subgraph verification flag
+        VERTEX_LABEL = cmd.getOptionValue(OPTION_VERTEX_LABEL);
+        EDGE_LABEL = cmd.getOptionValue(OPTION_EDGE_LABEL);
         VERIFICATION = cmd.hasOption(OPTION_VERIFICATION);
     }
 
@@ -158,15 +178,19 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
      */
     private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
-        String head = String.format("%s|%s|%s|%s%n",
+        String head = String.format("%s|%s|%s|%s|%s|%s%n",
                 "Parallelism",
                 "dataset",
+                "vertex-label",
+                "edge-label",
                 "verification",
                 "Runtime(s)");
 
-        String tail = String.format("%s|%s|%s|%s%n",
+        String tail = String.format("%s|%s|%s|%s|%s|%s%n",
                 env.getParallelism(),
                 INPUT_PATH,
+                VERTEX_LABEL,
+                EDGE_LABEL,
                 VERIFICATION,
                 env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS));
 

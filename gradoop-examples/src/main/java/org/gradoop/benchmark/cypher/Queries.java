@@ -25,10 +25,10 @@ class Queries {
    */
   static String q2(String name) {
     return
-      "MATCH (p:person)<-[:hasCreator]-(m:comment|post ), " +
-            "(m)-[:replyOf*0..10]->(p:post)" +
-      "WHERE p.firstName = " + name + " " +
-      "RETURN m.creationDate, m.content, p.creationDate, p.content";
+      "MATCH (p:person)<-[:hasCreator]-(c:comment)," +
+            "(p)<-[:hasCreator]-(po:post)," +
+            "(c)-[:replyOf*0..10]->(po)" +
+      "WHERE p.firstName = " + name;
   }
 
   /**
