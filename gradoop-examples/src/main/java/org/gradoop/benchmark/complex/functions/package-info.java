@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains example Gradoop programs that can be executed on a Flink cluster.
+ * Contains functions used in benchmark programs
  */
 package org.gradoop.benchmark.complex.functions;

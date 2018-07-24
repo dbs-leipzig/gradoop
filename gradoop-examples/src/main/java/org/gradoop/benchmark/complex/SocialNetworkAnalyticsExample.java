@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.benchmark.complex;
 
 import org.apache.commons.cli.CommandLine;
@@ -113,12 +128,12 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
         .read(STATISTICS_PATH, new Configuration());
 
       graph = graph
-        .cypher(getQuery(), getConstruction(), statistics)
+        .query(getQuery(), getConstruction(), statistics)
         .reduce(new ReduceCombination());
 
     } else {
       graph = graph
-        .cypher(getQuery(), getConstruction())
+        .query(getQuery(), getConstruction())
         .reduce(new ReduceCombination());
     }
 
@@ -140,7 +155,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     // execute and write job statistics
     env.execute();
     writeCSV(env);
-    }
+  }
 
   /**
    * Reads the given arguments from command line
@@ -148,9 +163,9 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * @param cmd command line
    */
   private static void readCMDArguments(CommandLine cmd) {
-    INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
-    CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+    INPUT_PATH      = cmd.getOptionValue(OPTION_INPUT_PATH);
+    OUTPUT_PATH     = cmd.getOptionValue(OPTION_OUTPUT_PATH);
+    CSV_PATH        = cmd.getOptionValue(OPTION_CSV_PATH);
     STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
   }
 
@@ -200,9 +215,10 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
 
 
   /**
-   * Method to create and add lines to a csv-file
+   *  Method to create and add lines to a csv-file
    *
-   * @throws IOException exception during file writing
+   * @param env given ExecutionEnvironment
+   * @throws IOException exeption during file writing
    */
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
@@ -230,8 +246,8 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
   /**
    * {@inheritDoc}
    */
-    @Override
-    public String getDescription() {
-        return SocialNetworkAnalyticsExample.class.getName();
-    }
+  @Override
+  public String getDescription() {
+    return SocialNetworkAnalyticsExample.class.getName();
+  }
 }
