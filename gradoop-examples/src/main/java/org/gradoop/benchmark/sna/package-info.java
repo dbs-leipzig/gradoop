@@ -16,4 +16,4 @@
 /**
  * Contains benchmark classes (social analytics)
  */
-package org.gradoop.benchmark.complex;
+package org.gradoop.benchmark.sna;
