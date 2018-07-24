@@ -4,12 +4,12 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A dedicated program for parametrized graph cypher benchmark.
+ */
 public class CypherBenchmark extends AbstractRunner implements ProgramDescription {
   /**
    * Option to declare path to input graph
@@ -43,6 +46,10 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static final String OPTION_QUERY = "q";
   /**
+   * Option for used first name in query.
+   */
+  private static final String OPTION_FIRST_NAME = "n";
+  /**
    * Used input path
    */
   private static String INPUT_PATH;
@@ -63,9 +70,13 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static String CSV_PATH;
   /**
-   * Used verification flag
+   * Used query
    */
   private static String QUERY;
+  /**
+   * Used first name for query (q1,q2,q3)
+   */
+  private static String First_NAME;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
@@ -76,13 +87,24 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       "Path to csv statistics");
     OPTIONS.addOption(OPTION_QUERY, "query", true,
       "Used query (q1,q2,q3,q4,q5,q6)");
+    OPTIONS.addOption(OPTION_FIRST_NAME, "query-name", true,
+      "Used first Name in Cypher Query");
     OPTIONS.addOption(OPTION_STATISTICS_PATH, "statistics", true,
       "Path to previously generated statistics.");
   }
 
-
-
   public static void main(String[] args) throws Exception {
+    CommandLine cmd = parseArguments(args, SubgraphBenchmark.class.getName());
+
+    if (cmd == null) {
+      System.exit(1);
+    }
+
+    // test if minimum arguments are set
+    performSanityCheck(cmd);
+
+    // read cmd arguments
+    readCMDArguments(cmd);
 
     ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
@@ -103,17 +125,23 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       collection = graph.cypher(query);
     }
 
-    DataSink sink = new JSONDataSink(OUTPUT_PATH, config);
-    sink.write(collection);
+    System.out.println(collection.getGraphHeads().count());
+//    DataSink sink = new CSVDataSink(OUTPUT_PATH, config);
+//    sink.write(collection);
 
-    env.execute();
+    //env.execute();
+    writeCSV(env);
   }
 
   private static String getQuery(String query) {
     switch (query) {
-    case "q1": return Queries.q1();
-    case "q4": return Queries.q4();
-    default: throw new IllegalArgumentException("unsupported query: " + query);
+    case "q1" : return Queries.q1(First_NAME);
+    case "q2" : return Queries.q2(First_NAME);
+    case "q3" : return Queries.q3(First_NAME);
+    case "q4" : return Queries.q4();
+    case "q5" : return Queries.q5();
+    case "q6" : return Queries.q6();
+    default : throw new IllegalArgumentException("Unsupported query: " + query);
     }
   }
 
@@ -123,13 +151,13 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    * @param cmd command line
    */
   private static void readCMDArguments(CommandLine cmd) {
-    // read input output paths
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
     QUERY = cmd.getOptionValue(OPTION_QUERY);
     HAS_STATISTICS = cmd.hasOption(OPTION_STATISTICS_PATH);
     STATISTICS_INPUT_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
+    First_NAME = cmd.getOptionValue(OPTION_FIRST_NAME);
   }
 
   /**
@@ -149,6 +177,13 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     }
     if (!cmd.hasOption(OPTION_QUERY)) {
       throw new IllegalArgumentException("Define a query to run (q1,q2,q3,q4,q5,q6).");
+    }
+    if (cmd.getOptionValue(OPTION_QUERY).equals("q1") ||
+        cmd.getOptionValue(OPTION_QUERY).equals("q2") ||
+        cmd.getOptionValue(OPTION_QUERY).equals("q3")) {
+      if (!cmd.hasOption(OPTION_FIRST_NAME)) {
+        throw new IllegalArgumentException("Define a first name for query");
+      }
     }
   }
 
@@ -185,6 +220,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
 
   @Override
   public String getDescription() {
-    return null;
+    return CypherBenchmark.class.getName();
   }
 }
