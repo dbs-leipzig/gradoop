@@ -33,6 +33,7 @@ public interface EPGMGraphInput extends Closeable {
    * Writes the given graph data into the graph store.
    *
    * @param graphData graph data to write
+   * @throws IOException if writing the {@link EPGMGraphHead} fails
    */
   void writeGraphHead(@Nonnull EPGMGraphHead graphData) throws IOException;
 
@@ -40,6 +41,7 @@ public interface EPGMGraphInput extends Closeable {
    * Writes the given vertex data into the graph store.
    *
    * @param vertexData vertex data to write
+   * @throws IOException if writing the {@link EPGMVertex} fails
    */
   void writeVertex(@Nonnull EPGMVertex vertexData) throws IOException;
 
@@ -47,6 +49,7 @@ public interface EPGMGraphInput extends Closeable {
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
+   * @throws IOException if writing the {@link EPGMEdge} fails
    */
   void writeEdge(@Nonnull EPGMEdge edgeData) throws IOException;
 
@@ -60,6 +63,8 @@ public interface EPGMGraphInput extends Closeable {
 
   /**
    * Flushes all buffered writes to the store.
+   *
+   * @throws IOException if flushing changes to the store fails
    */
   void flush() throws IOException;
 

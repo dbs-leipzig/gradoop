@@ -35,12 +35,12 @@ public class HBaseEdgeIterator implements ClosableIterator<Edge> {
   private final ResultScanner scanner;
 
   /**
-   * Gradoop graph head handler
+   * Gradoop edge handler
    */
   private final EdgeHandler handler;
 
   /**
-   * inner result iterator_
+   * Inner result iterator
    */
   private final Iterator<Result> it;
 

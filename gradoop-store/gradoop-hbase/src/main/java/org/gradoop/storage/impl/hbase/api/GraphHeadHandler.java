@@ -36,6 +36,7 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param put       put to add graph data to
    * @param graphData graph data
    * @return put with graph data
+   * @throws IOException if writing the {@link EPGMGraphHead} to store fails
    */
   Put writeGraphHead(final Put put, final EPGMGraphHead graphData) throws IOException;
 

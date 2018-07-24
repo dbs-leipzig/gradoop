@@ -94,11 +94,17 @@ public class HBaseDataSource extends HBaseBase
     this.edgeQuery = edgeQuery;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public LogicalGraph getLogicalGraph() {
     return getGraphCollection().reduce(new ReduceCombination());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public GraphCollection getGraphCollection() {
     GradoopHBaseConfig config = getHBaseConfig();
@@ -128,6 +134,9 @@ public class HBaseDataSource extends HBaseBase
     return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
@@ -135,6 +144,9 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), query, vertexQuery, edgeQuery);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
@@ -142,6 +154,9 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), graphHeadQuery, query, edgeQuery);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
@@ -149,6 +164,9 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), graphHeadQuery, vertexQuery, query);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isFilterPushedDown() {
     return this.graphHeadQuery != null || this.vertexQuery != null || this.edgeQuery != null;

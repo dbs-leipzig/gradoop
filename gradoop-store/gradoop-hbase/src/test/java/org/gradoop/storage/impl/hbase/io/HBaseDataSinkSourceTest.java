@@ -16,6 +16,7 @@
 package org.gradoop.storage.impl.hbase.io;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
@@ -419,5 +420,22 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       loader.getEdges(),
       epgmStore.getEdgeSpace().readRemainsAndClose()
     );
+  }
+
+  /**
+   * Test writing a graph to {@link HBaseDataSink} with overwrite flag, that results in an exception
+   */
+  @Test(expected = NotImplementedException.class)
+  public void testWriteToSinkWithOverWrite() throws Exception {
+    // Create an empty store
+    HBaseEPGMStore epgmStore = createEmptyEPGMStore(getExecutionEnvironment(),
+      "testWriteToSink");
+
+    GraphCollection graphCollection = epgmStore.getConfig().getGraphCollectionFactory()
+      .createEmptyCollection();
+
+    (new HBaseDataSink(epgmStore)).write(graphCollection, true);
+
+    getExecutionEnvironment().execute();
   }
 }

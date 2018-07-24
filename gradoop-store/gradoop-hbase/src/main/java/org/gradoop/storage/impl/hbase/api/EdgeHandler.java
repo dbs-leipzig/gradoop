@@ -70,6 +70,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param put      {@link} Put to add edge to
    * @param edgeData edge data to be written
    * @return put with edge data
+   * @throws IOException if writing the {@link EPGMEdge} to store fails
    */
   Put writeEdge(final Put put, final EPGMEdge edgeData) throws IOException;
 
