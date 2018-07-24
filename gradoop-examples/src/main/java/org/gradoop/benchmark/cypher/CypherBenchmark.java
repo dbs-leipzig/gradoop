@@ -4,11 +4,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.conf.Configuration;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -94,6 +94,12 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       "Path to previously generated statistics.");
   }
 
+  /**
+   * Main program to run the benchmark. Arguments are the available options.
+   *
+   * @param args program arguments
+   * @throws Exception IO or execution Exception
+   */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SubgraphBenchmark.class.getName());
 
@@ -110,29 +116,41 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
+    // read graph
     DataSource source = new IndexedCSVDataSource(INPUT_PATH, config);
-
     LogicalGraph graph = source.getLogicalGraph();
+
+    // prepare collection
     GraphCollection collection;
 
+    // get cypher query
     String query = getQuery(QUERY);
 
+    // execute cypher with or without statistics
     if (HAS_STATISTICS) {
       GraphStatistics statistics = GraphStatisticsHDFSReader
-        .read(STATISTICS_INPUT_PATH, new org.apache.hadoop.conf.Configuration());
+        .read(STATISTICS_INPUT_PATH, new Configuration());
 
       collection = graph.cypher(query, statistics);
     } else {
       collection = graph.cypher(query);
     }
 
+    // write data to sink
     DataSink sink = new JSONDataSink(OUTPUT_PATH, config);
     sink.write(collection);
 
+    // execute and write job statistics
     env.execute();
     writeCSV(env);
   }
 
+  /**
+   * Returns used query for benchmark
+   *
+   * @param query argument input
+   * @return used query
+   */
   private static String getQuery(String query) {
     switch (query) {
     case "q1" : return Queries.q1(First_NAME);
@@ -189,7 +207,8 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
 
   /**
    * Method to create and add lines to a csv-file
-   * @throws IOException
+   *
+   * @throws IOException exception during file writing
    */
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
@@ -218,6 +237,9 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getDescription() {
     return CypherBenchmark.class.getName();

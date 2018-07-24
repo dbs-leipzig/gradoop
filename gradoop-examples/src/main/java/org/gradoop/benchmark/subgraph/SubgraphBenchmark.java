@@ -4,8 +4,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.functions.EdgeLabelFilter;
-import org.gradoop.common.functions.VertexLabelFilter;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
@@ -13,6 +11,7 @@ import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -115,28 +114,26 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
         // read graph
         DataSource source = new IndexedCSVDataSource(INPUT_PATH, conf);
-
         LogicalGraph graph = source.getLogicalGraph();
 
         // compute subgraph -> verify results (join) vs no verify (filter)
-        LogicalGraph subGraph;
-
         if (VERIFICATION) {
-            subGraph = graph.subgraph(
-              new VertexLabelFilter(VERTEX_LABEL),
-              new EdgeLabelFilter(EDGE_LABEL),
+            graph = graph.subgraph(
+              new LabelIsIn<>(VERTEX_LABEL),
+              new LabelIsIn<>(EDGE_LABEL),
               Subgraph.Strategy.BOTH_VERIFIED);
         } else {
-            subGraph = graph.subgraph(
-              new VertexLabelFilter(VERTEX_LABEL),
-              new EdgeLabelFilter(EDGE_LABEL),
+            graph = graph.subgraph(
+              new LabelIsIn<>(VERTEX_LABEL),
+              new LabelIsIn<>(EDGE_LABEL),
               Subgraph.Strategy.BOTH);
         }
 
         // write graph
         DataSink sink = new CSVDataSink(OUTPUT_PATH, conf);
-        sink.write(subGraph);
+        sink.write(graph);
 
+        // execute and write job statistics
         env.execute();
         writeCSV(env);
     }
@@ -174,7 +171,8 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
     /**
      * Method to create and add lines to a csv-file
-     * @throws IOException
+     *
+     * @throws IOException Exception during file writing
      */
     private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
