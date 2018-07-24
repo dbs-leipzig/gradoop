@@ -13,7 +13,8 @@ class Queries {
    */
   static String q1(String name) {
     return
-      "MATCH (p:person)<-[:hasCreator]-(c:comment), (p)<-[:hasCreator]-(po:post) " +
+      "MATCH (p:person)<-[:hasCreator]-(c:comment), " +
+            "(p)<-[:hasCreator]-(po:post) " +
       "WHERE p.firstName = " + name;
   }
 
@@ -40,13 +41,10 @@ class Queries {
   static String q3(String name) {
     return
       "MATCH (p1:person )-[:knows]->(p2:person)," +
-        "(c:comment)-[:hasCreator]->(p2)" +
-        "(c)-[:replyOf*0..10]->(po:post)" +
-        "(p)-[:hasCreator]->(p1)" +
-        "WHERE p1.firstName = " + name +
-        "RETURN p1.firstName, p1.lastName," +
-        "p2.firstName, p2.lastName," +
-        "po.content";
+            "(c:comment)-[:hasCreator]->(p2)" +
+            "(c)-[:replyOf*0..10]->(po:post)" +
+            "(po)-[:hasCreator]->(p1)" +
+      "WHERE p1.firstName = " + name;
 
   }
 
@@ -60,8 +58,8 @@ class Queries {
       "MATCH (p:person)-[:isLocatedIn]->(c:city)," +
             "(p)-[:hasInterest]->(t:tag)," +
             "(p)-[:studyAt]->(u:university)," +
-            "(p)<-[:hasMember|hasModerator]-(f:forum)" +
-      "RETURN p.firstName, p.lastName, c.name, t.name, u.name, f.name";
+            "(p)<-[:hasMember]-(f:forum)," +
+            "(p)<-[:hasModerator]-(f)";
   }
 
   /**
@@ -72,11 +70,8 @@ class Queries {
   static String q5() {
     return
       "MATCH (p1:person)-[:knows]->(p2:person)," +
-        "(p2)-[:knows]->(p3:person)," +
-        "(p1)-[:knows]->(p3)," +
-        "RETURN p1.firstName, p1.lastName, " +
-        "p2.firstName, p2.lastName, " +
-        "p3.firstName, p3.lastName, ";
+            "(p2)-[:knows]->(p3:person)," +
+            "(p1)-[:knows]->(p3)";
   }
 
   /**
@@ -87,9 +82,8 @@ class Queries {
   static String q6() {
     return
       "MATCH (p1:person)-[:knows]->(p2:person)," +
-        "(p1)-[:hasInterest]->(t1:tag)," +
-        "(p2)-[:hasInterest]->(t1)," +
-        "(p2)-[:hasInterest]->(t2:tag)," +
-        "RETURN p1.firstName, p1.lastName, t2.name";
+            "(p1)-[:hasInterest]->(t1:tag)," +
+            "(p2)-[:hasInterest]->(t1)," +
+            "(p2)-[:hasInterest]->(t2:tag)";
   }
 }

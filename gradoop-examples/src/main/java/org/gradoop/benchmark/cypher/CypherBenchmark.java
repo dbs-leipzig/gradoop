@@ -77,7 +77,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
   /**
    * Used first name for query (q1,q2,q3)
    */
-  private static String First_NAME;
+  private static String FIRST_NAME;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
@@ -153,9 +153,9 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static String getQuery(String query) {
     switch (query) {
-    case "q1" : return Queries.q1(First_NAME);
-    case "q2" : return Queries.q2(First_NAME);
-    case "q3" : return Queries.q3(First_NAME);
+    case "q1" : return Queries.q1(FIRST_NAME);
+    case "q2" : return Queries.q2(FIRST_NAME);
+    case "q3" : return Queries.q3(FIRST_NAME);
     case "q4" : return Queries.q4();
     case "q5" : return Queries.q5();
     case "q6" : return Queries.q6();
@@ -175,7 +175,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     QUERY = cmd.getOptionValue(OPTION_QUERY);
     HAS_STATISTICS = cmd.hasOption(OPTION_STATISTICS_PATH);
     STATISTICS_INPUT_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
-    First_NAME = cmd.getOptionValue(OPTION_FIRST_NAME);
+    FIRST_NAME = cmd.getOptionValue(OPTION_FIRST_NAME);
   }
 
   /**
