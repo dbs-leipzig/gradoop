@@ -18,23 +18,14 @@ package org.gradoop.storage.config;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.hbase.TableName;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.storage.common.config.GradoopStoreConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentEdgeFactory;
-import org.gradoop.storage.impl.hbase.api.PersistentGraphHeadFactory;
-import org.gradoop.storage.impl.hbase.api.PersistentVertexFactory;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.factory.HBaseEdgeFactory;
-import org.gradoop.storage.impl.hbase.factory.HBaseGraphHeadFactory;
-import org.gradoop.storage.impl.hbase.factory.HBaseVertexFactory;
 import org.gradoop.storage.impl.hbase.handler.HBaseEdgeHandler;
 import org.gradoop.storage.impl.hbase.handler.HBaseGraphHeadHandler;
 import org.gradoop.storage.impl.hbase.handler.HBaseVertexHandler;
@@ -45,11 +36,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Configuration class for using HBase with Gradoop.
  */
-public class GradoopHBaseConfig extends GradoopStoreConfig<
-  PersistentGraphHeadFactory<GraphHead>,
-  PersistentVertexFactory<Vertex, Edge>,
-  PersistentEdgeFactory<Edge, Vertex>> {
-
+public class GradoopHBaseConfig
+  extends GradoopStoreConfig<GraphHeadFactory, VertexFactory, EdgeFactory> {
 
   /**
    * Graph table name.
@@ -68,15 +56,15 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
   /**
    * Graph head handler.
    */
-  private final GraphHeadHandler<GraphHead> graphHeadHandler;
+  private final GraphHeadHandler graphHeadHandler;
   /**
    * EPGMVertex handler.
    */
-  private final VertexHandler<Vertex, Edge> vertexHandler;
+  private final VertexHandler vertexHandler;
   /**
    * EPGMEdge handler.
    */
-  private final EdgeHandler<Edge, Vertex> edgeHandler;
+  private final EdgeHandler edgeHandler;
 
   /**
    * Creates a new Configuration.
@@ -90,18 +78,15 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
    * @param edgeTableName               edge table name
    */
   private GradoopHBaseConfig(
-    GraphHeadHandler<GraphHead> graphHeadHandler,
-    VertexHandler<Vertex, Edge> vertexHandler,
-    EdgeHandler<Edge, Vertex> edgeHandler,
+    GraphHeadHandler graphHeadHandler,
+    VertexHandler vertexHandler,
+    EdgeHandler edgeHandler,
     ExecutionEnvironment env,
     String graphTableName,
     String vertexTableName,
     String edgeTableName
   ) {
-    super(new HBaseGraphHeadFactory<>(),
-      new HBaseVertexFactory<>(),
-      new HBaseEdgeFactory<>(),
-      env);
+    super(new GraphHeadFactory(), new VertexFactory(), new EdgeFactory(), env);
     checkArgument(!StringUtils.isEmpty(graphTableName),
       "Graph table name was null or empty");
     checkArgument(!StringUtils.isEmpty(vertexTableName),
@@ -149,12 +134,9 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
    * @return Default Gradoop HBase configuration.
    */
   public static GradoopHBaseConfig getDefaultConfig(ExecutionEnvironment env) {
-    GraphHeadHandler<GraphHead> graphHeadHandler =
-      new HBaseGraphHeadHandler<>(new GraphHeadFactory());
-    VertexHandler<Vertex, Edge> vertexHandler =
-      new HBaseVertexHandler<>(new VertexFactory());
-    EdgeHandler<Edge, Vertex> edgeHandler =
-      new HBaseEdgeHandler<>(new EdgeFactory());
+    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new GraphHeadFactory());
+    VertexHandler vertexHandler = new HBaseVertexHandler(new VertexFactory());
+    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EdgeFactory());
 
     return new GradoopHBaseConfig(
       graphHeadHandler,
@@ -198,15 +180,15 @@ public class GradoopHBaseConfig extends GradoopStoreConfig<
     return graphTableName;
   }
 
-  public GraphHeadHandler<GraphHead> getGraphHeadHandler() {
+  public GraphHeadHandler getGraphHeadHandler() {
     return graphHeadHandler;
   }
 
-  public VertexHandler<Vertex, Edge> getVertexHandler() {
+  public VertexHandler getVertexHandler() {
     return vertexHandler;
   }
 
-  public EdgeHandler<Edge, Vertex> getEdgeHandler() {
+  public EdgeHandler getEdgeHandler() {
     return edgeHandler;
   }
 }

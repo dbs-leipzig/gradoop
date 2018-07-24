@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -64,8 +65,7 @@ abstract class GVEBaseFactory extends BaseFactory {
         .orElseThrow(() -> new RuntimeException("Error during graph head union")),
       vertices.values().stream().reduce(DataSet::union)
         .orElseThrow(() -> new RuntimeException("Error during vertex union")),
-      edges.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during edge union"))
+      edges.values().stream().reduce(createEdgeDataSet(Collections.EMPTY_LIST), DataSet::union)
     );
   }
 }

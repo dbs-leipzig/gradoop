@@ -25,37 +25,33 @@ import java.io.IOException;
 
 /**
  * Definition of graph store input.
- * A graph input instance provide a set of writing methods for EPGM elements
- *
- * @param <GInput> graph head(output)
- * @param <VInput> graph vertex(output)
- * @param <EInput> graph edge(output)
+ * A graph input instance provide a set of writing methods for EPGM elements.
  */
-public interface EPGMGraphInput<
-  GInput extends EPGMGraphHead,
-  VInput extends EPGMVertex,
-  EInput extends EPGMEdge> extends Closeable {
+public interface EPGMGraphInput extends Closeable {
 
   /**
    * Writes the given graph data into the graph store.
    *
    * @param graphData graph data to write
+   * @throws IOException if writing the {@link EPGMGraphHead} fails
    */
-  void writeGraphHead(@Nonnull GInput graphData) throws IOException;
+  void writeGraphHead(@Nonnull EPGMGraphHead graphData) throws IOException;
 
   /**
    * Writes the given vertex data into the graph store.
    *
    * @param vertexData vertex data to write
+   * @throws IOException if writing the {@link EPGMVertex} fails
    */
-  void writeVertex(@Nonnull VInput vertexData) throws IOException;
+  void writeVertex(@Nonnull EPGMVertex vertexData) throws IOException;
 
   /**
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
+   * @throws IOException if writing the {@link EPGMEdge} fails
    */
-  void writeEdge(@Nonnull EInput edgeData) throws IOException;
+  void writeEdge(@Nonnull EPGMEdge edgeData) throws IOException;
 
   /**
    * Setting this value to true, forces the store implementation to flush the
@@ -67,6 +63,8 @@ public interface EPGMGraphInput<
 
   /**
    * Flushes all buffered writes to the store.
+   *
+   * @throws IOException if flushing changes to the store fails
    */
   void flush() throws IOException;
 

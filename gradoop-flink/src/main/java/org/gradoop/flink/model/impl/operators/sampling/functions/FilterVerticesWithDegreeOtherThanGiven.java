@@ -20,26 +20,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 
 /**
  * Retains all vertices which do not have the given degree.
  */
 public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraphOperator {
-  /**
-   * Degree property name
-   */
-  private final String degreePropertyName = "_degree";
-  /**
-   * In-degree property name
-   */
-  private final String inDegreePropertyName = "_inDegree";
-  /**
-   * Out-degree property name
-   */
-  private final String outDegreePropertyName = "_outDegree";
 
   /**
    * the given degree
@@ -60,18 +46,21 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(degreePropertyName,
-    inDegreePropertyName, outDegreePropertyName, true);
+    DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
+      VertexDegree.IN_OUT.getName(),
+      VertexDegree.IN.getName(),
+      VertexDegree.OUT.getName(),
+      true);
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
-    List<String> unnecessaryPropertyNames = new ArrayList<>();
-    unnecessaryPropertyNames.add(degreePropertyName);
-    unnecessaryPropertyNames.add(inDegreePropertyName);
-    unnecessaryPropertyNames.add(outDegreePropertyName);
-    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree, degreePropertyName))
-      .map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
-    return graph;
+    newVertices = newVertices.filter(
+      new VertexWithDegreeFilter<>(degree, VertexDegree.IN_OUT.getName()))
+      .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
+      .map(new PropertyRemover<>(VertexDegree.IN.getName()))
+      .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
+
+    return graph.getConfig().getLogicalGraphFactory().fromDataSets(
+      graph.getGraphHead(), newVertices, graph.getEdges());
   }
 
   /**

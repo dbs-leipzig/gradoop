@@ -22,16 +22,14 @@ import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.AddMaxDegreeCrossFunction;
 import org.gradoop.flink.model.impl.operators.sampling.functions.NonUniformVertexRandomFilter;
-import org.gradoop.flink.model.impl.operators.sampling.functions.RemoveUnnecessaryPropertiesMap;
+import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeMap;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
@@ -76,13 +74,16 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    String degreePropertyName = "_degree";
-    String inDegreePropertyName = "_inDegree";
-    String outDegreePropertyName = "_outDegree";
+    String degreePropertyName = VertexDegree.IN_OUT.getName();
+    String inDegreePropertyName = VertexDegree.IN.getName();
+    String outDegreePropertyName = VertexDegree.OUT.getName();
     String maxDegree = "_maxDegree";
 
-    graph = new DistinctVertexDegrees(degreePropertyName, inDegreePropertyName,
-      outDegreePropertyName, true).execute(graph);
+    graph = new DistinctVertexDegrees(
+      degreePropertyName,
+      inDegreePropertyName,
+      outDegreePropertyName,
+      true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .map(new VertexToDegreeMap(degreePropertyName))
@@ -90,32 +91,28 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
       .cross(graph.getVertices())
       .with(new AddMaxDegreeCrossFunction(maxDegree));
 
+    graph = graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 
+    newVertices = graph.getVertices().filter(new NonUniformVertexRandomFilter<>(
+        sampleSize, randomSeed, degreePropertyName, maxDegree));
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
-
-    newVertices = graph.getVertices()
-      .filter(new NonUniformVertexRandomFilter<>(sampleSize, randomSeed,
-        degreePropertyName, maxDegree));
-
-    List<String> unnecessaryPropertyNames = new ArrayList<>();
-    unnecessaryPropertyNames.add(degreePropertyName);
-    unnecessaryPropertyNames.add(inDegreePropertyName);
-    unnecessaryPropertyNames.add(outDegreePropertyName);
-    unnecessaryPropertyNames.add(maxDegree);
-    newVertices = newVertices.map(new RemoveUnnecessaryPropertiesMap<>(unnecessaryPropertyNames));
+    newVertices = newVertices
+      .map(new PropertyRemover<>(degreePropertyName))
+      .map(new PropertyRemover<>(inDegreePropertyName))
+      .map(new PropertyRemover<>(outDegreePropertyName))
+      .map(new PropertyRemover<>(maxDegree));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
+      .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
       .join(newVertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
+      .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
   /**

@@ -21,15 +21,15 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentGraphHead;
 
 /**
  * Creates HBase {@link Mutation} from persistent graph data using graph
  * data handler.
  */
-public class BuildGraphHeadMutation extends RichMapFunction
-  <PersistentGraphHead, Tuple2<GradoopId, Mutation>> {
+public class BuildGraphHeadMutation extends
+  RichMapFunction<GraphHead, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -44,14 +44,14 @@ public class BuildGraphHeadMutation extends RichMapFunction
   /**
    * Graph data handler to create Mutations.
    */
-  private final GraphHeadHandler<PersistentGraphHead> graphHeadHandler;
+  private final GraphHeadHandler graphHeadHandler;
 
   /**
    * Creates rich map function.
    *
    * @param graphHeadHandler graph data handler
    */
-  public BuildGraphHeadMutation(GraphHeadHandler<PersistentGraphHead> graphHeadHandler) {
+  public BuildGraphHeadMutation(GraphHeadHandler graphHeadHandler) {
     this.graphHeadHandler = graphHeadHandler;
   }
 
@@ -68,11 +68,10 @@ public class BuildGraphHeadMutation extends RichMapFunction
    * {@inheritDoc}
    */
   @Override
-  public Tuple2<GradoopId, Mutation> map(
-    PersistentGraphHead persistentGraphData) throws Exception {
-    GradoopId key = persistentGraphData.getId();
-    Put put = new Put(graphHeadHandler.getRowKey(persistentGraphData.getId()));
-    put = graphHeadHandler.writeGraphHead(put, persistentGraphData);
+  public Tuple2<GradoopId, Mutation> map(GraphHead graphHead) throws Exception {
+    GradoopId key = graphHead.getId();
+    Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));
+    put = graphHeadHandler.writeGraphHead(put, graphHead);
 
     reuseTuple.f0 = key;
     reuseTuple.f1 = put;
