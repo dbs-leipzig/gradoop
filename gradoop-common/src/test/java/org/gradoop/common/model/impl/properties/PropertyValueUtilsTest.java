@@ -18,10 +18,12 @@ package org.gradoop.common.model.impl.properties;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Boolean.or;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric.*;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -945,5 +947,236 @@ public class PropertyValueUtilsTest {
     p = max(create(minShort), create(maxShort));
     assertTrue(p.isShort());
     assertEquals(p.getShort(), maxShort, 0);
+  }
+
+  /**
+   * Test static function {@link PropertyValueUtils.Bytes#getRawBytesWithoutType(PropertyValue)}
+   */
+  @Test
+  public void testGetRawBytesWithoutType() {
+    // null
+    PropertyValue p = create(null);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // boolean
+    p = create(BOOL_VAL_1);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // short
+    p = create(SHORT_VAL_e);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // int
+    p = create(INT_VAL_2);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // long
+    p = create(LONG_VAL_3);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // float
+    p = create(FLOAT_VAL_4);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // double
+    p = create(DOUBLE_VAL_5);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // String
+    p = create(STRING_VAL_6);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    // BigDecimal
+    p = create(BIG_DECIMAL_VAL_7);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //GradoopId
+    p = create(GRADOOP_ID_VAL_8);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //Map
+    p = create(MAP_VAL_9);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //List
+    p = create(LIST_VAL_a);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //Date
+    p = create(DATE_VAL_b);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //Time
+    p = create(TIME_VAL_c);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+    //DateTime
+    p = create(DATETIME_VAL_d);
+    assertArrayEquals(Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length),
+      PropertyValueUtils.Bytes.getRawBytesWithoutType(p));
+  }
+
+  /**
+   * Test static function {@link PropertyValueUtils.Bytes#getTypeByte(PropertyValue)}
+   */
+  @Test
+  public void testGetTypeByte() {
+    // null
+    PropertyValue p = create(null);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_NULL},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // boolean
+    p = create(BOOL_VAL_1);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_BOOLEAN},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // short
+    p = create(SHORT_VAL_e);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_SHORT},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // int
+    p = create(INT_VAL_2);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_INTEGER},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // long
+    p = create(LONG_VAL_3);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_LONG},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // float
+    p = create(FLOAT_VAL_4);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_FLOAT},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // double
+    p = create(DOUBLE_VAL_5);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_DOUBLE},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // String
+    p = create(STRING_VAL_6);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_STRING},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    // BigDecimal
+    p = create(BIG_DECIMAL_VAL_7);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_BIG_DECIMAL},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //GradoopId
+    p = create(GRADOOP_ID_VAL_8);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_GRADOOP_ID},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //Map
+    p = create(MAP_VAL_9);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_MAP},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //List
+    p = create(LIST_VAL_a);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_LIST},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //Date
+    p = create(DATE_VAL_b);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_DATE},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //Time
+    p = create(TIME_VAL_c);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_TIME},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+    //DateTime
+    p = create(DATETIME_VAL_d);
+    assertArrayEquals(new byte[] {PropertyValue.TYPE_DATETIME},
+      PropertyValueUtils.Bytes.getTypeByte(p));
+  }
+
+  /**
+   * Test static function {@link PropertyValueUtils.Bytes#createFromTypeValueBytes(byte[], byte[])}}
+   */
+  @Test
+  public void testCreateFromTypeValueBytes() {
+    // null
+    PropertyValue p = create(null);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_NULL},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // boolean
+    p = create(BOOL_VAL_1);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_BOOLEAN},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // short
+    p = create(SHORT_VAL_e);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_SHORT},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // int
+    p = create(INT_VAL_2);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_INTEGER},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // long
+    p = create(LONG_VAL_3);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_LONG},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // float
+    p = create(FLOAT_VAL_4);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_FLOAT},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // double
+    p = create(DOUBLE_VAL_5);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_DOUBLE},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // String
+    p = create(STRING_VAL_6);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_STRING},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    // BigDecimal
+    p = create(BIG_DECIMAL_VAL_7);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_BIG_DECIMAL},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //GradoopId
+    p = create(GRADOOP_ID_VAL_8);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_GRADOOP_ID},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //Map
+    p = create(MAP_VAL_9);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_MAP},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //List
+    p = create(LIST_VAL_a);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_LIST},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //Date
+    p = create(DATE_VAL_b);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_DATE},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //Time
+    p = create(TIME_VAL_c);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_TIME},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
+    //DateTime
+    p = create(DATETIME_VAL_d);
+    assertEquals(p,
+      PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        new byte[] {PropertyValue.TYPE_DATETIME},
+        Arrays.copyOfRange(p.getRawBytes(), 1, p.getRawBytes().length)));
   }
 }

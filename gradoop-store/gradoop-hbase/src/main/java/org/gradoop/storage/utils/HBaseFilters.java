@@ -20,6 +20,7 @@ import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
 import org.gradoop.storage.impl.hbase.filter.impl.HBasePropEquals;
 import org.gradoop.storage.impl.hbase.filter.impl.HBasePropLargerThan;
+import org.gradoop.storage.impl.hbase.filter.impl.HBasePropReg;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
@@ -89,5 +90,22 @@ public class HBaseFilters {
     boolean include
   ) {
     return new HBasePropLargerThan<>(key, value, include);
+  }
+
+  /**
+   * Static generator function for propReg predicate to apply on a HBase store.
+   * See {@link HBasePropReg} for further details.
+   *
+   * @param key property key
+   * @param pattern property pattern
+   * @param <T> epgm element type
+   * @return HBasePropReg filter instance
+   */
+  @Nonnull
+  public static <T extends EPGMElement> HBasePropReg<T> propReg(
+    @Nonnull String key,
+    @Nonnull Pattern pattern
+  ) {
+    return new HBasePropReg<>(key, pattern);
   }
 }

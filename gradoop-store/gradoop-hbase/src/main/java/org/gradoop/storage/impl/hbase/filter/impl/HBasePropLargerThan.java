@@ -18,15 +18,18 @@ package org.gradoop.storage.impl.hbase.filter.impl;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.storage.common.predicate.filter.impl.PropLargerThan;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTIES;
+import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
+import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
 
 /**
  * HBase property value compare predicate implement
@@ -53,17 +56,28 @@ public class HBasePropLargerThan<T extends EPGMElement>
   @Nonnull
   @Override
   public Filter toHBaseFilter() {
+    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
-    SingleColumnValueFilter filter = new SingleColumnValueFilter(
-      Bytes.toBytesBinary(CF_PROPERTIES),
+    SingleColumnValueFilter valueFilter = new SingleColumnValueFilter(
+      Bytes.toBytesBinary(CF_PROPERTY_VALUE),
       Bytes.toBytesBinary(getKey()),
       isInclude() ? CompareFilter.CompareOp.GREATER_OR_EQUAL : CompareFilter.CompareOp.GREATER,
-      new BinaryComparator(getMin().getRawBytes())
-    );
+      new BinaryComparator(PropertyValueUtils.Bytes.getRawBytesWithoutType(getMin())));
 
     // Define that the entire row will be skipped if the column is not found
-    filter.setFilterIfMissing(true);
+    valueFilter.setFilterIfMissing(true);
 
-    return filter;
+    SingleColumnValueFilter typeFilter = new SingleColumnValueFilter(
+      Bytes.toBytesBinary(CF_PROPERTY_TYPE),
+      Bytes.toBytesBinary(getKey()),
+      CompareFilter.CompareOp.EQUAL,
+      PropertyValueUtils.Bytes.getTypeByte(getMin()));
+
+    // Define that the entire row will be skipped if the column is not found
+    typeFilter.setFilterIfMissing(true);
+
+    filterList.addFilter(valueFilter);
+    filterList.addFilter(typeFilter);
+    return filterList;
   }
 }
