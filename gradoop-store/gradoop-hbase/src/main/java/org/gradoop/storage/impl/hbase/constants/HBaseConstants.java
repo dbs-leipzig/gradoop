@@ -45,7 +45,7 @@ public final class HBaseConstants {
    */
   public static final String COL_GRAPHS = "g";
   /**
-   * Column family name for property value.
+   * Column family name for property type.
    */
   public static final String CF_PROPERTY_TYPE = "p_type";
   /**
