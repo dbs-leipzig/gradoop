@@ -54,7 +54,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
   /**
    * Type of degree which should be considered: input degree, output degree, sum of both.
    */
-  private final Neighborhood.NeighborType neighborType;
+  private final Neighborhood neighborType;
 
   /**
    * Creates new RandomVertexNeighborhoodSampling instance.
@@ -74,7 +74,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
   public RandomVertexNeighborhoodSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
-    this.neighborType = Neighborhood.NeighborType.Both;
+    this.neighborType = Neighborhood.IN_OUT;
   }
 
   /**
@@ -85,7 +85,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    * @param neighborType type of neighbor-vertex for sampling
    */
   public RandomVertexNeighborhoodSampling(float sampleSize, long randomSeed,
-                                          Neighborhood.NeighborType neighborType) {
+                                          Neighborhood neighborType) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
     this.neighborType = neighborType;
@@ -98,7 +98,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    * @param neighborType type of neighbor-vertex for sampling
    */
   public RandomVertexNeighborhoodSampling(float sampleSize,
-                                          Neighborhood.NeighborType neighborType) {
+                                          Neighborhood neighborType) {
     this.sampleSize = sampleSize;
     this.randomSeed = 0L;
     this.neighborType = neighborType;

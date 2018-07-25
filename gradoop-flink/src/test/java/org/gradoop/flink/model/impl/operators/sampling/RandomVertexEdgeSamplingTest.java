@@ -15,16 +15,68 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
 
 public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampling {
+
   public RandomVertexEdgeSamplingTest(String testName, String seed, String sampleSize,
-                                      String neighborType) {
-    super(testName, seed, sampleSize, neighborType);
+    String edgeSampleSize, String vertexEdgeSamplingType) {
+    super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize), Float.parseFloat(edgeSampleSize),
+      RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(vertexEdgeSamplingType));
   }
 
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
-    return new RandomVertexSampling(sampleSize, seed);
+    return new RandomVertexEdgeSampling(sampleSize, edgeSampleSize, seed, vertexEdgeSamplingType);
+  }
+
+  @Override
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+
+    dbEdges.removeAll(newEdges);
+    for (Edge edge : dbEdges) {
+      assertFalse("there are vertices from edges, which are not part of the sampled graph",
+        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+    }
+  }
+
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(
+      new String[] {
+        "VertexEdgeSamplingTest with seed and simple version",
+        "-4181668494294894490",
+        "0.272f",
+        "0.272f",
+        "SimpleVersion"
+      },
+      new String[] {
+        "VertexEdgeSamplingTest without seed and simple version",
+        "0",
+        "0.272f",
+        "0.272f",
+        "SimpleVersion"
+      },
+      new String[] {
+        "VertexEdgeSamplingTest without seed and nonuniform version",
+        "0",
+        "0.272f",
+        "0.272f",
+        "NonuniformVersion"
+      },
+      new String[] {
+        "VertexEdgeSamplingTest without seed and nonuniform hybrid version",
+        "0",
+        "0.272f",
+        "0.272f",
+        "NonuniformHybridVersion"
+      });
   }
 }

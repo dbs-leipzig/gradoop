@@ -15,13 +15,22 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
 
 public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGraphSampling {
 
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
-                                              String neighborType) {
-    super(testName, seed, sampleSize, neighborType);
+    String neighborType) {
+    super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
+      Neighborhood.valueOf(neighborType));
   }
 
   @Override
@@ -29,4 +38,42 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
+  @Override
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+
+    dbEdges.removeAll(newEdges);
+    for (Edge edge : dbEdges) {
+      assertFalse("there are vertices from edges, which are not part of the sampled graph",
+        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+    }
+  }
+
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and both neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "IN_OUT"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest without seed and both neighborhood",
+        "0",
+        "0.272f",
+        "IN_OUT"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and input neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "IN"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and output neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "OUT"
+      });
+  }
 }

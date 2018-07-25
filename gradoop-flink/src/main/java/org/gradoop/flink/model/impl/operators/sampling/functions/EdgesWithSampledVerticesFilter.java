@@ -21,9 +21,8 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Filters the edges with sampled vertices
- * If any vertices of the edge does not have any related property for sampling,
- * we consider that vertex as not sampled.
+ * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
+ * property for sampling, we consider that vertex as not sampled.
  */
 public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
   /**
@@ -33,7 +32,7 @@ public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edg
   /**
    * type of neighborhood
    */
-  private Neighborhood.NeighborType neighborType;
+  private Neighborhood neighborType;
 
   /**
    * Constructor
@@ -41,8 +40,7 @@ public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edg
    * @param propertyNameForSampled property name which shows if a vertex is sampled
    * @param neighborType type of neighborhood
    */
-  public EdgesWithSampledVerticesFilter(String propertyNameForSampled,
-                                        Neighborhood.NeighborType neighborType) {
+  public EdgesWithSampledVerticesFilter(String propertyNameForSampled, Neighborhood neighborType) {
     this.propertyNameForSampled = propertyNameForSampled;
     this.neighborType = neighborType;
   }
@@ -63,11 +61,11 @@ public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edg
               t3.f2.getPropertyValue(propertyNameForSampled).toString());
     }
     boolean ret = false;
-    if (neighborType.equals(Neighborhood.NeighborType.Both)) {
+    if (neighborType.equals(Neighborhood.IN_OUT)) {
       ret = isSourceVertexMarked || isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.NeighborType.Input)) {
+    } else if (neighborType.equals(Neighborhood.IN)) {
       ret = isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.NeighborType.Output)) {
+    } else if (neighborType.equals(Neighborhood.OUT)) {
       ret = isSourceVertexMarked;
     }
     return ret;
