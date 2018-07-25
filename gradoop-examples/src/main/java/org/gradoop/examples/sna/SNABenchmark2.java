@@ -66,14 +66,13 @@ public class SNABenchmark2 extends AbstractRunner implements
    *
    * For using external data, the following arguments are mandatory:
    *
-   * 1) (possibly HDFS) input directory that contains
-   *  - nodes.json
-   *  - edges.json
-   *  - graphs.json
+   * 1) (possibly HDFS) input directory that contains a EPGM graph
    *
-   * 2) (possibly HDFS) output directory to write the resulting graph to
+   * 2) Format the graph is in (csv, indexed, json)
    *
-   * 3) Threshold for community selection depending on the dataset size:
+   * 3) (possibly HDFS) output directory to write the resulting graph to
+   *
+   * 4) Threshold for community selection depending on the dataset size:
    *
    * Scale - Threshold (recommended)
    * 1     -     1,000
@@ -82,7 +81,7 @@ public class SNABenchmark2 extends AbstractRunner implements
    * 1K    -   350,000
    * 10K   - 2,450,000
    *
-   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
+   * @param args args[0]: input dir, args[1]: input format, args[2]: output dir, args[3]: threshold
    * @throws Exception
    */
   @SuppressWarnings({
@@ -103,23 +102,24 @@ public class SNABenchmark2 extends AbstractRunner implements
 
   /**
    * Runs the benchmark program with external data (e.g. from HDFS)
+   * in a given format (csv, indexed, json)
    *
-   * @param args args[0]: input dir, args[1]: output dir, args[2]: threshold
+   * @param args args[0]: input dir, args[1]: input format, args[2]: output dir, args[3]: threshold
    * @throws Exception
    */
   @SuppressWarnings("unchecked")
   private static void executeWithExternalData(String[] args) throws Exception {
     Preconditions.checkArgument(
-      args.length == 3, "input dir, output dir and threshold required");
-    String inputDir  = args[0];
-    String outputDir = args[1];
-    int threshold    = Integer.parseInt(args[2]);
+      args.length == 4,
+      "input dir, input format, output dir and threshold required");
+    String inputDir    = args[0];
+    String inputFormat = args[1];
+    String outputDir   = args[2];
+    int threshold      = Integer.parseInt(args[3]);
 
-    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir, inputFormat);
 
     writeLogicalGraph(execute(epgmDatabase, threshold), outputDir);
-
-    getExecutionEnvironment().execute();
   }
 
   /**

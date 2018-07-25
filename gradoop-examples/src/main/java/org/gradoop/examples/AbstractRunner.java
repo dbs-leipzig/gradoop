@@ -68,13 +68,13 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Reads an EPGM database from a given directory  using a {@link JSONDataSource}.
+   * Reads an EPGM database from a given directory  using a {@link CSVDataSource}.
    *
    * @param directory path to EPGM database
    * @return EPGM logical graph
    */
   protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
-    return readLogicalGraph(directory, "json");
+    return readLogicalGraph(directory, "csv");
   }
 
   /**
@@ -104,14 +104,14 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Writes a logical graph into the specified directory using a {@link JSONDataSink}.
+   * Writes a logical graph into the specified directory using a {@link CSVDataSink}.
    *
    * @param graph     logical graph
    * @param directory output path
    * @throws Exception
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory) throws Exception {
-    writeLogicalGraph(graph, directory, "json");
+    writeLogicalGraph(graph, directory, "csv");
   }
 
   /**
@@ -129,7 +129,7 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Writes a graph collection into the specified directory using a {@link JSONDataSink}.
+   * Writes a graph collection into the specified directory using a {@link CSVDataSink}.
    *
    * @param collection  graph collection
    * @param directory   output path
@@ -137,7 +137,7 @@ public abstract class AbstractRunner {
    */
   protected static void writeGraphCollection(GraphCollection collection, String directory)
     throws Exception {
-    writeGraphCollection(collection, directory, "json");
+    writeGraphCollection(collection, directory, "csv");
   }
 
   /**
