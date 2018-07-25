@@ -3,6 +3,7 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 
 /**
  * Represents the relational database schema
@@ -27,7 +28,7 @@ public class RDBMSTableBase {
 	/**
 	 * List of further attributes (no primary, foreign key attributes) of database table
 	 */
-	private ArrayList<NameTypeTuple> furtherAttributes;
+	private ArrayList<NameTypeTypeTuple> furtherAttributes;
 	
 	/**
 	 * Number of rows of table
@@ -43,7 +44,7 @@ public class RDBMSTableBase {
 	 * @param rowCount Number of rows
 	 */
 	public RDBMSTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
-			ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
+			ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
@@ -75,11 +76,11 @@ public class RDBMSTableBase {
 		this.foreignKeys = foreignKeys;
 	}
 
-	public ArrayList<NameTypeTuple> getFurtherAttributes() {
+	public ArrayList<NameTypeTypeTuple> getFurtherAttributes() {
 		return furtherAttributes;
 	}
 
-	public void setFurtherAttributes(ArrayList<NameTypeTuple> furtherAttributes) {
+	public void setFurtherAttributes(ArrayList<NameTypeTypeTuple> furtherAttributes) {
 		this.furtherAttributes = furtherAttributes;
 	}
 

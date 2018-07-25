@@ -45,6 +45,7 @@ import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -69,35 +70,44 @@ public class RDBMSDataSource implements DataSource {
 	 * Flink Execution Environment
 	 */
 	private ExecutionEnvironment env;
-	
+
 	/**
 	 * Temporary vertices
 	 */
 	private DataSet<Vertex> tempVertices;
-	
+
 	/**
 	 * Vertices
 	 */
 	private DataSet<Vertex> vertices;
-	
+
 	/**
 	 * Edges
 	 */
 	private DataSet<Edge> edges;
 
 	/**
-	 * Transforms a relational database into an EPGM instance 
+	 * Transforms a relational database into an EPGM instance
 	 * 
-	 * The datasource expects a standard jdbc url, e.g. (jdbc:mysql://localhost/employees) and a valid path to a fitting jdbc driver
+	 * The datasource expects a standard jdbc url, e.g.
+	 * (jdbc:mysql://localhost/employees) and a valid path to a fitting jdbc
+	 * driver
 	 * 
-	 * @param url Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
-	 * @param user Username of relational database user
-	 * @param pw Password of relational database user
-	 * @param jdbcDriverPath Valid path to jdbc driver
-	 * @param jdbcDriverClassName Valid jdbc driver class name
-	 * @param config Gradoop Flink configuration
+	 * @param url
+	 *            Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
+	 * @param user
+	 *            Username of relational database user
+	 * @param pw
+	 *            Password of relational database user
+	 * @param jdbcDriverPath
+	 *            Valid path to jdbc driver
+	 * @param jdbcDriverClassName
+	 *            Valid jdbc driver class name
+	 * @param config
+	 *            Gradoop Flink configuration
 	 */
-	public RDBMSDataSource(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName, GradoopFlinkConfig config) {
+	public RDBMSDataSource(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName,
+			GradoopFlinkConfig config) {
 		this.config = config;
 		this.rdbmsConfig = new RDBMSConfig(url, user, pw, jdbcDriverPath, jdbcDriverClassName);
 		this.env = config.getExecutionEnvironment();
@@ -108,44 +118,84 @@ public class RDBMSDataSource implements DataSource {
 		Connection con = RDBMSConnect.connect(rdbmsConfig);
 
 		try {
-			//creates a metadata representation of the connected relational database schema
+			// creates a metadata representation of the connected relational
+			// database schema
 			MetaDataParser metadata = new MetaDataParser(con);
 			metadata.parse();
 
-			//tables going to convert to vertices
+			// tables going to convert to vertices
 			ArrayList<TableToNode> tablesToNodes = metadata.getTablesToNodes();
-			
-			//tables going to convert to edges
+
+			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadata.getTablesToEdges();
-			
-			//creates vertices from rdbms table tuples 
+
+			// ********************
+			System.out.println("\n****************************");
+			System.out.println("Tables to Nodes");
+			System.out.println("\n****************************");
+			for (TableToNode table : tablesToNodes) {
+				System.out.println("\n" + table.getTableName());
+				System.out.println("*************");
+				for (NameTypeTuple pk : table.getPrimaryKeys()) {
+					System.out.println(pk.f0 + " " + pk.f1 + " pk");
+				}
+				for (Tuple2<NameTypeTuple, String> fk : table.getForeignKeys()) {
+					System.out.println(fk.f0.f0 + " " + fk.f0.f1 + " " + fk.f1 + " fk");
+				}
+				for (NameTypeTypeTuple att : table.getFurtherAttributes()) {
+					System.out.println(att.f0 + " " + att.f1 + " " + att.f2 + " att");
+				}
+			}
+			System.out.println("\n****************************");
+			System.out.println("Tables to Edges");
+			System.out.println("\n****************************");
+			System.out.println(tablesToEdges.size());
+			for (TableToEdge table : tablesToEdges) {
+				System.out.println("\n" + table.getRelationshipType());
+				System.out.println("*************");
+				System.out.println(table.getstartTableName() + " " + table.getendTableName() + " "
+						+ table.getStartAttribute() + " " + table.getEndAttribute());
+				try {
+					for (NameTypeTuple pk : table.getPrimaryKeys()) {
+						System.out.println(pk.f0 + " " + pk.f1 + " pk");
+					}
+					for (NameTypeTypeTuple att : table.getFurtherAttributes()) {
+						System.out.println(att.f0 + " " + att.f1 + " " + att.f2 + " att");
+					}
+				} catch (Exception e) {
+				}
+			}
+			// ********************
+
+			// creates vertices from rdbms table tuples
 			int tablePos = 0;
 			for (TableToNode table : tablesToNodes) {
 				DataSet<Row> dsSQLResult = FlinkConnect.connect(env, rdbmsConfig, table.getRowCount(),
 						table.getSqlQuery(), table.getRowTypeInfo());
 
 				if (tempVertices == null) {
-					tempVertices = dsSQLResult.map(new CreateVertices(table.getTableName(),tablePos))
+					tempVertices = dsSQLResult.map(new CreateVertices(table.getTableName(), tablePos))
 							.withBroadcastSet(env.fromCollection(tablesToNodes), "tables");
 				} else {
-					tempVertices = tempVertices.union(dsSQLResult.map(new CreateVertices(table.getTableName(),tablePos))
-							.withBroadcastSet(env.fromCollection(tablesToNodes), "tables"));
+					tempVertices = tempVertices
+							.union(dsSQLResult.map(new CreateVertices(table.getTableName(), tablePos))
+									.withBroadcastSet(env.fromCollection(tablesToNodes), "tables"));
 				}
 				tablePos++;
 			}
 
-			//creates edges from rdbms table tuples and foreign key relations
+			// creates edges from rdbms table tuples and foreign key relations
 			tablePos = 0;
 			for (TableToEdge table : tablesToEdges) {
-				
-				//converts foreign key relations (1:1,1:n relations)
+
+				// converts foreign key relations (1:1,1:n relations)
 				if (table.isDirectionIndicator()) {
 
-					//represents vertices of referencing table
+					// represents vertices of referencing table
 					DataSet<IdKeyTuple> fkTable = tempVertices.filter(new VertexLabelFilter(table.getstartTableName()))
 							.map(new VertexToIdFkTuple(table.getEndAttribute().f0));
 
-					//represents vertices referenced by current foreign key
+					// represents vertices referenced by current foreign key
 					DataSet<IdKeyTuple> pkTable = tempVertices.filter(new VertexLabelFilter(table.getendTableName()))
 							.map(new VertexToIdPkTuple());
 
@@ -159,22 +209,23 @@ public class RDBMSDataSource implements DataSource {
 					}
 				}
 
-				//converts table tuples (n:m relations)
+				// converts table tuples (n:m relations)
 				else {
 					DataSet<Row> dsSQLResult = FlinkConnect.connect(env, rdbmsConfig, table.getRowCount(),
 							table.getSqlQuery(), table.getRowTypeInfo());
-					
-					//represents the two foreign key attributes and belonging properties
+
+					// represents the two foreign key attributes and belonging
+					// properties
 					DataSet<Tuple3<String, String, Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(tablePos))
 							.withBroadcastSet(env.fromCollection(tablesToEdges), "tables");
 
-					//represents vertices in relation with foreign key one 
-					DataSet<IdKeyTuple> idPkTableOne = tempVertices.filter(new VertexLabelFilter(table.getstartTableName()))
-							.map(new VertexToIdPkTuple());
+					// represents vertices in relation with foreign key one
+					DataSet<IdKeyTuple> idPkTableOne = tempVertices
+							.filter(new VertexLabelFilter(table.getstartTableName())).map(new VertexToIdPkTuple());
 
-					//represents vertices in relation with foreign key two
-					DataSet<IdKeyTuple> idPkTableTwo = tempVertices.filter(new VertexLabelFilter(table.getendTableName()))
-							.map(new VertexToIdPkTuple());
+					// represents vertices in relation with foreign key two
+					DataSet<IdKeyTuple> idPkTableTwo = tempVertices
+							.filter(new VertexLabelFilter(table.getendTableName())).map(new VertexToIdPkTuple());
 
 					DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
 							.map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
@@ -186,7 +237,7 @@ public class RDBMSDataSource implements DataSource {
 						edges = edges.union(dsTupleEdges);
 					}
 
-					//creates other direction edges
+					// creates other direction edges
 					DataSet<Edge> dsTupleEdges2 = dsTupleEdges.map(new EdgeToEdgeComplement());
 
 					edges = edges.union(dsTupleEdges2);
@@ -194,16 +245,17 @@ public class RDBMSDataSource implements DataSource {
 				tablePos++;
 			}
 
-			//cleans vertices by deleting primary key and foreign key properties
+			// cleans vertices by deleting primary key and foreign key
+			// properties
 			for (TableToNode table : tablesToNodes) {
-				
-				//used to find foreign key properties
+
+				// used to find foreign key properties
 				ArrayList<String> fkProps = new ArrayList<String>();
-				
+
 				for (RowHeaderTuple rht : table.getRowheader().getForeignKeyHeader()) {
 					fkProps.add(rht.getName());
 				}
-				
+
 				if (vertices == null) {
 					vertices = tempVertices.filter(new VertexLabelFilter(table.getTableName()))
 							.map(new DeletePKandFKs(fkProps));
@@ -215,6 +267,7 @@ public class RDBMSDataSource implements DataSource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+//		return null;
 		return config.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}
 

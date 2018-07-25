@@ -126,6 +126,13 @@
 			<artifactId>flink-hadoop-compatibility_2.11</artifactId>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.4</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-jdbc -->
 		<dependency>
 			<groupId>org.apache.flink</groupId>

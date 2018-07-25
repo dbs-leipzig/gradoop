@@ -7,6 +7,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**
@@ -47,7 +48,7 @@ public class TableToEdge {
 	/**
 	 * List of further attribute names and belonging datatypes
 	 */
-	private ArrayList<NameTypeTuple> furtherAttributes;
+	private ArrayList<NameTypeTypeTuple> furtherAttributes;
 	
 	/**
 	 * Direction indicator
@@ -83,7 +84,7 @@ public class TableToEdge {
 	 */
 	public TableToEdge(String relationshipType, String startTableName, String endTableName, NameTypeTuple startAttribute,
 			NameTypeTuple endAttribute, ArrayList<NameTypeTuple> primaryKeys,
-			ArrayList<NameTypeTuple> furtherAttributes, boolean directionIndicator, int rowCount) {
+			ArrayList<NameTypeTypeTuple> furtherAttributes, boolean directionIndicator, int rowCount) {
 		this.relationshipType = relationshipType;
 		this.startTableName = startTableName;
 		this.endTableName = endTableName;
@@ -110,12 +111,12 @@ public class TableToEdge {
 		if(!directionIndicator) {
 			int i = 2;
 			fieldTypes = new TypeInformation[furtherAttributes.size() + 2];
-			fieldTypes[0] = SQLToBasicTypeMapper.getBasicTypeInfo(startAttribute.f1);
+			fieldTypes[0] = SQLToBasicTypeMapper.getBasicTypeInfo(startAttribute.f1,null);
 			rowheader.getRowHeader().add(new RowHeaderTuple(startAttribute.f0,RDBMSConstants.FK_FIELD,0));
-			fieldTypes[1] = SQLToBasicTypeMapper.getBasicTypeInfo(endAttribute.f1);
+			fieldTypes[1] = SQLToBasicTypeMapper.getBasicTypeInfo(endAttribute.f1,null);
 			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0,RDBMSConstants.FK_FIELD,1));
-			for (NameTypeTuple att : furtherAttributes) {
-				fieldTypes[i] = SQLToBasicTypeMapper.getBasicTypeInfo(att.f1);
+			for (NameTypeTypeTuple att : furtherAttributes) {
+				fieldTypes[i] = SQLToBasicTypeMapper.getBasicTypeInfo(att.f1,att.f2);
 				rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RDBMSConstants.ATTRIBUTE_FIELD, i));
 				i++;
 			}
@@ -171,11 +172,11 @@ public class TableToEdge {
 		this.primaryKeys = primaryKeys;
 	}
 
-	public ArrayList<NameTypeTuple> getFurtherAttributes() {
+	public ArrayList<NameTypeTypeTuple> getFurtherAttributes() {
 		return furtherAttributes;
 	}
 
-	public void setFurtherAttributes(ArrayList<NameTypeTuple> furtherAttributes) {
+	public void setFurtherAttributes(ArrayList<NameTypeTypeTuple> furtherAttributes) {
 		this.furtherAttributes = furtherAttributes;
 	}
 

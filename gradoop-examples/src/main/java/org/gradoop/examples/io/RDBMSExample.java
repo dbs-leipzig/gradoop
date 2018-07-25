@@ -54,7 +54,7 @@ public class RDBMSExample implements ProgramDescription {
 		LogicalGraph schema = dataSource.getLogicalGraph();
 
 		// write conversion result to given path with timestamp and db name
-		schema.writeTo(new JSONDataSink(outputPath + getDateString() + urlParser(url),gfc));
+		schema.writeTo(new JSONDataSink(outputPath + "/" + getDateString() + urlParser(url),gfc));
 
 		// execute program
 		env.execute();

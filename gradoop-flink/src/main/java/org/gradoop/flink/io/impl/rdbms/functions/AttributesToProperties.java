@@ -17,7 +17,11 @@ public class AttributesToProperties {
 	public static Properties getProperties(Row tuple, RowHeader rowheader) {
 		Properties props = new Properties();
 		for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-			props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
+			try{
+				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
+			}catch(Exception e){
+				System.err.println("Properties require non null.");
+			}
 		}
 		return props;
 	}
