@@ -25,8 +25,6 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -35,7 +33,6 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
 
@@ -148,9 +145,6 @@ public class FrequentLossPatterns
 
     // avoids multiple output files
     getExecutionEnvironment().setParallelism(1);
-    // get Gradoop configuration
-    GradoopFlinkConfig config = GradoopFlinkConfig
-      .createConfig(getExecutionEnvironment());
 
     // START DEMONSTRATION PROGRAM
 
@@ -159,9 +153,7 @@ public class FrequentLossPatterns
     String csvPath = FrequentLossPatterns.class
       .getResource("/data/csv/foodbroker").getFile();
 
-    DataSource dataSource = new CSVDataSource(csvPath, config);
-
-    LogicalGraph iig = dataSource.getLogicalGraph();
+    LogicalGraph iig = readLogicalGraph(csvPath, "csv");
 
     // (2) extract collection of business transaction graphs
 

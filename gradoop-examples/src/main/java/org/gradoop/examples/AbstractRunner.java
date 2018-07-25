@@ -21,6 +21,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
@@ -66,12 +68,11 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Reads an EPGM database from a given directory.
+   * Reads an EPGM database from a given directory  using a {@link JSONDataSource}.
    *
    * @param directory path to EPGM database
    * @return EPGM logical graph
    */
-  @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
     return readLogicalGraph(directory, "json");
   }
@@ -80,26 +81,26 @@ public abstract class AbstractRunner {
    * Reads an EPGM database from a given directory.
    *
    * @param directory path to EPGM database
-   * @param format    format in which the graph is stored (csv, json)
+   * @param format    format in which the graph is stored (csv, indexed, json)
    * @return EPGM logical graph
+   * @throws IOException
    */
-  @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory, String format)
     throws IOException {
-    directory = appendSeparator(directory);
+    return getDataSource(directory, format).getLogicalGraph();
+  }
 
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    format = format.toLowerCase();
-
-    if (format.equals("json")) {
-      return new JSONDataSource(directory, config).getLogicalGraph();
-    } else if (format.equals("csv")) {
-      return new CSVDataSource(directory, config).getLogicalGraph();
-    } else if (format.equals("indexed")) {
-      return new IndexedCSVDataSource(directory, config).getLogicalGraph();
-    } else {
-      throw new IllegalArgumentException("Unsupported format: " + format);
-    }
+  /**
+   * Reads an EPGM database from a given directory.
+   *
+   * @param directory path to EPGM database
+   * @param format    format in which the graph collection is stored (csv, indexed, json)
+   * @return EPGM graph collection
+   * @throws IOException
+   */
+  protected static GraphCollection readGraphCollection(String directory, String format)
+    throws IOException {
+    return getDataSource(directory, format).getGraphCollection();
   }
 
   /**
@@ -118,20 +119,12 @@ public abstract class AbstractRunner {
    *
    * @param graph     logical graph
    * @param directory output path
-   * @param format output format (json, csv)
+   * @param format output format (csv, indexed, json)
    * @throws Exception
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory, String format)
     throws Exception {
-
-    format = format.toLowerCase();
-    if (format.equals("json")) {
-      graph.writeTo(new JSONDataSink(appendSeparator(directory), graph.getConfig()));
-    } else if (format.equals("csv")) {
-      graph.writeTo(new CSVDataSink(appendSeparator(directory), graph.getConfig()));
-    } else if (format.equals("indexed")) {
-      graph.writeTo(new IndexedCSVDataSink(appendSeparator(directory), graph.getConfig()));
-    }
+    graph.writeTo(getDataSink(directory, format, graph.getConfig()));
     getExecutionEnvironment().execute();
   }
 
@@ -144,7 +137,22 @@ public abstract class AbstractRunner {
    */
   protected static void writeGraphCollection(GraphCollection collection, String directory)
     throws Exception {
-    collection.writeTo(new JSONDataSink(appendSeparator(directory), collection.getConfig()));
+    writeGraphCollection(collection, directory, "json");
+  }
+
+  /**
+   * Writes a graph collection into a given directory.
+   *
+   * @param collection  graph collection
+   * @param directory   output path
+   * @param format output format (csv, indexed, json)
+   * @throws Exception
+   */
+  protected static void writeGraphCollection(GraphCollection collection,
+                                             String directory,
+                                             String format)
+    throws Exception {
+    collection.writeTo(getDataSink(directory, format, collection.getConfig()));
     getExecutionEnvironment().execute();
   }
 
@@ -188,5 +196,53 @@ public abstract class AbstractRunner {
     File output = new File(pngFile);
     pb.redirectOutput(ProcessBuilder.Redirect.appendTo(output));
     pb.start();
+  }
+
+  /**
+   * Returns an EPGM DataSource for a given directory and format.
+   *
+   * @param directory input path
+   * @param format    format in which the data is stored (csv, indexed, json)
+   * @return DataSource for EPGM Data
+   * @throws IOException
+   */
+  private static DataSource getDataSource(String directory, String format) throws IOException {
+    directory = appendSeparator(directory);
+
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    format = format.toLowerCase();
+
+    if (format.equals("json")) {
+      return new JSONDataSource(directory, config);
+    } else if (format.equals("csv")) {
+      return new CSVDataSource(directory, config);
+    } else if (format.equals("indexed")) {
+      return new IndexedCSVDataSource(directory, config);
+    } else {
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
+  }
+
+  /**
+   * Returns an EPGM DataSink for a given directory and format.
+   *
+   * @param directory output path
+   * @param format    output format (csv, indexed, json)
+   * @param config    gradoop config
+   * @return DataSink for EPGM Data
+   */
+  private static DataSink getDataSink(String directory, String format, GradoopFlinkConfig config) {
+    directory = appendSeparator(directory);
+
+    format = format.toLowerCase();
+    if (format.equals("json")) {
+      return new JSONDataSink(directory, config);
+    } else if (format.equals("csv")) {
+      return new CSVDataSink(directory, config);
+    } else if (format.equals("indexed")) {
+      return new IndexedCSVDataSink(directory, config);
+    } else {
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
   }
 }
