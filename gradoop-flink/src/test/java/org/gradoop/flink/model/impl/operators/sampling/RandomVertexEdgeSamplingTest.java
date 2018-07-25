@@ -38,14 +38,7 @@ public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampli
   }
 
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
-
-    dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
-      assertFalse("there are vertices from edges, which are not part of the sampled graph",
-        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
-    }
-  }
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {}
 
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
