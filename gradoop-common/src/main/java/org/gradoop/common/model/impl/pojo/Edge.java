@@ -20,8 +20,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
-import java.util.Map;
-
 /**
  * POJO Implementation of an EPGM edge.
  */
