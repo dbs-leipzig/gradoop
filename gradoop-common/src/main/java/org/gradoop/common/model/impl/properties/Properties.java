@@ -307,19 +307,4 @@ public class Properties implements Iterable<Property>, Value, Serializable {
       .map(Property::toString)
       .collect(Collectors.joining(","));
   }
-
-  /**
-   * Returns the properties as a GDL formatted String.
-   *
-   * @return A GDL formatted string that represents the properties.
-   */
-  public String toGDLString() {
-    if (properties.isEmpty()) {
-      return "";
-    } else {
-      return toList().stream()
-        .map(Property::toGDLString)
-        .collect(Collectors.joining(",", "{", "}"));
-    }
-  }
 }

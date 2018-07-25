@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.text.GDLConsoleOutput;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -66,11 +67,8 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
@@ -780,38 +778,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @throws Exception
    */
   public void print() throws Exception {
-    List<Vertex> vertices = getVertices().collect();
-    List<Edge> edges = getEdges().collect();
-    GraphHead graphHead = getGraphHead().collect().get(0);
-
-    Map<GradoopId, String> idToVertexName = new HashMap<>();
-    for (int i = 0; i < vertices.size(); i++) {
-      Vertex v = vertices.get(i);
-      String vName = String.format("v_%s_%s", v.getLabel(), i);
-      idToVertexName.put(v.getId(), vName);
-    }
-
-    String vertexString =
-      vertices.stream()
-        .map(v -> v.toGDLString(idToVertexName.get(v.getId())))
-        .collect(Collectors.joining("\n"));
-
-    String edgeString = edges.stream()
-      .map(e -> e.toGDLString(idToVertexName))
-      .collect(Collectors.joining("\n"));
-
-    StringBuilder result = new StringBuilder()
-      .append("g")
-      .append(graphHead.getId())
-      .append(":")
-      .append(graphHead.getLabel())
-      .append(graphHead.getProperties().toGDLString())
-      .append("[\n")
-      .append(vertexString)
-      .append("\n")
-      .append(edgeString)
-      .append("\n]");
-
-    System.out.println(result);
+    new GDLConsoleOutput(this).print();
   }
 }

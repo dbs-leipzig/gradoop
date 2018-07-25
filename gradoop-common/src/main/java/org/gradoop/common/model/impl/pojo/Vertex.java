@@ -48,16 +48,4 @@ public class Vertex extends GraphElement implements EPGMVertex {
   public String toString() {
     return String.format("(%s)", super.toString());
   }
-
-  /**
-   * Returns a GDL formatted vertex.
-   * @param referenceIdentifier Determines the GDL variable name for the vertex.
-   * @return A GDL formatted vertex string.
-   */
-  public String toGDLString(String referenceIdentifier) {
-    return String.format("(%s:%s %s)",
-      referenceIdentifier,
-      getLabel(),
-      getProperties().toGDLString());
-  }
 }
