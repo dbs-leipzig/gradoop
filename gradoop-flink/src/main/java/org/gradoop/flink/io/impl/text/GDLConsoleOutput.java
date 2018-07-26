@@ -30,6 +30,9 @@ import java.util.List;
 public class GDLConsoleOutput {
   /**
    * Prints the logical graph to the standard output.
+   *
+   * @param logicalGraph The logical graph that is supposed to be printed.
+   * @throws Exception Forwarded from flink execute.
    */
   public static void print(LogicalGraph logicalGraph) throws Exception {
     List<Vertex> vertices = new ArrayList<>();
