@@ -126,6 +126,9 @@ public class GDLEncoder {
 
     Map<GradoopId, String> idToVertexName = getVertexNameMapping(vertices);
 
+
+    String graphHeadString = graphHeadToGDLString(graphHead);
+
     String verticesString = vertices.stream()
       .map(v -> vertexToGDLString(v, idToVertexName.get(v.getId())))
       .collect(Collectors.joining("\n"));
@@ -135,11 +138,7 @@ public class GDLEncoder {
       .collect(Collectors.joining("\n"));
 
     StringBuilder result = new StringBuilder()
-      .append(GRAPH_VARIABLE_PREFIX)
-      .append(graphHead.getId())
-      .append(ID_LABEL_SEPERATOR)
-      .append(graphHead.getLabel()).append(" ")
-      .append(propertiesToGDLString(graphHead.getProperties()))
+      .append(graphHeadString)
       .append(GRAPH_ELEMENTS_DEFINITION_START).append("\n")
       .append(verticesString).append("\n")
       .append(edgesString).append("\n")
@@ -161,6 +160,22 @@ public class GDLEncoder {
       idToVertexName.put(v.getId(), vName);
     }
     return idToVertexName;
+  }
+
+  /**
+   * Returns a GDL formatted graph head string.
+   * @param g graph head
+   * @return gdl formatted string
+   */
+  private String graphHeadToGDLString(GraphHead g) {
+    StringBuilder result = new StringBuilder()
+      .append(GRAPH_VARIABLE_PREFIX)
+      .append(graphHead.getId())
+      .append(ID_LABEL_SEPERATOR)
+      .append(graphHead.getLabel()).append(" ")
+      .append(propertiesToGDLString(g.getProperties()));
+
+    return result.toString();
   }
   /**
    * Returns a GDL formatted edge string.
