@@ -139,7 +139,7 @@ public class FrequentLossPatterns
   /**
    * main method
    * @param args arguments (none required)
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 
@@ -153,7 +153,7 @@ public class FrequentLossPatterns
     String csvPath = FrequentLossPatterns.class
       .getResource("/data/csv/foodbroker").getFile();
 
-    LogicalGraph iig = readLogicalGraph(csvPath, "csv");
+    LogicalGraph iig = readLogicalGraph(csvPath);
 
     // (2) extract collection of business transaction graphs
 

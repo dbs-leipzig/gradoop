@@ -61,7 +61,7 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
       "Path to vertex file");
     OPTIONS.addOption(OPTION_INPUT_FORMAT, "input-format", true,
-      "Format of the input [csv, indexed, json]. Default: csv");
+      "Format of the input [csv, indexed, json]. Default: " + DEFAULT_FORMAT);
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
     OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
@@ -78,7 +78,7 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
    * Main program to run the example. Arguments are the available options.
    *
    * @param args program arguments
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -92,8 +92,8 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     final String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
 
-    boolean hasInputFormat = cmd.hasOption(OPTION_INPUT_FORMAT);
-    final String inputFormat = hasInputFormat ? cmd.getOptionValue(OPTION_INPUT_FORMAT) : "csv";
+    final String inputFormat = cmd.hasOption(OPTION_INPUT_FORMAT) ?
+      cmd.getOptionValue(OPTION_INPUT_FORMAT) : DEFAULT_FORMAT;
 
     boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
     String vertexKey =
