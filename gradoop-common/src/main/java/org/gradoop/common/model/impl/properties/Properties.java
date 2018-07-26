@@ -207,7 +207,6 @@ public class Properties implements Iterable<Property>, Value, Serializable {
   }
 
   /**
-  /**
    * Returns the number of properties.
    *
    * @return number of properties
