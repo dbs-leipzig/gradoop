@@ -776,6 +776,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * Prints the GDL formatted graph to the standard output.
    */
   public void print() throws Exception {
-    new GDLConsoleOutput(this).print();
+    GDLConsoleOutput.print(this);
   }
 }

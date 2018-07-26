@@ -28,51 +28,23 @@ import java.util.List;
  * Allows to print a logical graph to the standard output.
  */
 public class GDLConsoleOutput {
-
-  /**
-   * The logical graph to be printed.
-   */
-  private LogicalGraph logicalGraph;
-  /**
-   * The vertex to be printed.
-   */
-  private List<Vertex> vertices;
-  /**
-   * The edges to be printed.
-   */
-  private List<Edge> edges;
-  /**
-   * The graph head to be printed.
-   */
-  private List<GraphHead> graphHead;
-
-  /**
-   * Initializes the data sinks for the graph information.
-   * @param logicalGraph the Logical Graph that should be printed.
-   */
-  public GDLConsoleOutput(LogicalGraph logicalGraph) {
-    this.logicalGraph = logicalGraph;
-
-    this.vertices = new ArrayList<>();
-    logicalGraph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
-
-    this.edges = new ArrayList<>();
-    logicalGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
-
-    this.graphHead = new ArrayList<>();
-    logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(graphHead));
-  }
-
   /**
    * Prints the logical graph to the standard output.
    */
-  public void print() throws Exception {
+  public static void print(LogicalGraph logicalGraph) throws Exception {
+    List<Vertex> vertices = new ArrayList<>();
+    logicalGraph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
+
+    List<Edge> edges = new ArrayList<>();
+    logicalGraph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
+
+    List<GraphHead> graphHead = new ArrayList<>();
+    logicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(graphHead));
+
     logicalGraph.getConfig().getExecutionEnvironment().execute();
-    GraphHead gh = this.graphHead.get(0);
 
-    GDLEncoder encoder = new GDLEncoder(gh, vertices, edges);
+    GDLEncoder encoder = new GDLEncoder(graphHead.get(0), vertices, edges);
     String graphString = encoder.graphToGDLString();
-
     System.out.println(graphString);
   }
 
