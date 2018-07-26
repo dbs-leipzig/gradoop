@@ -30,8 +30,15 @@ import java.io.IOException;
  */
 public class GDLDataSink implements DataSink {
 
+  /**
+   * The path to write the file to.
+   */
   private String path;
 
+  /**
+   *
+   * @param path The path to write the file to.
+   */
   public GDLDataSink(String path) {
     this.path = path;
   }
@@ -56,10 +63,13 @@ public class GDLDataSink implements DataSink {
     FileSystem.WriteMode writeMode =
       overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
+    TextOutputFormat textOutputFormat = new TextOutputFormat(new Path(path));
+    textOutputFormat.setWriteMode(writeMode);
+
     graphCollection
       .getGraphTransactions()
       .map(new GraphTransactionToGDL())
-      .output(new TextOutputFormat<>(new Path(path)))
+      .output(textOutputFormat)
       .setParallelism(1);
   }
 }

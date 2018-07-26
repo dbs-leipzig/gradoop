@@ -24,12 +24,26 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Allows to print a logical graph to the standard output.
+ */
 public class GDLConsoleOutput {
 
-
+  /**
+   * The logical graph to be printed.
+   */
   private LogicalGraph logicalGraph;
+  /**
+   * The vertex to be printed.
+   */
   private List<Vertex> vertices;
+  /**
+   * The edges to be printed.
+   */
   private List<Edge> edges;
+  /**
+   * The graph head to be printed.
+   */
   private List<GraphHead> graphHead;
 
   /**
@@ -54,9 +68,9 @@ public class GDLConsoleOutput {
    */
   public void print() throws Exception {
     logicalGraph.getConfig().getExecutionEnvironment().execute();
-    GraphHead graphHead = this.graphHead.get(0);
+    GraphHead gh = this.graphHead.get(0);
 
-    GDLEncoder encoder = new GDLEncoder(graphHead, vertices, edges);
+    GDLEncoder encoder = new GDLEncoder(gh, vertices, edges);
     String graphString = encoder.graphToGDLString();
 
     System.out.println(graphString);

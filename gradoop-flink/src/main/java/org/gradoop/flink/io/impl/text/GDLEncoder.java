@@ -148,17 +148,24 @@ public class GDLEncoder {
     return result.toString();
   }
 
+  /**
+   * Returns a mapping between the vertex gradoop id and the gdl variable name.
+   * @param vertices The graph vertices.
+   * @return Mapping between vertex and gdl variable name.
+   */
   private Map<GradoopId, String> getVertexNameMapping(List<Vertex> vertices) {
     Map<GradoopId, String> idToVertexName = new HashMap<>();
     for (int i = 0; i < vertices.size(); i++) {
       Vertex v = vertices.get(i);
-      String vName = String.format("%s_%s_%s", VERTEX_VARIABLE_PREFIX,v.getLabel(), i);
+      String vName = String.format("%s_%s_%s", VERTEX_VARIABLE_PREFIX, v.getLabel(), i);
       idToVertexName.put(v.getId(), vName);
     }
     return idToVertexName;
   }
   /**
    * Returns a GDL formatted edge string.
+   *
+   * @param e The edge to be formatted.
    * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl
    *                       variable name
    * @return A GDL formatted edge string.
@@ -172,6 +179,8 @@ public class GDLEncoder {
   }
   /**
    * Returns a GDL formatted vertex.
+   *
+   * @param v The vertex that should be formatted.
    * @param referenceIdentifier Determines the GDL variable name for the vertex.
    * @return A GDL formatted vertex string.
    */
@@ -184,6 +193,7 @@ public class GDLEncoder {
   /**
    * Returns the properties as a GDL formatted String.
    *
+   * @param properties The properties to be formatted.
    * @return A GDL formatted string that represents the properties.
    */
   private String propertiesToGDLString(Properties properties) {
@@ -198,6 +208,9 @@ public class GDLEncoder {
 
   /**
    * Returns this property as a GDL formatted String.
+   *
+   * @param property The property.
+   *
    * @return A GDL formatted string that represents the property.
    */
   private String propertyToGDLString(Property property) {

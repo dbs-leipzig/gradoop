@@ -1,4 +1,4 @@
-g1:graph {name: "randomName"} [
+g1:graph{name: "randomName"} [
 (p1:Person {name: "Bob", age: 24})-[:friendsWith]->
 (p2:Person{name: "Alice", age: 30})-[:friendsWith]->(p1)
 (p2)-[:friendsWith]->(p3:Person {name: "Jacob", age: 27})-[:friendsWith]->(p2)
