@@ -19,8 +19,6 @@ public class GDLDataSinkTest extends GradoopFlinkTestBase {
     LogicalGraph expected = getLoaderFromFile(gdlPath)
       .getLogicalGraphByVariable("g1");
 
-    expected.print();
-
     String path = temporaryFolder.getRoot().getPath() + "/graph.gdl";
     expected.writeTo(new GDLDataSink(path));
 
