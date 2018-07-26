@@ -27,6 +27,7 @@ import java.io.IOException;
 
 /**
  * A data sink that writes a gdl formatted string.
+ * It is executed with a parallelism of 1 and therefore limited to smaller graphs.
  */
 public class GDLDataSink implements DataSink {
 
@@ -42,22 +43,31 @@ public class GDLDataSink implements DataSink {
   public GDLDataSink(String path) {
     this.path = path;
   }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
     write(logicalGraph, false);
   }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(GraphCollection graphCollection) throws
     IOException {
     write(graphCollection, false);
   }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(LogicalGraph graph, boolean overwrite) throws IOException {
     write(graph.getConfig().getGraphCollectionFactory().fromGraph(graph), overwrite);
   }
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
     FileSystem.WriteMode writeMode =

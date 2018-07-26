@@ -32,9 +32,7 @@ public class GraphTransactionToGDL implements MapFunction<GraphTransaction, Stri
   @Override
   public String map(GraphTransaction graphTransaction) throws Exception {
     List<Vertex> vertices = new ArrayList<>(graphTransaction.getVertices());
-
     List<Edge> edges = new ArrayList<>(graphTransaction.getEdges());
-
     GraphHead graphHead = graphTransaction.getGraphHead();
 
     GDLEncoder encoder = new GDLEncoder(graphHead, vertices, edges);

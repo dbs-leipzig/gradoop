@@ -43,7 +43,7 @@ public class GDLEncoder {
   /**
    * Seperates the id and label of graph, vertex and edge.
    */
-  private static final String ID_LABEL_SEPERATOR = ":";
+  private static final String ID_LABEL_SEPARATOR = ":";
   /**
    * Graph variable prefix, because Gradoop can't parse GDL variable starting with a number.
    */
@@ -53,21 +53,21 @@ public class GDLEncoder {
    */
   private static final String VERTEX_VARIABLE_PREFIX = "v";
   /**
-   * Seperates properties.
+   * Marks the end of the properties prefix.
    */
   private static final String PROPERTIES_PREFIX = "{";
   /**
-   * Seperates properties.
+   * Marks the end of the properties string.
    */
   private static final String PROPERTIES_SUFFIX = "}";
   /**
    * Seperates properties.
    */
-  private static final String PROPERTIES_SEPERATOR = ",";
+  private static final String PROPERTIES_SEPARATOR = ",";
   /**
    * Seperates key and value for properties.
    */
-  private static final String KEY_VALUE_SEPERATOR = ":";
+  private static final String KEY_VALUE_SEPARATOR = ":";
   /**
    * Suffix for GDL double representation.
    */
@@ -171,7 +171,7 @@ public class GDLEncoder {
     StringBuilder result = new StringBuilder()
       .append(GRAPH_VARIABLE_PREFIX)
       .append(graphHead.getId())
-      .append(ID_LABEL_SEPERATOR)
+      .append(ID_LABEL_SEPARATOR)
       .append(graphHead.getLabel()).append(" ")
       .append(propertiesToGDLString(g.getProperties()));
 
@@ -217,7 +217,7 @@ public class GDLEncoder {
     } else {
       return properties.toList().stream()
         .map(this::propertyToGDLString)
-        .collect(Collectors.joining(PROPERTIES_SEPERATOR, PROPERTIES_PREFIX, PROPERTIES_SUFFIX));
+        .collect(Collectors.joining(PROPERTIES_SEPARATOR, PROPERTIES_PREFIX, PROPERTIES_SUFFIX));
     }
   }
 
@@ -225,13 +225,12 @@ public class GDLEncoder {
    * Returns this property as a GDL formatted String.
    *
    * @param property The property.
-   *
    * @return A GDL formatted string that represents the property.
    */
   private String propertyToGDLString(Property property) {
     StringBuilder result = new StringBuilder()
       .append(property.getKey())
-      .append(KEY_VALUE_SEPERATOR);
+      .append(KEY_VALUE_SEPARATOR);
 
     PropertyValue value = property.getValue();
 
