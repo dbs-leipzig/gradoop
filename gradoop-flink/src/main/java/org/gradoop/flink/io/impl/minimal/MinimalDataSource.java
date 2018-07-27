@@ -1,7 +1,21 @@
+/**
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.io.impl.minimal;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSource;
@@ -12,109 +26,60 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * A data source to create a logical graph
+ * that is not in gradoop format.
+ *
+ * It is necessary to pre-process the edges and vertices with
+ * the MinimalEdgeProvider/MinimalVertecProvider to import the
+ * external representation into the EPGM.
+ */
 public class MinimalDataSource implements DataSource {
 
   /**
-   * Path to the vertex csv file
-   */
-  private String vertexCsvPath;
-
-  /**
-   * Gradoop Flink configuration
-   */
+  * Gradoop Flink configuration
+  */
   private GradoopFlinkConfig config;
 
   /**
-   * Token delimiter
-   */
-  private static String tokenSeparator;
+  * All vertices the graph contains.
+  */
+  private MinimalVertexProvider vertices;
 
   /**
-   * Name of the id column
-   */
-  private String vertexIdColumn;
+  * All edges the graph contains.
+  */
+  private MinimalEdgeProvider edges;
 
   /**
-   * Name of the label column
-   */
-  private String vertexLabel;
+  * Constructor
+  * @param config Gradoop configuration
+  * @param vertices all vertices of the graph
+  * @param edges all edges of the graph
+  */
+  public MinimalDataSource(GradoopFlinkConfig config, MinimalVertexProvider vertices,
+        MinimalEdgeProvider edges) {
 
-  /**
-   * Property names of all vertices
-   */
-  private static List<String> vertexProperties;
-  
-  /**
-   * Path to the edge csv file
-   */
-  private String edgeCsvPath;
-  
-  /**
-   * Name of the edge id column
-   */
-  private String edgeIdColumn;
-
-  /**
-   * Name of the source id column
-   */
-  private String sourceIdColumn;
-
-  /**
-   * Name of the target id column
-   */
-  private String targetIdColumn;
-
-  /**
-   * Name of the label column
-   */
-  private String edgeLabel;
-
-  /**
-   * Property names of all vertices
-   */
-  private static List<String> edgeProperties;
-  
-  public MinimalDataSource(GradoopFlinkConfig config, String tokenSeperator,
-      String vertexCsvPath, String vertexIdColumn, String vertexLabel,
-      List<String> vertexProperties, String edgeCsvPath, String edgeId,
-      String sourceId, String targetId, String edgeLabel, List<String> edgeProperties) {
     this.config = config;
-    this.tokenSeparator = tokenSeperator;
-    this.vertexCsvPath = vertexCsvPath;
-    this.vertexIdColumn = vertexIdColumn;
-    this.vertexLabel = vertexLabel;
-    this.vertexProperties = vertexProperties;
-    this.edgeCsvPath = edgeCsvPath;
-    this.edgeIdColumn = edgeId;
-    this.sourceIdColumn = sourceId;
-    this.targetIdColumn = targetId;
-    this.edgeLabel = edgeLabel;
-    this.edgeProperties = edgeProperties;
+    this.vertices = vertices;
+    this.edges = edges;
   }
-  
+
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    
-    MinimalVertexProvider verticesProvide = new MinimalVertexProvider(
-        vertexCsvPath, config, tokenSeparator, vertexIdColumn, vertexLabel, vertexProperties);
-    
-    DataSet<ImportVertex<String>> importVertices = verticesProvide.importVertex();
-    
-    MinimalEdgeProvider edgesProvider = new MinimalEdgeProvider(
-        edgeCsvPath, config, tokenSeparator, edgeIdColumn, sourceIdColumn,
-        targetIdColumn, edgeLabel, edgeProperties);
-    
-    DataSet<ImportEdge<String>> importEdges = edgesProvider.importEdge();
-    
+
+    DataSet<ImportVertex<String>> importVertices = vertices.importVertex();
+
+    DataSet<ImportEdge<String>> importEdges = edges.importEdge();
+
     return new GraphDataSource<>(importVertices, importEdges, getConfig()).getLogicalGraph();
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
-  
+
   GradoopFlinkConfig getConfig() {
     return config;
   }
