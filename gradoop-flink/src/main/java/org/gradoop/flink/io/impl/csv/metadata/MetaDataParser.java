@@ -293,7 +293,7 @@ public class MetaDataParser {
    * @return Returns null
    */
   private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
-    if (nullString != null && nullString.equalsIgnoreCase("null")) {
+    if (nullString != null && nullString.equalsIgnoreCase(TypeString.NULL.getTypeString())) {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");
