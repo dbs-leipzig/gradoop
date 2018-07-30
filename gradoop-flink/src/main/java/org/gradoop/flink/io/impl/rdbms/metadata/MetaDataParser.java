@@ -18,7 +18,9 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -94,10 +96,12 @@ public class MetaDataParser {
 
 					// assigning primary key name
 					while (rsPrimaryKeys.next()) {
-						primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
-						pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
+						if (!rsPrimaryKeys.getString(4).contains("CONSTRAINT")) {
+							primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
+							pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
+						}
 					}
-
+					
 					// assigning primary key data type
 					for (NameTypeTuple pk : primaryKeys) {
 						ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
@@ -132,14 +136,16 @@ public class MetaDataParser {
 					// assigning attribute name and belonging data type
 					while (rsAttributes.next()) {
 						if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
-								&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER) {
+								&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
+								&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
 
 							NameTypeTypeTuple att = new NameTypeTypeTuple(rsAttributes.getString("COLUMN_NAME"),
 									JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")), null);
 
-							if (JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) == JDBCType.ARRAY) {
-								att.f2 = JDBCType.valueOf(rsAttributes.getMetaData().getColumnType(1));
-							}
+							//TODO: support for array data type
+//							if (JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) == JDBCType.ARRAY) {
+//								att.f2 = JDBCType.valueOf(rsAttributes.getMetaData().getColumnType(1));
+//							}
 
 							furtherAttributes.add(att);
 						}

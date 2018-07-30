@@ -85,6 +85,10 @@ public class RDBMSDataSource implements DataSource {
 	 * Edges
 	 */
 	private DataSet<Edge> edges;
+	
+	private DataSet<Edge> edges1;
+	
+	private DataSet<Edge> edges2;
 
 	/**
 	 * Transforms a relational database into an EPGM instance
@@ -202,10 +206,20 @@ public class RDBMSDataSource implements DataSource {
 					DataSet<Edge> dsFKEdges = fkTable.join(pkTable).where(1).equalTo(1)
 							.map(new Tuple2ToEdge(table.getEndAttribute().f0));
 
-					if (edges == null) {
-						edges = dsFKEdges;
-					} else {
-						edges = edges.union(dsFKEdges);
+					if (tablePos < (tablesToEdges.size()/2)) {
+						if(edges1 == null){
+							edges1 = dsFKEdges;
+						}else{
+							edges1 = edges1.union(dsFKEdges);
+						}
+					} 
+					else {
+						if(edges2 == null){
+							edges2 = dsFKEdges;
+						}
+						else{
+							edges2 = edges2.union(dsFKEdges);
+						}
 					}
 				}
 
@@ -233,7 +247,8 @@ public class RDBMSDataSource implements DataSource {
 
 					if (edges == null) {
 						edges = dsTupleEdges;
-					} else {
+					} 
+					else {
 						edges = edges.union(dsTupleEdges);
 					}
 
@@ -244,7 +259,9 @@ public class RDBMSDataSource implements DataSource {
 				}
 				tablePos++;
 			}
-
+			
+			edges = edges1.union(edges2);
+			
 			// cleans vertices by deleting primary key and foreign key
 			// properties
 			for (TableToNode table : tablesToNodes) {
@@ -267,7 +284,6 @@ public class RDBMSDataSource implements DataSource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		return null;
 		return config.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}
 
