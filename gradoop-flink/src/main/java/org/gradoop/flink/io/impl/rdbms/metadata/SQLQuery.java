@@ -2,6 +2,7 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 
@@ -18,7 +19,7 @@ public class SQLQuery {
 	 * @param furtherAttributes List of further attributes
 	 * @return Valid sql string for querying needed data for tuple-to-vertex conversation
 	 */
-	public static String getNodeTableQuery(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys,
+	public static String getNodeTableQuery(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys,
 			ArrayList<NameTypeTypeTuple> furtherAttributes) {
 		
 		String sqlQuery = "SELECT ";
@@ -27,8 +28,8 @@ public class SQLQuery {
 			sqlQuery = sqlQuery + pk.f0 + ",";
 		}
 		
-		for (Tuple2<NameTypeTuple,String> fk : foreignKeys){
-			sqlQuery += fk.f0.f0 + ",";
+		for (FkTuple fk : foreignKeys){
+			sqlQuery += fk.f0 + ",";
 		}
 		
 		for (NameTypeTypeTuple att : furtherAttributes) {

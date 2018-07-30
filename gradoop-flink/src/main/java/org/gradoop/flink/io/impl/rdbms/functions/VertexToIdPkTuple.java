@@ -9,9 +9,15 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
  * Creates pairs consisting of gradoop id and primary key name, from vertices
  */
 public class VertexToIdPkTuple implements MapFunction<Vertex,IdKeyTuple> {
+	
+	private String refdAttName;
+	
+	public VertexToIdPkTuple(String refdAttName) {
+		this.refdAttName = refdAttName;
+	}
 
 	@Override
 	public IdKeyTuple map(Vertex v) throws Exception {
-		return new IdKeyTuple(v.getId(),v.getProperties().get(RDBMSConstants.PK_ID).toString());
+		return new IdKeyTuple(v.getId(),v.getProperties().get(refdAttName).toString());
 	}
 }

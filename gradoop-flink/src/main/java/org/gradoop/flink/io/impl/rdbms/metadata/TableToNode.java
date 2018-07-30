@@ -7,6 +7,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
@@ -29,7 +30,7 @@ public class TableToNode {
 	/**
 	 * List of foreign key names and belonging datatypes
 	 */
-	private ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys;
+	private ArrayList<FkTuple> foreignKeys;
 
 	/**
 	 * List of further attribute names and belonging datatypes
@@ -59,7 +60,7 @@ public class TableToNode {
 	 * @param furtherAttributes List of further attribute names and datatypes
 	 * @param rowCount Number of database rows
 	 */
-	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes,
+	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes,
 			int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
@@ -83,9 +84,9 @@ public class TableToNode {
 			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RDBMSConstants.PK_FIELD,i));
 			i++;
 		}
-		for(Tuple2<NameTypeTuple,String> fk : foreignKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f0.f1,null);
-			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0.f0,RDBMSConstants.FK_FIELD,i));
+		for(FkTuple fk : foreignKeys){
+			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f1,null);
+			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RDBMSConstants.FK_FIELD,i));
 			i++;
 		}
 		for(NameTypeTypeTuple att : furtherAttributes){
@@ -97,11 +98,11 @@ public class TableToNode {
 		return new RowTypeInfo(fieldTypes);
 	}
 
-	public ArrayList<Tuple2<NameTypeTuple,String>> getForeignKeys() {
+	public ArrayList<FkTuple> getForeignKeys() {
 		return foreignKeys;
 	}
 
-	public void setForeignKeys(ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys) {
+	public void setForeignKeys(ArrayList<FkTuple> foreignKeys) {
 		this.foreignKeys = foreignKeys;
 	}
 

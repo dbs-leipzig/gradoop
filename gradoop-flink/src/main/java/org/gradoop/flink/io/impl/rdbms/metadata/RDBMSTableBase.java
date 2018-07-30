@@ -2,6 +2,7 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 
@@ -23,7 +24,7 @@ public class RDBMSTableBase {
 	/**
 	 * List of foreign key of database table
 	 */
-	private ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys;
+	private ArrayList<FkTuple> foreignKeys;
 	
 	/**
 	 * List of further attributes (no primary, foreign key attributes) of database table
@@ -44,7 +45,7 @@ public class RDBMSTableBase {
 	 * @param rowCount Number of rows
 	 */
 	public RDBMSTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
-			ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes, int rowCount) {
+			ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
@@ -68,11 +69,11 @@ public class RDBMSTableBase {
 		this.primaryKeys = primaryKeys;
 	}
 
-	public ArrayList<Tuple2<NameTypeTuple,String>> getForeignKeys() {
+	public ArrayList<FkTuple> getForeignKeys() {
 		return foreignKeys;
 	}
 
-	public void setForeignKeys(ArrayList<Tuple2<NameTypeTuple,String>> foreignKeys) {
+	public void setForeignKeys(ArrayList<FkTuple> foreignKeys) {
 		this.foreignKeys = foreignKeys;
 	}
 

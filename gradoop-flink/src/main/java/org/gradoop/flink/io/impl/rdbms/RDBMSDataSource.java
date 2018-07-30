@@ -30,6 +30,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.rdbms.connection.FlinkConnect;
 import org.gradoop.flink.io.impl.rdbms.connection.RDBMSConfig;
 import org.gradoop.flink.io.impl.rdbms.connection.RDBMSConnect;
+import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeletePKandFKs;
 import org.gradoop.flink.io.impl.rdbms.functions.EdgeToEdgeComplement;
@@ -43,6 +44,7 @@ import org.gradoop.flink.io.impl.rdbms.functions.VertexToIdPkTuple;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
@@ -86,10 +88,6 @@ public class RDBMSDataSource implements DataSource {
 	 */
 	private DataSet<Edge> edges;
 	
-	private DataSet<Edge> edges1;
-	
-	private DataSet<Edge> edges2;
-
 	/**
 	 * Transforms a relational database into an EPGM instance
 	 * 
@@ -143,8 +141,8 @@ public class RDBMSDataSource implements DataSource {
 				for (NameTypeTuple pk : table.getPrimaryKeys()) {
 					System.out.println(pk.f0 + " " + pk.f1 + " pk");
 				}
-				for (Tuple2<NameTypeTuple, String> fk : table.getForeignKeys()) {
-					System.out.println(fk.f0.f0 + " " + fk.f0.f1 + " " + fk.f1 + " fk");
+				for (FkTuple fk : table.getForeignKeys()) {
+					System.out.println(fk.f0 + " " + fk.f1 + " " + fk.f2 + " " + fk.f3 + " fk");
 				}
 				for (NameTypeTypeTuple att : table.getFurtherAttributes()) {
 					System.out.println(att.f0 + " " + att.f1 + " " + att.f2 + " att");
@@ -153,7 +151,6 @@ public class RDBMSDataSource implements DataSource {
 			System.out.println("\n****************************");
 			System.out.println("Tables to Edges");
 			System.out.println("\n****************************");
-			System.out.println(tablesToEdges.size());
 			for (TableToEdge table : tablesToEdges) {
 				System.out.println("\n" + table.getRelationshipType());
 				System.out.println("*************");
@@ -197,29 +194,19 @@ public class RDBMSDataSource implements DataSource {
 
 					// represents vertices of referencing table
 					DataSet<IdKeyTuple> fkTable = tempVertices.filter(new VertexLabelFilter(table.getstartTableName()))
-							.map(new VertexToIdFkTuple(table.getEndAttribute().f0));
+							.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
 
 					// represents vertices referenced by current foreign key
 					DataSet<IdKeyTuple> pkTable = tempVertices.filter(new VertexLabelFilter(table.getendTableName()))
-							.map(new VertexToIdPkTuple());
+							.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
 
 					DataSet<Edge> dsFKEdges = fkTable.join(pkTable).where(1).equalTo(1)
 							.map(new Tuple2ToEdge(table.getEndAttribute().f0));
 
-					if (tablePos < (tablesToEdges.size()/2)) {
-						if(edges1 == null){
-							edges1 = dsFKEdges;
-						}else{
-							edges1 = edges1.union(dsFKEdges);
-						}
-					} 
-					else {
-						if(edges2 == null){
-							edges2 = dsFKEdges;
-						}
-						else{
-							edges2 = edges2.union(dsFKEdges);
-						}
+					if(edges == null) {
+						edges = dsFKEdges;
+					}else {
+						edges = edges.union(dsFKEdges);
 					}
 				}
 
@@ -235,11 +222,11 @@ public class RDBMSDataSource implements DataSource {
 
 					// represents vertices in relation with foreign key one
 					DataSet<IdKeyTuple> idPkTableOne = tempVertices
-							.filter(new VertexLabelFilter(table.getstartTableName())).map(new VertexToIdPkTuple());
+							.filter(new VertexLabelFilter(table.getstartTableName())).map(new VertexToIdPkTuple(RDBMSConstants.PK_ID));
 
 					// represents vertices in relation with foreign key two
 					DataSet<IdKeyTuple> idPkTableTwo = tempVertices
-							.filter(new VertexLabelFilter(table.getendTableName())).map(new VertexToIdPkTuple());
+							.filter(new VertexLabelFilter(table.getendTableName())).map(new VertexToIdPkTuple(RDBMSConstants.PK_ID));
 
 					DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
 							.map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
@@ -259,9 +246,7 @@ public class RDBMSDataSource implements DataSource {
 				}
 				tablePos++;
 			}
-			
-			edges = edges1.union(edges2);
-			
+					
 			// cleans vertices by deleting primary key and foreign key
 			// properties
 			for (TableToNode table : tablesToNodes) {
@@ -269,8 +254,8 @@ public class RDBMSDataSource implements DataSource {
 				// used to find foreign key properties
 				ArrayList<String> fkProps = new ArrayList<String>();
 
-				for (RowHeaderTuple rht : table.getRowheader().getForeignKeyHeader()) {
-					fkProps.add(rht.getName());
+				for (FkTuple fk : table.getForeignKeys()) {
+					fkProps.add(fk.f0);
 				}
 
 				if (vertices == null) {
@@ -284,6 +269,7 @@ public class RDBMSDataSource implements DataSource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+//		return null;
 		return config.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}
 
