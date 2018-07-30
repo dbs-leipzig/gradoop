@@ -464,7 +464,7 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   }
 
   /**
-   * Prints a graph collection the console.
+   * Prints a GraphCollection the console.
    *
    * @throws Exception forwarded DataSet print() Exception.
    */
