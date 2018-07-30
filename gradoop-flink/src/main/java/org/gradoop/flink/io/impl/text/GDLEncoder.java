@@ -107,6 +107,7 @@ public class GDLEncoder {
   private List<Edge> edges;
 
   /**
+   * Creates a GDLEncoder using the passed parameters.
    *
    * @param graphHead graph head that should be encoded
    * @param vertices vertices that should be encoded
@@ -120,28 +121,28 @@ public class GDLEncoder {
 
   /**
    * Transforms the graph that is represented by graph head, vertices and edges into a GDL string.
+   *
    * @return GDL formatted String.
    */
   public String graphToGDLString() {
 
     Map<GradoopId, String> idToVertexName = getVertexNameMapping(vertices);
 
-
     String graphHeadString = graphHeadToGDLString(graphHead);
 
     String verticesString = vertices.stream()
       .map(v -> vertexToGDLString(v, idToVertexName.get(v.getId())))
-      .collect(Collectors.joining("\n"));
+      .collect(Collectors.joining(System.lineSeparator()));
 
     String edgesString = edges.stream()
       .map(e -> edgeToGDLString(e, idToVertexName))
-      .collect(Collectors.joining("\n"));
+      .collect(Collectors.joining(System.lineSeparator()));
 
     StringBuilder result = new StringBuilder()
       .append(graphHeadString)
-      .append(GRAPH_ELEMENTS_DEFINITION_START).append("\n")
-      .append(verticesString).append("\n")
-      .append(edgesString).append("\n")
+      .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())
+      .append(verticesString).append(System.lineSeparator())
+      .append(edgesString).append(System.lineSeparator())
       .append(GRAPH_ELEMENTS_DEFINITION_END);
 
     return result.toString();
@@ -149,11 +150,12 @@ public class GDLEncoder {
 
   /**
    * Returns a mapping between the vertex gradoop id and the gdl variable name.
+   *
    * @param vertices The graph vertices.
    * @return Mapping between vertex and gdl variable name.
    */
   private Map<GradoopId, String> getVertexNameMapping(List<Vertex> vertices) {
-    Map<GradoopId, String> idToVertexName = new HashMap<>();
+    Map<GradoopId, String> idToVertexName = new HashMap<>(vertices.size());
     for (int i = 0; i < vertices.size(); i++) {
       Vertex v = vertices.get(i);
       String vName = String.format("%s_%s_%s", VERTEX_VARIABLE_PREFIX, v.getLabel(), i);
@@ -164,6 +166,7 @@ public class GDLEncoder {
 
   /**
    * Returns a GDL formatted graph head string.
+   *
    * @param g graph head
    * @return gdl formatted string
    */

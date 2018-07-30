@@ -73,7 +73,7 @@ public class GDLDataSink implements DataSink {
     FileSystem.WriteMode writeMode =
       overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
-    TextOutputFormat textOutputFormat = new TextOutputFormat(new Path(path));
+    TextOutputFormat<String> textOutputFormat = new TextOutputFormat<>(new Path(path));
     textOutputFormat.setWriteMode(writeMode);
 
     graphCollection

@@ -25,6 +25,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.text.functions.GraphTransactionToGDL;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -460,5 +461,14 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
+  }
+
+  /**
+   * Prints a graph collection the console.
+   *
+   * @throws Exception forwarded DataSet print() Exception.
+   */
+  public void print() throws Exception {
+    getGraphTransactions().map(new GraphTransactionToGDL()).print();
   }
 }
