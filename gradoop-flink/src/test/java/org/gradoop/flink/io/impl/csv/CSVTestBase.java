@@ -73,22 +73,22 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     objectMap.put(stringValue2, PropertyValue.create(67.89));
 
     Map<String, Object> propertyMap = new HashMap<>();
-    propertyMap.put(GradoopTestUtils.KEY_0, GradoopTestUtils.NULL_VAL_0);
-    propertyMap.put(GradoopTestUtils.KEY_1, GradoopTestUtils.BOOL_VAL_1);
-    propertyMap.put(GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2);
-    propertyMap.put(GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3);
-    propertyMap.put(GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4);
-    propertyMap.put(GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5);
-    propertyMap.put(GradoopTestUtils.KEY_6, GradoopTestUtils.STRING_VAL_6);
-    propertyMap.put(GradoopTestUtils.KEY_7, GradoopId.fromString("000000000000000000000001"));
-    propertyMap.put(GradoopTestUtils.KEY_8, localDate);
-    propertyMap.put(GradoopTestUtils.KEY_9, localTime);
-    propertyMap.put(GradoopTestUtils.KEY_a, LocalDateTime.of(localDate, localTime));
-    propertyMap.put(GradoopTestUtils.KEY_b, GradoopTestUtils.BIG_DECIMAL_VAL_7);
-    propertyMap.put(GradoopTestUtils.KEY_c, objectMap);
-    propertyMap.put(GradoopTestUtils.KEY_d, stringList);
-    propertyMap.put(GradoopTestUtils.KEY_e, intList);
-    propertyMap.put(GradoopTestUtils.KEY_f, GradoopTestUtils.SHORT_VAL_e);
+    propertyMap.put(GradoopTestUtils.KEY_0, GradoopTestUtils.BOOL_VAL_1);
+    propertyMap.put(GradoopTestUtils.KEY_1, GradoopTestUtils.INT_VAL_2);
+    propertyMap.put(GradoopTestUtils.KEY_2, GradoopTestUtils.LONG_VAL_3);
+    propertyMap.put(GradoopTestUtils.KEY_3, GradoopTestUtils.FLOAT_VAL_4);
+    propertyMap.put(GradoopTestUtils.KEY_4, GradoopTestUtils.DOUBLE_VAL_5);
+    propertyMap.put(GradoopTestUtils.KEY_5, GradoopTestUtils.STRING_VAL_6);
+    propertyMap.put(GradoopTestUtils.KEY_6, GradoopId.fromString("000000000000000000000001"));
+    propertyMap.put(GradoopTestUtils.KEY_7, localDate);
+    propertyMap.put(GradoopTestUtils.KEY_8, localTime);
+    propertyMap.put(GradoopTestUtils.KEY_9, LocalDateTime.of(localDate, localTime));
+    propertyMap.put(GradoopTestUtils.KEY_a, GradoopTestUtils.BIG_DECIMAL_VAL_7);
+    propertyMap.put(GradoopTestUtils.KEY_b, objectMap);
+    propertyMap.put(GradoopTestUtils.KEY_c, stringList);
+    propertyMap.put(GradoopTestUtils.KEY_d, intList);
+    propertyMap.put(GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e);
+    propertyMap.put(GradoopTestUtils.KEY_f, GradoopTestUtils.NULL_VAL_0);
     return Collections.unmodifiableMap(propertyMap);
   }
 
@@ -161,7 +161,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).isList());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).isList());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isNull());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
 
     // assert that the properties have valid values
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
@@ -194,7 +194,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
       PROPERTY_MAP.get(GradoopTestUtils.KEY_d));
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_e));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getShort(),
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_f));
   }
 
