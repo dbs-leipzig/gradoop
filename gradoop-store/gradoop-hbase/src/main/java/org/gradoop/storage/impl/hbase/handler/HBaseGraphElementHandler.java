@@ -23,8 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 
-import java.io.IOException;
-
 /**
  * Handler class for entities that are contained in logical graphs (i.e.,
  * vertex and edge data).

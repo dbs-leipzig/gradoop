@@ -22,8 +22,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 
-import java.io.IOException;
-
 /**
  * Responsible for reading and writing vertex data from and to HBase.
  */

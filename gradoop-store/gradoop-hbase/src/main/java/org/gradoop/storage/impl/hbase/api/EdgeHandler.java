@@ -23,8 +23,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
-import java.io.IOException;
-
 /**
  * Responsible for reading and writing edge data from and to HBase.
  */

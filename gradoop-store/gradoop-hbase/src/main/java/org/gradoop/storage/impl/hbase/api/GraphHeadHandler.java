@@ -22,8 +22,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 
-import java.io.IOException;
-
 /**
  * This class is responsible for reading and writing EPGM graph heads from
  * and to HBase.
