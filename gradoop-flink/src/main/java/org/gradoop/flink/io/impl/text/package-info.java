@@ -13,16 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tostring.api;
-
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
-
 /**
- * string representation of a vertex
- * @param <V> vertex type
+ * Contains classes related to the input and output of data in the gdl format.
  */
-public interface VertexToString<V extends Vertex>
-  extends FlatMapFunction<V, VertexString> {
-}
+package org.gradoop.flink.io.impl.text;
