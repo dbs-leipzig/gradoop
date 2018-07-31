@@ -21,7 +21,7 @@ public class VertexLabelFilter implements FilterFunction<Vertex> {
 	}
 	
 	@Override
-	public boolean filter(Vertex v) throws Exception {
+	public boolean filter(Vertex v) {
 		return v.getLabel().equals(label);
 	}
 

@@ -7,7 +7,7 @@ import java.util.Date;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
-import org.gradoop.flink.io.impl.rdbms.RDBMSDataSource;
+import org.gradoop.flink.io.impl.rdbms.RdbmsDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -16,7 +16,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * into a {@link LogicalGraph} and stores the
  * resulting {@link LogicalGraph} as JSON into declared directory.
  */
-public class RDBMSExample implements ProgramDescription {
+public class RdbmsExample implements ProgramDescription {
 
 	/**
 	 * Converts a relational database to an epgm graph
@@ -48,7 +48,7 @@ public class RDBMSExample implements ProgramDescription {
 		GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
 
 		// create DataSource
-		RDBMSDataSource dataSource = new RDBMSDataSource(url,user,pw,jdbcDriverPath, jdbcDriverClassName,gfc);
+		RdbmsDataSource dataSource = new RdbmsDataSource(url,user,pw,jdbcDriverPath, jdbcDriverClassName,gfc);
 
 		// get logical graph of datasource
 		LogicalGraph schema = dataSource.getLogicalGraph();
