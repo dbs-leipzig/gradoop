@@ -18,13 +18,12 @@ package org.gradoop.flink.io.impl.minimal;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.minimal.functions.CreateLabeledImportVertexProperties;
+import org.gradoop.flink.io.impl.minimal.functions.MapCSVLineToVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -36,12 +35,12 @@ public class MinimalVertexProvider {
   /**
    * Token delimiter
    */
-  private static String TOKEN_SEPERATOR;
+  private String tokenSeparator;
 
   /**
    * Map the file to the containing property names.
    */
-  private static Map<String, List<String>> PROPERTY_MAP;
+  private Map<String, List<String>> propertyMap;
 
   /**
    * Gradoop Flink configuration
@@ -51,13 +50,13 @@ public class MinimalVertexProvider {
   /**
    * Constructor.
    * @param config Gradoop Flink configuration
-   * @param tokenSeperator Delimiter of csv file
+   * @param tokenSeparator Delimiter of csv file
    * @param propertyMap Map of file path and property names
    */
   public MinimalVertexProvider(Map<String, List<String>> propertyMap,
-        String tokenSeperator, GradoopFlinkConfig config) {
-    this.PROPERTY_MAP = propertyMap;
-    this.TOKEN_SEPERATOR = tokenSeperator;
+        String tokenSeparator, GradoopFlinkConfig config) {
+    this.propertyMap = propertyMap;
+    this.tokenSeparator = tokenSeparator;
     this.config = config;
   }
 
@@ -69,11 +68,11 @@ public class MinimalVertexProvider {
   public DataSet<ImportVertex<String>> importVertex() {
 
     DataSet<ImportVertex<String>> vertices = null;
-    for (Map.Entry<String, List<String>> entry : PROPERTY_MAP.entrySet()) {
+    for (Map.Entry<String, List<String>> entry : propertyMap.entrySet()) {
       if (vertices != null) {
-        vertices = vertices.union(readCSVFile(config, entry.getKey(), TOKEN_SEPERATOR));
+        vertices = vertices.union(readCSVFile(config, entry.getKey(), tokenSeparator));
       } else {
-        vertices = readCSVFile(config, entry.getKey(), TOKEN_SEPERATOR);
+        vertices = readCSVFile(config, entry.getKey(), tokenSeparator);
       }
     }
     return vertices;
@@ -92,38 +91,10 @@ public class MinimalVertexProvider {
 
     DataSet<Tuple3<String, String, Properties>> lines = config.getExecutionEnvironment()
                 .readTextFile(vertexCsvPath)
-                .map(line -> {
-                    String[] tokens = line.split(tokenSeparator, 3);
-                    Properties props = parseProperties(tokens[2],
-                            PROPERTY_MAP.get(vertexCsvPath));
-                    return Tuple3.of(tokens[0], tokens[1], props);
-                  }).returns(new TypeHint<Tuple3<String, String, Properties>>() { });
+                .map(new MapCSVLineToVertex(tokenSeparator, propertyMap, vertexCsvPath));
 
     DataSet<ImportVertex<String>> vertices = lines.map(new CreateLabeledImportVertexProperties<>());
 
     return vertices;
-  }
-
-  /**
-   * Map each label to the occurring properties.
-   * @param propertyValueString the properties
-   * @param propertieLabels List of all property names.
-   * @return Properties as pojo element
-   */
-  public static Properties parseProperties(String propertyValueString,
-          List<String> propertieLabels) {
-
-    Properties properties = new Properties();
-
-    String[] propertyValues = propertyValueString.split(TOKEN_SEPERATOR);
-
-    for (int i = 0; i < propertyValues.length; i++) {
-      if (propertyValues[i].length() > 0) {
-        properties.set(propertieLabels.get(i),
-            PropertyValue.create(propertyValues[i]));
-      }
-    }
-
-    return properties;
   }
 }
