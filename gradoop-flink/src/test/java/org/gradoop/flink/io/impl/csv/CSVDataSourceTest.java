@@ -57,7 +57,6 @@ public class CSVDataSourceTest extends CSVTestBase {
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
     LogicalGraph sourceLogicalGraph = dataSource.getLogicalGraph();
 
-    collectAndAssertTrue(sourceLogicalGraph.equalsByElementData(expected));
     collectAndAssertTrue(sourceLogicalGraph.equalsByData(expected));
 
     dataSource.getLogicalGraph().getEdges().collect()
