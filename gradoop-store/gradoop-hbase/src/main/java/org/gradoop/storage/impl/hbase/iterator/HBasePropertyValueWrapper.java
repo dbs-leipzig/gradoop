@@ -69,7 +69,8 @@ public class HBasePropertyValueWrapper implements Writable {
     dataOutput.writeByte(rawBytes[0]);
     // dynamic type?
     if (rawBytes[0] == PropertyValue.TYPE_STRING || rawBytes[0] == PropertyValue.TYPE_BIG_DECIMAL ||
-      rawBytes[0] == PropertyValue.TYPE_MAP || rawBytes[0] == PropertyValue.TYPE_LIST) {
+      rawBytes[0] == PropertyValue.TYPE_MAP || rawBytes[0] == PropertyValue.TYPE_LIST ||
+      rawBytes[0] == PropertyValue.TYPE_SET) {
       // write length
       dataOutput.writeShort(rawBytes.length - PropertyValue.OFFSET);
     }
@@ -84,13 +85,16 @@ public class HBasePropertyValueWrapper implements Writable {
     byte type = dataInput.readByte();
     // dynamic type?
     if (type == PropertyValue.TYPE_STRING || type == PropertyValue.TYPE_BIG_DECIMAL ||
-      type == PropertyValue.TYPE_MAP || type == PropertyValue.TYPE_LIST) {
+      type == PropertyValue.TYPE_MAP || type == PropertyValue.TYPE_LIST ||
+      type == PropertyValue.TYPE_SET) {
       // read length
       length = dataInput.readShort();
     } else if (type == PropertyValue.TYPE_NULL) {
       length = 0;
     } else if (type == PropertyValue.TYPE_BOOLEAN) {
       length = Bytes.SIZEOF_BOOLEAN;
+    } else if (type == PropertyValue.TYPE_SHORT) {
+      length = Bytes.SIZEOF_SHORT;
     } else if (type == PropertyValue.TYPE_INTEGER) {
       length = Bytes.SIZEOF_INT;
     } else if (type == PropertyValue.TYPE_LONG) {

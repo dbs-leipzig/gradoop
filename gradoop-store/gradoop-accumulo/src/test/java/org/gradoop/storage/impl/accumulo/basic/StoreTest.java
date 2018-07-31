@@ -285,6 +285,14 @@ public class StoreTest extends AccumuloStoreTestBase {
         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
         assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
         break;
+      case KEY_e:
+        assertTrue(v.getPropertyValue(propertyKey).isShort());
+        assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
+        break;
+      case KEY_f:
+        assertTrue(v.getPropertyValue(propertyKey).isSet());
+        assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
+        break;
       }
     }
   }

@@ -596,7 +596,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Sets the given value as internal value if it has a supported type.
    *
    * @param value value
-   * @throws UnsupportedTypeException
+   * @throws UnsupportedTypeException if the type of the Object is not supported
    */
   public void setObject(Object value) {
     if (value == null) {
