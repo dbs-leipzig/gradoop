@@ -28,7 +28,9 @@ import org.gradoop.common.util.GradoopConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -891,33 +893,34 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
+   * Write the internal byte representation to an output view.
+   *
    * Byte representation:
    *
-   * byte 1       : type info
+   * <pre>byte 1       : type info</pre>
    *
    * for dynamic length types (e.g. String and BigDecimal)
-   * byte 2       : length (short)
+   * <pre>byte 2       : length (short)
    * byte 3       : length (short)
-   * byte 4 - end : value bytes
+   * byte 4 - end : value bytes</pre>
    *
    * If the size of the internal byte representation if larger than
    * {@link #LARGE_PROPERTY_THRESHOLD} (i.e. if a {@code short} is too small to store the length),
    * then the {@link #FLAG_LARGE} bit will be set in the first byte and the byte representation
    * will be:
-   * byte 2       ; length (int)
+   * <pre>byte 2       ; length (int)
    * byte 3       : length (int)
    * byte 4       : length (int)
    * byte 5       : length (int)
-   * byte 6 - end : value bytes
+   * byte 6 - end : value bytes</pre>
    *
    * for fixed length types (e.g. int, long, float, ...)
-   * byte 2 - end : value bytes
+   * <pre>byte 2 - end : value bytes</pre>
    *
    * @param outputView data output to write data to
-   * @throws IOException
+   * @throws IOException forwarded from {@link DataOutput}
    */
-  @Override
-  public void write(DataOutputView outputView) throws IOException {
+  public void write(DataOutput outputView) throws IOException {
     // null?
     // Write type.
     byte type = rawBytes[0];
@@ -938,8 +941,22 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     outputView.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void read(DataInputView inputView) throws IOException {
+  public void write(DataOutputView outputView) throws IOException {
+    write((DataOutput) outputView);
+  }
+
+  /**
+   * Read this value from a {@link DataInput}. The value is expected to have the same byte
+   * representation as the one written in {@link #write(DataOutput)}.
+   *
+   * @param inputView The input view.
+   * @throws IOException forwarded from {@link DataInput}.
+   */
+  public void read(DataInput inputView) throws IOException {
     int length = 0;
     // type
     byte typeByte = inputView.readByte();
@@ -984,6 +1001,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     for (int i = OFFSET; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void read(DataInputView inputView) throws IOException {
+    read((DataInput) inputView);
   }
 
   @Override
