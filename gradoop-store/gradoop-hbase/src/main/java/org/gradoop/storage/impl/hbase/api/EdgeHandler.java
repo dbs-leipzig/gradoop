@@ -70,18 +70,16 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param put      {@link} Put to add edge to
    * @param edgeData edge data to be written
    * @return put with edge data
-   * @throws IOException if writing the {@link EPGMEdge} to store fails
    */
-  Put writeEdge(final Put put, final EPGMEdge edgeData) throws IOException;
+  Put writeEdge(final Put put, final EPGMEdge edgeData);
 
   /**
    * Reads the edge data from the given {@link Result}.
    *
    * @param res HBase row
    * @return edge data contained in the given result
-   * @throws IOException if reading the result as {@link Edge} instance fails
    */
-  Edge readEdge(final Result res) throws IOException;
+  Edge readEdge(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.

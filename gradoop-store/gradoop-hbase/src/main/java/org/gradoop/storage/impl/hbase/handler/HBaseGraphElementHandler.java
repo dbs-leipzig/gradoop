@@ -41,7 +41,7 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws IOException {
+  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
     if (graphElement.getGraphCount() > 0) {
       put = put.addColumn(
         CF_META_BYTES,

@@ -493,19 +493,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_FORUM)))
+        .where(HBaseFilters.labelIn(LABEL_FORUM)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
+        .where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM)))
+        .where(HBaseFilters.labelIn(LABEL_TAG, LABEL_FORUM)))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);
@@ -539,19 +539,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_GRAPH)))
+        .where(HBaseFilters.labelReg(PATTERN_GRAPH)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_EDGE)))
+        .where(HBaseFilters.labelReg(PATTERN_EDGE)))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_VERTEX)))
+        .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);

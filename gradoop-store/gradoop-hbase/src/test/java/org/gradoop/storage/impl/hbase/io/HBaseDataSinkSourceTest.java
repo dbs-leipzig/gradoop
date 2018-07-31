@@ -288,17 +288,17 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_FORUM))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_FORUM))
     );
 
     // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER))
     );
 
     // Apply vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
-      Query.elements().fromAll().where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM))
+      Query.elements().fromAll().where(HBaseFilters.labelIn(LABEL_TAG, LABEL_FORUM))
     );
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
@@ -343,18 +343,15 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     // Apply empty graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_GRAPH))
-    );
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_GRAPH)));
 
     // Apply empty edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_EDGE))
-    );
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_EDGE)));
 
     // Apply empty vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
-      Query.elements().fromAll().where(new HBaseLabelReg<>(PATTERN_VERTEX))
-    );
+      Query.elements().fromAll().where(HBaseFilters.labelReg(PATTERN_VERTEX)));
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
 
@@ -406,18 +403,15 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
       Query.elements().fromAll()
-        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount))
-    );
+        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)));
 
     // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
-      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince))
-    );
+      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince)));
 
     // Apply vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
-      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity))
-    );
+      Query.elements().fromAll().where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity)));
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
 
@@ -475,20 +469,17 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
       Query.elements().fromAll()
         .where(HBaseFilters.propLargerThan(PROP_VERTEX_COUNT, propertyValueVertexCount,
-          true))
-    );
+          true)));
 
     // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
       Query.elements().fromAll()
-        .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false))
-    );
+        .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false)));
 
     // Apply vertex predicate
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
       Query.elements().fromAll()
-        .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false))
-    );
+        .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false)));
 
     assertTrue(hBaseDataSource.isFilterPushedDown());
 

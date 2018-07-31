@@ -87,8 +87,7 @@ public class HBaseFilters {
   public static <T extends EPGMElement> HBasePropLargerThan<T> propLargerThan(
     @Nonnull String key,
     Object value,
-    boolean include
-  ) {
+    boolean include) {
     return new HBasePropLargerThan<>(key, value, include);
   }
 
@@ -104,8 +103,7 @@ public class HBaseFilters {
   @Nonnull
   public static <T extends EPGMElement> HBasePropReg<T> propReg(
     @Nonnull String key,
-    @Nonnull Pattern pattern
-  ) {
+    @Nonnull Pattern pattern) {
     return new HBasePropReg<>(key, pattern);
   }
 }

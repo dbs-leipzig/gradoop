@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Parameterized.class)
 public class HBasePropEqualsTest {
-
   /**
    * Property type
    */
@@ -61,7 +60,7 @@ public class HBasePropEqualsTest {
    * Test the toHBaseFilter function
    */
   @Test
-  public void testToHBaseFilter() throws IOException {
+  public void testToHBaseFilter() {
 
     HBasePropEquals<Vertex> vertexFilter = new HBasePropEquals<>(propertyKey, propertyValue);
 

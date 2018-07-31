@@ -85,7 +85,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertex(Put put, EPGMVertex vertexData) throws IOException {
+  public Put writeVertex(Put put, EPGMVertex vertexData) {
     writeLabel(put, vertexData);
     writeProperties(put, vertexData);
     writeGraphIds(put, vertexData);
@@ -96,7 +96,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public Vertex readVertex(final Result res) throws IOException {
+  public Vertex readVertex(final Result res) {
     return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
       readGraphIds(res));
   }
