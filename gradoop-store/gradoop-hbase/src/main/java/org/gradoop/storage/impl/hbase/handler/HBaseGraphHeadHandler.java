@@ -85,7 +85,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphHead(final Put put, final EPGMGraphHead graphData) throws IOException {
+  public Put writeGraphHead(final Put put, final EPGMGraphHead graphData) {
     writeLabel(put, graphData);
     writeProperties(put, graphData);
     return put;
@@ -95,9 +95,8 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    * {@inheritDoc}
    */
   @Override
-  public GraphHead readGraphHead(final Result res) throws IOException {
-    return graphHeadFactory
-      .initGraphHead(readId(res), readLabel(res), readProperties(res));
+  public GraphHead readGraphHead(final Result res) {
+    return graphHeadFactory.initGraphHead(readId(res), readLabel(res), readProperties(res));
   }
 
   /**

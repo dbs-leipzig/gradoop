@@ -78,6 +78,7 @@ public class GradoopTestUtils {
   public static final String KEY_c = "keyc";
   public static final String KEY_d = "keyd";
   public static final String KEY_e = "keye";
+  public static final String KEY_f = "keyf";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;

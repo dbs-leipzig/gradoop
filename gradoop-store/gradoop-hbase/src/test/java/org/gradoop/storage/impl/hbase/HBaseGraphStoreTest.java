@@ -50,6 +50,7 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
@@ -493,19 +494,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_FORUM)))
+        .where(HBaseFilters.labelIn(LABEL_FORUM)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
+        .where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<Vertex>(LABEL_TAG, LABEL_FORUM).negate()))
+        .where(HBaseFilters.<Vertex>labelIn(LABEL_TAG, LABEL_FORUM).negate()))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);
@@ -574,7 +575,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
-      .filter(g -> !g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
       .collect(Collectors.toList());
 
     List<Edge> edges = Lists.newArrayList(getSocialEdges())
@@ -593,8 +594,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(HBaseFilters.<GraphHead>propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)
-          .negate()))
+        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(

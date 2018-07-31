@@ -88,6 +88,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     propertyMap.put(GradoopTestUtils.KEY_c, stringList);
     propertyMap.put(GradoopTestUtils.KEY_d, intList);
     propertyMap.put(GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e);
+    propertyMap.put(GradoopTestUtils.KEY_f, GradoopTestUtils.NULL_VAL_0);
     return Collections.unmodifiableMap(propertyMap);
   }
 
@@ -142,6 +143,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_c));
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_d));
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_e));
+    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_f));
 
     // assert that the properties have valid data types
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
@@ -159,6 +161,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).isList());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).isList());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
 
     // assert that the properties have valid values
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
@@ -191,6 +194,8 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
       PROPERTY_MAP.get(GradoopTestUtils.KEY_d));
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_e));
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
+      PROPERTY_MAP.get(GradoopTestUtils.KEY_f));
   }
 
   /**
@@ -214,5 +219,6 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(line.contains(GradoopTestUtils.KEY_c + ":list:string"));
     assertTrue(line.contains(GradoopTestUtils.KEY_d + ":list:int"));
     assertTrue(line.contains(GradoopTestUtils.KEY_e + ":short"));
+    assertTrue(line.contains(GradoopTestUtils.KEY_f + ":null"));
   }
 }
