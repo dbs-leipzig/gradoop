@@ -43,14 +43,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -95,6 +88,7 @@ public class GradoopTestUtils {
   public static final LocalTime           TIME_VAL_c                = LocalTime.now();
   public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
   public static final short       SHORT_VAL_e                       = (short)23;
+  public static final Set<PropertyValue> SET_VAL_f                  = new HashSet<>();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
@@ -143,6 +137,7 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_c, TIME_VAL_c);
     SUPPORTED_PROPERTIES.put(KEY_d, DATETIME_VAL_d);
     SUPPORTED_PROPERTIES.put(KEY_e, SHORT_VAL_e);
+    SUPPORTED_PROPERTIES.put(KEY_f, SET_VAL_f);
   }
 
   /**
