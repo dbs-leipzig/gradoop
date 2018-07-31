@@ -17,8 +17,8 @@
 (frank)-[:hasInterest]->(hadoop)
 (dave)-[:hasInterest]->(hadoop)
 (gdbs)-[:hasModerator]->(alice)
-(gdbs)-[:hasMember]->(alice)
-(gdbs)-[:hasMember]->(bob)
+(gdbs)-[:hasMember {status : "poweruser"}]->(alice)
+(gdbs)-[:hasMember {status : "starter"}]->(bob)
 
 (databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag]->(hadoop)
 
@@ -37,7 +37,7 @@ g2:Community {interest : "Graphs", vertexCount : 4} [
 ]
 g3:Forum [
     (gps)-[:hasModerator {since : 2013}]->(dave)
-    (gps)-[:hasMember]->(dave)
+    (gps)-[:hasMember {status : "starter"}]->(dave)
     (gps)-[:hasMember]->(carol)-[ckd]->(dave)
 ]
 

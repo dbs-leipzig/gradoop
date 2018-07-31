@@ -87,7 +87,8 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));
     admin.createTable(tableDescriptor);
   }
 
@@ -127,7 +128,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public Put writeEdge(Put put, EPGMEdge edgeData) throws IOException {
+  public Put writeEdge(Put put, EPGMEdge edgeData) {
     writeLabel(put, edgeData);
     writeSource(put, edgeData.getSourceId());
     writeTarget(put, edgeData.getTargetId());
@@ -140,9 +141,8 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    * {@inheritDoc}
    */
   @Override
-  public Edge readEdge(Result res) throws IOException {
-    return edgeFactory
-      .initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
+  public Edge readEdge(Result res) {
+    return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
         readProperties(res), readGraphIds(res));
   }
 
