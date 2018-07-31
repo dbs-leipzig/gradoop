@@ -19,6 +19,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
@@ -32,6 +33,15 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
   @Test
   public void testWrite() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    GraphCollection input = getSocialNetworkLoader().getGraphCollection();
+
+    checkIndexedCSVWrite(tmpPath, input);
+  }
+
+  @Test
+  public void testWriteLogicalGraph() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     LogicalGraph input = getSocialNetworkLoader().getLogicalGraph(true);
@@ -50,7 +60,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "g[" +
+      "g:graph1[" +
         "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})," +
         "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})," +
         "(v3:A {keya:\"Bar\", keyb:true})," +
@@ -75,11 +85,11 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     // The properties are incompatible to get a conversion error
     // if the metadata is not separated
     FlinkAsciiGraphLoader loader = getLoaderFromString(
-      "single[" +
-      "(v1:A {keya:2})" +
+      "single:graph1[" +
+      "(v1:B {keya:2})" +
       "(v1)-[e1:A {keya:false}]->(v1)," +
       "]" +
-      "multiple[" +
+      "multiple:graph2[" +
       "(v2:B {keya:true, keyb:1, keyc:\"Foo\"})," +
       "(v3:B {keya:false, keyb:2})," +
       "(v4:C {keya:2.3f, keyb:\"Bar\"})," +
@@ -89,8 +99,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
       "(v4)-[e4:C {keya:false}]->(v4)," +
       "(v5)-[e5:C {keya:true, keyb:13}]->(v5)" +
       "]");
-    checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("single"));
-    checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
+
+    GraphCollection graphCollection = loader.getGraphCollectionByVariables("single", "multiple");
+    checkIndexedCSVWrite(tmpPath, graphCollection);
   }
 
   @Test
@@ -101,9 +112,10 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
       .getResource("/data/csv/input_indexed").getFile();
 
     String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl").getFile();
+      .getResource("/data/csv/expected/expected_graph_collection.gdl").getFile();
 
-    LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
+    GraphCollection input = getLoaderFromFile(gdlPath).getGraphCollectionByVariables("expected1",
+      "expected2");
 
     DataSink csvDataSink =
       new IndexedCSVDataSink(tmpPath, csvPath + "/metadata.csv", getConfig());
@@ -113,9 +125,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     DataSource csvDataSource = new IndexedCSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    GraphCollection output = csvDataSource.getGraphCollection();
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
   }
 
   /**
@@ -126,14 +138,25 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * @throws Exception on failure
    */
   private void checkIndexedCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
-    DataSink csvDataSink = new IndexedCSVDataSink(tmpPath, getConfig());
-    csvDataSink.write(input, true);
+    checkIndexedCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+  }
+
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input graph collection
+   * @throws Exception on failure
+   */
+  private void checkIndexedCSVWrite(String tmpPath, GraphCollection input) throws Exception {
+    DataSink indexedCSVDataSink = new IndexedCSVDataSink(tmpPath, getConfig());
+    indexedCSVDataSink.write(input, true);
 
     getExecutionEnvironment().execute();
 
-    DataSource csvDataSource = new IndexedCSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    DataSource indexedCSVDataSource = new IndexedCSVDataSource(tmpPath, getConfig());
+    GraphCollection output = indexedCSVDataSource.getGraphCollection();
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
   }
 }

@@ -15,45 +15,45 @@
  */
 package org.gradoop.flink.io.impl.csv.functions;
 
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
  * /**
- * Creates a {@link Vertex} from a CSV string. The function uses a
+ * Creates a {@link GraphHead} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
- * vertex-id;vertex-label;value_1|value_2|...|value_n
+ * graph-id;graph-label;value_1|value_2|...|value_n
  */
-public class CSVLineToVertex extends CSVLineToElement<Vertex> {
+public class CSVLineToGraphHead extends CSVLineToElement<GraphHead> {
   /**
-   * Used to instantiate the vertex.
+   * Used to create the graph head.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
 
   /**
-   * Constructor
+   * Creates a CSVLineToGraphHead converter
    *
-   * @param epgmVertexFactory EPGM vertex factory
+   * @param graphHeadFactory The factory method that is used to create the graph heads.
    */
-  public CSVLineToVertex(EPGMVertexFactory<Vertex> epgmVertexFactory) {
-    this.vertexFactory = epgmVertexFactory;
+  public CSVLineToGraphHead(EPGMGraphHeadFactory<GraphHead> graphHeadFactory) {
+    this.graphHeadFactory = graphHeadFactory;
   }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public Vertex map(String csvLine) throws Exception {
-    String[] tokens = split(csvLine, 4);
-    return vertexFactory.initVertex(
+  public GraphHead map(String csvLine) throws Exception {
+    String[] tokens = split(csvLine, 3);
+    return graphHeadFactory.initGraphHead(
       GradoopId.fromString(tokens[0]),
-      tokens[2],
-      parseProperties(CSVConstants.VERTEX_TYPE, tokens[2], tokens[3]),
-      parseGradoopIds(tokens[1])
+      tokens[1],
+      parseProperties(CSVConstants.GRAPH_TYPE, tokens[1], tokens[2])
     );
-
   }
 }

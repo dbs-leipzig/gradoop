@@ -15,12 +15,12 @@
  */
 package org.gradoop.flink.io.impl.csv.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
- * Tuple representing a vertex in a CSV file.
+ * Tuple representing an edge in a CSV file.
  */
-public class CSVVertex extends Tuple4<String, String, String, String> implements CSVElement {
+public class CSVGraphHead extends Tuple3<String, String, String> implements CSVElement {
 
   public String getId() {
     return f0;
@@ -30,27 +30,19 @@ public class CSVVertex extends Tuple4<String, String, String, String> implements
     f0 = id;
   }
 
-  public String getGradoopIds() {
+  public String getLabel() {
     return f1;
   }
 
-  public void setGradoopIds(String gradoopIds) {
-    f1 = gradoopIds;
-  }
-
-  public String getLabel() {
-    return f2;
-  }
-
   public void setLabel(String label) {
-    f2 = label;
+    f1 = label;
   }
 
   public String getProperties() {
-    return f3;
+    return f2;
   }
 
   public void setProperties(String properties) {
-    f3 = properties;
+    f2 = properties;
   }
 }

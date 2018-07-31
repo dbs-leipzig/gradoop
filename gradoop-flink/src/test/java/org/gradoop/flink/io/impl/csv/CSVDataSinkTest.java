@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.csv;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
@@ -36,9 +37,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    LogicalGraph input = getSocialNetworkLoader().getLogicalGraph(true);
+    GraphCollection graphCollection = getSocialNetworkLoader().getGraphCollection();
 
-    checkCSVWrite(tmpPath, input);
+    checkCSVWrite(tmpPath, graphCollection);
   }
 
   /**
@@ -124,7 +125,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to write a graph with all supported properties
+   * Test CSVDataSink to write a graph with all supported properties.
+   * CSVDataSource ignores the graph heads when using getLogicalGraph(),
+   * therefore the graph head is not tested for equality.
    *
    * @throws Exception on failure
    */
@@ -141,7 +144,7 @@ public class CSVDataSinkTest extends CSVTestBase {
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
     LogicalGraph sourceLogicalGraph = csvDataSource.getLogicalGraph();
 
-    collectAndAssertTrue(logicalGraph.equalsByData(sourceLogicalGraph));
+    collectAndAssertTrue(logicalGraph.equalsByElementData(sourceLogicalGraph));
 
     sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);
     sourceLogicalGraph.getVertices().collect().forEach(this::checkProperties);
@@ -179,14 +182,25 @@ public class CSVDataSinkTest extends CSVTestBase {
    * @throws Exception on failure
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
+    checkCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+  }
+
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input graph collection
+   * @throws Exception on failure
+   */
+  private void checkCSVWrite(String tmpPath, GraphCollection input) throws Exception {
     DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
     csvDataSink.write(input, true);
 
     getExecutionEnvironment().execute();
 
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    GraphCollection output = csvDataSource.getGraphCollection();
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
   }
 }

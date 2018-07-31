@@ -86,7 +86,7 @@ public class MetaDataParser {
    * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
    * separated into the label and the
    *
-   * @param metaDataStrings (label, meta-data) tuples
+   * @param metaDataStrings (element prefix (g,v,e), label, meta-data) tuples
    * @return Meta Data object
    */
   public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {

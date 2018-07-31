@@ -15,12 +15,12 @@
  */
 package org.gradoop.flink.io.impl.csv.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple6;
 
 /**
  * Tuple representing an edge in a CSV file.
  */
-public class CSVEdge extends Tuple5<String, String, String, String, String> {
+public class CSVEdge extends Tuple6<String, String, String, String, String, String> implements CSVElement {
 
   public String getId() {
     return f0;
@@ -30,35 +30,43 @@ public class CSVEdge extends Tuple5<String, String, String, String, String> {
     f0 = id;
   }
 
-  public String getSourceId() {
+  public String getGradoopIds() {
     return f1;
   }
 
-  public void setSourceId(String sourceId) {
-    f1 = sourceId;
+  public void setGradoopIds(String gradoopIds) {
+    f1 = gradoopIds;
   }
 
-  public String getTargetId() {
+  public String getSourceId() {
     return f2;
   }
 
-  public void setTargetId(String targetId) {
-    f2 = targetId;
+  public void setSourceId(String sourceId) {
+    f2 = sourceId;
   }
 
-  public String getLabel() {
+  public String getTargetId() {
     return f3;
   }
 
-  public void setLabel(String label) {
-    f3 = label;
+  public void setTargetId(String targetId) {
+    f3 = targetId;
   }
 
-  public String getProperties() {
+  public String getLabel() {
     return f4;
   }
 
+  public void setLabel(String label) {
+    f4 = label;
+  }
+
+  public String getProperties() {
+    return f5;
+  }
+
   public void setProperties(String properties) {
-    f4 = properties;
+    f5 = properties;
   }
 }

@@ -18,13 +18,16 @@ package org.gradoop.flink.io.impl.csv;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
+import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -50,10 +53,28 @@ public class CSVDataSource extends CSVBase implements DataSource {
     super(csvPath, config);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * graph heads will be disposed.
+   */
   @Override
   public LogicalGraph getLogicalGraph() {
+    return getGraphCollection().reduce(new ReduceCombination());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection getGraphCollection() {
     DataSet<Tuple3<String, String, String>> metaData =
       MetaData.fromFile(getMetaDataPath(), getConfig());
+
+    DataSet<GraphHead> graphHeads = getConfig().getExecutionEnvironment()
+      .readTextFile(getGraphHeadCSVPath())
+      .map(new CSVLineToGraphHead(getConfig().getGraphHeadFactory()))
+      .withBroadcastSet(metaData, BC_METADATA);
 
     DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
@@ -65,11 +86,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .map(new CSVLineToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    return getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);
-  }
 
-  @Override
-  public GraphCollection getGraphCollection() {
-    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    return getConfig().getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
   }
 }

@@ -28,15 +28,23 @@ public class CSVConstants {
    */
   public static final String VALUE_DELIMITER = "|";
   /**
+   * Used to separate the graph ids of edges and vertices.
+   */
+  public static final String GRAPH_ID_SEPARATOR = ",";
+  /**
    * Used to separate lines in the output CSV files.
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to tag a graph head entity.
+   */
+  public static final String GRAPH_TYPE = "g";
+  /**
+   * Used to tag a vertex entity.
    */
   public static final String VERTEX_TYPE = "v";
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to tag an edge entity.
    */
   public static final String EDGE_TYPE = "e";
   /**

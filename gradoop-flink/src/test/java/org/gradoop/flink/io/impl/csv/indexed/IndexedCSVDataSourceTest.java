@@ -18,8 +18,11 @@ package org.gradoop.flink.io.impl.csv.indexed;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.junit.Test;
+import sun.rmi.runtime.Log;
 
 public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 
@@ -30,13 +33,35 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
       .getFile();
 
     String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
       .getFile();
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
+
+    GraphCollection input = dataSource.getGraphCollection();
+    GraphCollection expected = getLoaderFromFile(gdlPath)
+      .getGraphCollectionByVariables("expected1", "expected2");
+
+    collectAndAssertTrue(input.equalsByGraphElementData(expected));
+  }
+
+  @Test
+  public void testReadSingleGraph() throws Exception {
+    String csvPath = VertexLabeledEdgeListDataSourceTest.class
+      .getResource("/data/csv/input_indexed")
+      .getFile();
+
+    String gdlPath = IndexedCSVDataSourceTest.class
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
+      .getFile();
+
+    DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
+
     LogicalGraph input = dataSource.getLogicalGraph();
-    LogicalGraph expected = getLoaderFromFile(gdlPath)
-      .getLogicalGraphByVariable("expected");
+
+    GraphCollection graphCollection = getLoaderFromFile(gdlPath)
+      .getGraphCollectionByVariables("expected1", "expected2");
+    LogicalGraph expected = graphCollection.reduce(new ReduceCombination());
 
     collectAndAssertTrue(input.equalsByElementData(expected));
   }
@@ -52,10 +77,10 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
       .getFile();
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
-    LogicalGraph input = dataSource.getLogicalGraph();
-    LogicalGraph expected = getLoaderFromFile(gdlPath)
-      .getLogicalGraphByVariable("expectedEmptyEdges");
+    GraphCollection input = dataSource.getGraphCollection();
+    GraphCollection expected = getLoaderFromFile(gdlPath)
+      .getGraphCollectionByVariables("expected1", "expected2");
 
-    collectAndAssertTrue(input.equalsByElementData(expected));
+    collectAndAssertTrue(input.equalsByGraphElementData(expected));
   }
 }

@@ -16,32 +16,29 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
+import org.gradoop.flink.io.impl.csv.tuples.CSVGraphHead;
 
 /**
- * Converts an {@link Edge} into a CSV representation.
+ * Converts an {@link org.gradoop.common.model.impl.pojo.GraphHead} into a CSV representation.
  *
  * Forwarded fields:
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f4")
-public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
+@FunctionAnnotation.ForwardedFields("label->f1")
+public class GraphHeadToCSVGraphHead extends ElementToCSV<GraphHead, CSVGraphHead> {
   /**
    * Reduce object instantiations
    */
-  private final CSVEdge csvEdge = new CSVEdge();
+  private final CSVGraphHead csvGraphHead = new CSVGraphHead();
 
   @Override
-  public CSVEdge map(Edge edge) throws Exception {
-    csvEdge.setId(edge.getId().toString());
-    csvEdge.setGradoopIds(edge.getGraphIds().toString());
-    csvEdge.setSourceId(edge.getSourceId().toString());
-    csvEdge.setTargetId(edge.getTargetId().toString());
-    csvEdge.setLabel(edge.getLabel());
-    csvEdge.setProperties(getPropertyString(edge, CSVConstants.EDGE_TYPE));
-    return csvEdge;
+  public CSVGraphHead map(GraphHead graphHead) throws Exception {
+    csvGraphHead.setId(graphHead.getId().toString());
+    csvGraphHead.setLabel(graphHead.getLabel());
+    csvGraphHead.setProperties(getPropertyString(graphHead, CSVConstants.GRAPH_TYPE));
+    return csvGraphHead;
   }
 }

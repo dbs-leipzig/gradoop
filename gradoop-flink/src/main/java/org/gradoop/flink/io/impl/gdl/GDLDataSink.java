@@ -65,8 +65,8 @@ public class GDLDataSink implements DataSink {
    * {@inheritDoc}
    */
   @Override
-  public void write(LogicalGraph graph, boolean overwrite) throws IOException {
-    write(graph.getConfig().getGraphCollectionFactory().fromGraph(graph), overwrite);
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   /**
