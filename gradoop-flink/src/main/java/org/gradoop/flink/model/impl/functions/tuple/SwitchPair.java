@@ -31,7 +31,7 @@ public class SwitchPair<A, B>
   /**
    * Reduce object instantiations.
    */
-  private final Tuple2<B,A> reuse = new Tuple2<>();
+  private final Tuple2<B, A> reuse = new Tuple2<>();
 
   @Override
   public Tuple2<B, A> map(Tuple2<A, B> pair) throws Exception {
