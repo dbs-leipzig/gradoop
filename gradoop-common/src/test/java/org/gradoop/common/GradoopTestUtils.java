@@ -72,6 +72,8 @@ public class GradoopTestUtils {
   public static final String KEY_d = "keyd";
   public static final String KEY_e = "keye";
   public static final String KEY_f = "keyf";
+  public static final String KEY_g = "keyg";
+  public static final String KEY_h = "keyh";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;
@@ -87,8 +89,8 @@ public class GradoopTestUtils {
   public static final LocalDate           DATE_VAL_b                = LocalDate.now();
   public static final LocalTime           TIME_VAL_c                = LocalTime.now();
   public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
-  public static final short       SHORT_VAL_e                       = (short)23;
-  public static final Set<PropertyValue> SET_VAL_f                  = new HashSet<>();
+  public static final short               SHORT_VAL_e               = (short)23;
+  public static final Set<PropertyValue>  SET_VAL_f                 = new HashSet<>();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 

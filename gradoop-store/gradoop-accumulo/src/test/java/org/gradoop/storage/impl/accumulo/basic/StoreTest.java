@@ -16,6 +16,7 @@
 package org.gradoop.storage.impl.accumulo.basic;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -43,6 +44,7 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import static org.gradoop.common.GradoopTestUtils.*;
@@ -174,7 +176,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * Tries to add an unsupported property type {@link Set} as property value.
+   * Tries to add an unsupported property type {@link Queue} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
   public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
@@ -182,8 +184,8 @@ public class StoreTest extends AccumuloStoreTestBase {
       AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST04);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
-    // Set is not supported by
-    final Set<String> value = Sets.newHashSet();
+    // Queue is not supported by
+    final Queue<String> value = Queues.newPriorityQueue();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";

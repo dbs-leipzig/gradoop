@@ -1008,6 +1008,11 @@ public class PropertyValueTest {
     create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithSet() {
+    create(SET_VAL_f).compareTo(create(SET_VAL_f));
+  }
+
   @Test
   public void testArrayValueMaxSize() {
     PropertyValue property = new PropertyValue();
