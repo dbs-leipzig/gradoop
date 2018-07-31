@@ -31,6 +31,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
@@ -42,6 +43,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,6 +51,7 @@ import java.util.stream.Collectors;
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -340,6 +343,45 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   /**
+   * Check if large properties are written and read correctly.
+   */
+  @Test
+  public void testLargePropertySupport() throws IOException {
+    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+
+    EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
+
+    final GradoopId vertexID = GradoopId.get();
+    final String label = "A";
+
+    final String propertyKey = "key";
+    Properties properties = Properties.create();
+    // Create a "large" property.
+    final String testValue = "some test String";
+    final int neededCopies = PropertyValue.LARGE_PROPERTY_THRESHOLD / testValue.length();
+    PropertyValue largeProperty = PropertyValue.create(
+      Collections.nCopies(neededCopies, PropertyValue.create(testValue)));
+    // Check if the created Property is actually a large property.
+    assertTrue(largeProperty.byteSize() > PropertyValue.LARGE_PROPERTY_THRESHOLD);
+    properties.set(propertyKey, largeProperty);
+
+    final GradoopIdSet graphs = new GradoopIdSet();
+
+    // write to store
+    graphStore.writeVertex(vertexFactory.initVertex(vertexID, label, properties, graphs));
+    graphStore.flush();
+
+    // read from store
+    Vertex v = graphStore.readVertex(vertexID);
+    assertNotNull(v);
+    List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
+    assertEquals(properties.size(), propertyKeys.size());
+    PropertyValue readValue = v.getPropertyValue(propertyKey);
+    assertNotNull(readValue);
+    assertEquals(largeProperty, readValue);
+  }
+
+ /**
    * Test the getGraphSpace() method with an id filter predicate
    */
   @Test
