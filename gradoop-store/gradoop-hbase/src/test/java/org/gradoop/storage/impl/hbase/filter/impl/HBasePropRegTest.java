@@ -68,6 +68,6 @@ public class HBasePropRegTest {
     expectedFilter.addFilter(valueFilter);
 
     assertEquals("Failed during filter comparison for key [" + key + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 }

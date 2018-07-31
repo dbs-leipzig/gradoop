@@ -54,6 +54,6 @@ public class HBaseLabelInTest {
       );
       expectedFilterList.addFilter(valueFilter);
     }
-    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter().toString());
+    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter(false).toString());
   }
 }

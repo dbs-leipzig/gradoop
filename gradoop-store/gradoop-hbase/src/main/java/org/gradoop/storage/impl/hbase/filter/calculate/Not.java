@@ -13,48 +13,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
+package org.gradoop.storage.impl.hbase.filter.calculate;
 
+import org.apache.hadoop.hbase.filter.Filter;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+
+import javax.annotation.Nonnull;
 
 /**
- * negative logic filter
+ * Negated filter
  *
  * @param <T> input type
  */
-public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class Not<T extends EPGMElement> implements HBaseElementFilter<T> {
 
   /**
-   * predicate list
+   * The predicate to negate
    */
-  private final AccumuloElementFilter<T> predicate;
+  private final HBaseElementFilter<T> predicate;
 
   /**
-   * Create a new predicate to be conjunction
+   * Create a new negated predicate
    *
    * @param predicate predicate
    */
-  private NOT(AccumuloElementFilter<T> predicate) {
+  private Not(HBaseElementFilter<T> predicate) {
     this.predicate = predicate;
   }
 
   /**
    * Create a negative formula
    *
-   * @param predicate negative predicate
+   * @param predicate predicate to negate
    * @param <T> input type
-   * @return negative filter instance
+   * @return negated filter instance
    */
-  public static <T extends EPGMElement> NOT<T> of(AccumuloElementFilter<T> predicate) {
-    return new NOT<>(predicate);
+  public static <T extends EPGMElement> Not<T> of(HBaseElementFilter<T> predicate) {
+    return new Not<>(predicate);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Nonnull
   @Override
-  public boolean test(T t) {
-    return !predicate.test(t);
+  public Filter toHBaseFilter(boolean negate) {
+    // Toggle negation to prevent double negation while fetching filter instance
+    return predicate.toHBaseFilter(!negate);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     return "NOT " + predicate;

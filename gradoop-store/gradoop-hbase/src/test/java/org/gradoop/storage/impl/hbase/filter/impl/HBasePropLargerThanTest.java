@@ -43,17 +43,17 @@ public class HBasePropLargerThanTest {
   /**
    * Property type
    */
-  private String propertyType;
+  private final String propertyType;
 
   /**
    * Property key
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Property value
    */
-  private PropertyValue propertyValue;
+  private final PropertyValue propertyValue;
 
   /**
    * Flag if min value should be included
@@ -107,7 +107,7 @@ public class HBasePropLargerThanTest {
     expectedFilter.addFilter(typeFilter);
 
     assertEquals("Failed during filter comparison for type [" + propertyType + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 
   /**

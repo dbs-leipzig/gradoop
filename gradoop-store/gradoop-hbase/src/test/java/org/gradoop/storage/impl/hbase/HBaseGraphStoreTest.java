@@ -34,6 +34,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
 import org.gradoop.storage.impl.hbase.filter.impl.HBasePropEquals;
@@ -49,7 +50,6 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
@@ -486,7 +486,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
-      .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
+      .filter(e -> (!e.getLabel().equals(LABEL_TAG) && !e.getLabel().equals(LABEL_FORUM)))
       .collect(Collectors.toList());
 
     // Query the store
@@ -505,7 +505,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM)))
+        .where(new HBaseLabelIn<Vertex>(LABEL_TAG, LABEL_FORUM).negate()))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);
@@ -527,7 +527,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
-      .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
+      .filter(e -> !PATTERN_EDGE.matcher(e.getLabel()).matches())
       .collect(Collectors.toList());
 
     List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
@@ -539,19 +539,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_GRAPH)))
+        .where(HBaseFilters.labelReg(PATTERN_GRAPH)))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_EDGE)))
+        .where(HBaseFilters.<Edge>labelReg(PATTERN_EDGE).negate()))
       .readRemainsAndClose();
 
     List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_VERTEX)))
+        .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
       .readRemainsAndClose();
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);
@@ -574,7 +574,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
-      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
+      .filter(g -> !g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
       .collect(Collectors.toList());
 
     List<Edge> edges = Lists.newArrayList(getSocialEdges())
@@ -593,7 +593,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
-        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)))
+        .where(HBaseFilters.<GraphHead>propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)
+          .negate()))
       .readRemainsAndClose();
 
     List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
@@ -722,6 +723,69 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
     assertEquals(1, graphHeadResult.size());
     assertEquals(2, edgeResult.size());
     assertEquals(2, vertexResult.size());
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with complex predicates
+   */
+  @Test
+  public void testGetElementSpaceWithChainedPredicates() throws IOException {
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = getSocialGraphHeads()
+      .stream()
+      .filter(g -> g.getLabel().equals("Community"))
+      .filter(g -> g.getPropertyValue(PROP_INTEREST).getString().equals("Hadoop") ||
+          g.getPropertyValue(PROP_INTEREST).getString().equals("Graphs"))
+      .collect(Collectors.toList());
+
+    List<Edge> edges = getSocialEdges()
+      .stream()
+      .filter(e -> e.getLabel().matches(PATTERN_EDGE.pattern()) ||
+        (e.hasProperty(PROP_SINCE) && e.getPropertyValue(PROP_SINCE).getInt() < 2015))
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = getSocialVertices()
+      .stream()
+      .filter(v -> v.getLabel().equals("Person"))
+      .collect(Collectors.toList())
+      .subList(1, 4);
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.<GraphHead>labelIn("Community")
+          .and(HBaseFilters.<GraphHead>propEquals(PROP_INTEREST, "Hadoop")
+            .or(HBaseFilters.propEquals(PROP_INTEREST, "Graphs")))))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        // WHERE edge.label LIKE '^has.*$' OR edge.since < 2015
+        .where(HBaseFilters.<Edge>labelReg(PATTERN_EDGE)
+          .or(HBaseFilters.<Edge>propLargerThan(PROP_SINCE, 2015, true).negate())))
+      .readRemainsAndClose();
+
+    final HBaseElementFilter<Vertex> vertexFilter = HBaseFilters.<Vertex>labelIn("Person")
+      .and(HBaseFilters.<Vertex>propEquals(PROP_NAME, vertices.get(0).getPropertyValue("name"))
+        .or(HBaseFilters.<Vertex>propEquals(PROP_NAME, vertices.get(1).getPropertyValue("name"))
+          .or(HBaseFilters.propEquals(PROP_NAME, vertices.get(2).getPropertyValue("name")))));
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(vertexFilter))
+      .readRemainsAndClose();
+
+    assertEquals(2, graphHeadResult.size());
+    assertEquals(21, edgeResult.size());
+    assertEquals(3, vertexResult.size());
 
     validateEPGMElementCollections(graphHeads, graphHeadResult);
     validateEPGMElementCollections(vertices, vertexResult);

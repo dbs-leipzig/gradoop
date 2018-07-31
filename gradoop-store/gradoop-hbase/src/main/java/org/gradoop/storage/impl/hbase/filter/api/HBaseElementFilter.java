@@ -15,10 +15,12 @@
  */
 package org.gradoop.storage.impl.hbase.filter.api;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
+import org.gradoop.storage.impl.hbase.filter.calculate.And;
+import org.gradoop.storage.impl.hbase.filter.calculate.Not;
+import org.gradoop.storage.impl.hbase.filter.calculate.Or;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
@@ -31,33 +33,40 @@ import java.io.Serializable;
 public interface HBaseElementFilter<T extends EPGMElement>
   extends ElementFilter<HBaseElementFilter<T>>, Serializable {
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> or(@Nonnull HBaseElementFilter<T> another) {
-    // this will be implemented at issue #857
-    throw new NotImplementedException("Logical 'or' not implemented.");
+    return Or.create(this, another);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> and(@Nonnull HBaseElementFilter<T> another) {
-    // this will be implemented at issue #857
-    throw new NotImplementedException("Logical 'and' not implemented.");
+    return And.create(this, another);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> negate() {
-    // this will be implemented at issue #857
-    throw new NotImplementedException("Logical negation not implemented.");
+    return Not.of(this);
   }
 
   /**
    * Translate the filter to a HBase specific {@link Filter} which can be applied
    * to a {@link org.apache.hadoop.hbase.client.Scan} instance.
    *
+   * @param negate flag to negate the filter
    * @return the translated filter instance
    */
   @Nonnull
-  Filter toHBaseFilter();
+  Filter toHBaseFilter(boolean negate);
 }

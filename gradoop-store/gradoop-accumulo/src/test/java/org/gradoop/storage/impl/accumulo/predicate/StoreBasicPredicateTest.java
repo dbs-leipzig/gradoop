@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
-import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.OR;
+import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or;
 import org.gradoop.storage.utils.AccumuloFilters;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.junit.FixMethodOrder;
@@ -76,7 +76,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
                   return (AccumuloElementFilter<Vertex>) AccumuloFilters
                     .<Vertex>propEquals("name", name);
                 })
-                .reduce((a, b) -> OR.create(a, b))
+                .reduce((a, b) -> Or.create(a, b))
                 .orElse(it -> false))
             ))
         .readRemainsAndClose();

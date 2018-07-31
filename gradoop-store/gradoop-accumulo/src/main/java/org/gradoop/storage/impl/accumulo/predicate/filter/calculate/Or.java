@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * conjunctive predicate filter
+ * Disjunctive predicate filter
  *
  * @param <T> element type
  */
-public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class Or<T extends EPGMElement> implements AccumuloElementFilter<T> {
 
   /**
    * predicate list
@@ -36,11 +36,11 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * Create a new conjunctive principles
+   * Create a new disjunctive principles
    *
    * @param predicates predicates
    */
-  private AND(List<AccumuloElementFilter<T>> predicates) {
+  private Or(List<AccumuloElementFilter<T>> predicates) {
     if (predicates.size() < 2) {
       throw new IllegalArgumentException(String.format("predicates len(=%d) < 2",
         predicates.size()));
@@ -49,36 +49,35 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
   }
 
   /**
-   * Create a conjunctive formula
+   * create a disjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type
    * @return Conjunctive filter instance
    */
   @SafeVarargs
-  public static <T extends EPGMElement> AND<T> create(AccumuloElementFilter<T>... predicates) {
+  public static <T extends EPGMElement> Or<T> create(AccumuloElementFilter<T>... predicates) {
     List<AccumuloElementFilter<T>> formula = new ArrayList<>();
     Collections.addAll(formula, predicates);
-    return new AND<>(formula);
+    return new Or<>(formula);
   }
 
   @Override
   public boolean test(T t) {
     for (AccumuloElementFilter<T> predicate : predicates) {
-      if (!predicate.test(t)) {
-        return false;
+      if (predicate.test(t)) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   @Override
   public String toString() {
-    StringJoiner joiner = new StringJoiner(" AND ");
+    StringJoiner joiner = new StringJoiner(" OR ");
     for (AccumuloElementFilter<T> predicate : predicates) {
       joiner.add("(" + predicate.toString() + ")");
     }
     return joiner.toString();
   }
-
 }

@@ -346,7 +346,7 @@ public class HBaseEPGMStore implements
     }
 
     if (query.getFilterPredicate() != null) {
-      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));
     }
 
     // if there are filters inside the root list, add it to the Scan object

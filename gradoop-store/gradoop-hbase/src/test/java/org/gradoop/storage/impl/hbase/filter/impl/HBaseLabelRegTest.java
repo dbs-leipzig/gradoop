@@ -48,6 +48,6 @@ public class HBaseLabelRegTest {
       new RegexStringComparator(PATTERN_VERTEX.pattern())
     );
 
-    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
+    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 }
