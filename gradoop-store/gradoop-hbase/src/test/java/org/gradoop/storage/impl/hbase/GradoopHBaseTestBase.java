@@ -44,6 +44,17 @@ public class GradoopHBaseTestBase {
   public static final Pattern PATTERN_GRAPH = Pattern.compile("^Com.*");
   public static final Pattern PATTERN_VERTEX = Pattern.compile("^(Per|Ta).*");
   public static final Pattern PATTERN_EDGE = Pattern.compile("^has.*");
+  public static final Pattern PATTERN_GRAPH_PROP = Pattern.compile(".*doop$");
+  public static final Pattern PATTERN_VERTEX_PROP = Pattern.compile(".*ve$");
+  public static final Pattern PATTERN_EDGE_PROP = Pattern.compile("^start..$");
+
+  public static final String PROP_AGE = "age";
+  public static final String PROP_CITY = "city";
+  public static final String PROP_INTEREST = "interest";
+  public static final String PROP_NAME = "name";
+  public static final String PROP_SINCE = "since";
+  public static final String PROP_STATUS = "status";
+  public static final String PROP_VERTEX_COUNT = "vertexCount";
 
   private static Collection<GraphHead> socialGraphHeads;
   private static Collection<Vertex> socialVertices;

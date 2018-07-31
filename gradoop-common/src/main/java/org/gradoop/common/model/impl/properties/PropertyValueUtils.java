@@ -18,6 +18,7 @@ package org.gradoop.common.model.impl.properties;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -609,6 +610,50 @@ public class PropertyValueUtils {
       default:
         return value.getLong();
       }
+    }
+  }
+
+  /**
+   * Byte utilities.
+   */
+  public static class Bytes {
+
+    /**
+     * Get the raw byte representation of a {@link PropertyValue} instance without the type byte as prefix.
+     *
+     * @param value the {@link PropertyValue} to extract the bytes
+     * @return a byte array containing the value without type information
+     */
+    public static byte[] getRawBytesWithoutType(PropertyValue value) {
+      return Arrays.copyOfRange(value.getRawBytes(), 1, value.getRawBytes().length);
+    }
+
+    /**
+     * Get the type byte of a {@link PropertyValue} instance. It's the first one of the
+     * raw representation of a PropertyValue.
+     *
+     * @param value the {@link PropertyValue} to extract the type byte
+     * @return the type byte as array
+     */
+    public static byte[] getTypeByte(PropertyValue value) {
+      byte[] typeByte = new byte[1];
+      typeByte[0] = value.getRawBytes()[0];
+      return typeByte;
+    }
+
+    /**
+     * Creates a {@link PropertyValue} instance by concatenating the byte representations
+     * of the type and the value.
+     *
+     * @param typeByte a byte array containing only one byte representing the value type
+     * @param valueBytes a byte array representing the property value
+     * @return the resulting {@link PropertyValue}
+     */
+    public static PropertyValue createFromTypeValueBytes(byte[] typeByte, byte[] valueBytes) {
+      byte[] validValue = new byte[valueBytes.length + 1];
+      validValue[0] = typeByte[0];
+      System.arraycopy(valueBytes, 0, validValue, 1, valueBytes.length);
+      return PropertyValue.fromRawBytes(validValue);
     }
   }
 }
