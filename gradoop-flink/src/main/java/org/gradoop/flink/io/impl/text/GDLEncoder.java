@@ -41,7 +41,7 @@ public class GDLEncoder {
    */
   private static final String GRAPH_ELEMENTS_DEFINITION_END = "]";
   /**
-   * Seperates the id and label of graph, vertex and edge.
+   * Separates the id and label of graph, vertex and edge.
    */
   private static final String ID_LABEL_SEPARATOR = ":";
   /**
@@ -61,11 +61,11 @@ public class GDLEncoder {
    */
   private static final String PROPERTIES_SUFFIX = "}";
   /**
-   * Seperates properties.
+   * Separates properties.
    */
   private static final String PROPERTIES_SEPARATOR = ",";
   /**
-   * Seperates key and value for properties.
+   * Separates key and value for properties.
    */
   private static final String KEY_VALUE_SEPARATOR = ":";
   /**

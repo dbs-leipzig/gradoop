@@ -29,8 +29,14 @@ import java.util.List;
  * A map function that converts a graph transaction into a gdl string.
  */
 public class GraphTransactionToGDL implements MapFunction<GraphTransaction, String> {
+  /**
+   * Maps a graph transaction to a gdl formatted graph string.
+   *
+   * @param graphTransaction The graph that should be printed.
+   * @return A gdl formatted graph string.
+   */
   @Override
-  public String map(GraphTransaction graphTransaction) throws Exception {
+  public String map(GraphTransaction graphTransaction) {
     List<Vertex> vertices = new ArrayList<>(graphTransaction.getVertices());
     List<Edge> edges = new ArrayList<>(graphTransaction.getEdges());
     GraphHead graphHead = graphTransaction.getGraphHead();
