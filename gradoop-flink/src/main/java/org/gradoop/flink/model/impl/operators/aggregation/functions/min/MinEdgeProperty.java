@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the minimum of a specified property over all
- * vertices.
+ * edges.
  */
 public class MinEdgeProperty extends MinProperty implements EdgeAggregateFunction {
 

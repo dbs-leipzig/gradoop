@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
     this.properties = Properties.create();
   }
 
+
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
@@ -66,13 +67,14 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * Parses the given property values according to the meta data associated with the specified
    * label.
    *
+   * @param type element type
    * @param label element label
    * @param propertyValueString string representation of elements' property values
    * @return parsed properties
    */
-  Properties parseProperties(String label, String propertyValueString) {
+  Properties parseProperties(String type, String label, String propertyValueString) {
     String[] propertyValues = propertyValueString.split(valueDelimiter);
-    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(label);
+    List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(type, label);
     properties.clear();
     for (int i = 0; i < propertyValues.length; i++) {
       if (propertyValues[i].length() > 0) {

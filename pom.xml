@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.3-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -29,8 +31,7 @@
         <module>gradoop-flink</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
-        <module>gradoop-hbase</module>
-        <module>gradoop-accumulo</module>
+        <module>gradoop-store</module>
     </modules>
 
     <developers>
@@ -53,7 +54,7 @@
         <developer>
             <id>kgomez</id>
             <name>Kevin Gomez</name>
-            <email>gomez@studserv.uni-leipzig.de</email>
+            <email>gomez@informatik.uni-leipzig.de</email>
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
@@ -73,19 +74,29 @@
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
-		</developer>
-		<developer>
+        </developer>
+        <developer>
             <id>sdienst</id>
             <name>Steffen Dienst</name>
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
+        </developer>
+        <developer>
+            <id>crost</id>
+            <name>Christopher Rost</name>
+            <email>rost@informatik.uni-leipzig.de</email>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
     </developers>
 
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
-        <developerConnection>scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git</developerConnection>
+        <developerConnection>
+            scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git
+        </developerConnection>
     </scm>
 
     <distributionManagement>
@@ -111,13 +122,14 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.bson.version>3.6.3</dep.bson.version>
-        <dep.flink.version>1.3.1</dep.flink.version>
+        <dep.flink.version>1.5.0</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
-        <dep.hbase.version>1.3.1</dep.hbase.version>
+        <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.11</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
+        <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
@@ -130,9 +142,11 @@
         <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
         <plugin.maven-shade.version>2.4.3</plugin.maven-shade.version>
         <plugin.maven-source.version>3.0.1</plugin.maven-source.version>
-        <plugin.maven-javadoc.version>2.9.1</plugin.maven-javadoc.version>
+        <plugin.maven-javadoc.version>3.0.1</plugin.maven-javadoc.version>
         <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
+        <plugin.maven-site.version>3.4</plugin.maven-site.version>
+        <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
     </properties>
 
     <profiles>
@@ -187,8 +201,136 @@
                         <configuration>
                             <serverId>release_artifacts_gradoop</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshot</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${plugin.maven-source.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${plugin.maven-javadoc.version}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${plugin.maven-gpg.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign_artifacts_gradoop</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>${plugin.maven-nexus-staging.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>release_artifacts_gradoop</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${plugin.maven-javadoc.version}</version>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <doclint>none</doclint>
+                            <detectOfflineLinks>false</detectOfflineLinks>
+                            <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+                            <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>javadoc</id>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                            <execution>
+                                <id>aggregate</id>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>${plugin.maven-site.version}</version>
+                        <configuration>
+                            <skip>true</skip>
+                            <skipDeploy>true</skipDeploy>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-scm-publish-plugin</artifactId>
+                        <version>${plugin.maven-scm-publish.version}</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <serverId>github</serverId>
+                            <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
+                            <scmBranch>gh-pages</scmBranch>
+                            <checkinComment>Updated JavaDocs via Maven</checkinComment>
+                            <content>${project.build.directory}/apidocs</content>
+                            <siteOutputEncoding>UTF-8</siteOutputEncoding>
+                            <tryUpdate>true</tryUpdate>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>publish-scm</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -223,8 +365,12 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
-                        <suppressionsLocation>gradoop/checkstyle-suppressions.xml</suppressionsLocation>
-                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                        <suppressionsLocation>
+                            gradoop/checkstyle-suppressions.xml
+                        </suppressionsLocation>
+                        <suppressionsFileExpression>
+                            checkstyle.suppressions.file
+                        </suppressionsFileExpression>
                         <failsOnError>true</failsOnError>
                         <consoleOutput>true</consoleOutput>
                     </configuration>
@@ -310,6 +456,9 @@
                             <exclude>src/main/resources/**</exclude>
                             <exclude>**/dev-support/**</exclude>
                         </excludes>
+                        <mapping>
+                            <java>SLASHSTAR_STYLE</java>
+                        </mapping>
                     </configuration>
                     <executions>
                         <execution>
@@ -318,63 +467,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <!-- deployment plugins -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${plugin.maven-source.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${plugin.maven-javadoc.version}</version>
-                    <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${plugin.maven-gpg.version}</version>
-                    <executions>
-                        <execution>
-                            <id>sign_artifacts_gradoop</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>${plugin.maven-nexus-staging.version}</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <serverId>release_artifacts_gradoop</serverId>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -404,12 +496,24 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-store-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-core</artifactId>
+                <version>${dep.flink.version}</version>
             </dependency>
 
             <dependency>
@@ -455,6 +559,13 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-hadoop-compat</artifactId>
                 <version>${dep.hbase.version}</version>
+            </dependency>
+
+            <!-- Kryo -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo-shaded</artifactId>
+                <version>${dep.kryo.version}</version>
             </dependency>
 
             <!-- Others -->
@@ -511,6 +622,14 @@
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-examples</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-store-api</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>

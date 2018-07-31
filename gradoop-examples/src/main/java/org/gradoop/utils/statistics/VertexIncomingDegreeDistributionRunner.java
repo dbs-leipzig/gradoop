@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.IncomingVertexDegreeDistribution;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
@@ -37,7 +38,7 @@ public class VertexIncomingDegreeDistributionRunner extends AbstractRunner imple
 
     StatisticWriter.writeCSV(new IncomingVertexDegreeDistribution()
         .execute(readLogicalGraph(args[0], args[1])),
-        appendSeparator(args[2]) + "incoming_vertex_degree_distribution");
+        appendSeparator(args[2]) + GraphStatisticsReader.INCOMING_VERTEX_DEGREE_DISTRIBUTION);
 
     getExecutionEnvironment().execute("Statistics: Vertex incoming degree distribution");
   }

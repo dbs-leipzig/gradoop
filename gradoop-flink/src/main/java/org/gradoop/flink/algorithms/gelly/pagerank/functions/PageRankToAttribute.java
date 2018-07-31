@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,9 @@
  */
 package org.gradoop.flink.algorithms.gelly.pagerank.functions;
 
+
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.graph.library.link_analysis.PageRank;
+import org.apache.flink.graph.library.linkanalysis.PageRank;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -24,7 +25,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Stores the page rank result from the left as a Property in in the right.
  */
-public class PageRankToAttribute implements JoinFunction<PageRank.Result<GradoopId>, Vertex, Vertex> {
+public class PageRankToAttribute
+  implements JoinFunction<PageRank.Result<GradoopId>, Vertex, Vertex> {
 
   /**
    * Property to store the page rank in.

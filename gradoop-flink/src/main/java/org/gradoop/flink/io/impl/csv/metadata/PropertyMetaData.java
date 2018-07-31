@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,10 @@ public class PropertyMetaData {
    */
   private String key;
   /**
+   * Property type string
+   */
+  private String typeString;
+  /**
    * A function that parses a string to the typed property value
    */
   private Function<String, Object> valueParser;
@@ -34,10 +38,12 @@ public class PropertyMetaData {
    * Constructor.
    *
    * @param key property key
+   * @param typeString property type string
    * @param valueParser property value parser
    */
-  public PropertyMetaData(String key, Function<String, Object> valueParser) {
+  public PropertyMetaData(String key, String typeString, Function<String, Object> valueParser) {
     this.key = key;
+    this.typeString = typeString;
     this.valueParser = valueParser;
   }
 
@@ -48,6 +54,15 @@ public class PropertyMetaData {
    */
   public String getKey() {
     return key;
+  }
+
+  /**
+   * Returns the property type string
+   *
+   * @return property type string
+   */
+  public String getTypeString() {
+    return typeString;
   }
 
   /**

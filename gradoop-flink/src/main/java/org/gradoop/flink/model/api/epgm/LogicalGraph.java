@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,16 +47,13 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.sampling.RandomNodeSampling;
+import org.gradoop.flink.model.impl.operators.sampling.RandomVertexSampling;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -174,6 +171,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query) {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
@@ -182,6 +180,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query, String constructionPattern) {
     return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
@@ -190,6 +189,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
     return cypher(query, true,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
@@ -199,6 +199,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
     return cypher(query, constructionPattern, true,
@@ -210,6 +211,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
@@ -219,6 +221,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
+  @Deprecated
   public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
@@ -229,34 +232,56 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection match(String pattern) {
-    return match(pattern, true);
+  public GraphCollection query(String query) {
+    return query(query, new GraphStatistics(1, 1, 1, 1));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection match(String pattern, boolean attachData) {
-    return match(pattern, attachData, MatchStrategy.ISOMORPHISM,
-      TraverserStrategy.SET_PAIR_BULK_ITERATION);
+  public GraphCollection query(String query, String constructionPattern) {
+    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public GraphCollection match(String pattern, boolean attachData,
-    MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
+  public GraphCollection query(String query, GraphStatistics graphStatistics) {
+    return query(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
 
-    ExplorativePatternMatching op = new ExplorativePatternMatching.Builder()
-      .setQuery(pattern)
-      .setAttachData(attachData)
-      .setMatchStrategy(matchStrategy)
-      .setTraverserStrategy(traverserStrategy)
-      .setTraverser(new DFSTraverser()).build();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection query(String query, String constructionPattern,
+                                GraphStatistics graphStatistics) {
+    return query(query, constructionPattern, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
 
-    return callForCollection(op);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
+                                MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection query(String query, String constructionPattern, boolean attachData,
+                               MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+                               GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
   }
 
   /**
@@ -306,7 +331,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
-    return callForGraph(new Subgraph(vertexFilterFunction, null));
+    return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
   /**
@@ -316,7 +341,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
-    return callForGraph(new Subgraph(null, edgeFilterFunction));
+    return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
   /**
@@ -324,11 +349,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction) {
-    Objects.requireNonNull(vertexFilterFunction);
-    Objects.requireNonNull(edgeFilterFunction);
+    FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
     return callForGraph(
-      new Subgraph(vertexFilterFunction, edgeFilterFunction));
+      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   /**
@@ -344,7 +367,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public LogicalGraph sampleRandomNodes(float sampleSize) {
-    return callForGraph(new RandomNodeSampling(sampleSize));
+    return callForGraph(new RandomVertexSampling(sampleSize));
   }
 
   /**

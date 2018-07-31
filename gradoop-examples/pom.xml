@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.gradoop</groupId>
         <artifactId>gradoop-parent</artifactId>
-        <version>0.3.3-SNAPSHOT</version>
+        <version>0.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>gradoop-examples</artifactId>
@@ -34,6 +34,44 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshot</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
@@ -75,11 +113,11 @@
                                     <include>org.apache.hbase:hbase-common</include>
                                     <include>org.apache.flink:flink-gelly_2.11</include>
                                     <include>org.gradoop:*</include>
-                                    <include>org.s1ck:gdl</include>
+                                    <include>com.github.s1ck:gdl</include>
                                     <include>org.codehaus.jettison:jettison</include>
                                     <include>com.google.guava:guava</include>
                                     <include>org.antlr:antlr4-runtime</include>
-                                    <include>org.mongodb:mongo-java-driver</include>
+                                    <include>org.mongodb:bson</include>
                                     <include>commons-cli:*</include>
                                     <include>me.lemire.integercompression:*</include>
                                 </includes>
@@ -87,23 +125,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- deployment plugins -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

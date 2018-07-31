@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,15 @@
  */
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * True, if the element has not graph ids.
  *
  * @param <EL> epgm graph element
  */
-public class InNoGraph<EL extends EPGMGraphElement> implements FilterFunction<EL> {
+public class InNoGraph<EL extends EPGMGraphElement> implements CombinableFilter<EL> {
 
   @Override
   public boolean filter(EL value) throws Exception {

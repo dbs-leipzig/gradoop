@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,14 @@
  */
 package org.gradoop.flink.model.impl.functions.bool;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Logical false as Flink function.
  *
  * @param <T> data set type
  */
-public class False<T> implements FilterFunction<T> {
+public class False<T> implements CombinableFilter<T> {
 
   @Override
   public boolean filter(T t) throws Exception {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +15,13 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.FileSystem;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.csv.functions.EdgeToCSVEdge;
-import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
-import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -83,7 +77,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
     FileSystem.WriteMode writeMode = overwrite ?
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
-    DataSet<Tuple2<String, String>> metaData;
+    DataSet<Tuple3<String, String, String>> metaData;
     if (!reuseMetadata()) {
       metaData = createMetaData(logicalGraph);
     } else {
@@ -124,35 +118,5 @@ public class CSVDataSink extends CSVBase implements DataSink {
    */
   private boolean reuseMetadata() {
     return this.metaDataPath != null && !this.metaDataPath.isEmpty();
-  }
-
-  /**
-   * Creates the meta data for the given graph.
-   *
-   * @param graph logical graph
-   * @return meta data information
-   */
-  private DataSet<Tuple2<String, String>> createMetaData(LogicalGraph graph) {
-    return createMetaData(graph.getVertices())
-      .union(createMetaData(graph.getEdges()));
-  }
-
-  /**
-   * Creates the meta data for the specified data set of EPGM elements.
-   *
-   * @param elements EPGM elements
-   * @param <E> EPGM element type
-   * @return meta data information
-   */
-  private <E extends Element> DataSet<Tuple2<String, String>> createMetaData(DataSet<E> elements) {
-    return elements
-      .map(new ElementToPropertyMetaData<>())
-      .groupBy(0)
-      .combineGroup(new ReducePropertyMetaData())
-      .groupBy(0)
-      .reduceGroup(new ReducePropertyMetaData())
-      .map(tuple -> Tuple2.of(tuple.f0, MetaDataParser.getPropertiesMetaData(tuple.f1)))
-      .returns(new TupleTypeInfo<>(BasicTypeInfo.STRING_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO))
-      .withForwardedFields("f0");
   }
 }

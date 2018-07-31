@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,7 @@
  */
 package org.gradoop.flink.algorithms.fsm.transactional.tle;
 
-import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.aggregation.SumAggregationFunction;
-import org.apache.flink.api.java.operators.AggregateOperator;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
@@ -33,10 +30,8 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
-import org.gradoop.flink.model.impl.operators.count.Count;
-import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.representation.transactional.traversalcode.TraversalCode;
+import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -139,20 +134,5 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
       .filter(new NotEmpty());
 
     return transactions;
-  }
-
-  /**
-   * Creates a Flink sum aggregate function that can be applied in group combine operations.
-   *
-   * @return sum group combine function
-   */
-  protected GroupCombineFunction<WithCount<TraversalCode<String>>, WithCount<TraversalCode<String>>>
-  sumPartition() {
-
-    SumAggregationFunction.LongSumAgg[] sum = { new SumAggregationFunction.LongSumAgg() };
-
-    int[] fields = { 1 };
-
-    return new AggregateOperator.AggregatingUdf(sum, fields);
   }
 }

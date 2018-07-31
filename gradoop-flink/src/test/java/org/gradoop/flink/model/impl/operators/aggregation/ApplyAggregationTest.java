@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.runtime.client.JobExecutionException;
@@ -21,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -269,7 +268,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
         graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
 
       if (graphHead.getId().equals(g0Id)) {
-        assertEquals(1.5d, vertexAggregate.getDouble(), 0.00001);
+        assertEquals(1.5f, vertexAggregate.getFloat(), 0.00001);
         assertEquals(
           new BigDecimal("4.0"),
           edgeAggregate.getBigDecimal()

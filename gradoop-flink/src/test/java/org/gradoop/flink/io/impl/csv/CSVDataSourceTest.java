@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,10 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Test;
 
-public class CSVDataSourceTest extends GradoopFlinkTestBase {
+public class CSVDataSourceTest extends CSVTestBase {
 
   @Test
   public void testRead() throws Exception {
@@ -39,5 +38,31 @@ public class CSVDataSourceTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("expected");
 
     collectAndAssertTrue(input.equalsByElementData(expected));
+  }
+
+  /**
+   * Test reading a logical graph from csv files with properties
+   * that are supported by csv source and sink
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testReadExtendedProperties() throws Exception {
+    LogicalGraph expected = getExtendedLogicalGraph();
+
+    String csvPath = VertexLabeledEdgeListDataSourceTest.class
+      .getResource("/data/csv/input_extended_properties")
+      .getFile();
+
+    DataSource dataSource = new CSVDataSource(csvPath, getConfig());
+    LogicalGraph sourceLogicalGraph = dataSource.getLogicalGraph();
+
+    collectAndAssertTrue(sourceLogicalGraph.equalsByElementData(expected));
+    collectAndAssertTrue(sourceLogicalGraph.equalsByData(expected));
+
+    dataSource.getLogicalGraph().getEdges().collect()
+      .forEach(this::checkProperties);
+    dataSource.getLogicalGraph().getVertices().collect()
+      .forEach(this::checkProperties);
   }
 }

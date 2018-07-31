@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
+import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -70,7 +72,7 @@ public abstract class AbstractRunner {
    * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
-  protected static LogicalGraph readLogicalGraph(String directory) {
+  protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
     return readLogicalGraph(directory, "json");
   }
 
@@ -82,7 +84,8 @@ public abstract class AbstractRunner {
    * @return EPGM logical graph
    */
   @SuppressWarnings("unchecked")
-  protected static LogicalGraph readLogicalGraph(String directory, String format) {
+  protected static LogicalGraph readLogicalGraph(String directory, String format)
+    throws IOException {
     directory = appendSeparator(directory);
 
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
@@ -92,6 +95,8 @@ public abstract class AbstractRunner {
       return new JSONDataSource(directory, config).getLogicalGraph();
     } else if (format.equals("csv")) {
       return new CSVDataSource(directory, config).getLogicalGraph();
+    } else if (format.equals("indexed")) {
+      return new IndexedCSVDataSource(directory, config).getLogicalGraph();
     } else {
       throw new IllegalArgumentException("Unsupported format: " + format);
     }
@@ -124,6 +129,8 @@ public abstract class AbstractRunner {
       graph.writeTo(new JSONDataSink(appendSeparator(directory), graph.getConfig()));
     } else if (format.equals("csv")) {
       graph.writeTo(new CSVDataSink(appendSeparator(directory), graph.getConfig()));
+    } else if (format.equals("indexed")) {
+      graph.writeTo(new IndexedCSVDataSink(appendSeparator(directory), graph.getConfig()));
     }
     getExecutionEnvironment().execute();
   }

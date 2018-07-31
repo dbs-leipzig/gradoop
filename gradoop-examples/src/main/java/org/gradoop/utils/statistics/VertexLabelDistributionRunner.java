@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ public class VertexLabelDistributionRunner extends AbstractRunner implements Pro
 
     StatisticWriter.writeCSV(new VertexLabelDistribution()
         .execute(readLogicalGraph(args[0], args[1])),
-        appendSeparator(args[2]) + GraphStatisticsReader.TOKEN_SEPARATOR);
+        appendSeparator(args[2]) + GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL);
 
     getExecutionEnvironment().execute("Statistics: Vertex label distribution");
   }
