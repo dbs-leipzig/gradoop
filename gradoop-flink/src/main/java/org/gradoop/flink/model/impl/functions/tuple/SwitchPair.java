@@ -28,8 +28,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 public class SwitchPair<A, B>
   implements MapFunction<Tuple2<A, B>, Tuple2<B, A>> {
 
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple2<B,A> reuse = new Tuple2<>();
+
   @Override
   public Tuple2<B, A> map(Tuple2<A, B> pair) throws Exception {
-    return new Tuple2<>(pair.f1, pair.f0);
+    reuse.f0 = pair.f1;
+    reuse.f1 = pair.f0;
+    return reuse;
   }
 }
