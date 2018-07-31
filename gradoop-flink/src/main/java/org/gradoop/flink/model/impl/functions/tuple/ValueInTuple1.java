@@ -20,8 +20,11 @@ import org.apache.flink.api.java.tuple.Tuple1;
 
 /**
  * Wraps a value in a tuple 1.
+ *
  * @param <T> value type
+ * @deprecated This function is a duplicate of {@link ObjectTo1}, use it instead.
  */
+@Deprecated
 public class ValueInTuple1<T> implements MapFunction<T, Tuple1<T>> {
 
   @Override
