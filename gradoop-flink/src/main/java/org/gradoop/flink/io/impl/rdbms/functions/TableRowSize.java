@@ -17,14 +17,21 @@ public class TableRowSize {
 	 * @return Number of rows of database
 	 * @throws SQLException
 	 */
-	public static int getTableRowSize(Connection con, String tableName) throws SQLException {
-		int rowNumber;
-		Statement st = con.createStatement();
+	public static int getTableRowSize(Connection con, String tableName) {
+		int rowNumber = 0;
+		Statement st;
+		try {
+			st = con.createStatement();
+		
 		ResultSet rs = st.executeQuery("select count(*) from " + tableName);
 		if (rs.next()) {
 			rowNumber = rs.getInt(1);
 		} else {
 			rowNumber = 0;
+		}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return rowNumber;
 	}

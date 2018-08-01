@@ -16,8 +16,7 @@ import org.apache.flink.types.Row;
 public class FlinkConnect {
 
 	/**
-	 * Connects to a relational database and querying data in a distributed
-	 * manner.
+	 * Connects to a relational database and querying data in a distributed manner.
 	 * 
 	 * @param env
 	 *            Flink Execution Environment
@@ -45,20 +44,36 @@ public class FlinkConnect {
 		int j = 0;
 		for (int i = 0; i < parallelism; i++) {
 			if (i == parallelism - 1) {
-				parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
+				parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
+				System.out.println(parameters[i][0] + "," + parameters[i][1]);
 			} else {
-				parameters[i] = new Integer[] { partitionNumber, j };
+				parameters[i] = new Integer[] { j, partitionNumber};
 				j = j + partitionNumber;
+				System.out.println(parameters[i][0] + "," + parameters[i][1]);
 			}
 		}
-
+		
+		System.out.println(sqlQuery+pageinationQuery(rdbmsConfig.getUrl()));
 		// run jdbc input format with pagination
 		JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
 				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
 				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
-				.setQuery(sqlQuery + " limit ? offset ?").setRowTypeInfo(typeInfo)
+				.setQuery(sqlQuery + pageinationQuery(rdbmsConfig.getUrl())).setRowTypeInfo(typeInfo)
 				.setParametersProvider(new GenericParameterValuesProvider(parameters)).finish();
 
 		return env.createInput(jdbcInput);
+	}
+
+	public static String pageinationQuery(String url) {
+		
+		// default pageination query for mysql,mariadb,postgres, ... management systems
+		String pageinationQuery = " limit ? offset ?";
+		
+		// pageination query for microsoft sql server management system
+		if(url.contains("sqlserver")) {
+			pageinationQuery = " ORDER BY 1 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+		}
+		
+		return pageinationQuery;
 	}
 }

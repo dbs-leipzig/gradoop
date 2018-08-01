@@ -79,6 +79,7 @@ public class TableToNode {
 		int i = 0;
 		TypeInformation[] fieldTypes = new TypeInformation[primaryKeys.size()+foreignKeys.size()+furtherAttributes.size()];
 
+		try {
 		for(NameTypeTuple pk : primaryKeys){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(pk.f1,null);
 			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RDBMSConstants.PK_FIELD,i));
@@ -93,6 +94,9 @@ public class TableToNode {
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(att.f1,att.f2);
 			rowheader.getRowHeader().add(new RowHeaderTuple(att.f0,RDBMSConstants.ATTRIBUTE_FIELD,i));
 			i++;
+		}
+		}catch(Exception e) {
+			
 		}
 	
 		return new RowTypeInfo(fieldTypes);

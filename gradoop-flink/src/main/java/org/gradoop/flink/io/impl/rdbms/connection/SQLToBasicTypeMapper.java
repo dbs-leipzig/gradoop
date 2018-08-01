@@ -82,6 +82,9 @@ public class SQLToBasicTypeMapper {
 		case "VARCHAR":
 			bti = BasicTypeInfo.STRING_TYPE_INFO;
 			break;
+		case "NVARCHAR":
+			bti = BasicTypeInfo.STRING_TYPE_INFO;
+			break;
 		case "LONGVARCHAR":
 			bti = BasicTypeInfo.STRING_TYPE_INFO;
 			break;
@@ -112,6 +115,8 @@ public class SQLToBasicTypeMapper {
 		case "FLOAT":
 			bti = BasicTypeInfo.FLOAT_TYPE_INFO;
 			break;
+		case "MONEY":
+			bti = BasicTypeInfo.FLOAT_TYPE_INFO;
 		case "DOUBLE":
 			bti = BasicTypeInfo.DOUBLE_TYPE_INFO;
 			break;
@@ -151,6 +156,7 @@ public class SQLToBasicTypeMapper {
 		case "JAVA_OBJECT":
 			System.err.println("No Typemapping for Type : JAVA_OBJECT");
 			break;
+		default: bti = BasicTypeInfo.STRING_TYPE_INFO;
 		}
 		return bti;
 	}

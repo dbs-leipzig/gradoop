@@ -73,90 +73,90 @@ public class MetaDataParser {
 	 */
 	public void parse() throws SQLException {
 		ResultSet rsTables = metadata.getTables(null, null, "%", new String[] { "TABLE" });
+		ArrayList<String> tables = new ArrayList<String>();
 
 		while (rsTables.next()) {
-			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
-
-				String tableName = rsTables.getString("TABLE_NAME");
-				// used to store primary key metadata representation
-				ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
-				// used to store foreign key metadata representation
-				ArrayList<FkTuple> foreignKeys = new ArrayList<FkTuple>();
-				// used to store further attributes metadata representation
-				ArrayList<NameTypeTypeTuple> furtherAttributes = new ArrayList<NameTypeTypeTuple>();
-				// used to find further attributes, respectively no primary or
-				// foreign key attributes
-				ArrayList<String> pkfkAttributes = new ArrayList<String>();
-
-				ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, tableName);
-				ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, tableName);
-				ResultSet rsAttributes = metadata.getColumns(null, null, tableName, null);
-
-				// parses primary keys if exists
-				if (rsPrimaryKeys != null) {
-
-					// assigning primary key name
-					while (rsPrimaryKeys.next()) {
-						primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
-						pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
-					}
-
-					// assigning primary key data type
-					for (NameTypeTuple pk : primaryKeys) {
-						ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
-						rsColumns.next();
-						pk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
-					}
-				}
-
-				// parses foreign keys if exists
-				if (rsForeignKeys != null) {
-
-					// assigning foreign key name and name of belonging primary
-					// and foreign key table
-					while (rsForeignKeys.next()) {
-						foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,rsForeignKeys.getString("PKCOLUMN_NAME"),
-								rsForeignKeys.getString("PKTABLE_NAME")));
-						pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
-					}
-
-					// assigning foreign key data type
-					for (FkTuple fk : foreignKeys) {
-						ResultSet rsColumns = metadata.getColumns(null, null, tableName, fk.f0);
-						rsColumns.next();
-						fk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
-					}
-				}
-
-				// parses further attributes if exists
-				if (rsAttributes != null) {
-
-					// assigning attribute name and belonging data type
-					while (rsAttributes.next()) {
-						if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
-								&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
-								&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
-
-							NameTypeTypeTuple att = new NameTypeTypeTuple(rsAttributes.getString("COLUMN_NAME"),
-									JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")), null);
-
-							// TODO: support for array data type
-							// if (JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) == JDBCType.ARRAY) {
-							// att.f2 = JDBCType.valueOf(rsAttributes.getMetaData().getColumnType(1));
-							// }
-
-							furtherAttributes.add(att);
-						}
-					}
-				}
-
-				// number of rows (needed for distributed data querying via
-				// flink)
-				int rowCount = TableRowSize.getTableRowSize(con, tableName);
-
-				tableBase.add(new RDBMSTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+			if (rsTables.getString("TABLE_TYPE").equals("TABLE")
+					&& !rsTables.getString("TABLE_NAME").contains("trace_")) {
+				tables.add(rsTables.getString("TABLE_NAME"));
 			}
 		}
+
+		for (String table : tables) {
+			System.out.println(table);
+			// used to store primary key metadata representation
+			ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
+			// used to store foreign key metadata representation
+			ArrayList<FkTuple> foreignKeys = new ArrayList<FkTuple>();
+			// used to store further attributes metadata representation
+			ArrayList<NameTypeTypeTuple> furtherAttributes = new ArrayList<NameTypeTypeTuple>();
+			// used to find further attributes, respectively no primary or
+			// foreign key attributes
+			ArrayList<String> pkfkAttributes = new ArrayList<String>();
+
+			ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, table);
+
+			// parses primary keys if exists
+			if (rsPrimaryKeys != null) {
+
+				// assigning primary key name
+				while (rsPrimaryKeys.next()) {
+					primaryKeys.add(new NameTypeTuple(rsPrimaryKeys.getString("COLUMN_NAME"), null));
+					pkfkAttributes.add(rsPrimaryKeys.getString("COLUMN_NAME"));
+				}
+
+				// assigning primary key data type
+				for (NameTypeTuple pk : primaryKeys) {
+					ResultSet rsColumns = metadata.getColumns(null, null, table, pk.f0);
+					rsColumns.next();
+					pk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
+				}
+			}
+
+			ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, table);
+
+			// parses foreign keys if exists
+			if (rsForeignKeys != null) {
+
+				// assigning foreign key name and name of belonging primary
+				// and foreign key table
+				while (rsForeignKeys.next()) {
+					foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
+							rsForeignKeys.getString("PKCOLUMN_NAME"), rsForeignKeys.getString("PKTABLE_NAME")));
+					pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
+				}
+
+				// assigning foreign key data type
+				for (FkTuple fk : foreignKeys) {
+					ResultSet rsColumns = metadata.getColumns(null, null, table, fk.f0);
+					rsColumns.next();
+					fk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
+				}
+			}
+
+			ResultSet rsAttributes = metadata.getColumns(null, null, table, null);
+
+			// parses further attributes if exists
+			// assigning attribute name and belonging data type
+			while (rsAttributes.next()) {
+				if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
+
+					NameTypeTypeTuple att = new NameTypeTypeTuple(rsAttributes.getString("COLUMN_NAME"),
+							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")), null);
+
+					furtherAttributes.add(att);
+				}
+			}
+
+			// number of rows (needed for distributed data querying via
+			// flink)
+			int rowCount = TableRowSize.getTableRowSize(con, table);
+			
+			tableBase.add(new RDBMSTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+		}
+
 	}
 
 	/**
@@ -193,15 +193,18 @@ public class MetaDataParser {
 				// table tuples going to convert to edges
 				if (table.getForeignKeys().size() == 2 && table.getPrimaryKeys().size() == 2) {
 					tablesToEdges.add(new TableToEdge(table.getTableName(), table.getForeignKeys().get(0).f3,
-							table.getForeignKeys().get(1).f3, new NameTypeTuple(table.getForeignKeys().get(0).f0,table.getForeignKeys().get(0).f1),
-							new NameTypeTuple(table.getForeignKeys().get(1).f0,table.getForeignKeys().get(1).f1), null, table.getFurtherAttributes(), false, rowCount));
+							table.getForeignKeys().get(1).f3,
+							new NameTypeTuple(table.getForeignKeys().get(0).f0, table.getForeignKeys().get(0).f1),
+							new NameTypeTuple(table.getForeignKeys().get(1).f0, table.getForeignKeys().get(1).f1), null,
+							table.getFurtherAttributes(), false, rowCount));
 				}
 
 				// foreign keys going to convert to edges
 				else {
 					for (FkTuple fk : table.getForeignKeys()) {
-						tablesToEdges.add(new TableToEdge(null, table.getTableName(), fk.f3, new NameTypeTuple(fk.f0,fk.f1), new NameTypeTuple(fk.f2,null),
-								table.getPrimaryKeys(), null, true, rowCount));
+						tablesToEdges
+								.add(new TableToEdge(null, table.getTableName(), fk.f3, new NameTypeTuple(fk.f0, fk.f1),
+										new NameTypeTuple(fk.f2, null), table.getPrimaryKeys(), null, true, rowCount));
 					}
 				}
 			}
