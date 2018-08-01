@@ -15,23 +15,19 @@
  */
 package org.gradoop.storage.impl.hbase.handler;
 
-import com.google.common.collect.Sets;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Writables;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.storage.impl.hbase.api.ElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.iterator.HBasePropertyValueWrapper;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Handler is used to write label and properties into HBase tables. This is
@@ -46,12 +42,19 @@ public abstract class HBaseElementHandler implements ElementHandler {
   /**
    * Byte representation of the label column identifier.
    */
-  static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);
+  private static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);
 
   /**
-   * Byte representation of the properties column family.
+   * Byte representation of the property type column family.
    */
-  static final byte[] CF_PROPERTIES_BYTES = Bytes.toBytes(HBaseConstants.CF_PROPERTIES);
+  private static final byte[] CF_PROPERTY_TYPE_BYTES =
+    Bytes.toBytes(HBaseConstants.CF_PROPERTY_TYPE);
+
+  /**
+   * Byte representation of the property value column family.
+   */
+  private static final byte[] CF_PROPERTY_VALUE_BYTES =
+    Bytes.toBytes(HBaseConstants.CF_PROPERTY_VALUE);
 
   /**
    * {@inheritDoc}
@@ -85,14 +88,11 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperty(final Put put, Property property) throws IOException {
-    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(property.getValue());
-    put.addColumn(
-      CF_PROPERTIES_BYTES,
-      Bytes.toBytes(property.getKey()),
-      Writables.getBytes(wrapper)
-    );
-
+  public Put writeProperty(final Put put, Property property) {
+    byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());
+    byte[] bytesWithoutType = PropertyValueUtils.Bytes.getRawBytesWithoutType(property.getValue());
+    put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);
+    put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);
     return put;
   }
 
@@ -100,8 +100,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Put writeProperties(final Put put, final EPGMElement entity) throws IOException {
-    if (entity.getPropertyCount() > 0) {
+  public Put writeProperties(final Put put, final EPGMElement entity) {
+    if (entity.getProperties() != null && entity.getPropertyCount() > 0) {
       for (Property property : entity.getProperties()) {
         writeProperty(put, property);
       }
@@ -121,53 +121,23 @@ public abstract class HBaseElementHandler implements ElementHandler {
    * {@inheritDoc}
    */
   @Override
-  public Properties readProperties(final Result res) throws IOException {
+  public Properties readProperties(final Result res) {
     Properties properties = Properties.create();
-    Map<byte[], byte[]> familyMap = res.getFamilyMap(CF_PROPERTIES_BYTES);
-    for (Map.Entry<byte[], byte[]> propertyColumn : familyMap.entrySet()) {
+
+    // Get Map<Qualifier, Value> which is Map<PropertyKey, TypeByte>
+    Map<byte[], byte[]> typeFamilyMap = res.getFamilyMap(CF_PROPERTY_TYPE_BYTES);
+    // Get Map<Qualifier, Value> which is Map<PropertyKey, ValueBytesWithoutType>
+    Map<byte[], byte[]> valueFamilyMap = res.getFamilyMap(CF_PROPERTY_VALUE_BYTES);
+
+    for (Map.Entry<byte[], byte[]> propertyColumn : typeFamilyMap.entrySet()) {
       properties.set(
-        readPropertyKey(propertyColumn.getKey()),
-        readPropertyValue(propertyColumn.getValue()));
+        Bytes.toString(propertyColumn.getKey()),
+        PropertyValueUtils.Bytes.createFromTypeValueBytes(
+          propertyColumn.getValue(),
+          valueFamilyMap.get(propertyColumn.getKey())));
     }
+
     return properties;
-  }
-
-  /**
-   * Returns all column keys inside a column family.
-   *
-   * @param res          HBase row result
-   * @param columnFamily column family to get keys from
-   * @return all keys inside column family.
-   */
-  protected Set<Long> getColumnKeysFromFamily(final Result res, final byte[] columnFamily) {
-    Set<Long> keys = Sets.newHashSet();
-    for (Map.Entry<byte[], byte[]> column : res.getFamilyMap(columnFamily).entrySet()) {
-      keys.add(Bytes.toLong(column.getKey()));
-    }
-    return keys;
-  }
-
-  /**
-   * Reads the property key from the given byte array.
-   *
-   * @param encKey encoded property key
-   * @return property key
-   */
-  protected String readPropertyKey(final byte[] encKey) {
-    return Bytes.toString(encKey);
-  }
-
-  /**
-   * Decodes a value from a given byte array.
-   *
-   * @param encValue encoded property value
-   * @return property value
-   */
-  protected PropertyValue readPropertyValue(final byte[] encValue) throws IOException {
-    PropertyValue value = new PropertyValue();
-    HBasePropertyValueWrapper wrapper = new HBasePropertyValueWrapper(value);
-    Writables.getWritable(encValue, wrapper);
-    return value;
   }
 
   /**
@@ -175,9 +145,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
    *
    * @param res HBase row
    * @return gradoop id
-   * @throws IOException
    */
-  protected GradoopId readId(Result res) throws IOException {
+  GradoopId readId(Result res) {
     return GradoopId.fromByteArray(res.getRow());
   }
 }

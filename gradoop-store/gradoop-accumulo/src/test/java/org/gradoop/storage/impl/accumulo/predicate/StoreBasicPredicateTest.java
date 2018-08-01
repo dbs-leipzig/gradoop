@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
-import org.gradoop.AccumuloStoreTestBase;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Element;

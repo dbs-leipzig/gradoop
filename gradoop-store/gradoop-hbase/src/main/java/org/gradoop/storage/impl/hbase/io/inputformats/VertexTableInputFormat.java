@@ -15,30 +15,22 @@
  */
 package org.gradoop.storage.impl.hbase.io.inputformats;
 
-import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
 
 /**
  * Reads vertex data from HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
-  extends TableInputFormat<Tuple1<V>> {
+public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
 
   /**
    * Handles reading of persistent vertex data.
    */
-  private final VertexHandler<V, E> vertexHandler;
+  private final VertexHandler vertexHandler;
 
   /**
    * Table to read from.
@@ -51,8 +43,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
    * @param vertexHandler   vertex data handler
    * @param vertexTableName vertex data table name
    */
-  public VertexTableInputFormat(VertexHandler<V, E> vertexHandler,
-    String vertexTableName) {
+  public VertexTableInputFormat(VertexHandler vertexHandler, String vertexTableName) {
     this.vertexHandler = vertexHandler;
     this.vertexTableName = vertexTableName;
   }
@@ -66,26 +57,10 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
   @Override
   protected Scan getScanner() {
     Scan scan = new Scan();
-    scan.setCaching(HBaseConstants.HBASE_DEFAULT_SCAN_CACHE_SIZE);
+    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (vertexHandler.getQuery() != null) {
-      FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-
-      if (vertexHandler.getQuery().getQueryRanges() != null &&
-        !vertexHandler.getQuery().getQueryRanges().isEmpty()) {
-        conjunctFilters.addFilter(
-          HBaseFilterUtils.getIdFilter(vertexHandler.getQuery().getQueryRanges())
-        );
-      }
-
-      if (vertexHandler.getQuery().getFilterPredicate() != null) {
-        conjunctFilters.addFilter(vertexHandler.getQuery().getFilterPredicate().toHBaseFilter());
-      }
-
-      // if there are filters inside the root list, add it to the Scan object
-      if (!conjunctFilters.getFilters().isEmpty()) {
-        scan.setFilter(conjunctFilters);
-      }
+      attachFilter(vertexHandler.getQuery(), scan);
     }
 
     return scan;
@@ -103,7 +78,7 @@ public class VertexTableInputFormat<V extends EPGMVertex, E extends EPGMEdge>
    * {@inheritDoc}
    */
   @Override
-  protected Tuple1<V> mapResultToTuple(Result result) {
+  protected Tuple1<Vertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

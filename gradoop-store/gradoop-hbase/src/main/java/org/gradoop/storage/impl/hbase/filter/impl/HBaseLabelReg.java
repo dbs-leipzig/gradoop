@@ -21,8 +21,8 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.filter.impl.LabelReg;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;

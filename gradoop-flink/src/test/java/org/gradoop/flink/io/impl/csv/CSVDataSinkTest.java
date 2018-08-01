@@ -143,7 +143,6 @@ public class CSVDataSinkTest extends CSVTestBase {
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
     LogicalGraph sourceLogicalGraph = csvDataSource.getLogicalGraph();
 
-    collectAndAssertTrue(logicalGraph.equalsByElementData(sourceLogicalGraph));
     collectAndAssertTrue(logicalGraph.equalsByData(sourceLogicalGraph));
 
     sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);

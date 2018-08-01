@@ -20,37 +20,30 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
-import org.gradoop.storage.impl.hbase.api.PersistentGraphHead;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Used to read/write EPGM graph data from/to a HBase table.
  *
  * Graph data in HBase:
  *
- * |---------|-------------|----------|-----------|-----------|
- * | row-key | meta        | data     | vertices  | edges     |
- * |---------|-------------|----------|----- -----|-----------|
- * | "0"     | label       | k1  | k2 | 0 | 1 | 4 | 0 | 1 | 6 |
- * |         |-------------|----------|-----------|---|---|---|
- * |         | "Community" | v1  | v2 |   |   |   |   |   |   |
- * |---------|-------------|----------|-----------|---|---|---|
- *
- * @param <G> EPGM graph head type
+ * |---------|-------------|----------|
+ * | row-key | meta        | data     |
+ * |---------|-------------|----------|
+ * | "0"     | label       | k1  | k2 |
+ * |         |-------------|----------|
+ * |         | "Community" | v1  | v2 |
+ * |---------|-------------|----------|
  */
-public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
-  extends HBaseElementHandler
-  implements GraphHeadHandler<G> {
+public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphHeadHandler {
 
   /**
    * serial version uid
@@ -58,31 +51,21 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
   private static final long serialVersionUID = 42L;
 
   /**
-   * Byte array representation of the vertices column family.
-   */
-  private static final byte[] CF_VERTICES_BYTES = Bytes.toBytes(HBaseConstants.CF_VERTICES);
-
-  /**
-   * Byte array representation of the edges column family.
-   */
-  private static final byte[] CF_EDGES_BYTES = Bytes.toBytes(HBaseConstants.CF_EDGES);
-
-  /**
    * Creates graph data objects from the rows.
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
 
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<G>> graphQuery;
+  private ElementQuery<HBaseElementFilter<GraphHead>> graphQuery;
 
   /**
    * Creates a graph handler.
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<GraphHead> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 
@@ -93,9 +76,8 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_VERTICES));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_EDGES));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));
     admin.createTable(tableDescriptor);
   }
 
@@ -103,49 +85,9 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertices(final Put put, final PersistentGraphHead graphData) throws IOException {
-    for (GradoopId vertexId : graphData.getVertexIds()) {
-      put.addColumn(CF_VERTICES_BYTES, vertexId.toByteArray(), null);
-    }
-    return put;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Set<Long> readVertices(final Result res) {
-    return getColumnKeysFromFamily(res, CF_VERTICES_BYTES);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Put writeEdges(Put put, PersistentGraphHead graphData) throws IOException {
-    for (GradoopId edgeId : graphData.getEdgeIds()) {
-      put.addColumn(CF_EDGES_BYTES, edgeId.toByteArray(), null);
-    }
-    return put;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Set<Long> readEdges(Result res) {
-    return getColumnKeysFromFamily(res, CF_EDGES_BYTES);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Put writeGraphHead(final Put put, final PersistentGraphHead graphData) throws IOException {
+  public Put writeGraphHead(final Put put, final EPGMGraphHead graphData) {
     writeLabel(put, graphData);
     writeProperties(put, graphData);
-    writeVertices(put, graphData);
-    writeEdges(put, graphData);
     return put;
   }
 
@@ -153,30 +95,15 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public G readGraphHead(final Result res) {
-    G graphHead = null;
-    try {
-      graphHead = graphHeadFactory
-        .initGraphHead(readId(res), readLabel(res), readProperties(res));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return graphHead;
+  public GraphHead readGraphHead(final Result res) {
+    return graphHeadFactory.initGraphHead(readId(res), readLabel(res), readProperties(res));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public EPGMGraphHeadFactory<G> getGraphHeadFactory() {
-    return graphHeadFactory;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GraphHeadHandler<G> applyQuery(ElementQuery<HBaseElementFilter<G>> query) {
+  public GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<GraphHead>> query) {
     this.graphQuery = query;
     return this;
   }
@@ -185,7 +112,7 @@ public class HBaseGraphHeadHandler<G extends EPGMGraphHead>
    * {@inheritDoc}
    */
   @Override
-  public ElementQuery<HBaseElementFilter<G>> getQuery() {
+  public ElementQuery<HBaseElementFilter<GraphHead>> getQuery() {
     return this.graphQuery;
   }
 }

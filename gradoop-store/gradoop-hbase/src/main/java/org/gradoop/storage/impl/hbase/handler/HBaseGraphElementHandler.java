@@ -23,8 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 
-import java.io.IOException;
-
 /**
  * Handler class for entities that are contained in logical graphs (i.e.,
  * vertex and edge data).
@@ -41,7 +39,7 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) throws IOException {
+  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
     if (graphElement.getGraphCount() > 0) {
       put = put.addColumn(
         CF_META_BYTES,
@@ -57,7 +55,7 @@ public abstract class HBaseGraphElementHandler extends
    * {@inheritDoc}
    */
   @Override
-  public GradoopIdSet readGraphIds(Result res) throws IOException {
+  public GradoopIdSet readGraphIds(Result res) {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
 
     GradoopIdSet graphIds;

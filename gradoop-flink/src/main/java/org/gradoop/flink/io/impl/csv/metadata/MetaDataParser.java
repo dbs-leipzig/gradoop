@@ -77,6 +77,7 @@ public class MetaDataParser {
     map.put(TypeString.LOCALDATE.getTypeString(), LocalDate::parse);
     map.put(TypeString.LOCALTIME.getTypeString(), LocalTime::parse);
     map.put(TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);
+    map.put(TypeString.NULL.getTypeString(), MetaDataParser::parseNullProperty);
     return Collections.unmodifiableMap(map);
   }
 
@@ -285,13 +286,30 @@ public class MetaDataParser {
   }
 
   /**
+   * Parse function to create null from the null string representation.
+   *
+   * @param nullString The string representing null.
+   * @throws IllegalArgumentException The string that is passed has to represent null.
+   * @return Returns null
+   */
+  private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
+    if (nullString != null && nullString.equalsIgnoreCase(TypeString.NULL.getTypeString())) {
+      return null;
+    } else {
+      throw new IllegalArgumentException("Only null represents a null string.");
+    }
+  }
+
+  /**
    * Returns the type string for the specified property value.
    *
    * @param propertyValue property value
    * @return property type string
    */
   public static String getTypeString(PropertyValue propertyValue) {
-    if (propertyValue.isShort()) {
+    if (propertyValue.isNull()) {
+      return TypeString.NULL.getTypeString();
+    } else if (propertyValue.isShort()) {
       return TypeString.SHORT.getTypeString();
     } else if (propertyValue.isInt()) {
       return TypeString.INTEGER.getTypeString();
@@ -336,6 +354,10 @@ public class MetaDataParser {
    * Supported type strings for the CSV format.
    */
   private enum TypeString {
+    /**
+     * Null type
+     */
+    NULL("null"),
     /**
      * Boolean type
      */

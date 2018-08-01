@@ -22,15 +22,12 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
+import org.gradoop.storage.common.api.EPGMGraphInput;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.storage.common.api.EPGMGraphInput;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 
 import java.io.IOException;
@@ -170,24 +167,20 @@ public class HBaseEPGMStoreFactory {
   /**
    * Creates the tables used by the graph store.
    *
-   * @param admin HBAse admin instance
+   * @param admin HBase admin instance
    * @param vertexHandler   vertex storage handler
    * @param edgeHandler     edge storage handler
    * @param graphHeadHandler graph storage handler
    * @param vertexTableName vertex data table name
    * @param edgeTableName edge data table name
    * @param graphTableName  graph data table name
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
    * @throws IOException if checking for the existence of the tables fails
    */
-  private static <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
-  void createTablesIfNotExists(
+  private static void createTablesIfNotExists(
     final Admin admin,
-    final VertexHandler<V, E> vertexHandler,
-    final EdgeHandler<E, V> edgeHandler,
-    final GraphHeadHandler<G> graphHeadHandler,
+    final VertexHandler vertexHandler,
+    final EdgeHandler edgeHandler,
+    final GraphHeadHandler graphHeadHandler,
     final TableName vertexTableName,
     final TableName edgeTableName,
     final TableName graphTableName

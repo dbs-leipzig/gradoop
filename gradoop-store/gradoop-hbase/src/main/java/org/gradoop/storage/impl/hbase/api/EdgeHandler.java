@@ -18,33 +18,24 @@ package org.gradoop.storage.impl.hbase.api;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 
-import java.io.IOException;
-
 /**
  * Responsible for reading and writing edge data from and to HBase.
- *
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
  */
-public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends GraphElementHandler {
+public interface EdgeHandler extends GraphElementHandler {
 
   /**
    * Adds the source vertex data to the given {@link Put} and returns it.
    *
-   * @param put        HBase {@link Put}
-   * @param vertexData vertex data
+   * @param put HBase {@link Put}
+   * @param sourceId source vertex id
    * @return put with vertex data
    */
-  Put writeSource(
-    final Put put,
-    final V vertexData
-  ) throws IOException;
+  Put writeSource(final Put put, final GradoopId sourceId);
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -52,19 +43,16 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends G
    * @param res HBase {@link Result}
    * @return source vertex identifier
    */
-  GradoopId readSourceId(final Result res) throws IOException;
+  GradoopId readSourceId(final Result res);
 
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
    *
-   * @param put        HBase HBase {@link Put}
-   * @param vertexData vertex data
+   * @param put HBase {@link Put}
+   * @param targetId target vertex id
    * @return put with vertex data
    */
-  Put writeTarget(
-    final Put put,
-    final V vertexData
-  ) throws IOException;
+  Put writeTarget(final Put put, final GradoopId targetId);
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -72,7 +60,7 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends G
    * @param res HBase {@link Result}
    * @return target vertex identifier
    */
-  GradoopId readTargetId(final Result res) throws IOException;
+  GradoopId readTargetId(final Result res);
 
   /**
    * Writes the complete edge data to the given {@link Put} and returns it.
@@ -81,11 +69,7 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends G
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(
-    final Put put,
-    final PersistentEdge<V> edgeData
-  ) throws
-    IOException;
+  Put writeEdge(final Put put, final EPGMEdge edgeData);
 
   /**
    * Reads the edge data from the given {@link Result}.
@@ -93,14 +77,7 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends G
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  E readEdge(final Result res);
-
-  /**
-   * Returns the edge data factory used by this handler.
-   *
-   * @return edge data factory
-   */
-  EPGMEdgeFactory<E> getEdgeFactory();
+  Edge readEdge(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.
@@ -108,12 +85,12 @@ public interface EdgeHandler<E extends EPGMEdge, V extends EPGMVertex> extends G
    * @param query the element query to apply
    * @return the EdgeHandler instance with the query applied
    */
-  EdgeHandler<E, V> applyQuery(ElementQuery<HBaseElementFilter<E>> query);
+  EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<E>> getQuery();
+  ElementQuery<HBaseElementFilter<Edge>> getQuery();
 }
