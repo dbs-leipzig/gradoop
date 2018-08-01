@@ -16,6 +16,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
@@ -48,6 +49,7 @@ import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -231,7 +233,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   /**
-   * Tries to add an unsupported property type {@link Set} as property value.
+   * Tries to add an unsupported property type {@link Queue} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
@@ -239,8 +241,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
-    // Set is not supported by
-    final Set<String> value = Sets.newHashSet();
+    // Queue is not supported by
+    final Queue<String> value = Queues.newPriorityQueue();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
@@ -338,6 +340,14 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       case KEY_d:
         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
         assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+        break;
+      case KEY_e:
+        assertTrue(v.getPropertyValue(propertyKey).isShort());
+        assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
+        break;
+      case KEY_f:
+        assertTrue(v.getPropertyValue(propertyKey).isSet());
+        assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
         break;
       }
     }

@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.tuple.ValueInTuple1;
+import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.utils.OneSideEmpty;
 
 /**
@@ -41,13 +41,13 @@ public class CollectionEqualityByGraphIds
       .getGraphHeads()
       .map(new Id<GraphHead>())
       .distinct()
-      .map(new ValueInTuple1<GradoopId>());
+      .map(new ObjectTo1<>());
 
     DataSet<Tuple1<GradoopId>> distinctSecondGraphIds = secondCollection
       .getGraphHeads()
       .map(new Id<GraphHead>())
       .distinct()
-      .map(new ValueInTuple1<GradoopId>());
+      .map(new ObjectTo1<>());
 
     DataSet<Boolean> d = distinctFirstGraphIds
       .fullOuterJoin(distinctSecondGraphIds)
