@@ -26,7 +26,6 @@ import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -34,7 +33,6 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.math.BigDecimal;
 
@@ -141,33 +139,21 @@ public class FrequentLossPatterns
   /**
    * main method
    * @param args arguments (none required)
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 
     // avoids multiple output files
     getExecutionEnvironment().setParallelism(1);
-    // get Gradoop configuration
-    GradoopFlinkConfig config = GradoopFlinkConfig
-      .createConfig(getExecutionEnvironment());
 
     // START DEMONSTRATION PROGRAM
 
     // (1) read data from source
 
-    String graphHeadPath = FrequentLossPatterns.class
-      .getResource("/data/json/foodbroker/graphs.json").getFile();
+    String csvPath = FrequentLossPatterns.class
+      .getResource("/data/csv/foodbroker").getFile();
 
-    String vertexPath = FrequentLossPatterns.class.
-      getResource("/data/json/foodbroker/nodes.json").getFile();
-
-    String edgePath = FrequentLossPatterns.class
-      .getResource("/data/json/foodbroker/edges.json").getFile();
-
-    JSONDataSource dataSource = new JSONDataSource(
-      graphHeadPath, vertexPath, edgePath, config);
-
-    LogicalGraph iig = dataSource.getLogicalGraph();
+    LogicalGraph iig = readLogicalGraph(csvPath);
 
     // (2) extract collection of business transaction graphs
 
