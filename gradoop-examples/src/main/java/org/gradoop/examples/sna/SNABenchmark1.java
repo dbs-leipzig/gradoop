@@ -43,14 +43,12 @@ public class SNABenchmark1 extends AbstractRunner implements
   /**
    * Runs the example program.
    *
-   * Need a (possibly HDFS) input directory that contains
-   *  - nodes.json
-   *  - edges.json
-   *  - graphs.json
+   * Need a (possibly HDFS) input directory that contains a EPGM graph
+   * in a given format (csv, indexed, json)
    *
    * Needs a (possibly HDFS) output directory to write the resulting graph to.
    *
-   * @param args args[0] = input dir, args[1] output dir
+   * @param args args[0] = input dir, args[1] input format, args[2] output dir
    * @throws Exception
    */
   @SuppressWarnings({
@@ -59,11 +57,12 @@ public class SNABenchmark1 extends AbstractRunner implements
   })
   public static void main(String[] args) throws Exception {
     Preconditions.checkArgument(
-      args.length == 2, "input dir and output dir required");
+      args.length == 3, "input dir, input format and output dir required");
     String inputDir  = args[0];
-    String outputDir = args[1];
+    String inputFormat = args[1];
+    String outputDir = args[2];
 
-    LogicalGraph epgmDatabase = readLogicalGraph(inputDir);
+    LogicalGraph epgmDatabase = readLogicalGraph(inputDir, inputFormat);
 
     LogicalGraph result = execute(epgmDatabase);
 
