@@ -31,10 +31,15 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
+import org.gradoop.storage.impl.hbase.filter.impl.HBasePropEquals;
+import org.gradoop.storage.impl.hbase.filter.impl.HBasePropLargerThan;
+import org.gradoop.storage.impl.hbase.filter.impl.HBasePropReg;
+import org.gradoop.storage.utils.HBaseFilters;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -44,6 +49,7 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
@@ -380,99 +386,6 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   }
 
   /**
-   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
-   * with the {@link HBaseLabelIn} predicate
-   */
-  @Test
-  public void testGetElementSpaceWithLabelInPredicate() throws IOException {
-    // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
-      .stream()
-      .filter(e -> e.getLabel().equals(LABEL_FORUM))
-      .collect(Collectors.toList());
-
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
-      .stream()
-      .filter(
-        e -> e.getLabel().equals(LABEL_HAS_MODERATOR) || e.getLabel().equals(LABEL_HAS_MEMBER))
-      .collect(Collectors.toList());
-
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
-      .stream()
-      .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
-      .collect(Collectors.toList());
-
-    // Query the store
-    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_FORUM)))
-      .readRemainsAndClose();
-
-    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
-      .readRemainsAndClose();
-
-    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelIn<>(LABEL_TAG, LABEL_FORUM)))
-      .readRemainsAndClose();
-
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
-  }
-
-  /**
-   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
-   * with the {@link HBaseLabelReg} predicate
-   */
-  @Test
-  public void testGetElementSpaceWithLabelRegPredicate() throws IOException {
-    // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
-      .stream()
-      .filter(g -> PATTERN_GRAPH.matcher(g.getLabel()).matches())
-      .collect(Collectors.toList());
-
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
-      .stream()
-      .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
-      .collect(Collectors.toList());
-
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
-      .stream()
-      .filter(v -> PATTERN_VERTEX.matcher(v.getLabel()).matches())
-      .collect(Collectors.toList());
-
-    // Query the store
-    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_GRAPH)))
-      .readRemainsAndClose();
-
-    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_EDGE)))
-      .readRemainsAndClose();
-
-    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
-      Query.elements()
-        .fromAll()
-        .where(new HBaseLabelReg<>(PATTERN_VERTEX)))
-      .readRemainsAndClose();
-
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
-  }
-
-  /**
    * Test the getVertexSpace() method with an id filter predicate
    */
   @Test
@@ -551,6 +464,268 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .readRemainsAndClose();
 
     validateEPGMElementCollections(edges, queryResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBaseLabelIn} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithLabelInPredicate() throws IOException {
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+      .stream()
+      .filter(e -> e.getLabel().equals(LABEL_FORUM))
+      .collect(Collectors.toList());
+
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+      .stream()
+      .filter(
+        e -> e.getLabel().equals(LABEL_HAS_MODERATOR) || e.getLabel().equals(LABEL_HAS_MEMBER))
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+      .stream()
+      .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelIn(LABEL_FORUM)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelIn(LABEL_TAG, LABEL_FORUM)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBaseLabelReg} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithLabelRegPredicate() throws IOException {
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+      .stream()
+      .filter(g -> PATTERN_GRAPH.matcher(g.getLabel()).matches())
+      .collect(Collectors.toList());
+
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+      .stream()
+      .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+      .stream()
+      .filter(v -> PATTERN_VERTEX.matcher(v.getLabel()).matches())
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelReg(PATTERN_GRAPH)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelReg(PATTERN_EDGE)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBasePropEquals} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithPropEqualsPredicate() throws IOException {
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2013);
+    PropertyValue propertyValueCity = PropertyValue.create("Leipzig");
+
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+      .stream()
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
+      .collect(Collectors.toList());
+
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+      .stream()
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).equals(propertyValueSince))
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+      .stream()
+      .filter(v -> v.hasProperty(PROP_CITY))
+      .filter(v -> v.getPropertyValue(PROP_CITY).equals(propertyValueCity))
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBasePropLargerThan} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithPropLargerThanPredicate() throws IOException {
+    // Create the expected graph elements
+    PropertyValue propertyValueVertexCount = PropertyValue.create(3);
+    PropertyValue propertyValueSince = PropertyValue.create(2014);
+    PropertyValue propertyValueAge = PropertyValue.create(30);
+
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+      .stream()
+      // graph with property "vertexCount" and value >= 3
+      .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
+      .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).compareTo(propertyValueVertexCount) >= 0)
+      .collect(Collectors.toList());
+
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+      .stream()
+      // edge with property "since" and value > 2014
+      .filter(e -> e.hasProperty(PROP_SINCE))
+      .filter(e -> e.getPropertyValue(PROP_SINCE).compareTo(propertyValueSince) > 0)
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+      .stream()
+      // vertex with property "age" and value > 30
+      .filter(v -> v.hasProperty(PROP_AGE))
+      .filter(v -> v.getPropertyValue(PROP_AGE).compareTo(propertyValueAge) > 0)
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_VERTEX_COUNT,
+          propertyValueVertexCount, true)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false)))
+      .readRemainsAndClose();
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
+  }
+
+  /**
+   * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
+   * with the {@link HBasePropReg} predicate
+   */
+  @Test
+  public void testGetElementSpaceWithPropRegPredicate() throws IOException {
+    // Extract parts of social graph to filter for
+    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+      .stream()
+      // graph with property "name" and value matches regex ".*doop$"
+      .filter(g -> g.hasProperty(PROP_INTEREST))
+      .filter(g -> g.getPropertyValue(PROP_INTEREST).getString()
+        .matches(PATTERN_GRAPH_PROP.pattern()))
+      .collect(Collectors.toList());
+
+    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+      .stream()
+      // edge with property "status" and value matches regex "^start..$"
+      .filter(e -> e.hasProperty(PROP_STATUS))
+      .filter(e -> e.getPropertyValue(PROP_STATUS).getString().matches(PATTERN_EDGE_PROP.pattern()))
+      .collect(Collectors.toList());
+
+    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+      .stream()
+      // vertex with property "name" and value matches regex ".*ve$"
+      .filter(v -> v.hasProperty(PROP_NAME))
+      .filter(v -> v.getPropertyValue(PROP_NAME).getString().matches(PATTERN_VERTEX_PROP.pattern()))
+      .collect(Collectors.toList());
+
+    // Query the store
+    List<GraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propReg(PROP_INTEREST, PATTERN_GRAPH_PROP)))
+      .readRemainsAndClose();
+
+    List<Edge> edgeResult = socialNetworkStore.getEdgeSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propReg(PROP_STATUS, PATTERN_EDGE_PROP)))
+      .readRemainsAndClose();
+
+    List<Vertex> vertexResult = socialNetworkStore.getVertexSpace(
+      Query.elements()
+        .fromAll()
+        .where(HBaseFilters.propReg(PROP_NAME, PATTERN_VERTEX_PROP)))
+      .readRemainsAndClose();
+
+    assertEquals(1, graphHeadResult.size());
+    assertEquals(2, edgeResult.size());
+    assertEquals(2, vertexResult.size());
+
+    validateEPGMElementCollections(graphHeads, graphHeadResult);
+    validateEPGMElementCollections(vertices, vertexResult);
+    validateEPGMElementCollections(edges, edgeResult);
   }
 
   private AsciiGraphLoader<GraphHead, Vertex, Edge>

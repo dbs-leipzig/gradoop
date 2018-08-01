@@ -43,7 +43,7 @@ public abstract class PropReg<FilterImpl extends ElementFilter>
   private final String key;
 
   /**
-   * label regex filter constructor
+   * Property regex filter constructor
    *
    * @param key property key
    * @param reg label regex

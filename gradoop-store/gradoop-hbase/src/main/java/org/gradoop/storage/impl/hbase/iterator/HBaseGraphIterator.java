@@ -21,7 +21,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 /**
@@ -81,10 +80,6 @@ public class HBaseGraphIterator implements ClosableIterator<GraphHead> {
 
   @Override
   public GraphHead next() {
-    try {
-      return handler.readGraphHead(result);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return handler.readGraphHead(result);
   }
 }
