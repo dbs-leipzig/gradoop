@@ -48,9 +48,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -79,6 +81,8 @@ public class GradoopTestUtils {
   public static final String KEY_d = "keyd";
   public static final String KEY_e = "keye";
   public static final String KEY_f = "keyf";
+  public static final String KEY_g = "keyg";
+  public static final String KEY_h = "keyh";
 
   public static final Object      NULL_VAL_0                        = null;
   public static final boolean     BOOL_VAL_1                        = true;
@@ -94,7 +98,8 @@ public class GradoopTestUtils {
   public static final LocalDate           DATE_VAL_b                = LocalDate.now();
   public static final LocalTime           TIME_VAL_c                = LocalTime.now();
   public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
-  public static final short       SHORT_VAL_e                       = (short)23;
+  public static final short               SHORT_VAL_e               = (short)23;
+  public static final Set<PropertyValue>  SET_VAL_f                 = new HashSet<>();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
@@ -127,6 +132,20 @@ public class GradoopTestUtils {
     LIST_VAL_a.add(PropertyValue.create(DATETIME_VAL_d));
     LIST_VAL_a.add(PropertyValue.create(SHORT_VAL_e));
 
+    SET_VAL_f.add(PropertyValue.create(NULL_VAL_0));
+    SET_VAL_f.add(PropertyValue.create(BOOL_VAL_1));
+    SET_VAL_f.add(PropertyValue.create(INT_VAL_2));
+    SET_VAL_f.add(PropertyValue.create(LONG_VAL_3));
+    SET_VAL_f.add(PropertyValue.create(FLOAT_VAL_4));
+    SET_VAL_f.add(PropertyValue.create(DOUBLE_VAL_5));
+    SET_VAL_f.add(PropertyValue.create(STRING_VAL_6));
+    SET_VAL_f.add(PropertyValue.create(BIG_DECIMAL_VAL_7));
+    SET_VAL_f.add(PropertyValue.create(GRADOOP_ID_VAL_8));
+    SET_VAL_f.add(PropertyValue.create(DATE_VAL_b));
+    SET_VAL_f.add(PropertyValue.create(TIME_VAL_c));
+    SET_VAL_f.add(PropertyValue.create(DATETIME_VAL_d));
+    SET_VAL_f.add(PropertyValue.create(SHORT_VAL_e));
+
     SUPPORTED_PROPERTIES = Maps.newTreeMap();
     SUPPORTED_PROPERTIES.put(KEY_0, NULL_VAL_0);
     SUPPORTED_PROPERTIES.put(KEY_1, BOOL_VAL_1);
@@ -143,6 +162,7 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_c, TIME_VAL_c);
     SUPPORTED_PROPERTIES.put(KEY_d, DATETIME_VAL_d);
     SUPPORTED_PROPERTIES.put(KEY_e, SHORT_VAL_e);
+    SUPPORTED_PROPERTIES.put(KEY_f, SET_VAL_f);
   }
 
   /**
