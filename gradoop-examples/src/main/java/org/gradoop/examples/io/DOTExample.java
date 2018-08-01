@@ -20,12 +20,10 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
-import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Example program that reads a graph from an EPGM-specific JSON representation
+ * Example program that reads a graph from an EPGM format (csv, indexed, json)
  * into a {@link GraphCollection} and stores the
  * resulting {@link GraphCollection} as DOT.
  * The resulting format is described in {@link DOTFileFormat}.
@@ -36,11 +34,10 @@ public class DOTExample extends AbstractRunner implements ProgramDescription {
    * Reads an EPGM graph collection from a directory that contains the separate
    * files. Files can be stored in local file system or HDFS.
    *
-   * args[0]: path to graph head file
-   * args[1]: path to vertex file
-   * args[2]: path to edge file
-   * args[3]: path to write output graph
-   * args[4]: flag to write graph head information
+   * args[0]: path to graph files
+   * args[1]: input graph format
+   * args[2]: path to write output graph
+   * args[3]: flag to write graph head information
    *
    * @param args program arguments
    */
@@ -51,28 +48,23 @@ public class DOTExample extends AbstractRunner implements ProgramDescription {
           "graph head information (true/false)");
     }
 
-    final String graphHeadFile         = args[0];
-    final String vertexFile            = args[1];
-    final String edgeFile              = args[2];
-    final String outputDir             = args[3];
-    final String graphHeadInformation  = args[4];
+    final String inputDir             = args[0];
+    final String inputFormat          = args[1];
+    final String outputDir            = args[2];
+    final String graphHeadInformation = args[3];
 
     // init Flink execution environment
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    // create default Gradoop config
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
-
-    // create DataSource
-    JSONDataSource dataSource =
-      new JSONDataSource(graphHeadFile, vertexFile, edgeFile, config);
+    // read graph collection
+    GraphCollection collection = readGraphCollection(inputDir, inputFormat);
 
     // create DataSink
     DOTDataSink dataSink =
       new DOTDataSink(outputDir, Boolean.parseBoolean(graphHeadInformation));
 
     // write dot format
-    dataSink.write(dataSource.getGraphCollection());
+    dataSink.write(collection);
 
     // execute program
     env.execute();
