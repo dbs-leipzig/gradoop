@@ -30,7 +30,12 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -172,7 +177,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
 
     // assert that the properties have valid values
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
