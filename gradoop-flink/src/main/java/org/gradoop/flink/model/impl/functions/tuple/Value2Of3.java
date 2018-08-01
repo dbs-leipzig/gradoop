@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 
@@ -26,6 +27,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
  * @param <T1> f1 type
  * @param <T2> f2 type
  */
+@FunctionAnnotation.ForwardedFields("f2->*")
 public class Value2Of3<T0, T1, T2>
   implements MapFunction<Tuple3<T0, T1, T2>, T2>,
   KeySelector<Tuple3<T0, T1, T2>, T2> {
