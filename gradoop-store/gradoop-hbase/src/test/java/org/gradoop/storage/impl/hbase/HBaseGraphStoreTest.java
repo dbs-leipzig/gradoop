@@ -17,7 +17,6 @@ package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
@@ -51,12 +50,45 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
-import static org.gradoop.common.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils.BIG_DECIMAL_VAL_7;
+import static org.gradoop.common.GradoopTestUtils.BOOL_VAL_1;
+import static org.gradoop.common.GradoopTestUtils.DATETIME_VAL_d;
+import static org.gradoop.common.GradoopTestUtils.DATE_VAL_b;
+import static org.gradoop.common.GradoopTestUtils.DOUBLE_VAL_5;
+import static org.gradoop.common.GradoopTestUtils.FLOAT_VAL_4;
+import static org.gradoop.common.GradoopTestUtils.GRADOOP_ID_VAL_8;
+import static org.gradoop.common.GradoopTestUtils.INT_VAL_2;
+import static org.gradoop.common.GradoopTestUtils.KEY_0;
+import static org.gradoop.common.GradoopTestUtils.KEY_1;
+import static org.gradoop.common.GradoopTestUtils.KEY_2;
+import static org.gradoop.common.GradoopTestUtils.KEY_3;
+import static org.gradoop.common.GradoopTestUtils.KEY_4;
+import static org.gradoop.common.GradoopTestUtils.KEY_5;
+import static org.gradoop.common.GradoopTestUtils.KEY_6;
+import static org.gradoop.common.GradoopTestUtils.KEY_7;
+import static org.gradoop.common.GradoopTestUtils.KEY_8;
+import static org.gradoop.common.GradoopTestUtils.KEY_9;
+import static org.gradoop.common.GradoopTestUtils.KEY_a;
+import static org.gradoop.common.GradoopTestUtils.KEY_b;
+import static org.gradoop.common.GradoopTestUtils.KEY_c;
+import static org.gradoop.common.GradoopTestUtils.KEY_d;
+import static org.gradoop.common.GradoopTestUtils.KEY_e;
+import static org.gradoop.common.GradoopTestUtils.KEY_f;
+import static org.gradoop.common.GradoopTestUtils.LIST_VAL_a;
+import static org.gradoop.common.GradoopTestUtils.LONG_VAL_3;
+import static org.gradoop.common.GradoopTestUtils.MAP_VAL_9;
+import static org.gradoop.common.GradoopTestUtils.NULL_VAL_0;
+import static org.gradoop.common.GradoopTestUtils.SET_VAL_f;
+import static org.gradoop.common.GradoopTestUtils.SHORT_VAL_e;
+import static org.gradoop.common.GradoopTestUtils.STRING_VAL_6;
+import static org.gradoop.common.GradoopTestUtils.SUPPORTED_PROPERTIES;
+import static org.gradoop.common.GradoopTestUtils.TIME_VAL_c;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElements;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -76,7 +108,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @BeforeClass
   public static void setUp() throws IOException {
-    socialNetworkStore = openEPGMStore(getExecutionEnvironment(), "HBaseGraphStoreTest.");
+    socialNetworkStore = openEPGMStore("HBaseGraphStoreTest.");
     writeSocialGraphToStore(socialNetworkStore);
   }
 
@@ -96,7 +128,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void writeCloseOpenReadTest() throws IOException {
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
 
@@ -110,7 +142,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // re-open
     graphStore.close();
-    graphStore = openEPGMStore(getExecutionEnvironment());
+    graphStore = openEPGMStore();
 
     // validate
     validateGraphHead(graphStore, graphHead);
@@ -126,7 +158,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @Test
   public void writeCloseOpenReadTestWithPrefix() throws IOException {
     String prefix = "test.";
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment(), prefix);
+    HBaseEPGMStore graphStore = createEmptyEPGMStore(prefix);
 
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
 
@@ -140,7 +172,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
 
     // re-open
     graphStore.close();
-    graphStore = openEPGMStore(getExecutionEnvironment(), prefix);
+    graphStore = openEPGMStore(prefix);
 
     // validate
     validateGraphHead(graphStore, graphHead);
@@ -155,7 +187,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void writeFlushReadTest() throws IOException {
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore graphStore = createEmptyEPGMStore();
     graphStore.setAutoFlush(false);
 
     AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
@@ -187,7 +219,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test
   public void iteratorTest() throws IOException {
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
     List<Vertex> vertices = Lists.newArrayList(getSocialVertices());
     List<Edge> edges = Lists.newArrayList(getSocialEdges());
@@ -238,7 +270,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
@@ -263,7 +295,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   @SuppressWarnings("Duplicates")
   @Test
   public void propertyTypeTest() throws IOException {
-    HBaseEPGMStore graphStore = createEmptyEPGMStore(getExecutionEnvironment());
+    HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 

@@ -15,13 +15,13 @@
  */
 package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -48,7 +48,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_vertexIdSetQueryTest() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
 
       //vertex id query
@@ -56,7 +56,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .map(Element::getId)
         .collect(Collectors.toList()));
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       Assert.assertTrue(!source.isFilterPushedDown());
 
       source = source.applyVertexPredicate(
@@ -81,7 +81,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_edgeIdSetQueryTest() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       List<Edge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
 
       //edge id query
@@ -89,7 +89,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .map(Element::getId)
         .collect(Collectors.toList()));
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       Assert.assertTrue(!source.isFilterPushedDown());
 
       source = source.applyEdgePredicate(
@@ -114,7 +114,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_graphIdSetQueryTest() throws Throwable {
-    doTest(TEST03, (loader, store) -> {
+    doTest(TEST03, (loader, store, config) -> {
       List<GraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       //vertex id query
@@ -122,7 +122,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .map(Element::getId)
         .collect(Collectors.toList()));
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       Assert.assertTrue(!source.isFilterPushedDown());
 
       source = source.applyGraphPredicate(

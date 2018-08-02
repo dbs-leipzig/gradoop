@@ -19,13 +19,14 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
-import org.gradoop.storage.common.io.FilterableDataSource;
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.common.io.FilterableDataSource;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.storage.impl.accumulo.io.inputformats.EdgeInputFormat;
 import org.gradoop.storage.impl.accumulo.io.inputformats.GraphHeadInputFormat;
 import org.gradoop.storage.impl.accumulo.io.inputformats.VertexInputFormat;
@@ -62,26 +63,32 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
    * Creates a new Accumulo data source.
    *
    * @param store accumulo epgm store
+   * @param config gradoop flink configuration
    */
-  public AccumuloDataSource(@Nonnull AccumuloEPGMStore store) {
-    this(store, null, null, null);
+  public AccumuloDataSource(
+    @Nonnull AccumuloEPGMStore store,
+    @Nonnull GradoopFlinkConfig config
+  ) {
+    this(store, config, null, null, null);
   }
 
   /**
    * Creates a new Accumulo data source.
    *
    * @param store accumulo epgm store
+   * @param config gradoop flink configuration
    * @param graphQuery graph head filter
    * @param vertexQuery vertex filter
    * @param edgeQuery edge filter
    */
   private AccumuloDataSource(
     @Nonnull AccumuloEPGMStore store,
+    @Nonnull GradoopFlinkConfig config,
     @Nullable AccumuloQueryHolder<GraphHead> graphQuery,
     @Nullable AccumuloQueryHolder<Vertex> vertexQuery,
     @Nullable AccumuloQueryHolder<Edge> edgeQuery
   ) {
-    super(store);
+    super(store, config);
     this.graphHeadQuery = graphQuery;
     this.vertexQuery = vertexQuery;
     this.edgeQuery = edgeQuery;
@@ -94,8 +101,8 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
 
   @Override
   public GraphCollection getGraphCollection() {
-    GraphCollectionFactory factory = getAccumuloConfig().getGraphCollectionFactory();
-    ExecutionEnvironment env = getAccumuloConfig().getExecutionEnvironment();
+    GraphCollectionFactory factory = getFlinkConfig().getGraphCollectionFactory();
+    ExecutionEnvironment env = getFlinkConfig().getExecutionEnvironment();
     return factory.fromDataSets(
       /*graph head format*/
       env.createInput(new GraphHeadInputFormat(
@@ -117,6 +124,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     AccumuloQueryHolder<GraphHead> newGraphQuery = AccumuloQueryHolder.create(query);
     return new AccumuloDataSource(
       getStore(),
+      getFlinkConfig(),
       newGraphQuery,
       vertexQuery,
       edgeQuery
@@ -131,6 +139,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     AccumuloQueryHolder<Vertex> newVertexQuery = AccumuloQueryHolder.create(query);
     return new AccumuloDataSource(
       getStore(),
+      getFlinkConfig(),
       graphHeadQuery,
       newVertexQuery,
       edgeQuery
@@ -145,6 +154,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     AccumuloQueryHolder<Edge> newEdgeQuery = AccumuloQueryHolder.create(query);
     return new AccumuloDataSource(
       getStore(),
+      getFlinkConfig(),
       graphHeadQuery,
       vertexQuery,
       newEdgeQuery

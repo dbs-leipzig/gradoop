@@ -44,19 +44,19 @@ public interface EPGMGraphPredictableOutput<
   @Nonnull
   @Override
   default ClosableIterator<GraphHead> getGraphSpace(int cacheSize) throws IOException {
-    return getGraphSpace(null, DEFAULT_CACHE_SIZE);
+    return getGraphSpace(null, cacheSize);
   }
 
   @Nonnull
   @Override
   default ClosableIterator<Vertex> getVertexSpace(int cacheSize) throws IOException {
-    return getVertexSpace(null, DEFAULT_CACHE_SIZE);
+    return getVertexSpace(null, cacheSize);
   }
 
   @Nonnull
   @Override
   default ClosableIterator<Edge> getEdgeSpace(int cacheSize) throws IOException {
-    return getEdgeSpace(null, DEFAULT_CACHE_SIZE);
+    return getEdgeSpace(null, cacheSize);
   }
 
   /**

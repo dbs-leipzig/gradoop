@@ -17,17 +17,17 @@ package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
-import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.basic.StoreTest;
-import org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest;
-import org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
-import org.gradoop.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
-import org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest;
 import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
 import org.gradoop.storage.impl.accumulo.io.source.IOEdgePredicateTest;
 import org.gradoop.storage.impl.accumulo.io.source.IOGraphPredicateTest;
 import org.gradoop.storage.impl.accumulo.io.source.IOVertexPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StoreLabelPredicateTest;
+import org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -39,7 +39,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-import static org.gradoop.storage.config.GradoopAccumuloConfig.*;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_USER;
+import static org.gradoop.storage.config.GradoopAccumuloConfig.ZOOKEEPER_HOSTS;
 
 /**
  * gradoop accumulo test suit
@@ -94,11 +98,8 @@ public class AccumuloTestSuite {
    * @param prefix store prefix
    * @return gradoop accumulo configure
    */
-  public static GradoopAccumuloConfig getAcConfig(
-    ExecutionEnvironment env,
-    String prefix
-  ) {
-    return GradoopAccumuloConfig.getDefaultConfig(env)
+  public static GradoopAccumuloConfig getAcConfig(String prefix) {
+    return GradoopAccumuloConfig.getDefaultConfig()
       .set(ACCUMULO_USER, "root")
       .set(ACCUMULO_INSTANCE, accumulo.getInstanceName())
       .set(ZOOKEEPER_HOSTS, accumulo.getZooKeepers())

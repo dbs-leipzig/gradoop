@@ -19,6 +19,7 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
 import org.gradoop.storage.common.iterator.ClosableIterator;
@@ -44,7 +45,7 @@ import java.util.Map;
  * @see EPGMGraphOutput
  * @see EPGMGraphPredictableOutput
  */
-public class ClientClosableIterator<R extends EPGMElement, E extends EPGMElement>
+public class ClientClosableIterator<R extends Element, E extends EPGMElement>
   implements ClosableIterator<R> {
 
   /**

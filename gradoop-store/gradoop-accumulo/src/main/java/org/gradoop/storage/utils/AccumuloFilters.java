@@ -26,12 +26,12 @@ import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
 /**
- * accumulo filters collection utils
+ * Accumulo filters collection utils
  */
 public class AccumuloFilters {
 
   /**
-   * label in formula generator function
+   * Label in formula generator function
    *
    * @param value value ranges
    * @param <T> epgm element type
@@ -45,7 +45,7 @@ public class AccumuloFilters {
   }
 
   /**
-   * label regex formula generator function
+   * Label regex formula generator function
    *
    * @param reg regex pattern
    * @param <T> epgm element type
@@ -59,7 +59,7 @@ public class AccumuloFilters {
   }
 
   /**
-   * property equals formula generator function
+   * Property equals formula generator function
    *
    * @param key property key
    * @param value property value
@@ -75,7 +75,7 @@ public class AccumuloFilters {
   }
 
   /**
-   * property larger than formula generator function
+   * Property larger than formula generator function
    *
    * @param key property key
    * @param value property value
@@ -93,7 +93,7 @@ public class AccumuloFilters {
   }
 
   /**
-   * property regex formula generator function
+   * Property regex formula generator function
    *
    * @param key property key
    * @param reg property regex pattern
