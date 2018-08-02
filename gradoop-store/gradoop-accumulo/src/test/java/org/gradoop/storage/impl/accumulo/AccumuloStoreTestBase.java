@@ -16,12 +16,13 @@
 package org.gradoop.storage.impl.accumulo;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,7 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     String namespace,
     SocialTestContext context
   ) throws Throwable {
-    GradoopAccumuloConfig config = AccumuloTestSuite
-      .getAcConfig(getExecutionEnvironment(), namespace);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(namespace);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     //read vertices by label
@@ -58,7 +58,8 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     }
     graphStore.flush();
 
-    context.test(loader, graphStore);
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    context.test(loader, graphStore, flinkConfig);
   }
 
   /**
@@ -98,7 +99,8 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
 
     void test(
       AsciiGraphLoader<GraphHead, Vertex, Edge> loader,
-      AccumuloEPGMStore store
+      AccumuloEPGMStore store,
+      GradoopFlinkConfig config
     ) throws Throwable;
 
   }

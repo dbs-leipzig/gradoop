@@ -15,7 +15,6 @@
  */
 package org.gradoop.storage.impl.hbase;
 
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
@@ -24,7 +23,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 
 import java.io.IOException;
@@ -100,31 +98,29 @@ public class GradoopHBaseTestBase {
   /**
    * Initializes and returns an empty graph store.
    *
-   * @param env the execution environment
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore(ExecutionEnvironment env) {
+  public static HBaseEPGMStore createEmptyEPGMStore() {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(config,
-      GradoopHBaseConfig.getDefaultConfig(env));
+      GradoopHBaseConfig.getDefaultConfig());
   }
 
   /**
    * Initializes and returns an empty graph store with a prefix at each table name.
    *
-   * @param env the execution environment
    * @param prefix the table prefix
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore(ExecutionEnvironment env, String prefix) {
+  public static HBaseEPGMStore createEmptyEPGMStore(String prefix) {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config, prefix);
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       config,
-      GradoopHBaseConfig.getDefaultConfig(env),
+      GradoopHBaseConfig.getDefaultConfig(),
       prefix
     );
   }
@@ -133,13 +129,12 @@ public class GradoopHBaseTestBase {
    * Open existing EPGMStore for test purposes. If the store does not exist, a
    * new one will be initialized and returned.
    *
-   * @param env the execution environment
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(ExecutionEnvironment env) {
+  public static HBaseEPGMStore openEPGMStore() {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
-      GradoopHBaseConfig.getDefaultConfig(env)
+      GradoopHBaseConfig.getDefaultConfig()
     );
   }
 
@@ -147,18 +142,16 @@ public class GradoopHBaseTestBase {
    * Open existing EPGMStore for test purposes. If the store does not exist, a
    * new one will be initialized and returned.
    *
-   * @param env the execution environment
    * @param prefix the table prefix
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(ExecutionEnvironment env, String prefix) {
+  public static HBaseEPGMStore openEPGMStore(String prefix) {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
-      GradoopHBaseConfig.getDefaultConfig(env),
+      GradoopHBaseConfig.getDefaultConfig(),
       prefix
     );
   }
-
 
 
   //----------------------------------------------------------------------------

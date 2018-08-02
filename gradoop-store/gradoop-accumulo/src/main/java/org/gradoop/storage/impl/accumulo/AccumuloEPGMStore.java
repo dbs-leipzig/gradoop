@@ -34,7 +34,6 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -50,6 +49,7 @@ import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.common.iterator.EmptyClosableIterator;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloRowHandler;
@@ -130,8 +130,8 @@ public class AccumuloEPGMStore implements
    *                                    etc.
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
-  public AccumuloEPGMStore(@Nonnull GradoopAccumuloConfig config) throws
-    AccumuloSecurityException, AccumuloException {
+  public AccumuloEPGMStore(@Nonnull GradoopAccumuloConfig config)
+    throws AccumuloSecurityException, AccumuloException {
     this.config = config;
     this.conn = createConnector();
     createTablesIfNotExists();
@@ -198,9 +198,6 @@ public class AccumuloEPGMStore implements
   @Override
   public void writeEdge(@Nonnull EPGMEdge record) {
     writeRecord(record, edgeWriter, config.getEdgeHandler());
-    // TODO: [#833] add Edge-in and edge-out
-    //writeEdgeOut(record);
-    //writeEdgeIn(record);
   }
 
   @Override
@@ -468,40 +465,6 @@ public class AccumuloEPGMStore implements
       } catch (TableExistsException ignore) {
         //ignore if it is exists, maybe create by another process or thread
       }
-    }
-  }
-
-  /**
-   * Write an edge-out link record into vertex table
-   *
-   * @param record epgm edge record
-   */
-  private void writeEdgeOut(EPGMEdge record) {
-    //write out mutation
-    try {
-      Mutation mutation = new Mutation(record.getSourceId().toString());
-      mutation = config.getVertexHandler()
-        .writeLink(mutation, record, false);
-      vertexWriter.addMutation(mutation);
-    } catch (MutationsRejectedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Write an edge-in link record into vertex table
-   *
-   * @param record epgm edge record
-   */
-  private void writeEdgeIn(EPGMEdge record) {
-    //write out mutation
-    try {
-      Mutation mutation = new Mutation(record.getTargetId().toString());
-      mutation = config.getVertexHandler()
-        .writeLink(mutation, record, true);
-      vertexWriter.addMutation(mutation);
-    } catch (MutationsRejectedException e) {
-      throw new RuntimeException(e);
     }
   }
 

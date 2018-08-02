@@ -18,18 +18,18 @@ package org.gradoop.storage.impl.hbase.io;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
-import org.gradoop.storage.common.predicate.query.ElementQuery;
-import org.gradoop.storage.common.io.FilterableDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.common.io.FilterableDataSource;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.io.inputformats.EdgeTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.VertexTableInputFormat;
@@ -67,28 +67,32 @@ public class HBaseDataSource extends HBaseBase
    * Creates a new HBase data source.
    *
    * @param epgmStore HBase store
+   * @param flinkConfig gradoop flink execute config
    */
   public HBaseDataSource(
-    @Nonnull HBaseEPGMStore epgmStore
+    @Nonnull HBaseEPGMStore epgmStore,
+    @Nonnull GradoopFlinkConfig flinkConfig
   ) {
-    this(epgmStore, null, null, null);
+    this(epgmStore, flinkConfig, null, null, null);
   }
 
   /**
    * Private constructor to create a data source instance with predicates.
    *
    * @param epgmStore HBase store
+   * @param flinkConfig gradoop flink execute config
    * @param graphHeadQuery A predicate to apply to graph head elements
    * @param vertexQuery A predicate to apply to vertices
    * @param edgeQuery A predicate to apply to edges
    */
   private HBaseDataSource(
     @Nonnull HBaseEPGMStore epgmStore,
+    @Nonnull GradoopFlinkConfig flinkConfig,
     @Nullable ElementQuery<HBaseElementFilter<GraphHead>> graphHeadQuery,
     @Nullable ElementQuery<HBaseElementFilter<Vertex>> vertexQuery,
     @Nullable ElementQuery<HBaseElementFilter<Edge>> edgeQuery
   ) {
-    super(epgmStore);
+    super(epgmStore, flinkConfig);
     this.graphHeadQuery = graphHeadQuery;
     this.vertexQuery = vertexQuery;
     this.edgeQuery = edgeQuery;
@@ -107,27 +111,27 @@ public class HBaseDataSource extends HBaseBase
    */
   @Override
   public GraphCollection getGraphCollection() {
-    GradoopHBaseConfig config = getHBaseConfig();
+    GradoopFlinkConfig config = getFlinkConfig();
     HBaseEPGMStore store = getStore();
 
     DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
       .createInput(new GraphHeadTableInputFormat(
-        config.getGraphHeadHandler().applyQuery(graphHeadQuery),
-        store.getGraphHeadName()),
+          getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),
+          store.getGraphHeadName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Vertex> vertices = config.getExecutionEnvironment()
       .createInput(new VertexTableInputFormat(
-        config.getVertexHandler().applyQuery(vertexQuery),
-        store.getVertexTableName()),
+          getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
+          store.getVertexTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
     DataSet<Edge> edges = config.getExecutionEnvironment()
       .createInput(new EdgeTableInputFormat(
-        config.getEdgeHandler().applyQuery(edgeQuery),
-        store.getEdgeTableName()),
+          getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
+          store.getEdgeTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))
       .map(new ValueOf1<>());
 
@@ -140,8 +144,9 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query) {
-    return new HBaseDataSource(getStore(), query, vertexQuery, edgeQuery);
+    @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query
+  ) {
+    return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
   }
 
   /**
@@ -150,8 +155,9 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query) {
-    return new HBaseDataSource(getStore(), graphHeadQuery, query, edgeQuery);
+    @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query
+  ) {
+    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
   }
 
   /**
@@ -160,8 +166,9 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Edge>> query) {
-    return new HBaseDataSource(getStore(), graphHeadQuery, vertexQuery, query);
+    @Nonnull ElementQuery<HBaseElementFilter<Edge>> query
+  ) {
+    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
   }
 
   /**

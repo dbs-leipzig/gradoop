@@ -15,12 +15,12 @@
  */
 package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.utils.AccumuloFilters;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
+import org.gradoop.storage.utils.AccumuloFilters;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -42,7 +42,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_queryGraphByProperty() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -53,7 +53,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<GraphHead> query = source.applyGraphPredicate(
         Query.elements()
           .fromAll()
@@ -73,7 +73,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_queryByMulti() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community"))
         .filter(it -> it.getProperties() != null)
@@ -82,7 +82,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         .filter(it -> it.getPropertyValue("vertexCount").getInt() < 4)
         .collect(Collectors.toList());
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<GraphHead> query = source.applyGraphPredicate(
         Query.elements()
           .fromAll()

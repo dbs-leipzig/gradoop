@@ -15,12 +15,12 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.utils.AccumuloFilters;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_vertexPropEquals() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertices = loader.getVertices().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -79,7 +79,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_edgePropEquals() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       List<Edge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -108,7 +108,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_propRegex() throws Throwable {
-    doTest(TEST03, (loader, store) -> {
+    doTest(TEST03, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("(Leipzig|Dresden)");
 
       List<Vertex> inputVertices = loader.getVertices().stream()
@@ -140,7 +140,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test04_propLargerThan() throws Throwable {
-    doTest(TEST04, (loader, store) -> {
+    doTest(TEST04, (loader, store, config) -> {
       List<Edge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -171,7 +171,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test05_propSmallerThan() throws Throwable {
-    doTest(TEST05, (loader, store) -> {
+    doTest(TEST05, (loader, store, config) -> {
       List<GraphHead> inputVertices = loader.getGraphHeads()
         .stream()
         .filter(it -> it.getPropertyValue("vertexCount") != null)
