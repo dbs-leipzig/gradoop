@@ -27,7 +27,6 @@ import org.apache.flink.api.java.tuple.Tuple3;
  * @param <T1> f1 type
  * @param <T2> f2 type
  */
-@FunctionAnnotation.ReadFields("f0")
 @FunctionAnnotation.ForwardedFields("f0")
 public class Project3To0<T0, T1, T2> implements MapFunction<Tuple3<T0, T1, T2>, Tuple1<T0>> {
 
