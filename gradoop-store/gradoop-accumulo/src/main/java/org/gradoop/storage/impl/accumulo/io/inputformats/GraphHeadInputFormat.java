@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo graph head input format
  */
-public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
+public class GraphHeadInputFormat extends BaseElementInputFormat<GraphHead> {
 
   /**
    * serialize id

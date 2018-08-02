@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo vertex input format
  */
-public class VertexInputFormat extends BaseInputFormat<Vertex> {
+public class VertexInputFormat extends BaseElementInputFormat<Vertex> {
 
   /**
    * serialize id

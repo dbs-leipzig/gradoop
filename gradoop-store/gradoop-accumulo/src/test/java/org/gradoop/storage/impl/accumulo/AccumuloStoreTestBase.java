@@ -37,29 +37,28 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
    * @param context loader context
    * @throws Throwable if error
    */
-  protected void doTest(
+  protected void storeInsertAndTest(
     String namespace,
     SocialTestContext context
   ) throws Throwable {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(namespace);
-    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
+    try (AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config)) {
+      // read vertices by label
+      AsciiGraphLoader<GraphHead, Vertex, Edge> loader = GradoopTestUtils.getSocialNetworkLoader();
+      // write social graph to Accumulo
+      for (GraphHead g : loader.getGraphHeads()) {
+        graphStore.writeGraphHead(g);
+      }
+      for (Vertex v : loader.getVertices()) {
+        graphStore.writeVertex(v);
+      }
+      for (Edge e : loader.getEdges()) {
+        graphStore.writeEdge(e);
+      }
+      graphStore.flush();
 
-    //read vertices by label
-    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = GradoopTestUtils.getSocialNetworkLoader();
-    // write social graph to Accumulo
-    for (GraphHead g : loader.getGraphHeads()) {
-      graphStore.writeGraphHead(g);
+      context.test(loader, graphStore, GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
     }
-    for (Vertex v : loader.getVertices()) {
-      graphStore.writeVertex(v);
-    }
-    for (Edge e : loader.getEdges()) {
-      graphStore.writeEdge(e);
-    }
-    graphStore.flush();
-
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    context.test(loader, graphStore, flinkConfig);
   }
 
   /**
@@ -104,4 +103,5 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     ) throws Throwable;
 
   }
+
 }

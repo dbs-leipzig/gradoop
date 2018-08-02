@@ -49,7 +49,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_vertexLabelEquals() throws Throwable {
-    doTest(TEST01, (loader, store, config) -> {
+    storeInsertAndTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertex = loader.getVertices().stream()
         .filter(it ->
           Objects.equals(it.getLabel(), "Person") ||
@@ -75,7 +75,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_edgeLabelEquals() throws Throwable {
-    doTest(TEST02, (loader, store, config) -> {
+    storeInsertAndTest(TEST02, (loader, store, config) -> {
       List<Edge> inputEdges = loader.getEdges().stream()
         .filter(it ->
           Objects.equals(it.getLabel(), "hasInterest") ||
@@ -100,7 +100,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_vertexLabelRegex() throws Throwable {
-    doTest(TEST03, (loader, store, config) -> {
+    storeInsertAndTest(TEST03, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("[Pers|Ta].*+");
 
       List<Vertex> inputVertex = loader.getVertices().stream()
@@ -126,7 +126,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test04_edgeLabelRegex() throws Throwable {
-    doTest(TEST04, (loader, store, config) -> {
+    storeInsertAndTest(TEST04, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("has.*+");
 
       //graph label query
@@ -151,7 +151,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test05_graphLabelEquals() throws Throwable {
-    doTest(TEST05, (loader, store, config) -> {
+    storeInsertAndTest(TEST05, (loader, store, config) -> {
       List<GraphHead> inputGraph = loader.getGraphHeads().stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community") ||
           Objects.equals(it.getLabel(), "Person"))
@@ -173,7 +173,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test06_graphLabelRegex() throws Throwable {
-    doTest(TEST06, (loader, store, config) -> {
+    storeInsertAndTest(TEST06, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("Com.*+");
 
       List<GraphHead> inputGraph = loader.getGraphHeads().stream()

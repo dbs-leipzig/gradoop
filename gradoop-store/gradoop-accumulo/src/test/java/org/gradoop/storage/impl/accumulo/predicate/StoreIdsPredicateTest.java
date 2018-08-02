@@ -46,7 +46,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_vertexIdSetQueryTest() throws Throwable {
-    doTest(TEST01, (loader, store, config) -> {
+    storeInsertAndTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
 
       //vertex id query
@@ -71,7 +71,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_edgeIdSetQueryTest() throws Throwable {
-    doTest(TEST02, (loader, store, config) -> {
+    storeInsertAndTest(TEST02, (loader, store, config) -> {
       List<Edge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
 
       //edge id query
@@ -91,7 +91,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
 
   @Test
   public void test03_graphIdSetQueryTest() throws Throwable {
-    doTest(TEST03, (loader, store, config) -> {
+    storeInsertAndTest(TEST03, (loader, store, config) -> {
       List<GraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputGraphs.stream()

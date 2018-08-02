@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop edge input format
  */
-public class EdgeInputFormat extends BaseInputFormat<Edge> {
+public class EdgeInputFormat extends BaseElementInputFormat<Edge> {
 
   /**
    * serialize id

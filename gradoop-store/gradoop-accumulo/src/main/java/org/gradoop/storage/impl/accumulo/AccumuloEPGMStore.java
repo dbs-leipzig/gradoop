@@ -27,13 +27,12 @@ import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.NamespaceExistsException;
 import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
-import org.apache.accumulo.core.client.ZooKeeperInstance;
-import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
+import org.apache.accumulo.core.security.Authorizations;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -50,14 +49,15 @@ import org.gradoop.storage.common.iterator.EmptyClosableIterator;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
-import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
+import org.gradoop.storage.impl.accumulo.constants.GradoopAccumuloProperty;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloRowHandler;
 import org.gradoop.storage.impl.accumulo.iterator.client.ClientClosableIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+import org.gradoop.storage.utils.GradoopAccumuloUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ import java.util.stream.Collectors;
 /**
  * Default Accumulo EPGM graph store that handles reading and writing vertices and
  * graphs from and to Accumulo, It is designed thread-safe.
- * Store contains instances are divided by {@link GradoopAccumuloConfig#ACCUMULO_TABLE_PREFIX}
+ * Store contains instances are divided by {@link GradoopAccumuloProperty#ACCUMULO_TABLE_PREFIX}
  *
  * @see EPGMGraphPredictableOutput
  */
@@ -85,37 +85,37 @@ public class AccumuloEPGMStore implements
     AccumuloElementFilter<Edge>> {
 
   /**
-   * accumulo epgm store logger
+   * Accumulo epgm store logger
    */
   private static final Logger LOG = LoggerFactory.getLogger(AccumuloEPGMStore.class);
 
   /**
-   * gradoop accumulo configuration
+   * Gradoop accumulo configuration
    */
   private final GradoopAccumuloConfig config;
 
   /**
-   * accumulo client connector
+   * Accumulo client connector
    */
   private final Connector conn;
 
   /**
-   * batch writer for epgm graph head table
+   * Batch writer for epgm graph head table
    */
   private final BatchWriter graphWriter;
 
   /**
-   * batch writer for epgm vertex table
+   * Batch writer for epgm vertex table
    */
   private final BatchWriter vertexWriter;
 
   /**
-   * batch writer for epgm edge table
+   * Batch writer for epgm edge table
    */
   private final BatchWriter edgeWriter;
 
   /**
-   * auto flush flag, default false
+   * Auto flush flag, default false
    */
   private volatile boolean autoFlush;
 
@@ -155,14 +155,7 @@ public class AccumuloEPGMStore implements
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
-    return new ZooKeeperInstance(
-      /*instannce*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),
-      /*zookeepers*/config.get(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS)
-    ).getConnector(
-      /*user*/config.get(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),
-      /*password*/
-      new PasswordToken(config.get(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault
-        .PASSWORD)));
+    return GradoopAccumuloUtils.createConnector(getConfig().getAccumuloProperties());
   }
 
   @Override
@@ -403,14 +396,13 @@ public class AccumuloEPGMStore implements
     }
     BatchScanner scanner;
     try {
-      scanner = conn.createBatchScanner(table,
-        config.get(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,
-          AccumuloDefault.AUTHORIZATION),
-        config.get(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,
-          AccumuloDefault.BATCH_SCANNER_THREADS));
-      int priority =
-        config.get(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY, AccumuloDefault
-          .ITERATOR_PRIORITY);
+      Authorizations auth = GradoopAccumuloProperty.ACCUMULO_AUTHORIZATIONS
+        .get(getConfig().getAccumuloProperties());
+      int batchSize = GradoopAccumuloProperty.GRADOOP_BATCH_SCANNER_THREADS
+        .get(getConfig().getAccumuloProperties());
+      int priority = GradoopAccumuloProperty.GRADOOP_ITERATOR_PRIORITY
+        .get(getConfig().getAccumuloProperties());
+      scanner = conn.createBatchScanner(table, auth, batchSize);
       scanner.addScanIterator(new IteratorSetting(
         /*iterator priority*/priority,
         /*iterator class*/iterator,
@@ -443,8 +435,9 @@ public class AccumuloEPGMStore implements
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   private void createTablesIfNotExists() throws AccumuloSecurityException, AccumuloException {
-    String prefix =
-      config.get(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX);
+    String prefix = GradoopAccumuloProperty.ACCUMULO_TABLE_PREFIX
+      .get(getConfig().getAccumuloProperties());
+
     if (prefix.contains(".")) {
       String namespace = prefix.substring(0, prefix.indexOf("."));
       try {
