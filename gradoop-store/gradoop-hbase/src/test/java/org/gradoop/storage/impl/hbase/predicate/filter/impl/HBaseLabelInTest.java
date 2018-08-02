@@ -13,41 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
-import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.junit.Test;
 
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
+import java.util.Arrays;
+
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test class for {@link HBaseLabelReg}
+ * Test class for {@link HBaseLabelIn}
  */
-public class HBaseLabelRegTest {
+public class HBaseLabelInTest {
 
   /**
    * Test the toHBaseFilter function
    */
   @Test
   public void testToHBaseFilter() {
+    String testLabel1 = "test1";
+    String testLabel2 = "test2";
 
-    HBaseLabelReg<Vertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
+    HBaseLabelIn<Edge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
 
-    Filter expectedFilter = new SingleColumnValueFilter(
-      Bytes.toBytesBinary(CF_META),
-      Bytes.toBytesBinary(COL_LABEL),
-      CompareFilter.CompareOp.EQUAL,
-      new RegexStringComparator(PATTERN_VERTEX.pattern())
-    );
+    FilterList expectedFilterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
 
-    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+    for (String label : Arrays.asList(testLabel2, testLabel1)) {
+      SingleColumnValueFilter valueFilter = new SingleColumnValueFilter(
+        Bytes.toBytesBinary(CF_META),
+        Bytes.toBytesBinary(COL_LABEL),
+        CompareFilter.CompareOp.EQUAL,
+        Bytes.toBytesBinary(label)
+      );
+      expectedFilterList.addFilter(valueFilter);
+    }
+    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter(false).toString());
   }
 }

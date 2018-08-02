@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter;
+package org.gradoop.storage.impl.hbase.predicate.filter;
 
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
@@ -126,11 +126,8 @@ public class HBaseFilterUtils {
    * @param negate flag to define if this filter should be negated
    * @return the HBase filter representation
    */
-  public static Filter getPropEqualsFilter(
-    @Nonnull String key,
-    @Nonnull PropertyValue value,
-    boolean negate
-  ) {
+  public static Filter getPropEqualsFilter(@Nonnull String key, @Nonnull PropertyValue value,
+    boolean negate) {
     // Handle negation
     CompareFilter.CompareOp compareOp = negate ? CompareFilter.CompareOp.NOT_EQUAL :
       CompareFilter.CompareOp.EQUAL;
@@ -170,11 +167,7 @@ public class HBaseFilterUtils {
    * @param negate flag to define if this filter should be negated
    * @return the HBase filter representation
    */
-  public static Filter getPropRegFilter(
-    @Nonnull String key,
-    @Nonnull Pattern reg,
-    boolean negate
-  ) {
+  public static Filter getPropRegFilter(@Nonnull String key, @Nonnull Pattern reg, boolean negate) {
     // Handle negation
     CompareFilter.CompareOp compareOp = negate ? CompareFilter.CompareOp.NOT_EQUAL :
       CompareFilter.CompareOp.EQUAL;
@@ -215,12 +208,8 @@ public class HBaseFilterUtils {
    * @param negate flag to define if this filter should be negated
    * @return the HBase filter representation
    */
-  public static Filter getPropLargerThanFilter(
-    @Nonnull String key,
-    @Nonnull PropertyValue min,
-    boolean include,
-    boolean negate
-  ) {
+  public static Filter getPropLargerThanFilter(@Nonnull String key, @Nonnull PropertyValue min,
+    boolean include, boolean negate) {
     // Handle negation
     FilterList.Operator listOperator = negate ? FilterList.Operator.MUST_PASS_ONE :
       FilterList.Operator.MUST_PASS_ALL;

@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * conjunctive predicate filter
+ * Conjunctive predicate filter
  *
  * @param <T> element type
  */
 public final class And<T extends EPGMElement> implements AccumuloElementFilter<T> {
 
   /**
-   * predicate list
+   * Predicate list
    */
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 

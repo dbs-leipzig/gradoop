@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.Filter;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.common.predicate.filter.impl.LabelIn;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.common.predicate.filter.impl.PropReg;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
+import java.util.regex.Pattern;
 
 /**
- * HBase label equality predicate implementation
+ * HBase property regex filter implementation
  *
  * @param <T> EPGM element type
  */
-public class HBaseLabelIn<T extends EPGMElement> extends LabelIn<HBaseElementFilter<T>>
+public class HBasePropReg<T extends EPGMElement> extends PropReg<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {
 
   /**
-   * Create a new label equality filter
+   * Property regex filter constructor
    *
-   * @param labels label
+   * @param key property key
+   * @param reg label regex
    */
-  public HBaseLabelIn(String... labels) {
-    super(labels);
+  public HBasePropReg(@Nonnull String key, @Nonnull Pattern reg) {
+    super(key, reg);
   }
 
   /**
@@ -46,6 +48,6 @@ public class HBaseLabelIn<T extends EPGMElement> extends LabelIn<HBaseElementFil
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
-    return HBaseFilterUtils.getLabelInFilter(getLabels(), negate);
+    return HBaseFilterUtils.getPropRegFilter(getKey(), getReg(), negate);
   }
 }

@@ -31,7 +31,7 @@ import java.util.StringJoiner;
 public final class Or<T extends EPGMElement> implements AccumuloElementFilter<T> {
 
   /**
-   * predicate list
+   * Predicate list
    */
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public final class Or<T extends EPGMElement> implements AccumuloElementFilter<T>
   }
 
   /**
-   * create a disjunctive formula
+   * Create a disjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type

@@ -21,13 +21,14 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 
 /**
  * Base class for common functionality of HBase input formats
+ *
  * @param <E> type of EPGM element
  */
 abstract class BaseTableInputFormat<E extends EPGMElement> extends TableInputFormat<Tuple1<E>> {
@@ -38,10 +39,7 @@ abstract class BaseTableInputFormat<E extends EPGMElement> extends TableInputFor
    * @param query the query that represents a filter
    * @param scan the HBase scan instance on which the filter will be applied
    */
-  void attachFilter(
-    @Nonnull ElementQuery<HBaseElementFilter<E>> query,
-    @Nonnull Scan scan
-  ) {
+  void attachFilter(@Nonnull ElementQuery<HBaseElementFilter<E>> query, @Nonnull Scan scan) {
     FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
     if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {

@@ -16,4 +16,4 @@
 /**
  * Contains utility classes for common HBase filter tasks
  */
-package org.gradoop.storage.impl.hbase.filter;
+package org.gradoop.storage.impl.hbase.predicate.filter;

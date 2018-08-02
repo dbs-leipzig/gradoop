@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.api;
+package org.gradoop.storage.impl.hbase.predicate.filter.api;
 
 import org.apache.hadoop.hbase.filter.Filter;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
-import org.gradoop.storage.impl.hbase.filter.calculate.And;
-import org.gradoop.storage.impl.hbase.filter.calculate.Not;
-import org.gradoop.storage.impl.hbase.filter.calculate.Or;
+import org.gradoop.storage.impl.hbase.predicate.filter.calculate.And;
+import org.gradoop.storage.impl.hbase.predicate.filter.calculate.Not;
+import org.gradoop.storage.impl.hbase.predicate.filter.calculate.Or;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;

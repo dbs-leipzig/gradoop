@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 
 /**
- * accumulo graph store predicate test
+ * Accumulo graph store predicate test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
@@ -48,8 +48,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST03 = "basic_predicate_03";
 
   /**
-   * pick 3 person randomly
-   * then find vertex with label 'Person' and with same name (property) value
+   * Pick 3 person randomly then find vertex with label 'Person' and with same name (property) value
    *
    * @throws Throwable if error
    */
@@ -86,7 +85,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all person who's age is not smaller than 35
+   * Find all person who's age is not smaller than 35
    *
    * @throws Throwable if error
    */
@@ -113,7 +112,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find graph by property equality within a certain sample id range
+   * Find graph by property equality within a certain sample id range
    *
    * @throws Throwable if error
    */

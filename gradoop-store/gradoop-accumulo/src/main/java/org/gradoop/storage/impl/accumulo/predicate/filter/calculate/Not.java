@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
 /**
- * negative logic filter
+ * Negative logic filter
  *
  * @param <T> input type
  */
