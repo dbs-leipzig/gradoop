@@ -22,10 +22,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -46,10 +44,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
-   * Option to declare path to output graph
-   */
-  private static final String OPTION_OUTPUT_PATH = "o";
-  /**
    * Option do declare path to statistics
    */
   private static final String OPTION_STATISTICS_PATH = "s";
@@ -69,10 +63,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    * Used input path
    */
   private static String INPUT_PATH;
-  /**
-   * Used output path
-   */
-  private static String OUTPUT_PATH;
   /**
    * Used to indicate if statistics are used
    */
@@ -97,8 +87,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
       "Path to source files.");
-    OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
-      "Path to output file");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
       "Path to csv statistics");
     OPTIONS.addOption(OPTION_QUERY, "query", true,
@@ -151,12 +139,10 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       collection = graph.query(query);
     }
 
-    // write data to sink
-    DataSink sink = new JSONDataSink(OUTPUT_PATH, config);
-    sink.write(collection);
+    // count found embeddings
+    System.out.println(collection.getGraphHeads().count());
 
     // execute and write job statistics
-    env.execute();
     writeCSV(env);
   }
 
@@ -185,7 +171,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
     QUERY = cmd.getOptionValue(OPTION_QUERY);
     HAS_STATISTICS = cmd.hasOption(OPTION_STATISTICS_PATH);
@@ -204,9 +189,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     }
     if (!cmd.hasOption(OPTION_CSV_PATH)) {
       throw new IllegalArgumentException("Path to CSV-File need to be set.");
-    }
-    if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
-      throw new IllegalArgumentException("Define a graph output directory.");
     }
     if (!cmd.hasOption(OPTION_QUERY)) {
       throw new IllegalArgumentException("Define a query to run (q1,q2,q3,q4,q5,q6).");

@@ -30,7 +30,7 @@ class Queries {
     return
       "MATCH (p:person)<-[:hasCreator]-(c:comment), " +
             "(p)<-[:hasCreator]-(po:post) " +
-      "WHERE p.firstName = " + name;
+      "WHERE p.firstName = '" + name + "'";
   }
 
   /**
@@ -44,7 +44,7 @@ class Queries {
       "MATCH (p:person)<-[:hasCreator]-(c:comment)," +
             "(p)<-[:hasCreator]-(po:post)," +
             "(c)-[:replyOf*0..10]->(po)" +
-      "WHERE p.firstName = " + name;
+      "WHERE p.firstName =  '" + name + "'";
   }
 
   /**
@@ -59,7 +59,7 @@ class Queries {
             "(c:comment)-[:hasCreator]->(p2)" +
             "(c)-[:replyOf*0..10]->(po:post)" +
             "(po)-[:hasCreator]->(p1)" +
-      "WHERE p1.firstName = " + name;
+      "WHERE p1.firstName = '" + name + "'";
 
   }
 
