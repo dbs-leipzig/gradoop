@@ -115,6 +115,11 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
     return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;
   }
 
+  /**
+   * Get reduce filter
+   *
+   * @return accumulo element filter
+   */
   public AccumuloElementFilter<T> getReduceFilter() {
     return reduceFilter;
   }

@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
- * Contains output format classes for accumulo store
+ * Gradoop Accumulo OutputFormat
  */
 package org.gradoop.storage.impl.accumulo.io.outputformats;
