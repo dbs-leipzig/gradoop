@@ -58,7 +58,7 @@ public class HBasePropLargerThanTest {
   /**
    * Flag if min value should be included
    */
-  private boolean isInclude;
+  private final boolean isInclude;
 
   /**
    * Constructor for parametrized test

@@ -622,7 +622,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .subList(1, 4);
 
     // Define HBase source
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore);
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
