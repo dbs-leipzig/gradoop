@@ -147,6 +147,7 @@
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
         <plugin.maven-site.version>3.4</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
+        <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
     </properties>
 
     <profiles>
@@ -420,7 +421,7 @@
                         <excludes>
                             <exclude>**/*TestBase*.class</exclude>
                         </excludes>
-                        <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
+                        <argLine>@{argLine} -Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -465,6 +466,30 @@
                             <goals>
                                 <goal>check</goal>
                             </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${plugin.maven-jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-test</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>post-unit-test</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${session.executionRootDirectory}/target/coverage-reports/${project.name}</outputDirectory>
+                                <title>${project.name}</title>
+                                <footer>Code Coverage Report for Gradoop ${project.version}</footer>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
