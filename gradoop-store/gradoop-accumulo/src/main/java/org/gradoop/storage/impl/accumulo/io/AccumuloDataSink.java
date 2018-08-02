@@ -15,13 +15,17 @@
  */
 package org.gradoop.storage.impl.accumulo.io;
 
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.storage.impl.accumulo.io.outputformats.EdgeOutputFormat;
-import org.gradoop.storage.impl.accumulo.io.outputformats.GraphHeadOutputFormat;
-import org.gradoop.storage.impl.accumulo.io.outputformats.VertexOutputFormat;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.impl.accumulo.io.outputformats.ElementOutputFormat;
+
+import javax.annotation.Nonnull;
 
 /**
  * Write graph or graph collection into accumulo store
@@ -29,12 +33,16 @@ import org.gradoop.storage.impl.accumulo.io.outputformats.VertexOutputFormat;
 public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
   /**
-   * Creates a new Accumulo data source/sink.
+   * Creates a new Accumulo data sink.
    *
    * @param store     store implementation
+   * @param flinkConfig gradoop flink configuration
    */
-  public AccumuloDataSink(AccumuloEPGMStore store) {
-    super(store);
+  public AccumuloDataSink(
+    @Nonnull AccumuloEPGMStore store,
+    @Nonnull GradoopFlinkConfig flinkConfig
+  ) {
+    super(store, flinkConfig);
   }
 
   @Override
@@ -48,29 +56,18 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
   }
 
   @Override
-  public void write(
-    LogicalGraph logicalGraph,
-    boolean overwrite
-  ) {
-    write(getAccumuloConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+  public void write(LogicalGraph logicalGraph, boolean overwrite) {
+    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
-  public void write(
-    GraphCollection graphCollection,
-    boolean overWrite
-  ) {
-    graphCollection.getGraphHeads().output(
-      new GraphHeadOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    graphCollection.getVertices().output(
-      new VertexOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    graphCollection.getEdges().output(
-      new EdgeOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    // TODO: [#833] add Edge-in and edge-out
-    //graphCollection.getEdges().output(
-    //  new EdgeOutOutputFormat(getAccumuloConfig().getAccumuloProperties()));
-    //graphCollection.getEdges().output(
-    //  new EdgeInOutputFormat(getAccumuloConfig().getAccumuloProperties()));
+  public void write(GraphCollection graphCollection, boolean overWrite) {
+    graphCollection.getGraphHeads()
+      .output(new ElementOutputFormat<>(GraphHead.class, getAccumuloConfig()));
+    graphCollection.getVertices()
+      .output(new ElementOutputFormat<>(Vertex.class, getAccumuloConfig()));
+    graphCollection.getEdges()
+      .output(new ElementOutputFormat<>(Edge.class, getAccumuloConfig()));
   }
 
 }
