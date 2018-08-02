@@ -29,7 +29,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A self contained example on how to use the aggregate operator on Gradoop's LogicalGraph class.
- *
+ * <p>
  * The example uses the graph in dev-support/social-network.pdf
  */
 public class AggregationExample {
@@ -37,19 +37,20 @@ public class AggregationExample {
   /**
    * Path to the example data graph
    */
-  static private final String EXAMPLE_DATA_FILE = AggregationExample.class
+  private static final String EXAMPLE_DATA_FILE = AggregationExample.class
     .getResource("/data/gdl/sna.gdl").getFile();
 
   /**
    * Runs the program on the example data graph.
-   *
+   * <p>
    * The example provides an overview over the usage of the aggregate() method.
    * It both showcases the application of aggregation functions that are already provided by
    * Gradoop, as well as the definition of custom ones.
    * Documentation for all available aggregation functions as well as a detailed description of the
    * aggregate method can be found in the projects wiki.
+   *
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
-   *   Gradoop Wiki</a>
+   * Gradoop Wiki</a>
    *
    * Using the social network graph in the resources directory, the program will:
    * 1. extract a subgraph only containing vertices which are labeled "person"
@@ -101,11 +102,11 @@ public class AggregationExample {
       .aggregate(new SumVertexProperty("birthday"))
       // add computed property "meanAge" to the graph head
       .transformGraphHead((TransformationFunction<GraphHead>) (current, transformed) -> {
-        int sumAge = current.getPropertyValue("sum_birthday").getInt();
-        Long numPerson = current.getPropertyValue("vertexCount").getLong();
-        current.setProperty("meanAge", (double) sumAge / numPerson);
-        return current;
-      });
+          int sumAge = current.getPropertyValue("sum_birthday").getInt();
+          Long numPerson = current.getPropertyValue("vertexCount").getLong();
+          current.setProperty("meanAge", (double) sumAge / numPerson);
+          return current;
+        });
 
     // print graph head, which now contains the newly aggregated properties
     System.out.println(result.getGraphHead().collect());
