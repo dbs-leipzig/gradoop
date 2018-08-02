@@ -17,18 +17,16 @@ package org.gradoop.storage.impl.accumulo.io;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.storage.impl.accumulo.io.AccumuloDataSink;
-import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -50,8 +48,7 @@ public class IOBasicTest extends GradoopFlinkTestBase {
 
   @Test
   public void test01_read() throws Exception {
-    AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST_01));
+    AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_01));
 
     Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
     Collection<Vertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
@@ -69,7 +66,9 @@ public class IOBasicTest extends GradoopFlinkTestBase {
     }
     accumuloStore.flush();
 
-    GraphCollection collection = new AccumuloDataSource(accumuloStore).getGraphCollection();
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    GraphCollection collection = new AccumuloDataSource(accumuloStore, flinkConfig)
+      .getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();
@@ -92,8 +91,7 @@ public class IOBasicTest extends GradoopFlinkTestBase {
 
   @Test
   public void test02_write() throws Exception {
-    AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite
-      .getAcConfig(getExecutionEnvironment(), TEST_02));
+    AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_02));
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(
       GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
@@ -102,13 +100,14 @@ public class IOBasicTest extends GradoopFlinkTestBase {
       GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
 
     loader.initDatabaseFromStream(inputStream);
-    new AccumuloDataSink(accumuloStore).write(accumuloStore
-      .getConfig()
-      .getGraphCollectionFactory()
-      .fromCollections(
-        loader.getGraphHeads(),
-        loader.getVertices(),
-        loader.getEdges()));
+
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    new AccumuloDataSink(accumuloStore, flinkConfig)
+      .write(flinkConfig.getGraphCollectionFactory()
+        .fromCollections(
+          loader.getGraphHeads(),
+          loader.getVertices(),
+          loader.getEdges()));
     getExecutionEnvironment().execute();
     accumuloStore.flush();
 

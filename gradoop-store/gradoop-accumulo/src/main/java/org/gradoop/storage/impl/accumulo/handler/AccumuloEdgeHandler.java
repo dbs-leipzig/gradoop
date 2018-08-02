@@ -71,7 +71,6 @@ public class AccumuloEdgeHandler implements AccumuloRowHandler<Edge, EPGMEdge> {
     return mutation;
   }
 
-
   @Override
   public Edge readRow(EPGMEdge origin) {
     return factory.initEdge(

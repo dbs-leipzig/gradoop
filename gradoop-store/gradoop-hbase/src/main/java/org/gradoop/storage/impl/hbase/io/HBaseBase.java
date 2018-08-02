@@ -15,8 +15,11 @@
  */
 package org.gradoop.storage.impl.hbase.io;
 
+import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+
+import javax.annotation.Nonnull;
 
 /**
  * Base class for HBase data source and sink.
@@ -28,12 +31,22 @@ abstract class HBaseBase {
   private final HBaseEPGMStore epgmStore;
 
   /**
+   * Gradoop flink configuration
+   */
+  private final GradoopFlinkConfig flinkConfig;
+
+  /**
    * Creates a new HBase data source/sink.
    *
+   * @param flinkConfig gradoop flink execute config
    * @param epgmStore store implementation
    */
-  HBaseBase(HBaseEPGMStore epgmStore) {
+  HBaseBase(
+    @Nonnull HBaseEPGMStore epgmStore,
+    @Nonnull GradoopFlinkConfig flinkConfig
+  ) {
     this.epgmStore = epgmStore;
+    this.flinkConfig = flinkConfig;
   }
 
   HBaseEPGMStore getStore() {
@@ -43,4 +56,9 @@ abstract class HBaseBase {
   GradoopHBaseConfig getHBaseConfig() {
     return epgmStore.getConfig();
   }
+
+  GradoopFlinkConfig getFlinkConfig() {
+    return flinkConfig;
+  }
+
 }

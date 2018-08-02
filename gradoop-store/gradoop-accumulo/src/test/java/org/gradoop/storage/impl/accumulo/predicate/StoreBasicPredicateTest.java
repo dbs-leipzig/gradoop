@@ -55,7 +55,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_findPersonByName() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
         .stream()
@@ -92,7 +92,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_findPersonByAge() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()
@@ -119,7 +119,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_findGraphByIdsAndProperty() throws Throwable {
-    doTest(TEST03, (loader, store) -> {
+    doTest(TEST03, (loader, store, config) -> {
       List<GraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()

@@ -17,7 +17,6 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -25,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
- * accumulo vertex handler for row's read/write operator
+ * Accumulo vertex handler for row's read/write operator
  */
 public class AccumuloVertexHandler implements AccumuloRowHandler<Vertex, EPGMVertex> {
 
@@ -76,27 +75,6 @@ public class AccumuloVertexHandler implements AccumuloRowHandler<Vertex, EPGMVer
       origin.getProperties(),
       origin.getGraphIds()
     );
-  }
-
-  /**
-   * write link edge to store
-   *
-   * @param mutation new row mutation
-   * @param edge link epgm edge
-   * @param isEdgeIn if this is in-edg (not out-edge)
-   * @return mutation instance
-   */
-  public Mutation writeLink(
-    Mutation mutation,
-    EPGMEdge edge,
-    boolean isEdgeIn
-  ) {
-    mutation.put(
-      /*cf*/isEdgeIn ? AccumuloTables.KEY.EDGE_IN : AccumuloTables.KEY.EDGE_OUT,
-      /*cq*/edge.getId().toString(),
-      /*value*/isEdgeIn ? edge.getSourceId().toString() : edge.getTargetId().toString());
-
-    return mutation;
   }
 
 }
