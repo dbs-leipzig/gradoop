@@ -69,16 +69,18 @@ public class TLFDataSource extends TLFBase implements DataSource {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
     ExecutionEnvironment env = config.getExecutionEnvironment();
     if (hasVertexDictionary()) {
-      DataSet<Map<Integer, String>> dictionary =  env.createInput(HadoopInputs.readHadoopFile(
+      DataSet<Map<Integer, String>> dictionary = env.createInput(HadoopInputs.readHadoopFile(
         new TextInputFormat(), LongWritable.class, Text.class, getTLFVertexDictionaryPath()))
-        .map(new DictionaryEntry())
-        .reduceGroup(new Dictionary());
+          .filter(t -> !t.f1.toString().isEmpty())
+          .map(new DictionaryEntry())
+          .reduceGroup(new Dictionary());
 
       setVertexDictionary(dictionary);
     }
     if (hasEdgeDictionary()) {
       DataSet<Map<Integer, String>> dictionary = env.createInput(HadoopInputs.readHadoopFile(
-          new TextInputFormat(), LongWritable.class, Text.class, getTLFEdgeDictionaryPath()))
+        new TextInputFormat(), LongWritable.class, Text.class, getTLFEdgeDictionaryPath()))
+          .filter(t -> !t.f1.toString().isEmpty())
           .map(new DictionaryEntry())
           .reduceGroup(new Dictionary());
 
@@ -107,10 +109,7 @@ public class TLFDataSource extends TLFBase implements DataSource {
 
     // load tlf graphs from file
     assert input != null;
-    transactions = input.map(new GraphTransactionFromText(
-        getConfig().getGraphHeadFactory(),
-        getConfig().getVertexFactory(),
-        getConfig().getEdgeFactory()));
+    transactions = input.map(new GraphTransactionFromText(getConfig()));
 
     // map the integer valued labels to strings from dictionary
     if (hasVertexDictionary()) {
