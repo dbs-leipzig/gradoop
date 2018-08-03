@@ -25,6 +25,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SubgraphBenchmark extends AbstractRunner implements ProgramDescription {
   /**
-   * Option to declare path to input graph
+   * Option to declare path to indexed input graph
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
@@ -47,7 +48,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
-   * Option to declare path to statistics csv file
+   * Option to declare output path to statistics csv file
    */
   private static final String OPTION_CSV_PATH = "c";
   /**
@@ -87,10 +88,9 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static boolean VERIFICATION;
 
-
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
-      "Path to source files.");
+      "Path to indexed source files.");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to output file");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
@@ -103,12 +103,11 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
       "Used edge label");
   }
 
-
   /**
    * Main program to run the benchmark. Arguments are the available options.
    *
    * @param args program arguments
-   * @throws Exception
+   * @throws Exception in case of Error
    */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SubgraphBenchmark.class.getName());
@@ -133,10 +132,10 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
     // compute subgraph -> verify results (join) vs no verify (filter)
     if (VERIFICATION) {
-      graph = graph.subgraph(new LabelIsIn<>(VERTEX_LABEL), new LabelIsIn<>(EDGE_LABEL),
+      graph = graph.subgraph(new ByLabel<>(VERTEX_LABEL), new ByLabel<>(EDGE_LABEL),
         Subgraph.Strategy.BOTH_VERIFIED);
     } else {
-      graph = graph.subgraph(new LabelIsIn<>(VERTEX_LABEL), new LabelIsIn<>(EDGE_LABEL),
+      graph = graph.subgraph(new ByLabel<>(VERTEX_LABEL), new ByLabel<>(EDGE_LABEL),
         Subgraph.Strategy.BOTH);
     }
 
@@ -181,7 +180,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
   }
 
   /**
-   *  Method to create and add lines to a csv-file
+   * Method to create and add lines to a csv-file
    *
    * @param env given ExecutionEnvironment
    * @throws IOException exeption during file writing

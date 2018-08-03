@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CypherBenchmark extends AbstractRunner implements ProgramDescription {
   /**
-   * Option to declare path to input graph
+   * Option to declare path to indexed input graph
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
@@ -68,11 +68,11 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static boolean HAS_STATISTICS;
   /**
-   * Used for statistics path
+   * Used statistics input path
    */
   private static String STATISTICS_INPUT_PATH;
   /**
-   * Used csv path
+   * Used output path for csv statistics
    */
   private static String CSV_PATH;
   /**
@@ -86,15 +86,15 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
-      "Path to source files.");
+      "Input path to indexed source files.");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
-      "Path to csv statistics");
+      "Output path to csv statistics output");
     OPTIONS.addOption(OPTION_QUERY, "query", true,
       "Used query (q1,q2,q3,q4,q5,q6)");
     OPTIONS.addOption(OPTION_FIRST_NAME, "query-name", true,
       "Used first Name in Cypher Query");
     OPTIONS.addOption(OPTION_STATISTICS_PATH, "statistics", true,
-      "Path to previously generated statistics.");
+      "Input path to previously generated statistics.");
   }
 
   /**
@@ -139,7 +139,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       collection = graph.query(query);
     }
 
-    // count found embeddings
+    // count embeddings
     System.out.println(collection.getGraphHeads().count());
 
     // execute and write job statistics
@@ -203,7 +203,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
   }
 
   /**
-   *  Method to create and add lines to a csv-file
+   * Method to create and add lines to a csv-file
    *
    * @param env given ExecutionEnvironment
    * @throws IOException exeption during file writing

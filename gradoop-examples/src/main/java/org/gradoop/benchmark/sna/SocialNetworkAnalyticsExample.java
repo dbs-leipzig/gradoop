@@ -90,7 +90,6 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
       "Path to graph statistics");
   }
 
-
   /**
    * Main program to run the benchmark. Arguments are the available options.
    *
@@ -213,9 +212,8 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
   }
 
-
   /**
-   *  Method to create and add lines to a csv-file
+   * Method to create and add lines to a csv-file
    *
    * @param env given ExecutionEnvironment
    * @throws IOException exeption during file writing
