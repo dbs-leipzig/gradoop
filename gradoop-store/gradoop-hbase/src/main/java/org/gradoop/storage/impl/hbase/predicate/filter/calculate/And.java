@@ -13,34 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
+package org.gradoop.storage.impl.hbase.predicate.filter.calculate;
 
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * conjunctive predicate filter
+ * Conjunctive predicate filter
  *
  * @param <T> element type
  */
-public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class And<T extends EPGMElement> implements HBaseElementFilter<T> {
 
   /**
-   * predicate list
+   * Predicate list
    */
-  private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
+  private final List<HBaseElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * Create a new conjunctive principles
+   * Creates a new conjunctive filter chain
    *
-   * @param predicates predicates
+   * @param predicates the predicates to combine with a logical and
    */
-  private AND(List<AccumuloElementFilter<T>> predicates) {
+  private And(List<HBaseElementFilter<T>> predicates) {
     if (predicates.size() < 2) {
       throw new IllegalArgumentException(String.format("predicates len(=%d) < 2",
         predicates.size()));
@@ -56,29 +59,39 @@ public final class AND<T extends EPGMElement> implements AccumuloElementFilter<T
    * @return Conjunctive filter instance
    */
   @SafeVarargs
-  public static <T extends EPGMElement> AND<T> create(AccumuloElementFilter<T>... predicates) {
-    List<AccumuloElementFilter<T>> formula = new ArrayList<>();
+  public static <T extends EPGMElement> And<T> create(HBaseElementFilter<T>... predicates) {
+    List<HBaseElementFilter<T>> formula = new ArrayList<>();
     Collections.addAll(formula, predicates);
-    return new AND<>(formula);
+    return new And<>(formula);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Nonnull
   @Override
-  public boolean test(T t) {
-    for (AccumuloElementFilter<T> predicate : predicates) {
-      if (!predicate.test(t)) {
-        return false;
-      }
-    }
-    return true;
+  public Filter toHBaseFilter(boolean negate) {
+    // If filter is negated, logical AND will be transformed to logical OR
+    FilterList.Operator listOperator = negate ? FilterList.Operator.MUST_PASS_ONE :
+      FilterList.Operator.MUST_PASS_ALL;
+    FilterList filterList = new FilterList(listOperator);
+    // Add each filter to filter list
+    predicates.stream()
+      .map(predicate -> predicate.toHBaseFilter(negate))
+      .forEach(filterList::addFilter);
+
+    return filterList;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     StringJoiner joiner = new StringJoiner(" AND ");
-    for (AccumuloElementFilter<T> predicate : predicates) {
+    for (HBaseElementFilter<T> predicate : predicates) {
       joiner.add("(" + predicate.toString() + ")");
     }
     return joiner.toString();
   }
-
 }

@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
-import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.RegexStringComparator;
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.common.predicate.filter.impl.LabelReg;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
-
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
 
 /**
  * HBase label regex predicate implementation
@@ -47,14 +41,12 @@ public class HBaseLabelReg<T extends EPGMElement> extends LabelReg<HBaseElementF
     super(reg);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
-  public Filter toHBaseFilter() {
-    return new SingleColumnValueFilter(
-      Bytes.toBytesBinary(CF_META),
-      Bytes.toBytesBinary(COL_LABEL),
-      CompareFilter.CompareOp.EQUAL,
-      new RegexStringComparator(getReg().pattern())
-    );
+  public Filter toHBaseFilter(boolean negate) {
+    return HBaseFilterUtils.getLabelRegFilter(getReg(), negate);
   }
 }

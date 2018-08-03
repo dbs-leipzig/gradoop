@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains utility classes for common HBase filter tasks
+ * Specific filter implementations of HBase store
  */
-package org.gradoop.storage.impl.hbase.filter;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;

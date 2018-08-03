@@ -19,23 +19,23 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
 /**
- * negative logic filter
+ * Negative logic filter
  *
  * @param <T> input type
  */
-public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class Not<T extends EPGMElement> implements AccumuloElementFilter<T> {
 
   /**
-   * predicate list
+   * The predicate to negate
    */
   private final AccumuloElementFilter<T> predicate;
 
   /**
-   * Create a new predicate to be conjunction
+   * Create a new negated predicate
    *
    * @param predicate predicate
    */
-  private NOT(AccumuloElementFilter<T> predicate) {
+  private Not(AccumuloElementFilter<T> predicate) {
     this.predicate = predicate;
   }
 
@@ -46,8 +46,8 @@ public final class NOT<T extends EPGMElement> implements AccumuloElementFilter<T
    * @param <T> input type
    * @return negative filter instance
    */
-  public static <T extends EPGMElement> NOT<T> of(AccumuloElementFilter<T> predicate) {
-    return new NOT<>(predicate);
+  public static <T extends EPGMElement> Not<T> of(AccumuloElementFilter<T> predicate) {
+    return new Not<>(predicate);
   }
 
   @Override

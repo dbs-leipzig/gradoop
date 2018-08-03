@@ -13,69 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
-import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.gradoop.storage.common.predicate.filter.impl.PropEquals;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.junit.Test;
 
-import javax.annotation.Nonnull;
+import java.util.regex.Pattern;
 
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
+import static org.junit.Assert.assertEquals;
 
 /**
- * HBase property equality implementation
- *
- * @param <T> EPGM element type
+ * Test class for {@link HBasePropReg}
  */
-public class HBasePropEquals<T extends EPGMElement> extends PropEquals<HBaseElementFilter<T>>
-  implements HBaseElementFilter<T> {
-
+public class HBasePropRegTest {
   /**
-   * Property equals filter
-   *
-   * @param key   property key
-   * @param value property value
+   * Test the toHBaseFilter function
    */
-  public HBasePropEquals(@Nonnull String key, @Nonnull Object value) {
-    super(key, value);
-  }
+  @Test
+  public void testToHBaseFilter() {
+    String key = "key";
+    Pattern pattern = Pattern.compile("^FooBar.*$");
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Nonnull
-  public Filter toHBaseFilter() {
-    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+    HBasePropReg<Vertex> vertexFilter = new HBasePropReg<>(key, pattern);
+
+    FilterList expectedFilter = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
     SingleColumnValueFilter valueFilter = new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_PROPERTY_VALUE),
-      Bytes.toBytesBinary(getKey()),
+      Bytes.toBytesBinary(key),
       CompareFilter.CompareOp.EQUAL,
-      PropertyValueUtils.Bytes.getRawBytesWithoutType(getValue()));
+      new RegexStringComparator(pattern.pattern()));
 
     // Define that the entire row will be skipped if the column is not found
     valueFilter.setFilterIfMissing(true);
 
     SingleColumnValueFilter typeFilter = new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_PROPERTY_TYPE),
-      Bytes.toBytesBinary(getKey()),
+      Bytes.toBytesBinary(key),
       CompareFilter.CompareOp.EQUAL,
-      PropertyValueUtils.Bytes.getTypeByte(getValue()));
+      new byte[] {PropertyValue.TYPE_STRING});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);
 
-    filterList.addFilter(valueFilter);
-    filterList.addFilter(typeFilter);
-    return filterList;
+    expectedFilter.addFilter(typeFilter);
+    expectedFilter.addFilter(valueFilter);
+
+    assertEquals("Failed during filter comparison for key [" + key + "].",
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 }

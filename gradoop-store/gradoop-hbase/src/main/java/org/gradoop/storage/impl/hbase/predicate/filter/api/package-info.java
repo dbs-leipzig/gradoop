@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Specific filter implementations of HBase store
+ * Contains filter API interface related to HBase predicate definitions.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.api;

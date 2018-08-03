@@ -24,23 +24,23 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * Disjunctive predicate filter
+ * Conjunctive predicate filter
  *
  * @param <T> element type
  */
-public final class OR<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class And<T extends EPGMElement> implements AccumuloElementFilter<T> {
 
   /**
-   * predicate list
+   * Predicate list
    */
   private final List<AccumuloElementFilter<T>> predicates = new ArrayList<>();
 
   /**
-   * Create a new disjunctive principles
+   * Create a new conjunctive principles
    *
    * @param predicates predicates
    */
-  private OR(List<AccumuloElementFilter<T>> predicates) {
+  private And(List<AccumuloElementFilter<T>> predicates) {
     if (predicates.size() < 2) {
       throw new IllegalArgumentException(String.format("predicates len(=%d) < 2",
         predicates.size()));
@@ -49,35 +49,36 @@ public final class OR<T extends EPGMElement> implements AccumuloElementFilter<T>
   }
 
   /**
-   * create a disjunctive formula
+   * Create a conjunctive formula
    *
    * @param predicates filter predicate
    * @param <T> input type
    * @return Conjunctive filter instance
    */
   @SafeVarargs
-  public static <T extends EPGMElement> OR<T> create(AccumuloElementFilter<T>... predicates) {
+  public static <T extends EPGMElement> And<T> create(AccumuloElementFilter<T>... predicates) {
     List<AccumuloElementFilter<T>> formula = new ArrayList<>();
     Collections.addAll(formula, predicates);
-    return new OR<>(formula);
+    return new And<>(formula);
   }
 
   @Override
   public boolean test(T t) {
     for (AccumuloElementFilter<T> predicate : predicates) {
-      if (predicate.test(t)) {
-        return true;
+      if (!predicate.test(t)) {
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   @Override
   public String toString() {
-    StringJoiner joiner = new StringJoiner(" OR ");
+    StringJoiner joiner = new StringJoiner(" AND ");
     for (AccumuloElementFilter<T> predicate : predicates) {
       joiner.add("(" + predicate.toString() + ")");
     }
     return joiner.toString();
   }
+
 }
