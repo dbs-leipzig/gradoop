@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
@@ -43,22 +43,22 @@ public class HBasePropLargerThanTest {
   /**
    * Property type
    */
-  private String propertyType;
+  private final String propertyType;
 
   /**
    * Property key
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Property value
    */
-  private PropertyValue propertyValue;
+  private final PropertyValue propertyValue;
 
   /**
    * Flag if min value should be included
    */
-  private boolean isInclude;
+  private final boolean isInclude;
 
   /**
    * Constructor for parametrized test
@@ -107,7 +107,7 @@ public class HBasePropLargerThanTest {
     expectedFilter.addFilter(typeFilter);
 
     assertEquals("Failed during filter comparison for type [" + propertyType + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 
   /**

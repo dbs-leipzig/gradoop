@@ -16,11 +16,11 @@
 package org.gradoop.storage.utils;
 
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelIn;
-import org.gradoop.storage.impl.hbase.filter.impl.HBaseLabelReg;
-import org.gradoop.storage.impl.hbase.filter.impl.HBasePropEquals;
-import org.gradoop.storage.impl.hbase.filter.impl.HBasePropLargerThan;
-import org.gradoop.storage.impl.hbase.filter.impl.HBasePropReg;
+import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
+import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
+import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
+import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThan;
+import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropReg;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;

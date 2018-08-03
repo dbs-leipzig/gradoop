@@ -29,10 +29,10 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.io.FilterableDataSource;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.io.inputformats.EdgeTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.GraphHeadTableInputFormat;
 import org.gradoop.storage.impl.hbase.io.inputformats.VertexTableInputFormat;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

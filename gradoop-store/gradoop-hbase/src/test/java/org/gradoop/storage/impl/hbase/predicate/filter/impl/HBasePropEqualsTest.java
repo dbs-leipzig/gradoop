@@ -1,4 +1,4 @@
-package org.gradoop.storage.impl.hbase.filter.impl;
+package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,20 +27,21 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Parameterized.class)
 public class HBasePropEqualsTest {
+
   /**
    * Property type
    */
-  private String propertyType;
+  private final String propertyType;
 
   /**
    * Property key
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Property value
    */
-  private PropertyValue propertyValue;
+  private final PropertyValue propertyValue;
 
   /**
    * Constructor for parametrized test
@@ -88,7 +88,7 @@ public class HBasePropEqualsTest {
     expectedFilter.addFilter(typeFilter);
 
     assertEquals("Failed during filter comparison for type [" + propertyType + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter().toString());
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 
   /**
