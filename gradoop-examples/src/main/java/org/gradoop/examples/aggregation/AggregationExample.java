@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -29,7 +30,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A self contained example on how to use the aggregate operator on Gradoop's LogicalGraph class.
- * <p>
+ *
  * The example uses the graph in dev-support/social-network.pdf
  */
 public class AggregationExample {
@@ -37,12 +38,32 @@ public class AggregationExample {
   /**
    * Path to the example data graph
    */
-  private static final String EXAMPLE_DATA_FILE = AggregationExample.class
-    .getResource("/data/gdl/sna.gdl").getFile();
+  private static final String EXAMPLE_DATA_FILE =
+    AggregationExample.class.getResource("/data/gdl/sna.gdl").getFile();
+  /**
+   * Property key 'name'
+   */
+  private static final String PROPERTY_KEY_NAME = "name";
+  /**
+   * Property key 'list_of_names'
+   */
+  private static final String PROPERTY_KEY_LIST_OF_NAMES = "list_of_names";
+  /**
+   * Property key 'birthday'
+   */
+  private static final String PROPERTY_KEY_BIRTHDAY = "birthday";
+  /**
+   * Property key 'mean_age'
+   */
+  private static final String PROPERTY_KEY_MEAN_AGE = "mean_age";
+  /**
+   * Property key 'person'
+   */
+  private static final String LABEL_PERSON = "Person";
 
   /**
    * Runs the program on the example data graph.
-   * <p>
+   *
    * The example provides an overview over the usage of the aggregate() method.
    * It both showcases the application of aggregation functions that are already provided by
    * Gradoop, as well as the definition of custom ones.
@@ -77,12 +98,12 @@ public class AggregationExample {
     // execute aggregations and graph-head transformations
     LogicalGraph result = networkGraph
       // extract subgraph with edges and vertices which are of interest
-      .subgraph(v -> v.getLabel().equals("Person"), e -> true)
+      .vertexInducedSubgraph(new ByLabel<>(LABEL_PERSON))
       // apply custom VertexAggregateFunctions
       .aggregate(new VertexAggregateFunction() {
         @Override
         public PropertyValue getVertexIncrement(Vertex vertex) {
-          return PropertyValue.create(vertex.getPropertyValue("name").toString());
+          return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
         }
 
         @Override
@@ -93,18 +114,20 @@ public class AggregationExample {
 
         @Override
         public String getAggregatePropertyKey() {
-          return "list_of_names";
+          return PROPERTY_KEY_LIST_OF_NAMES;
         }
       })
       // aggregate sum of vertices in order to obtain total amount of persons
       .aggregate(new VertexCount())
       // sum up values of the vertex property "birthday"
-      .aggregate(new SumVertexProperty("birthday"))
+      .aggregate(new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
       // add computed property "meanAge" to the graph head
       .transformGraphHead((TransformationFunction<GraphHead>) (current, transformed) -> {
+          // property 'sum_birthday' is result of the aggregate function SumVertexProperty
           int sumAge = current.getPropertyValue("sum_birthday").getInt();
-          Long numPerson = current.getPropertyValue("vertexCount").getLong();
-          current.setProperty("meanAge", (double) sumAge / numPerson);
+          // property 'vertexCount' is result of the aggregate function VertexCount
+          long numPerson = current.getPropertyValue("vertexCount").getLong();
+          current.setProperty(PROPERTY_KEY_MEAN_AGE, (double) sumAge / numPerson);
           return current;
         });
 
