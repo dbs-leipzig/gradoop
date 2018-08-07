@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.util.ArrayList;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -32,7 +33,7 @@ public class CreateVertices {
 
 		DataSet<Vertex> vertices = null;
 
-		int tablePos = 0;
+		int counter = 0;
 
 		for (TableToNode table : tablesToNodes) {
 
@@ -42,16 +43,14 @@ public class CreateVertices {
 
 				if (vertices == null) {
 					vertices = dsSQLResult
-							.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), tablePos))
+							.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), counter))
 							.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes), "tables");
 				} else {
-					vertices = vertices.union(dsSQLResult
-							.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), tablePos))
-							.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
-									"tables"));
+					vertices = vertices.union(
+							dsSQLResult.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), counter))
+									.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
+											"tables"));
 				}
-
-				tablePos++;
 
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();

@@ -30,8 +30,7 @@ import org.apache.flink.types.Row;
 public class FlinkConnect {
 
 	/**
-	 * Connects to a relational database and querying data in a distributed
-	 * manner.
+	 * Connects to a relational database and querying data in a distributed manner.
 	 * 
 	 * @param env
 	 *            Flink Execution Environment
@@ -49,42 +48,23 @@ public class FlinkConnect {
 	public static DataSet<Row> connect(ExecutionEnvironment env, RdbmsConfig rdbmsConfig, int rowCount, String sqlQuery,
 			RowTypeInfo typeInfo) throws ClassNotFoundException {
 
-		// used for best database pagination
 		int parallelism = env.getParallelism();
-		int partitionNumber = rowCount / parallelism;
-		int partitionRest = rowCount % parallelism;
 
 		// computes the parameter array for ParametersProvider
-		Serializable[][] parameters = new Integer[parallelism][2];
-		int j = 0;
-		for (int i = 0; i < parallelism; i++) {
-			if (i == parallelism - 1) {
-				if (rdbmsConfig.getUrl().contains(":sqlserver:")) {
-					parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
-				} else {
-					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
-				}
-			} else {
-				if (rdbmsConfig.getUrl().contains(":sqlserver:")) {
-					parameters[i] = new Integer[] { j, partitionNumber };
-				} else {
-					parameters[i] = new Integer[] { partitionNumber, j };
-				}
-				j = j + partitionNumber;
-			}
-		}
 
 		// run jdbc input format with pagination
 		JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
 				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
 				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
 				.setQuery(sqlQuery + pageinationQuery(rdbmsConfig.getUrl())).setRowTypeInfo(typeInfo)
-				.setParametersProvider(new GenericParameterValuesProvider(parameters)).finish();
+				.setParametersProvider(
+						new GenericParameterValuesProvider(parameters(parallelism, rowCount, rdbmsConfig.getUrl())))
+				.finish();
 
 		return env.createInput(jdbcInput);
 	}
 
-	// cooses the right pageination query for belonging management system
+	// chooses the right pageination query for belonging management system
 	public static String pageinationQuery(String url) {
 
 		// default pageination query for mysql,mariadb,postgres, ... management
@@ -97,5 +77,39 @@ public class FlinkConnect {
 		}
 
 		return pageinationQuery;
+	}
+
+	// chooses the right parameters for pageination query
+	public static Serializable[][] parameters(int parallelism, int rowCount, String url) {
+
+		// splits database data in parts of same
+		int partitionNumber = rowCount / parallelism;
+		int partitionRest = rowCount % parallelism;
+
+		Serializable[][] parameters = new Integer[parallelism][2];
+
+		int j = 0;
+
+		for (int i = 0; i < parallelism; i++) {
+
+			if (i == parallelism - 1) {
+
+				if (url.contains(":sqlserver:")) {
+					parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
+				} else {
+					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
+				}
+			} else {
+
+				if (url.contains(":sqlserver:")) {
+					parameters[i] = new Integer[] { j, partitionNumber };
+				} else {
+					parameters[i] = new Integer[] { partitionNumber, j };
+				}
+				j = j + partitionNumber;
+			}
+		}
+
+		return parameters;
 	}
 }

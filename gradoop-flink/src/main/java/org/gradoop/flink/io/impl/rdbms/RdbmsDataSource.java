@@ -27,7 +27,6 @@ import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnect;
 import org.gradoop.flink.io.impl.rdbms.functions.CleanVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
-import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges2;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
@@ -104,10 +103,7 @@ public class RdbmsDataSource implements DataSource {
 	public LogicalGraph getLogicalGraph() {
 		
 		Connection con = RdbmsConnect.connect(rdbmsConfig);
-		
-		DataSet<Edge> edges1 = null;
-		DataSet<Edge> edges2 = null;
-
+	
 		try {
 		
 			// creates a metadata representation of the connected relational
@@ -120,16 +116,14 @@ public class RdbmsDataSource implements DataSource {
 
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
-
-//			print(tablesToNodes,tablesToEdges);
+			
+			print(tablesToNodes,tablesToEdges);
 			
 			// creates vertices from rdbms table tuples
 			tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 			
 			// creates edges from rdbms table tuples and foreign key relations
-			edges1 = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices, "0,20");
-			edges2 = CreateEdges2.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices, "20," + String.valueOf(tablesToEdges.size()-1));
-			edges = edges1.union(edges2);
+			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 			
 			// to avoid exception if edge set is empty
 			if(edges == null) {
@@ -148,23 +142,8 @@ public class RdbmsDataSource implements DataSource {
 	
 	public void print(ArrayList<TableToNode> tablesToNodes, ArrayList<TableToEdge> tablesToEdges) {
 		System.out.println("TABLES TO NODES :" + tablesToNodes.size());
-		for(TableToNode table : tablesToNodes) {
-			System.out.println(table.getTableName() + " "  + table.getSqlQuery() + " " + table.getRowTypeInfo() + " " + table.getRowCount());
-			for(NameTypeTuple pk : table.getPrimaryKeys()) {
-				System.out.println(pk.f0 + " " + pk.f1 );
-			}
-			for(FkTuple fk : table.getForeignKeys()) {
-				System.out.println(fk.f0 + " " + fk.f1 + " " + fk.f2 + " " + fk.f3);
-			}
-			for(NameTypeTypeTuple att : table.getFurtherAttributes()) {
-				System.out.println(att.getName() + " " + att.getJdbctype());
-			}
-		}
 		System.out.println("TABLES TO EDGES :" + tablesToEdges.size());
-		for(TableToEdge table : tablesToEdges) {
-			System.out.println(table.getendTableName());
-			System.out.println(table.getstartTableName() + " " + table.getendTableName() + " " + table.getStartAttribute() + " " + table.getEndAttribute());
-		}
+		
 	}
 
 	@Override

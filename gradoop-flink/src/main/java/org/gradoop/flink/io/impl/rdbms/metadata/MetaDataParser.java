@@ -61,8 +61,8 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Parses the schema of a relational database to a relational database
-	 * metadata representation
+	 * Parses the schema of a relational database to a relational database metadata
+	 * representation
 	 * 
 	 * @throws SQLException
 	 */
@@ -71,7 +71,8 @@ public class MetaDataParser {
 		ArrayList<String> tables = new ArrayList<String>();
 
 		while (rsTables.next()) {
-			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
+			if (rsTables.getString("TABLE_TYPE").equals("TABLE")
+					&& !rsTables.getString("TABLE_NAME").contains("trace_xe")) {
 				tables.add(rsTables.getString("TABLE_NAME"));
 			}
 		}
@@ -156,18 +157,17 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to
-	 * vertices
+	 * Creates metadata representations of tables, which will be convert to vertices
 	 * 
-	 * @return ArrayList containing metadata representations of rdbms tables
-	 *         going to convert to vertices
+	 * @return ArrayList containing metadata representations of rdbms tables going
+	 *         to convert to vertices
 	 */
 	public ArrayList<TableToNode> getTablesToNodes() {
 		ArrayList<TableToNode> tablesToNodes = new ArrayList<TableToNode>();
 
 		for (RdbmsTableBase tables : tableBase) {
 			if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
-				
+
 				tablesToNodes.add(new TableToNode(tables.getTableName(), tables.getPrimaryKeys(),
 						tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
 			}
@@ -176,11 +176,10 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to
-	 * edges
+	 * Creates metadata representations of tables, which will be convert to edges
 	 * 
-	 * @return ArrayList containing metadata representations of rdbms tables
-	 *         going to convert to edges
+	 * @return ArrayList containing metadata representations of rdbms tables going
+	 *         to convert to edges
 	 */
 	public ArrayList<TableToEdge> getTablesToEdges() {
 		ArrayList<TableToEdge> tablesToEdges = new ArrayList<TableToEdge>();
