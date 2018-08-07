@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -43,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  * Abstract parent class of csv test classes with common functions for source and sink tests
  */
 abstract class CSVTestBase extends GradoopFlinkTestBase {
-  
+
   /**
    * Global map to define properties of vertices and edges
    */
@@ -72,6 +74,14 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     objectMap.put(stringValue1, PropertyValue.create(12.345));
     objectMap.put(stringValue2, PropertyValue.create(67.89));
 
+    Set<PropertyValue> stringSet = new HashSet<>();
+    stringSet.add(stringValue1);
+    stringSet.add(stringValue2);
+
+    Set<PropertyValue> intSet = new HashSet<>();
+    intSet.add(PropertyValue.create(1234));
+    intSet.add(PropertyValue.create(5678));
+
     Map<String, Object> propertyMap = new HashMap<>();
     propertyMap.put(GradoopTestUtils.KEY_0, GradoopTestUtils.BOOL_VAL_1);
     propertyMap.put(GradoopTestUtils.KEY_1, GradoopTestUtils.INT_VAL_2);
@@ -87,6 +97,10 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     propertyMap.put(GradoopTestUtils.KEY_b, objectMap);
     propertyMap.put(GradoopTestUtils.KEY_c, stringList);
     propertyMap.put(GradoopTestUtils.KEY_d, intList);
+    propertyMap.put(GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e);
+    propertyMap.put(GradoopTestUtils.KEY_f, GradoopTestUtils.NULL_VAL_0);
+    propertyMap.put(GradoopTestUtils.KEY_g, stringSet);
+    propertyMap.put(GradoopTestUtils.KEY_h, intSet);
     return Collections.unmodifiableMap(propertyMap);
   }
 
@@ -140,6 +154,10 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_b));
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_c));
     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_d));
+    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_e));
+    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_f));
+    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_g));
+    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_h));
 
     // assert that the properties have valid data types
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
@@ -156,6 +174,10 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_b).isMap());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).isList());
     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).isList());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
+    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
 
     // assert that the properties have valid values
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
@@ -186,6 +208,14 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
       PROPERTY_MAP.get(GradoopTestUtils.KEY_c));
     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).getList(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_d));
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
+      PROPERTY_MAP.get(GradoopTestUtils.KEY_e));
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
+      PROPERTY_MAP.get(GradoopTestUtils.KEY_f));
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).getSet(),
+      PROPERTY_MAP.get(GradoopTestUtils.KEY_g));
+    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).getSet(),
+      PROPERTY_MAP.get(GradoopTestUtils.KEY_h));
   }
 
   /**
@@ -208,5 +238,9 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     assertTrue(line.contains(GradoopTestUtils.KEY_b + ":map:string:double"));
     assertTrue(line.contains(GradoopTestUtils.KEY_c + ":list:string"));
     assertTrue(line.contains(GradoopTestUtils.KEY_d + ":list:int"));
+    assertTrue(line.contains(GradoopTestUtils.KEY_e + ":short"));
+    assertTrue(line.contains(GradoopTestUtils.KEY_f + ":null"));
+    assertTrue(line.contains(GradoopTestUtils.KEY_g + ":set:string"));
+    assertTrue(line.contains(GradoopTestUtils.KEY_h + ":set:int"));
   }
 }

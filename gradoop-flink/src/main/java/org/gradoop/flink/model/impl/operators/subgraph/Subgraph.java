@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,9 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
-import org.gradoop.flink.model.impl.functions.tuple.ValueInTuple1;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 
@@ -220,10 +220,10 @@ public class Subgraph implements UnaryGraphToGraphOperator {
 
     DataSet<Tuple1<GradoopId>> vertexIdentifiers = filteredEdges
       .map(new SourceId<>())
-      .map(new ValueInTuple1<>())
+      .map(new ObjectTo1<>())
       .union(filteredEdges
         .map(new TargetId<>())
-        .map(new ValueInTuple1<>()))
+        .map(new ObjectTo1<>()))
       .distinct();
 
     DataSet<Vertex> filteredVertices = vertexIdentifiers

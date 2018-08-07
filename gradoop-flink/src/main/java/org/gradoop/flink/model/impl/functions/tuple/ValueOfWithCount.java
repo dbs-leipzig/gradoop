@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * (object, count) => object
- * @param <T>
+ * @param <T> value type
  */
 public class ValueOfWithCount<T> implements MapFunction<WithCount<T>, T> {
 

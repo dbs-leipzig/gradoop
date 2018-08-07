@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,10 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,21 +67,25 @@ public class PropertyValueUtils {
   public static class Numeric {
 
     /**
-     * Float type.
+     * Short type.
      */
-    private static final int FLOAT = 1;
+    private static final int SHORT = 0;
     /**
      * Integer type.
      */
-    private static final int INT = 2;
-    /**
-     * Double type.
-     */
-    private static final int DOUBLE = 3;
+    private static final int INT = 1;
     /**
      * Long type.
      */
-    private static final int LONG = 4;
+    private static final int LONG = 2;
+    /**
+     * Float type.
+     */
+    private static final int FLOAT = 3;
+    /**
+     * Double type.
+     */
+    private static final int DOUBLE = 4;
     /**
      * Big decimal type.
      */
@@ -102,10 +107,14 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
       if (returnType == INT)  {
-        aValue.setInt(aValue.getInt() + bValue.getInt());
+
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
+
+        aValue.setInt(a + b);
 
       } else if (returnType == FLOAT)  {
 
@@ -116,8 +125,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aValue.setFloat(a + b);
@@ -131,8 +140,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aValue.setLong(a + b);
@@ -174,7 +183,7 @@ public class PropertyValueUtils {
     }
 
     /**
-     * returns the maximum of two types
+     * Returns the maximum of two types, at least Integer.
      *
      * @param aType first type
      * @param bType second type
@@ -182,18 +191,7 @@ public class PropertyValueUtils {
      * @return larger compatible type
      */
     private static int maxType(int aType, int bType) {
-
-      int maxType = Math.max(aType, bType);
-
-      if (maxType != BIG_DECIMAL && // not big decimal
-        aType % 2 != bType % 2 && // different supertype
-        maxType % 2 == 0) { // high supertype is integer
-
-        // next decimal type
-        maxType++;
-      }
-
-      return maxType;
+      return Math.max(Math.max(aType, bType), INT);
     }
 
     /**
@@ -212,10 +210,14 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
       if (returnType == INT)  {
-        aValue.setInt(aValue.getInt() * bValue.getInt());
+
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
+
+        aValue.setInt(a * b);
 
       } else if (returnType == FLOAT)  {
 
@@ -226,8 +228,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aValue.setFloat(a * b);
@@ -241,8 +243,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aValue.setLong(a * b);
@@ -281,6 +283,104 @@ public class PropertyValueUtils {
       }
 
       return aValue;
+    }
+
+    /**
+     * Compares two numerical property values
+     *
+     * @param aValue first value
+     * @param bValue second value
+     *
+     * @return 0 if a is equal to b, < 0 if a is less than b and > 0 if a is greater than b
+     */
+    public static int compare(PropertyValue aValue, PropertyValue bValue) {
+
+      int aType = checkNumericalAndGetType(aValue);
+      int bType = checkNumericalAndGetType(bValue);
+
+      boolean sameType = aType == bType;
+
+      int maxType = Math.max(aType, bType);
+
+      int result;
+
+      if (maxType == SHORT) {
+        result = Short.compare(aValue.getShort(), bValue.getShort());
+
+      } else if (maxType == INT)  {
+        int a;
+        int b;
+
+        if (sameType) {
+          a = aValue.getInt();
+          b = bValue.getInt();
+        } else {
+          a = aType == INT ? aValue.getInt() : aValue.getShort();
+          b = bType == INT ? bValue.getInt() : bValue.getShort();
+        }
+
+        result = Integer.compare(a, b);
+
+      } else if (maxType == FLOAT) {
+        float a;
+        float b;
+
+        if (sameType) {
+          a = aValue.getFloat();
+          b = bValue.getFloat();
+        } else {
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
+        }
+
+        result = Float.compare(a, b);
+
+      } else if (maxType == LONG) {
+        long a;
+        long b;
+
+        if (sameType) {
+          a = aValue.getLong();
+          b = bValue.getLong();
+        } else {
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
+        }
+
+        result = Long.compare(a, b);
+
+      } else if (maxType == DOUBLE) {
+        double a;
+        double b;
+
+        if (sameType) {
+          a = aValue.getDouble();
+          b = bValue.getDouble();
+        } else {
+          a = aType == DOUBLE ? aValue.getDouble() : doubleValue(aValue, aType);
+          b = bType == DOUBLE ? bValue.getDouble() : doubleValue(bValue, bType);
+        }
+
+        result = Double.compare(a, b);
+
+      } else {
+        BigDecimal a;
+        BigDecimal b;
+
+        if (sameType) {
+          a = aValue.getBigDecimal();
+          b = bValue.getBigDecimal();
+        } else {
+          a = aType == BIG_DECIMAL ? aValue.getBigDecimal() :
+                  bigDecimalValue(aValue, aType);
+          b = bType == BIG_DECIMAL ? bValue.getBigDecimal() :
+                  bigDecimalValue(bValue, bType);
+        }
+
+        result = a.compareTo(b);
+      }
+
+      return result;
     }
 
     /**
@@ -324,12 +424,16 @@ public class PropertyValueUtils {
 
       boolean sameType = aType == bType;
 
-      int returnType = sameType ? aType : maxType(aType, bType);
+      int returnType = maxType(aType, bType);
 
       boolean aIsLessOrEqual;
 
-      if (returnType == INT) {
-        aIsLessOrEqual = aValue.getInt() <= bValue.getInt();
+      if (returnType == INT)  {
+
+        int a = aType == INT ? aValue.getInt() : aValue.getShort();
+        int b = bType == INT ? bValue.getInt() : bValue.getShort();
+
+        aIsLessOrEqual = a <= b;
 
       } else if (returnType == FLOAT) {
 
@@ -340,8 +444,8 @@ public class PropertyValueUtils {
           a = aValue.getFloat();
           b = bValue.getFloat();
         } else {
-          a = aType == FLOAT ? aValue.getFloat() : aValue.getInt();
-          b = bType == FLOAT ? bValue.getFloat() : bValue.getInt();
+          a = aType == FLOAT ? aValue.getFloat() : floatValue(aValue, aType);
+          b = bType == FLOAT ? bValue.getFloat() : floatValue(bValue, bType);
         }
 
         aIsLessOrEqual = a <= b;
@@ -355,8 +459,8 @@ public class PropertyValueUtils {
           a = aValue.getLong();
           b = bValue.getLong();
         } else {
-          a = aType == LONG ? aValue.getLong() : aValue.getInt();
-          b = bType == LONG ? bValue.getLong() : bValue.getInt();
+          a = aType == LONG ? aValue.getLong() : longValue(aValue, aType);
+          b = bType == LONG ? bValue.getLong() : longValue(bValue, bType);
         }
 
         aIsLessOrEqual = a <= b;
@@ -409,7 +513,9 @@ public class PropertyValueUtils {
 
       int type;
 
-      if (value.isInt()) {
+      if (value.isShort()) {
+        type = SHORT;
+      } else if (value.isInt()) {
         type = INT;
       } else if (value.isLong()) {
         type = LONG;
@@ -436,6 +542,8 @@ public class PropertyValueUtils {
      */
     private static BigDecimal bigDecimalValue(PropertyValue value, int type) {
       switch (type) {
+      case SHORT:
+        return BigDecimal.valueOf(value.getShort());
       case INT:
         return BigDecimal.valueOf(value.getInt());
       case LONG:
@@ -457,6 +565,8 @@ public class PropertyValueUtils {
      */
     private static double doubleValue(PropertyValue value, int type) {
       switch (type) {
+      case SHORT:
+        return value.getShort();
       case INT:
         return value.getInt();
       case LONG:
@@ -464,6 +574,86 @@ public class PropertyValueUtils {
       default:
         return value.getFloat();
       }
+    }
+
+    /**
+     * Converts a value of a lower domain numerical type to Long.
+     *
+     * @param value value
+     * @param type type
+     *
+     * @return converted value
+     */
+    private static long longValue(PropertyValue value, int type) {
+      switch (type) {
+      case SHORT:
+        return value.getShort();
+      default:
+        return value.getInt();
+      }
+    }
+
+    /**
+     * Converts a value of a lower domain numerical type to Float.
+     *
+     * @param value value
+     * @param type type
+     *
+     * @return converted value
+     */
+    private static float floatValue(PropertyValue value, int type) {
+      switch (type) {
+      case SHORT:
+        return value.getShort();
+      case INT:
+        return value.getInt();
+      default:
+        return value.getLong();
+      }
+    }
+  }
+
+  /**
+   * Byte utilities.
+   */
+  public static class Bytes {
+
+    /**
+     * Get the raw byte representation of a {@link PropertyValue} instance without the type byte as prefix.
+     *
+     * @param value the {@link PropertyValue} to extract the bytes
+     * @return a byte array containing the value without type information
+     */
+    public static byte[] getRawBytesWithoutType(PropertyValue value) {
+      return Arrays.copyOfRange(value.getRawBytes(), 1, value.getRawBytes().length);
+    }
+
+    /**
+     * Get the type byte of a {@link PropertyValue} instance. It's the first one of the
+     * raw representation of a PropertyValue.
+     *
+     * @param value the {@link PropertyValue} to extract the type byte
+     * @return the type byte as array
+     */
+    public static byte[] getTypeByte(PropertyValue value) {
+      byte[] typeByte = new byte[1];
+      typeByte[0] = value.getRawBytes()[0];
+      return typeByte;
+    }
+
+    /**
+     * Creates a {@link PropertyValue} instance by concatenating the byte representations
+     * of the type and the value.
+     *
+     * @param typeByte a byte array containing only one byte representing the value type
+     * @param valueBytes a byte array representing the property value
+     * @return the resulting {@link PropertyValue}
+     */
+    public static PropertyValue createFromTypeValueBytes(byte[] typeByte, byte[] valueBytes) {
+      byte[] validValue = new byte[valueBytes.length + 1];
+      validValue[0] = typeByte[0];
+      System.arraycopy(valueBytes, 0, validValue, 1, valueBytes.length);
+      return PropertyValue.fromRawBytes(validValue);
     }
   }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,6 +43,29 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
       loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
         getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
+    );
+  }
+
+  @Test
+  public void testReadWithoutEdges() throws Exception {
+    String tlfFile = TLFDataSinkTest.class
+    .getResource("/data/tlf/io_test_string_without_edges.tlf").getFile();
+
+    // create datasource
+    DataSource dataSource = new TLFDataSource(tlfFile, getConfig());
+    // get transactions
+    DataSet<GraphTransaction> transactions = dataSource.getGraphCollection().getGraphTransactions();
+
+    String asciiGraphs = "" +
+      "g1[(v1:A),(v2:B)]" +
+      "g2[(v1:A),(v2:B)]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
+
+    collectAndAssertTrue(
+    loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+    getConfig().getGraphCollectionFactory().fromTransactions(transactions)
+    )
     );
   }
 

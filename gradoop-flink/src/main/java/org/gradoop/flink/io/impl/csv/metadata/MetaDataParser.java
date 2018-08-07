@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package org.gradoop.flink.io.impl.csv.metadata;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -62,6 +63,7 @@ public class MetaDataParser {
    */
   private static Map<String, Function<String, Object>> getTypeParserMap() {
     Map<String, Function<String, Object>> map = new HashMap<>();
+    map.put(TypeString.SHORT.getTypeString(), Short::parseShort);
     map.put(TypeString.INTEGER.getTypeString(), Integer::parseInt);
     map.put(TypeString.LONG.getTypeString(), Long::parseLong);
     map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
@@ -75,6 +77,8 @@ public class MetaDataParser {
     map.put(TypeString.LOCALDATE.getTypeString(), LocalDate::parse);
     map.put(TypeString.LOCALTIME.getTypeString(), LocalTime::parse);
     map.put(TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);
+    map.put(TypeString.NULL.getTypeString(), MetaDataParser::parseNullProperty);
+    map.put(TypeString.SET.getTypeString(), MetaDataParser::parseSetProperty);
     return Collections.unmodifiableMap(map);
   }
 
@@ -85,39 +89,47 @@ public class MetaDataParser {
    * @param metaDataStrings (label, meta-data) tuples
    * @return Meta Data object
    */
-  public static MetaData create(List<Tuple2<String, String>> metaDataStrings) {
-    Map<String, List<PropertyMetaData>> metaDataMap = new HashMap<>(metaDataStrings.size());
+  public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {
+    Map<Tuple2<String, String>, List<PropertyMetaData>> metaDataMap
+      = new HashMap<>(metaDataStrings.size());
 
-    for (Tuple2<String, String> tuple : metaDataStrings) {
+    for (Tuple3<String, String, String> tuple : metaDataStrings) {
       List<PropertyMetaData> propertyMetaDataList;
-      if (tuple.f1.length() > 0) {
-        String[] propertyStrings = tuple.f1.split(PROPERTY_DELIMITER);
+      if (tuple.f2.length() > 0) {
+        String[] propertyStrings = tuple.f2.split(PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
-          String[] propertyTokens = propertyString.split(PROPERTY_TOKEN_DELIMITER);
-          if (propertyTokens.length == 3 &&
-            propertyTokens[1].equals(TypeString.LIST.getTypeString())) {
+          String[] propertyMetadata = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2);
+          String[] propertyTypeTokens = propertyMetadata[1].split(PROPERTY_TOKEN_DELIMITER);
+          if (propertyTypeTokens.length == 2 &&
+            propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
             // it's a list with one additional data type (type of list items)
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], getListValueParser(propertyTokens[2])));
-          } else if (propertyTokens.length == 4 &&
-            propertyTokens[1].equals(TypeString.MAP.getTypeString())) {
+              propertyMetadata[0], propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
+          } else if (propertyTypeTokens.length == 2 &&
+            propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
+            // it's a set with one additional data type (type of set items)
+            propertyMetaDataList.add(new PropertyMetaData(
+              propertyMetadata[0], propertyMetadata[1], getSetValueParser(propertyTypeTokens[1])));
+          } else if (propertyTypeTokens.length == 3 &&
+            propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
             // it's a map with two additional data types (key type + value type)
             propertyMetaDataList.add(
               new PropertyMetaData(
-                propertyTokens[0],
-                getMapValueParser(propertyTokens[2], propertyTokens[3])
+                propertyMetadata[0],
+                propertyMetadata[1],
+                getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2])
               )
             );
           } else {
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyTokens[0], getValueParser(propertyTokens[1])));
+              propertyMetadata[0], propertyMetadata[1], getValueParser(propertyMetadata[1])));
           }
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
       }
-      metaDataMap.put(tuple.f0, propertyMetaDataList);
+      metaDataMap.put(new Tuple2<>(tuple.f0, tuple.f1), propertyMetaDataList);
     }
 
     return new MetaData(metaDataMap);
@@ -206,6 +218,21 @@ public class MetaDataParser {
   }
 
   /**
+   * Creates a parsing function for set property type.
+   *
+   * @param setItemType string representation of the set item type, e.g. "String"
+   * @return parsing function
+   */
+  private static Function<String, Object> getSetValueParser(String setItemType) {
+    final String itemType = setItemType.toLowerCase();
+    // check the validity of the set item type
+    if (!TYPE_PARSER_MAP.containsKey(itemType)) {
+      throw new TypeNotPresentException(itemType, null);
+    }
+
+    return s -> parseSetProperty(s, TYPE_PARSER_MAP.get(itemType));
+  }
+  /**
    * Parse function to translate string representation of a List to a list of PropertyValues
    * Every PropertyValue has the type "string", because there is no parser for the items given
    * Use {@link #parseListProperty(String, Function)} to specify a parsing function
@@ -280,13 +307,62 @@ public class MetaDataParser {
   }
 
   /**
+   * Parse function to translate string representation of a Set to a set of PropertyValues
+   * Every PropertyValue has the type "string", because there is no parser for the items given
+   * Use {@link #parseListProperty(String, Function)} to specify a parsing function
+   *
+   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @return the set represented by the argument
+   */
+  private static Object parseSetProperty(String s) {
+    // no item type given, so use string as type
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(PropertyValue::create)
+      .collect(Collectors.toSet());
+  }
+
+  /**
+   * Parse function to translate string representation of a Set to a set of PropertyValues
+   *
+   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @param itemParser the function to parse the set items
+   * @return the set represented by the argument
+   */
+  private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(itemParser)
+      .map(PropertyValue::create)
+      .collect(Collectors.toSet());
+  }
+  /**
+   * Parse function to create null from the null string representation.
+   *
+   * @param nullString The string representing null.
+   * @throws IllegalArgumentException The string that is passed has to represent null.
+   * @return Returns null
+   */
+  private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
+    if (nullString != null && nullString.equalsIgnoreCase(TypeString.NULL.getTypeString())) {
+      return null;
+    } else {
+      throw new IllegalArgumentException("Only null represents a null string.");
+    }
+  }
+
+  /**
    * Returns the type string for the specified property value.
    *
    * @param propertyValue property value
    * @return property type string
    */
-  private static String getTypeString(PropertyValue propertyValue) {
-    if (propertyValue.isInt()) {
+  public static String getTypeString(PropertyValue propertyValue) {
+    if (propertyValue.isNull()) {
+      return TypeString.NULL.getTypeString();
+    } else if (propertyValue.isShort()) {
+      return TypeString.SHORT.getTypeString();
+    } else if (propertyValue.isInt()) {
       return TypeString.INTEGER.getTypeString();
     } else if (propertyValue.isLong()) {
       return TypeString.LONG.getTypeString();
@@ -320,6 +396,11 @@ public class MetaDataParser {
       return TypeString.LOCALTIME.getTypeString();
     } else if (propertyValue.isDateTime()) {
       return TypeString.LOCALDATETIME.getTypeString();
+    } else if (propertyValue.isSet()) {
+      // set type string is set:{itemType}
+      return TypeString.SET.getTypeString() +
+        PROPERTY_TOKEN_DELIMITER +
+        getTypeString(propertyValue.getSet().iterator().next());
     } else {
       throw new IllegalArgumentException("Type " + propertyValue.getType() + " is not supported");
     }
@@ -330,9 +411,17 @@ public class MetaDataParser {
    */
   private enum TypeString {
     /**
+     * Null type
+     */
+    NULL("null"),
+    /**
      * Boolean type
      */
     BOOLEAN("boolean"),
+    /**
+     * Short type
+     */
+    SHORT("short"),
     /**
      * Integer type
      */
@@ -380,7 +469,11 @@ public class MetaDataParser {
     /**
      * LocalDateTime type
      */
-    LOCALDATETIME("localdatetime");
+    LOCALDATETIME("localdatetime"),
+    /**
+     * Set type
+     */
+    SET("set");
 
     /**
      * String representation

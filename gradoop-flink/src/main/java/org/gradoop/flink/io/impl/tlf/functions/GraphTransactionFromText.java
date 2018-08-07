@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
  */
 package org.gradoop.flink.io.impl.tlf.functions;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
@@ -30,9 +28,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Reads graph imported from a TLF file. The result of the mapping is a
@@ -54,43 +57,16 @@ public class GraphTransactionFromText
    * Edge factory.
    */
   private EdgeFactory edgeFactory;
-  /**
-   * Line fields splittet by space.
-   */
-  private String[] fields;
-  /**
-   * String builder for each line.
-   */
-  private StringBuilder stringBuilder = new StringBuilder();
-  /**
-   * String builder for label with spaces.
-   */
-  private StringBuilder labelBuilder = new StringBuilder();
-  /**
-   * Map for long id from tlf file to gradoop id.
-   */
-  private Map<Long, GradoopId> idMap = Maps.newHashMap();
-  /**
-   * Vertices of transaction.
-   */
-  private Set<Vertex> vertices = Sets.newHashSet();
-  /**
-   * Edges of transaction.
-   */
-  private Set<Edge> edges = Sets.newHashSet();
 
   /**
    * Valued constructor.
    *
-   * @param graphHeadFactory graph head factory
-   * @param vertexFactory vertex factory
-   * @param edgeFactory edge factory
+   * @param config gradoop flink config
    */
-  public GraphTransactionFromText(GraphHeadFactory graphHeadFactory, VertexFactory vertexFactory,
-    EdgeFactory edgeFactory) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.vertexFactory = vertexFactory;
-    this.edgeFactory = edgeFactory;
+  public GraphTransactionFromText(GradoopFlinkConfig config) {
+    this.graphHeadFactory = config.getGraphHeadFactory();
+    this.vertexFactory = config.getVertexFactory();
+    this.edgeFactory = config.getEdgeFactory();
   }
 
   /**
@@ -98,61 +74,40 @@ public class GraphTransactionFromText
    *
    * @param inputTuple consists of a key(LongWritable) and a value(Text)
    * @return a TLFGraph created by the input text
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public GraphTransaction map(Tuple2<LongWritable, Text> inputTuple) throws Exception {
-    idMap.clear();
-    vertices.clear();
-    edges.clear();
-    stringBuilder.setLength(0);
-    boolean firstLine = true;
-    boolean vertexLine = true;
-    String graph = inputTuple.f1.toString();
-    int cursor = 0;
-    char currChar;
-
-    GradoopId gradoopId;
+    Map<Long, GradoopId> idMap = new HashMap<>();
+    Set<Vertex> vertices = new HashSet<>();
+    Set<Edge> edges = new HashSet<>();
     GraphHead graphHead = null;
-    Vertex vertex;
-    Edge edge;
 
-    do {
-      currChar = graph.charAt(cursor);
-      if (currChar == '\n') {
-        fields = stringBuilder.toString().trim().split(" ");
-        if (firstLine) {
-          gradoopId = GradoopId.get();
-          idMap.put(Long.valueOf(fields[2]), gradoopId);
-          graphHead = graphHeadFactory.initGraphHead(gradoopId);
-          firstLine = false;
-        } else {
-          if (vertexLine) {
-            gradoopId = GradoopId.get();
-            idMap.put(Long.valueOf(fields[1]), gradoopId);
-            vertex = vertexFactory.initVertex(gradoopId, getLabel(2));
-            vertex.addGraphId(graphHead.getId());
-            vertices.add(vertex);
-            if (TLFConstants.EDGE_SYMBOL.equals(String.valueOf(graph.charAt(cursor + 1)))) {
-              vertexLine = false;
-            }
-          } else {
-            gradoopId = GradoopId.get();
-            edge = edgeFactory.initEdge(gradoopId,
-              getLabel(3),
-              idMap.get(Long.valueOf(fields[1])),
-              idMap.get(Long.valueOf(fields[2]))
-            );
-            edge.addGraphId(graphHead.getId());
-            edges.add(edge);
-          }
-        }
-        stringBuilder.setLength(0);
-      } else {
-        stringBuilder.append(currChar);
+    String[] lines = inputTuple.f1.toString().split("\\R", -1);
+    for (int i = 0; i < lines.length; i++) {
+      String[] fields = lines[i].trim().split(" ");
+      GradoopId gradoopId = GradoopId.get();
+
+      if (i == 0) {
+        idMap.put(Long.valueOf(fields[2]), gradoopId);
+        graphHead = graphHeadFactory.initGraphHead(gradoopId);
+
+      } else if (TLFConstants.VERTEX_SYMBOL.equals(fields[0])) {
+        idMap.put(Long.valueOf(fields[1]), gradoopId);
+        Vertex vertex = vertexFactory.initVertex(gradoopId, getLabel(fields, 2));
+        vertex.addGraphId(graphHead.getId());
+        vertices.add(vertex);
+
+      } else if (TLFConstants.EDGE_SYMBOL.equals(fields[0])) {
+        Edge edge = edgeFactory.initEdge(gradoopId,
+          getLabel(fields, 3),
+          idMap.get(Long.valueOf(fields[1])),
+          idMap.get(Long.valueOf(fields[2]))
+        );
+        edge.addGraphId(graphHead.getId());
+        edges.add(edge);
       }
-      cursor++;
-    } while (cursor != graph.length());
+    }
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
@@ -161,17 +116,11 @@ public class GraphTransactionFromText
    * Builds a label from the current fields. If the label is split by whitespaces the last fields
    * which represent the label will be concatenated.
    *
+   * @param fields graph element fields
    * @param labelStart field where the label starts
    * @return full label
    */
-  private String getLabel(int labelStart) {
-    labelBuilder.setLength(0);
-    for (int i = labelStart; i < fields.length; i++) {
-      if (i > labelStart) {
-        labelBuilder.append(" ");
-      }
-      labelBuilder.append(fields[i]);
-    }
-    return labelBuilder.toString();
+  private String getLabel(String[] fields, int labelStart) {
+    return Arrays.stream(fields).skip(labelStart).collect(Collectors.joining(" "));
   }
 }

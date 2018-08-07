@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
@@ -48,6 +50,11 @@ public class PropertyValueTest {
   public void testBigDecimalConversion() {
     PropertyValue property;
     BigDecimal decimalValue;
+
+    // SHORT
+    property = create(SHORT_VAL_e);
+    decimalValue = BigDecimal.valueOf(SHORT_VAL_e);
+    assertEquals(decimalValue, property.getBigDecimal());
 
     // INT
     property = create(INT_VAL_2);
@@ -96,6 +103,10 @@ public class PropertyValueTest {
     p = create(BOOL_VAL_1);
     assertTrue(p.isBoolean());
     assertEquals(BOOL_VAL_1, p.getBoolean());
+    // short
+    p = create(SHORT_VAL_e);
+    assertTrue(p.isShort());
+    assertEquals(SHORT_VAL_e, p.getShort());
     // int
     p = create(INT_VAL_2);
     assertTrue(p.isInt());
@@ -120,43 +131,51 @@ public class PropertyValueTest {
     p = create(BIG_DECIMAL_VAL_7);
     assertTrue(p.isBigDecimal());
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
-    //GradoopId
+    // GradoopId
     p = create(GRADOOP_ID_VAL_8);
     assertTrue(p.isGradoopId());
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
-    //Map
+    // Map
     p = create(MAP_VAL_9);
     assertTrue(p.isMap());
     assertEquals(MAP_VAL_9, p.getMap());
-    //List
+    // List
     p = create(LIST_VAL_a);
     assertTrue(p.isList());
     assertEquals(LIST_VAL_a, p.getList());
-    //Date
+    // Date
     p = create(DATE_VAL_b);
     assertTrue(p.isDate());
     assertEquals(DATE_VAL_b, p.getDate());
-    //Time
+    // Time
     p = create(TIME_VAL_c);
     assertTrue(p.isTime());
     assertEquals(TIME_VAL_c, p.getTime());
-    //DateTime
+    // DateTime
     p = create(DATETIME_VAL_d);
     assertTrue(p.isDateTime());
     assertEquals(DATETIME_VAL_d, p.getDateTime());
+    // Set
+    p = create(SET_VAL_f);
+    assertTrue(p.isSet());
+    assertEquals(SET_VAL_f, p.getSet());
   }
 
   @Test
   public void testSetAndGetObject() throws Exception {
     PropertyValue p = new PropertyValue();
-
+    // null
     p.setObject(null);
     assertTrue(p.isNull());
     assertNull(p.getObject());
-
+    // boolean
     p.setObject(BOOL_VAL_1);
     assertTrue(p.isBoolean());
     assertEquals(BOOL_VAL_1, p.getObject());
+    // short
+    p.setObject(SHORT_VAL_e);
+    assertTrue(p.isShort());
+    assertEquals(SHORT_VAL_e, p.getObject());
     // int
     p.setObject(INT_VAL_2);
     assertTrue(p.isInt());
@@ -193,24 +212,28 @@ public class PropertyValueTest {
     p.setObject(LIST_VAL_a);
     assertTrue(p.isList());
     assertEquals(LIST_VAL_a, p.getObject());
-    //Date
+    // Date
     p.setObject(DATE_VAL_b);
     assertTrue(p.isDate());
     assertEquals(DATE_VAL_b, p.getDate());
-    //Time
+    // Time
     p.setObject(TIME_VAL_c);
     assertTrue(p.isTime());
     assertEquals(TIME_VAL_c, p.getTime());
-    //DateTime
+    // DateTime
     p.setObject(DATETIME_VAL_d);
     assertTrue(p.isDateTime());
     assertEquals(DATETIME_VAL_d, p.getDateTime());
+    // Set
+    p.setObject(SET_VAL_f);
+    assertTrue(p.isSet());
+    assertEquals(SET_VAL_f, p.getSet());
   }
 
   @Test(expected = UnsupportedTypeException.class)
   public void testSetObjectWithUnsupportedType() {
     PropertyValue p = new PropertyValue();
-    p.setObject(new HashSet<>());
+    p.setObject(new PriorityQueue<>());
   }
 
   @Test
@@ -218,6 +241,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(null);
     assertTrue(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -230,6 +254,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -237,6 +262,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(true);
     assertFalse(p.isNull());
     assertTrue(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -249,6 +275,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -265,10 +292,45 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testIsShort() throws Exception {
+    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertTrue(p.isShort());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
+  }
+
+  @Test
+  public void testGetShort() throws Exception {
+    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
+    assertEquals(SHORT_VAL_e, p.getShort());
+  }
+
+  @Test
+  public void testSetShort() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setShort(SHORT_VAL_e);
+    assertEquals(SHORT_VAL_e, p.getShort());
+  }
+
+  @Test
   public void testIsInt() throws Exception {
     PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertTrue(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -281,6 +343,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -301,6 +364,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertTrue(p.isLong());
     assertFalse(p.isFloat());
@@ -313,6 +377,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -333,6 +398,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertTrue(p.isFloat());
@@ -345,6 +411,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -365,6 +432,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -377,6 +445,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -397,6 +466,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -409,6 +479,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -429,6 +500,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -441,6 +513,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -461,6 +534,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -473,6 +547,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -493,6 +568,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(MAP_VAL_9);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -505,6 +581,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -525,6 +602,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -537,6 +615,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -557,6 +636,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(DATE_VAL_b);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -569,6 +649,7 @@ public class PropertyValueTest {
     assertTrue(p.isDate());
     assertFalse(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -589,6 +670,7 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(TIME_VAL_c);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -601,6 +683,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertTrue(p.isTime());
     assertFalse(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -616,12 +699,12 @@ public class PropertyValueTest {
     assertEquals(TIME_VAL_c, p.getTime());
   }
 
-
   @Test
   public void testIsDateTime() throws Exception {
     PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
     assertFalse(p.isInt());
     assertFalse(p.isLong());
     assertFalse(p.isFloat());
@@ -634,6 +717,7 @@ public class PropertyValueTest {
     assertFalse(p.isDate());
     assertFalse(p.isTime());
     assertTrue(p.isDateTime());
+    assertFalse(p.isSet());
   }
 
   @Test
@@ -649,12 +733,84 @@ public class PropertyValueTest {
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
+  @Test
+  public void testIsSet() throws Exception {
+    PropertyValue p = PropertyValue.create(SET_VAL_f);
+    assertFalse(p.isNull());
+    assertFalse(p.isBoolean());
+    assertFalse(p.isShort());
+    assertFalse(p.isInt());
+    assertFalse(p.isLong());
+    assertFalse(p.isFloat());
+    assertFalse(p.isDouble());
+    assertFalse(p.isString());
+    assertFalse(p.isBigDecimal());
+    assertFalse(p.isGradoopId());
+    assertFalse(p.isMap());
+    assertFalse(p.isList());
+    assertFalse(p.isDate());
+    assertFalse(p.isTime());
+    assertFalse(p.isDateTime());
+    assertTrue(p.isSet());
+  }
+
+  @Test
+  public void testGetSet() throws Exception {
+    PropertyValue p = PropertyValue.create(SET_VAL_f);
+    assertEquals(SET_VAL_f, p.getSet());
+  }
+
+  @Test
+  public void testSetSet() throws Exception {
+    PropertyValue p = new PropertyValue();
+    p.setSet(SET_VAL_f);
+    assertEquals(SET_VAL_f, p.getSet());
+  }
+
+  @Test
+  public void testIsNumber() throws Exception {
+    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(INT_VAL_2);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(LONG_VAL_3);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(FLOAT_VAL_4);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(DOUBLE_VAL_5);
+    assertTrue(p.isNumber());
+    p = PropertyValue.create(BIG_DECIMAL_VAL_7);
+    assertTrue(p.isNumber());
+
+    p = PropertyValue.create(NULL_VAL_0);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(BOOL_VAL_1);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(STRING_VAL_6);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(GRADOOP_ID_VAL_8);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(MAP_VAL_9);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(LIST_VAL_a);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(DATE_VAL_b);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(TIME_VAL_c);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(DATETIME_VAL_d);
+    assertFalse(p.isNumber());
+    p = PropertyValue.create(SET_VAL_f);
+    assertFalse(p.isNumber());
+  }
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
     validateEqualsAndHashCode(create(null), create(null), create(false));
 
     validateEqualsAndHashCode(create(true), create(true), create(false));
+
+    validateEqualsAndHashCode(create((short)10), create((short)10), create((short)11));
 
     validateEqualsAndHashCode(create(10), create(10), create(11));
 
@@ -712,7 +868,14 @@ public class PropertyValueTest {
     LocalDateTime dateTime3 = LocalDateTime.of(date3, time3);
 
     validateEqualsAndHashCode(create(dateTime1), create(dateTime2), create(dateTime3));
-  }
+
+    Set<PropertyValue> set1 = new HashSet<>();
+    set1.add(PropertyValue.create("bar"));
+    Set<PropertyValue> set2 = new HashSet<>();
+    set2.add(PropertyValue.create("bar"));
+    Set<PropertyValue> set3 = new HashSet<>();
+    set3.add(PropertyValue.create("baz"));
+    validateEqualsAndHashCode(create(set1), create(set2), create(set3));  }
 
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
@@ -720,48 +883,126 @@ public class PropertyValueTest {
     assertEquals(p1, p2);
     assertNotEquals(p1, p3);
 
-    assertTrue(p1.hashCode() == p1.hashCode());
-    assertTrue(p1.hashCode() == p2.hashCode());
-    assertFalse(p1.hashCode() == p3.hashCode());
+    assertEquals(p1.hashCode(), p1.hashCode());
+    assertEquals(p1.hashCode(), p2.hashCode());
+    assertNotEquals(p1.hashCode(), p3.hashCode());
   }
 
   @Test
   public void testCompareTo() throws Exception {
-    assertTrue(create(null).compareTo(create(null)) == 0);
-
+    // null
+    assertEquals(create(null).compareTo(create(null)), 0);
+    // boolean
     validateCompareTo(create(false), create(false), create(true));
-
-    validateCompareTo(create(-10), create(-10), create(10));
+    // short
+    validateCompareTo(create((short)-10), create((short)-10), create((short)12));
+    validateCompareTo(create((short)10), create((short)10), create((short)12));
+    validateCompareTo(create((short)-10), create(-10), create(12));
+    validateCompareTo(create((short)10), create(10), create(12));
+    validateCompareTo(create((short)-10), create(-10L), create(12L));
+    validateCompareTo(create((short)10), create(10L), create(12L));
+    validateCompareTo(create((short)-10), create(-10F), create(12F));
+    validateCompareTo(create((short)10), create(10F), create(12F));
+    validateCompareTo(create((short)-10), create(-10D), create(12D));
+    validateCompareTo(create((short)10), create(10D), create(12D));
+    validateCompareTo(create((short)-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create((short)10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // int
+    validateCompareTo(create(-10), create((short)-10), create((short)12));
+    validateCompareTo(create(10), create((short)10), create((short)12));
+    validateCompareTo(create(-10), create(-10), create(12));
     validateCompareTo(create(10), create(10), create(12));
-
+    validateCompareTo(create(-10), create(-10L), create(12L));
+    validateCompareTo(create(10), create(10L), create(12L));
+    validateCompareTo(create(-10), create(-10F), create(12F));
+    validateCompareTo(create(10), create(10F), create(12F));
+    validateCompareTo(create(-10), create(-10D), create(12D));
+    validateCompareTo(create(10), create(10D), create(12D));
+    validateCompareTo(create(-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // long
+    validateCompareTo(create(-10L), create((short)-10), create((short)12));
+    validateCompareTo(create(10L), create((short)10), create((short)12));
+    validateCompareTo(create(-10L), create(-10), create(12));
+    validateCompareTo(create(10L), create(10), create(12));
     validateCompareTo(create(-10L), create(-10L), create(12L));
     validateCompareTo(create(10L), create(10L), create(12L));
-
+    validateCompareTo(create(-10L), create(-10F), create(12F));
+    validateCompareTo(create(10L), create(10F), create(12F));
+    validateCompareTo(create(-10L), create(-10D), create(12D));
+    validateCompareTo(create(10L), create(10D), create(12D));
+    validateCompareTo(create(-10L), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10L), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // float
+    validateCompareTo(create(-10F), create((short)-10), create((short)12));
+    validateCompareTo(create(10F), create((short)10), create((short)12));
+    validateCompareTo(create(-10F), create(-10), create(12));
+    validateCompareTo(create(10F), create(10), create(12));
+    validateCompareTo(create(-10F), create(-10L), create(12L));
+    validateCompareTo(create(10F), create(10L), create(12L));
     validateCompareTo(create(-10F), create(-10F), create(12F));
     validateCompareTo(create(10F), create(10F), create(12F));
-
-    validateCompareTo(create(-10.), create(-10.), create(12.));
-    validateCompareTo(create(10.), create(10.), create(12.));
-
+    validateCompareTo(create(-10F), create(-10D), create(12D));
+    validateCompareTo(create(10F), create(10D), create(12D));
+    validateCompareTo(create(-10F), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10F), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // double
+    validateCompareTo(create(-10D), create((short)-10), create((short)12));
+    validateCompareTo(create(10D), create((short)10), create((short)12));
+    validateCompareTo(create(-10D), create(-10), create(12));
+    validateCompareTo(create(10D), create(10), create(12));
+    validateCompareTo(create(-10D), create(-10L), create(12L));
+    validateCompareTo(create(10D), create(10L), create(12L));
+    validateCompareTo(create(-10D), create(-10F), create(12F));
+    validateCompareTo(create(10D), create(10F), create(12F));
+    validateCompareTo(create(-10D), create(-10D), create(12D));
+    validateCompareTo(create(10D), create(10D), create(12D));
+    validateCompareTo(create(-10D), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(10D), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // string
     validateCompareTo(create("10"), create("10"), create("12"));
-
-    validateCompareTo(create(new BigDecimal(-10)),
-      create(new BigDecimal(-10)),
-      create(new BigDecimal(11)));
-    validateCompareTo(create(new BigDecimal(10)),
-      create(new BigDecimal(10)),
-      create(new BigDecimal(11)));
-
+    // BigDecimal
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create((short)-10), create((short)12));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create((short)10), create((short)12));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10), create(12));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10), create(12));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10L), create(12L));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10L), create(12L));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10F), create(12F));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10F), create(12F));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10D), create(12D));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(10D), create(12D));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    // GradoopId
     validateCompareTo(
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
       create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
       create(GradoopId.fromString("583ff8ffbd7d222690a9099a"))
     );
+    // Date
+    validateCompareTo(
+      create(DATE_VAL_b),
+      create(DATE_VAL_b),
+      create(DATE_VAL_b.plusDays(1L))
+    );
+    // Time
+    validateCompareTo(
+      create(TIME_VAL_c),
+      create(TIME_VAL_c),
+      create(TIME_VAL_c.plusSeconds(1L))
+    );
+    // DateTime
+    validateCompareTo(
+      create(DATETIME_VAL_d),
+      create(DATETIME_VAL_d),
+      create(DATETIME_VAL_d.plusNanos(1L))
+    );
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testCompareToWithIncompatibleTypes() {
-    create(10).compareTo(create(10L));
+    create(10).compareTo(create("10"));
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -774,12 +1015,17 @@ public class PropertyValueTest {
     create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCompareToWithSet() {
+    create(SET_VAL_f).compareTo(create(SET_VAL_f));
+  }
+
   @Test
   public void testArrayValueMaxSize() {
     PropertyValue property = new PropertyValue();
     property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]);
   }
-  
+
   @Test
   public void testLargeArrayValue() {
     PropertyValue property = new PropertyValue();
@@ -790,12 +1036,12 @@ public class PropertyValueTest {
   public void testStringValueMaxSize() {
     create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]));
   }
-  
+
   @Test
   public void testLargeString() {
     create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 10]));
   }
-  
+
   @Test
   public void testListValueMaxSize() {
     int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9;
@@ -805,7 +1051,7 @@ public class PropertyValueTest {
     }
     create(list);
   }
-  
+
   @Test
   public void testLargeListValue() {
     // 8 bytes per double + 1 byte overhead
@@ -816,7 +1062,7 @@ public class PropertyValueTest {
     }
     create(list);
   }
-  
+
   @Test
   public void testMapValueMaxSize() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
@@ -827,7 +1073,7 @@ public class PropertyValueTest {
     }
     create(m);
   }
-  
+
   @Test
   public void testLargeMapValue() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
@@ -838,7 +1084,29 @@ public class PropertyValueTest {
     }
     create(m);
   }
-  
+
+  @Test
+  public void testSetValueMaxSize() {
+    Set<PropertyValue> s = new HashSet<>();
+    // 8 bytes per double + 1 byte overhead
+    for (int i = 0; i < PropertyValue.LARGE_PROPERTY_THRESHOLD / 9; i++) {
+      PropertyValue p = create(Math.random());
+      s.add(p);
+    }
+    create(s);
+  }
+
+  @Test
+  public void testLargeSetValue() {
+    Set<PropertyValue> s = new HashSet<>();
+    // 8 bytes per double + 1 byte overhead
+    for (int i = 0; i < PropertyValue.LARGE_PROPERTY_THRESHOLD / 9 + 1; i++) {
+      PropertyValue p = create(Math.random());
+      s.add(p);
+    }
+    create(s);
+  }
+
   @Test
   public void testBigDecimalValueMaxSize() {
     // internal representation of BigInteger needs 5 bytes
@@ -846,20 +1114,23 @@ public class PropertyValueTest {
     Arrays.fill(bigendian, (byte) 121);
     create(new BigDecimal(new BigInteger(bigendian)));
   }
-  
+
   @Test
   public void testLargeBigDecimal() {
     byte [] bigendian = new byte[Short.MAX_VALUE + 10];
     Arrays.fill(bigendian, (byte) 121);
     create(new BigDecimal(new BigInteger(bigendian)));
   }
-  
+
   @Test
   public void testWriteAndReadFields() throws IOException {
     PropertyValue p = create(NULL_VAL_0);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(BOOL_VAL_1);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(SHORT_VAL_e);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
 
     p = create(INT_VAL_2);
@@ -897,6 +1168,9 @@ public class PropertyValueTest {
 
     p = create(DATETIME_VAL_d);
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+
+    p = create(SET_VAL_f);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
 
   @Test
@@ -906,6 +1180,9 @@ public class PropertyValueTest {
 
     p = create(BOOL_VAL_1);
     assertEquals(Boolean.class, p.getType());
+
+    p = create(SHORT_VAL_e);
+    assertEquals(Short.class, p.getType());
 
     p = create(INT_VAL_2);
     assertEquals(Integer.class, p.getType());
@@ -942,6 +1219,9 @@ public class PropertyValueTest {
 
     p = create(DATETIME_VAL_d);
     assertEquals(LocalDateTime.class, p.getType());
+
+    p = create(SET_VAL_f);
+    assertEquals(Set.class, p.getType());
   }
 
   /**

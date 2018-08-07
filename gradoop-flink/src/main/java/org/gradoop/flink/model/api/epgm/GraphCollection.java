@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -460,5 +461,14 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
+  }
+
+  /**
+   * Prints this graph collection to the console.
+   *
+   * @throws Exception forwarded DataSet print() Exception.
+   */
+  public void print() throws Exception {
+    GDLConsoleOutput.print(this);
   }
 }

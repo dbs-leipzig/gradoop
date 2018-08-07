@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,10 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
    */
   public static final String OPTION_INPUT_PATH = "i";
   /**
+   * Option to declare input graph format (csv, indexed, json)
+   */
+  public static final String OPTION_INPUT_FORMAT = "f";
+  /**
    * Option to declare path to output graph
    */
   public static final String OPTION_OUTPUT_PATH = "o";
@@ -56,6 +60,8 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
       "Path to vertex file");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "input-format", true,
+      "Format of the input [csv, indexed, json]. Default: " + DEFAULT_FORMAT);
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
     OPTIONS.addOption(OPTION_VERTEX_GROUPING_KEY, "vertex-grouping-key", true,
@@ -72,7 +78,7 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
    * Main program to run the example. Arguments are the available options.
    *
    * @param args program arguments
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -86,6 +92,9 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     final String inputPath = cmd.getOptionValue(OPTION_INPUT_PATH);
     final String outputPath = cmd.getOptionValue(OPTION_OUTPUT_PATH);
 
+    final String inputFormat = cmd.hasOption(OPTION_INPUT_FORMAT) ?
+      cmd.getOptionValue(OPTION_INPUT_FORMAT) : DEFAULT_FORMAT;
+
     boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
     String vertexKey =
       useVertexKey ? cmd.getOptionValue(OPTION_VERTEX_GROUPING_KEY) : null;
@@ -96,7 +105,7 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     boolean useEdgeLabels = cmd.hasOption(OPTION_USE_EDGE_LABELS);
 
     // initialize EPGM database
-    LogicalGraph graphDatabase = readLogicalGraph(inputPath);
+    LogicalGraph graphDatabase = readLogicalGraph(inputPath, inputFormat);
 
     // initialize grouping method
     Grouping grouping = getOperator(

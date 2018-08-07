@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,7 @@
 package org.gradoop.examples.patternmatching;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -33,7 +32,7 @@ public class CypherExample {
   /**
    * Path to the data graph.
    */
-  static final String DATA_PATH = CypherExample.class.getResource("/data/json/sna").getFile();
+  static final String DATA_PATH = CypherExample.class.getResource("/data/csv/sna").getFile();
   /**
    * Path to the data graph statistics (computed using {@link org.gradoop.utils.statistics.StatisticsRunner}
    */
@@ -52,16 +51,16 @@ public class CypherExample {
     // create a Gradoop config
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
     // create a datasource
-    DataSource jsonDataSource = new JSONDataSource(DATA_PATH, config);
+    CSVDataSource csvDataSource = new CSVDataSource(DATA_PATH, config);
     // load graph statistics
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(STATISTICS_PATH);
 
     // load graph from datasource (lazy)
-    LogicalGraph socialNetwork = jsonDataSource.getLogicalGraph();
+    LogicalGraph socialNetwork = csvDataSource.getLogicalGraph();
 
     // run a Cypher query (vertex homomorphism, edge isomorphism)
     // the result is a graph collection containing all matching subgraphs
-    GraphCollection matches = socialNetwork.cypher(
+    GraphCollection matches = socialNetwork.query(
       "MATCH (u1:Person)<-[:hasModerator]-(f:Forum)" +
       "(u2:Person)<-[:hasMember]-(f)" +
       "WHERE u1.name = \"Alice\"", statistics);

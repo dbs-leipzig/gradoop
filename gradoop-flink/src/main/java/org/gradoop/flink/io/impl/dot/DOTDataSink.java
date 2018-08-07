@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,9 +71,9 @@ public class DOTDataSink implements DataSink {
   }
 
   @Override
-  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+  public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
     FileSystem.WriteMode writeMode =
-      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+      overwrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
     DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
     GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));

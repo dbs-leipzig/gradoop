@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.utils;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Checks if a given object of type {@link IN} is instance of a specific class
@@ -24,7 +24,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
  * @param <IN>  input type
  * @param <T>   class type to check
  */
-public class IsInstance<IN, T> implements FilterFunction<IN> {
+public class IsInstance<IN, T> implements CombinableFilter<IN> {
   /**
    * Class for isInstance check
    */

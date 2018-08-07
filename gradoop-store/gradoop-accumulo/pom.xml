@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gradoop-store</artifactId>
+        <groupId>org.gradoop</groupId>
+        <version>0.5.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gradoop-accumulo</artifactId>
+    <name>Gradoop Accumulo</name>
+    <description>Read/write graphs from/to Accumulo</description>
+
+    <properties>
+        <accumuloTestSuite>**/AccumuloTestSuite.class</accumuloTestSuite>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshot</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.0.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.gradoop</groupId>
+                        <artifactId>gradoop-checkstyle</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>gradoop/checkstyle.xml</configLocation>
+                    <headerLocation>gradoop/LICENSE.txt</headerLocation>
+                    <includeResources>false</includeResources>
+                    <includeTestResources>false</includeTestResources>
+                    <suppressionsLocation>
+                        gradoop/checkstyle-suppressions.xml
+                    </suppressionsLocation>
+                    <suppressionsFileExpression>
+                        checkstyle.suppressions.file
+                    </suppressionsFileExpression>
+                    <failsOnError>true</failsOnError>
+                    <consoleOutput>true</consoleOutput>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>${accumuloTestSuite}</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <!-- Creates an gradoop-accumulo-iterator.jar for tserver dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>gradoop-accumulo-iterator</finalName>
+                            <outputDirectory>target/iterator</outputDirectory>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.gradoop:gradoop-common</include>
+                                    <include>org.gradoop:gradoop-store-api</include>
+                                    <include>com.esotericsoftware.minlog:*</include>
+                                    <include>com.esotericsoftware.kryo:*</include>
+                                    <include>org.apache.flink:flink-core</include>
+                                    <include>org.apache.hbase:hbase-common</include>
+                                    <include>org.mongodb:bson</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Compile dependencies -->
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-store-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-core</artifactId>
+        </dependency>
+
+        <!-- Accumulo -->
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo-core</artifactId>
+        </dependency>
+
+        <!-- Kryo for object serialization -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo-shaded</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo-minicluster</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-common</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-flink</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Flink -->
+        <!-- needs to be added even though it is already a test dependency of gradoop-flink
+             Maven issue has been unresolved for 12(!) years
+             see https://issues.apache.org/jira/browse/MNG-1378 -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils_2.11</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Others -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

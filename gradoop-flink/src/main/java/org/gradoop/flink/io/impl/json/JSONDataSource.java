@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,11 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 /**
  * Creates an EPGM instance from JSON files. The exact format is documented in
  * {@link JSONToGraphHead}, {@link JSONToVertex}, {@link JSONToEdge}.
+ *
+ * @deprecated This class is deprecated. For example use
+ * {@link org.gradoop.flink.io.impl.csv.CSVDataSource}
  */
+@Deprecated
 public class JSONDataSource extends JSONBase implements DataSource {
 
   /**

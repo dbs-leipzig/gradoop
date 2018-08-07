@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
         "(bob)-[:possible_friend]->(dave)" +
       "]");
 
-    GraphCollection result = dbGraph.cypher(
+    GraphCollection result = dbGraph.query(
       "MATCH (a:Person)-[e0:knows]->(b:Person)-[e1:knows]->(c:Person) " +
         "WHERE a.city = 'Leipzig' AND a <> c",
       "(b)<-[e0]-(a)-[e_new:possible_friend]->(c)<-[e1]-(b)");
@@ -62,7 +62,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
         "(bob)-[:possible_friend]->(dave)" +
       "]");
 
-    GraphCollection result = dbGraph.cypher(
+    GraphCollection result = dbGraph.query(
       "MATCH (a:Person)-[:knows]->(b:Person)-[:knows]->(c:Person) " +
         "WHERE a.city = 'Leipzig' AND a <> c",
       "(a)-[e_new:possible_friend]->(c)");
@@ -86,7 +86,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
             "(bob)-[:possible_friend]->(:possible_person)-[:possible_friend]->(dave)" +
             "]");
 
-    GraphCollection result = dbGraph.cypher(
+    GraphCollection result = dbGraph.query(
             "MATCH (a:Person)-[:knows]->(b:Person)-[:knows]->(c:Person) " +
                     "WHERE a.city = 'Leipzig' AND a <> c",
             "(a)-[e_new:possible_friend]->(v_new:possible_person)-[e_new2:possible_friend]->(c)");

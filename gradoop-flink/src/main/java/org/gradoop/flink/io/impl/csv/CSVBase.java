@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,15 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
+import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -36,6 +45,14 @@ public abstract class CSVBase {
    * CSV file for vertices.
    */
   private static final String VERTEX_FILE = "vertices" + CSV_FILE_SUFFIX;
+  /**
+   * Path for indexed vertices
+   */
+  private static final String VERTEX_PATH = "vertices";
+  /**
+   * Path for indexed edges
+   */
+  private static final String EDGE_PATH = "edges";
   /**
    * CSV file for edges.
    */
@@ -70,6 +87,14 @@ public abstract class CSVBase {
     return csvRoot + VERTEX_FILE;
   }
 
+  protected String getVertexPath() {
+    return csvRoot + VERTEX_PATH;
+  }
+
+  protected String getEdgePath() {
+    return csvRoot + EDGE_PATH;
+  }
+
   /**
    * Returns the path to the vertex file containing only vertices with the specified label.
    *
@@ -78,7 +103,12 @@ public abstract class CSVBase {
    */
   protected String getVertexCSVPath(String label) {
     Objects.requireNonNull(label);
-    return csvRoot + label + CSV_FILE_SUFFIX;
+    return csvRoot +
+      VERTEX_PATH +
+      CSVConstants.DIRECTORY_SEPARATOR +
+      label +
+      CSVConstants.DIRECTORY_SEPARATOR +
+      CSVConstants.SIMPLE_FILE;
   }
 
   protected String getEdgeCSVPath() {
@@ -93,7 +123,12 @@ public abstract class CSVBase {
    */
   protected String getEdgeCSVPath(String label) {
     Objects.requireNonNull(label);
-    return csvRoot + label + CSV_FILE_SUFFIX;
+    return csvRoot +
+      EDGE_PATH +
+      CSVConstants.DIRECTORY_SEPARATOR +
+      label +
+      CSVConstants.DIRECTORY_SEPARATOR +
+      CSVConstants.SIMPLE_FILE;
   }
 
   protected String getMetaDataPath() {
@@ -102,5 +137,39 @@ public abstract class CSVBase {
 
   protected GradoopFlinkConfig getConfig() {
     return config;
+  }
+
+  /**
+   * Creates the meta data for the given graph.
+   *
+   * @param graph logical graph
+   * @return meta data information
+   */
+  protected DataSet<Tuple3<String, String, String>> createMetaData(LogicalGraph graph) {
+    return createMetaData(graph.getVertices())
+      .union(createMetaData(graph.getEdges()));
+  }
+
+  /**
+   * Creates the meta data for the specified data set of EPGM elements.
+   *
+   * @param elements EPGM elements
+   * @param <E> EPGM element type
+   * @return meta data information
+   */
+  protected <E extends Element> DataSet<Tuple3<String, String, String>> createMetaData(
+    DataSet<E> elements) {
+    return elements
+      .map(new ElementToPropertyMetaData<>())
+      .groupBy(1)
+      .combineGroup(new ReducePropertyMetaData())
+      .groupBy(1)
+      .reduceGroup(new ReducePropertyMetaData())
+      .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
+      .returns(new TupleTypeInfo<>(
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO))
+      .withForwardedFields("f0", "f1");
   }
 }

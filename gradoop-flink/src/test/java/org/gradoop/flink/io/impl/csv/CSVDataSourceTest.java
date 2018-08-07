@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,7 +57,6 @@ public class CSVDataSourceTest extends CSVTestBase {
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
     LogicalGraph sourceLogicalGraph = dataSource.getLogicalGraph();
 
-    collectAndAssertTrue(sourceLogicalGraph.equalsByElementData(expected));
     collectAndAssertTrue(sourceLogicalGraph.equalsByData(expected));
 
     dataSource.getLogicalGraph().getEdges().collect()

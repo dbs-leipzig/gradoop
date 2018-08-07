@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.storage.exceptions.UnsupportedTypeException;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.util.GradoopConstants;
 
 import java.io.ByteArrayInputStream;
@@ -36,12 +36,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents a single property value in the EPGM.
@@ -111,6 +113,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * {@code <property-type>} for {@link LocalDateTime}
    */
   public static final transient byte TYPE_DATETIME     = 0x0d;
+  /**
+   * {@code <property-type>} for {@link java.lang.Short}
+   */
+  public static final transient byte TYPE_SHORT        = 0x0e;
+  /**
+   * {@code <property-type>} for {@link java.util.Set}
+   */
+  public static final transient byte TYPE_SET          = 0x0f;
 
   /**
    * Value offset in byte
@@ -209,6 +219,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return rawBytes[0] == TYPE_BOOLEAN;
   }
   /**
+   * True, if the wrapped value is of type {@code short}.
+   *
+   * @return true, if {@code short} value
+   */
+  public boolean isShort() {
+    return rawBytes[0] == TYPE_SHORT;
+  }
+  /**
    * True, if the wrapped value is of type {@code int}.
    *
    * @return true, if {@code int} value
@@ -305,6 +323,23 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isDateTime() {
     return rawBytes[0] == TYPE_DATETIME;
   }
+  /**
+   * True, if the wrapped value is of type {@code Set}.
+   *
+   * @return true, if {@code Set} value
+   */
+  public boolean isSet() {
+    return rawBytes[0] == TYPE_SET;
+  }
+
+  /**
+   * True, if the wrapped value is a subtype of {@code Number}.
+   *
+   * @return true, if {@code Number} value
+   */
+  public boolean isNumber() {
+    return !isNull() && Number.class.isAssignableFrom(getType());
+  }
 
   //----------------------------------------------------------------------------
   // Getter
@@ -317,19 +352,21 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public Object getObject() {
     return isBoolean() ? getBoolean() :
-      isInt() ? getInt() :
-        isLong() ? getLong() :
-          isFloat() ? getFloat() :
-            isDouble() ? getDouble() :
-              isString() ? getString() :
-                isBigDecimal() ? getBigDecimal() :
-                  isGradoopId() ? getGradoopId() :
-                    isMap() ? getMap() :
-                      isList() ? getList() :
-                        isDate() ? getDate() :
-                          isTime() ? getTime() :
-                            isDateTime() ? getDateTime() :
-                              null;
+      isShort() ? getShort() :
+        isInt() ? getInt() :
+          isLong() ? getLong() :
+            isFloat() ? getFloat() :
+              isDouble() ? getDouble() :
+                isString() ? getString() :
+                  isBigDecimal() ? getBigDecimal() :
+                    isGradoopId() ? getGradoopId() :
+                      isMap() ? getMap() :
+                        isList() ? getList() :
+                          isDate() ? getDate() :
+                            isTime() ? getTime() :
+                              isDateTime() ? getDateTime() :
+                                isSet() ? getSet() :
+                                  null;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -338,6 +375,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public boolean getBoolean() {
     return rawBytes[1] == -1;
+  }
+
+  /**
+   * Returns the wrapped value as {@code short}.
+   *
+   * @return {@code short} value
+   */
+  public short getShort() {
+    return Bytes.toShort(rawBytes, OFFSET);
   }
   /**
    * Returns the wrapped value as {@code int}.
@@ -391,16 +437,17 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (isBigDecimal()) {
       decimal = Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
     } else if (isFloat()) {
-      decimal = BigDecimal.valueOf(Bytes.toFloat(rawBytes, OFFSET));
-    } else if (isDouble())  {
-      decimal = BigDecimal.valueOf(Bytes.toDouble(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getFloat());
+    } else if (isDouble()) {
+      decimal = BigDecimal.valueOf(getDouble());
+    } else if (isShort()) {
+      decimal = BigDecimal.valueOf(getShort());
     } else if (isInt()) {
-      decimal = BigDecimal.valueOf(Bytes.toInt(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getInt());
     } else if (isLong()) {
-      decimal = BigDecimal.valueOf(Bytes.toLong(rawBytes, OFFSET));
+      decimal = BigDecimal.valueOf(getLong());
     } else if (isString()) {
-      decimal = new BigDecimal(
-        Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET));
+      decimal = new BigDecimal(getString());
     } else {
       throw new ClassCastException(
         "Cannot covert " + this.getType().getSimpleName() +
@@ -510,6 +557,36 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return DateTimeSerializer.deserializeDateTime(
       Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));
   }
+  /**
+   * Returns the wrapped Set as {@code Set<PropertyValue>}.
+   *
+   * @return {@code Set<PropertyValue>} value
+   */
+  public Set<PropertyValue> getSet() {
+    PropertyValue entry;
+
+    Set<PropertyValue> set = new HashSet<>();
+
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
+    DataInputStream inputStream = new DataInputStream(byteStream);
+    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+
+    try {
+      if (inputStream.skipBytes(OFFSET) != OFFSET) {
+        throw new RuntimeException("Malformed entry in PropertyValue Set");
+      }
+      while (inputStream.available() > 0) {
+        entry = new PropertyValue();
+        entry.read(inputView);
+
+        set.add(entry);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading PropertyValue");
+    }
+
+    return set;
+  }
 
   //----------------------------------------------------------------------------
   // Setter
@@ -519,13 +596,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Sets the given value as internal value if it has a supported type.
    *
    * @param value value
-   * @throws UnsupportedTypeException
+   * @throws UnsupportedTypeException if the type of the Object is not supported
    */
   public void setObject(Object value) {
     if (value == null) {
       rawBytes = new byte[] {TYPE_NULL};
     } else if (value instanceof Boolean) {
       setBoolean((Boolean) value);
+    } else if (value instanceof Short) {
+      setShort((Short) value);
     } else if (value instanceof Integer) {
       setInt((Integer) value);
     } else if (value instanceof Long) {
@@ -550,6 +629,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       setTime((LocalTime) value);
     } else if (value instanceof LocalDateTime) {
       setDateTime((LocalDateTime) value);
+    } else if (value instanceof Set) {
+      setSet((Set) value);
     } else {
       throw new UnsupportedTypeException(value.getClass());
     }
@@ -563,6 +644,17 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     rawBytes = new byte[OFFSET + Bytes.SIZEOF_BOOLEAN];
     rawBytes[0] = TYPE_BOOLEAN;
     Bytes.putByte(rawBytes, OFFSET, (byte) (booleanValue ? -1 : 0));
+  }
+
+  /**
+   * Sets the wrapped value as {@code short} value.
+   *
+   * @param shortValue value
+   */
+  public void setShort(short shortValue) {
+    rawBytes = new byte[OFFSET + Bytes.SIZEOF_SHORT];
+    rawBytes[0] = TYPE_SHORT;
+    Bytes.putShort(rawBytes, OFFSET, shortValue);
   }
   /**
    * Sets the wrapped value as {@code int} value.
@@ -725,6 +817,30 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
   }
 
+  /**
+   * Sets the wrapped value as {@code Set} value.
+   *
+   * @param set value
+   */
+  public void setSet(Set<PropertyValue> set) {
+    int size = set.stream().mapToInt(PropertyValue::byteSize).sum() + OFFSET;
+
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+    DataOutputStream outputStream = new DataOutputStream(byteStream);
+    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+
+    try {
+      outputStream.write(TYPE_SET);
+      for (PropertyValue entry : set) {
+        entry.write(outputView);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error writing PropertyValue");
+    }
+
+    this.rawBytes = byteStream.toByteArray();
+  }
+
   //----------------------------------------------------------------------------
   // Util
   //----------------------------------------------------------------------------
@@ -746,6 +862,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   private static Map<Byte, Class> getTypeMap() {
     Map<Byte, Class> map = new HashMap<>();
     map.put(TYPE_BOOLEAN, Boolean.class);
+    map.put(TYPE_SHORT, Short.class);
     map.put(TYPE_INTEGER, Integer.class);
     map.put(TYPE_LONG, Long.class);
     map.put(TYPE_FLOAT, Float.class);
@@ -758,6 +875,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     map.put(TYPE_DATE, LocalDate.class);
     map.put(TYPE_TIME, LocalTime.class);
     map.put(TYPE_DATETIME, LocalDateTime.class);
+    map.put(TYPE_SET, Set.class);
     return Collections.unmodifiableMap(map);
   }
 
@@ -811,23 +929,23 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
     if (this.isNull() && o.isNull()) {
       result = 0;
+    } else if (this.isNumber() && o.isNumber()) {
+      result = PropertyValueUtils.Numeric.compare(this, o);
     } else if (this.isBoolean() && o.isBoolean()) {
       result = Boolean.compare(this.getBoolean(), o.getBoolean());
-    } else if (this.isInt() && o.isInt()) {
-      result = Integer.compare(this.getInt(), o.getInt());
-    } else if (this.isLong() && o.isLong()) {
-      result = Long.compare(this.getLong(), o.getLong());
-    } else if (this.isFloat() && o.isFloat()) {
-      result = Float.compare(this.getFloat(), o.getFloat());
-    } else if (this.isDouble() && o.isDouble()) {
-      result = Double.compare(this.getDouble(), o.getDouble());
     } else if (this.isString() && o.isString()) {
       result = this.getString().compareTo(o.getString());
-    } else if (this.isBigDecimal() && o.isBigDecimal()) {
-      result = this.getBigDecimal().compareTo(o.getBigDecimal());
     } else if (this.isGradoopId() && o.isGradoopId()) {
       result = this.getGradoopId().compareTo(o.getGradoopId());
-    } else if (this.isMap() || o.isMap() || this.isList() || o.isList()) {
+    } else if (this.isDate() && o.isDate()) {
+      result = this.getDate().compareTo(o.getDate());
+    } else if (this.isTime() && o.isTime()) {
+      result = this.getTime().compareTo(o.getTime());
+    } else if (this.isDateTime() && o.isDateTime()) {
+      result = this.getDateTime().compareTo(o.getDateTime());
+    } else if (this.isMap() || o.isMap() ||
+        this.isList() || o.isList() ||
+        this.isSet() || o.isSet()) {
       throw new UnsupportedOperationException(String.format(
         "Method compareTo() is not supported for %s, %s", this.getClass(), o.getClass()));
     } else {
@@ -882,7 +1000,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
     outputView.writeByte(type);
     // Write length for types with a variable length.
-    if (isString() || isBigDecimal() || isMap() || isList()) {
+    if (isString() || isBigDecimal() || isMap() || isList() || isSet()) {
       // Write length as an int if the "large" flag is set.
       if ((type & FLAG_LARGE) == FLAG_LARGE) {
         outputView.writeInt(rawBytes.length - OFFSET);
@@ -902,7 +1020,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     // Apply bitmask to get the actual type.
     byte type = (byte) (~FLAG_LARGE & typeByte);
     // dynamic type?
-    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP || type == TYPE_LIST) {
+    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP ||
+      type == TYPE_LIST || type == TYPE_SET) {
       // read length
       if ((typeByte & FLAG_LARGE) == FLAG_LARGE) {
         length = inputView.readInt();
@@ -913,6 +1032,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       length = 0;
     } else if (type == TYPE_BOOLEAN) {
       length = Bytes.SIZEOF_BOOLEAN;
+    } else if (type == TYPE_SHORT) {
+      length = Bytes.SIZEOF_SHORT;
     } else if (type == TYPE_INTEGER) {
       length = Bytes.SIZEOF_INT;
     } else if (type == TYPE_LONG) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,12 @@ import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.hits.functions.HITSToAttributes;
+import org.gradoop.flink.algorithms.gelly.hits.functions.HitsResultKeySelector;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * A gradoop operator wrapping {@link org.apache.flink.graph.library.link_analysis.HITS}
+ * A gradoop operator wrapping {@link org.apache.flink.graph.library.linkanalysis.HITS}
  * <p>
  * This algorithm can be configured to terminate either by a limit on the number of iterations, a
  * convergence threshold, or both.
@@ -50,7 +51,7 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
   /**
    * Gelly HITS implementation
    */
-  private org.apache.flink.graph.library.link_analysis.HITS<GradoopId, NullValue, NullValue> hits;
+  private org.apache.flink.graph.library.linkanalysis.HITS<GradoopId, NullValue, NullValue> hits;
 
   /**
    * HITS with fixed number of iterations
@@ -63,7 +64,7 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
     super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
     this.authorityPropertyKey = authorityPropertyKey;
     this.hubPropertyKey = hubPropertyKey;
-    hits = new org.apache.flink.graph.library.link_analysis.HITS<>(iterations, Double.MAX_VALUE);
+    hits = new org.apache.flink.graph.library.linkanalysis.HITS<>(iterations, Double.MAX_VALUE);
   }
 
 
@@ -78,7 +79,7 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
     super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
     this.authorityPropertyKey = authorityPropertyKey;
     this.hubPropertyKey = hubPropertyKey;
-    hits = new org.apache.flink.graph.library.link_analysis.HITS<>(Integer.MAX_VALUE,
+    hits = new org.apache.flink.graph.library.linkanalysis.HITS<>(Integer.MAX_VALUE,
       convergenceThreshold);
   }
 
@@ -96,7 +97,7 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
     this.authorityPropertyKey = authorityPropertyKey;
     this.hubPropertyKey = hubPropertyKey;
     hits =
-      new org.apache.flink.graph.library.link_analysis.HITS<>(maxIterations, convergenceThreshold);
+      new org.apache.flink.graph.library.linkanalysis.HITS<>(maxIterations, convergenceThreshold);
   }
 
 
@@ -104,11 +105,10 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
   protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
 
-    DataSet<Vertex> newVertices =
-      hits.run(graph)
-        .join(currentGraph.getVertices())
-        .where(0).equalTo(new Id<>())
-        .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));
+    DataSet<Vertex> newVertices = hits.runInternal(graph)
+      .join(currentGraph.getVertices())
+      .where(new HitsResultKeySelector()).equalTo(new Id<>())
+      .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));
 
     return currentGraph.getConfig().getLogicalGraphFactory()
       .fromDataSets(newVertices, currentGraph.getEdges());
@@ -118,4 +118,5 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
   public String getName() {
     return HITS.class.getName();
   }
+
 }

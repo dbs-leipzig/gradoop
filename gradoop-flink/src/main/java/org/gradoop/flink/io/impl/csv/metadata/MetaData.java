@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.csv.metadata;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -28,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,16 +40,16 @@ import java.util.stream.Collectors;
  */
 public class MetaData {
   /**
-   * Mapping between an element label and its associated property meta data.
+   * Mapping between an entity tuple(type, label) to their associated property meta data.
    */
-  private Map<String, List<PropertyMetaData>> metaData;
+  private Map<Tuple2<String, String>, List<PropertyMetaData>> metaData;
 
   /**
    * Constructor
    *
-   * @param metaData meta data
+   * @param metaData contains entity tuple(type, label) and its property strings
    */
-  MetaData(Map<String, List<PropertyMetaData>> metaData) {
+  MetaData(Map<Tuple2<String, String>, List<PropertyMetaData>> metaData) {
     this.metaData = metaData;
   }
 
@@ -59,14 +61,15 @@ public class MetaData {
    * @param config gradoop configuration
    * @return (label, metadata) tuple dataset
    */
-  public static DataSet<Tuple2<String, String>> fromFile(String path, GradoopFlinkConfig config) {
+  public static DataSet<Tuple3<String, String, String>> fromFile(String path, GradoopFlinkConfig
+    config) {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 2);
-          return Tuple2.of(tokens[0], tokens[1]);
+          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);
+          return Tuple3.of(tokens[0], tokens[1], tokens[2]);
         })
-      .returns(new TypeHint<Tuple2<String, String>>() { });
+      .returns(new TypeHint<Tuple3<String, String, String>>() { });
   }
 
   /**
@@ -85,8 +88,8 @@ public class MetaData {
 
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {
       return MetaDataParser.create(br.lines()
-        .map(line -> line.split(CSVConstants.TOKEN_DELIMITER, 2))
-        .map(tokens -> Tuple2.of(tokens[0], tokens[1]))
+        .map(line -> line.split(CSVConstants.TOKEN_DELIMITER, 3))
+        .map(tokens -> Tuple3.of(tokens[0], tokens[1], tokens[2]))
         .collect(Collectors.toList()));
     }
   }
@@ -98,7 +101,8 @@ public class MetaData {
    */
   public Set<String> getVertexLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isUpperCase(l.charAt(0)))
+      .filter(key -> key.f0.equals(CSVConstants.VERTEX_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
@@ -109,17 +113,19 @@ public class MetaData {
    */
   public Set<String> getEdgeLabels() {
     return metaData.keySet().stream()
-      .filter(l -> Character.isLowerCase(l.charAt(0)))
+      .filter(key -> key.f0.equals(CSVConstants.EDGE_TYPE))
+      .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
 
   /**
-   * Returns the property meta data associated with the specified label.
+   * Returns the property meta data associated with the specified label and type.
    *
+   * @param type element type
    * @param label element label
    * @return property meta data for the element
    */
-  public List<PropertyMetaData> getPropertyMetaData(String label) {
-    return metaData.get(label);
+  public List<PropertyMetaData> getPropertyMetaData(String type, String label) {
+    return metaData.getOrDefault(new Tuple2<>(type, label), new ArrayList<>());
   }
 }

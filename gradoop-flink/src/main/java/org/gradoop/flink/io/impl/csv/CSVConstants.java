@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,4 +31,20 @@ public class CSVConstants {
    * Used to separate lines in the output CSV files.
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
+  /**
+   * Used to specify entity type (vertex or edge)
+   */
+  public static final String VERTEX_TYPE = "v";
+  /**
+   * Used to specify entity type (vertex or edge)
+   */
+  public static final String EDGE_TYPE = "e";
+  /**
+   * System constant file separator
+   */
+  public static final String DIRECTORY_SEPARATOR = System.getProperty("file.separator");
+  /**
+   * File name for indexed data
+   */
+  public static final String SIMPLE_FILE = "data.csv";
 }

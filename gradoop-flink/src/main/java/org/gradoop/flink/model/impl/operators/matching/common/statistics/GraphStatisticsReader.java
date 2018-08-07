@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,6 +54,35 @@ public abstract class GraphStatisticsReader {
    * EOF
    */
   public static final String FILE_VERTEX_COUNT_BY_LABEL = "vertex_count_by_label";
+  /**
+   * Each line contains a vertex and its degree, e.g.
+   *
+   * BOF
+   * v1,6
+   * v2,12
+   * EOF
+   */
+  public static final String FILE_VERTEX_DEGREE_DISTRIBUTION = "vertex_degree_distribution";
+  /**
+   * Each line contains a vertex and its in-degree, e.g.
+   *
+   * BOF
+   * v1,3
+   * v2,4
+   * EOF
+   */
+  public static final String INCOMING_VERTEX_DEGREE_DISTRIBUTION =
+    "incoming_vertex_degree_distribution";
+  /**
+   * Each line contains a vertex and its out-degree, e.g.
+   *
+   * BOF
+   * v1,3
+   * v2,8
+   * EOF
+   */
+  public static final String OUTGOING_VERTEX_DEGREE_DISTRIBUTION =
+    "outgoing_vertex_degree_distribution";
   /**
    * Each line contains the label and its count, e.g.
    *
