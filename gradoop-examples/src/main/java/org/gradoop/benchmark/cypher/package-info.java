@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains benchmark classes (social analytics)
- */
-/**
  * Contains benchmark classes (cypher)
  */
 package org.gradoop.benchmark.cypher;

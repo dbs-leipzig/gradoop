@@ -48,7 +48,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static final String OPTION_STATISTICS_PATH = "s";
   /**
-   * Option to declare path to statistics csv file
+   * Option to declare output path to statistics csv file
    */
   private static final String OPTION_CSV_PATH = "c";
   /**
