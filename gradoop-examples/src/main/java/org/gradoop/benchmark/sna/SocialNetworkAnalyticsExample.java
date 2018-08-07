@@ -55,7 +55,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
-   * Option to declare path to statistics csv file
+   * Option to declare output path to statistics csv file
    */
   private static final String OPTION_CSV_PATH = "c";
   /**
