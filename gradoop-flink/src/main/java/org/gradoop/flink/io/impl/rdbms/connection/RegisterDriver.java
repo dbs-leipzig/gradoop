@@ -31,7 +31,7 @@ public class RegisterDriver {
 	 * Registers a jdbc driver 
 	 * @param config Valid RDBMS configuration
 	 */
-	public static void register(RDBMSConfig config) {
+	public static void register(RdbmsConfig config) {
 		
 		try {
 			URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");

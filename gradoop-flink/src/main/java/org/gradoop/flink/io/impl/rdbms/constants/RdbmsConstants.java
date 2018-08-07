@@ -3,7 +3,7 @@ package org.gradoop.flink.io.impl.rdbms.constants;
 /**
  * Stores constants for rdbms to graph conversation
  */
-public class RDBMSConstants {
+public class RdbmsConstants {
 	
 	/**
 	 * Vertex key identifier for primary keys

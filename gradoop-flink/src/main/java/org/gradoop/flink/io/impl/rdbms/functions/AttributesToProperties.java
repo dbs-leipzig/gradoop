@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
@@ -30,9 +30,7 @@ public class AttributesToProperties {
 	public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
 		Properties props = new Properties();
 		for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-			if (rht.getAttType().equals(RDBMSConstants.ATTRIBUTE_FIELD)) {
-				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
-			} else if (rht.getAttType().equals(RDBMSConstants.PK_FIELD)) {
+			if(!rht.getAttType().equals(RdbmsConstants.FK_FIELD)){
 				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
 			}
 		}

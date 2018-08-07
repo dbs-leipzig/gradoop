@@ -2,7 +2,6 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
 /**

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,13 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
-
-import com.sun.tools.javac.code.Attribute.Array;
 
 /**
  * Relational database schema.
@@ -49,7 +44,7 @@ public class MetaDataParser {
 	/**
 	 * Parsed relational database tables
 	 */
-	private ArrayList<RDBMSTableBase> tableBase;
+	private ArrayList<RdbmsTableBase> tableBase;
 
 	/**
 	 * Parses the schema of a relational database and provides base classes for
@@ -62,12 +57,12 @@ public class MetaDataParser {
 	public MetaDataParser(Connection con) throws SQLException {
 		this.con = con;
 		this.metadata = con.getMetaData();
-		this.tableBase = new ArrayList<RDBMSTableBase>();
+		this.tableBase = new ArrayList<RdbmsTableBase>();
 	}
 
 	/**
-	 * Parses the schema of a relational database to a relational database metadata
-	 * representation
+	 * Parses the schema of a relational database to a relational database
+	 * metadata representation
 	 * 
 	 * @throws SQLException
 	 */
@@ -76,8 +71,7 @@ public class MetaDataParser {
 		ArrayList<String> tables = new ArrayList<String>();
 
 		while (rsTables.next()) {
-			if (rsTables.getString("TABLE_TYPE").equals("TABLE")
-					&& !rsTables.getString("TABLE_NAME").contains("trace_")) {
+			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
 				tables.add(rsTables.getString("TABLE_NAME"));
 			}
 		}
@@ -139,6 +133,8 @@ public class MetaDataParser {
 			// parses further attributes if exists
 			// assigning attribute name and belonging data type
 			while (rsAttributes.next()) {
+
+				// catches unsupported data types
 				if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
@@ -153,23 +149,25 @@ public class MetaDataParser {
 			// number of rows (needed for distributed data querying via
 			// flink)
 			int rowCount = TableRowSize.getTableRowSize(con, table);
-			
-			tableBase.add(new RDBMSTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+
+			tableBase.add(new RdbmsTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
 		}
 
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to vertices
+	 * Creates metadata representations of tables, which will be convert to
+	 * vertices
 	 * 
-	 * @return ArrayList containing metadata representations of rdbms tables going
-	 *         to convert to vertices
+	 * @return ArrayList containing metadata representations of rdbms tables
+	 *         going to convert to vertices
 	 */
 	public ArrayList<TableToNode> getTablesToNodes() {
 		ArrayList<TableToNode> tablesToNodes = new ArrayList<TableToNode>();
 
-		for (RDBMSTableBase tables : tableBase) {
+		for (RdbmsTableBase tables : tableBase) {
 			if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
+				
 				tablesToNodes.add(new TableToNode(tables.getTableName(), tables.getPrimaryKeys(),
 						tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
 			}
@@ -178,33 +176,47 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to edges
+	 * Creates metadata representations of tables, which will be convert to
+	 * edges
 	 * 
-	 * @return ArrayList containing metadata representations of rdbms tables going
-	 *         to convert to edges
+	 * @return ArrayList containing metadata representations of rdbms tables
+	 *         going to convert to edges
 	 */
 	public ArrayList<TableToEdge> getTablesToEdges() {
 		ArrayList<TableToEdge> tablesToEdges = new ArrayList<TableToEdge>();
 
-		for (RDBMSTableBase table : tableBase) {
+		for (RdbmsTableBase table : tableBase) {
 			if (table.getForeignKeys() != null) {
+				String tableName = table.getTableName();
+
 				int rowCount = table.getRowCount();
 
 				// table tuples going to convert to edges
 				if (table.getForeignKeys().size() == 2 && table.getPrimaryKeys().size() == 2) {
-					tablesToEdges.add(new TableToEdge(table.getTableName(), table.getForeignKeys().get(0).f3,
-							table.getForeignKeys().get(1).f3,
-							new NameTypeTuple(table.getForeignKeys().get(0).f0, table.getForeignKeys().get(0).f1),
-							new NameTypeTuple(table.getForeignKeys().get(1).f0, table.getForeignKeys().get(1).f1), null,
-							table.getFurtherAttributes(), false, rowCount));
+
+					String refdTableNameOne = table.getForeignKeys().get(0).f3;
+					String refdTableNameTwo = table.getForeignKeys().get(1).f3;
+
+					NameTypeTuple fkAttOne = new NameTypeTuple(table.getForeignKeys().get(0).f0,
+							table.getForeignKeys().get(0).f1);
+					NameTypeTuple fkAttTwo = new NameTypeTuple(table.getForeignKeys().get(1).f0,
+							table.getForeignKeys().get(1).f1);
+
+					tablesToEdges.add(new TableToEdge(tableName, refdTableNameOne, refdTableNameTwo, fkAttOne, fkAttTwo,
+							null, table.getFurtherAttributes(), false, rowCount));
 				}
 
 				// foreign keys going to convert to edges
 				else {
 					for (FkTuple fk : table.getForeignKeys()) {
-						tablesToEdges
-								.add(new TableToEdge(null, table.getTableName(), fk.f3, new NameTypeTuple(fk.f0, fk.f1),
-										new NameTypeTuple(fk.f2, null), table.getPrimaryKeys(), null, true, rowCount));
+
+						String refdTableName = fk.getRefdTableName();
+
+						NameTypeTuple startAtt = new NameTypeTuple(fk.f0, fk.f1);
+						NameTypeTuple endAtt = new NameTypeTuple(fk.f2, null);
+
+						tablesToEdges.add(new TableToEdge(null, tableName, refdTableName, startAtt, endAtt,
+								table.getPrimaryKeys(), null, true, rowCount));
 					}
 				}
 			}

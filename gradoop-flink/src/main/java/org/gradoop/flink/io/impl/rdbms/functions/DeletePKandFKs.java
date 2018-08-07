@@ -5,7 +5,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 
 /**
  * Assigns new vertex properties, ignoring primary and foreign key attributes
@@ -29,7 +29,7 @@ public class DeletePKandFKs extends RichMapFunction<Vertex,Vertex> {
 	public Vertex map(Vertex v1) throws Exception {
 		Properties newProps = new Properties();
 		for(Property prop : v1.getProperties()){
-			if(!fkProps.contains(prop.getKey()) && !prop.getKey().equals(RDBMSConstants.PK_ID)){
+			if(!fkProps.contains(prop.getKey()) && !prop.getKey().equals(RdbmsConstants.PK_ID)){
 				newProps.set(prop);
 			}
 		}

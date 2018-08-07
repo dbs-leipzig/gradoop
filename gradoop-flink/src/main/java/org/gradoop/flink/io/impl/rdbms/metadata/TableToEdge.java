@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
@@ -109,15 +109,16 @@ public class TableToEdge {
 		TypeInformation<RowTypeInfo>[] fieldTypes = null;
 
 		if(!directionIndicator) {
-			int i = 2;
 			fieldTypes = new TypeInformation[furtherAttributes.size() + 2];
 			fieldTypes[0] = SQLToBasicTypeMapper.getBasicTypeInfo(startAttribute.f1,null);
-			rowheader.getRowHeader().add(new RowHeaderTuple(startAttribute.f0,RDBMSConstants.FK_FIELD,0));
+			rowheader.getRowHeader().add(new RowHeaderTuple(startAttribute.f0,RdbmsConstants.FK_FIELD,0));
 			fieldTypes[1] = SQLToBasicTypeMapper.getBasicTypeInfo(endAttribute.f1,null);
-			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0,RDBMSConstants.FK_FIELD,1));
+			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0,RdbmsConstants.FK_FIELD,1));
+			
+			int i = 2;
 			for (NameTypeTypeTuple att : furtherAttributes) {
 				fieldTypes[i] = SQLToBasicTypeMapper.getBasicTypeInfo(att.f1,att.f2);
-				rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RDBMSConstants.ATTRIBUTE_FIELD, i));
+				rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
 				i++;
 			}
 		}

@@ -3,10 +3,9 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 import java.util.ArrayList;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
@@ -82,17 +81,17 @@ public class TableToNode {
 		try {
 		for(NameTypeTuple pk : primaryKeys){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(pk.f1,null);
-			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RDBMSConstants.PK_FIELD,i));
+			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RdbmsConstants.PK_FIELD,i));
 			i++;
 		}
 		for(FkTuple fk : foreignKeys){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f1,null);
-			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RDBMSConstants.FK_FIELD,i));
+			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RdbmsConstants.FK_FIELD,i));
 			i++;
 		}
 		for(NameTypeTypeTuple att : furtherAttributes){
 			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(att.f1,att.f2);
-			rowheader.getRowHeader().add(new RowHeaderTuple(att.f0,RDBMSConstants.ATTRIBUTE_FIELD,i));
+			rowheader.getRowHeader().add(new RowHeaderTuple(att.f0,RdbmsConstants.ATTRIBUTE_FIELD,i));
 			i++;
 		}
 		}catch(Exception e) {

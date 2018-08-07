@@ -3,7 +3,7 @@ package org.gradoop.flink.io.impl.rdbms.connection;
 /**
  * Stores database management system parameters
  */
-public class RDBMSConfig {
+public class RdbmsConfig {
 	
 	/**
 	 * Valid jdbc url
@@ -38,7 +38,7 @@ public class RDBMSConfig {
 	 * @param jdbcDriverPath Valid path to a fitting jdbc driver jar
 	 * @param jdbcDriverClassName Valid and fitting jdbc driver class name
 	 */
-	public RDBMSConfig(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName) {
+	public RdbmsConfig(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName) {
 		this.url = url;
 		this.user = user;
 		this.pw = pw;

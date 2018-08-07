@@ -10,7 +10,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 
@@ -69,7 +69,7 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 		GradoopId id = GradoopId.get();
 		String label = tableName;
 		Properties props = AttributesToProperties.getProperties(tuple, rowheader);
-		props.set(RDBMSConstants.PK_ID,pkString);
+		props.set(RdbmsConstants.PK_ID,pkString);
 		
 		return vertexFactory.initVertex(id,label,props);
 	}

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,33 +15,24 @@
  */
 package org.gradoop.flink.io.impl.rdbms.connection;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import org.gradoop.flink.io.impl.rdbms.constants.RDBMSConstants;
 
 /**
  * Connection to relational datbase
  */
-public class RDBMSConnect {
+public class RdbmsConnect {
 	
 	/**
 	 * Establishes a connection to a relational database via jdbc.
 	 * 
 	 * @return Valid connection to a relational database
 	 */
-	public static Connection connect(RDBMSConfig config) {
+	public static Connection connect(RdbmsConfig config) {
 		Connection connection = null;
 		try {
-			new RegisterDriver().register(config);
+			RegisterDriver.register(config);
 			connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
 			System.out.println("Successfully connected to " + config.getUrl().replaceAll(".*/", ""));
 		} catch (SQLException e) {
