@@ -1,6 +1,10 @@
 org.gradoop.benchmark
+org.gradoop.benchmark.cypher
 org.gradoop.benchmark.grouping
 org.gradoop.benchmark.patternmatching
+org.gradoop.benchmark.sna
+org.gradoop.benchmark.sna.functions
+org.gradoop.benchmark.subgraph
 org.gradoop.common.config
 org.gradoop.common.exceptions
 org.gradoop.common.model.api.entities
