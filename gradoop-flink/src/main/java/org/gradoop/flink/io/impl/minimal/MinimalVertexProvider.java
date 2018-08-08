@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.api.VertexImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.io.impl.minimal.functions.CreateLabeledImportVertexProperties;
 import org.gradoop.flink.io.impl.minimal.functions.MapCSVLineToVertex;
@@ -30,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Import external vertices from csv files into EPGM.
  * It is possible import vertices from different csv files.
  */
-public class MinimalVertexProvider {
+public class MinimalVertexProvider implements VertexImporter<String> {
 
   /**
    * Token delimiter
@@ -65,6 +66,7 @@ public class MinimalVertexProvider {
    * Combine each vertices from different files into one DataSet.
    * @return DataSet of all vertices of the graph.
    */
+  @Override
   public DataSet<ImportVertex<String>> importVertex() {
 
     DataSet<ImportVertex<String>> vertices = null;

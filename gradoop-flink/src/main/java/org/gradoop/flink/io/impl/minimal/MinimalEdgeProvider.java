@@ -22,6 +22,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.api.EdgeImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.minimal.functions.CreateLabeledImportEdgeProperties;
 import org.gradoop.flink.io.impl.minimal.functions.MapCSVLineToEdge;
@@ -31,7 +32,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Import external edges from csv files into EPGM.
  * It is possible import edges from different csv files.
  */
-public class MinimalEdgeProvider {
+public class MinimalEdgeProvider implements EdgeImporter<String> {
 
   /**
    * Token separator of the file.
@@ -67,6 +68,7 @@ public class MinimalEdgeProvider {
    * Combine each edges from different files into one DataSet.
    * @return DataSet of all edges of the graph.
    */
+  @Override
   public DataSet<ImportEdge<String>> importEdge() {
 
     DataSet<ImportEdge<String>> edges = null;
