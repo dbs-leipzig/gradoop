@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.AddMaxDegreeCro
 import org.gradoop.flink.model.impl.operators.sampling.functions.NonUniformVertexRandomFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeMap;
+import static org.gradoop.flink.model.impl.operators.sampling.SamplingConstants.PROPERTY_KEY_MAX_DEGREE;
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
@@ -77,7 +78,6 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
     String degreePropertyName = VertexDegree.IN_OUT.getName();
     String inDegreePropertyName = VertexDegree.IN.getName();
     String outDegreePropertyName = VertexDegree.OUT.getName();
-    String maxDegree = "_maxDegree";
 
     graph = new DistinctVertexDegrees(
       degreePropertyName,
@@ -89,19 +89,19 @@ public class RandomNonUniformVertexSampling implements UnaryGraphToGraphOperator
       .map(new VertexToDegreeMap(degreePropertyName))
       .max(0)
       .cross(graph.getVertices())
-      .with(new AddMaxDegreeCrossFunction(maxDegree));
+      .with(new AddMaxDegreeCrossFunction(PROPERTY_KEY_MAX_DEGREE));
 
     graph = graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 
     newVertices = graph.getVertices().filter(new NonUniformVertexRandomFilter<>(
-        sampleSize, randomSeed, degreePropertyName, maxDegree));
+        sampleSize, randomSeed, degreePropertyName, PROPERTY_KEY_MAX_DEGREE));
 
     newVertices = newVertices
       .map(new PropertyRemover<>(degreePropertyName))
       .map(new PropertyRemover<>(inDegreePropertyName))
       .map(new PropertyRemover<>(outDegreePropertyName))
-      .map(new PropertyRemover<>(maxDegree));
+      .map(new PropertyRemover<>(PROPERTY_KEY_MAX_DEGREE));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)

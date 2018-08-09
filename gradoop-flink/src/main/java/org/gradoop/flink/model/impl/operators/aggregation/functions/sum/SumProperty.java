@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_PREFIX_SUM;
 
 /**
  * Superclass if aggregate functions that sum property values of vertices OR
@@ -39,6 +40,6 @@ public abstract class SumProperty extends Sum implements AggregateFunction {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "sum_" + propertyKey;
+    return PROPERTY_KEY_PREFIX_SUM + propertyKey;
   }
 }

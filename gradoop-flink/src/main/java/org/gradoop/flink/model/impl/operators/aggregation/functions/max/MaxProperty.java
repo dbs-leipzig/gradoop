@@ -15,6 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_PREFIX_MAX;
+
+
 /**
  * Superclass of aggregate functions that determine a maximal property value.
  */
@@ -35,6 +38,6 @@ public abstract class MaxProperty extends Max {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "max_" + propertyKey;
+    return PROPERTY_KEY_PREFIX_MAX + propertyKey;
   }
 }

@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.containment
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_PREFIX_HAS_EDGE_LABEL;
 
 /**
  * Aggregate and filter function to check presence of an edge label in a graph.
@@ -42,6 +43,6 @@ public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "hasEdgeLabel_" + label;
+    return PROPERTY_KEY_PREFIX_HAS_EDGE_LABEL + label;
   }
 }

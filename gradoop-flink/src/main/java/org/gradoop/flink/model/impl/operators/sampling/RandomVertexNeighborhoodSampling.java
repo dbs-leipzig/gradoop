@@ -32,6 +32,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVerte
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;
+import static org.gradoop.flink.model.impl.operators.sampling.SamplingConstants.PROPERTY_KEY_SAMPLED;
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
@@ -109,10 +110,8 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    String propertyNameForSampled = "sampled";
-
     DataSet<Tuple2<Vertex, GradoopId>> sampledVerticesWithId = graph.getVertices()
-            .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, propertyNameForSampled))
+            .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, PROPERTY_KEY_SAMPLED))
             .map(new VertexWithId());
 
     DataSet<Tuple3<Edge, GradoopId, GradoopId>> edgeSourceIdTargetId = graph.getEdges()
@@ -125,7 +124,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
             .join(sampledVerticesWithId)
             .where(2).equalTo(1)
             .with(new EdgeTargetVertexJoin())
-            .filter(new EdgesWithSampledVerticesFilter(propertyNameForSampled, neighborType))
+            .filter(new EdgesWithSampledVerticesFilter(PROPERTY_KEY_SAMPLED, neighborType))
             .map(new Value0Of3<>());
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), ds);

@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_PREFIX_MIN;
+
 /**
  * Superclass of aggregate functions that determine a minimal property value.
  */
@@ -35,6 +37,6 @@ public abstract class MinProperty extends Min {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "min_" + propertyKey;
+    return PROPERTY_KEY_PREFIX_MIN + propertyKey;
   }
 }

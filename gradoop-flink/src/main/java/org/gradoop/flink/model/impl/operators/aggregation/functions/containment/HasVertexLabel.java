@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.containment
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_PREFIX_HAS_VERTEX_LABEL;
 
 /**
  * Aggregate and filter function to check presence of a vertex label in a graph.
@@ -43,7 +44,7 @@ public class HasVertexLabel
 
   @Override
   public String getAggregatePropertyKey() {
-    return "hasVertexLabel_" + label;
+    return PROPERTY_KEY_PREFIX_HAS_VERTEX_LABEL + label;
   }
 
 }

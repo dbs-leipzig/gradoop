@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import static org.gradoop.flink.model.impl.operators.aggregation.AggregationConstants.PROPERTY_KEY_VERTEX_COUNT;
 
 /**
  * Aggregate function returning the vertex count of a graph / graph collection.
@@ -31,6 +32,6 @@ public class VertexCount extends Count implements VertexAggregateFunction {
 
   @Override
   public String getAggregatePropertyKey() {
-    return "vertexCount";
+    return PROPERTY_KEY_VERTEX_COUNT;
   }
 }
