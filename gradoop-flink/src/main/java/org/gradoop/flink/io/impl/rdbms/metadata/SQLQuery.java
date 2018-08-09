@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 
 /**
  * Provides valid sql strings for querying needed relational data
@@ -20,7 +19,7 @@ public class SQLQuery {
 	 * @return Valid sql string for querying needed data for tuple-to-vertex conversation
 	 */
 	public static String getNodeTableQuery(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys,
-			ArrayList<NameTypeTypeTuple> furtherAttributes) {
+			ArrayList<NameTypeTuple> furtherAttributes) {
 		
 		String sqlQuery = "SELECT ";
 		
@@ -32,7 +31,7 @@ public class SQLQuery {
 			sqlQuery += fk.f0 + ",";
 		}
 		
-		for (NameTypeTypeTuple att : furtherAttributes) {
+		for (NameTypeTuple att : furtherAttributes) {
 			sqlQuery += att.f0 + ",";
 		}
 		
@@ -48,11 +47,11 @@ public class SQLQuery {
 	 * @return Valid sql string for querying needed data for tuple-to-edge conversation
 	 */
 	public static String getNtoMEdgeTableQuery(String tableName, String startAttribute, String endAttribute,
-			ArrayList<NameTypeTypeTuple> furtherAttributes) {
+			ArrayList<NameTypeTuple> furtherAttributes) {
 		
 		String sqlQuery = "SELECT " + startAttribute + "," + endAttribute + ",";
 		
-		for (NameTypeTypeTuple att : furtherAttributes) {
+		for (NameTypeTuple att : furtherAttributes) {
 			sqlQuery += att.f0 + ",";
 		}
 		

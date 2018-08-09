@@ -31,6 +31,8 @@ import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -139,7 +141,24 @@ public class RdbmsDataSource implements DataSource {
 	
 	public void print(ArrayList<TableToNode> tablesToNodes, ArrayList<TableToEdge> tablesToEdges) {
 		System.out.println("TABLES TO NODES :" + tablesToNodes.size());
-		System.out.println("TABLES TO EDGES :" + tablesToEdges.size());
+		for(TableToNode table : tablesToNodes){
+			System.out.println(table.getTableName());
+			for(NameTypeTuple pk : table.getPrimaryKeys()){
+				System.out.println(pk.getName() + " " + pk.f1);
+			}
+			for(FkTuple fk : table.getForeignKeys()){
+				System.out.println(fk.f0 + " " + fk.f1 + " " + fk.f2 + " " + fk.f3);
+			}
+			for(NameTypeTuple att : table.getFurtherAttributes()){
+				System.out.println(att.f0 + " " + att.f1);
+			}
+		}
+		System.out.println("\nTABLES TO EDGES :" + tablesToEdges.size());
+		for(TableToEdge table : tablesToEdges){
+			System.out.println(table.getendTableName());
+			System.out.println(table.getstartTableName() + " " + table.getStartAttribute() + 
+					" " + table.getendTableName() + " " + table.getEndAttribute());
+		}
 		
 	}
 

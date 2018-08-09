@@ -43,11 +43,11 @@ public class CreateVertices {
 
 				if (vertices == null) {
 					vertices = dsSQLResult
-							.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), counter))
+							.map(new RowToVertices(table.getTableName(), counter))
 							.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes), "tables");
 				} else {
 					vertices = vertices.union(
-							dsSQLResult.map(new RowToVertices(config.getVertexFactory(), table.getTableName(), counter))
+							dsSQLResult.map(new RowToVertices(table.getTableName(), counter))
 									.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
 											"tables"));
 				}
@@ -55,6 +55,7 @@ public class CreateVertices {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
+			counter++;
 		}
 		return vertices;
 	}

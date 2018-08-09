@@ -25,11 +25,6 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 	private List<TableToNode> tables;
 	
 	/**
-	 * EPGM Vertex Factory
-	 */
-	private VertexFactory vertexFactory;
-	
-	/**
 	 * Current table
 	 */
 	private TableToNode currentTable;
@@ -54,8 +49,7 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 	 * 
 	 * @param tableName Name of current database table
 	 */
-	public RowToVertices(EPGMVertexFactory epgmVertexFactory, String tableName, int tablePos){
-		this.vertexFactory = (VertexFactory) epgmVertexFactory;
+	public RowToVertices(String tableName, int tablePos){
 		this.tableName = tableName;
 		this.tablePos = tablePos;
 	}
@@ -65,13 +59,14 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 		this.currentTable = tables.get(tablePos);
 		this.rowheader = currentTable.getRowheader();
 		
-		String pkString = PrimaryKeyConcatString.getPrimaryKeyString(tuple,rowheader);		
-		GradoopId id = GradoopId.get();
-		String label = tableName;
+		Vertex v = new Vertex();
+		v.setId(GradoopId.get());
+		v.setLabel(tableName);
 		Properties props = AttributesToProperties.getProperties(tuple, rowheader);
-		props.set(RdbmsConstants.PK_ID,pkString);
+		props.set(RdbmsConstants.PK_ID,PrimaryKeyConcatString.getPrimaryKeyString(tuple,rowheader));
+		v.setProperties(props);
 		
-		return vertexFactory.initVertex(id,label,props);
+		return v;
 	}
 
 	public void open(Configuration parameters) throws Exception {

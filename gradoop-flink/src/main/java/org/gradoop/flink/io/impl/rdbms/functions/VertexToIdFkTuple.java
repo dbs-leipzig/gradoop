@@ -2,6 +2,7 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
 /**
@@ -24,6 +25,12 @@ public class VertexToIdFkTuple implements MapFunction<Vertex,IdKeyTuple> {
 	
 	@Override
 	public IdKeyTuple map(Vertex v) throws Exception {
-		return new IdKeyTuple(v.getId(),v.getProperties().get(fkName).toString());
+		String key = "";
+		try{
+			key = v.getProperties().get(fkName).toString();
+		}catch(Exception e){
+			System.out.println("Foreign Key " + fkName + " not found.");
+		}
+		return new IdKeyTuple(v.getId(),key);
 	}
 }

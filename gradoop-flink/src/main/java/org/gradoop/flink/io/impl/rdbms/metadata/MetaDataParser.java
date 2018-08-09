@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 
 /**
  * Relational database schema.
@@ -78,13 +77,16 @@ public class MetaDataParser {
 		}
 
 		for (String table : tables) {
-			System.out.println(table);
+
 			// used to store primary key metadata representation
 			ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
+			
 			// used to store foreign key metadata representation
 			ArrayList<FkTuple> foreignKeys = new ArrayList<FkTuple>();
+			
 			// used to store further attributes metadata representation
-			ArrayList<NameTypeTypeTuple> furtherAttributes = new ArrayList<NameTypeTypeTuple>();
+			ArrayList<NameTypeTuple> furtherAttributes = new ArrayList<NameTypeTuple>();
+			
 			// used to find further attributes, respectively no primary or
 			// foreign key attributes
 			ArrayList<String> pkfkAttributes = new ArrayList<String>();
@@ -140,8 +142,8 @@ public class MetaDataParser {
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
 
-					NameTypeTypeTuple att = new NameTypeTypeTuple(rsAttributes.getString("COLUMN_NAME"),
-							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")), null);
+					NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
+							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
 
 					furtherAttributes.add(att);
 				}

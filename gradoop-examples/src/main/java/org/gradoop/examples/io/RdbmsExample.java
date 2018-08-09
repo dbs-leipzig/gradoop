@@ -47,6 +47,7 @@ public class RdbmsExample implements ProgramDescription {
 	 * @param args[4] Valid jdbc driver class name
 	 * @param args[5] Valid path to output directory
 	 */
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 
 		if(args.length != 6){

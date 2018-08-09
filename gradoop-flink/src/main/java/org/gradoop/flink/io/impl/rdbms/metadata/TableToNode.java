@@ -8,7 +8,6 @@ import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**
@@ -34,7 +33,7 @@ public class TableToNode {
 	/**
 	 * List of further attribute names and belonging datatypes
 	 */
-	private ArrayList<NameTypeTypeTuple> furtherAttributes;
+	private ArrayList<NameTypeTuple> furtherAttributes;
 
 	/**
 	 * Numbe of rows of database table
@@ -59,7 +58,7 @@ public class TableToNode {
 	 * @param furtherAttributes List of further attribute names and datatypes
 	 * @param rowCount Number of database rows
 	 */
-	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTypeTuple> furtherAttributes,
+	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes,
 			int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
@@ -80,17 +79,17 @@ public class TableToNode {
 
 		try {
 		for(NameTypeTuple pk : primaryKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(pk.f1,null);
+			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(pk.f1);
 			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RdbmsConstants.PK_FIELD,i));
 			i++;
 		}
 		for(FkTuple fk : foreignKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(fk.f1,null);
+			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(fk.f1);
 			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RdbmsConstants.FK_FIELD,i));
 			i++;
 		}
-		for(NameTypeTypeTuple att : furtherAttributes){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getBasicTypeInfo(att.f1,att.f2);
+		for(NameTypeTuple att : furtherAttributes){
+			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(att.f1);
 			rowheader.getRowHeader().add(new RowHeaderTuple(att.f0,RdbmsConstants.ATTRIBUTE_FIELD,i));
 			i++;
 		}
@@ -133,11 +132,11 @@ public class TableToNode {
 		this.primaryKeys = primaryKeys;
 	}
 
-	public ArrayList<NameTypeTypeTuple> getFurtherAttributes() {
+	public ArrayList<NameTypeTuple> getFurtherAttributes() {
 		return furtherAttributes;
 	}
 
-	public void setFurtherAttributes(ArrayList<NameTypeTypeTuple> furtherAttributes) {
+	public void setFurtherAttributes(ArrayList<NameTypeTuple> furtherAttributes) {
 		this.furtherAttributes = furtherAttributes;
 	}
 
