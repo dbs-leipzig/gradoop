@@ -41,6 +41,7 @@ public enum Neighborhood {
 
   /**
    * Enum constructor for neighbor type with property name.
+   *
    * @param neighborPropertyName The property name for a neighbor type
    */
   Neighborhood(String neighborPropertyName) {
@@ -49,6 +50,7 @@ public enum Neighborhood {
 
   /**
    * Get the property name for an instance of Neighborhood.
+   *
    * @return The neighbor property name
    */
   public String getName() {

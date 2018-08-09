@@ -32,19 +32,34 @@ import static org.junit.Assert.assertFalse;
 
 public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGraphSampling {
 
+  /**
+   * Creates a new RandomLimitedDegreeVertexSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   * @param degreeType The vertex degree type, e.g. VertexDegree.IN_OUT
+   * @param degreeThreshold The threshold for the vertex degree, e.g. 3
+   */
   public RandomLimitedDegreeVertexSamplingTest(String testName, String seed, String sampleSize,
     String degreeType, String degreeThreshold) {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
       VertexDegree.valueOf(degreeType), Long.parseLong(degreeThreshold));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
     return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     List<Vertex> dbDegreeVertices = Lists.newArrayList();
     LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
       VertexDegree.IN_OUT.getName(),
@@ -53,7 +68,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
       true).execute(input);
     inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbDegreeVertices));
 
-    getExecutionEnvironment().execute();
+    try {
+      getExecutionEnvironment().execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
@@ -75,6 +94,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
     }
   }
 
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(

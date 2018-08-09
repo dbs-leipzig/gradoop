@@ -24,7 +24,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
  * property for sampling, we consider that vertex as not sampled.
  */
-public class EdgesWithSampledVerticesFilter implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
+public class EdgesWithSampledVerticesFilter
+  implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
   /**
    * Property name which shows if a vertex is sampled
    */

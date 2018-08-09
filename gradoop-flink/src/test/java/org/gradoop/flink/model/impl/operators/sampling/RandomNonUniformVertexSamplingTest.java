@@ -26,17 +26,30 @@ import static org.junit.Assert.assertFalse;
 
 public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraphSampling {
 
+  /**
+   * Creates a new RandomNonUniformVertexSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   */
   public RandomNonUniformVertexSamplingTest(String testName, String seed, String sampleSize) {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
     return new RandomNonUniformVertexSampling(sampleSize, seed);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
@@ -45,6 +58,11 @@ public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraph
     }
   }
 
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(

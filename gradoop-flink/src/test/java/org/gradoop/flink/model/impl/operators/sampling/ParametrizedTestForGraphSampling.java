@@ -49,64 +49,65 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
   /**
    * Seed-value for random number generator, e.g. 0L
    */
-  protected long seed;
+  long seed;
   /**
    * Value for sample size, e.g. 0.5
    */
-  protected float sampleSize;
+  float sampleSize;
   /**
    * Value for edge sample size (if sampled separately), e.g. 0.5
    */
-  protected float edgeSampleSize;
+  float edgeSampleSize;
   /**
    * The vertex neighborhood type. Distinguishes ingoing, outgoing edges or both.
    */
-  protected Neighborhood neighborType = Neighborhood.IN_OUT;
+  Neighborhood neighborType = Neighborhood.IN_OUT;
   /**
    * The dampening factor used by Flinks PageRank-algorithm
    */
-  protected double dampeningFactor = 0.5;
+  double dampeningFactor = 0.5;
   /**
    * The iteration number used by Flinks PageRank-algorithm
    */
-  protected int maxIteration = 20;
+  int maxIteration = 20;
   /**
    * The vertex degree type. Distinguishes in-degree, out-degree or the sum of both.
    */
-  protected VertexDegree degreeType = VertexDegree.IN_OUT;
+  VertexDegree degreeType = VertexDegree.IN_OUT;
   /**
    * The threshold for the vertex degree
    */
-  protected long degreeThreshold = 3L;
+  long degreeThreshold = 3L;
   /**
    * Sampling type for VertexEdgeSampling
    */
-  protected RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType =
+  RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType =
     RandomVertexEdgeSampling.VertexEdgeSamplingType.SimpleVersion;
 
   /**
    * List of original vertices
    */
-  protected List<Vertex> dbVertices;
+  List<Vertex> dbVertices;
   /**
    * List of original edges
    */
-  protected List<Edge> dbEdges;
+  List<Edge> dbEdges;
   /**
    * List of sampled vertices
    */
-  protected List<Vertex> newVertices;
+  List<Vertex> newVertices;
   /**
    * IDs from sampled vertices
    */
-  protected Set<GradoopId> newVertexIDs;
+  Set<GradoopId> newVertexIDs;
   /**
    * List of sampled edges
    */
-  protected List<Edge> newEdges;
+  List<Edge> newEdges;
 
   /**
    * Common Constructor for most samplings
+   *
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
@@ -119,6 +120,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
 
   /**
    * Constructor for VertexNeighborhoodSamplingTest
+   *
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
@@ -126,14 +128,13 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
     Neighborhood neighborType) {
-    this.testName = testName;
-    this.seed = seed;
-    this.sampleSize = sampleSize;
+    this(testName, seed, sampleSize);
     this.neighborType = neighborType;
   }
 
   /**
    * Constructor for PageRankSamplingTest
+   *
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
@@ -142,15 +143,14 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
     double dampeningFactor, int maxIteration) {
-    this.testName = testName;
-    this.seed = seed;
-    this.sampleSize = sampleSize;
+    this(testName, seed, sampleSize);
     this.dampeningFactor = dampeningFactor;
     this.maxIteration = maxIteration;
   }
 
   /**
    * Constructor for LimitedDegreeVertexSamplingTest
+   *
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
@@ -159,15 +159,14 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
     VertexDegree degreeType, long degreeThreshold) {
-    this.testName = testName;
-    this.seed = seed;
-    this.sampleSize = sampleSize;
+    this(testName, seed, sampleSize);
     this.degreeType = degreeType;
     this.degreeThreshold = degreeThreshold;
   }
 
   /**
    * Constructor for VertexEdgeSamplingTest
+   *
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for vertex sample size, e.g. 0.5
@@ -176,21 +175,21 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
     float edgeSampleSize, RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType) {
-    this.testName = testName;
-    this.seed = seed;
-    this.sampleSize = sampleSize;
+    this(testName, seed, sampleSize);
     this.edgeSampleSize = edgeSampleSize;
     this.vertexEdgeSamplingType = vertexEdgeSamplingType;
   }
 
   /**
    * Gets the sampling operator used for testing.
+   *
    * @return The sampling operator
    */
   public abstract UnaryGraphToGraphOperator getSamplingOperator();
 
   /**
    * Common test-case.
+   *
    * @throws Exception Exception thrown by graph loading
    */
   @Test
@@ -204,6 +203,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
 
   /**
    * The common graph validation used by all graph samplings
+   *
    * @param input The input graph
    * @param output The sampled graph
    */
@@ -240,8 +240,9 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
   /**
    * The specific graph validation used by some graph samplings.
    * Needs to be implemented in the respective sampling test-class.
+   *
    * @param input The input graph
    * @param output The sampled graph
    */
-  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception;
+  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output);
 }

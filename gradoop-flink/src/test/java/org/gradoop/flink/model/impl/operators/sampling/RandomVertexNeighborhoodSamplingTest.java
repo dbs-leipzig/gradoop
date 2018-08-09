@@ -27,19 +27,33 @@ import static org.junit.Assert.assertFalse;
 
 public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGraphSampling {
 
+  /**
+   * Creates a new RandomVertexNeighborhoodSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.IN_OUT
+   */
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
     String neighborType) {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
       Neighborhood.valueOf(neighborType));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
@@ -48,6 +62,11 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
     }
   }
 
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(
