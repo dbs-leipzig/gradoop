@@ -16,12 +16,9 @@
 package org.gradoop.examples.aggregation;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.examples.aggregation.functions.AddPropertyMeanAgeToGraphHead;
+import org.gradoop.examples.aggregation.functions.AggregateListOfNames;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
@@ -41,21 +38,9 @@ public class AggregationExample {
   private static final String EXAMPLE_DATA_FILE =
     AggregationExample.class.getResource("/data/gdl/sna.gdl").getFile();
   /**
-   * Property key 'name'
-   */
-  private static final String PROPERTY_KEY_NAME = "name";
-  /**
-   * Property key 'list_of_names'
-   */
-  private static final String PROPERTY_KEY_LIST_OF_NAMES = "list_of_names";
-  /**
    * Property key 'birthday'
    */
   private static final String PROPERTY_KEY_BIRTHDAY = "birthday";
-  /**
-   * Property key 'mean_age'
-   */
-  private static final String PROPERTY_KEY_MEAN_AGE = "mean_age";
   /**
    * Property key 'person'
    */
@@ -99,39 +84,16 @@ public class AggregationExample {
     LogicalGraph result = networkGraph
       // extract subgraph with edges and vertices which are of interest
       .vertexInducedSubgraph(new ByLabel<>(LABEL_PERSON))
-      // apply custom VertexAggregateFunctions
-      .aggregate(new VertexAggregateFunction() {
-        @Override
-        public PropertyValue getVertexIncrement(Vertex vertex) {
-          return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
-        }
-
-        @Override
-        public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
-          aggregate.setString(aggregate.getString() + "," + increment.getString());
-          return aggregate;
-        }
-
-        @Override
-        public String getAggregatePropertyKey() {
-          return PROPERTY_KEY_LIST_OF_NAMES;
-        }
-      })
+      // apply custom VertexAggregateFunction
+      .aggregate(new AggregateListOfNames())
       // aggregate sum of vertices in order to obtain total amount of persons
       .aggregate(new VertexCount())
       // sum up values of the vertex property "birthday"
       .aggregate(new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
       // add computed property "meanAge" to the graph head
-      .transformGraphHead((TransformationFunction<GraphHead>) (current, transformed) -> {
-          // property 'sum_birthday' is result of the aggregate function SumVertexProperty
-          int sumAge = current.getPropertyValue("sum_birthday").getInt();
-          // property 'vertexCount' is result of the aggregate function VertexCount
-          long numPerson = current.getPropertyValue("vertexCount").getLong();
-          current.setProperty(PROPERTY_KEY_MEAN_AGE, (double) sumAge / numPerson);
-          return current;
-        });
+      .transformGraphHead(new AddPropertyMeanAgeToGraphHead());
 
-    // print graph head, which now contains the newly aggregated properties
-    System.out.println(result.getGraphHead().collect());
+    // print graph, which now contains the newly aggregated properties in the graph head
+    result.print();
   }
 }
