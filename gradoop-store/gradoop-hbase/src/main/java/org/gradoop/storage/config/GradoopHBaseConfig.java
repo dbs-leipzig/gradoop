@@ -16,7 +16,6 @@
 package org.gradoop.storage.config;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.hbase.TableName;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
@@ -36,31 +35,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Configuration class for using HBase with Gradoop.
  */
-public class GradoopHBaseConfig
-  extends GradoopStoreConfig<GraphHeadFactory, VertexFactory, EdgeFactory> {
+public class GradoopHBaseConfig implements GradoopStoreConfig {
+
+  /**
+   * Definition for serialize version control
+   */
+  private static final int serialVersionUID = 23;
 
   /**
    * Graph table name.
    */
-  private final TableName graphTableName;
+  private final String graphTableName;
+
   /**
    * EPGMVertex table name.
    */
-  private final TableName vertexTableName;
+  private final String vertexTableName;
 
   /**
    * EPGMEdge table name.
    */
-  private final TableName edgeTableName;
+  private final String edgeTableName;
 
   /**
    * Graph head handler.
    */
   private final GraphHeadHandler graphHeadHandler;
+
   /**
    * EPGMVertex handler.
    */
   private final VertexHandler vertexHandler;
+
   /**
    * EPGMEdge handler.
    */
@@ -72,7 +78,6 @@ public class GradoopHBaseConfig
    * @param graphHeadHandler            graph head handler
    * @param vertexHandler               vertex handler
    * @param edgeHandler                 edge handler
-   * @param env                                   flink execution environment
    * @param graphTableName              graph table name
    * @param vertexTableName             vertex table name
    * @param edgeTableName               edge table name
@@ -81,12 +86,10 @@ public class GradoopHBaseConfig
     GraphHeadHandler graphHeadHandler,
     VertexHandler vertexHandler,
     EdgeHandler edgeHandler,
-    ExecutionEnvironment env,
     String graphTableName,
     String vertexTableName,
     String edgeTableName
   ) {
-    super(new GraphHeadFactory(), new VertexFactory(), new EdgeFactory(), env);
     checkArgument(!StringUtils.isEmpty(graphTableName),
       "Graph table name was null or empty");
     checkArgument(!StringUtils.isEmpty(vertexTableName),
@@ -94,9 +97,9 @@ public class GradoopHBaseConfig
     checkArgument(!StringUtils.isEmpty(edgeTableName),
       "EPGMEdge table name was null or empty");
 
-    this.graphTableName = TableName.valueOf(graphTableName);
-    this.vertexTableName = TableName.valueOf(vertexTableName);
-    this.edgeTableName = TableName.valueOf(edgeTableName);
+    this.graphTableName = graphTableName;
+    this.vertexTableName = vertexTableName;
+    this.edgeTableName = edgeTableName;
 
     this.graphHeadHandler = checkNotNull(graphHeadHandler, "GraphHeadHandler was null");
     this.vertexHandler = checkNotNull(vertexHandler, "VertexHandler was null");
@@ -120,7 +123,6 @@ public class GradoopHBaseConfig
     this(config.getGraphHeadHandler(),
       config.getVertexHandler(),
       config.getEdgeHandler(),
-      config.getExecutionEnvironment(),
       graphTableName,
       vertexTableName,
       edgeTableName);
@@ -130,10 +132,9 @@ public class GradoopHBaseConfig
    * Creates a default Configuration using POJO handlers for vertices, edges
    * and graph heads and default table names.
    *
-   * @param env apache flink execution environment
    * @return Default Gradoop HBase configuration.
    */
-  public static GradoopHBaseConfig getDefaultConfig(ExecutionEnvironment env) {
+  public static GradoopHBaseConfig getDefaultConfig() {
     GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new GraphHeadFactory());
     VertexHandler vertexHandler = new HBaseVertexHandler(new VertexFactory());
     EdgeHandler edgeHandler = new HBaseEdgeHandler(new EdgeFactory());
@@ -142,7 +143,6 @@ public class GradoopHBaseConfig
       graphHeadHandler,
       vertexHandler,
       edgeHandler,
-      env,
       HBaseConstants.DEFAULT_TABLE_GRAPHS,
       HBaseConstants.DEFAULT_TABLE_VERTICES,
       HBaseConstants.DEFAULT_TABLE_EDGES
@@ -168,26 +168,56 @@ public class GradoopHBaseConfig
     return new GradoopHBaseConfig(gradoopConfig, graphTableName, vertexTableName, edgeTableName);
   }
 
+  /**
+   * Get vertex table name
+   *
+   * @return vertex table name
+   */
   public TableName getVertexTableName() {
-    return vertexTableName;
+    return TableName.valueOf(vertexTableName);
   }
 
+  /**
+   * Get edge table name
+   *
+   * @return edge table name
+   */
   public TableName getEdgeTableName() {
-    return edgeTableName;
+    return TableName.valueOf(edgeTableName);
   }
 
+  /**
+   * Get graph table name
+   *
+   * @return graph table name
+   */
   public TableName getGraphTableName() {
-    return graphTableName;
+    return TableName.valueOf(graphTableName);
   }
 
+  /**
+   * Get graph head handler
+   *
+   * @return graph head handler
+   */
   public GraphHeadHandler getGraphHeadHandler() {
     return graphHeadHandler;
   }
 
+  /**
+   * Get vertex handler
+   *
+   * @return vertex handler
+   */
   public VertexHandler getVertexHandler() {
     return vertexHandler;
   }
 
+  /**
+   * Get edge handler
+   *
+   * @return edge handler
+   */
   public EdgeHandler getEdgeHandler() {
     return edgeHandler;
   }

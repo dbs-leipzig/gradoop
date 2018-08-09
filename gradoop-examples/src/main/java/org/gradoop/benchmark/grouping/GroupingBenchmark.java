@@ -47,6 +47,10 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
+   * Option to declare input graph format (csv, indexed, json)
+   */
+  private static final String OPTION_INPUT_FORMAT = "f";
+  /**
    * Option to declare path to output graph
    */
   private static final String OPTION_OUTPUT_PATH = "o";
@@ -119,6 +123,10 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static String INPUT_PATH;
   /**
+   * Used INPUT_FORMAT
+   */
+  private static String INPUT_FORMAT;
+  /**
    * Used hdfs OUTPUT_PATH
    */
   private static String OUTPUT_PATH;
@@ -163,6 +171,8 @@ public class GroupingBenchmark extends AbstractRunner
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "vertex-input-path", true,
       "Path to vertex file");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "input-format", true,
+      "Format of the input [csv, indexed, json]. Default: " + DEFAULT_FORMAT);
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Path to write output files to");
     OPTIONS.addOption(OPTION_GROUPING_STRATEGY, "strategy", true,
@@ -211,7 +221,7 @@ public class GroupingBenchmark extends AbstractRunner
     readCMDArguments(cmd);
 
     // initialize EPGM database
-    LogicalGraph graphDatabase = readLogicalGraph(INPUT_PATH);
+    LogicalGraph graphDatabase = readLogicalGraph(INPUT_PATH, INPUT_FORMAT);
 
     // initialize grouping keys
     List<String> vertexKeys = Lists.newArrayList();
@@ -292,6 +302,10 @@ public class GroupingBenchmark extends AbstractRunner
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
+
+    // input format
+    INPUT_FORMAT = cmd.hasOption(OPTION_INPUT_FORMAT) ?
+      cmd.getOptionValue(OPTION_INPUT_FORMAT).toLowerCase() : DEFAULT_FORMAT;
 
     // initialize grouping strategy
     if (cmd.hasOption(OPTION_GROUPING_STRATEGY)) {

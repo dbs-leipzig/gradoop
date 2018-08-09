@@ -40,8 +40,8 @@ import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.impl.hbase.filter.HBaseFilterUtils;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.iterator.HBaseEdgeIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseGraphIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator;
@@ -346,7 +346,7 @@ public class HBaseEPGMStore implements
     }
 
     if (query.getFilterPredicate() != null) {
-      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter());
+      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));
     }
 
     // if there are filters inside the root list, add it to the Scan object

@@ -66,5 +66,4 @@ public class AccumuloGraphHandler implements AccumuloRowHandler<GraphHead, EPGMG
       /*properties*/origin.getProperties());
   }
 
-
 }

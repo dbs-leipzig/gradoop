@@ -48,8 +48,7 @@ public class DictionaryEntry implements
    * @throws Exception
    */
   @Override
-  public Tuple2<Integer, String> map(
-    Tuple2<LongWritable, Text> tuple) throws Exception {
+  public Tuple2<Integer, String> map(Tuple2<LongWritable, Text> tuple) throws Exception {
     String[] stringArray = tuple.getField(1).toString().split(" ");
     returnTuple.f0 = Integer.parseInt(stringArray[1]);
     returnTuple.f1 = stringArray[0];

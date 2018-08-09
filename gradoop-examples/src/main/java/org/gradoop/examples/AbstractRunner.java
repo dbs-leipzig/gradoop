@@ -21,6 +21,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
@@ -43,6 +45,10 @@ public abstract class AbstractRunner {
    */
   protected static final Options OPTIONS = new Options();
   /**
+   * Graph format used as default
+   */
+  protected static final String DEFAULT_FORMAT = "csv";
+  /**
    * Flink execution environment.
    */
   private static ExecutionEnvironment ENV;
@@ -50,10 +56,10 @@ public abstract class AbstractRunner {
   /**
    * Parses the program arguments and performs sanity checks.
    *
-   * @param args      program arguments
+   * @param args program arguments
    * @param className executing class name (for help display)
    * @return command line which can be used in the program
-   * @throws ParseException
+   * @throws ParseException on failure
    */
   protected static CommandLine parseArguments(String[] args, String className)
       throws ParseException {
@@ -66,85 +72,91 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Reads an EPGM database from a given directory.
+   * Reads an EPGM database from a given directory  using a {@link CSVDataSource}.
    *
    * @param directory path to EPGM database
    * @return EPGM logical graph
    */
-  @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
-    return readLogicalGraph(directory, "json");
+    return readLogicalGraph(directory, DEFAULT_FORMAT);
   }
 
   /**
    * Reads an EPGM database from a given directory.
    *
    * @param directory path to EPGM database
-   * @param format    format in which the graph is stored (csv, json)
+   * @param format format in which the graph is stored (csv, indexed, json)
    * @return EPGM logical graph
+   * @throws IOException on failure
    */
-  @SuppressWarnings("unchecked")
   protected static LogicalGraph readLogicalGraph(String directory, String format)
     throws IOException {
-    directory = appendSeparator(directory);
-
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    format = format.toLowerCase();
-
-    if (format.equals("json")) {
-      return new JSONDataSource(directory, config).getLogicalGraph();
-    } else if (format.equals("csv")) {
-      return new CSVDataSource(directory, config).getLogicalGraph();
-    } else if (format.equals("indexed")) {
-      return new IndexedCSVDataSource(directory, config).getLogicalGraph();
-    } else {
-      throw new IllegalArgumentException("Unsupported format: " + format);
-    }
+    return getDataSource(directory, format).getLogicalGraph();
   }
 
   /**
-   * Writes a logical graph into the specified directory using a {@link JSONDataSink}.
+   * Reads an EPGM database from a given directory.
    *
-   * @param graph     logical graph
+   * @param directory path to EPGM database
+   * @param format format in which the graph collection is stored (csv, indexed, json)
+   * @return EPGM graph collection
+   * @throws IOException on failure
+   */
+  protected static GraphCollection readGraphCollection(String directory, String format)
+    throws IOException {
+    return getDataSource(directory, format).getGraphCollection();
+  }
+
+  /**
+   * Writes a logical graph into the specified directory using a {@link CSVDataSink}.
+   *
+   * @param graph logical graph
    * @param directory output path
-   * @throws Exception
+   * @throws Exception on failure
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory) throws Exception {
-    writeLogicalGraph(graph, directory, "json");
+    writeLogicalGraph(graph, directory, DEFAULT_FORMAT);
   }
 
   /**
    * Writes a logical graph into a given directory.
    *
-   * @param graph     logical graph
+   * @param graph logical graph
    * @param directory output path
-   * @param format output format (json, csv)
-   * @throws Exception
+   * @param format output format (csv, indexed, json)
+   * @throws Exception on failure
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory, String format)
     throws Exception {
-
-    format = format.toLowerCase();
-    if (format.equals("json")) {
-      graph.writeTo(new JSONDataSink(appendSeparator(directory), graph.getConfig()));
-    } else if (format.equals("csv")) {
-      graph.writeTo(new CSVDataSink(appendSeparator(directory), graph.getConfig()));
-    } else if (format.equals("indexed")) {
-      graph.writeTo(new IndexedCSVDataSink(appendSeparator(directory), graph.getConfig()));
-    }
+    graph.writeTo(getDataSink(directory, format, graph.getConfig()));
     getExecutionEnvironment().execute();
   }
 
   /**
-   * Writes a graph collection into the specified directory using a {@link JSONDataSink}.
+   * Writes a graph collection into the specified directory using a {@link CSVDataSink}.
    *
-   * @param collection  graph collection
-   * @param directory   output path
-   * @throws Exception
+   * @param collection graph collection
+   * @param directory output path
+   * @throws Exception on failure
    */
   protected static void writeGraphCollection(GraphCollection collection, String directory)
     throws Exception {
-    collection.writeTo(new JSONDataSink(appendSeparator(directory), collection.getConfig()));
+    writeGraphCollection(collection, directory, DEFAULT_FORMAT);
+  }
+
+  /**
+   * Writes a graph collection into a given directory.
+   *
+   * @param collection graph collection
+   * @param directory output path
+   * @param format output format (csv, indexed, json)
+   * @throws Exception on failure
+   */
+  protected static void writeGraphCollection(GraphCollection collection,
+                                             String directory,
+                                             String format)
+    throws Exception {
+    collection.writeTo(getDataSink(directory, format, collection.getConfig()));
     getExecutionEnvironment().execute();
   }
 
@@ -181,12 +193,61 @@ public abstract class AbstractRunner {
    *
    * @param dotFile path to DOT file
    * @param pngFile path to PNG file
-   * @throws IOException
+   * @throws IOException on failure
    */
   protected static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
     File output = new File(pngFile);
     pb.redirectOutput(ProcessBuilder.Redirect.appendTo(output));
     pb.start();
+  }
+
+  /**
+   * Returns an EPGM DataSource for a given directory and format.
+   *
+   * @param directory input path
+   * @param format format in which the data is stored (csv, indexed, json)
+   * @return DataSource for EPGM Data
+   * @throws IOException on failure
+   */
+  private static DataSource getDataSource(String directory, String format) throws IOException {
+    directory = appendSeparator(directory);
+    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    format = format.toLowerCase();
+
+    switch (format) {
+    case "json":
+      return new JSONDataSource(directory, config);
+    case "csv":
+      return new CSVDataSource(directory, config);
+    case "indexed":
+      return new IndexedCSVDataSource(directory, config);
+    default:
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
+  }
+
+  /**
+   * Returns an EPGM DataSink for a given directory and format.
+   *
+   * @param directory output path
+   * @param format output format (csv, indexed, json)
+   * @param config gradoop config
+   * @return DataSink for EPGM Data
+   */
+  private static DataSink getDataSink(String directory, String format, GradoopFlinkConfig config) {
+    directory = appendSeparator(directory);
+    format = format.toLowerCase();
+
+    switch (format) {
+    case "json":
+      return new JSONDataSink(directory, config);
+    case "csv":
+      return new CSVDataSink(directory, config);
+    case "indexed":
+      return new IndexedCSVDataSink(directory, config);
+    default:
+      throw new IllegalArgumentException("Unsupported format: " + format);
+    }
   }
 }
