@@ -21,7 +21,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 /**
@@ -81,11 +80,7 @@ public class HBaseVertexIterator implements ClosableIterator<Vertex> {
 
   @Override
   public Vertex next() {
-    try {
-      return handler.readVertex(result);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return handler.readVertex(result);
   }
 
 }

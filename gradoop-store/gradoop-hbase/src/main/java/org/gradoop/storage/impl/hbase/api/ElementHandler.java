@@ -69,11 +69,7 @@ public interface ElementHandler extends Serializable {
    * @param property property
    * @return put with property
    */
-  Put writeProperty(
-    final Put put,
-    final Property property
-  ) throws
-    IOException;
+  Put writeProperty(final Put put, final Property property);
 
   /**
    * Adds all properties of the given element to the given {@link Put} and
@@ -83,11 +79,7 @@ public interface ElementHandler extends Serializable {
    * @param entity entity to use properties from
    * @return put with properties
    */
-  Put writeProperties(
-    final Put put,
-    final EPGMElement entity
-  ) throws
-    IOException;
+  Put writeProperties(final Put put, final EPGMElement entity);
 
   /**
    * Reads the label from the given row {@link Result}.
@@ -102,9 +94,8 @@ public interface ElementHandler extends Serializable {
    *
    * @param res row result
    * @return all properties contained in the row
-   * @throws IOException if reading result to Properties failed
    */
-  Properties readProperties(final Result res) throws IOException;
+  Properties readProperties(final Result res);
 
   /**
    * Creates table based on the given table descriptor.

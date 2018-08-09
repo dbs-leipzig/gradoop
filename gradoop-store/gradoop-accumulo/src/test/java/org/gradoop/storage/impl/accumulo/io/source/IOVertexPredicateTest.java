@@ -15,12 +15,12 @@
  */
 package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.storage.utils.AccumuloFilters;
-import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -46,7 +46,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_writeAndQueryVertexByName() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
         .stream()
@@ -66,7 +66,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
       }
       AccumuloElementFilter<Vertex> whereCases = labelFilter.and(nameFilter);
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<Vertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()
@@ -87,7 +87,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_findPersonByAge() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()
@@ -97,7 +97,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .filter(it -> it.getProperties().get("age").getInt() >= 35)
         .collect(Collectors.toList());
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<Vertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()
@@ -120,7 +120,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_findPersonByAge() throws Throwable {
-    doTest(TEST03, (loader, store) -> {
+    doTest(TEST03, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()
@@ -130,7 +130,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .filter(it -> it.getProperties().get("age").getInt() < 35)
         .collect(Collectors.toList());
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<Vertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()

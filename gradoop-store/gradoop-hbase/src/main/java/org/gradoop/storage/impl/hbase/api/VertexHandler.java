@@ -19,10 +19,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
-
-import java.io.IOException;
 
 /**
  * Responsible for reading and writing vertex data from and to HBase.
@@ -35,18 +33,16 @@ public interface VertexHandler extends GraphElementHandler {
    * @param put        {@link Put} to add vertex to
    * @param vertexData vertex data to be written
    * @return put with vertex data
-   * @throws IOException on writing failure
    */
-  Put writeVertex(final Put put, final EPGMVertex vertexData) throws IOException;
+  Put writeVertex(final Put put, final EPGMVertex vertexData);
 
   /**
    * Reads the vertex data from the given {@link Result}.
    *
    * @param res HBase row
    * @return vertex data contained in the given result.
-   * @throws IOException if reading the result as {@link Vertex} instance fails
    */
-  Vertex readVertex(final Result res) throws IOException;
+  Vertex readVertex(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.

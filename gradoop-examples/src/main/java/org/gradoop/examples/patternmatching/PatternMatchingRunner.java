@@ -77,7 +77,7 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
    */
   private static final String OPTION_INPUT_PATH  = "i";
   /**
-   * Option to declare the format of the input path (csv,json)
+   * Option to declare input graph format (csv, indexed, json)
    */
   private static final String OPTION_INPUT_FORMAT = "f";
   /**
@@ -105,7 +105,7 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
     OPTIONS.addOption(OPTION_INPUT_PATH, "input-path", true,
       "Input graph directory");
     OPTIONS.addOption(OPTION_INPUT_FORMAT, "input-format", true,
-      "Format of the input graph [csv,json]");
+      "Format of the input graph [csv, indexed, json]");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output-path", true,
       "Output graph directory");
     OPTIONS.addOption(OPTION_QUERY_GRAPH, "query", true,
@@ -123,7 +123,7 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
    * Runs the simulation using the given arguments.
    * <p>
    * -i, --input-path (path to data graph)<br />
-   * -f, --input-format (format of data graph [json,csv])<br />
+   * -f, --input-format (format of data graph [csv, indexed, json])<br />
    * -o, --output-path (path to output directory)<br />
    * -q, --query (GDL/Cypher query string)<br />
    * -a, --algorithm [dual-bulk,dual-delta,iso-exp,iso-exp-bc-hf,cypher]<br />

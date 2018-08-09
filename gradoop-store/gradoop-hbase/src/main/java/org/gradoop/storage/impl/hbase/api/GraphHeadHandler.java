@@ -19,10 +19,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
-
-import java.io.IOException;
 
 /**
  * This class is responsible for reading and writing EPGM graph heads from
@@ -36,18 +34,16 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param put       put to add graph data to
    * @param graphData graph data
    * @return put with graph data
-   * @throws IOException if writing the {@link EPGMGraphHead} to store fails
    */
-  Put writeGraphHead(final Put put, final EPGMGraphHead graphData) throws IOException;
+  Put writeGraphHead(final Put put, final EPGMGraphHead graphData);
 
   /**
    * Reads the graph data from the given result.
    *
    * @param res HBase row
    * @return graph entity
-   * @throws IOException if reading the result as {@link GraphHead} instance fails
    */
-  GraphHead readGraphHead(final Result res) throws IOException;
+  GraphHead readGraphHead(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.
