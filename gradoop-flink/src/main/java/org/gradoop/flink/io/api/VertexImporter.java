@@ -21,6 +21,7 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 /**
  * Base interface to import external vertices into a DataSet of EPGM Vertices.
  * The vertices will be prepared for execution of the DataSource.
+ *
  * @param <K> Type of the vertex identifier type
  */
 public interface VertexImporter<K extends Comparable<K>> {
@@ -30,5 +31,5 @@ public interface VertexImporter<K extends Comparable<K>> {
   * import it into EPGM. Put all imported vertices into a DataSet.
   * @return DataSet of all imported vertices.
   */
-  DataSet<ImportVertex<K>> importVertex();
+  DataSet<ImportVertex<K>> getImportVertex();
 }

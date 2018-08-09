@@ -34,7 +34,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * the MinimalEdgeProvider/MinimalVertecProvider to import the
  * external representation into the EPGM.
  */
-public class MinimalDataSource implements DataSource {
+public class MinimalCSVDataSource implements DataSource {
 
   /**
   * Gradoop Flink configuration
@@ -44,21 +44,22 @@ public class MinimalDataSource implements DataSource {
   /**
   * All vertices the graph contains.
   */
-  private MinimalVertexProvider vertices;
+  private MinimalCSVVertexProvider vertices;
 
   /**
   * All edges the graph contains.
   */
-  private MinimalEdgeProvider edges;
+  private MinimalCSVEdgeProvider edges;
 
   /**
   * Constructor
+  *
   * @param config Gradoop configuration
   * @param vertices all vertices of the graph
   * @param edges all edges of the graph
   */
-  public MinimalDataSource(GradoopFlinkConfig config, MinimalVertexProvider vertices,
-        MinimalEdgeProvider edges) {
+  public MinimalCSVDataSource(GradoopFlinkConfig config, MinimalCSVVertexProvider vertices,
+        MinimalCSVEdgeProvider edges) {
 
     this.config = config;
     this.vertices = vertices;

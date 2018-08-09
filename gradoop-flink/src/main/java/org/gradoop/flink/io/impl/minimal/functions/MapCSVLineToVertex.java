@@ -67,6 +67,7 @@ public class MapCSVLineToVertex implements MapFunction<String, Tuple3<String, St
 
   /**
    * Map each label to the occurring properties.
+   *
    * @param propertyValueString the properties
    * @param propertieLabels List of all property names.
    * @return Properties as pojo element

@@ -81,11 +81,11 @@ public class MinimalDataSourceTest extends GradoopFlinkTestBase {
 	  pathToPropertiesEdge.put(edgePathA, aProperties);
 	  pathToPropertiesEdge.put(edgePathB, bProperties);
 
-	  MinimalVertexProvider vp = new MinimalVertexProvider(pathToProperties, delimiter, getConfig());
+	  MinimalCSVVertexProvider vp = new MinimalCSVVertexProvider(pathToProperties, delimiter, getConfig());
 
-	  MinimalEdgeProvider ep = new MinimalEdgeProvider(pathToPropertiesEdge, delimiter, getConfig());
+	  MinimalCSVEdgeProvider ep = new MinimalCSVEdgeProvider(pathToPropertiesEdge, delimiter, getConfig());
 
-	  DataSource source = new MinimalDataSource(getConfig(), vp, ep);
+	  DataSource source = new MinimalCSVDataSource(getConfig(), vp, ep);
 
 	  LogicalGraph input = source.getLogicalGraph();
 

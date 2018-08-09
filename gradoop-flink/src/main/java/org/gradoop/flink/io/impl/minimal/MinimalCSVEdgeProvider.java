@@ -32,7 +32,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Import external edges from csv files into EPGM.
  * It is possible import edges from different csv files.
  */
-public class MinimalEdgeProvider implements EdgeImporter<String> {
+public class MinimalCSVEdgeProvider implements EdgeImporter<String> {
 
   /**
    * Token separator of the file.
@@ -50,12 +50,18 @@ public class MinimalEdgeProvider implements EdgeImporter<String> {
   private GradoopFlinkConfig config;
 
   /**
-   * Construct
+   * Dataset of eges in EPGM format
+   */
+  private DataSet<ImportEdge<String>> importEdge;
+
+  /**
+   * Constructor
+   *
    * @param propertyMap Map of the file path and the property names.
    * @param tokenSeparator token separator
    * @param config Gradoop Flink configuration
    */
-  public MinimalEdgeProvider(Map<String, List<String>> propertyMap,
+  public MinimalCSVEdgeProvider(Map<String, List<String>> propertyMap,
       String tokenSeparator, GradoopFlinkConfig config) {
 
     this.config = config;
@@ -66,25 +72,26 @@ public class MinimalEdgeProvider implements EdgeImporter<String> {
   /**
    * Import the external edges into EPGM.
    * Combine each edges from different files into one DataSet.
+   *
    * @return DataSet of all edges of the graph.
    */
-  @Override
   public DataSet<ImportEdge<String>> importEdge() {
 
-    DataSet<ImportEdge<String>> edges = null;
+    importEdge = null;
     for (Map.Entry<String, List<String>> entry : propertyMap.entrySet()) {
-      if (edges != null) {
+      if (importEdge != null) {
         DataSet<ImportEdge<String>> e = readCSVFile(config, entry.getKey(), tokenSeparator);
-        edges = edges.union(e);
+        importEdge = importEdge.union(e);
       } else {
-        edges = readCSVFile(config, entry.getKey(), tokenSeparator);
+        importEdge = readCSVFile(config, entry.getKey(), tokenSeparator);
       }
     }
-    return edges;
+    return importEdge;
   }
 
   /**
    * Read the edges from a csv file.
+   *
    * @param config Gradoop Flink configuration
    * @param edgeCsvPath path to the file
    * @param tokenSeparator separator
@@ -101,6 +108,11 @@ public class MinimalEdgeProvider implements EdgeImporter<String> {
     DataSet<ImportEdge<String>> edges = lines.map(new CreateLabeledImportEdgeProperties<>());
 
     return edges;
+  }
+
+  @Override
+  public DataSet<ImportEdge<String>> getImportEdge() {
+    return importEdge;
   }
 }
 

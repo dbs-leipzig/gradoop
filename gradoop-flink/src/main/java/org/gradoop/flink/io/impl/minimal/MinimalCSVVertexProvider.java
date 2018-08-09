@@ -31,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Import external vertices from csv files into EPGM.
  * It is possible import vertices from different csv files.
  */
-public class MinimalVertexProvider implements VertexImporter<String> {
+public class MinimalCSVVertexProvider implements VertexImporter<String> {
 
   /**
    * Token delimiter
@@ -49,12 +49,18 @@ public class MinimalVertexProvider implements VertexImporter<String> {
   private GradoopFlinkConfig config;
 
   /**
+   * Set of vertices in EPGM format.
+   */
+  private DataSet<ImportVertex<String>> importVertices;
+
+  /**
    * Constructor.
+   *
    * @param config Gradoop Flink configuration
    * @param tokenSeparator Delimiter of csv file
    * @param propertyMap Map of file path and property names
    */
-  public MinimalVertexProvider(Map<String, List<String>> propertyMap,
+  public MinimalCSVVertexProvider(Map<String, List<String>> propertyMap,
         String tokenSeparator, GradoopFlinkConfig config) {
     this.propertyMap = propertyMap;
     this.tokenSeparator = tokenSeparator;
@@ -64,20 +70,20 @@ public class MinimalVertexProvider implements VertexImporter<String> {
   /**
    * Import the external vertices into EPGM.
    * Combine each vertices from different files into one DataSet.
+   *
    * @return DataSet of all vertices of the graph.
    */
-  @Override
   public DataSet<ImportVertex<String>> importVertex() {
 
-    DataSet<ImportVertex<String>> vertices = null;
+    importVertices = null;
     for (Map.Entry<String, List<String>> entry : propertyMap.entrySet()) {
-      if (vertices != null) {
-        vertices = vertices.union(readCSVFile(config, entry.getKey(), tokenSeparator));
+      if (importVertices != null) {
+        importVertices = importVertices.union(readCSVFile(config, entry.getKey(), tokenSeparator));
       } else {
-        vertices = readCSVFile(config, entry.getKey(), tokenSeparator);
+        importVertices = readCSVFile(config, entry.getKey(), tokenSeparator);
       }
     }
-    return vertices;
+    return importVertices;
   }
 
   /**
@@ -98,5 +104,10 @@ public class MinimalVertexProvider implements VertexImporter<String> {
     DataSet<ImportVertex<String>> vertices = lines.map(new CreateLabeledImportVertexProperties<>());
 
     return vertices;
+  }
+
+  @Override
+  public DataSet<ImportVertex<String>> getImportVertex() {
+    return importVertices;
   }
 }
