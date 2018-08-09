@@ -306,7 +306,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       vertexTransformationFunction,
       edgeTransformationFunction));
   }
-
+  
   @Override
   public LogicalGraph transformGraphHead(
     TransformationFunction<GraphHead> graphHeadTransformationFunction) {
@@ -464,8 +464,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillVertex(true);
+    builder.setVertexDrillFunction(function);
 
     if (vertexLabel != null) {
       builder.setLabel(vertexLabel);
@@ -506,8 +505,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillEdge(true);
+    builder.setEdgeDrillFunction(function);
 
     if (edgeLabel != null) {
       builder.setLabel(edgeLabel);
@@ -564,8 +562,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillVertex(true);
+    builder.setVertexDrillFunction(function);
 
     if (vertexLabel != null) {
       builder.setLabel(vertexLabel);
@@ -574,7 +571,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
     if (function != null) {
-      builder.setFunction(function);
+      builder.setVertexDrillFunction(function);
     }
 
     return callForGraph(builder.buildDrillDown());
@@ -625,8 +622,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillEdge(true);
+    builder.setEdgeDrillFunction(function);
 
     if (edgeLabel != null) {
       builder.setLabel(edgeLabel);
@@ -635,7 +631,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
     if (function != null) {
-      builder.setFunction(function);
+      builder.setEdgeDrillFunction(function);
     }
 
     return callForGraph(builder.buildDrillDown());
