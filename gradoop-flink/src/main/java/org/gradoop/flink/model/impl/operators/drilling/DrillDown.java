@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.drilling;
 
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
@@ -23,8 +24,7 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.transformations
 
 /**
  * Creates a graph with the same structure but a specified property of an element is drilled down
- * by the declared function. It is possible to drill down either on one vertex / edge type or all
- * vertex / edge types. Additionally the drilled down value can be stored under a new key. If the
+ * by the declared function. The drilled down value can be stored under a new key. If the
  * original key shall be reused the old value is overwritten. Drill down can also be used
  * without specifying a drill down function when it is preceded by a roll up operation on the
  * same property key.
@@ -34,29 +34,39 @@ public class DrillDown extends Drill {
   /**
    * Valued constructor.
    *
-   * @param label          label of the element whose property shall be drilled
-   * @param propertyKey    property key
-   * @param function       drill function which shall be applied to a property
-   * @param newPropertyKey new property key
-   * @param drillVertex    true, if vertices shall be drilled, false for edges
+   * @param label                   label of the element whose property shall be drilled
+   * @param propertyKey             property key
+   * @param vertexDrillFunction     drill function which shall be applied to a property of a vertex
+   * @param edgeDrillFunction       drill function which shall be applied to a property of an edge
+   * @param graphheadDrillFunction  drill function which shall be applied to a property of a
+   *                                graph head
+   * @param newPropertyKey          new property key
+   * @param element                 Element to be covered by the operation
    */
   public DrillDown(
-    String label, String propertyKey, DrillFunction function, String newPropertyKey,
-    boolean drillVertex) {
-    super(label, propertyKey, function, newPropertyKey, drillVertex);
+    String label, String propertyKey, DrillFunction vertexDrillFunction,
+    DrillFunction edgeDrillFunction, DrillFunction graphheadDrillFunction,
+    String newPropertyKey, Element element) {
+    super(label, propertyKey, vertexDrillFunction, edgeDrillFunction,
+      graphheadDrillFunction, newPropertyKey, element);
   }
 
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    if (drillVertex()) {
+    if (getElement() == Element.VERTICES) {
       graph = graph.transformVertices(
-        new DrillDownTransformation<Vertex>(getLabel(), getPropertyKey(), getFunction(),
+        new DrillDownTransformation<Vertex>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
+          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
+    } else if (getElement() == Element.EDGES) {
+      graph = graph.transformEdges(
+        new DrillDownTransformation<Edge>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else {
-      graph = graph.transformEdges(
-        new DrillDownTransformation<Edge>(getLabel(), getPropertyKey(), getFunction(),
-          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
+      graph = graph.transformGraphHead(
+        new DrillDownTransformation<GraphHead>(getLabel(), getPropertyKey(),
+          getGraphheadDrillFunction(), getNewPropertyKey(), drillAllLabels(),
+          keepCurrentPropertyKey()));
     }
     return graph;
   }
