@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-
 /**
  * Superclass of aggregate functions that determine a minimal property value.
  */
