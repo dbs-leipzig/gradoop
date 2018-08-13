@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
 /**
- * Base interface to import external edges into a DataSet of EPGM Edges.
- * It prepared the edges for execution of the DataSource.
+ * Base interface to import external edges into a {@link DataSet} of {@link ImportEdge} of key type K.
+ * It prepared the edges for execution of the {@link DataSource}.
  *
  * @param <K> Type of the edge identifier type
  */
@@ -28,7 +28,7 @@ public interface EdgeImporter<K extends Comparable<K>> {
 
  /**
   * The import method. Takes for each edge the elements of the external edge and
-  * import it into EPGM. Put all imported edges into a DataSet.
+  * import it into ImportEdge of key type K. Put all imported edges into a DataSet.
   *
   * @return DataSet of all imported edges.
   */
