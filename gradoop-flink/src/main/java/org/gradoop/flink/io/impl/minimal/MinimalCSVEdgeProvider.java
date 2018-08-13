@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.api.EdgeImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
@@ -38,19 +37,16 @@ public class MinimalCSVEdgeProvider implements EdgeImporter<String> {
    * Token separator of the file.
    */
   private String tokenSeparator;
-
   /**
    * Map the file to the containing property names.
    */
   private Map<String, List<String>> propertyMap;
-
   /**
    * Gradoop Flink configuration
    */
   private GradoopFlinkConfig config;
-
   /**
-   * Dataset of eges in EPGM format
+   * DataSet of edges in EPGM format
    */
   private DataSet<ImportEdge<String>> importEdge;
 
@@ -63,7 +59,6 @@ public class MinimalCSVEdgeProvider implements EdgeImporter<String> {
    */
   public MinimalCSVEdgeProvider(Map<String, List<String>> propertyMap,
       String tokenSeparator, GradoopFlinkConfig config) {
-
     this.config = config;
     this.tokenSeparator = tokenSeparator;
     this.propertyMap = propertyMap;
@@ -76,12 +71,10 @@ public class MinimalCSVEdgeProvider implements EdgeImporter<String> {
    * @return DataSet of all edges of the graph.
    */
   public DataSet<ImportEdge<String>> importEdge() {
-
     importEdge = null;
     for (Map.Entry<String, List<String>> entry : propertyMap.entrySet()) {
       if (importEdge != null) {
-        DataSet<ImportEdge<String>> e = readCSVFile(config, entry.getKey(), tokenSeparator);
-        importEdge = importEdge.union(e);
+        importEdge = importEdge.union(readCSVFile(config, entry.getKey(), tokenSeparator));
       } else {
         importEdge = readCSVFile(config, entry.getKey(), tokenSeparator);
       }
@@ -99,15 +92,12 @@ public class MinimalCSVEdgeProvider implements EdgeImporter<String> {
    */
   public DataSet<ImportEdge<String>> readCSVFile(
       GradoopFlinkConfig config, String edgeCsvPath, String tokenSeparator) {
-
-    DataSet<Tuple4<String, Tuple2<String, String>, String, Properties>> lines = config
-            .getExecutionEnvironment()
+    DataSet<Tuple5<String, String, String, String, Properties>> lines =
+            config.getExecutionEnvironment()
             .readTextFile(edgeCsvPath)
             .map(new MapCSVLineToEdge(tokenSeparator, propertyMap, edgeCsvPath));
 
-    DataSet<ImportEdge<String>> edges = lines.map(new CreateLabeledImportEdgeProperties<>());
-
-    return edges;
+    return lines.map(new CreateLabeledImportEdgeProperties<>());
   }
 
   @Override

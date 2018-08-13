@@ -32,13 +32,12 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
  * @param <K> id type
  */
 public class CreateLabeledImportVertexProperties<K extends Comparable<K>>
-implements MapFunction<Tuple3<K, String, Properties>, ImportVertex<K>> {
+  implements MapFunction<Tuple3<K, String, Properties>, ImportVertex<K>> {
 
   /**
    * Used ImportVertex
    */
   private ImportVertex<K> vertex;
-
   /**
    * Constructor
    */
@@ -48,7 +47,6 @@ implements MapFunction<Tuple3<K, String, Properties>, ImportVertex<K>> {
 
   @Override
   public ImportVertex<K> map(Tuple3<K, String, Properties> value) throws Exception {
-
     vertex.setId(value.f0);
     vertex.setLabel(value.f1);
     vertex.setProperties(value.f2);

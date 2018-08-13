@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -35,15 +34,21 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * f3: edge properties
  */
 public class MapCSVLineToEdge
-        implements MapFunction<String, Tuple4<String, Tuple2<String, String>, String, Properties>> {
+  implements MapFunction<String, Tuple5<String, String, String, String, Properties>> {
 
-  /** Token separator for the csv file. */
+  /**
+   * Token separator for the csv file.
+   */
   private String tokenSeparator;
 
-  /** Map the path of an edge file to the edge property names. */
+  /**
+   * Map the path of an edge file to the edge property names.
+   */
   private Map<String, List<String>> propertyMap;
 
-  /** The path to the edge file. */
+  /**
+   * The path to the edge file.
+   */
   private String edgePath;
 
   /**
@@ -61,24 +66,21 @@ public class MapCSVLineToEdge
   }
 
   @Override
-  public Tuple4<String, Tuple2<String, String>, String, Properties> map(String line)
-          throws Exception {
-
+  public Tuple5<String, String, String, String, Properties> map(String line)
+    throws Exception {
     String[] tokens = line.split(tokenSeparator, 5);
     Properties props = parseProperties(tokens[4], propertyMap.get(edgePath));
-    return Tuple4.of(tokens[0], Tuple2.of(tokens[1], tokens[2]), tokens[3], props);
+    return Tuple5.of(tokens[0], tokens[1], tokens[2], tokens[3], props);
   }
 
   /**
    * Map each label to the occurring properties.
    *
-   * @param propertyValueString
-   *            the properties
-   * @param propertieLabels
-   *            List of all property names.
+   * @param propertyValueString the properties
+   * @param propertyLabels List of all property names.
    * @return Properties as pojo element
    */
-  public Properties parseProperties(String propertyValueString, List<String> propertieLabels) {
+  public Properties parseProperties(String propertyValueString, List<String> propertyLabels) {
 
     Properties properties = new Properties();
 
@@ -86,7 +88,7 @@ public class MapCSVLineToEdge
 
     for (int i = 0; i < propertyValues.length; i++) {
       if (propertyValues[i].length() > 0) {
-        properties.set(propertieLabels.get(i), PropertyValue.create(propertyValues[i]));
+        properties.set(propertyLabels.get(i), PropertyValue.create(propertyValues[i]));
       }
     }
 

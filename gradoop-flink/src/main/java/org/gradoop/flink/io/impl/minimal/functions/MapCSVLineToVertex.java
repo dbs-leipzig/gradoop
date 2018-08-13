@@ -33,13 +33,17 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  */
 public class MapCSVLineToVertex implements MapFunction<String, Tuple3<String, String, Properties>> {
 
-  /** Token separator for the csv file. */
+  /**
+   * Token separator for the csv file.
+   */
   private String tokenSeparator;
-
-  /** Map the path of an vertex file to the vertex property names. */
+  /**
+   * Map the path of an vertex file to the vertex property names.
+   */
   private Map<String, List<String>> propertyMap;
-
-  /** The path to the vertex file. */
+  /**
+   * The path to the vertex file.
+   */
   private String vertexPath;
 
   /**
@@ -58,10 +62,8 @@ public class MapCSVLineToVertex implements MapFunction<String, Tuple3<String, St
 
   @Override
   public Tuple3<String, String, Properties> map(String line) throws Exception {
-
     String[] tokens = line.split(tokenSeparator, 3);
-    Properties props = parseProperties(tokens[2],
-            propertyMap.get(vertexPath));
+    Properties props = parseProperties(tokens[2], propertyMap.get(vertexPath));
     return Tuple3.of(tokens[0], tokens[1], props);
   }
 
@@ -69,11 +71,11 @@ public class MapCSVLineToVertex implements MapFunction<String, Tuple3<String, St
    * Map each label to the occurring properties.
    *
    * @param propertyValueString the properties
-   * @param propertieLabels List of all property names.
+   * @param propertyLabels List of all property names.
    * @return Properties as pojo element
    */
   public Properties parseProperties(String propertyValueString,
-          List<String> propertieLabels) {
+          List<String> propertyLabels) {
 
     Properties properties = new Properties();
 
@@ -81,7 +83,7 @@ public class MapCSVLineToVertex implements MapFunction<String, Tuple3<String, St
 
     for (int i = 0; i < propertyValues.length; i++) {
       if (propertyValues[i].length() > 0) {
-        properties.set(propertieLabels.get(i),
+        properties.set(propertyLabels.get(i),
             PropertyValue.create(propertyValues[i]));
       }
     }

@@ -37,17 +37,14 @@ public class MinimalCSVVertexProvider implements VertexImporter<String> {
    * Token delimiter
    */
   private String tokenSeparator;
-
   /**
    * Map the file to the containing property names.
    */
   private Map<String, List<String>> propertyMap;
-
   /**
    * Gradoop Flink configuration
    */
   private GradoopFlinkConfig config;
-
   /**
    * Set of vertices in EPGM format.
    */
@@ -74,7 +71,6 @@ public class MinimalCSVVertexProvider implements VertexImporter<String> {
    * @return DataSet of all vertices of the graph.
    */
   public DataSet<ImportVertex<String>> importVertex() {
-
     importVertices = null;
     for (Map.Entry<String, List<String>> entry : propertyMap.entrySet()) {
       if (importVertices != null) {
@@ -96,14 +92,11 @@ public class MinimalCSVVertexProvider implements VertexImporter<String> {
    */
   public DataSet<ImportVertex<String>> readCSVFile(
       GradoopFlinkConfig config, String vertexCsvPath, String tokenSeparator) {
-
     DataSet<Tuple3<String, String, Properties>> lines = config.getExecutionEnvironment()
                 .readTextFile(vertexCsvPath)
                 .map(new MapCSVLineToVertex(tokenSeparator, propertyMap, vertexCsvPath));
 
-    DataSet<ImportVertex<String>> vertices = lines.map(new CreateLabeledImportVertexProperties<>());
-
-    return vertices;
+    return lines.map(new CreateLabeledImportVertexProperties<>());
   }
 
   @Override

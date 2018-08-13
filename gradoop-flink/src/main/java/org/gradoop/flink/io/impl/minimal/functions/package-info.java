@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to graph data sources and data sinks.
+ * Contains all classes related to all minimal data sources and sinks.
  */
 package org.gradoop.flink.io.impl.minimal.functions;

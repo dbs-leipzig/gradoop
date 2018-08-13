@@ -44,33 +44,33 @@ public class MinimalCSVDataSource implements DataSource {
   /**
   * All vertices the graph contains.
   */
-  private MinimalCSVVertexProvider vertices;
+  private MinimalCSVVertexProvider vertexProvider;
 
   /**
   * All edges the graph contains.
   */
-  private MinimalCSVEdgeProvider edges;
+  private MinimalCSVEdgeProvider edgeProvider;
 
   /**
   * Constructor
   *
   * @param config Gradoop configuration
-  * @param vertices all vertices of the graph
-  * @param edges all edges of the graph
+  * @param vertexProvider all vertices of the graph
+  * @param edgeProvider all edges of the graph
   */
-  public MinimalCSVDataSource(MinimalCSVVertexProvider vertices,
-        MinimalCSVEdgeProvider edges, GradoopFlinkConfig config) {
-    this.vertices = vertices;
-    this.edges = edges;
+  public MinimalCSVDataSource(MinimalCSVVertexProvider vertexProvider,
+        MinimalCSVEdgeProvider edgeProvider, GradoopFlinkConfig config) {
+    this.vertexProvider = vertexProvider;
+    this.edgeProvider = edgeProvider;
     this.config = config;
   }
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
 
-    DataSet<ImportVertex<String>> importVertices = vertices.importVertex();
+    DataSet<ImportVertex<String>> importVertices = vertexProvider.importVertex();
 
-    DataSet<ImportEdge<String>> importEdges = edges.importEdge();
+    DataSet<ImportEdge<String>> importEdges = edgeProvider.importEdge();
 
     return new GraphDataSource<>(importVertices, importEdges, getConfig()).getLogicalGraph();
   }

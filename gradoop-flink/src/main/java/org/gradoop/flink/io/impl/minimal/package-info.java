@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to reading an external graph from CSV input into Gradoop.
+ * Contains all classes related to reading an external graph to all minimal data sources and sinks.
  */
 package org.gradoop.flink.io.impl.minimal;
