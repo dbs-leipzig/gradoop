@@ -14,6 +14,8 @@ org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
 org.gradoop.common.util
 org.gradoop.examples
+org.gradoop.examples.aggregation
+org.gradoop.examples.aggregation.functions
 org.gradoop.examples.biiig
 org.gradoop.examples.dimspan
 org.gradoop.examples.dimspan.data_source
