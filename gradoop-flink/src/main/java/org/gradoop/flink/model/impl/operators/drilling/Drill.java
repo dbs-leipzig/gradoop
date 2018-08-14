@@ -31,7 +31,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
   /**
    * Supported elements.
    */
-  public static enum Element {
+  public enum Element {
     /**
      * Vertices
      */
@@ -76,14 +76,15 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
 
   /**
    * Valued constructor.
-   * @param label           label of the element whose property shall be drilled
-   * @param propertyKey     property key
-   * @param vertexDrillFunction drill function which shall be applied to a property of a vertex
+   *
+   * @param label                   label of the element whose property shall be drilled
+   * @param propertyKey             property key
+   * @param vertexDrillFunction     drill function which shall be applied to a property of a vertex
    * @param edgeDrillFunction       drill function which shall be applied to a property of an edge
    * @param graphheadDrillFunction  drill function which shall be applied to a property of a
-   * graph head
-   * @param newPropertyKey  new property key
-   * @param element          Element to be covered by the operation
+   *                                graph head
+   * @param newPropertyKey          new property key
+   * @param element                 Element to be covered by the operation
    */
   Drill(String label, String propertyKey, DrillFunction vertexDrillFunction,
     DrillFunction edgeDrillFunction, DrillFunction graphheadDrillFunction,
@@ -290,11 +291,11 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Creates a drill up operation.
+     * Creates a roll up operation.
      *
-     * @return drill up operation
+     * @return roll up operation
      */
-    public DrillUp buildDrillUp() {
+    public RollUp buildRollUp() {
       Objects.requireNonNull(propertyKey);
 
       if (vertexDrillFunction == null &&
@@ -303,7 +304,7 @@ public abstract class Drill implements UnaryGraphToGraphOperator {
         throw new IllegalArgumentException();
       }
 
-      return new DrillUp(
+      return new RollUp(
         label, propertyKey, vertexDrillFunction, edgeDrillFunction, graphheadDrillFunction,
         newPropertyKey, element);
     }

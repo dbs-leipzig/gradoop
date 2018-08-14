@@ -438,24 +438,24 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(String propertyKey, DrillFunction function) {
-    return drillUpVertex(null, propertyKey, function);
+  public LogicalGraph rollUpVertex(String propertyKey, DrillFunction function) {
+    return rollUpVertex(null, propertyKey, function);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(
+  public LogicalGraph rollUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function) {
-    return drillUpVertex(vertexLabel, propertyKey, function, null);
+    return rollUpVertex(vertexLabel, propertyKey, function, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(
+  public LogicalGraph rollUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
@@ -473,30 +473,30 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
 
-    return callForGraph(builder.buildDrillUp());
+    return callForGraph(builder.buildRollUp());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(String propertyKey, DrillFunction function) {
-    return drillUpEdge(null, propertyKey, function);
+  public LogicalGraph rollUpEdge(String propertyKey, DrillFunction function) {
+    return rollUpEdge(null, propertyKey, function);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
-    return drillUpEdge(edgeLabel, propertyKey, function, null);
+  public LogicalGraph rollUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return rollUpEdge(edgeLabel, propertyKey, function, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(
+  public LogicalGraph rollUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
@@ -514,7 +514,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
 
-    return callForGraph(builder.buildDrillUp());
+    return callForGraph(builder.buildRollUp());
   }
 
   /**

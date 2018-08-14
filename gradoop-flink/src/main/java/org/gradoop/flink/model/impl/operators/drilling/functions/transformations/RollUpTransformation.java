@@ -19,24 +19,24 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 
 /**
- * Logical graph transformation which drills up a property value of a given key. This class is
+ * Logical graph transformation which rolls up a property value of a given key. This class is
  * used for vertices and edges.
  *
  * @param <EL> element
  */
-public class DrillUpTransformation<EL extends Element> extends DrillTransformation<EL> {
+public class RollUpTransformation<EL extends Element> extends DrillTransformation<EL> {
 
   /**
    * Valued constructor.
    *
-   * @param label                  label of the element whose property shall be drilled
+   * @param label                  label of the element whose property shall be rolled
    * @param propertyKey            property key
    * @param function               drill function which shall be applied to a property
    * @param newPropertyKey         new property key
-   * @param drillAllLabels         true, if all elements of a kind (vertex / edge) shall be drilled
+   * @param drillAllLabels         true, if all elements of an element shall be drilled
    * @param keepCurrentPropertyKey true, if the current property key shall be reused
    */
-  public DrillUpTransformation(String label, String propertyKey, DrillFunction function,
+  public RollUpTransformation(String label, String propertyKey, DrillFunction function,
     String newPropertyKey, boolean drillAllLabels, boolean keepCurrentPropertyKey) {
     super(label, propertyKey, function, newPropertyKey, drillAllLabels, keepCurrentPropertyKey);
   }
@@ -49,19 +49,19 @@ public class DrillUpTransformation<EL extends Element> extends DrillTransformati
     // filters relevant elements
     if (drillAllLabels() || getLabel().equals(current.getLabel())) {
       if (current.hasProperty(getPropertyKey())) {
-        // save drilled up value with the same key
+        // save rolled up value with the same key
         if (keepCurrentPropertyKey()) {
           // save the original value with the version number in the property key
           transformed.setProperty(
-            getPropertyKey() + PROPERTY_VERSION_SEPARATOR + getNextDrillUpVersionNumber(current),
+            getPropertyKey() + PROPERTY_VERSION_SEPARATOR + getNextRollUpVersionNumber(current),
             current.getPropertyValue(getPropertyKey()));
-          // save the new drilled value
+          // save the new rolled value
           transformed.setProperty(
             getPropertyKey(),
             getFunction().execute(current.getPropertyValue(getPropertyKey())));
           // new key is used, so the old property is untouched
         } else {
-          // store the drilled value with the new key
+          // store the rolled value with the new key
           transformed.setProperty(
             getNewPropertyKey(),
             getFunction().execute(current.getPropertyValue(getPropertyKey())));

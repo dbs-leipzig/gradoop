@@ -15,12 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.drilling;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
-import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillUpTransformation;
+import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.RollUpTransformation;
 
 /**
  * Creates a graph with the same structure but a specified property of an element is drilled up
@@ -46,7 +43,7 @@ import org.gradoop.flink.model.impl.operators.drilling.functions.transformations
  * This example shows that this operation may be used as pre processing for the
  * {@link org.gradoop.flink.model.impl.operators.grouping.Grouping} operator.
  */
-public class DrillUp extends Drill {
+public class RollUp extends Drill {
 
   /**
    * Valued constructor.
@@ -60,7 +57,7 @@ public class DrillUp extends Drill {
    * @param newPropertyKey          new property key
    * @param element                 Element to be covered by the operation
    */
-  DrillUp(String label, String propertyKey, DrillFunction vertexDrillFunction,
+  RollUp(String label, String propertyKey, DrillFunction vertexDrillFunction,
   DrillFunction edgeDrillFunction, DrillFunction graphheadDrillFunction,
   String newPropertyKey, Element element) {
     super(label, propertyKey, vertexDrillFunction, edgeDrillFunction, graphheadDrillFunction,
@@ -71,15 +68,15 @@ public class DrillUp extends Drill {
   public LogicalGraph execute(LogicalGraph graph) {
     if (getElement() == Element.VERTICES) {
       graph = graph.transformVertices(
-        new DrillUpTransformation<Vertex>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
+        new RollUpTransformation<>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else if (getElement() == Element.EDGES) {
       graph = graph.transformEdges(
-        new DrillUpTransformation<Edge>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
+        new RollUpTransformation<>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else {
       graph = graph.transformGraphHead(
-        new DrillUpTransformation<GraphHead>(getLabel(), getPropertyKey(),
+        new RollUpTransformation<>(getLabel(), getPropertyKey(),
         getGraphheadDrillFunction(), getNewPropertyKey(), drillAllLabels(),
         keepCurrentPropertyKey()));
     }
@@ -88,6 +85,6 @@ public class DrillUp extends Drill {
 
   @Override
   public String getName() {
-    return DrillUp.class.getName();
+    return RollUp.class.getName();
   }
 }

@@ -15,9 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.drilling;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillDownTransformation;
@@ -56,15 +53,15 @@ public class DrillDown extends Drill {
   public LogicalGraph execute(LogicalGraph graph) {
     if (getElement() == Element.VERTICES) {
       graph = graph.transformVertices(
-        new DrillDownTransformation<Vertex>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
+        new DrillDownTransformation<>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else if (getElement() == Element.EDGES) {
       graph = graph.transformEdges(
-        new DrillDownTransformation<Edge>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
+        new DrillDownTransformation<>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
           getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
     } else {
       graph = graph.transformGraphHead(
-        new DrillDownTransformation<GraphHead>(getLabel(), getPropertyKey(),
+        new DrillDownTransformation<>(getLabel(), getPropertyKey(),
           getGraphheadDrillFunction(), getNewPropertyKey(), drillAllLabels(),
           keepCurrentPropertyKey()));
     }
