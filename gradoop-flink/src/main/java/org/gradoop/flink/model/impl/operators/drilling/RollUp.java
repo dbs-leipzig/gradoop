@@ -67,7 +67,7 @@ public class RollUp extends Drill {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-  	switch (getElement()) {
+    switch (getElement()) {
     case VERTICES:
       graph = graph.transformVertices(
         new RollUpTransformation<>(
@@ -98,8 +98,9 @@ public class RollUp extends Drill {
           drillAllLabels(),
           keepCurrentPropertyKey()));
       break;
-      default: throw new UnsupportedTypeException("Element type must be vertex, edge or graphhead");
-  	}
+    default:
+      throw new UnsupportedTypeException("Element type must be vertex, edge or graphhead");
+    }
     return graph;
   }
 
