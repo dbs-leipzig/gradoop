@@ -15,18 +15,84 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
 
 public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGraphSampling {
 
+  /**
+   * Creates a new RandomVertexNeighborhoodSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.IN_OUT
+   */
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
-                                              String neighborType) {
-    super(testName, seed, sampleSize, neighborType);
+    String neighborType) {
+    super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
+      Neighborhood.valueOf(neighborType));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UnaryGraphToGraphOperator getSamplingOperator() {
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
+
+    dbEdges.removeAll(newEdges);
+    for (Edge edge : dbEdges) {
+      assertFalse("there are vertices from edges, which are not part of the sampled graph",
+        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+    }
+  }
+
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and both neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "IN_OUT"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest without seed and both neighborhood",
+        "0",
+        "0.272f",
+        "IN_OUT"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and input neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "IN"
+      },
+      new String[] {
+        "VertexNeighborhoodSamplingTest with seed and output neighborhood",
+        "-4181668494294894490",
+        "0.272f",
+        "OUT"
+      });
+  }
 }

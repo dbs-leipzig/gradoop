@@ -17,123 +17,88 @@ package org.gradoop.flink.model.impl.operators.sampling;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
-@RunWith(Parameterized.class)
-public class RandomLimitedDegreeVertexSamplingTest extends GradoopFlinkTestBase {
+public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGraphSampling {
 
-  private final String testName;
-
-  private final long randomSeed;
-
-  private final float sampleSize;
-
-  private final VertexDegree degreeType;
-
-  private final long degreeThreshold;
-
-  private final String degreePropertyName;
-
-  public RandomLimitedDegreeVertexSamplingTest(String testName, String randomSeed,
-    String sampleSize, String degreeType, String degreeThreshold) {
-    this.testName = testName;
-    this.randomSeed = Long.parseLong(randomSeed);
-    this.sampleSize = Float.parseFloat(sampleSize);
-    this.degreeType = VertexDegree.valueOf(degreeType);
-    this.degreeThreshold = Long.parseLong(degreeThreshold);
-    this.degreePropertyName = this.degreeType.getName();
+  /**
+   * Creates a new RandomLimitedDegreeVertexSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   * @param degreeType The vertex degree type, e.g. VertexDegree.IN_OUT
+   * @param degreeThreshold The threshold for the vertex degree, e.g. 3
+   */
+  public RandomLimitedDegreeVertexSamplingTest(String testName, String seed, String sampleSize,
+    String degreeType, String degreeThreshold) {
+    super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
+      VertexDegree.valueOf(degreeType), Long.parseLong(degreeThreshold));
   }
 
-  @Test
-  public void randomLimitedDegreeVertexSamplingTest() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader()
-      .getDatabase().getDatabaseGraph();
-
-    LogicalGraph newGraph = new RandomLimitedDegreeVertexSampling(sampleSize, randomSeed,
-      degreeThreshold, degreeType).execute(dbGraph);
-
-    validateResult(dbGraph, newGraph);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UnaryGraphToGraphOperator getSamplingOperator() {
+    return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
   }
 
-  private void validateResult(LogicalGraph input, LogicalGraph output)
-    throws Exception {
-    List<Vertex> dbVertices = Lists.newArrayList();
-    List<Edge> dbEdges = Lists.newArrayList();
-    List<Vertex> newVertices = Lists.newArrayList();
-    List<Edge> newEdges = Lists.newArrayList();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
+    List<Vertex> dbDegreeVertices = Lists.newArrayList();
+    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
+      VertexDegree.IN_OUT.getName(),
+      VertexDegree.IN.getName(),
+      VertexDegree.OUT.getName(),
+      true).execute(input);
+    inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbDegreeVertices));
 
-    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(VertexDegree.IN_OUT.getName(),
-      VertexDegree.IN.getName(),VertexDegree.OUT.getName(),true).execute(input);
-
-    inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbVertices));
-    inputWithDegrees.getEdges().output(new LocalCollectionOutputFormat<>(dbEdges));
-
-    output.getVertices().output(new LocalCollectionOutputFormat<>(newVertices));
-    output.getEdges().output(new LocalCollectionOutputFormat<>(newEdges));
-
-    getExecutionEnvironment().execute();
-
-    // Test, if there is a result graph
-    assertNotNull("graph was null", output);
-
-    Set<GradoopId> newVertexIDs = new HashSet<>();
-    for (Vertex vertex : newVertices) {
-      // Test, if all new vertices are taken from the original graph
-      assertTrue("sampled vertex is not part of the original graph",
-        dbVertices.contains(vertex));
-      newVertexIDs.add(vertex.getId());
+    try {
+      getExecutionEnvironment().execute();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
-    for (Edge edge : newEdges) {
-      // Test, if all new edges are taken from the original graph
-      assertTrue("sampled edge is not part of the original graph", dbEdges.contains(edge));
-      // Test, if all source- and target-vertices from new edges are part of the sampled graph, too
-      assertTrue("sampled edge has source vertex which is not part of the sampled graph",
-        newVertexIDs.contains(edge.getSourceId()));
-      assertTrue("sampled edge has target vertex which is not part of the sampled graph",
-        newVertexIDs.contains(edge.getTargetId()));
-    }
-
-    // Test, if there aren't any source- and target-vertices from not sampled edges left
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
       assertFalse("there are vertices from edges, which are not part of the sampled graph",
-        newVertexIDs.contains(edge.getSourceId()) &&
-          newVertexIDs.contains(edge.getTargetId()));
+        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
     }
 
-    // Test, if all vertices with degree higher the given threshold were sampled
     List<Vertex> verticesSampledByDegree = Lists.newArrayList();
-    for (Vertex vertex : dbVertices) {
-      if ((Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString())
-        > degreeThreshold) && newVertices.contains(vertex)) {
+    for (Vertex vertex : dbDegreeVertices) {
+      if ((Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString()) > degreeThreshold) &&
+        newVertices.contains(vertex)) {
         verticesSampledByDegree.add(vertex);
       }
     }
-    dbVertices.removeAll(verticesSampledByDegree);
-    for (Vertex vertex : dbVertices) {
-      assertFalse("vertex with degree higher than degree threshold was not sampled",
-        Long.parseLong(vertex.getPropertyValue(degreePropertyName).toString())
-          > degreeThreshold);
+    dbDegreeVertices.removeAll(verticesSampledByDegree);
+    for (Vertex vertex : dbDegreeVertices) {
+      assertFalse("vertex with degree greater than degree threshold was not sampled",
+        Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString()) > degreeThreshold);
     }
   }
 
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(

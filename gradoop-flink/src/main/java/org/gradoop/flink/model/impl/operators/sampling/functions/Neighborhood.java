@@ -15,44 +15,45 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
-import java.security.InvalidParameterException;
-
 /**
- * Keeps the types of neighborhood
+ * Keeps the types of vertex-neighborhood regarding the connecting edges
+ * and their respective property names.
+ * Available neighborhood-types: input (IN), output (OUT), both (IN_OUT).
  */
-public class Neighborhood {
+public enum Neighborhood {
   /**
-   * Types of neighborhood: input, output, or both edges
+   * Input edges
    */
-  public enum NeighborType {
-    /**
-     * Input edges
-     */
-    Input,
-    /**
-     * Output edges
-     */
-    Output,
-    /**
-     * Both edges
-     */
-    Both
+  IN("_InNeighbor"),
+  /**
+   * Output edges
+   */
+  OUT("_OutNeighbor"),
+  /**
+   * Both edges
+   */
+  IN_OUT("_InOutNeighbor");
+
+  /**
+   * The property name of a vertex neighbor type
+   */
+  private String neighborPropertyName;
+
+  /**
+   * Enum constructor for neighbor type with property name.
+   *
+   * @param neighborPropertyName The property name for a neighbor type
+   */
+  Neighborhood(String neighborPropertyName) {
+    this.neighborPropertyName = neighborPropertyName;
   }
 
   /**
-   * Build an instance of NieghborType from a given string
-   * @param neighborType type of neighborhood
-   * @return an instace of NieghborType
+   * Get the property name for an instance of Neighborhood.
+   *
+   * @return The neighbor property name
    */
-  public static NeighborType fromString(String neighborType) {
-    if (neighborType.equals(NeighborType.Input.toString())) {
-      return NeighborType.Input;
-    } else if (neighborType.equals(NeighborType.Output.toString())) {
-      return NeighborType.Output;
-    } else if (neighborType.equals(NeighborType.Both.toString())) {
-      return NeighborType.Both;
-    } else {
-      throw new InvalidParameterException();
-    }
+  public String getName() {
+    return neighborPropertyName;
   }
 }
