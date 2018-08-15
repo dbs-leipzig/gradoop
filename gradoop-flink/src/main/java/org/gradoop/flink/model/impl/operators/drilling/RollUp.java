@@ -18,16 +18,33 @@ package org.gradoop.flink.model.impl.operators.drilling;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
-import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillDownTransformation;
+import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.RollUpTransformation;
 
 /**
- * Creates a graph with the same structure but a specified property of an element is drilled down
- * by the declared function. The drilled down value can be stored under a new key. If the
- * original key shall be reused the old value is overwritten. Drill down can also be used
- * without specifying a drill down function when it is preceded by a roll up operation on the
- * same property key.
+ * Creates a graph with the same structure but a specified property of an element is drilled up
+ * by the declared function. The drilled up value can be stored under a new key. If the
+ * original key shall be reused the old value is stored under the key 'key__x' where 'x' is a
+ * version number. This number increases on every continuous drill up call where the highest
+ * number is the level direct below the drilled up one.
+ * <p>
+ * Consider the following example:
+ * <p>
+ * Input vertices:<br>
+ * (0, "Person", {yob: 1973})<br>
+ * (1, "Person", {yob: 1977})<br>
+ * (2, "Person", {yob: 1984})<br>
+ * (3, "Person", {yob: 1989})<br>
+ * <p>
+ * Output vertices (drilled by the century of their year of birth):<br>
+ * (0, "Person", {yob: 1970, yob__1: 1973})<br>
+ * (1, "Person", {yob: 1970, yob__1: 1977})<br>
+ * (2, "Person", {yob: 1980, yob__1: 1984})<br>
+ * (3, "Person", {yob: 1980, yob__1: 1989})<br>
+ * <p>
+ * This example shows that this operation may be used as pre processing for the
+ * {@link org.gradoop.flink.model.impl.operators.grouping.Grouping} operator.
  */
-public class DrillDown extends Drill {
+public class RollUp extends Drill {
 
   /**
    * Valued constructor.
@@ -41,21 +58,19 @@ public class DrillDown extends Drill {
    * @param newPropertyKey          new property key
    * @param element                 Element to be covered by the operation
    */
-  public DrillDown(
-    String label, String propertyKey, DrillFunction vertexDrillFunction,
-    DrillFunction edgeDrillFunction, DrillFunction graphheadDrillFunction,
-    String newPropertyKey, Element element) {
-    super(label, propertyKey, vertexDrillFunction, edgeDrillFunction,
-      graphheadDrillFunction, newPropertyKey, element);
+  RollUp(String label, String propertyKey, DrillFunction vertexDrillFunction,
+  DrillFunction edgeDrillFunction, DrillFunction graphheadDrillFunction,
+  String newPropertyKey, Element element) {
+    super(label, propertyKey, vertexDrillFunction, edgeDrillFunction, graphheadDrillFunction,
+    newPropertyKey, element);
   }
-
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     switch (getElement()) {
     case VERTICES:
       graph = graph.transformVertices(
-        new DrillDownTransformation<>(
+        new RollUpTransformation<>(
           getLabel(),
           getPropertyKey(),
           getVertexDrillFunction(),
@@ -65,7 +80,7 @@ public class DrillDown extends Drill {
       break;
     case EDGES:
       graph = graph.transformEdges(
-        new DrillDownTransformation<>(
+        new RollUpTransformation<>(
           getLabel(),
           getPropertyKey(),
           getEdgeDrillFunction(),
@@ -75,7 +90,7 @@ public class DrillDown extends Drill {
       break;
     case GRAPHHEAD:
       graph = graph.transformGraphHead(
-        new DrillDownTransformation<>(
+        new RollUpTransformation<>(
           getLabel(),
           getPropertyKey(),
           getGraphheadDrillFunction(),
@@ -91,7 +106,6 @@ public class DrillDown extends Drill {
 
   @Override
   public String getName() {
-    return DrillDown.class.getName();
+    return RollUp.class.getName();
   }
-
 }
