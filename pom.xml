@@ -133,6 +133,7 @@
         <dep.log4j.version>1.2.17</dep.log4j.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
+        <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>2.16</plugin.maven-checkstyle.version>
@@ -421,7 +422,6 @@
                         <excludes>
                             <exclude>**/*TestBase*.class</exclude>
                         </excludes>
-                        <argLine>@{argLine} -Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
