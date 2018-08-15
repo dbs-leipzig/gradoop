@@ -15,24 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.drilling;
 
-import static org.gradoop.common.GradoopTestUtils.validateIdEquality;
-
-import java.util.List;
-
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillMultiplyBy;
-import org.gradoop.flink.model.impl.operators.transformation.TransformationTest;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.drilling.drillfunctions.DrillDivideBy;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 
 public class DrillTest extends GradoopFlinkTestBase {
@@ -42,7 +30,8 @@ public class DrillTest extends GradoopFlinkTestBase {
   //----------------------------------------------------------------------------
 
 
-  @Test(expected = NullPointerException.class)
+  @SuppressWarnings("unused")
+	@Test(expected = NullPointerException.class)
   public void testVertexRollUpNoProperty() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
@@ -52,7 +41,8 @@ public class DrillTest extends GradoopFlinkTestBase {
       .buildRollUp());
   }
 
-  @Test(expected = NullPointerException.class)
+  @SuppressWarnings("unused")
+	@Test(expected = NullPointerException.class)
   public void testVertexRollUpFunctionOnly() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 
@@ -338,7 +328,8 @@ public class DrillTest extends GradoopFlinkTestBase {
   	FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    loader.appendToDatabaseFromString("expected{title : \"Graph\", globalMemberCount : 42L,globalMemberCount__1: 42000L}[" + 
+    loader.appendToDatabaseFromString(
+    	"expected{title : \"Graph\", globalMemberCount : 42L,globalMemberCount__1: 42000L}[" + 
     	"(v0:Forum {topic : \"rdf\",memberCount : 1563145521L})" + 
     	"(v1:Forum {topic : \"graph\",memberCount: 451341564L})" + 
     	"(v2:User {gender : \"male\",birthMillis : 500000000000L})" + 
@@ -372,7 +363,8 @@ public class DrillTest extends GradoopFlinkTestBase {
   //----------------------------------------------------------------------------
 
 
-  @Test(expected = NullPointerException.class)
+  @SuppressWarnings("unused")
+	@Test(expected = NullPointerException.class)
   public void testVertexDrillDownNoProperty() {
     FlinkAsciiGraphLoader loader = getLoaderFromString(getDrillInput());
 

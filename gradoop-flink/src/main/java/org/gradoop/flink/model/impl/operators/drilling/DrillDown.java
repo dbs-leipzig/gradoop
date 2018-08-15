@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.drilling;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.DrillDownTransformation;
@@ -51,20 +52,39 @@ public class DrillDown extends Drill {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    if (getElement() == Element.VERTICES) {
+  	switch (getElement()) {
+    case VERTICES:
       graph = graph.transformVertices(
-        new DrillDownTransformation<>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
-          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
-    } else if (getElement() == Element.EDGES) {
-      graph = graph.transformEdges(
-        new DrillDownTransformation<>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
-          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
-    } else {
-      graph = graph.transformGraphHead(
-        new DrillDownTransformation<>(getLabel(), getPropertyKey(),
-          getGraphheadDrillFunction(), getNewPropertyKey(), drillAllLabels(),
+        new DrillDownTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getVertexDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
           keepCurrentPropertyKey()));
-    }
+      break;
+    case EDGES:
+      graph = graph.transformEdges(
+        new DrillDownTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getEdgeDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
+          keepCurrentPropertyKey()));
+      break;
+    case GRAPHHEAD:
+      graph = graph.transformGraphHead(
+        new DrillDownTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getGraphheadDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
+          keepCurrentPropertyKey()));
+      break;
+      default: throw new UnsupportedTypeException("Element type must be vertex, edge or graphhead");
+  	}
     return graph;
   }
 

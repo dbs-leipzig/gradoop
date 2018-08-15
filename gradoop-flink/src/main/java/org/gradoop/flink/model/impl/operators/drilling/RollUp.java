@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.drilling;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
 import org.gradoop.flink.model.impl.operators.drilling.functions.transformations.RollUpTransformation;
@@ -66,20 +67,39 @@ public class RollUp extends Drill {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    if (getElement() == Element.VERTICES) {
+  	switch (getElement()) {
+    case VERTICES:
       graph = graph.transformVertices(
-        new RollUpTransformation<>(getLabel(), getPropertyKey(), getVertexDrillFunction(),
-          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
-    } else if (getElement() == Element.EDGES) {
+        new RollUpTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getVertexDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
+          keepCurrentPropertyKey()));
+      break;
+    case EDGES:
       graph = graph.transformEdges(
-        new RollUpTransformation<>(getLabel(), getPropertyKey(), getEdgeDrillFunction(),
-          getNewPropertyKey(), drillAllLabels(), keepCurrentPropertyKey()));
-    } else {
+        new RollUpTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getEdgeDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
+          keepCurrentPropertyKey()));
+      break;
+    case GRAPHHEAD:
       graph = graph.transformGraphHead(
-        new RollUpTransformation<>(getLabel(), getPropertyKey(),
-        getGraphheadDrillFunction(), getNewPropertyKey(), drillAllLabels(),
-        keepCurrentPropertyKey()));
-    }
+        new RollUpTransformation<>(
+          getLabel(),
+          getPropertyKey(),
+          getGraphheadDrillFunction(),
+          getNewPropertyKey(),
+          drillAllLabels(),
+          keepCurrentPropertyKey()));
+      break;
+      default: throw new UnsupportedTypeException("Element type must be vertex, edge or graphhead");
+  	}
     return graph;
   }
 
