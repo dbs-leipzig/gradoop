@@ -37,6 +37,7 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
    * args[4] - sampling threshold for vertices
    * args[5] - sampling threshold for edges
    * args[6] - sampling type
+   * args[7] - evaluate (true, false)
    *
    * @param args arguments
    */
@@ -46,6 +47,9 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample = graph.callForGraph(new RandomVertexEdgeSampling(
             Float.parseFloat(args[4]), Float.parseFloat(args[5]), vertexEdgeSamplingType));
+    if (Boolean.parseBoolean(args[7])) {
+      SamplingEvaluationRunner.evaluate(graph, sample, args[2]);
+    }
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

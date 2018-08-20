@@ -35,6 +35,7 @@ public class RandomNonUniformVertexSamplingRunner extends AbstractRunner impleme
    * args[2] - path to output graph
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold
+   * args[5] - evaluate (true, false)
    *
    * @param args arguments
    */
@@ -42,6 +43,9 @@ public class RandomNonUniformVertexSamplingRunner extends AbstractRunner impleme
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample = graph.callForGraph(
             new RandomNonUniformVertexSampling(Float.parseFloat(args[4])));
+    if (Boolean.parseBoolean(args[5])) {
+      SamplingEvaluationRunner.evaluate(graph, sample, args[2]);
+    }
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

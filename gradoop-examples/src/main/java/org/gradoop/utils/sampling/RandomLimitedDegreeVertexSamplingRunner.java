@@ -39,6 +39,7 @@ public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner impl
    * args[4] - sampling threshold
    * args[5] - vertex degree threshold
    * args[6] - vertex degree type (IN, OUT, IN_OUT)
+   * args[7] - evaluate (true, false)
    *
    * @param args arguments
    */
@@ -46,6 +47,9 @@ public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner impl
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
     LogicalGraph sample = graph.callForGraph(new RandomLimitedDegreeVertexSampling(
       Float.parseFloat(args[4]), Long.parseLong(args[5]), VertexDegree.valueOf(args[6])));
+    if (Boolean.parseBoolean(args[7])) {
+      SamplingEvaluationRunner.evaluate(graph, sample, args[2]);
+    }
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
