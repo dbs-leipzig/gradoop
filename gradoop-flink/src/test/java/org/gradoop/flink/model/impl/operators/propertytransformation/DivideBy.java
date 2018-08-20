@@ -13,23 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions;
+package org.gradoop.flink.model.impl.operators.propertytransformation;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 
-import java.io.Serializable;
-
-/**
- * Interface for all drill functions which are used for drill down / drill up operations.
- */
-public interface DrillFunction extends Serializable {
+public class DivideBy implements PropertyTransformationFunction {
 
   /**
-   * Returns a changed property value based in the property before drilling.
-   *
-   * @param property current property
-   * @return property after drilling
+   * Avoid object instantiation.
    */
-  PropertyValue execute(PropertyValue property);
+  private PropertyValue reuseProperty = new PropertyValue();
 
+  /**
+   * Value which the property value shall be divided by.
+   */
+  private long divisor;
+
+  /**
+   * Valued constructor.
+   *
+   * @param divisor divisor for the property value
+   */
+  public DivideBy(long divisor) {
+    this.divisor = divisor;
+  }
+
+  @Override
+  public PropertyValue execute(PropertyValue property) {
+    reuseProperty.setLong(property.getLong() / divisor);
+    return reuseProperty;
+  }
 }
