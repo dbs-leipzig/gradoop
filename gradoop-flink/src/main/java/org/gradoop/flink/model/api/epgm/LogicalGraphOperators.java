@@ -528,7 +528,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   DataSet<Boolean> equalsByData(LogicalGraph other);
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * Applies a given roll-up (transformation) function on a single vertex property of the input
    * graph. The property is identified by the specified property key. The previous version of the
    * property value is stored at the vertex. The structure of the graph remains unchanged.
    *
@@ -538,12 +538,12 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param propertyKey property key
    * @param function drill up function
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpVertex(String propertyKey, DrillFunction function);
+  LogicalGraph rollUpVertex(String propertyKey, DrillFunction function);
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * Applies a given roll-up (transformation) function on a single vertex property of the input
    * graph. The vertices are selected by their label and the property is identified by the
    * specified property key. The previous version of the property value is stored at the vertex.
    * The structure of the graph remains unchanged.
@@ -555,12 +555,12 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param vertexLabel vertex label
    * @param propertyKey property key
    * @param function drill up function
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
+  LogicalGraph rollUpVertex(String vertexLabel, String propertyKey, DrillFunction function);
 
   /**
-   * Applies a given drill-up (transformation) function on a single vertex property of the input
+   * Applies a given roll-up (transformation) function on a single vertex property of the input
    * graph. The vertices are selected by their label and the property is identified by the
    * specified property key. The new version of the property value is stored at the vertex
    * under the new property key. The structure of the graph remains unchanged.
@@ -573,13 +573,13 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param propertyKey property key
    * @param function drill up function
    * @param newPropertyKey new property key
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpVertex(
+  LogicalGraph rollUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
   /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * Applies a given roll-up (transformation) function on a single edge property of the input
    * graph. The property is identified by the specified property key. The previous version of the
    * property value is stored at the edge. The structure of the graph remains unchanged.
    *
@@ -589,12 +589,12 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *
    * @param propertyKey property key
    * @param function drill up function
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpEdge(String propertyKey, DrillFunction function);
+  LogicalGraph rollUpEdge(String propertyKey, DrillFunction function);
 
   /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * Applies a given roll-up (transformation) function on a single edge property of the input
    * graph. The edges are selected by their label and the property is identified by the
    * specified property key. The previous version of the property value is stored at the edge.
    * The structure of the graph remains unchanged.
@@ -606,12 +606,12 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeLabel edge label
    * @param propertyKey property key
    * @param function drill up function
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
+  LogicalGraph rollUpEdge(String edgeLabel, String propertyKey, DrillFunction function);
 
   /**
-   * Applies a given drill-up (transformation) function on a single edge property of the input
+   * Applies a given roll-up (transformation) function on a single edge property of the input
    * graph. The edges are selected by their label and the property is identified by the
    * specified property key. The new version of the property value is stored at the edge
    * under the new property key. The structure of the graph remains unchanged.
@@ -624,15 +624,15 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param propertyKey property key
    * @param function drill up function
    * @param newPropertyKey new property key
-   * @return graph with drilled up properties
+   * @return graph with rolled up properties
    */
-  LogicalGraph drillUpEdge(
+  LogicalGraph rollUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey);
 
   /**
    * Applies a drill-down operation on a single vertex property of the input graph. The property
    * is identified by the specified property key. The detailed version of the property value has
-   * to be stored at the vertex as a result from a previous drill-up operation.
+   * to be stored at the vertex as a result from a previous roll-up operation.
    *
    * This is a convenience function for
    * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
@@ -647,7 +647,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Applies a given drill-down operation on a single vertex property of the input graph. The
    * vertices are selected by their label and the property is identified by the specified
    * property key. The detailed version of the property value has to be stored at the vertex as a
-   * result from a previous drill-up operation. The structure of the graph remains unchanged.
+   * result from a previous roll-up operation. The structure of the graph remains unchanged.
    *
    * This is a convenience function for
    * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
@@ -714,7 +714,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   /**
    * Applies a drill-down operation on a single edge property of the input graph. The property
    * is identified by the specified property key. The detailed version of the property value has
-   * to be stored at the edge as a result from a previous drill-up operation.
+   * to be stored at the edge as a result from a previous roll-up operation.
    *
    * This is a convenience function for
    * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a
@@ -729,7 +729,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Applies a given drill-down operation on a single edge property of the input graph. The
    * edges are selected by their label and the property is identified by the specified
    * property key. The detailed version of the property value has to be stored at the edge as a
-   * result from a previous drill-up operation. The structure of the graph remains unchanged.
+   * result from a previous roll-up operation. The structure of the graph remains unchanged.
    *
    * This is a convenience function for
    * {@link LogicalGraph#transformVertices(TransformationFunction)} and can be used as a

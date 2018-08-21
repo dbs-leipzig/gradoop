@@ -84,7 +84,7 @@ public abstract class DrillTransformation<EL extends Element>
    * @param element element whose property shall be drilled up
    * @return next unused version number
    */
-  protected int getNextDrillUpVersionNumber(EL element) {
+  protected int getNextRollUpVersionNumber(EL element) {
     int i = 1;
     while (element.hasProperty(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i)) {
       i++;
