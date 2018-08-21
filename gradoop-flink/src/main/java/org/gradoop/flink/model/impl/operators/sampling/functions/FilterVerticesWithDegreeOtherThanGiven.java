@@ -28,6 +28,21 @@ import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraphOperator {
 
   /**
+   * Key of degree property
+   */
+  private static final String DEGREE_PROPERTY_KEY = VertexDegree.BOTH.getName();
+
+  /**
+   * Key of in-degree property
+   */
+  private static final String IN_DEGREE_PROPERTY_KEY = VertexDegree.IN.getName();
+
+  /**
+   * Key of out-degree property
+   */
+  private static final String OUT_DEGREE_PROPERTY_KEY = VertexDegree.OUT.getName();
+
+  /**
    * the given degree
    */
   private long degree;
@@ -47,17 +62,16 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
-      VertexDegree.IN_OUT.getName(),
-      VertexDegree.IN.getName(),
-      VertexDegree.OUT.getName(),
+      DEGREE_PROPERTY_KEY,
+      IN_DEGREE_PROPERTY_KEY,
+      OUT_DEGREE_PROPERTY_KEY,
       true);
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
 
-    newVertices = newVertices.filter(
-      new VertexWithDegreeFilter<>(degree, VertexDegree.IN_OUT.getName()))
-      .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
-      .map(new PropertyRemover<>(VertexDegree.IN.getName()))
-      .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
+    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree, DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(OUT_DEGREE_PROPERTY_KEY));
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());

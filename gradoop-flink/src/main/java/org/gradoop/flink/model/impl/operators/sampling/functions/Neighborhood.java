@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 /**
  * Keeps the types of vertex-neighborhood regarding the connecting edges
  * and their respective property names.
- * Available neighborhood-types: input (IN), output (OUT), both (IN_OUT).
+ * Available neighborhood-types: input (IN), output (OUT), both (BOTH).
  */
 public enum Neighborhood {
   /**
@@ -32,7 +32,7 @@ public enum Neighborhood {
   /**
    * Both edges
    */
-  IN_OUT("_InOutNeighbor");
+  BOTH("_InOutNeighbor");
 
   /**
    * The property name of a vertex neighbor type

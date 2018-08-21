@@ -41,7 +41,7 @@ public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraph
    * {@inheritDoc}
    */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
+  public SamplingAlgorithm getSamplingOperator() {
     return new RandomNonUniformVertexSampling(sampleSize, seed);
   }
 

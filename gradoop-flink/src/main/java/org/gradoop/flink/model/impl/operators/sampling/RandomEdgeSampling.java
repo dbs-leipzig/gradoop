@@ -19,7 +19,6 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -31,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  * and their associated source- and target-vertices. No unconnected vertices will retain in the
  * sampled graph.
  */
-public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
+public class RandomEdgeSampling extends SamplingAlgorithm {
   /**
    * Relative amount of edges in the result graph
    */
@@ -46,7 +45,7 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
   /**
    * Creates new RandomEdgeSampling instance.
    *
-   * @param sampleSize relative preprocess size
+   * @param sampleSize relative pre-process size
    */
   public RandomEdgeSampling(float sampleSize) {
     this(sampleSize, 0L);
@@ -67,17 +66,20 @@ public class RandomEdgeSampling implements UnaryGraphToGraphOperator {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Edge> newEdges =
-      graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
+  public LogicalGraph sample(LogicalGraph graph) {
+    DataSet<Edge> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<Vertex> newSourceVertices =
-      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new SourceId<>())
-        .with(new LeftSide<>()).distinct(new Id<>());
+    DataSet<Vertex> newSourceVertices = graph.getVertices()
+      .join(newEdges)
+      .where(new Id<>()).equalTo(new SourceId<>())
+      .with(new LeftSide<>())
+      .distinct(new Id<>());
 
-    DataSet<Vertex> newTargetVertices =
-      graph.getVertices().join(newEdges).where(new Id<>()).equalTo(new TargetId<>())
-        .with(new LeftSide<>()).distinct(new Id<>());
+    DataSet<Vertex> newTargetVertices = graph.getVertices()
+      .join(newEdges)
+      .where(new Id<>()).equalTo(new TargetId<>())
+      .with(new LeftSide<>())
+      .distinct(new Id<>());
 
     DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);

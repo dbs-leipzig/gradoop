@@ -16,9 +16,6 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-
-import java.security.InvalidParameterException;
 
 /**
  * Computes an edge sampling of the graph. First selects randomly chosen vertices of a given
@@ -26,10 +23,10 @@ import java.security.InvalidParameterException;
  * chooses edges from this set of edges and their associated source- and target-vertices.
  * No unconnected vertices will retain in the sampled graph.
  */
-public class RandomVertexEdgeSampling implements UnaryGraphToGraphOperator {
+public class RandomVertexEdgeSampling extends SamplingAlgorithm {
 
   /**
-   * The samping type enum
+   * The sampling type enum
    */
   public enum VertexEdgeSamplingType {
     /**
@@ -119,21 +116,25 @@ public class RandomVertexEdgeSampling implements UnaryGraphToGraphOperator {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    if (vertexEdgeSamplingType == VertexEdgeSamplingType.SimpleVersion) {
+  public LogicalGraph sample(LogicalGraph graph) {
+
+    switch (vertexEdgeSamplingType) {
+    case SimpleVersion:
       graph = new RandomVertexSampling(vertexSampleSize, randomSeed).execute(graph);
       graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);
-    } else if (vertexEdgeSamplingType == VertexEdgeSamplingType.NonuniformVersion ||
-            vertexEdgeSamplingType == VertexEdgeSamplingType.NonuniformHybridVersion) {
+      break;
+    case NonuniformVersion:
       graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);
-      if (vertexEdgeSamplingType == VertexEdgeSamplingType.NonuniformHybridVersion) {
-        graph = new RandomEdgeSampling(1 - vertexSampleSize, randomSeed).execute(graph);
-      } else {
-        graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);
-      }
-    } else {
-      throw new InvalidParameterException();
+      graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);
+      break;
+    case NonuniformHybridVersion:
+      graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);
+      graph = new RandomEdgeSampling(1 - vertexSampleSize, randomSeed).execute(graph);
+      break;
+    default:
+      break;
     }
+
     return graph;
   }
 
@@ -152,16 +153,6 @@ public class RandomVertexEdgeSampling implements UnaryGraphToGraphOperator {
    * @return the actual type of sampling
    */
   public static VertexEdgeSamplingType sampleTypeFromString(String type) {
-    VertexEdgeSamplingType vertexEdgeSamplingType;
-    if (type.equals(RandomVertexEdgeSampling.VertexEdgeSamplingType.SimpleVersion.toString())) {
-      vertexEdgeSamplingType = VertexEdgeSamplingType.SimpleVersion;
-    } else if (type.equals(VertexEdgeSamplingType.NonuniformVersion.toString())) {
-      vertexEdgeSamplingType = VertexEdgeSamplingType.NonuniformVersion;
-    } else if (type.equals(VertexEdgeSamplingType.NonuniformHybridVersion.toString())) {
-      vertexEdgeSamplingType = VertexEdgeSamplingType.NonuniformHybridVersion;
-    } else {
-      throw new InvalidParameterException();
-    }
-    return vertexEdgeSamplingType;
+    return VertexEdgeSamplingType.valueOf(type);
   }
 }

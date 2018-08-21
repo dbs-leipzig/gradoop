@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.evaluation;
+package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.CalculateDensity;
 
 /**
  * Computes the density of a graph and writes it to the graph head.
@@ -34,22 +34,16 @@ public class GraphDensity implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    VertexCount vc = new VertexCount();
-    EdgeCount ec = new EdgeCount();
-    DataSet<GraphHead> gh = graph.aggregate(vc).aggregate(ec).getGraphHead()
-      .map(new MapFunction<GraphHead, GraphHead>() {
-        @Override
-        public GraphHead map(GraphHead graphHead) throws Exception {
-          double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();
-          double ec1 = (double) graphHead.getPropertyValue("edgeCount").getLong();
-          double density = ec1 / (vc1 * (vc1 - 1.));
-          graphHead.setProperty(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY, density);
-          return graphHead;
-        }
-      });
+    VertexCount vertexCount = new VertexCount();
+    EdgeCount edgeCount = new EdgeCount();
+    DataSet<GraphHead> newGraphHead = graph
+      .aggregate(vertexCount)
+      .aggregate(edgeCount)
+      .getGraphHead()
+      .map(new CalculateDensity(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
     return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(gh, graph.getVertices(), graph.getEdges());
+      .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 
   /**

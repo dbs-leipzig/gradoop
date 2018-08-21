@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.util.List;
@@ -401,10 +402,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Creates a new graph from a randomly chosen subset of nodes and their
    * associated edges.
    *
-   * @param sampleSize relative amount of nodes in the result graph
+   * @param algorithm used sampling algorithm
    * @return logical graph with random nodes and their associated edges
    */
-  LogicalGraph sampleRandomNodes(float sampleSize);
+  LogicalGraph sample(SamplingAlgorithm algorithm);
 
   /**
    * Creates a condensed version of the logical graph by grouping vertices based on the specified

@@ -41,7 +41,7 @@ public class RandomVertexSamplingTest extends ParametrizedTestForGraphSampling {
    * {@inheritDoc}
    */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
+  public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexSampling(sampleSize, seed);
   }
 

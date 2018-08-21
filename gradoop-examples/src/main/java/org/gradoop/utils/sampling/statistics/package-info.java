@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains a collection of evaluation methods for graph sampling.
+ * Contains sampling statistics runner
  */
-package org.gradoop.flink.model.impl.operators.sampling.evaluation;
+package org.gradoop.utils.sampling.statistics;

@@ -13,57 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling;
+package org.gradoop.utils.sampling.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.evaluation.GraphDensity;
-import org.gradoop.flink.model.impl.operators.sampling.evaluation.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.GraphDensity;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
+import org.gradoop.utils.sampling.statistics.functions.GetPropertyValueDouble;
 
 /**
  * Calls the graph density computation for a logical graph and a graph sampled from it.
- * Writes both results to files in the given directory.
+ * Writes both results to files in the output directory.
  */
 public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
    * Calls the graph density computation for both graphs.
    *
-   * @param graph Original logical graph
-   * @param sample Sampled logical graph
-   * @param outputDir Directory for evaluation results
+   * args[0] - path to original graph
+   * args[1] - format of original graph (csv, json, indexed)
+   * args[2] - path to sampled graph
+   * args[3] - format of sampled graph (csv, json, indexed)
+   * args[4] - output path
+   *
+   * @param args command line arguments
+   * @throws Exception in case of read/write failure
    */
-  public static void main(LogicalGraph graph, LogicalGraph sample, String outputDir)
-    throws Exception {
+  public static void main(String[] args) throws Exception {
 
-    DataSet<Double> densityOriginal = graph.callForGraph(new GraphDensity()).getGraphHead()
-      .map(new MapFunction<GraphHead, Double>() {
-        @Override
-        public Double map(GraphHead graphHead) throws Exception {
-          return graphHead.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY)
-            .getDouble();
-        }
-      });
+    LogicalGraph origin = readLogicalGraph(args[0], args[1]);
+    LogicalGraph sampled = readLogicalGraph(args[2], args[3]);
 
-    DataSet<Double> densitySampled = sample.callForGraph(new GraphDensity()).getGraphHead()
-      .map(new MapFunction<GraphHead, Double>() {
-        @Override
-        public Double map(GraphHead graphHead) throws Exception {
-          return graphHead.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY)
-            .getDouble();
-        }
-      });
+    DataSet<Double> densityOriginal = origin.callForGraph(new GraphDensity()).getGraphHead()
+      .map(new GetPropertyValueDouble(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
+
+    DataSet<Double> densitySampled = sampled.callForGraph(new GraphDensity()).getGraphHead()
+      .map(new GetPropertyValueDouble(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
     StatisticWriter.writeCSV(densityOriginal.map(new ObjectTo1<>()),
-      appendSeparator(outputDir) + SamplingEvaluationConstants.FILE_DENSITY_ORIGINAL);
+      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY_ORIGINAL);
     StatisticWriter.writeCSV(densitySampled.map(new ObjectTo1<>()),
-      appendSeparator(outputDir) + SamplingEvaluationConstants.FILE_DENSITY_SAMPLED);
+      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY_SAMPLED);
 
     getExecutionEnvironment().execute("Sampling Evaluation: Graph density");
   }
