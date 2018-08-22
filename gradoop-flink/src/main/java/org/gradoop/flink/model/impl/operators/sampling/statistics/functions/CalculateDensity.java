@@ -42,10 +42,9 @@ public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
    *
    * @param graphHead The graphHead the density shall be written to
    * @return GraphHead The graphHead the density is written to
-   * @throws Exception if mapping goes wrong
    */
   @Override
-  public GraphHead map(GraphHead graphHead) throws Exception {
+  public GraphHead map(GraphHead graphHead) {
     double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();
     double ec1 = (double) graphHead.getPropertyValue("edgeCount").getLong();
     double density = ec1 / (vc1 * (vc1 - 1.));

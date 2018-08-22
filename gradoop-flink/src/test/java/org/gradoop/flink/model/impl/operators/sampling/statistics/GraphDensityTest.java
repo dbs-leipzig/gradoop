@@ -29,7 +29,7 @@ public class GraphDensityTest extends GradoopFlinkTestBase {
   /**
    * Tests the computation of graph density for a logical graph
    *
-   * @throws Exception If loading of the example-graph goes wrong
+   * @throws Exception If loading of the example-graph fails
    */
   @Test
   public void testGraphDensity() throws Exception {
