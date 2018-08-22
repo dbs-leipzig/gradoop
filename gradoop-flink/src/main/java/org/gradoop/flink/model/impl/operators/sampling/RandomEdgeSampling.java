@@ -45,7 +45,7 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
   /**
    * Creates new RandomEdgeSampling instance.
    *
-   * @param sampleSize relative pre-process size
+   * @param sampleSize relative sample size, e.g. 0.5
    */
   public RandomEdgeSampling(float sampleSize) {
     this(sampleSize, 0L);
@@ -54,7 +54,7 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
   /**
    * Creates new RandomEdgeSampling instance.
    *
-   * @param sampleSize relative sample size
+   * @param sampleSize relative sample size, e.g. 0.5
    * @param randomSeed random seed value (can be 0)
    */
   public RandomEdgeSampling(float sampleSize, long randomSeed) {

@@ -42,13 +42,12 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
    */
   public static void main(String[] args) throws Exception {
     RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType =
-            RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(args[6]);
+      RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(args[6]);
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    LogicalGraph sample = graph.callForGraph(
-      new RandomVertexEdgeSampling(
-            Float.parseFloat(args[4]), Float.parseFloat(args[5]), vertexEdgeSamplingType));
+    LogicalGraph sample = graph.callForGraph(new RandomVertexEdgeSampling(
+      Float.parseFloat(args[4]), Float.parseFloat(args[5]), vertexEdgeSamplingType));
 
     writeLogicalGraph(sample, args[2], args[3]);
   }

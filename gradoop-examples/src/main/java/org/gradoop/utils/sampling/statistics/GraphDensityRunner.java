@@ -23,16 +23,20 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.GraphDensity;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
-import org.gradoop.utils.sampling.statistics.functions.GetPropertyValueDouble;
 
 /**
- * Calls the graph density computation for a logical graph. Writes the result to a file in the
- * output directory.
+ * Calls the graph density computation for a logical graph.
+ * Writes the result to a csv-file named {@value SamplingEvaluationConstants#FILE_DENSITY} in
+ * the output directory, containing a single line with the graph density value, e.g.:
+ *
+ * BOF
+ * 0.281
+ * EOF
  */
 public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the graph density computation a graph.
+   * Calls the graph density computation for the graph.
    *
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
@@ -46,10 +50,10 @@ public class GraphDensityRunner extends AbstractRunner implements ProgramDescrip
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
     DataSet<Double> density = graph.callForGraph(new GraphDensity()).getGraphHead()
-      .map(new GetPropertyValueDouble(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
+      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble());
 
     StatisticWriter.writeCSV(density.map(new ObjectTo1<>()),
-      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY);
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_DENSITY);
 
     getExecutionEnvironment().execute("Sampling Statistics: Graph density");
   }

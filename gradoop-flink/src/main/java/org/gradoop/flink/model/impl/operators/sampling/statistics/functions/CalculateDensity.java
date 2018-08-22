@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
- * Calculates the graph density and safes the metric to the corresponding GraphHead.
+ * Calculates the graph density and safes the value as property to the corresponding graphHead.
  */
 public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
 
@@ -37,6 +37,13 @@ public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
     this.propertyKey = key;
   }
 
+  /**
+   * Calculates the graph density and safes the value as property to the graphHead.
+   *
+   * @param graphHead The graphHead the density shall be written to
+   * @return GraphHead The graphHead the density is written to
+   * @throws Exception if mapping goes wrong
+   */
   @Override
   public GraphHead map(GraphHead graphHead) throws Exception {
     double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();

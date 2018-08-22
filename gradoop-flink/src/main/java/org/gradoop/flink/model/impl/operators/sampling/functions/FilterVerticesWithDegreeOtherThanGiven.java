@@ -21,26 +21,12 @@ import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 /**
  * Retains all vertices which do not have the given degree.
  */
 public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraphOperator {
-
-  /**
-   * Key of degree property
-   */
-  private static final String DEGREE_PROPERTY_KEY = VertexDegree.BOTH.getName();
-
-  /**
-   * Key of in-degree property
-   */
-  private static final String IN_DEGREE_PROPERTY_KEY = VertexDegree.IN.getName();
-
-  /**
-   * Key of out-degree property
-   */
-  private static final String OUT_DEGREE_PROPERTY_KEY = VertexDegree.OUT.getName();
 
   /**
    * the given degree
@@ -62,16 +48,16 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
-      DEGREE_PROPERTY_KEY,
-      IN_DEGREE_PROPERTY_KEY,
-      OUT_DEGREE_PROPERTY_KEY,
+      SamplingAlgorithm.DEGREE_PROPERTY_KEY,
+      SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY,
+      SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY,
       true);
-    DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
 
-    newVertices = newVertices.filter(new VertexWithDegreeFilter<>(degree, DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(IN_DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(OUT_DEGREE_PROPERTY_KEY));
+    DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices()
+      .filter(new VertexWithDegreeFilter<>(degree, SamplingAlgorithm.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY));
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());

@@ -21,8 +21,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test-class for graph density computation.
+ */
 public class GraphDensityTest extends GradoopFlinkTestBase {
 
+  /**
+   * Tests the computation of graph density for a logical graph
+   *
+   * @throws Exception If loading of the example-graph goes wrong
+   */
   @Test
   public void testGraphDensity() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();

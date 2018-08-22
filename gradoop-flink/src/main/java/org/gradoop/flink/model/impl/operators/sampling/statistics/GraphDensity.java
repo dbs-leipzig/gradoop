@@ -34,11 +34,9 @@ public class GraphDensity implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    VertexCount vertexCount = new VertexCount();
-    EdgeCount edgeCount = new EdgeCount();
     DataSet<GraphHead> newGraphHead = graph
-      .aggregate(vertexCount)
-      .aggregate(edgeCount)
+      .aggregate(new VertexCount())
+      .aggregate(new EdgeCount())
       .getGraphHead()
       .map(new CalculateDensity(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
@@ -46,9 +44,6 @@ public class GraphDensity implements UnaryGraphToGraphOperator {
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return GraphDensity.class.getName();
