@@ -20,7 +20,7 @@ import org.gradoop.examples.AbstractRunner;
 
 /**
  * Calls the computation of all given graph properties for a logical graph. Results are written
- * to files in the given output path.
+ * to files in the output path.
  */
 public class SamplingStatisticsRunner extends AbstractRunner implements ProgramDescription {
 
