@@ -26,40 +26,32 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 import org.gradoop.utils.sampling.statistics.functions.GetPropertyValueDouble;
 
 /**
- * Calls the graph density computation for a logical graph and a graph sampled from it.
- * Writes both results to files in the output directory.
+ * Calls the graph density computation for a logical graph. Writes the result to a file in the
+ * output directory.
  */
 public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the graph density computation for both graphs.
+   * Calls the graph density computation a graph.
    *
-   * args[0] - path to original graph
-   * args[1] - format of original graph (csv, json, indexed)
-   * args[2] - path to sampled graph
-   * args[3] - format of sampled graph (csv, json, indexed)
-   * args[4] - output path
+   * args[0] - path to graph
+   * args[1] - format of graph (csv, json, indexed)
+   * args[2] - output path
    *
    * @param args command line arguments
    * @throws Exception in case of read/write failure
    */
   public static void main(String[] args) throws Exception {
 
-    LogicalGraph origin = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sampled = readLogicalGraph(args[2], args[3]);
+    LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Double> densityOriginal = origin.callForGraph(new GraphDensity()).getGraphHead()
+    DataSet<Double> density = graph.callForGraph(new GraphDensity()).getGraphHead()
       .map(new GetPropertyValueDouble(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
-    DataSet<Double> densitySampled = sampled.callForGraph(new GraphDensity()).getGraphHead()
-      .map(new GetPropertyValueDouble(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
+    StatisticWriter.writeCSV(density.map(new ObjectTo1<>()),
+      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY);
 
-    StatisticWriter.writeCSV(densityOriginal.map(new ObjectTo1<>()),
-      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY_ORIGINAL);
-    StatisticWriter.writeCSV(densitySampled.map(new ObjectTo1<>()),
-      appendSeparator(args[4]) + SamplingEvaluationConstants.FILE_DENSITY_SAMPLED);
-
-    getExecutionEnvironment().execute("Sampling Evaluation: Graph density");
+    getExecutionEnvironment().execute("Sampling Statistics: Graph density");
   }
 
   @Override

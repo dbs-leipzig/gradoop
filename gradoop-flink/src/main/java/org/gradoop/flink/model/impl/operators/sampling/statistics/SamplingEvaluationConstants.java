@@ -26,14 +26,9 @@ public class SamplingEvaluationConstants {
   public static final String PROPERTY_KEY_DENSITY = "density";
 
   /**
-   * Filename for the density of the original graph
+   * Filename for the saved density value of the graph
    */
-  public static final String FILE_DENSITY_ORIGINAL = "graph_density_original";
-
-  /**
-   * Filename for the density of the sampled graph
-   */
-  public static final String FILE_DENSITY_SAMPLED = "graph_density_sampled";
+  public static final String FILE_DENSITY = "graph_density";
 
   /**
    * private Constructor

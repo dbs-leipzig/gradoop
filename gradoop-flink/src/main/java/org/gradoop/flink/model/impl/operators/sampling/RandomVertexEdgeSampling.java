@@ -145,14 +145,4 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
   public String getName() {
     return RandomVertexEdgeSampling.class.getName();
   }
-
-  /**
-   * Converts a string to sample type
-   *
-   * @param type the string containing the sample type
-   * @return the actual type of sampling
-   */
-  public static VertexEdgeSamplingType sampleTypeFromString(String type) {
-    return VertexEdgeSamplingType.valueOf(type);
-  }
 }

@@ -19,21 +19,18 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 
 /**
- * Helps evaluating a graph sampling for a given original logical graph and the graph sampled from
- * it by calling the computation of all given graph properties. Results are written to files in
- * the given output path.
+ * Calls the computation of all given graph properties for a logical graph. Results are written
+ * to files in the given output path.
  */
 public class SamplingStatisticsRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the computation of all given graph properties for both graphs.
+   * Calls the computation of all given graph properties.
    * (List of called graph properties will be extended over time)
    *
-   * args[0] - path to original graph
-   * args[1] - format of original graph (csv, json, indexed)
-   * args[2] - path to sampled graph
-   * args[3] - format of sampled graph (csv, json, indexed)
-   * args[4] - output path
+   * args[0] - path to graph
+   * args[1] - format of graph (csv, json, indexed)
+   * args[2] - output path
    *
    * @param args command line arguments
    * @throws Exception if something goes wrong
@@ -44,6 +41,6 @@ public class SamplingStatisticsRunner extends AbstractRunner implements ProgramD
 
   @Override
   public String getDescription() {
-    return "Graph Sampling Statistics";
+    return "Sampling Statistics";
   }
 }

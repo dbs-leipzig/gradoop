@@ -36,8 +36,7 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold for vertices
    * args[5] - sampling threshold for edges
-   * args[6] - sampling type
-   * args[7] - evaluate (true, false)
+   * args[6] - sampling type (SimpleVersion, NonuniformVersion, NonuniformHybridVersion)
    *
    * @param args arguments
    */
