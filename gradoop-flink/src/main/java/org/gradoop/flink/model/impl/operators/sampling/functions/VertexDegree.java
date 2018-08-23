@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 /**
  * Keeps the types of vertex-degrees and their respective property names.
- * Available degree-types: input (IN), output (OUT), sum of both (IN_OUT).
+ * Available degree-types: input (IN), output (OUT), sum of both (BOTH).
  */
 public enum VertexDegree {
   /**
@@ -31,7 +31,7 @@ public enum VertexDegree {
   /**
    * The sum of input and output degree
    */
-  IN_OUT("_InOutDegree");
+  BOTH("_Degree");
 
   /**
    * The property name of a vertex degree type

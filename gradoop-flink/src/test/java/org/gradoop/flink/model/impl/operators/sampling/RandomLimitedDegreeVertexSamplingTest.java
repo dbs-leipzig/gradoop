@@ -38,7 +38,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
-   * @param degreeType The vertex degree type, e.g. VertexDegree.IN_OUT
+   * @param degreeType The vertex degree type, e.g. VertexDegree.BOTH
    * @param degreeThreshold The threshold for the vertex degree, e.g. 3
    */
   public RandomLimitedDegreeVertexSamplingTest(String testName, String seed, String sampleSize,
@@ -51,7 +51,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
    * {@inheritDoc}
    */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
+  public SamplingAlgorithm getSamplingOperator() {
     return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
   }
 
@@ -62,7 +62,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     List<Vertex> dbDegreeVertices = Lists.newArrayList();
     LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
-      VertexDegree.IN_OUT.getName(),
+      VertexDegree.BOTH.getName(),
       VertexDegree.IN.getName(),
       VertexDegree.OUT.getName(),
       true).execute(input);
@@ -106,14 +106,14 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
         "With seed and the sum of in- and out-degree with value = 3",
         "-4181668494294894490",
         "0.272f",
-        "IN_OUT",
+        "BOTH",
         "3"
       },
       new String[] {
         "Without seed and the sum of in- and out-degree with value = 3",
         "0",
         "0.272f",
-        "IN_OUT",
+        "BOTH",
         "3"
       },
       new String[] {

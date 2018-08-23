@@ -40,7 +40,9 @@ public class RandomVertexSamplingRunner extends AbstractRunner implements Progra
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
+
     LogicalGraph sample = graph.callForGraph(new RandomVertexSampling(Float.parseFloat(args[4])));
+
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
