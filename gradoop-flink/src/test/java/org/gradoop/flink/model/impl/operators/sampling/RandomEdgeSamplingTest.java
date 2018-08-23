@@ -44,7 +44,7 @@ public class RandomEdgeSamplingTest extends ParametrizedTestForGraphSampling {
    * {@inheritDoc}
    */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
+  public SamplingAlgorithm getSamplingOperator() {
     return new RandomEdgeSampling(sampleSize, seed);
   }
 
