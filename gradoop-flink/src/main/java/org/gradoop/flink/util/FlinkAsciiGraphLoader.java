@@ -15,13 +15,17 @@
  */
 package org.gradoop.flink.util;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.EPGMDatabase;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,7 +77,7 @@ public class FlinkAsciiGraphLoader {
    * Initializes the database from the given ASCII GDL stream.
    *
    * @param stream GDL stream
-   * @throws IOException
+   * @throws IOException on failure
    */
   public void initDatabaseFromStream(InputStream stream) throws IOException {
     if (stream == null) {
@@ -104,13 +108,48 @@ public class FlinkAsciiGraphLoader {
    * Initializes the database from the given GDL file.
    *
    * @param fileName GDL file name (must not be {@code null})
-   * @throws IOException
+   * @throws IOException on failure
    */
   public void initDatabaseFromFile(String fileName) throws IOException {
     if (fileName == null) {
       throw new IllegalArgumentException("FileName must not be null.");
     }
     loader = AsciiGraphLoader.fromFile(fileName, config);
+  }
+
+  /**
+   * Returns a logical graph containing the complete vertex and edge space of
+   * the database.
+   *
+   * @return logical graph of vertex and edge space
+   */
+  public LogicalGraph getLogicalGraph() {
+    return getLogicalGraph(false);
+  }
+
+  /**
+   * Returns a logical graph containing the complete vertex and edge space of
+   * the database.
+   *
+   * @param withGraphContainment true, if vertices and edges shall be updated to
+   *                             be contained in the logical graph representing
+   *                             the database
+   * @return logical graph of vertex and edge space
+   */
+  public LogicalGraph getLogicalGraph(boolean withGraphContainment) {
+    GraphHead graphHead = config.getGraphHeadFactory()
+      .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
+
+    if (withGraphContainment) {
+      ExecutionEnvironment env = config.getExecutionEnvironment();
+
+      return config.getLogicalGraphFactory().fromDataSets(env.fromElements(graphHead),
+        env.fromCollection(getVertices()).map(new AddToGraph<>(graphHead)),
+        env.fromCollection(getEdges()).map(new AddToGraph<>(graphHead)));
+
+    } else {
+      return config.getLogicalGraphFactory().fromCollections(graphHead, getVertices(), getEdges());
+    }
   }
 
   /**
@@ -121,11 +160,28 @@ public class FlinkAsciiGraphLoader {
    * @return LogicalGraph
    */
   public LogicalGraph getLogicalGraphByVariable(String variable) {
-    GraphHead graphHead = loader.getGraphHeadByVariable(variable);
-    Collection<Vertex> vertices = loader.getVerticesByGraphVariables(variable);
-    Collection<Edge> edges = loader.getEdgesByGraphVariables(variable);
+    GraphHead graphHead = getGraphHeadByVariable(variable);
+    Collection<Vertex> vertices = getVerticesByGraphVariables(variable);
+    Collection<Edge> edges = getEdgesByGraphVariables(variable);
 
     return config.getLogicalGraphFactory().fromCollections(graphHead, vertices, edges);
+  }
+
+  /**
+   * Returns a collection of all logical graph contained in the database.
+   *
+   * @return collection of all logical graphs
+   */
+  public GraphCollection getGraphCollection() {
+    ExecutionEnvironment env = config.getExecutionEnvironment();
+
+    DataSet<Vertex> newVertices = env.fromCollection(getVertices())
+      .filter(vertex -> vertex.getGraphCount() > 0);
+    DataSet<Edge> newEdges = env.fromCollection(getEdges())
+      .filter(longEDEdge -> longEDEdge.getGraphCount() > 0);
+
+    return config.getGraphCollectionFactory()
+      .fromDataSets(env.fromCollection(getGraphHeads()), newVertices, newEdges);
   }
 
   /**
@@ -136,12 +192,9 @@ public class FlinkAsciiGraphLoader {
    * @return GraphCollection
    */
   public GraphCollection getGraphCollectionByVariables(String... variables) {
-    Collection<GraphHead> graphHeads =
-      loader.getGraphHeadsByVariables(variables);
-    Collection<Vertex> vertices =
-      loader.getVerticesByGraphVariables(variables);
-    Collection<Edge> edges =
-      loader.getEdgesByGraphVariables(variables);
+    Collection<GraphHead> graphHeads = getGraphHeadsByVariables(variables);
+    Collection<Vertex> vertices = getVerticesByGraphVariables(variables);
+    Collection<Edge> edges = getEdgesByGraphVariables(variables);
 
     return config.getGraphCollectionFactory().fromCollections(graphHeads, vertices, edges);
   }

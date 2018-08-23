@@ -173,20 +173,9 @@ public class EPGMDatabase {
   @Deprecated
   public GraphCollection getCollection() {
     DataSet<Vertex> newVertices = database.getVertices()
-        .filter(new FilterFunction<Vertex>() {
-          @Override
-          public boolean filter(Vertex vertex) throws
-            Exception {
-            return vertex.getGraphCount() > 0;
-          }
-        });
+      .filter(vertex -> vertex.getGraphCount() > 0);
     DataSet<Edge> newEdges = database.getEdges()
-      .filter(new FilterFunction<Edge>() {
-        @Override
-        public boolean filter(Edge longEDEdge) throws Exception {
-          return longEDEdge.getGraphCount() > 0;
-        }
-      });
+      .filter(longEDEdge -> longEDEdge.getGraphCount() > 0);
 
     return config.getGraphCollectionFactory()
       .fromDataSets(database.getGraphHeads(), newVertices, newEdges);
