@@ -61,7 +61,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
   /**
    * The vertex neighborhood type. Distinguishes ingoing, outgoing edges or both.
    */
-  Neighborhood neighborType = Neighborhood.IN_OUT;
+  Neighborhood neighborType = Neighborhood.BOTH;
   /**
    * The dampening factor used by Flinks PageRank-algorithm
    */
@@ -71,9 +71,14 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   int maxIteration = 20;
   /**
+   * Whether to sample vertices with scaled PageRank-score
+   * greater (true) or equal/smaller (false) the sampleSize
+   */
+  boolean sampleGreaterThanThreshold = true;
+  /**
    * The vertex degree type. Distinguishes in-degree, out-degree or the sum of both.
    */
-  VertexDegree degreeType = VertexDegree.IN_OUT;
+  VertexDegree degreeType = VertexDegree.BOTH;
   /**
    * The threshold for the vertex degree
    */
@@ -124,7 +129,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
-   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.IN_OUT
+   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.BOTH
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
     Neighborhood neighborType) {
@@ -142,10 +147,11 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param maxIteration The iteration number used by Flinks PageRank-algorithm, e.g. 20
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
-    double dampeningFactor, int maxIteration) {
+    double dampeningFactor, int maxIteration, boolean sampleGreaterThanThreshold) {
     this(testName, seed, sampleSize);
     this.dampeningFactor = dampeningFactor;
     this.maxIteration = maxIteration;
+    this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;
   }
 
   /**
@@ -154,7 +160,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
-   * @param degreeType The vertex degree type, e.g. VertexDegree.IN_OUT
+   * @param degreeType The vertex degree type, e.g. VertexDegree.BOTH
    * @param degreeThreshold The threshold for the vertex degree, e.g. 3
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
@@ -185,7 +191,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    *
    * @return The sampling operator
    */
-  public abstract UnaryGraphToGraphOperator getSamplingOperator();
+  public abstract SamplingAlgorithm getSamplingOperator();
 
   /**
    * Common test-case.
@@ -195,7 +201,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
   @Test
   public void samplingTest() throws Exception {
     LogicalGraph dbGraph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
-    LogicalGraph newGraph = getSamplingOperator().execute(dbGraph);
+    LogicalGraph newGraph = getSamplingOperator().sample(dbGraph);
 
     validateGraph(dbGraph, newGraph);
     validateSpecific(dbGraph, newGraph);

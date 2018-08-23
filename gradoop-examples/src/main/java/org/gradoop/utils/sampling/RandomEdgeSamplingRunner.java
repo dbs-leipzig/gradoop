@@ -40,7 +40,9 @@ public class RandomEdgeSamplingRunner extends AbstractRunner implements ProgramD
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
+
     LogicalGraph sample = graph.callForGraph(new RandomEdgeSampling(Float.parseFloat(args[4])));
+
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

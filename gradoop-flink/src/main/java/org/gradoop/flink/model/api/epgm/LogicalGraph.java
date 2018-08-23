@@ -54,7 +54,7 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.sampling.RandomVertexSampling;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -367,8 +367,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph sampleRandomNodes(float sampleSize) {
-    return callForGraph(new RandomVertexSampling(sampleSize));
+  public LogicalGraph sample(SamplingAlgorithm algorithm) {
+    return callForGraph(algorithm);
   }
 
   /**

@@ -62,7 +62,7 @@ public class EdgesWithSampledVerticesFilter
               t3.f2.getPropertyValue(propertyNameForSampled).toString());
     }
     boolean ret = false;
-    if (neighborType.equals(Neighborhood.IN_OUT)) {
+    if (neighborType.equals(Neighborhood.BOTH)) {
       ret = isSourceVertexMarked || isTargetVertexMarked;
     } else if (neighborType.equals(Neighborhood.IN)) {
       ret = isTargetVertexMarked;

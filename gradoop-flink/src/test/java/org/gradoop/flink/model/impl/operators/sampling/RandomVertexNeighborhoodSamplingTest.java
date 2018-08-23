@@ -33,7 +33,7 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
    * @param testName Name for test-case
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
-   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.IN_OUT
+   * @param neighborType The vertex neighborhood type, e.g. Neighborhood.BOTH
    */
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
     String neighborType) {
@@ -45,7 +45,7 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
    * {@inheritDoc}
    */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
+  public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
@@ -74,13 +74,13 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
         "VertexNeighborhoodSamplingTest with seed and both neighborhood",
         "-4181668494294894490",
         "0.272f",
-        "IN_OUT"
+        "BOTH"
       },
       new String[] {
         "VertexNeighborhoodSamplingTest without seed and both neighborhood",
         "0",
         "0.272f",
-        "IN_OUT"
+        "BOTH"
       },
       new String[] {
         "VertexNeighborhoodSamplingTest with seed and input neighborhood",
