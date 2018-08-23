@@ -36,9 +36,7 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    LogicalGraph input = getSocialNetworkLoader()
-      .getDatabase()
-      .getDatabaseGraph(true);
+    LogicalGraph input = getSocialNetworkLoader().getLogicalGraph(true);
 
     checkCSVWrite(tmpPath, input);
   }

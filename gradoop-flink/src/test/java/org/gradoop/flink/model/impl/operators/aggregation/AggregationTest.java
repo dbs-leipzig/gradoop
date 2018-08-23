@@ -203,8 +203,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleGraphVertexAndEdgeCount() throws Exception {
-    LogicalGraph graph = getLoaderFromString("[()-->()<--()]")
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph graph = getLoaderFromString("[()-->()<--()]").getLogicalGraph();
 
     VertexCount vertexCount = new VertexCount();
     EdgeCount edgeCount = new EdgeCount();

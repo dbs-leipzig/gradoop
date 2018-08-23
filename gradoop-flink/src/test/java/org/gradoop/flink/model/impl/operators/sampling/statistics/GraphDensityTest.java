@@ -33,7 +33,7 @@ public class GraphDensityTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testGraphDensity() throws Exception {
-    LogicalGraph graph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     double density = graph.callForGraph(new GraphDensity())
       .getGraphHead()
