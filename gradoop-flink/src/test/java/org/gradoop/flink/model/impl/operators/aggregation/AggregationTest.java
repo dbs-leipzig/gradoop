@@ -37,7 +37,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AggregationTest extends GradoopFlinkTestBase {
-  
+
   static final String EDGE_PROPERTY = "ep";
   static final String VERTEX_PROPERTY = "vp";
 
