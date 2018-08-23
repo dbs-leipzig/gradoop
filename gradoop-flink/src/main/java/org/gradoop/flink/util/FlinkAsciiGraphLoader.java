@@ -24,7 +24,6 @@ import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.EPGMDatabase;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 
 import java.io.IOException;
@@ -286,19 +285,5 @@ public class FlinkAsciiGraphLoader {
    */
   public Edge getEdgeByVariable(String variable) {
     return loader.getEdgeByVariable(variable);
-  }
-
-  /**
-   * Returns the complete database represented by the loader.
-   *
-   * @return EPGM database
-   */
-  @SuppressWarnings("unchecked")
-  public EPGMDatabase getDatabase() {
-    return EPGMDatabase
-      .fromCollections(loader.getGraphHeads(),
-        loader.getVertices(),
-        loader.getEdges(),
-        config);
   }
 }
