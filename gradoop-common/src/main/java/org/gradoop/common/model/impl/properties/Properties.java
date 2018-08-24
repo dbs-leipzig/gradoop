@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -257,13 +258,28 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     return properties != null ? properties.hashCode() : 0;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Iterator<Property> iterator() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()))
-      .collect(Collectors.toList()).iterator();
+    return toList().iterator();
   }
 
+  /**
+   * Returns a list of properties.
+   *
+   * @return List of properties
+   */
+  public List<Property> toList() {
+    return  properties.entrySet().stream()
+            .map(e -> Property.create(e.getKey(), e.getValue()))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(DataOutputView outputView) throws IOException {
     outputView.writeInt(properties.size());
@@ -274,6 +290,10 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     }
   }
 
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void read(DataInputView inputView) throws IOException {
     int propertyCount = inputView.readInt();
@@ -290,10 +310,13 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
-    return properties.entrySet().stream()
-      .map(e -> Property.create(e.getKey(), e.getValue()).toString())
+    return toList().stream()
+      .map(Property::toString)
       .collect(Collectors.joining(","));
   }
 }

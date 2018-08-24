@@ -20,7 +20,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -34,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
  * degree threshold and degree type. Also retains randomly chosen vertices with a degree smaller
  * or equal this threshold. Retains all edges which source- and target-vertices where chosen.
  */
-public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOperator {
+public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
 
   /**
    * Relative amount of vertices in the result graph
@@ -78,7 +77,7 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
     this.degreeThreshold = 2L;
-    this.degreeType = VertexDegree.IN_OUT;
+    this.degreeType = VertexDegree.BOTH;
   }
 
   /**
@@ -116,20 +115,20 @@ public class RandomLimitedDegreeVertexSampling implements UnaryGraphToGraphOpera
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LogicalGraph sample(LogicalGraph graph) {
 
     graph = new DistinctVertexDegrees(
-      VertexDegree.IN_OUT.getName(),
-      VertexDegree.IN.getName(),
-      VertexDegree.OUT.getName(),
+      DEGREE_PROPERTY_KEY,
+      IN_DEGREE_PROPERTY_KEY,
+      OUT_DEGREE_PROPERTY_KEY,
       true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new LimitedDegreeVertexRandomFilter<>(
         sampleSize, randomSeed, degreeThreshold, degreeType))
-      .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
-      .map(new PropertyRemover<>(VertexDegree.IN.getName()))
-      .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
+      .map(new PropertyRemover<>(DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(OUT_DEGREE_PROPERTY_KEY));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)

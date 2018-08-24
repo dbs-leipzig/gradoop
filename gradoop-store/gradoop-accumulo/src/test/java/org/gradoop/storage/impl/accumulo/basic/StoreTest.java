@@ -16,14 +16,12 @@
 package org.gradoop.storage.impl.accumulo.basic;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Queues;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
-import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
@@ -33,9 +31,12 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
+import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -43,9 +44,45 @@ import org.junit.runners.MethodSorters;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Queue;
 
-import static org.gradoop.common.GradoopTestUtils.*;
+import static org.gradoop.common.GradoopTestUtils.BIG_DECIMAL_VAL_7;
+import static org.gradoop.common.GradoopTestUtils.BOOL_VAL_1;
+import static org.gradoop.common.GradoopTestUtils.DATETIME_VAL_d;
+import static org.gradoop.common.GradoopTestUtils.DATE_VAL_b;
+import static org.gradoop.common.GradoopTestUtils.DOUBLE_VAL_5;
+import static org.gradoop.common.GradoopTestUtils.FLOAT_VAL_4;
+import static org.gradoop.common.GradoopTestUtils.GRADOOP_ID_VAL_8;
+import static org.gradoop.common.GradoopTestUtils.INT_VAL_2;
+import static org.gradoop.common.GradoopTestUtils.KEY_0;
+import static org.gradoop.common.GradoopTestUtils.KEY_1;
+import static org.gradoop.common.GradoopTestUtils.KEY_2;
+import static org.gradoop.common.GradoopTestUtils.KEY_3;
+import static org.gradoop.common.GradoopTestUtils.KEY_4;
+import static org.gradoop.common.GradoopTestUtils.KEY_5;
+import static org.gradoop.common.GradoopTestUtils.KEY_6;
+import static org.gradoop.common.GradoopTestUtils.KEY_7;
+import static org.gradoop.common.GradoopTestUtils.KEY_8;
+import static org.gradoop.common.GradoopTestUtils.KEY_9;
+import static org.gradoop.common.GradoopTestUtils.KEY_a;
+import static org.gradoop.common.GradoopTestUtils.KEY_b;
+import static org.gradoop.common.GradoopTestUtils.KEY_c;
+import static org.gradoop.common.GradoopTestUtils.KEY_d;
+import static org.gradoop.common.GradoopTestUtils.KEY_e;
+import static org.gradoop.common.GradoopTestUtils.KEY_f;
+import static org.gradoop.common.GradoopTestUtils.LIST_VAL_a;
+import static org.gradoop.common.GradoopTestUtils.LONG_VAL_3;
+import static org.gradoop.common.GradoopTestUtils.MAP_VAL_9;
+import static org.gradoop.common.GradoopTestUtils.NULL_VAL_0;
+import static org.gradoop.common.GradoopTestUtils.SET_VAL_f;
+import static org.gradoop.common.GradoopTestUtils.SHORT_VAL_e;
+import static org.gradoop.common.GradoopTestUtils.STRING_VAL_6;
+import static org.gradoop.common.GradoopTestUtils.SUPPORTED_PROPERTIES;
+import static org.gradoop.common.GradoopTestUtils.TIME_VAL_c;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElements;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -68,8 +105,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test01_writeCloseOpenReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST01);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST01);
 
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
@@ -101,8 +137,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test02_writeFlushReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST02);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST02);
 
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
     graphStore.setAutoFlush(false);
@@ -135,8 +170,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test03_iteratorTest() throws IOException, AccumuloSecurityException,
     AccumuloException {
-    GradoopAccumuloConfig config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST03);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST03);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
@@ -174,16 +208,15 @@ public class StoreTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * Tries to add an unsupported property type {@link Set} as property value.
+   * Tries to add an unsupported property type {@link Queue} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
   public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
-    GradoopAccumuloConfig config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST04);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST04);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
-    // Set is not supported by
-    final Set<String> value = Sets.newHashSet();
+    // Queue is not supported by
+    final Queue<String> value = Queues.newPriorityQueue();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
@@ -192,7 +225,10 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     final GradoopIdSet graphs = new GradoopIdSet();
 
-    graphStore.writeVertex(config.getVertexFactory().initVertex(vertexID, label, props, graphs));
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    graphStore.writeVertex(flinkConfig
+      .getVertexFactory()
+      .initVertex(vertexID, label, props, graphs));
   }
 
   /**
@@ -202,8 +238,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   @Test
   public void test05_propertyTypeTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
-    GradoopAccumuloConfig config =
-      AccumuloTestSuite.getAcConfig(getExecutionEnvironment(), TEST05);
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST05);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     final GradoopId vertexID = GradoopId.get();
@@ -214,7 +249,9 @@ public class StoreTest extends AccumuloStoreTestBase {
     final GradoopIdSet graphs = new GradoopIdSet();
 
     // write to store
-    graphStore.writeVertex(config.getVertexFactory()
+    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+    graphStore.writeVertex(flinkConfig
+      .getVertexFactory()
       .initVertex(vertexID, label, properties, graphs));
 
     graphStore.flush();
@@ -282,6 +319,14 @@ public class StoreTest extends AccumuloStoreTestBase {
       case KEY_d:
         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
         assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+        break;
+      case KEY_e:
+        assertTrue(v.getPropertyValue(propertyKey).isShort());
+        assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
+        break;
+      case KEY_f:
+        assertTrue(v.getPropertyValue(propertyKey).isSet());
+        assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
         break;
       }
     }

@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
-import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.OR;
+import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or;
 import org.gradoop.storage.utils.AccumuloFilters;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.junit.FixMethodOrder;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 
 /**
- * accumulo graph store predicate test
+ * Accumulo graph store predicate test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
@@ -48,14 +48,13 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST03 = "basic_predicate_03";
 
   /**
-   * pick 3 person randomly
-   * then find vertex with label 'Person' and with same name (property) value
+   * Pick 3 person randomly then find vertex with label 'Person' and with same name (property) value
    *
    * @throws Throwable if error
    */
   @Test
   public void test01_findPersonByName() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
         .stream()
@@ -76,7 +75,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
                   return (AccumuloElementFilter<Vertex>) AccumuloFilters
                     .<Vertex>propEquals("name", name);
                 })
-                .reduce((a, b) -> OR.create(a, b))
+                .reduce((a, b) -> Or.create(a, b))
                 .orElse(it -> false))
             ))
         .readRemainsAndClose();
@@ -86,13 +85,13 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all person who's age is not smaller than 35
+   * Find all person who's age is not smaller than 35
    *
    * @throws Throwable if error
    */
   @Test
   public void test02_findPersonByAge() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()
@@ -113,13 +112,13 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find graph by property equality within a certain sample id range
+   * Find graph by property equality within a certain sample id range
    *
    * @throws Throwable if error
    */
   @Test
   public void test03_findGraphByIdsAndProperty() throws Throwable {
-    doTest(TEST03, (loader, store) -> {
+    doTest(TEST03, (loader, store, config) -> {
       List<GraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()

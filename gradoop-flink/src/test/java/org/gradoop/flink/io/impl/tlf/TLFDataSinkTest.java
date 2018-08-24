@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Test;
 
@@ -56,6 +57,60 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
   }
 
   @Test
+  public void testWriteWithoutEdges() throws Exception {
+    String tlfFileImport = TLFDataSinkTest.class
+    .getResource("/data/tlf/io_test_string_without_edges.tlf").getFile();
+
+    String tlfFileExport = TLFDataSinkTest.class
+    .getResource("/data/tlf").getFile() + "/io_test_output";
+
+    // read from inputfile
+    DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
+    // write to ouput path
+    DataSink dataSink = new TLFDataSink(tlfFileExport, getConfig());
+    dataSink.write(dataSource.getGraphCollection(), true);
+    // read from output path
+    DataSource dataSource2 = new TLFDataSource(tlfFileExport, getConfig());
+
+    getExecutionEnvironment().execute();
+
+    // compare original graph and written one
+    collectAndAssertTrue(dataSource.getGraphCollection()
+    .equalsByGraphElementData(dataSource2.getGraphCollection()));
+  }
+
+  @Test
+  public void testWriteWithoutEdgesWithDictionaries() throws Exception {
+    String tlfFileImport = TLFDataSinkTest.class
+      .getResource("/data/tlf/io_test_string_without_edges.tlf").getFile();
+
+    String tlfFileExport = TLFDataSinkTest.class.getResource("/data/tlf")
+      .getFile() + "/io_test_output";
+
+    String tlfVertexDictionaryFileExport = TLFDataSinkTest.class.getResource("/data/tlf")
+      .getFile() + "/dictionaries/io_test_output_vertex_dictionary";
+
+    // read from inputfile
+    DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
+    GraphCollection input = dataSource.getGraphCollection();
+
+    // write to ouput path
+    DataSink dataSink = new TLFDataSink(tlfFileExport, tlfVertexDictionaryFileExport,
+      "", getConfig());
+    dataSink.write(input, true);
+
+    // read from output path
+    DataSource dataSource2 = new TLFDataSource(tlfFileExport, tlfVertexDictionaryFileExport,
+      "", getConfig());
+    GraphCollection output = dataSource2.getGraphCollection();
+
+    getExecutionEnvironment().execute();
+
+    // compare original graph and written one
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
+  }
+
+  @Test
   public void testWriteWithVertexDictionary() throws Exception {
     String tlfFileImport = TLFDataSinkTest.class
       .getResource("/data/tlf/io_test.tlf").getFile();
@@ -70,10 +125,10 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       + "/dictionaries/io_test_output_vertex_dictionary";
 
     // read from inputfile
-    DataSource dataSource = new TLFDataSource(tlfFileImport, 
+    DataSource dataSource = new TLFDataSource(tlfFileImport,
       tlfVertexDictionaryFileImport, "", getConfig());
     // write to output path
-    DataSink dataSink = new TLFDataSink(tlfFileExport, 
+    DataSink dataSink = new TLFDataSink(tlfFileExport,
       tlfVertexDictionaryFileExport, "", getConfig());
     dataSink.write(dataSource.getGraphCollection(), true);
     // read from output path
@@ -117,7 +172,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
       + "/dictionaries/io_test_output_vertex_dictionary";
 
     String tlfEdgeDictionaryFileExport = TLFDataSinkTest.class
-      .getResource("/data/tlf").getFile() 
+      .getResource("/data/tlf").getFile()
       + "/dictionaries/io_test_output_edge_dictionary";
 
     // read from inputfile

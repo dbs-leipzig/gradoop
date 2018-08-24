@@ -45,9 +45,13 @@ public final class HBaseConstants {
    */
   public static final String COL_GRAPHS = "g";
   /**
-   * Column family name for properties.
+   * Column family name for property type.
    */
-  public static final String CF_PROPERTIES = "p";
+  public static final String CF_PROPERTY_TYPE = "p_type";
+  /**
+   * Column family name for property value.
+   */
+  public static final String CF_PROPERTY_VALUE = "p_value";
   /**
    * Column identifier for source vertex identifier.
    */

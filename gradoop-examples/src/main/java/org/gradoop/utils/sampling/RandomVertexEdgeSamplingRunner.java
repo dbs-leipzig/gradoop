@@ -36,16 +36,19 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold for vertices
    * args[5] - sampling threshold for edges
-   * args[6] - sampling type
+   * args[6] - sampling type (SimpleVersion, NonuniformVersion, NonuniformHybridVersion)
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
     RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType =
-            RandomVertexEdgeSampling.sampleTypeFromString(args[6]);
+      RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(args[6]);
+
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
+
     LogicalGraph sample = graph.callForGraph(new RandomVertexEdgeSampling(
-            Float.parseFloat(args[4]), Float.parseFloat(args[5]), vertexEdgeSamplingType));
+      Float.parseFloat(args[4]), Float.parseFloat(args[5]), vertexEdgeSamplingType));
+
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

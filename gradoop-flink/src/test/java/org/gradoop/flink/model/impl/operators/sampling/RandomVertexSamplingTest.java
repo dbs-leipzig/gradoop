@@ -15,16 +15,66 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
 
 public class RandomVertexSamplingTest extends ParametrizedTestForGraphSampling {
-  public RandomVertexSamplingTest(String testName, String seed, String sampleSize,
-                                  String neighborType) {
-    super(testName, seed, sampleSize, neighborType);
+
+  /**
+   * Creates a new RandomVertexSamplingTest instance.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   */
+  public RandomVertexSamplingTest(String testName, String seed, String sampleSize) {
+    super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public UnaryGraphToGraphOperator getSamplingOperator() {
-    return new RandomVertexSampling(sampleSize,seed);
+  public SamplingAlgorithm getSamplingOperator() {
+    return new RandomVertexSampling(sampleSize, seed);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
+
+    dbEdges.removeAll(newEdges);
+    for (Edge edge : dbEdges) {
+      assertFalse("there are vertices from edges, which are not part of the sampled graph",
+        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+    }
+  }
+
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(
+      new String[] {
+        "VertexSamplingTest with seed",
+        "-4181668494294894490",
+        "0.272f"
+      },
+      new String[] {
+        "VertexSamplingTest without seed",
+        "0",
+        "0.272f"
+      });
   }
 }

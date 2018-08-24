@@ -16,7 +16,6 @@
 package org.gradoop.storage.config;
 
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -27,14 +26,12 @@ import org.gradoop.storage.impl.accumulo.handler.AccumuloEdgeHandler;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
 
-import javax.annotation.Nonnull;
 import java.util.Properties;
 
 /**
  * Gradoop Accumulo configuration define
  */
-public class GradoopAccumuloConfig extends
-  GradoopStoreConfig<GraphHeadFactory, VertexFactory, EdgeFactory> {
+public class GradoopAccumuloConfig implements GradoopStoreConfig {
 
   /**
    * accumulo user for accumulo connector, default "root"
@@ -77,7 +74,7 @@ public class GradoopAccumuloConfig extends
   public static final String ZOOKEEPER_HOSTS = "zookeeper.hosts";
 
   /**
-   * define for serialize version control
+   * Definition for serialize version control
    */
   private static final int serialVersionUID = 23;
 
@@ -89,17 +86,17 @@ public class GradoopAccumuloConfig extends
   /**
    * row handler for EPGM GraphHead
    */
-  private transient AccumuloGraphHandler graphHandler;
+  private final AccumuloGraphHandler graphHandler;
 
   /**
    * row handler for EPGM Vertex
    */
-  private transient AccumuloVertexHandler vertexHandler;
+  private final AccumuloVertexHandler vertexHandler;
 
   /**
    * row handler for EPGM Edge
    */
-  private transient AccumuloEdgeHandler edgeHandler;
+  private final AccumuloEdgeHandler edgeHandler;
 
   /**
    * Creates a new Configuration.
@@ -107,59 +104,31 @@ public class GradoopAccumuloConfig extends
    * @param graphHandler                graph head handler
    * @param vertexHandler               vertex handler
    * @param edgeHandler                 edge handler
-   * @param env                         flink execution environment
    */
   private GradoopAccumuloConfig(
     AccumuloGraphHandler graphHandler,
     AccumuloVertexHandler vertexHandler,
-    AccumuloEdgeHandler edgeHandler,
-    ExecutionEnvironment env
+    AccumuloEdgeHandler edgeHandler
   ) {
-    super(new GraphHeadFactory(), new VertexFactory(), new EdgeFactory(), env);
     this.graphHandler = graphHandler;
     this.vertexHandler = vertexHandler;
     this.edgeHandler = edgeHandler;
   }
 
   /**
-   * Creates a new Configuration.
-   *
-   * @param config Gradoop configuration
-   */
-  private GradoopAccumuloConfig(GradoopAccumuloConfig config) {
-    this(config.graphHandler, config.vertexHandler, config.edgeHandler,
-      config.getExecutionEnvironment());
-    this.accumuloProperties.putAll(config.accumuloProperties);
-  }
-
-  /**
    * Creates a default Configuration using POJO handlers for vertices, edges
    * and graph heads and default table names.
    *
-   * @param env apache flink execution environment
    * @return Default Gradoop Accumulo configuration.
    */
-  public static GradoopAccumuloConfig getDefaultConfig(
-    ExecutionEnvironment env
-  ) {
+  public static GradoopAccumuloConfig getDefaultConfig() {
     GraphHeadFactory graphHeadFactory = new GraphHeadFactory();
     EdgeFactory edgeFactory = new EdgeFactory();
     VertexFactory vertexFactory = new VertexFactory();
     return new GradoopAccumuloConfig(
       new AccumuloGraphHandler(graphHeadFactory),
       new AccumuloVertexHandler(vertexFactory),
-      new AccumuloEdgeHandler(edgeFactory),
-      env);
-  }
-
-  /**
-   * Creates a Gradoop Accumulo configuration based on the given arguments.
-   *
-   * @param gradoopConfig   Gradoop configuration
-   * @return Gradoop HBase configuration
-   */
-  public static GradoopAccumuloConfig createConfig(@Nonnull GradoopAccumuloConfig gradoopConfig) {
-    return new GradoopAccumuloConfig(gradoopConfig);
+      new AccumuloEdgeHandler(edgeFactory));
   }
 
   /**
@@ -169,10 +138,7 @@ public class GradoopAccumuloConfig extends
    * @param value property value
    * @return configure itself
    */
-  public GradoopAccumuloConfig set(
-    String key,
-    Object value
-  ) {
+  public GradoopAccumuloConfig set(String key, Object value) {
     accumuloProperties.put(key, value);
     return this;
   }
@@ -185,10 +151,7 @@ public class GradoopAccumuloConfig extends
    * @param <T> value template
    * @return integer value
    */
-  public <T> T get(
-    String key,
-    T defValue
-  ) {
+  public <T> T get(String key, T defValue) {
     Object value = accumuloProperties.get(key);
     if (value == null) {
       return defValue;
@@ -198,18 +161,38 @@ public class GradoopAccumuloConfig extends
     }
   }
 
+  /**
+   * Get accumulo properties
+   *
+   * @return accumulo properties
+   */
   public Properties getAccumuloProperties() {
     return accumuloProperties;
   }
 
+  /**
+   * Get graph handler
+   *
+   * @return graph handler
+   */
   public AccumuloGraphHandler getGraphHandler() {
     return graphHandler;
   }
 
+  /**
+   * Get vertex handler
+   *
+   * @return vertex handler
+   */
   public AccumuloVertexHandler getVertexHandler() {
     return vertexHandler;
   }
 
+  /**
+   * Get edge handler
+   *
+   * @return edge handler
+   */
   public AccumuloEdgeHandler getEdgeHandler() {
     return edgeHandler;
   }
