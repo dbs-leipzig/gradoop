@@ -21,6 +21,7 @@ import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 /**
  * Retains all vertices which do not have the given degree.
@@ -47,17 +48,16 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
-      VertexDegree.IN_OUT.getName(),
-      VertexDegree.IN.getName(),
-      VertexDegree.OUT.getName(),
+      SamplingAlgorithm.DEGREE_PROPERTY_KEY,
+      SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY,
+      SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY,
       true);
-    DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices();
 
-    newVertices = newVertices.filter(
-      new VertexWithDegreeFilter<>(degree, VertexDegree.IN_OUT.getName()))
-      .map(new PropertyRemover<>(VertexDegree.IN_OUT.getName()))
-      .map(new PropertyRemover<>(VertexDegree.IN.getName()))
-      .map(new PropertyRemover<>(VertexDegree.OUT.getName()));
+    DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices()
+      .filter(new VertexWithDegreeFilter<>(degree, SamplingAlgorithm.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY));
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());

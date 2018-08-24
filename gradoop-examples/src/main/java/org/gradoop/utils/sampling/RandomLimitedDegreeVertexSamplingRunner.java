@@ -38,14 +38,17 @@ public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner impl
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold
    * args[5] - vertex degree threshold
-   * args[6] - vertex degree type (IN, OUT, IN_OUT)
+   * args[6] - vertex degree type (IN, OUT, BOTH)
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample = graph.callForGraph(new RandomLimitedDegreeVertexSampling(
-      Float.parseFloat(args[4]), Long.parseLong(args[5]), VertexDegree.valueOf(args[6])));
+
+    LogicalGraph sample = graph.callForGraph(
+      new RandomLimitedDegreeVertexSampling(
+        Float.parseFloat(args[4]), Long.parseLong(args[5]), VertexDegree.valueOf(args[6])));
+
     writeLogicalGraph(sample, args[2], args[3]);
   }
 

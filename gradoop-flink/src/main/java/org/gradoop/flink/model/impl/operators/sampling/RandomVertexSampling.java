@@ -19,7 +19,6 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -31,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  * aggregate function is applied on the logical graph and the resulting
  * aggregate is stored as an additional property at the result graph.
  */
-public class RandomVertexSampling implements UnaryGraphToGraphOperator {
+public class RandomVertexSampling extends SamplingAlgorithm {
   /**
    * Relative amount of nodes in the result graph
    */
@@ -67,19 +66,17 @@ public class RandomVertexSampling implements UnaryGraphToGraphOperator {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LogicalGraph sample(LogicalGraph graph) {
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new RandomFilter<>(sampleSize, randomSeed));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
+      .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
       .join(newVertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
+      .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
