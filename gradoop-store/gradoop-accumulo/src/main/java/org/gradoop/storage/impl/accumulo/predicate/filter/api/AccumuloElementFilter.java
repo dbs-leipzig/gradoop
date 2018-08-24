@@ -20,9 +20,9 @@ import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
-import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.AND;
-import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.NOT;
-import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.OR;
+import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.And;
+import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Not;
+import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or;
 
 import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
@@ -92,7 +92,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    */
   @Nonnull
   default AccumuloElementFilter<T> or(@Nonnull AccumuloElementFilter<T> another) {
-    return OR.create(this, another);
+    return Or.create(this, another);
   }
 
   /**
@@ -103,7 +103,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    */
   @Nonnull
   default AccumuloElementFilter<T> and(@Nonnull AccumuloElementFilter<T> another) {
-    return AND.create(this, another);
+    return And.create(this, another);
   }
 
   /**
@@ -112,7 +112,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    */
   @Nonnull
   default AccumuloElementFilter<T> negate() {
-    return NOT.of(this);
+    return Not.of(this);
   }
 
 }

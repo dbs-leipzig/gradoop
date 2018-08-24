@@ -15,12 +15,13 @@
  */
 package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.utils.AccumuloFilters;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
+import org.gradoop.storage.utils.AccumuloFilters;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -38,7 +39,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
 
   @Test
   public void queryEdgeByProperty() throws Throwable {
-    doTest(TEST01, (loader, store) -> {
+    doTest(TEST01, (loader, store, config) -> {
       List<Edge> storeEdges = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -49,7 +50,9 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(
+        store,
+        GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
       List<Edge> query = source.applyEdgePredicate(
         Query.elements()
           .fromAll()
@@ -64,7 +67,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
 
   @Test
   public void findEdgeByLabelRegex() throws Throwable {
-    doTest(TEST02, (loader, store) -> {
+    doTest(TEST02, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("has.*+");
 
       //edge label query
@@ -73,7 +76,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         .collect(Collectors.toList());
 
       //edge label regex query
-      AccumuloDataSource source = new AccumuloDataSource(store);
+      AccumuloDataSource source = new AccumuloDataSource(store, config);
       List<Edge> query = source.applyEdgePredicate(
         Query.elements()
           .fromAll()

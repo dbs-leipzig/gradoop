@@ -55,7 +55,7 @@ public class DrillDownTransformation<EL extends Element> extends DrillTransforma
           // drill up was stored with the same label
           if (keepCurrentPropertyKey()) {
             // get the last used number in the roll up step
-            int i = getNextDrillUpVersionNumber(current) - 1;
+            int i = getNextRollUpVersionNumber(current) - 1;
             // save the property on the next level to the key
             transformed.setProperty(getPropertyKey(),
               current.getPropertyValue(getPropertyKey() + PROPERTY_VERSION_SEPARATOR + i));

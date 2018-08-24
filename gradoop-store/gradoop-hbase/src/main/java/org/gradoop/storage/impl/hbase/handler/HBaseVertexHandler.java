@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
-import org.gradoop.storage.impl.hbase.filter.api.HBaseElementFilter;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import java.io.IOException;
 
@@ -76,7 +76,8 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
-    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTIES));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));
+    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));
     admin.createTable(tableDescriptor);
   }
 
@@ -84,7 +85,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public Put writeVertex(Put put, EPGMVertex vertexData) throws IOException {
+  public Put writeVertex(Put put, EPGMVertex vertexData) {
     writeLabel(put, vertexData);
     writeProperties(put, vertexData);
     writeGraphIds(put, vertexData);
@@ -95,7 +96,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    * {@inheritDoc}
    */
   @Override
-  public Vertex readVertex(final Result res) throws IOException {
+  public Vertex readVertex(final Result res) {
     return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
       readGraphIds(res));
   }
