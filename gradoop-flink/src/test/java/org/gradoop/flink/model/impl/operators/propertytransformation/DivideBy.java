@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.drilling.drillfunctions;
+package org.gradoop.flink.model.impl.operators.propertytransformation;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions.DrillFunction;
+import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformationFunction;
 
-public class DrillMultiplyBy implements DrillFunction {
+public class DivideBy implements PropertyTransformationFunction {
 
   /**
    * Avoid object instantiation.
@@ -26,22 +26,22 @@ public class DrillMultiplyBy implements DrillFunction {
   private PropertyValue reuseProperty = new PropertyValue();
 
   /**
-   * Value which the property value shall be multiplied with.
+   * Value which the property value shall be divided by.
    */
-  private long multiplier;
+  private long divisor;
 
   /**
    * Valued constructor.
    *
-   * @param multiplier multiplier for the property value
+   * @param divisor divisor for the property value
    */
-  public DrillMultiplyBy(long multiplier) {
-    this.multiplier = multiplier;
+  public DivideBy(long divisor) {
+    this.divisor = divisor;
   }
 
   @Override
   public PropertyValue execute(PropertyValue property) {
-    reuseProperty.setLong(property.getLong() * multiplier);
+    reuseProperty.setLong(property.getLong() / divisor);
     return reuseProperty;
   }
 }
