@@ -53,11 +53,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Vertex> inputVertices = loader.getVertices();
 
-    List<Vertex> outputVertices = loader
-      .getDatabase()
-      .getDatabaseGraph()
-      .getVertices()
-      .collect();
+    List<Vertex> outputVertices = loader.getLogicalGraph().getVertices().collect();
 
     validateEPGMElementCollections(inputVertices, outputVertices);
     validateEPGMGraphElementCollections(inputVertices, outputVertices);
@@ -70,11 +66,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Edge> inputEdges = loader.getEdges();
 
-    List<Edge> outputEdges = loader
-      .getDatabase()
-      .getDatabaseGraph()
-      .getEdges()
-      .collect();
+    List<Edge> outputEdges = loader.getLogicalGraph().getEdges().collect();
 
     validateEPGMElementCollections(inputEdges, outputEdges);
     validateEPGMGraphElementCollections(inputEdges, outputEdges);
