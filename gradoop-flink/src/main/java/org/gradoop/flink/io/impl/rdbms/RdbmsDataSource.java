@@ -138,23 +138,25 @@ public class RdbmsDataSource implements DataSource {
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes)
 					.map(new VertexIdMapper());
 
-			DataSet<Tuple3<GradoopId,GradoopId,String>> directedEdges = dsTablesToEdges.filter(new DirFilter())
+			DataSet<Tuple3<String,GradoopId,String>> directedEdges = dsTablesToEdges.filter(new DirFilter())
 					.flatMap(new VertexToIdKeyTuple()).withBroadcastSet(tempVertices, "vertices");
 			
-			DataSet<Tuple3<GradoopId,GradoopId,String>> groupedSet = directedEdges.groupBy(0,2).reduce(new ReducePairs());
+			directedEdges.print();
+			
+//			DataSet<Tuple3<GradoopId,GradoopId,String>> groupedSet = directedEdges.groupBy(0,2).reduce(new ReducePairs());
 //			groupedSet.print();
-			edges = groupedSet.map(new MapFunction<Tuple3<GradoopId,GradoopId,String>, Edge>() {
-
-				@Override
-				public Edge map(Tuple3<GradoopId, GradoopId, String> in) throws Exception {
-					Edge e = new Edge();
-					e.setId(GradoopId.get());
-					e.setSourceId(in.f0);
-					e.setTargetId(in.f1);
-					e.setLabel(in.f2);
-					return e;
-				}
-			});
+//			edges = groupedSet.map(new MapFunction<Tuple3<GradoopId,GradoopId,String>, Edge>() {
+//
+//				@Override
+//				public Edge map(Tuple3<GradoopId, GradoopId, String> in) throws Exception {
+//					Edge e = new Edge();
+//					e.setId(GradoopId.get());
+//					e.setSourceId(in.f0);
+//					e.setTargetId(in.f1);
+//					e.setLabel(in.f2);
+//					return e;
+//				}
+//			});			
 
 			// creates edges from rdbms table tuples and foreign key
 			// relations

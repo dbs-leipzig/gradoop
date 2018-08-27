@@ -12,27 +12,25 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
-public class VertexToIdKeyTuple extends RichFlatMapFunction<TableToEdge, Tuple3<GradoopId,GradoopId,String>> {
+public class VertexToIdKeyTuple extends RichFlatMapFunction<TableToEdge, Tuple3<String,GradoopId,String>> {
 	List<Vertex> vertices;
 
 	@Override
-	public void flatMap(TableToEdge table, Collector<Tuple3<GradoopId,GradoopId,String>> out) throws Exception {
-		GradoopId id = null;
-		String key = null;
-		GradoopId id2;
-		String key2;
-		GradoopId groupId = GradoopId.get();
-
+	public void flatMap(TableToEdge table, Collector<Tuple3<String,GradoopId,String>> out) throws Exception {
+		String label = table.getStartAttribute().f0;
+		GradoopId id;
+		String key;
+		
 		for (Vertex v : vertices) {
 			if (v.getLabel().equals(table.getstartTableName())) {
 				id = v.getId();
 				key = v.getProperties().get(table.getStartAttribute().f0).toString();
-				out.collect(new Tuple3<>(groupId, id, key));
+				out.collect(new Tuple3<>(label, id, key));
 			}
 			if(v.getLabel().equals(table.getendTableName())){
-				id2 = v.getId();
-				key2 = v.getProperties().get(table.getEndAttribute().f0).toString();
-				out.collect(new Tuple3<>(groupId, id2, key2));
+				id = v.getId();
+				key = v.getProperties().get(table.getEndAttribute().f0).toString();
+				out.collect(new Tuple3<>(label, id, key));
 			}
 		}
 	}
