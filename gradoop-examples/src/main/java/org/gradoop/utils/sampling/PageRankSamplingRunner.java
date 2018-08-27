@@ -40,7 +40,7 @@ public class PageRankSamplingRunner extends AbstractRunner implements ProgramDes
    * args[7] - sample vertices with score greater than threshold (true, false)
    * args[8] - sample all vertices if all got same score (true, false)
    * </pre>
-   * 
+   *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
