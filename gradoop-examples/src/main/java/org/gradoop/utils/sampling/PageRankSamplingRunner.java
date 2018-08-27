@@ -29,6 +29,7 @@ public class PageRankSamplingRunner extends AbstractRunner implements ProgramDes
    * Runs the {@link PageRankSampling} operator on the specified graph and writes the result to
    * the specified output.
    *
+   * <pre>
    * args[0] - path to input graph
    * args[1] - format of input graph (csv, json, indexed)
    * args[2] - path to output graph
@@ -38,7 +39,8 @@ public class PageRankSamplingRunner extends AbstractRunner implements ProgramDes
    * args[6] - sampling threshold for PageRank-score (between 0.0 and 1.0)
    * args[7] - sample vertices with score greater than threshold (true, false)
    * args[8] - sample all vertices if all got same score (true, false)
-   *
+   * </pre>
+   * 
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {

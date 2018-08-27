@@ -15,10 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.pagerank.PageRank;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -30,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Vertex
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+import org.gradoop.flink.model.impl.operators.sampling.functions.AddPageRankScoresToVertexCrossFunction;
 import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultVertexFilter;
 
 /**
@@ -126,26 +125,8 @@ public class PageRankSampling extends SamplingAlgorithm {
 
     DataSet<Vertex> scaledVertices = graph.getVertices()
       .crossWithTiny(graph.getGraphHead().first(1))
-      .with(new CrossFunction<Vertex, GraphHead, Vertex>() {
-        @Override
-        public Vertex cross(Vertex vertex, GraphHead graphHead) throws Exception {
-          double min = graphHead.getPropertyValue(MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-          double max = graphHead.getPropertyValue(MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-          double sum = graphHead.getPropertyValue(SUM_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-
-          vertex.setProperty(MIN_PAGE_RANK_SCORE_PROPERTY_KEY, min);
-          vertex.setProperty(MAX_PAGE_RANK_SCORE_PROPERTY_KEY, max);
-          vertex.setProperty(SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);
-          vertex.setProperty("vertexCount", graphHead.getPropertyValue("vertexCount"));
-
-          if (min != max) {
-            double score = vertex.getPropertyValue(PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-            vertex.setProperty(SCALED_PAGE_RANK_SCORE_PROPERTY_KEY, (score - min) / (max - min));
-          }
-
-          return vertex;
-        }
-      }).filter(new PageRankResultVertexFilter(
+      .with(new AddPageRankScoresToVertexCrossFunction())
+      .filter(new PageRankResultVertexFilter(
         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
 
     DataSet<Edge> newEdges = graph.getEdges()

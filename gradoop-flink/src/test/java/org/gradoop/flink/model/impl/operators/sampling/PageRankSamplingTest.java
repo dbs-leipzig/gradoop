@@ -94,7 +94,7 @@ public class PageRankSamplingTest extends ParametrizedTestForGraphSampling {
       } else {
         if (keepVerticesIfSameScore) {
           assertEquals("not all vertices got sampled (should be, all got same score)",
-            newVertices.size(), dbVertices.size());
+            dbVertices.size(), newVertices.size());
         } else {
           assertTrue("some vertices got sampled (should NOT be, all got same score)",
             newVertices.isEmpty());
@@ -102,7 +102,7 @@ public class PageRankSamplingTest extends ParametrizedTestForGraphSampling {
       }
       dbEdges.removeAll(newEdges);
       for (Edge edge : dbEdges) {
-        assertFalse("there are vertices from edges, which are not part of the sampled graph",
+        assertFalse("edge from original graph was not sampled but source and target were",
           newVertexIDs.contains(edge.getSourceId()) &&
             newVertexIDs.contains(edge.getTargetId()));
       }
@@ -139,7 +139,7 @@ public class PageRankSamplingTest extends ParametrizedTestForGraphSampling {
       if (keepVerticesIfSameScore) {
         assertEquals(
           "special: not all vertices got sampled (should be, all got same score)",
-          specialSampledVertices.size(), specialVertices.size());
+          specialVertices.size(), specialSampledVertices.size());
       } else {
         assertTrue(
           "special: some vertices got sampled (should NOT be, all got same score)",
