@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.util;
 
 import com.google.common.collect.Lists;
@@ -10,6 +25,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * Test class for {@link FlinkAsciiGraphLoader}
+ */
 public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
 
   /**
@@ -22,11 +40,9 @@ public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     String graphVariable = "g1";
-
     GradoopId graphId = loader.getGraphHeadByVariable(graphVariable).getId();
 
     LogicalGraph graphFromLoader = loader.getLogicalGraphByVariable(graphVariable);
-
     LogicalGraph graphFromCollection = loader.getGraphCollection().getGraph(graphId);
 
     collectAndAssertTrue(graphFromLoader.equalsByElementData(graphFromCollection));
@@ -43,7 +59,6 @@ public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
 
     GraphCollection collectionFromLoader =
       loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
-
     GraphCollection collectionFromDb = loader.getGraphCollection();
 
     // heads <> heads
@@ -72,8 +87,6 @@ public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
     GradoopIdSet graphIdSet = GradoopIdSet.fromExisting(graphIds);
 
     GraphCollection collectionFromLoader = loader.getGraphCollectionByVariables(graphVariables);
-
-
     GraphCollection collectionFromDbViaSet = loader.getGraphCollection().getGraphs(graphIdSet);
 
     // heads <> heads

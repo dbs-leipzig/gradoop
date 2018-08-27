@@ -177,7 +177,7 @@ public class FlinkAsciiGraphLoader {
     DataSet<Vertex> newVertices = env.fromCollection(getVertices())
       .filter(vertex -> vertex.getGraphCount() > 0);
     DataSet<Edge> newEdges = env.fromCollection(getEdges())
-      .filter(longEDEdge -> longEDEdge.getGraphCount() > 0);
+      .filter(edge -> edge.getGraphCount() > 0);
 
     return config.getGraphCollectionFactory()
       .fromDataSets(env.fromCollection(getGraphHeads()), newVertices, newEdges);
