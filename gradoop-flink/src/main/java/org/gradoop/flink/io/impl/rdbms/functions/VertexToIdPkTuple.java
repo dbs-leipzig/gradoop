@@ -21,7 +21,7 @@ public class VertexToIdPkTuple implements MapFunction<Vertex,IdKeyTuple> {
 		try{
 			key = v.getProperties().get(refdAttName).toString();
 		}catch(Exception e){
-			System.err.println("Foreign Key " + refdAttName + " not found.");
+			System.err.println("Primary Key " + refdAttName + " not found.");
 		}
 		return new IdKeyTuple(v.getId(),key);
 	}

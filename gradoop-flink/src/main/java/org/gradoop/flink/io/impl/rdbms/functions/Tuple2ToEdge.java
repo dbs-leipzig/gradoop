@@ -12,6 +12,10 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 public class Tuple2ToEdge implements MapFunction <Tuple2<IdKeyTuple,IdKeyTuple>, Edge>{
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1695056384509963362L;
+	/**
 	 * Name of current foreign key attribute
 	 */
 	String fkName;

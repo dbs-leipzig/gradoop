@@ -9,7 +9,7 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
  * Creates pairs consisting of gradoop id and foreign key name, from vertices
  */
 public class VertexToIdFkTuple implements MapFunction<Vertex,IdKeyTuple> {
-	
+
 	/**
 	 * Name of current foreign key attribute
 	 */

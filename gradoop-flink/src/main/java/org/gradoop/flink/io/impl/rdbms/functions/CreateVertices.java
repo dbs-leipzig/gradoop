@@ -34,7 +34,7 @@ public class CreateVertices {
 		DataSet<Vertex> vertices = null;
 
 		int counter = 0;
-
+				
 		for (TableToNode table : tablesToNodes) {
 
 			try {
@@ -57,6 +57,6 @@ public class CreateVertices {
 			}
 			counter++;
 		}
-		return vertices;
+		return vertices; 
 	}
 }
