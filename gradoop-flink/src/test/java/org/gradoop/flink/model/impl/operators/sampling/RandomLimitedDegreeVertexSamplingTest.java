@@ -76,8 +76,9 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
 
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
-      assertFalse("there are vertices from edges, which are not part of the sampled graph",
-        newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+      assertFalse("edge from original graph was not sampled but source and target were",
+        newVertexIDs.contains(edge.getSourceId()) &&
+          newVertexIDs.contains(edge.getTargetId()));
     }
 
     List<Vertex> verticesSampledByDegree = Lists.newArrayList();
