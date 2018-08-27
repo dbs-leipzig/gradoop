@@ -44,7 +44,7 @@ public class PageRankSamplingRunner extends AbstractRunner implements ProgramDes
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    LogicalGraph sample = graph.callForGraph(new PageRankSampling(
+    LogicalGraph sample = graph.sample(new PageRankSampling(
       Double.parseDouble(args[4]), Integer.parseInt(args[5]), Double.parseDouble(args[6]),
       Boolean.parseBoolean(args[7]), Boolean.parseBoolean(args[8])));
 

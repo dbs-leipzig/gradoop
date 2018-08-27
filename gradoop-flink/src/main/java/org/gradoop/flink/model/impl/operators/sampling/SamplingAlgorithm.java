@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;
-import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultFilter;
+import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultVertexFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 
 /**
@@ -51,7 +51,7 @@ public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
 
   /**
    * Key of the scaled_PageRankScore property used by {@link PageRankSampling} and
-   * {@link PageRankResultFilter}
+   * {@link PageRankResultVertexFilter}
    */
   public static final String SCALED_PAGE_RANK_SCORE_PROPERTY_KEY = "scaled_" +
     PAGE_RANK_SCORE_PROPERTY_KEY;

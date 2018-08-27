@@ -26,10 +26,29 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Parameterized test-class for {@link PageRankSampling}.
+ */
 public class PageRankSamplingTest extends ParametrizedTestForGraphSampling {
 
+  /**
+   * Creates a new PageRankSamplingTest instance, parsing the parameters.
+   *
+   * @param testName Name for test-case
+   * @param seed Seed-value for random number generator, e.g. 0
+   * @param sampleSize Value for sample size, e.g. 0.5
+   * @param dampeningFactor The dampening factor used by Flinks PageRank-algorithm, e.g. 0.85
+   * @param maxIteration The iteration number used by Flinks PageRank-algorithm, e.g. 20
+   * @param sampleGreaterThanThreshold Whether to sample vertices with a PageRank-score
+   *                                   greater (true) or equal/smaller (false) the threshold
+   * @param keepVerticesIfSameScore Whether to sample all vertices (true) or none of them (false)
+   *                                in case all vertices got the same PageRank-score.
+   */
   public PageRankSamplingTest(String testName, String seed, String sampleSize,
     String dampeningFactor, String maxIteration, String sampleGreaterThanThreshold,
     String keepVerticesIfSameScore) {
@@ -39,18 +58,12 @@ public class PageRankSamplingTest extends ParametrizedTestForGraphSampling {
       Boolean.parseBoolean(keepVerticesIfSameScore));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new PageRankSampling(dampeningFactor, maxIteration, (double) sampleSize,
       sampleGreaterThanThreshold, keepVerticesIfSameScore);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 

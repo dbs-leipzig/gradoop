@@ -30,7 +30,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Vertex
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultFilter;
+import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultVertexFilter;
 
 /**
  * Computes a PageRank-Sampling of the graph.
@@ -98,6 +98,16 @@ public class PageRankSampling extends SamplingAlgorithm {
 
   /**
    * {@inheritDoc}
+   *
+   * Vertices are sampled by using the Gradoop-Wrapper of Flinks PageRank-algorithm
+   * {@link PageRank}. If they got different PageRank-scores, all scores are scaled
+   * in a range between 0 and 1.
+   * Then all vertices with a PageRank-score greater or equal/smaller than a given sampling
+   * threshold are retained - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
+   * If ALL vertices got the same PageRank-score, it can be decided whether to sample all
+   * vertices or none of them - depending on the Boolean set in {@code keepVerticesIfSameScore}.
+   * Retains all edges which source- and target-vertices were chosen. There may retain some
+   * unconnected vertices in the sampled graph.
    */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
@@ -114,7 +124,8 @@ public class PageRankSampling extends SamplingAlgorithm {
       .aggregate(new SumVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY))
       .aggregate(new VertexCount());
 
-    DataSet<Vertex> scaledVertices = graph.getVertices().cross(graph.getGraphHead().first(1))
+    DataSet<Vertex> scaledVertices = graph.getVertices()
+      .crossWithTiny(graph.getGraphHead().first(1))
       .with(new CrossFunction<Vertex, GraphHead, Vertex>() {
         @Override
         public Vertex cross(Vertex vertex, GraphHead graphHead) throws Exception {
@@ -134,7 +145,7 @@ public class PageRankSampling extends SamplingAlgorithm {
 
           return vertex;
         }
-      }).filter(new PageRankResultFilter<>(
+      }).filter(new PageRankResultVertexFilter(
         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
 
     DataSet<Edge> newEdges = graph.getEdges()

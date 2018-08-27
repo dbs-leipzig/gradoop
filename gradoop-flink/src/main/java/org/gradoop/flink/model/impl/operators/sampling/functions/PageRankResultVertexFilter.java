@@ -22,10 +22,8 @@ import org.gradoop.flink.model.impl.operators.sampling.PageRankSampling;
 /**
  * Retains all vertices with a PageRank-score greater or equal/smaller than a given
  * sampling threshold - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
- *
- * @param <V> EPGM vertex type
  */
-public class PageRankResultFilter<V extends Vertex> implements FilterFunction<V> {
+public class PageRankResultVertexFilter implements FilterFunction<Vertex> {
 
   /**
    * Sampling threshold for PageRankScore
@@ -52,7 +50,7 @@ public class PageRankResultFilter<V extends Vertex> implements FilterFunction<V>
    * @param keepVerticesIfSameScore Whether to sample all vertices (true) or none of them (false)
    *                                in case all vertices got the same PageRank-score.
    */
-  public PageRankResultFilter(double threshold, boolean sampleGreaterThanThreshold,
+  public PageRankResultVertexFilter(double threshold, boolean sampleGreaterThanThreshold,
     boolean keepVerticesIfSameScore) {
     this.threshold = threshold;
     this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;
@@ -60,7 +58,7 @@ public class PageRankResultFilter<V extends Vertex> implements FilterFunction<V>
   }
 
   @Override
-  public boolean filter(V v) throws Exception {
+  public boolean filter(Vertex v) throws Exception {
     if (v.hasProperty(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
       double pr = v.getPropertyValue(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
         .getDouble();
