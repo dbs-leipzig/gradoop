@@ -35,7 +35,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
         .getResource("/data/gdl/cam_test.gdl").getFile());
 
-    GraphCollection g = loader.getDatabase().getCollection();
+    GraphCollection g = loader.getGraphCollection();
 
     CanonicalAdjacencyMatrixBuilder cam =
       new CanonicalAdjacencyMatrixBuilder(
@@ -59,7 +59,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
       .getResource("/data/gdl/cam_test.gdl").getFile());
 
-    GraphCollection g = loader.getDatabase().getCollection();
+    GraphCollection g = loader.getGraphCollection();
 
     CanonicalAdjacencyMatrixBuilder cam =
       new CanonicalAdjacencyMatrixBuilder(

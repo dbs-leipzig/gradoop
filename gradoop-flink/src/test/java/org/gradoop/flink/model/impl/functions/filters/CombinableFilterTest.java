@@ -82,7 +82,7 @@ public class CombinableFilterTest extends GradoopFlinkTestBase {
       // label = 'Tag'
       "(databases)(graphs)(hadoop)" +
       "]");
-    LogicalGraph databaseGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph databaseGraph = loader.getLogicalGraph();
     // Filter vertices where
     // (gender = 'f' AND city = 'Leipzig') OR NOT(label = 'Person' OR label = 'Forum')
     FilterFunction<Vertex> vertexFilterFunction =
