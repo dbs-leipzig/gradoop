@@ -33,7 +33,7 @@ public class AverageOutgoingDegreeTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testAverageOutgoingDegree() throws Exception {
-    LogicalGraph graph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     long averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
       .getGraphHead()
