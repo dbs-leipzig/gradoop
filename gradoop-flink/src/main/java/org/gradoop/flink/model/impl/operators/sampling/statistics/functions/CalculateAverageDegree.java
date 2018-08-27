@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 
 /**
@@ -47,7 +48,8 @@ public class CalculateAverageDegree implements MapFunction<GraphHead, GraphHead>
    */
   @Override
   public GraphHead map(GraphHead graphHead) {
-    long numVertices = graphHead.getPropertyValue("vertexCount").getLong();
+    long numVertices = graphHead.getPropertyValue(
+      new VertexCount().getAggregatePropertyKey()).getLong();
     long sumDegrees = graphHead.getPropertyValue(
       SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES).getLong();
     long average = (long) Math.ceil((double) sumDegrees / (double) numVertices);

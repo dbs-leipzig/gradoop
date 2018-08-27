@@ -31,7 +31,10 @@ import org.gradoop.flink.model.impl.operators.statistics.OutgoingVertexDegrees;
 public class AverageOutgoingDegree implements UnaryGraphToGraphOperator {
 
   /**
-   * {@inheritDoc}
+   * Calculates the average outgoing degree of the input graph and writes it to the graph head.
+   *
+   * @param graph the input graph
+   * @return LogicalGraph with the average outgoing degree value written to the graph head.
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {

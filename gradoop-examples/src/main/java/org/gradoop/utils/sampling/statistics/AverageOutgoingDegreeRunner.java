@@ -37,9 +37,9 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 public class AverageOutgoingDegreeRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * <pre>
    * Calls the average outgoing degree computation for the graph.
    *
+   * <pre>
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
    * args[2] - output path
