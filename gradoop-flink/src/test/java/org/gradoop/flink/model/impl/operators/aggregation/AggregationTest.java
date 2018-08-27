@@ -37,7 +37,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AggregationTest extends GradoopFlinkTestBase {
-  
+
   static final String EDGE_PROPERTY = "ep";
   static final String VERTEX_PROPERTY = "vp";
 
@@ -203,8 +203,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleGraphVertexAndEdgeCount() throws Exception {
-    LogicalGraph graph = getLoaderFromString("[()-->()<--()]")
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph graph = getLoaderFromString("[()-->()<--()]").getLogicalGraph();
 
     VertexCount vertexCount = new VertexCount();
     EdgeCount edgeCount = new EdgeCount();

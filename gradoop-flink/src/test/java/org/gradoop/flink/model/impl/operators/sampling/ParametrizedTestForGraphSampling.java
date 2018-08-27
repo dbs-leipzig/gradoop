@@ -206,7 +206,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   @Test
   public void samplingTest() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader().getLogicalGraph();
     LogicalGraph newGraph = getSamplingOperator().sample(dbGraph);
 
     validateGraph(dbGraph, newGraph);
