@@ -28,19 +28,22 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
  * Calls the average degree computation for a logical graph. Writes the result to a csv-file
  * named {@value SamplingEvaluationConstants#FILE_AVERAGE_DEGREE}
  * in the output directory, containing a single line with the average degree value, e.g.:
- *
+ * <pre>
  * BOF
  * 4
  * EOF
+ * </pre>
  */
 public class AverageDegreeRunner extends AbstractRunner implements ProgramDescription {
 
   /**
+   * <pre>
    * Calls the average degree computation for the graph.
    *
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
    * args[2] - output path
+   * </pre>
    *
    * @param args command line arguments
    * @throws Exception in case of read/write failure

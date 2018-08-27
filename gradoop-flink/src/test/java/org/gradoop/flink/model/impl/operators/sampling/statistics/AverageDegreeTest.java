@@ -32,7 +32,7 @@ public class AverageDegreeTest extends GradoopFlinkTestBase {
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testGraphDensity() throws Exception {
+  public void testAverageDegree() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
 
     long averageDegree = graph.callForGraph(new AverageDegree())

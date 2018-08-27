@@ -28,12 +28,14 @@ import org.gradoop.utils.statistics.VertexOutgoingDegreeDistributionRunner;
 public class SamplingStatisticsRunner extends AbstractRunner implements ProgramDescription {
 
   /**
+   * <pre>
    * Calls the computation of all given graph properties.
    * (List of called graph properties will be extended over time)
    *
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
    * args[2] - output path
+   * </pre>
    *
    * @param args command line arguments
    * @throws Exception if something goes wrong

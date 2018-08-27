@@ -15,20 +15,18 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
-import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AddSumDegreesToGraphHeadCrossFunction;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.CalculateAverageDegree;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegrees;
-import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Calculates the average degree of a graph and writes it to the graph head.
- * Uses: ceiling( sum(vertex degrees) / |vertices| )
+ * Uses: {@code ceiling( sum(vertex degrees) / |vertices| )}
  */
 public class AverageDegree implements UnaryGraphToGraphOperator {
 
@@ -40,16 +38,11 @@ public class AverageDegree implements UnaryGraphToGraphOperator {
     graph = graph.aggregate(new VertexCount());
     DataSet<GraphHead> newGraphHead = new VertexDegrees().execute(graph)
       .sum(1)
-      .cross(graph.getGraphHead().first(1))
-      .with(new CrossFunction<WithCount<GradoopId>, GraphHead, GraphHead>() {
-        @Override
-        public GraphHead cross(WithCount<GradoopId> sumDeg, GraphHead graphHead) throws Exception {
-          graphHead.setProperty(
-            SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES, sumDeg.getCount());
-          return graphHead;
-        }
-      })
-      .map(new CalculateAverageDegree(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_DEGREE));
+      .crossWithTiny(graph.getGraphHead().first(1))
+      .with(new AddSumDegreesToGraphHeadCrossFunction(
+        SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES))
+      .map(new CalculateAverageDegree(
+        SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_DEGREE));
 
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
