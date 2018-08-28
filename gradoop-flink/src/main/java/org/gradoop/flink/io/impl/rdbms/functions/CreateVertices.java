@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.rdbms.connection.FlinkConnect;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
@@ -32,6 +33,7 @@ public class CreateVertices {
 			ArrayList<TableToNode> tablesToNodes) {
 
 		DataSet<Vertex> vertices = null;
+		EPGMVertexFactory vertexFactory = config.getVertexFactory(); 
 
 		int counter = 0;
 				
@@ -43,11 +45,11 @@ public class CreateVertices {
 
 				if (vertices == null) {
 					vertices = dsSQLResult
-							.map(new RowToVertices(table.getTableName(), counter))
+							.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
 							.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes), "tables");
 				} else {
 					vertices = vertices.union(
-							dsSQLResult.map(new RowToVertices(table.getTableName(), counter))
+							dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
 									.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
 											"tables"));
 				}

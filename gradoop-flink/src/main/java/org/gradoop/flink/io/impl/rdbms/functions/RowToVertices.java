@@ -20,6 +20,11 @@ import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 public class RowToVertices extends RichMapFunction<Row, Vertex> {
 	
 	/**
+	 * EPGM vertex factory
+	 */
+	private EPGMVertexFactory vertexFactory;
+	
+	/**
 	 * List of all instances converted to vertices
 	 */
 	private List<TableToNode> tables;
@@ -49,7 +54,8 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 	 * 
 	 * @param tableName Name of current database table
 	 */
-	public RowToVertices(String tableName, int tablePos){
+	public RowToVertices(EPGMVertexFactory vertexFactory, String tableName, int tablePos){
+		this.vertexFactory = vertexFactory;
 		this.tableName = tableName;
 		this.tablePos = tablePos;
 	}
@@ -59,14 +65,13 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 		this.currentTable = tables.get(tablePos);
 		this.rowheader = currentTable.getRowheader();
 		
-		Vertex v = new Vertex();
-		v.setId(GradoopId.get());
-		v.setLabel(tableName);
-		Properties props = AttributesToProperties.getProperties(tuple, rowheader);
-		props.set(RdbmsConstants.PK_ID,PrimaryKeyConcatString.getPrimaryKeyString(tuple,rowheader));
-		v.setProperties(props);
 		
-		return v;
+		GradoopId id = GradoopId.get();
+		String label = tableName;
+		Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
+		properties.set(RdbmsConstants.PK_ID,PrimaryKeyConcatString.getPrimaryKeyString(tuple,rowheader));
+		
+		return (Vertex) vertexFactory.initVertex(id, label, properties);
 	}
 
 	public void open(Configuration parameters) throws Exception {

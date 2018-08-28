@@ -25,7 +25,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 public class CreateEdges {
 
 	public static DataSet<Edge> create(GradoopFlinkConfig config, RdbmsConfig rdbmsConfig,
-			ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices, int downLimit, int upLimit) throws Exception {
+			ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
 
 		// DataSet<Tuple4<String,GradoopId,GradoopId,Properties>> vertexUnion =
 		// vertices.map(new VertexToTuple4());
@@ -33,73 +33,72 @@ public class CreateEdges {
 		DataSet<Edge> edges = null;
 
 		int counter = 0;
-		int innerCounter = 0;
 
-		for (TableToEdge table : tablesToEdges) {
-
-			// converts foreign key relations (1:1,1:n relations)
-			if (table.isDirectionIndicator()) {
-
-				// represents vertices of referencing table
-				DataSet<IdKeyTuple> fkTable = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
-						.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
-
-				// represents vertices referenced by current foreign key
-				DataSet<IdKeyTuple> pkTable = vertices.filter(new VertexLabelFilter(table.getendTableName()))
-						.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
-
-				// DataSet<IdKeyTuple> tupleUnion =
-				// fkTable.union(pkTable).map(new MapFunction<IdKeyTuple,
-				// IdKeyTuple>() {
-				// @Override
-				// public IdKeyTuple map(IdKeyTuple i) throws Exception {
-				// return i;
-				// }
-				// });
-
-				// DataSet<Tuple3<GradoopId, GradoopId, String>> test = pkTable
-				// .map(new MapFunction<IdKeyTuple, Tuple3<GradoopId, GradoopId,
-				// String>>() {
-				//
-				// @Override
-				// public Tuple3<GradoopId, GradoopId, String> map(IdKeyTuple
-				// tuple) throws Exception {
-				// return new Tuple3<>(GradoopId.get(), tuple.f0, tuple.f1);
-				// }
-				// });
-				//
-				// DataSet<Edge> dsFKEdges = test.groupBy(2)
-				// .reduce(new ReduceFunction<Tuple3<GradoopId, GradoopId,
-				// String>>() {
-				//
-				// @Override
-				// public Tuple3<GradoopId, GradoopId, String>
-				// reduce(Tuple3<GradoopId, GradoopId, String> in1,
-				// Tuple3<GradoopId, GradoopId, String> in2) throws Exception {
-				// return new Tuple3<>(in1.f1, in2.f1, in2.f2);
-				// }
-				// }).map(new CreateEdges2(table.getStartAttribute().f0));
-
-				DataSet<Edge> dsFKEdges = fkTable.join(pkTable).where(1).equalTo(1)
-						.map(new Tuple2ToEdge(table.getStartAttribute().f0));
-				//
-				// DataSet<Edge> test =
-				// config.getExecutionEnvironment().fromElements(new Edge());
-				// DataSet<Edge> test2 =
-				// config.getExecutionEnvironment().fromElements(new Edge());
-				//
-				// DataSet<Edge> dsFKEdges = test.union(test2);
-
-				if (innerCounter >= downLimit && innerCounter < upLimit) {
-					if (edges == null) {
-						edges = dsFKEdges;
-					} else {
-						edges = edges.union(dsFKEdges);
-					}
-				}
-				innerCounter++;
-			}
-		}
+//		for (TableToEdge table : tablesToEdges) {
+//
+//			// converts foreign key relations (1:1,1:n relations)
+//			if (table.isDirectionIndicator()) {
+//
+//				// represents vertices of referencing table
+//				DataSet<IdKeyTuple> fkTable = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
+//						.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
+//
+//				// represents vertices referenced by current foreign key
+//				DataSet<IdKeyTuple> pkTable = vertices.filter(new VertexLabelFilter(table.getendTableName()))
+//						.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
+//
+//				// DataSet<IdKeyTuple> tupleUnion =
+//				// fkTable.union(pkTable).map(new MapFunction<IdKeyTuple,
+//				// IdKeyTuple>() {
+//				// @Override
+//				// public IdKeyTuple map(IdKeyTuple i) throws Exception {
+//				// return i;
+//				// }
+//				// });
+//
+//				// DataSet<Tuple3<GradoopId, GradoopId, String>> test = pkTable
+//				// .map(new MapFunction<IdKeyTuple, Tuple3<GradoopId, GradoopId,
+//				// String>>() {
+//				//
+//				// @Override
+//				// public Tuple3<GradoopId, GradoopId, String> map(IdKeyTuple
+//				// tuple) throws Exception {
+//				// return new Tuple3<>(GradoopId.get(), tuple.f0, tuple.f1);
+//				// }
+//				// });
+//				//
+//				// DataSet<Edge> dsFKEdges = test.groupBy(2)
+//				// .reduce(new ReduceFunction<Tuple3<GradoopId, GradoopId,
+//				// String>>() {
+//				//
+//				// @Override
+//				// public Tuple3<GradoopId, GradoopId, String>
+//				// reduce(Tuple3<GradoopId, GradoopId, String> in1,
+//				// Tuple3<GradoopId, GradoopId, String> in2) throws Exception {
+//				// return new Tuple3<>(in1.f1, in2.f1, in2.f2);
+//				// }
+//				// }).map(new CreateEdges2(table.getStartAttribute().f0));
+//
+//				DataSet<Edge> dsFKEdges = fkTable.join(pkTable).where(1).equalTo(1)
+//						.map(new Tuple2ToEdge(table.getStartAttribute().f0));
+//				//
+//				// DataSet<Edge> test =
+//				// config.getExecutionEnvironment().fromElements(new Edge());
+//				// DataSet<Edge> test2 =
+//				// config.getExecutionEnvironment().fromElements(new Edge());
+//				//
+//				// DataSet<Edge> dsFKEdges = test.union(test2);
+//
+//				if (innerCounter >= downLimit && innerCounter < upLimit) {
+//					if (edges == null) {
+//						edges = dsFKEdges;
+//					} else {
+//						edges = edges.union(dsFKEdges);
+//					}
+//				}
+//				innerCounter++;
+//			}
+//		}
 
 		// converts table tuples (n:m relations)
 		for (TableToEdge table : tablesToEdges) {
