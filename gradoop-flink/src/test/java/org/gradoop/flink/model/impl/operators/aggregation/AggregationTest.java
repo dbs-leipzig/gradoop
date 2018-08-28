@@ -311,4 +311,79 @@ public class AggregationTest extends GradoopFlinkTestBase {
     assertFalse("Property hasVertexLabel_ is true, should be false",
       graphHead.getPropertyValue(hasLabel.getAggregatePropertyKey()).getBoolean());
   }
+
+  /**
+   * Test using multiple vertex aggregation functions in one call.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testMultipleVertexAggregationFunctions() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
+
+    MinVertexProperty minVertexProperty = new MinVertexProperty("age");
+    MaxVertexProperty maxVertexProperty = new MaxVertexProperty("age");
+
+    LogicalGraph expected = graph.aggregate(minVertexProperty).aggregate(maxVertexProperty);
+    LogicalGraph output = graph.aggregate(minVertexProperty, maxVertexProperty);
+
+    collectAndAssertTrue(expected.equalsByElementData(output));
+  }
+
+  /**
+   * Test using multiple edge aggregation functions in one call.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testMultipleEdgeAggregationFunctions() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
+
+    MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
+    MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
+
+    LogicalGraph expected = graph.aggregate(minEdgeProperty).aggregate(maxEdgeProperty);
+    LogicalGraph output = graph.aggregate(minEdgeProperty, maxEdgeProperty);
+
+    collectAndAssertTrue(expected.equalsByElementData(output));
+  }
+
+  /**
+   * Test using multiple vertex and edge aggregation functions in one call.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testMultipleDifferentAggregationFunctions() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
+
+    MinVertexProperty minVertexProperty = new MinVertexProperty("age");
+    MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
+    MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
+
+    LogicalGraph expected = graph.aggregate(minVertexProperty)
+      .aggregate(minEdgeProperty)
+      .aggregate(maxEdgeProperty);
+    LogicalGraph output = graph.aggregate(minVertexProperty, minEdgeProperty, maxEdgeProperty);
+
+    collectAndAssertTrue(expected.equalsByElementData(output));
+  }
+
+  /**
+   * Test using multiple aggregation functions in one call on an empty graph.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testMultipleAggregationFunctionsWithEmptyGraph() throws Exception {
+    LogicalGraph graph = getLoaderFromString("").getLogicalGraph();
+
+    VertexCount vertexCount = new VertexCount();
+    MinEdgeProperty minEdgeProperty = new MinEdgeProperty(VERTEX_PROPERTY);
+
+    LogicalGraph expected = graph.aggregate(vertexCount).aggregate(minEdgeProperty);
+    LogicalGraph output = graph.aggregate(vertexCount, minEdgeProperty);
+
+    collectAndAssertTrue(expected.equalsByElementData(output));
+  }
 }
