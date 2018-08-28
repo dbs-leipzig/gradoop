@@ -23,65 +23,76 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Sets an aggregate value of a graph head.
+ * Sets aggregate values of a graph head.
  */
 @FunctionAnnotation.ForwardedFields("id")
 public class SetAggregateProperty
   extends RichMapFunction<GraphHead, GraphHead> {
 
   /**
-   * constant string for accessing broadcast variable "property value"
+   * constant string for accessing broadcast variable "property values"
    */
   public static final String VALUE = "value";
 
   /**
-   * aggregate property key
+   * map from aggregate property key to its value
    */
-  private final String propertyKey;
+  private Map<String, PropertyValue> aggregateValues;
 
   /**
-   * aggregate value
+   * map from aggregate property key to its default value
+   * used to replace aggregate value in case of NULL.
    */
-  private PropertyValue aggregateValue;
-
-  /**
-   * default value used to replace aggregate value in case of NULL.
-   */
-  private final PropertyValue defaultValue;
+  private final Map<String, PropertyValue> defaultValues;
 
 
   /**
    * Constructor.
    *
-   * @param aggregateFunction aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public SetAggregateProperty(AggregateFunction aggregateFunction) {
-    checkNotNull(aggregateFunction);
+  public SetAggregateProperty(Set<AggregateFunction> aggregateFunctions) {
+    for (AggregateFunction func : aggregateFunctions) {
+      checkNotNull(func);
+    }
 
-    this.propertyKey = aggregateFunction.getAggregatePropertyKey();
+    defaultValues = new HashMap<>();
 
-    this.defaultValue = aggregateFunction instanceof AggregateDefaultValue ?
-      ((AggregateDefaultValue) aggregateFunction).getDefaultValue() :
-      PropertyValue.NULL_VALUE;
+    for (AggregateFunction func : aggregateFunctions) {
+      defaultValues.put(func.getAggregatePropertyKey(),
+        func instanceof AggregateDefaultValue ?
+          ((AggregateDefaultValue) func).getDefaultValue() :
+          PropertyValue.NULL_VALUE);
+    }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.aggregateValue =
-      (PropertyValue) getRuntimeContext().getBroadcastVariable(VALUE).get(0);
 
-    if (aggregateValue.equals(PropertyValue.NULL_VALUE)) {
-      aggregateValue = defaultValue;
+    if (getRuntimeContext().getBroadcastVariable(VALUE).isEmpty()) {
+      aggregateValues = defaultValues;
+    } else {
+      aggregateValues =
+        (Map<String, PropertyValue>) getRuntimeContext().getBroadcastVariable(VALUE).get(0);
+
+      defaultValues.forEach((defaultKey, defaultAgg) ->
+        aggregateValues.compute(defaultKey, (key, agg) ->
+          agg == null ? defaultAgg : agg));
     }
   }
 
   @Override
   public GraphHead map(GraphHead graphHead) throws Exception {
-    graphHead.setProperty(propertyKey, aggregateValue);
+    aggregateValues.forEach(graphHead::setProperty);
     return graphHead;
   }
 }

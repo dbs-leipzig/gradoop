@@ -21,43 +21,46 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * vertex,.. => aggregateValue
  */
 public class AggregateVertices
-  implements GroupCombineFunction<Vertex, PropertyValue> {
+  implements GroupCombineFunction<Vertex, Map<String, PropertyValue>> {
 
   /**
    * Aggregate function.
    */
-  private final VertexAggregateFunction aggFunc;
+  private final Set<VertexAggregateFunction> aggFuncs;
 
   /**
    * Constructor.
    *
-   * @param aggFunc aggregate function
+   * @param aggFuncs aggregate function
    */
-  public AggregateVertices(VertexAggregateFunction aggFunc) {
-    this.aggFunc = aggFunc;
+  public AggregateVertices(Set<VertexAggregateFunction> aggFuncs) {
+    this.aggFuncs = aggFuncs;
   }
 
   @Override
   public void combine(
-    Iterable<Vertex> vertices, Collector<PropertyValue> out) throws Exception {
-    PropertyValue aggregate = null;
+    Iterable<Vertex> vertices, Collector<Map<String, PropertyValue>> out) {
+    Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Vertex vertex : vertices) {
-      PropertyValue increment = aggFunc.getVertexIncrement(vertex);
-      if (increment != null) {
-        if (aggregate == null) {
-          aggregate = increment;
-        } else {
-          aggregate = aggFunc.aggregate(aggregate, increment);
+      for (VertexAggregateFunction aggFunc : aggFuncs) {
+        PropertyValue increment = aggFunc.getVertexIncrement(vertex);
+        if (increment != null) {
+          aggregate.compute(aggFunc.getAggregatePropertyKey(),
+            (key, agg) -> agg == null ? increment : aggFunc.aggregate(agg, increment));
         }
       }
     }
 
-    if (aggregate != null) {
+    if (!aggregate.isEmpty()) {
       out.collect(aggregate);
     }
   }

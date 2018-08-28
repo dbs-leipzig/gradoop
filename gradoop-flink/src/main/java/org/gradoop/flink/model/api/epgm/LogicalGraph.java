@@ -359,8 +359,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph aggregate(AggregateFunction aggregateFunc) {
-    return callForGraph(new Aggregation(aggregateFunc));
+  public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
+    return callForGraph(new Aggregation(aggregateFunctions));
   }
 
   /**
