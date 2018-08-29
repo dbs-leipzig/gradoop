@@ -318,7 +318,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    * @throws Exception on failure
    */
   @Test
-  public void testMultipleVertexAggregationFunctions() throws Exception {
+  public void testSingleGraphWithMultipleVertexAggregationFunctions() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     MinVertexProperty minVertexProperty = new MinVertexProperty("age");
@@ -336,7 +336,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    * @throws Exception on failure
    */
   @Test
-  public void testMultipleEdgeAggregationFunctions() throws Exception {
+  public void testSingleGraphWithMultipleEdgeAggregationFunctions() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
@@ -354,7 +354,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    * @throws Exception on failure
    */
   @Test
-  public void testMultipleDifferentAggregationFunctions() throws Exception {
+  public void testSingleGraphWithMultipleDifferentAggregationFunctions() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     MinVertexProperty minVertexProperty = new MinVertexProperty("age");
@@ -375,7 +375,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    * @throws Exception on failure
    */
   @Test
-  public void testMultipleAggregationFunctionsWithEmptyGraph() throws Exception {
+  public void testEmptySingleGraphWithMultipleAggregationFunctions() throws Exception {
     LogicalGraph graph = getLoaderFromString("").getLogicalGraph();
 
     VertexCount vertexCount = new VertexCount();
