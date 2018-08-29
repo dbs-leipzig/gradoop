@@ -53,14 +53,18 @@ public class FlinkConnect {
 		// computes the parameter array for ParametersProvider
 
 		// run jdbc input format with pagination
-		JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
+		JDBCInputFormat jdbcInput = null;
+		try {
+		jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
 				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
 				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
 				.setQuery(sqlQuery + pageinationQuery(rdbmsConfig.getUrl())).setRowTypeInfo(typeInfo)
 				.setParametersProvider(
 						new GenericParameterValuesProvider(parameters(parallelism, rowCount, rdbmsConfig.getUrl())))
 				.finish();
-
+		}catch(Exception e) {
+			System.out.println("No propper typeparsing");
+		}
 		return env.createInput(jdbcInput);
 	}
 
@@ -73,7 +77,7 @@ public class FlinkConnect {
 
 		// pageination query for microsoft sql server management system
 		if (url.contains(":sqlserver:")) {
-			pageinationQuery = " ORDER BY 1 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+			pageinationQuery = " ORDER BY 1 OFFSET (?) ROWS FETCH NEXT (?) ROWS ONLY";
 		}
 
 		return pageinationQuery;
@@ -102,6 +106,9 @@ public class FlinkConnect {
 			} else {
 
 				if (url.contains(":sqlserver:")) {
+					if(partitionNumber==0) {
+						partitionNumber=1;
+					}
 					parameters[i] = new Integer[] { j, partitionNumber };
 				} else {
 					parameters[i] = new Integer[] { partitionNumber, j };

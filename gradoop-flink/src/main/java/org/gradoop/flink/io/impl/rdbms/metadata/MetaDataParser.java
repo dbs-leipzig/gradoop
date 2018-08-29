@@ -66,32 +66,36 @@ public class MetaDataParser {
 	 * @throws SQLException
 	 */
 	public void parse() throws SQLException {
-		ResultSet rsTables = metadata.getTables(null, null, "%", new String[] { "TABLE" });
+		ResultSet rsTables = metadata.getTables(null, "%", "%", new String[] { "TABLE" });
 		ArrayList<String> tables = new ArrayList<String>();
 
 		while (rsTables.next()) {
 			if (rsTables.getString("TABLE_TYPE").equals("TABLE")
-					&& !rsTables.getString("TABLE_NAME").contains("trace_xe")) {
-				tables.add(rsTables.getString("TABLE_NAME"));
+					&& !rsTables.getString("TABLE_NAME").contains("trace_xe") 
+					&& !rsTables.getString("TABLE_SCHEM").contains("dbo")) {
+				tables.add(rsTables.getString("TABLE_SCHEM") + "." + rsTables.getString("TABLE_NAME"));
 			}
 		}
 
 		for (String table : tables) {
+			String tableName = table.split("\\.")[1];
+			String schemName = table.split("\\.")[0];
+			System.out.println("*"+schemName+"*");
 
 			// used to store primary key metadata representation
 			ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
-			
+
 			// used to store foreign key metadata representation
 			ArrayList<FkTuple> foreignKeys = new ArrayList<FkTuple>();
-			
+
 			// used to store further attributes metadata representation
 			ArrayList<NameTypeTuple> furtherAttributes = new ArrayList<NameTypeTuple>();
-			
+
 			// used to find further attributes, respectively no primary or
 			// foreign key attributes
 			ArrayList<String> pkfkAttributes = new ArrayList<String>();
 
-			ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, null, table);
+			ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, schemName, tableName);
 
 			// parses primary keys if exists
 			if (rsPrimaryKeys != null) {
@@ -104,13 +108,13 @@ public class MetaDataParser {
 
 				// assigning primary key data type
 				for (NameTypeTuple pk : primaryKeys) {
-					ResultSet rsColumns = metadata.getColumns(null, null, table, pk.f0);
+					ResultSet rsColumns = metadata.getColumns(null, null, tableName, pk.f0);
 					rsColumns.next();
 					pk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
 				}
 			}
 
-			ResultSet rsForeignKeys = metadata.getImportedKeys(null, null, table);
+			ResultSet rsForeignKeys = metadata.getImportedKeys(null, schemName, tableName);
 
 			// parses foreign keys if exists
 			if (rsForeignKeys != null) {
@@ -125,13 +129,13 @@ public class MetaDataParser {
 
 				// assigning foreign key data type
 				for (FkTuple fk : foreignKeys) {
-					ResultSet rsColumns = metadata.getColumns(null, null, table, fk.f0);
+					ResultSet rsColumns = metadata.getColumns(null, null, tableName, fk.f0);
 					rsColumns.next();
 					fk.f1 = JDBCType.valueOf(rsColumns.getInt("DATA_TYPE"));
 				}
 			}
 
-			ResultSet rsAttributes = metadata.getColumns(null, null, table, null);
+			ResultSet rsAttributes = metadata.getColumns(null, schemName, tableName, null);
 
 			// parses further attributes if exists
 			// assigning attribute name and belonging data type
@@ -151,11 +155,15 @@ public class MetaDataParser {
 
 			// number of rows (needed for distributed data querying via
 			// flink)
-			int rowCount = TableRowSize.getTableRowSize(con, table);
-
-			tableBase.add(new RdbmsTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+			int rowCount = 0;
+			if (schemName.equals("null") || schemName.equals("public")) {
+				rowCount = TableRowSize.getTableRowSize(con, tableName);
+				tableBase.add(new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+			} else {
+				rowCount = TableRowSize.getTableRowSize(con, table);
+				tableBase.add(new RdbmsTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+			}
 		}
-
 	}
 
 	/**

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -31,34 +32,34 @@ public class CreateVertices {
 
 	public static DataSet<Vertex> create(GradoopFlinkConfig config, RdbmsConfig rdbmsConfig,
 			ArrayList<TableToNode> tablesToNodes) {
-
 		DataSet<Vertex> vertices = null;
-		EPGMVertexFactory vertexFactory = config.getVertexFactory(); 
+		EPGMVertexFactory vertexFactory = config.getVertexFactory();
 
 		int counter = 0;
-				
+
 		for (TableToNode table : tablesToNodes) {
+			if(counter < 52) {
+			
+				try {
+					DataSet<Row> dsSQLResult = FlinkConnect.connect(config.getExecutionEnvironment(), rdbmsConfig,
+							table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
-			try {
-				DataSet<Row> dsSQLResult = FlinkConnect.connect(config.getExecutionEnvironment(), rdbmsConfig,
-						table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
+					if (vertices == null) {
+						vertices = dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+								.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
+										"tables");
+					} else {
+						vertices = vertices.union(dsSQLResult
+								.map(new RowToVertices(vertexFactory, table.getTableName(), counter)).withBroadcastSet(
+										config.getExecutionEnvironment().fromCollection(tablesToNodes), "tables"));
+					}
 
-				if (vertices == null) {
-					vertices = dsSQLResult
-							.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-							.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes), "tables");
-				} else {
-					vertices = vertices.union(
-							dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-									.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),
-											"tables"));
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
-
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
 			}
 			counter++;
 		}
-		return vertices; 
+		return vertices;
 	}
 }

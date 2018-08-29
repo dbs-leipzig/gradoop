@@ -19,13 +19,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
@@ -34,12 +29,8 @@ import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnect;
 import org.gradoop.flink.io.impl.rdbms.functions.CleanVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
-import org.gradoop.flink.io.impl.rdbms.functions.DirFilter;
-import org.gradoop.flink.io.impl.rdbms.functions.JoinSetToEdge;
-import org.gradoop.flink.io.impl.rdbms.functions.TableToEdgesToEdge;
+import org.gradoop.flink.io.impl.rdbms.functions.PrintConversionPlan;
 import org.gradoop.flink.io.impl.rdbms.functions.VertexIdMapper;
-import org.gradoop.flink.io.impl.rdbms.functions.VertexToFkTuples;
-import org.gradoop.flink.io.impl.rdbms.functions.VertexToPkTuple;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
@@ -66,11 +57,6 @@ public class RdbmsDataSource implements DataSource {
 	 * Flink Execution Environment
 	 */
 	private ExecutionEnvironment env;
-
-	/**
-	 * Temporary vertices
-	 */
-	private DataSet<Vertex> tempVertices;
 
 	/**
 	 * Vertices
@@ -110,7 +96,7 @@ public class RdbmsDataSource implements DataSource {
 
 	@Override
 	public LogicalGraph getLogicalGraph() {
-
+		
 		Connection con = RdbmsConnect.connect(rdbmsConfig);
 
 		try {
@@ -125,94 +111,25 @@ public class RdbmsDataSource implements DataSource {
 
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
-			DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
 
+			PrintConversionPlan.print(tablesToNodes, tablesToEdges);
+			
 			// creates vertices from rdbms table tuples
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes)
 					.map(new VertexIdMapper());
 
-			DataSet<Tuple3<String, GradoopId, String>> pkEdges = dsTablesToEdges.filter(new DirFilter())
-					.flatMap(new VertexToPkTuple()).withBroadcastSet(tempVertices, "vertices");
-
-			DataSet<Tuple3<String, GradoopId, String>> fkEdges = dsTablesToEdges.filter(new DirFilter())
-					.flatMap(new VertexToFkTuples()).withBroadcastSet(tempVertices, "vertices");
-
-			DataSet<Tuple2<Tuple3<String, GradoopId, String>, Tuple3<String, GradoopId, String>>> joinSet = pkEdges
-					.joinWithHuge(fkEdges).where(0, 2).equalTo(0, 2);
-			
-//			edges = dsTablesToEdges.flatMap(new TableToEdgesToEdge(flinkConfig)).withBroadcastSet(tempVertices, "vertices");
-//			edges = pkEdges
-//					.coGroup(fkEdges).where(0).equalTo(0).with(new CoGroupFunction<Tuple3<String,GradoopId,String>, Tuple3<String,GradoopId,String>, Edge>() {
-//
-//						@Override
-//						public void coGroup(Iterable<Tuple3<String, GradoopId, String>> pkTuples,
-//								Iterable<Tuple3<String, GradoopId, String>> fkTuples, Collector<Edge> out)
-//								throws Exception {
-//							for(Tuple3<String,GradoopId,String> pk : pkTuples) {
-//								for(Tuple3<String,GradoopId,String> fk : fkTuples) {
-//									Edge e = new Edge();
-//									e.setLabel(pk.f0);
-//									e.setSourceId(fk.f1);
-//									e.setTargetId(pk.f1);
-//									out.collect(e);	
-//								}
-//							}
-//						}
-//					});
-			
-			edges = joinSet.map(new JoinSetToEdge(flinkConfig));
-
-			// DataSet<Tuple3<GradoopId,GradoopId,String>> groupedSet =
-			// directedEdges.groupBy(0,2).reduce(new ReducePairs());
-			// groupedSet.print();
-			// edges = groupedSet.map(new MapFunction<Tuple3<GradoopId,GradoopId,String>,
-			// Edge>() {
-			//
-			// @Override
-			// public Edge map(Tuple3<GradoopId, GradoopId, String> in) throws Exception {
-			// Edge e = new Edge();
-			// e.setId(GradoopId.get());
-			// e.setSourceId(in.f0);
-			// e.setTargetId(in.f1);
-			// e.setLabel(in.f2);
-			// return e;
-			// }
-			// });
-
-			// creates edges from rdbms table tuples and foreign key
-			// relations
-			try {
-				edges = edges.union(CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices));
-			} catch (Exception e) {
-				System.out.println("No undirected Edges");
-			}
-
-			// to avoid exception if edge set is empty
-			if (edges == null) {
-				edges = env.fromElements(new Edge());
-			}
+			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 
 			// cleans vertices by deleting primary key and foreign key
 			// properties
-			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
+//			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
+			vertices = tempVertices;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LogicalGraph graph = flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
-		return graph;
-	}
-
-	public void print(ArrayList<TableToNode> tablesToNodes, ArrayList<TableToEdge> tablesToEdges) {
-		System.out.println("TABLES TO NODES :" + tablesToNodes.size());
-		int i = 0;
-		for (TableToEdge table : tablesToEdges) {
-			if (!table.isDirectionIndicator()) {
-				i++;
-			}
-		}
-		System.out.println("\nTABLES TO EDGES :" + tablesToEdges.size());
-		System.out.println("Tuple Tables : " + i);
-
+		
+		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}
 
 	@Override

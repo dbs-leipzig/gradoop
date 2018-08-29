@@ -49,10 +49,10 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
 			break;
 		case "TINYINT":
-			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
 			break;
 		case "SMALLINT":
-			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
 			break;
 		case "INTEGER":
 			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
@@ -72,13 +72,13 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.DOUBLE_TYPE_INFO;
 			break;
 		case "BINARY":
-			typeInfo = PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
+			typeInfo = BasicTypeInfo.of(byte[].class);
 			break;
 		case "VARBINARY":
-			typeInfo = BasicArrayTypeInfo.BYTE_ARRAY_TYPE_INFO;
+			typeInfo = BasicTypeInfo.of(byte[].class);
 			break;
 		case "LONGVARBINARY":
-			typeInfo = BasicArrayTypeInfo.BYTE_ARRAY_TYPE_INFO;
+			typeInfo = BasicTypeInfo.of(byte[].class);
 			break;
 		case "DATE":
 			typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
@@ -90,13 +90,13 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
 			break;
 		case "CLOB":
-			System.err.println("No Typemapping for Type : CLOB");
+			typeInfo = BasicTypeInfo.of(java.sql.Clob.class);
 			break;
 		case "BLOB":
-			System.err.println("No Typemapping for Type : BLOB");
+			typeInfo = BasicTypeInfo.of(java.sql.Blob.class);
 			break;
 		case "DISTINCT":
-			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
 			break;
 		case "STRUCT":
 			System.err.println("No Typemapping for Type : STRUCT");
