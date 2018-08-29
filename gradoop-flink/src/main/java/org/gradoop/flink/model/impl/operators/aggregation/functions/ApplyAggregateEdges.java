@@ -23,58 +23,51 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * (graphId,edge),.. => (graphId,aggregateValue),..
+ * (graphId,edge),.. => (graphId,[aggregateKey,aggregateValue]),..
  */
 public class ApplyAggregateEdges implements GroupCombineFunction
-  <Tuple2<GradoopId, Edge>, Tuple2<GradoopId, PropertyValue>> {
+  <Tuple2<GradoopId, Edge>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
 
   /**
    * Aggregate function.
    */
-  private final EdgeAggregateFunction aggFunc;
+  private final Set<EdgeAggregateFunction> aggFuncs;
   /**
    * Reuse tuple.
    */
-  private final Tuple2<GradoopId, PropertyValue> reusePair = new Tuple2<>();
+  private final Tuple2<GradoopId, Map<String, PropertyValue>> reusePair = new Tuple2<>();
 
   /**
    * Constructor.
    *
-   * @param aggFunc aggregate function
+   * @param aggFuncs aggregate functions
    */
-  public ApplyAggregateEdges(EdgeAggregateFunction aggFunc) {
-    this.aggFunc = aggFunc;
+  public ApplyAggregateEdges(Set<EdgeAggregateFunction> aggFuncs) {
+    this.aggFuncs = aggFuncs;
   }
 
   @Override
   public void combine(Iterable<Tuple2<GradoopId, Edge>> edges,
-    Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
+    Collector<Tuple2<GradoopId, Map<String, PropertyValue>>> out) {
 
     Iterator<Tuple2<GradoopId, Edge>> iterator = edges.iterator();
-
     Tuple2<GradoopId, Edge> graphIdEdge = iterator.next();
 
-    Edge edge = graphIdEdge.f1;
-
-    PropertyValue aggregate = aggFunc.getEdgeIncrement(edge);
+    Map<String, PropertyValue> aggregate = AggregateUtil.edgeIncrement(new HashMap<>(),
+      graphIdEdge.f1, aggFuncs);
 
     while (iterator.hasNext()) {
-      edge = iterator.next().f1;
-      PropertyValue increment = aggFunc.getEdgeIncrement(edge);
-
-      if (increment != null) {
-        if (aggregate == null) {
-          aggregate = increment;
-        } else {
-          aggregate = aggFunc.aggregate(aggregate, increment);
-        }
-      }
+      Edge edge = iterator.next().f1;
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggFuncs);
     }
 
-    if (aggregate != null) {
+    if (!aggregate.isEmpty()) {
       reusePair.f0 = graphIdEdge.f0;
       reusePair.f1 = aggregate;
       out.collect(reusePair);

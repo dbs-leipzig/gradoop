@@ -16,7 +16,8 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -24,9 +25,10 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
-import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Applies an {@link AggregateFunction} to the vertex or edge set of a graph transaction.
@@ -34,131 +36,83 @@ import java.util.function.Function;
 public class AggregateTransactions implements MapFunction<GraphTransaction, GraphTransaction> {
 
   /**
-   * True, if the given aggregate function is a {@link VertexAggregateFunction}.
-   * False, if the given aggregate function is a {@link EdgeAggregateFunction}.
+   * Set of aggregate vertex functions.
    */
-  private final boolean isVertexAggregateFunction;
+  private final Set<VertexAggregateFunction> vertexAggregateFunctions;
   /**
-   * True, iff the given aggregate function has a default value.
+   * Set of aggregate edge functions.
    */
-  private final boolean hasAggregateDefaultValue;
+  private final Set<EdgeAggregateFunction> edgeAggregateFunctions;
   /**
-   * Property key used to store the final aggregate at the graph head of the graph transaction.
+   * Set of aggregate default values.
    */
-  private final String aggregatePropertyKey;
-  /**
-   * Set to an instance of {@link VertexAggregateFunction} if
-   * {@link AggregateTransactions#isVertexAggregateFunction} is {@code true}.
-   */
-  private final VertexAggregateFunction vertexAggregateFunction;
-  /**
-   * Set to an instance of {@link EdgeAggregateFunction} if
-   * {@link AggregateTransactions#isVertexAggregateFunction} is {@code false}.
-   */
-  private final EdgeAggregateFunction edgeAggregateFunction;
-  /**
-   * Set to an instance of {@link AggregateDefaultValue} if
-   * {@link AggregateTransactions#hasAggregateDefaultValue} is {@code true}.
-   */
-  private final AggregateDefaultValue aggregateDefaultValue;
+  private final Map<String, PropertyValue> aggregateDefaultValues;
 
   /**
    * Creates a new instance.
    *
-   * @param aggregateFunction vertex or edge aggregate function with possible default value
+   * @param aggregateFunctions vertex or edge aggregate functions with possible default value
    */
-  public AggregateTransactions(AggregateFunction aggregateFunction) {
+  public AggregateTransactions(Set<AggregateFunction> aggregateFunctions) {
     // initialization logic to avoid instanceOf checking during execution
-    aggregatePropertyKey = aggregateFunction.getAggregatePropertyKey();
 
-    if (aggregateFunction instanceof VertexAggregateFunction) {
-      isVertexAggregateFunction = true;
-      vertexAggregateFunction = (VertexAggregateFunction) aggregateFunction;
-      edgeAggregateFunction = null;
-    } else {
-      isVertexAggregateFunction = false;
-      vertexAggregateFunction = null;
-      edgeAggregateFunction = (EdgeAggregateFunction) aggregateFunction;
-    }
+    vertexAggregateFunctions = aggregateFunctions.stream()
+      .filter(f -> f instanceof VertexAggregateFunction)
+      .map(f -> (VertexAggregateFunction) f)
+      .collect(Collectors.toSet());
 
-    if (aggregateFunction instanceof AggregateDefaultValue) {
-      hasAggregateDefaultValue = true;
-      aggregateDefaultValue = (AggregateDefaultValue) aggregateFunction;
-    } else {
-      hasAggregateDefaultValue = false;
-      aggregateDefaultValue = null;
+    edgeAggregateFunctions = aggregateFunctions.stream()
+      .filter(f -> f instanceof EdgeAggregateFunction)
+      .map(f -> (EdgeAggregateFunction) f)
+      .collect(Collectors.toSet());
+
+    aggregateDefaultValues = new HashMap<>();
+    for (AggregateFunction func : aggregateFunctions) {
+      aggregateDefaultValues.put(func.getAggregatePropertyKey(),
+        func instanceof AggregateDefaultValue ?
+          ((AggregateDefaultValue) func).getDefaultValue() :
+          PropertyValue.NULL_VALUE);
     }
   }
 
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
 
-    PropertyValue aggregate = isVertexAggregateFunction ?
-      aggregateVertices(graphTransaction) :
-      aggregateEdges(graphTransaction);
+    Map<String, PropertyValue> aggregate = aggregateVertices(graphTransaction);
+    aggregate.putAll(aggregateEdges(graphTransaction));
 
-    if (aggregate == null) {
-      if (hasAggregateDefaultValue) {
-        aggregate = aggregateDefaultValue.getDefaultValue();
-      } else {
-        aggregate = PropertyValue.NULL_VALUE;
-      }
-    }
+    aggregateDefaultValues.forEach(aggregate::putIfAbsent);
 
-    graphTransaction.getGraphHead().setProperty(aggregatePropertyKey, aggregate);
-
+    aggregate.forEach(graphTransaction.getGraphHead()::setProperty);
     return graphTransaction;
   }
 
   /**
-   * Applies the aggregate function on the vertices of the given graph transaction.
+   * Applies the aggregate functions on the vertices of the given graph transaction.
    *
    * @param graphTransaction graph transaction
-   * @return final aggregate value or {@code null} if no vertices are contained
+   * @return final vertex aggregate value
    */
-  private PropertyValue aggregateVertices(GraphTransaction graphTransaction) {
-    return iterate(graphTransaction.getVertices().iterator(),
-      vertexAggregateFunction::getVertexIncrement,
-      vertexAggregateFunction::aggregate);
+  private Map<String, PropertyValue> aggregateVertices(GraphTransaction graphTransaction) {
+    Map<String, PropertyValue> aggregate = new HashMap<>();
+
+    for (Vertex vertex : graphTransaction.getVertices()) {
+      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, vertexAggregateFunctions);
+    }
+    return aggregate;
   }
 
   /**
-   * Applies the aggregate function on the edges of the given graph transaction.
+   * Applies the aggregate functions on the edges of the given graph transaction.
    *
    * @param graphTransaction graph transaction
-   * @return final aggregate value or {@code null} if no edges are contained
+   * @return final edge aggregate value
    */
-  private PropertyValue aggregateEdges(GraphTransaction graphTransaction) {
-    return iterate(graphTransaction.getEdges().iterator(),
-      edgeAggregateFunction::getEdgeIncrement,
-      edgeAggregateFunction::aggregate);
-  }
+  private Map<String, PropertyValue> aggregateEdges(GraphTransaction graphTransaction) {
+    Map<String, PropertyValue> aggregate = new HashMap<>();
 
-  /**
-   * Iterates the given set of EPGM elements and computes the aggregate value given the two
-   * functions.
-   *
-   * @param elements iterator of EPGM elements
-   * @param valueFunction extracts the property value used for aggregation
-   * @param aggregateFunction used to update the aggregate
-   * @param <T> EPGM element type
-   * @return final aggregate value or {@code null} if {@code elements} is empty
-   */
-  private <T extends Element> PropertyValue iterate(Iterator<T> elements,
-    Function<T, PropertyValue> valueFunction,
-    BiFunction<PropertyValue, PropertyValue, PropertyValue> aggregateFunction) {
-
-    PropertyValue aggregate = null;
-
-    while (elements.hasNext()) {
-      PropertyValue increment = valueFunction.apply(elements.next());
-      if (increment != null) {
-        if (aggregate == null) {
-          aggregate = increment;
-        } else {
-          aggregate = aggregateFunction.apply(aggregate, increment);
-        }
-      }
+    for (Edge edge : graphTransaction.getEdges()) {
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, edgeAggregateFunctions);
     }
     return aggregate;
   }

@@ -23,38 +23,48 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * (graphId,partitionAggregateValue),.. => (graphId,globalAggregateValue),..
  */
 public class CombinePartitionApplyAggregates implements GroupReduceFunction
-  <Tuple2<GradoopId, PropertyValue>, Tuple2<GradoopId, PropertyValue>> {
+  <Tuple2<GradoopId, Map<String, PropertyValue>>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
 
   /**
-   * Aggregate Function
+   * Aggregate Functions
    */
-  private final AggregateFunction aggFunc;
+  private final Set<AggregateFunction> aggFuncs;
 
   /**
    * Constructor.
    *
-   * @param aggregateFunction aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public CombinePartitionApplyAggregates(AggregateFunction aggregateFunction) {
-
-    this.aggFunc = aggregateFunction;
+  public CombinePartitionApplyAggregates(Set<AggregateFunction> aggregateFunctions) {
+    this.aggFuncs = aggregateFunctions;
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<GradoopId, PropertyValue>> values,
-    Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
+  public void reduce(Iterable<Tuple2<GradoopId, Map<String, PropertyValue>>> values,
+    Collector<Tuple2<GradoopId, Map<String, PropertyValue>>> out) throws Exception {
 
-    Iterator<Tuple2<GradoopId, PropertyValue>> iterator = values.iterator();
+    Iterator<Tuple2<GradoopId, Map<String, PropertyValue>>> iterator = values.iterator();
 
-    Tuple2<GradoopId, PropertyValue> aggregate = iterator.next();
+    Tuple2<GradoopId, Map<String, PropertyValue>> aggregate = iterator.next();
 
     while (iterator.hasNext()) {
-      aggregate.f1 = aggFunc.aggregate(aggregate.f1, iterator.next().f1);
+      Tuple2<GradoopId, Map<String, PropertyValue>> next = iterator.next();
+
+      for (AggregateFunction aggFunc : aggFuncs) {
+        String propertyKey = aggFunc.getAggregatePropertyKey();
+        PropertyValue nextAgg = next.f1.get(propertyKey);
+        if (nextAgg != null) {
+          aggregate.f1.compute(propertyKey, (key, agg) -> agg == null ?
+            nextAgg : aggFunc.aggregate(agg, nextAgg));
+        }
+      }
     }
 
     out.collect(aggregate);

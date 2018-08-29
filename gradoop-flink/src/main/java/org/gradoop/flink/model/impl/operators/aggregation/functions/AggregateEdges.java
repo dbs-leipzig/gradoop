@@ -54,13 +54,7 @@ public class AggregateEdges
     Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Edge edge : edges) {
-      for (EdgeAggregateFunction aggFunc : aggFuncs) {
-        PropertyValue increment = aggFunc.getEdgeIncrement(edge);
-        if (increment != null) {
-          aggregate.compute(aggFunc.getAggregatePropertyKey(),
-            (key, agg) -> agg == null ? increment : aggFunc.aggregate(agg, increment));
-        }
-      }
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggFuncs);
     }
 
     if (!aggregate.isEmpty()) {

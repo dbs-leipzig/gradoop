@@ -51,13 +51,7 @@ public class AggregateVertices
     Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Vertex vertex : vertices) {
-      for (VertexAggregateFunction aggFunc : aggFuncs) {
-        PropertyValue increment = aggFunc.getVertexIncrement(vertex);
-        if (increment != null) {
-          aggregate.compute(aggFunc.getAggregatePropertyKey(),
-            (key, agg) -> agg == null ? increment : aggFunc.aggregate(agg, increment));
-        }
-      }
+      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggFuncs);
     }
 
     if (!aggregate.isEmpty()) {

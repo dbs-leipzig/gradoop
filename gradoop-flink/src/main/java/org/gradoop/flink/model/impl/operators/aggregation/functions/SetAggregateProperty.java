@@ -84,9 +84,7 @@ public class SetAggregateProperty
       aggregateValues =
         (Map<String, PropertyValue>) getRuntimeContext().getBroadcastVariable(VALUE).get(0);
 
-      defaultValues.forEach((defaultKey, defaultAgg) ->
-        aggregateValues.compute(defaultKey, (key, agg) ->
-          agg == null ? defaultAgg : agg));
+      defaultValues.forEach(aggregateValues::putIfAbsent);
     }
   }
 
