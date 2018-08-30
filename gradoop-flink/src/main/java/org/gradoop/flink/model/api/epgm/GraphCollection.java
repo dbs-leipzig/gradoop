@@ -455,17 +455,11 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     return callForCollection(new GroupByIsomorphism(func));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
     dataSink.write(this, overWrite);

@@ -55,6 +55,7 @@ public interface GraphBaseOperators {
    * Writes logical graph/graph collection to given data sink.
    *
    * @param dataSink data sink
+   * @throws IOException if the data sink can't be written
    */
   void writeTo(DataSink dataSink) throws IOException;
 
@@ -62,7 +63,8 @@ public interface GraphBaseOperators {
    * Writes logical graph/graph collection to given data sink with overwrite option
    *
    * @param dataSink data sink
-   * @param overWrite existing files should be overwritten iff true
+   * @param overWrite determines whether existing files are overwritten
+   * @throws IOException if the data sink can't be written
    */
   void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }
