@@ -143,16 +143,6 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     return layout.getEdgesByLabel(label);
   }
 
-  @Override
-  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
-    return layout.getOutgoingEdges(vertexID);
-  }
-
-  @Override
-  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
-    return layout.getIncomingEdges(vertexID);
-  }
-
   /**
    * {@inheritDoc}
    */

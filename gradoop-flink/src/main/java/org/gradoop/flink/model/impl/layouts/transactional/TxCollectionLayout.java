@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.layouts.transactional;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -25,8 +24,6 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentGraphId;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.functions.epgm.BySourceId;
-import org.gradoop.flink.model.impl.functions.epgm.ByTargetId;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
 import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
@@ -107,15 +104,5 @@ public class TxCollectionLayout implements GraphCollectionLayout {
   @Override
   public DataSet<Edge> getEdgesByLabel(String label) {
     return getEdges().filter(new ByLabel<>(label));
-  }
-
-  @Override
-  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
-    return getEdges().filter(new BySourceId<>(vertexID));
-  }
-
-  @Override
-  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
-    return getEdges().filter(new ByTargetId<>(vertexID));
   }
 }
