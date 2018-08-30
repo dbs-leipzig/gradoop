@@ -769,6 +769,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
+  }
+
+  /**
    * Prints the GDL formatted graph to the standard output.
    *
    * @throws Exception forwarded from dataset print

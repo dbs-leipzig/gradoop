@@ -464,6 +464,14 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
+  }
+
+  /**
    * Prints this graph collection to the console.
    *
    * @throws Exception forwarded DataSet print() Exception.
