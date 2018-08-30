@@ -321,13 +321,13 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testSingleGraphWithMultipleVertexAggregationFunctions() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    MinVertexProperty minVertexProperty = new MinVertexProperty("age");
+    SumVertexProperty sumVertexProperty = new SumVertexProperty("age");
     MaxVertexProperty maxVertexProperty = new MaxVertexProperty("age");
 
-    LogicalGraph expected = graph.aggregate(minVertexProperty).aggregate(maxVertexProperty);
-    LogicalGraph output = graph.aggregate(minVertexProperty, maxVertexProperty);
+    LogicalGraph expected = graph.aggregate(sumVertexProperty).aggregate(maxVertexProperty);
+    LogicalGraph output = graph.aggregate(sumVertexProperty, maxVertexProperty);
 
-    collectAndAssertTrue(expected.equalsByElementData(output));
+    collectAndAssertTrue(expected.equalsByData(output));
   }
 
   /**
@@ -339,13 +339,13 @@ public class AggregationTest extends GradoopFlinkTestBase {
   public void testSingleGraphWithMultipleEdgeAggregationFunctions() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
+    SumEdgeProperty sumEdgeProperty = new SumEdgeProperty("since");
     MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
 
-    LogicalGraph expected = graph.aggregate(minEdgeProperty).aggregate(maxEdgeProperty);
-    LogicalGraph output = graph.aggregate(minEdgeProperty, maxEdgeProperty);
+    LogicalGraph expected = graph.aggregate(sumEdgeProperty).aggregate(maxEdgeProperty);
+    LogicalGraph output = graph.aggregate(sumEdgeProperty, maxEdgeProperty);
 
-    collectAndAssertTrue(expected.equalsByElementData(output));
+    collectAndAssertTrue(expected.equalsByData(output));
   }
 
   /**
@@ -358,15 +358,15 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
     MinVertexProperty minVertexProperty = new MinVertexProperty("age");
-    MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
+    SumEdgeProperty sumEdgeProperty = new SumEdgeProperty("since");
     MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
 
     LogicalGraph expected = graph.aggregate(minVertexProperty)
-      .aggregate(minEdgeProperty)
+      .aggregate(sumEdgeProperty)
       .aggregate(maxEdgeProperty);
-    LogicalGraph output = graph.aggregate(minVertexProperty, minEdgeProperty, maxEdgeProperty);
+    LogicalGraph output = graph.aggregate(minVertexProperty, sumEdgeProperty, maxEdgeProperty);
 
-    collectAndAssertTrue(expected.equalsByElementData(output));
+    collectAndAssertTrue(expected.equalsByData(output));
   }
 
   /**
@@ -384,6 +384,6 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = graph.aggregate(vertexCount).aggregate(minEdgeProperty);
     LogicalGraph output = graph.aggregate(vertexCount, minEdgeProperty);
 
-    collectAndAssertTrue(expected.equalsByElementData(output));
+    collectAndAssertTrue(expected.equalsByData(output));
   }
 }

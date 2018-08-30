@@ -427,15 +427,15 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GraphCollection collection = getSocialNetworkLoader()
       .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
-    MinVertexProperty minVertexProperty = new MinVertexProperty("age");
+    SumVertexProperty sumVertexProperty = new SumVertexProperty("age");
     MaxVertexProperty maxVertexProperty = new MaxVertexProperty("age");
 
-    GraphCollection expected = collection.apply(new ApplyAggregation(minVertexProperty))
+    GraphCollection expected = collection.apply(new ApplyAggregation(sumVertexProperty))
       .apply(new ApplyAggregation(maxVertexProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(minVertexProperty,
+    GraphCollection output = collection.apply(new ApplyAggregation(sumVertexProperty,
       maxVertexProperty));
 
-    collectAndAssertTrue(expected.equalsByGraphElementData(output));
+    collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
   @Test
@@ -443,15 +443,15 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GraphCollection collection = getSocialNetworkLoader()
       .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
-    MinEdgeProperty minEdgeProperty = new MinEdgeProperty("since");
+    SumEdgeProperty sumEdgeProperty = new SumEdgeProperty("since");
     MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
 
-    GraphCollection expected = collection.apply(new ApplyAggregation(minEdgeProperty))
+    GraphCollection expected = collection.apply(new ApplyAggregation(sumEdgeProperty))
       .apply(new ApplyAggregation(maxEdgeProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(minEdgeProperty,
+    GraphCollection output = collection.apply(new ApplyAggregation(sumEdgeProperty,
       maxEdgeProperty));
 
-    collectAndAssertTrue(expected.equalsByGraphElementData(output));
+    collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
   @Test
@@ -468,7 +468,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount,
       maxEdgeProperty));
 
-    collectAndAssertTrue(expected.equalsByGraphElementData(output));
+    collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
   @Test
@@ -484,6 +484,6 @@ public abstract class ApplyAggregationTest extends AggregationTest {
       .apply(new ApplyAggregation(edgeCount));
     GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount));
 
-    collectAndAssertTrue(expected.equalsByGraphElementData(output));
+    collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 }
