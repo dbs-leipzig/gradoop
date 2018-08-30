@@ -85,11 +85,11 @@ public class AggregationExample {
       // extract subgraph with edges and vertices which are of interest
       .vertexInducedSubgraph(new ByLabel<>(LABEL_PERSON))
       // apply custom VertexAggregateFunction
-      .aggregate(new AggregateListOfNames())
+      .aggregate(new AggregateListOfNames(),
       // aggregate sum of vertices in order to obtain total amount of persons
-      .aggregate(new VertexCount())
+      new VertexCount(),
       // sum up values of the vertex property "birthday"
-      .aggregate(new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
+      new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
       // add computed property "meanAge" to the graph head
       .transformGraphHead(new AddPropertyMeanAgeToGraphHead());
 
