@@ -17,6 +17,9 @@ package org.gradoop.utils.sampling.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.utils.statistics.VertexDegreeDistributionRunner;
+import org.gradoop.utils.statistics.VertexIncomingDegreeDistributionRunner;
+import org.gradoop.utils.statistics.VertexOutgoingDegreeDistributionRunner;
 
 /**
  * Calls the computation of all given graph properties for a logical graph. Results are written
@@ -28,15 +31,23 @@ public class SamplingStatisticsRunner extends AbstractRunner implements ProgramD
    * Calls the computation of all given graph properties.
    * (List of called graph properties will be extended over time)
    *
+   * <pre>
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
    * args[2] - output path
+   * </pre>
    *
    * @param args command line arguments
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
     GraphDensityRunner.main(args);
+    VertexDegreeDistributionRunner.main(args);
+    VertexOutgoingDegreeDistributionRunner.main(args);
+    VertexIncomingDegreeDistributionRunner.main(args);
+    AverageDegreeRunner.main(args);
+    AverageIncomingDegreeRunner.main(args);
+    AverageOutgoingDegreeRunner.main(args);
   }
 
   @Override

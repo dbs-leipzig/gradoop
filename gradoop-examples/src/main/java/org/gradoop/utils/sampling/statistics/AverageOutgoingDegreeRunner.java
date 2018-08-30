@@ -20,24 +20,24 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.GraphDensity;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.AverageOutgoingDegree;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the graph density computation for a logical graph.
- * Writes the result to a csv-file named {@value SamplingEvaluationConstants#FILE_DENSITY} in
- * the output directory, containing a single line with the graph density value, e.g.:
+ * Calls the average outgoing degree computation for a logical graph. Writes the result to a
+ * csv-file named {@value SamplingEvaluationConstants#FILE_AVERAGE_OUTGOING_DEGREE}
+ * in the output directory, containing a single line with the average outgoing degree value, e.g.:
  * <pre>
  * BOF
- * 0.281
+ * 4
  * EOF
  * </pre>
  */
-public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
+public class AverageOutgoingDegreeRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the graph density computation for the graph.
+   * Calls the average outgoing degree computation for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -52,17 +52,19 @@ public class GraphDensityRunner extends AbstractRunner implements ProgramDescrip
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Double> density = graph.callForGraph(new GraphDensity()).getGraphHead()
-      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble());
+    DataSet<Long> averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
+      .getGraphHead()
+      .map(gh -> gh.getPropertyValue(
+        SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE).getLong());
 
-    StatisticWriter.writeCSV(density.map(new ObjectTo1<>()),
-      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_DENSITY);
+    StatisticWriter.writeCSV(averageOutgoingDegree.map(new ObjectTo1<>()),
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_AVERAGE_OUTGOING_DEGREE);
 
-    getExecutionEnvironment().execute("Sampling Statistics: Graph density");
+    getExecutionEnvironment().execute("Sampling Statistics: Average outgoing degree");
   }
 
   @Override
   public String getDescription() {
-    return GraphDensityRunner.class.getName();
+    return AverageOutgoingDegreeRunner.class.getName();
   }
 }
