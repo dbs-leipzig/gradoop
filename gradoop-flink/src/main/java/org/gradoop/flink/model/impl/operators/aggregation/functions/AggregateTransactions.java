@@ -58,12 +58,12 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
 
     vertexAggregateFunctions = aggregateFunctions.stream()
       .filter(f -> f instanceof VertexAggregateFunction)
-      .map(f -> (VertexAggregateFunction) f)
+      .map(VertexAggregateFunction.class::cast)
       .collect(Collectors.toSet());
 
     edgeAggregateFunctions = aggregateFunctions.stream()
       .filter(f -> f instanceof EdgeAggregateFunction)
-      .map(f -> (EdgeAggregateFunction) f)
+      .map(EdgeAggregateFunction.class::cast)
       .collect(Collectors.toSet());
 
     aggregateDefaultValues = new HashMap<>();

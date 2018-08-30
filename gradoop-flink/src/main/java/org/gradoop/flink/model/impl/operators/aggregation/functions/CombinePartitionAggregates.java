@@ -49,7 +49,6 @@ public class CombinePartitionAggregates
     Collector<Map<String, PropertyValue>> out) throws Exception {
 
     Iterator<Map<String, PropertyValue>> iterator = partitionAggregates.iterator();
-
     Map<String, PropertyValue> aggregate = iterator.next();
 
     while (iterator.hasNext()) {

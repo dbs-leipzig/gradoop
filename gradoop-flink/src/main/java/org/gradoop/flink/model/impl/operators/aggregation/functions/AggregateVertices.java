@@ -32,14 +32,14 @@ public class AggregateVertices
   implements GroupCombineFunction<Vertex, Map<String, PropertyValue>> {
 
   /**
-   * Aggregate function.
+   * Aggregate functions.
    */
   private final Set<VertexAggregateFunction> aggFuncs;
 
   /**
    * Constructor.
    *
-   * @param aggFuncs aggregate function
+   * @param aggFuncs aggregate functions
    */
   public AggregateVertices(Set<VertexAggregateFunction> aggFuncs) {
     this.aggFuncs = aggFuncs;

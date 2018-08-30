@@ -42,8 +42,8 @@ class AggregateUtil {
     for (VertexAggregateFunction aggFunc : aggFuncs) {
       PropertyValue increment = aggFunc.getVertexIncrement(vertex);
       if (increment != null) {
-        aggregate.compute(aggFunc.getAggregatePropertyKey(),
-          (key, agg) -> agg == null ? increment : aggFunc.aggregate(agg, increment));
+        aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
+          PropertyValue.create(increment) : aggFunc.aggregate(agg, increment));
       }
     }
     return aggregate;
@@ -62,8 +62,8 @@ class AggregateUtil {
     for (EdgeAggregateFunction aggFunc : aggFuncs) {
       PropertyValue increment = aggFunc.getEdgeIncrement(edge);
       if (increment != null) {
-        aggregate.compute(aggFunc.getAggregatePropertyKey(),
-          (key, agg) -> agg == null ? increment : aggFunc.aggregate(agg, increment));
+        aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
+          PropertyValue.create(increment) : aggFunc.aggregate(agg, increment));
       }
     }
     return aggregate;

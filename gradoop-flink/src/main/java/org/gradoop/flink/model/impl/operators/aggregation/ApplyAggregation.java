@@ -118,7 +118,7 @@ public class ApplyAggregation
       .groupBy(0)
       .combineGroup(new ApplyAggregateVertices(aggregateFunctions.stream()
         .filter(f -> f instanceof VertexAggregateFunction)
-        .map(f -> (VertexAggregateFunction) f)
+        .map(VertexAggregateFunction.class::cast)
         .collect(Collectors.toSet())));
   }
 
@@ -137,7 +137,7 @@ public class ApplyAggregation
       .groupBy(0)
       .combineGroup(new ApplyAggregateEdges(aggregateFunctions.stream()
         .filter(f -> f instanceof EdgeAggregateFunction)
-        .map(f -> (EdgeAggregateFunction) f)
+        .map(EdgeAggregateFunction.class::cast)
         .collect(Collectors.toSet())));
   }
 

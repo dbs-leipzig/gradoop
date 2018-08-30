@@ -68,7 +68,6 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-
     DataSet<Vertex> vertices = graph.getVertices();
     DataSet<Edge> edges = graph.getEdges();
 
@@ -93,7 +92,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
   private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<Vertex> vertices) {
     return vertices.combineGroup(new AggregateVertices(aggregateFunctions.stream()
       .filter(f -> f instanceof VertexAggregateFunction)
-      .map(f -> (VertexAggregateFunction) f)
+      .map(VertexAggregateFunction.class::cast)
       .collect(Collectors.toSet())));
   }
 
@@ -106,7 +105,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
   private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<Edge> edges) {
     return edges.combineGroup(new AggregateEdges(aggregateFunctions.stream()
       .filter(f -> f instanceof EdgeAggregateFunction)
-      .map(f -> (EdgeAggregateFunction) f)
+      .map(EdgeAggregateFunction.class::cast)
       .collect(Collectors.toSet())));
   }
 
