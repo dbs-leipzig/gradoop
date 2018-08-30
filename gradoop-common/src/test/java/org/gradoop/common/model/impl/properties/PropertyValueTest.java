@@ -94,8 +94,14 @@ public class PropertyValueTest {
 
   @Test
   public void testCreate() throws Exception {
+    // PropertyValue copy
+    PropertyValue p = create(BOOL_VAL_1);
+    PropertyValue copy = create(p);
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+
     // null
-    PropertyValue p = create(null);
+    p = create(null);
     assertTrue(p.isNull());
     assertNull(p.getObject());
 

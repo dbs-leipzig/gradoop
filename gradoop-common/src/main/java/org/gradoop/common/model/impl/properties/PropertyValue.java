@@ -172,7 +172,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param value value with supported type
    */
   private PropertyValue(Object value) {
-    setObject(value);
+    setObject(value instanceof PropertyValue ? ((PropertyValue) value).getObject() : value);
   }
 
   /**
