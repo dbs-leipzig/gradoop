@@ -38,7 +38,6 @@ public class CreateVertices {
 		int counter = 0;
 
 		for (TableToNode table : tablesToNodes) {
-			if(counter < 52) {
 			
 				try {
 					DataSet<Row> dsSQLResult = FlinkConnect.connect(config.getExecutionEnvironment(), rdbmsConfig,
@@ -57,7 +56,6 @@ public class CreateVertices {
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
-			}
 			counter++;
 		}
 		return vertices;

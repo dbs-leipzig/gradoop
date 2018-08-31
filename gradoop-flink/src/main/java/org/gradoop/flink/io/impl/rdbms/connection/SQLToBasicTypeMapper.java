@@ -49,10 +49,10 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
 			break;
 		case "TINYINT":
-			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
 			break;
 		case "SMALLINT":
-			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
 			break;
 		case "INTEGER":
 			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
@@ -96,7 +96,7 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.of(java.sql.Blob.class);
 			break;
 		case "DISTINCT":
-			typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
+			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
 			break;
 		case "STRUCT":
 			System.err.println("No Typemapping for Type : STRUCT");

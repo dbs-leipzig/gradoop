@@ -70,9 +70,7 @@ public class MetaDataParser {
 		ArrayList<String> tables = new ArrayList<String>();
 
 		while (rsTables.next()) {
-			if (rsTables.getString("TABLE_TYPE").equals("TABLE")
-					&& !rsTables.getString("TABLE_NAME").contains("trace_xe") 
-					&& !rsTables.getString("TABLE_SCHEM").contains("dbo")) {
+			if (rsTables.getString("TABLE_TYPE").equals("TABLE")) {
 				tables.add(rsTables.getString("TABLE_SCHEM") + "." + rsTables.getString("TABLE_NAME"));
 			}
 		}
@@ -80,7 +78,6 @@ public class MetaDataParser {
 		for (String table : tables) {
 			String tableName = table.split("\\.")[1];
 			String schemName = table.split("\\.")[0];
-			System.out.println("*"+schemName+"*");
 
 			// used to store primary key metadata representation
 			ArrayList<NameTypeTuple> primaryKeys = new ArrayList<NameTypeTuple>();
