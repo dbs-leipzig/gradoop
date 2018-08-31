@@ -365,7 +365,6 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     assertTrue("wrong number of output graph heads", graphHeadCount == 4);
   }
 
-
   @Test
   public void testCollectionHasVertexAndEdgeLabelTrue() throws Exception {
     GraphCollection collection = getSocialNetworkLoader()
@@ -422,6 +421,11 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     }
   }
 
+  /**
+   * Test using multiple vertex aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testCollectionWithMultipleVertexAggregationFunctions() throws Exception {
     GraphCollection collection = getSocialNetworkLoader()
@@ -438,6 +442,11 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
+  /**
+   * Test using multiple edge aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testCollectionWithMultipleEdgeAggregationFunctions() throws Exception {
     GraphCollection collection = getSocialNetworkLoader()
@@ -454,6 +463,11 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
+  /**
+   * Test using multiple vertex and edge aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testCollectionWithMultipleDifferentAggregationFunctions() throws Exception {
     GraphCollection collection = getSocialNetworkLoader()
@@ -471,6 +485,11 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 
+  /**
+   * Test using multiple aggregation functions on an empty graph collection
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testEmptyCollectionWithMultipleAggregationFunctions() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();

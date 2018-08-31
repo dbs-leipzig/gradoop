@@ -37,7 +37,7 @@ public class SetAggregateProperties implements
   CoGroupFunction<GraphHead, Tuple2<GradoopId, Map<String, PropertyValue>>, GraphHead> {
 
   /**
-   * default value used to replace aggregate value in case of NULL.
+   * default values used to replace aggregate values in case of NULL.
    */
   private final Map<String, PropertyValue> defaultValues;
 
