@@ -103,12 +103,12 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input")
+    String csvPath = CSVDataSinkTest.class
+      .getResource("/data/csv/input_graph_collection")
       .getFile();
 
-    String gdlPath = CSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
+    String gdlPath = CSVDataSinkTest.class
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
       .getFile();
 
     LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");

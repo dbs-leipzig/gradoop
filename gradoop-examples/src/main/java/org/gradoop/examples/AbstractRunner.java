@@ -32,6 +32,8 @@ import org.gradoop.flink.io.impl.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.utils.converter.deprecated.sources.OldCSVDataSource;
+import org.gradoop.utils.converter.deprecated.sources.OldIndexedCSVDataSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -222,6 +224,10 @@ public abstract class AbstractRunner {
       return new CSVDataSource(directory, config);
     case "indexed":
       return new IndexedCSVDataSource(directory, config);
+    case "oldcsv":
+      return new OldCSVDataSource(directory, config);
+    case "oldindexed":
+      return new OldIndexedCSVDataSource(directory, config);
     default:
       throw new IllegalArgumentException("Unsupported format: " + format);
     }
