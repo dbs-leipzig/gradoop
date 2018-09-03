@@ -156,8 +156,10 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
   @Test
   public void testReduceCollection() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("" +
-        "g1[(a)-[e1]->(b)];g2[(b)-[e2]->(c)]" +
-        "g3[(c)-[e3]->(d)];g4[(a)-[e4]->(b)]" +
+        "g1[(a)-[e1]->(b)]" +
+        "g2[(b)-[e2]->(c)]" +
+        "g3[(c)-[e3]->(d)]" +
+        "g4[(a)-[e4]->(b)]" +
         "exp12[(a)]" +
         "exp13[(a)-[e1]->(b)]" +
         "exp14[]");
