@@ -153,10 +153,13 @@ public class MetaDataParser {
 			// number of rows (needed for distributed data querying via
 			// flink)
 			int rowCount = 0;
+
 			if (schemName.equals("null") || schemName.equals("public")) {
+
 				rowCount = TableRowSize.getTableRowSize(con, tableName);
 				tableBase.add(new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
 			} else {
+
 				rowCount = TableRowSize.getTableRowSize(con, table);
 				tableBase.add(new RdbmsTableBase(table, primaryKeys, foreignKeys, furtherAttributes, rowCount));
 			}
@@ -193,8 +196,8 @@ public class MetaDataParser {
 
 		for (RdbmsTableBase table : tableBase) {
 			if (table.getForeignKeys() != null) {
-				String tableName = table.getTableName();
 
+				String tableName = table.getTableName();
 				int rowCount = table.getRowCount();
 
 				// table tuples going to convert to edges
@@ -211,7 +214,6 @@ public class MetaDataParser {
 					tablesToEdges.add(new TableToEdge(tableName, refdTableNameOne, refdTableNameTwo, fkAttOne, fkAttTwo,
 							null, table.getFurtherAttributes(), false, rowCount));
 				}
-
 				// foreign keys going to convert to edges
 				else {
 					for (FkTuple fk : table.getForeignKeys()) {

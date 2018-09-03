@@ -29,47 +29,50 @@ public class CreateEdges {
 
 	public static DataSet<Edge> create(GradoopFlinkConfig config, RdbmsConfig rdbmsConfig,
 			ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
-		
-		IterativeDataSet<TableToEdge> dsTablesToEdges = config.getExecutionEnvironment().fromCollection(tablesToEdges).iterate(tablesToEdges.size());
-		
-		DataSet<String> iterationEdges = dsTablesToEdges.map(new MapFunction<TableToEdge, String>() {
-			@Override
-			public String map(TableToEdge table) throws Exception {
-				return table.getendTableName();
-			}
-		});
-		
-		DataSet<String> result = dsTablesToEdges.closeWith(iterationEdges);
-		
-		
-		
 
-		DataSet<Edge> edges = config.getExecutionEnvironment().fromElements(new Edge());
-		DataSet<Edge> innerEdges = config.getExecutionEnvironment().fromElements(new Edge());
-		DataSet<Edge> edges1;
-		// DataSet<TableToEdge> dsTablesToEdges =
-		// config.getExecutionEnvironment().fromCollection(tablesToEdges);
-		//
-		// // converts directed edges
-		//
-		// DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new
-		// DirFilter())
-		// .flatMap(new VerticesToPkTable()).withBroadcastSet(vertices,
-		// "vertices");
-		//
-		// DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new
-		// DirFilter())
-		// .flatMap(new VerticesToFkTable()).withBroadcastSet(vertices,
-		// "vertices");
-		//
-		// edges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new
-		// JoinSetToEdges(config));
+		DataSet<Edge> edges = null;
+		DataSet<Edge> directedEdges = null;
+		DataSet<Edge> undirectedEdges = null;
+
+		/* 
+		 * alternative implementation to avoid flink`s max 64 outputs exception (just for directed edges)
+		 */
+		//**************************************************************************
+		
+		 DataSet<TableToEdge> dsTablesToEdges =
+		 config.getExecutionEnvironment().fromCollection(tablesToEdges);
+		
+		 // converts directed edges
+		
+		 DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new
+		 DirFilter())
+		 .flatMap(new VerticesToPkTable()).withBroadcastSet(vertices,
+		 "vertices").distinct(0,1);
+		
+		 DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new
+		 DirFilter())
+		 .flatMap(new VerticesToFkTable()).withBroadcastSet(vertices,
+		 "vertices").distinct(0,1);
+		
+		 directedEdges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new
+		 JoinSetToEdges(config));
+		
+		//****************************************************************************
 
 		// converts undirected edges
 		int counter = 0;
-		int innerCounter = 0;
+
 		for (TableToEdge table : tablesToEdges) {
-			if (!table.isDirectionIndicator()) {
+			if (table.isDirectionIndicator()) {
+//				DataSet<IdKeyTuple> pkTables = vertices.filter(new VertexLabelFilter(table.getendTableName()))
+//						.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
+//
+//				DataSet<IdKeyTuple> fkTables = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
+//						.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
+//
+//				edges = edges.union(
+//						pkTables.join(fkTables).where(1).equalTo(1).map(new Tuple2ToEdge(table.getEndAttribute().f0)));
+			} else {
 				DataSet<Row> dsSQLResult = null;
 
 				try {
@@ -97,37 +100,29 @@ public class CreateEdges {
 						.map(new Tuple2ToIdFkWithProps()).joinWithHuge(idPkTableTwo).where(1).equalTo(1)
 						.map(new Tuple3ToEdge(table.getRelationshipType()));
 
-				edges = edges.union(dsTupleEdges);
-
-				// creates other direction edges
-				DataSet<Edge> dsTupleEdges2 = dsTupleEdges.map(new EdgeToEdgeComplement());
-				edges = edges.union(dsTupleEdges2);
-			} else {
-				
-				
-				DataSet<IdKeyTuple> pkTables = vertices.filter(new VertexLabelFilter(table.getendTableName()))
-						.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
-
-				DataSet<IdKeyTuple> fkTables = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
-						.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
-
-				innerEdges = innerEdges.union(
-						pkTables.join(fkTables).where(1).equalTo(1).map(new Tuple2ToEdge(table.getEndAttribute().f0)));
-				
-				if(innerCounter%10==0){
-					edges1 = edges.map(new MapFunction<Edge, Edge>() {
-						private static final long serialVersionUID = 1L;
-						@Override
-						public Edge map(Edge e) throws Exception {
-							return e;
-						}
-					});
+				if(undirectedEdges == null) {
+					undirectedEdges = dsTupleEdges;
+				}else {
+					undirectedEdges = undirectedEdges.union(dsTupleEdges);
 				}
 				
-				innerCounter++;
+				// creates other direction edges
+				undirectedEdges = undirectedEdges.union(dsTupleEdges.map(new EdgeToEdgeComplement()));
 			}
 			counter++;
 		}
-		return edges.union(innerEdges);
+		
+		if(directedEdges == null) {
+			if(undirectedEdges == null) {
+				edges = null;
+			}else {
+				edges = undirectedEdges;
+			}
+		}else if(undirectedEdges == null) {
+			edges = directedEdges;
+		}else if(undirectedEdges != null) {
+			edges = directedEdges.union(undirectedEdges);
+		}
+		return edges;
 	}
 }

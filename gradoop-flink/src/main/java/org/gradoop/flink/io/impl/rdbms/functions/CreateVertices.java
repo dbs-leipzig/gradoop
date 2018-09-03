@@ -32,9 +32,10 @@ public class CreateVertices {
 
 	public static DataSet<Vertex> create(GradoopFlinkConfig config, RdbmsConfig rdbmsConfig,
 			ArrayList<TableToNode> tablesToNodes) {
+		
 		DataSet<Vertex> vertices = null;
 		EPGMVertexFactory vertexFactory = config.getVertexFactory();
-
+				
 		int counter = 0;
 
 		for (TableToNode table : tablesToNodes) {
@@ -42,7 +43,7 @@ public class CreateVertices {
 				try {
 					DataSet<Row> dsSQLResult = FlinkConnect.connect(config.getExecutionEnvironment(), rdbmsConfig,
 							table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
-
+					
 					if (vertices == null) {
 						vertices = dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
 								.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToNodes),

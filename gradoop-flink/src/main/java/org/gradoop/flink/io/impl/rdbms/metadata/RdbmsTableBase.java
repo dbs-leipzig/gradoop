@@ -20,7 +20,7 @@ import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
 /**
- * Represents the relational database schema
+ * Represents the relational database schema of a table 
  */
 public class RdbmsTableBase {
 	

@@ -2,9 +2,7 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.util.List;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;

@@ -15,7 +15,15 @@
  */
 package org.gradoop.flink.io.impl.rdbms;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 
@@ -30,10 +38,11 @@ import org.gradoop.flink.io.impl.rdbms.functions.CleanVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.PrintConversionPlan;
-import org.gradoop.flink.io.impl.rdbms.functions.VertexIdMapper;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -96,7 +105,7 @@ public class RdbmsDataSource implements DataSource {
 
 	@Override
 	public LogicalGraph getLogicalGraph() {
-		
+
 		Connection con = RdbmsConnect.connect(rdbmsConfig);
 
 		try {
@@ -112,24 +121,54 @@ public class RdbmsDataSource implements DataSource {
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
-			PrintConversionPlan.print(tablesToNodes, tablesToEdges);
-			
 			// creates vertices from rdbms table tuples
-			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes)
-					.map(new VertexIdMapper());
+			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 
+			print(tablesToNodes,tablesToEdges);
+			
 			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 
 			// cleans vertices by deleting primary key and foreign key
 			// properties
-//			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
-			vertices = tempVertices;
-
+			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
+	}
+	
+	public void print(ArrayList<TableToNode> tablesToNodes, ArrayList<TableToEdge> tablesToEdges) {
+		try {
+			PrintWriter pw = new PrintWriter(new File("/home/hr73vexy/00 Work/outputs/conversionplan"));
+		
+		pw.println("TABLE TO NODES\n");
+		for(TableToNode ttn : tablesToNodes) {
+			pw.println(ttn.getTableName());
+			for(NameTypeTuple pk : ttn.getPrimaryKeys()) {
+				pw.println(pk.f0 + " " + pk.f1.getName() + " : pk");
+			}
+			for(FkTuple fk : ttn.getForeignKeys()) {
+				pw.println(fk.f0 + " " + fk.f1.getName() + " " + fk.f2 + " " + fk.f3 + " : fk");
+			}
+			for(NameTypeTuple att : ttn.getFurtherAttributes()) {
+				pw.println(att.f0 + " " + att.f1.getName() + " : att");
+			}
+		}
+		pw.println("TABLE TO EDGES\n");
+		for(TableToEdge tte : tablesToEdges) {
+			pw.print("\n");
+			pw.print(tte.getstartTableName());
+			pw.print(tte.getStartAttribute());
+			pw.print(tte.getendTableName());
+			pw.print(tte.getEndAttribute());
+			pw.print(tte.isDirectionIndicator());
+		}
+		pw.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.rdbms.RdbmsDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -74,7 +75,7 @@ public class RdbmsExample implements ProgramDescription {
 		LogicalGraph schema = dataSource.getLogicalGraph();
 
 		// write conversion result to given path with timestamp and db name
-		schema.writeTo(new JSONDataSink(outputPath + "/" + getDateString() + urlParser(url),gfc));
+		schema.writeTo(new CSVDataSink(outputPath + "/" + getDateString() + urlParser(url),gfc));
 
 		PrintWriter pr = new PrintWriter(new File(outputPath + "/" + getDateString() + urlParser(url) + "_flinkplan"));
 		pr.write(env.getExecutionPlan());

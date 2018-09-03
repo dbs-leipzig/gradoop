@@ -50,19 +50,17 @@ public class FlinkConnect {
 
 		int parallelism = env.getParallelism();
 
-		// computes the parameter array for ParametersProvider
-
 		// run jdbc input format with pagination
 		JDBCInputFormat jdbcInput = null;
 		try {
-		jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
-				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
-				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
-				.setQuery(sqlQuery + pageinationQuery(rdbmsConfig.getUrl())).setRowTypeInfo(typeInfo)
-				.setParametersProvider(
-						new GenericParameterValuesProvider(parameters(parallelism, rowCount, rdbmsConfig.getUrl())))
-				.finish();
-		}catch(Exception e) {
+			jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
+					.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
+					.setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
+					.setQuery(sqlQuery + pageinationQuery(rdbmsConfig.getUrl())).setRowTypeInfo(typeInfo)
+					.setParametersProvider(
+							new GenericParameterValuesProvider(parameters(parallelism, rowCount, rdbmsConfig.getUrl())))
+					.finish();
+		} catch (Exception e) {
 			System.out.println("No propper typeparsing");
 		}
 		return env.createInput(jdbcInput);
@@ -91,32 +89,32 @@ public class FlinkConnect {
 		int partitionRest = rowCount % parallelism;
 
 		Serializable[][] parameters = new Integer[parallelism][2];
-
 		int j = 0;
-
-		for (int i = 0; i < parallelism; i++) {
-
-			if (i == parallelism - 1) {
-
-				if (url.contains(":sqlserver:")) {
+		
+		if (url.contains(":sqlserver:")) {
+			for (int i = 0; i < parallelism; i++) {
+				if (i == parallelism - 1) {
 					parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
 				} else {
-					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
-				}
-			} else {
-
-				if (url.contains(":sqlserver:")) {
-					if(partitionNumber==0) {
-						partitionNumber=1;
+					if (partitionNumber == 0) {
+						partitionNumber = 1;
 					}
 					parameters[i] = new Integer[] { j, partitionNumber };
+
+					j = j + partitionNumber;
+				}
+			}
+		} else {			
+			for (int i = 0; i < parallelism; i++) {
+				if (i == parallelism - 1) {
+					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
 				} else {
 					parameters[i] = new Integer[] { partitionNumber, j };
+					j = j + partitionNumber;
 				}
-				j = j + partitionNumber;
 			}
 		}
-
+		
 		return parameters;
 	}
 }
