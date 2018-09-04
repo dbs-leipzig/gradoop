@@ -162,9 +162,7 @@ public abstract class CSVBase {
     return elements
       .map(new ElementToPropertyMetaData<>())
       .groupBy(1)
-      .combineGroup(new ReducePropertyMetaData())
-      .groupBy(1)
-      .reduceGroup(new ReducePropertyMetaData())
+      .reduce(new ReducePropertyMetaData())
       .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
       .returns(new TupleTypeInfo<>(
         BasicTypeInfo.STRING_TYPE_INFO,
