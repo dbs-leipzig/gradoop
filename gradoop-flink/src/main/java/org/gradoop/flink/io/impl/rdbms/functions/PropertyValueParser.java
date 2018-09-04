@@ -6,12 +6,12 @@ import java.util.Date;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Parses database values to property values
+ * Converts the jdbc data type to matching EPGM property value if possible
  */
 public class PropertyValueParser {
 
 	/**
-	 * Parses database values to valid gradoop property values
+	 * Converts jdbc data type to matching EPGM property value if possible
 	 * 
 	 * @param att
 	 *            Attribute to be parsed

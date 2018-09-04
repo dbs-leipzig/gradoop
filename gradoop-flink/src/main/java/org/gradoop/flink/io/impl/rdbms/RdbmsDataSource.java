@@ -120,13 +120,13 @@ public class RdbmsDataSource implements DataSource {
 
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
+			
+			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
 
 			// creates vertices from rdbms table tuples
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
-
-			print(tablesToNodes,tablesToEdges);
 			
-			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+//			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 
 			// cleans vertices by deleting primary key and foreign key
 			// properties
@@ -136,39 +136,6 @@ public class RdbmsDataSource implements DataSource {
 		}
 
 		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
-	}
-	
-	public void print(ArrayList<TableToNode> tablesToNodes, ArrayList<TableToEdge> tablesToEdges) {
-		try {
-			PrintWriter pw = new PrintWriter(new File("/home/hr73vexy/00 Work/outputs/conversionplan"));
-		
-		pw.println("TABLE TO NODES\n");
-		for(TableToNode ttn : tablesToNodes) {
-			pw.println(ttn.getTableName());
-			for(NameTypeTuple pk : ttn.getPrimaryKeys()) {
-				pw.println(pk.f0 + " " + pk.f1.getName() + " : pk");
-			}
-			for(FkTuple fk : ttn.getForeignKeys()) {
-				pw.println(fk.f0 + " " + fk.f1.getName() + " " + fk.f2 + " " + fk.f3 + " : fk");
-			}
-			for(NameTypeTuple att : ttn.getFurtherAttributes()) {
-				pw.println(att.f0 + " " + att.f1.getName() + " : att");
-			}
-		}
-		pw.println("TABLE TO EDGES\n");
-		for(TableToEdge tte : tablesToEdges) {
-			pw.print("\n");
-			pw.print(tte.getstartTableName());
-			pw.print(tte.getStartAttribute());
-			pw.print(tte.getendTableName());
-			pw.print(tte.getEndAttribute());
-			pw.print(tte.isDirectionIndicator());
-		}
-		pw.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override

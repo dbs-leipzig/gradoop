@@ -26,14 +26,14 @@ public class DeletePKandFKs extends RichMapFunction<Vertex,Vertex> {
 	}
 	
 	@Override
-	public Vertex map(Vertex v1) throws Exception {
+	public Vertex map(Vertex v) throws Exception {
 		Properties newProps = new Properties();
-		for(Property prop : v1.getProperties()){
+		for(Property prop : v.getProperties()){
 			if(!fkProps.contains(prop.getKey()) && !prop.getKey().equals(RdbmsConstants.PK_ID)){
 				newProps.set(prop);
 			}
 		}
-		v1.setProperties(newProps);
-		return v1;
+		v.setProperties(newProps);
+		return v;
 	}
 }

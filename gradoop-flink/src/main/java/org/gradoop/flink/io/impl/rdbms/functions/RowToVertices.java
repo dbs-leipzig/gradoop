@@ -8,14 +8,13 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 
 /**
- * Creates vertices from database input.
+ * Creates one EPGM vertex from one row 
  */
 public class RowToVertices extends RichMapFunction<Row, Vertex> {
 	

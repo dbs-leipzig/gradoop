@@ -3,6 +3,10 @@ package org.gradoop.flink.io.impl.rdbms.tuples;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 
+/**
+ * Tuple used to represent primary key respectively foreign key site of foreign key relation
+ *
+ */
 public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String>{
 	private String label;
 	private GradoopId id;

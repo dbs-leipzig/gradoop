@@ -7,8 +7,18 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 
+/**
+ * Deletes foreign key respectively primary key attributes from vertex' properties
+ *
+ */
 public class CleanVertices {
 
+	/**
+	 * 
+	 * @param tablesToNodes List of 
+	 * @param tempVertices Uncleaned vertices
+	 * @return
+	 */
 	public static DataSet<Vertex> clean(ArrayList<TableToNode> tablesToNodes, DataSet<Vertex> tempVertices){
 		DataSet<Vertex> vertices = null;
 		

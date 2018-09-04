@@ -19,8 +19,7 @@ public class NameTypeTuple extends Tuple2<String,JDBCType>{
 	 */
 	private JDBCType type;
 	
-	public NameTypeTuple() {
-		
+	public NameTypeTuple() {	
 	}
 	
 	/**

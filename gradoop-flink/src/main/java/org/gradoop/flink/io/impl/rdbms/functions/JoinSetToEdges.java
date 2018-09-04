@@ -11,6 +11,10 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * Creates edges from joined primary key respectively foreign key tables of foreign key relations
+ *
+ */
 public class JoinSetToEdges extends RichMapFunction<Tuple2<LabelIdKeyTuple,LabelIdKeyTuple>,Edge> {
 	EPGMEdgeFactory edgeFactory;
 	

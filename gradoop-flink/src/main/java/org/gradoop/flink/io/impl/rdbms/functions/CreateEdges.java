@@ -25,54 +25,53 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * Creates EPGM edges from foreign key respectively n:m relations
+ *
+ */
 public class CreateEdges {
 
+	/**
+	 * Creates EPGM edges from foreign key respectively n:m relations
+	 * @param config Gradoop flink configuration
+	 * @param rdbmsConfig Relational database configuration
+	 * @param tablesToEdges List of relations going to convert to edges
+	 * @param vertices Dataset of already created vertices
+	 * @return	Directed and undirected EPGM edges
+	 * @throws Exception
+	 */
 	public static DataSet<Edge> create(GradoopFlinkConfig config, RdbmsConfig rdbmsConfig,
 			ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
 
 		DataSet<Edge> edges = null;
-		DataSet<Edge> directedEdges = null;
-		DataSet<Edge> undirectedEdges = null;
-
-		/* 
-		 * alternative implementation to avoid flink`s max 64 outputs exception (just for directed edges)
+	
+		/*
+		 *  Foreign key relations to edges
 		 */
-		//**************************************************************************
-		
-		 DataSet<TableToEdge> dsTablesToEdges =
-		 config.getExecutionEnvironment().fromCollection(tablesToEdges);
-		
-		 // converts directed edges
-		
-		 DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new
-		 DirFilter())
-		 .flatMap(new VerticesToPkTable()).withBroadcastSet(vertices,
-		 "vertices").distinct(0,1);
-		
-		 DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new
-		 DirFilter())
-		 .flatMap(new VerticesToFkTable()).withBroadcastSet(vertices,
-		 "vertices").distinct(0,1);
-		
-		 directedEdges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new
-		 JoinSetToEdges(config));
-		
-		//****************************************************************************
+		DataSet<TableToEdge> dsTablesToEdges = config.getExecutionEnvironment().fromCollection(tablesToEdges);
 
-		// converts undirected edges
+		// Primary key table representation of foreign key relation
+		DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges
+				.filter(new DirFilter())
+				.flatMap(new VerticesToPkTable())
+				.withBroadcastSet(vertices, "vertices")
+				.distinct("*");
+
+		// Foreign key table representation of foreign key relation
+		DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges
+				.filter(new DirFilter())
+				.flatMap(new VerticesToFkTable())
+				.withBroadcastSet(vertices, "vertices");
+
+		edges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new JoinSetToEdges(config));
+
+		/*
+		 *  N:M relations to edges
+		 */
 		int counter = 0;
-
 		for (TableToEdge table : tablesToEdges) {
-			if (table.isDirectionIndicator()) {
-//				DataSet<IdKeyTuple> pkTables = vertices.filter(new VertexLabelFilter(table.getendTableName()))
-//						.map(new VertexToIdPkTuple(table.getEndAttribute().f0));
-//
-//				DataSet<IdKeyTuple> fkTables = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
-//						.map(new VertexToIdFkTuple(table.getStartAttribute().f0));
-//
-//				edges = edges.union(
-//						pkTables.join(fkTables).where(1).equalTo(1).map(new Tuple2ToEdge(table.getEndAttribute().f0)));
-			} else {
+			if (!table.isDirectionIndicator()) {
+				
 				DataSet<Row> dsSQLResult = null;
 
 				try {
@@ -83,16 +82,16 @@ public class CreateEdges {
 					e.printStackTrace();
 				}
 
-				// represents the two foreign key attributes and belonging
+				// Represents the two foreign key attributes and belonging
 				// properties
 				DataSet<Tuple3<String, String, Properties>> fkPropsTable = dsSQLResult.map(new FKandProps(counter))
 						.withBroadcastSet(config.getExecutionEnvironment().fromCollection(tablesToEdges), "tables");
 
-				// represents vertices in relation with foreign key one
+				// Represents vertices in relation with foreign key one
 				DataSet<IdKeyTuple> idPkTableOne = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
 						.map(new VertexToIdPkTuple(RdbmsConstants.PK_ID));
 
-				// represents vertices in relation with foreign key two
+				// Represents vertices in relation with foreign key two
 				DataSet<IdKeyTuple> idPkTableTwo = vertices.filter(new VertexLabelFilter(table.getendTableName()))
 						.map(new VertexToIdPkTuple(RdbmsConstants.PK_ID));
 
@@ -100,29 +99,18 @@ public class CreateEdges {
 						.map(new Tuple2ToIdFkWithProps()).joinWithHuge(idPkTableTwo).where(1).equalTo(1)
 						.map(new Tuple3ToEdge(table.getRelationshipType()));
 
-				if(undirectedEdges == null) {
-					undirectedEdges = dsTupleEdges;
-				}else {
-					undirectedEdges = undirectedEdges.union(dsTupleEdges);
+				if (edges == null) {
+					edges = dsTupleEdges;
+				} else {
+					edges = edges.union(dsTupleEdges);
 				}
-				
-				// creates other direction edges
-				undirectedEdges = undirectedEdges.union(dsTupleEdges.map(new EdgeToEdgeComplement()));
+
+				// Creates other direction edges
+				edges = edges.union(dsTupleEdges.map(new EdgeToEdgeComplement()));
 			}
 			counter++;
 		}
 		
-		if(directedEdges == null) {
-			if(undirectedEdges == null) {
-				edges = null;
-			}else {
-				edges = undirectedEdges;
-			}
-		}else if(undirectedEdges == null) {
-			edges = directedEdges;
-		}else if(undirectedEdges != null) {
-			edges = directedEdges.union(undirectedEdges);
-		}
 		return edges;
 	}
 }

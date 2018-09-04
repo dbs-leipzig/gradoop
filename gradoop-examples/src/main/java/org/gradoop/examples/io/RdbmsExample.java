@@ -53,7 +53,7 @@ public class RdbmsExample implements ProgramDescription {
 
 		if(args.length != 6){
 			throw new IllegalArgumentException(
-					"provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, output directory");
+					"Please provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, output directory");
 		}
 		final String url = args[0];
 		final String user = args[1];
@@ -84,7 +84,6 @@ public class RdbmsExample implements ProgramDescription {
 		env.execute();
 	}	
 	
-
 	/**
 	 * Creates timestamp for output filename
 	 * @return Timestamp
