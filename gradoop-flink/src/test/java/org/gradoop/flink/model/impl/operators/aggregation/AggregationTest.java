@@ -21,6 +21,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
@@ -32,11 +34,10 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVerte
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AggregationTest extends GradoopFlinkTestBase {
-  
+
   static final String EDGE_PROPERTY = "ep";
   static final String VERTEX_PROPERTY = "vp";
 
@@ -202,8 +203,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleGraphVertexAndEdgeCount() throws Exception {
-    LogicalGraph graph = getLoaderFromString("[()-->()<--()]")
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph graph = getLoaderFromString("[()-->()<--()]").getLogicalGraph();
 
     VertexCount vertexCount = new VertexCount();
     EdgeCount edgeCount = new EdgeCount();
@@ -230,5 +230,85 @@ public class AggregationTest extends GradoopFlinkTestBase {
     assertEquals("wrong edge count", expectedEdgeCount,
       graphHead.getPropertyValue(
         new EdgeCount().getAggregatePropertyKey()).getLong());
+  }
+
+  @Test
+  public void testSingleGraphHasEdgeLabelTrue() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
+    HasVertexLabel hasPerson = new HasVertexLabel("Person");
+    graph = graph.aggregate(hasPerson);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasVertexLabel_Person not set",
+      graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
+    assertTrue("Property hasVertexLabel_Person is false, should be true",
+      graphHead.getPropertyValue(hasPerson.getAggregatePropertyKey()).getBoolean());
+  }
+
+  @Test
+  public void testSingleGraphHasEdgeLabelFalse() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
+    HasVertexLabel hasNotExistent = new HasVertexLabel("LabelDoesNotExist");
+    graph = graph.aggregate(hasNotExistent);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasVertexLabel_LabelDoesNotExist not set",
+      graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
+    assertFalse("Property hasVertexLabel_LabelDoesNotExist is true, should be false",
+      graphHead.getPropertyValue(hasNotExistent.getAggregatePropertyKey()).getBoolean());
+  }
+
+  @Test
+  public void testSingleGraphHasVertexLabelTrue() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
+    HasEdgeLabel hasKnows = new HasEdgeLabel("knows");
+    graph = graph.aggregate(hasKnows);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasEdgeLabel_knows not set",
+      graphHead.hasProperty(hasKnows.getAggregatePropertyKey()));
+    assertTrue("Property hasEdgeLabel_knows is false, should be true",
+      graphHead.getPropertyValue(hasKnows.getAggregatePropertyKey()).getBoolean());
+  }
+
+  @Test
+  public void testSingleGraphHasVertexLabelFalse() throws Exception {
+    LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
+    HasEdgeLabel hasNotExistent = new HasEdgeLabel("LabelDoesNotExist");
+    graph = graph.aggregate(hasNotExistent);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasEdgeLabel_LabelDoesNotExist not set",
+      graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
+    assertFalse("Property hasEdgeLabel_LabelDoesNotExist is true, should be false",
+      graphHead.getPropertyValue(hasNotExistent.getAggregatePropertyKey()).getBoolean());
+  }
+
+  @Test
+  public void testEdgelessGraphHasEdgeLabel() throws Exception {
+    LogicalGraph graph = getLoaderFromString("g0[(v0)(v1)]")
+      .getLogicalGraphByVariable("g0");
+    HasEdgeLabel hasLabel = new HasEdgeLabel("anyLabel");
+    graph = graph.aggregate(hasLabel);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasEdgeLabel_anyLabel not set",
+      graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
+    assertNull("Property hasEdgeLabel_anyLabel is not NULL",
+      graphHead.getPropertyValue(hasLabel.getAggregatePropertyKey()).getObject());
+  }
+
+  @Test
+  public void testSingleGraphHasVertexLabelEmptyString() throws Exception {
+    LogicalGraph graph = getLoaderFromString("g0[(v0:)-[e0]->(v1:)")
+      .getLogicalGraphByVariable("g0");
+    HasVertexLabel hasLabel = new HasVertexLabel("");
+    graph = graph.aggregate(hasLabel);
+    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+
+    assertTrue("Property hasVertexLabel_ not set",
+      graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
+    assertFalse("Property hasVertexLabel_ is true, should be false",
+      graphHead.getPropertyValue(hasLabel.getAggregatePropertyKey()).getBoolean());
   }
 }

@@ -34,8 +34,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    LogicalGraph input = getSocialNetworkLoader()
-      .getDatabase().getDatabaseGraph(true);
+    LogicalGraph input = getSocialNetworkLoader().getLogicalGraph(true);
 
     checkIndexedCSVWrite(tmpPath, input);
   }

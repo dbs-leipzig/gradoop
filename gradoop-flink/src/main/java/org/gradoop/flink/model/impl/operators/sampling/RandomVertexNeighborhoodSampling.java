@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeWithSourceTarget;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
@@ -38,7 +37,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesW
  * amount and includes all neighbors of those vertices in the sampling. All edges which source-
  * and target-vertices where chosen are sampled, too.
  */
-public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperator {
+public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 
   /**
    * Relative amount of vertices in the result graph
@@ -54,7 +53,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
   /**
    * Type of degree which should be considered: input degree, output degree, sum of both.
    */
-  private final Neighborhood.NeighborType neighborType;
+  private final Neighborhood neighborType;
 
   /**
    * Creates new RandomVertexNeighborhoodSampling instance.
@@ -74,7 +73,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
   public RandomVertexNeighborhoodSampling(float sampleSize, long randomSeed) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
-    this.neighborType = Neighborhood.NeighborType.Both;
+    this.neighborType = Neighborhood.BOTH;
   }
 
   /**
@@ -85,7 +84,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    * @param neighborType type of neighbor-vertex for sampling
    */
   public RandomVertexNeighborhoodSampling(float sampleSize, long randomSeed,
-                                          Neighborhood.NeighborType neighborType) {
+                                          Neighborhood neighborType) {
     this.sampleSize = sampleSize;
     this.randomSeed = randomSeed;
     this.neighborType = neighborType;
@@ -98,7 +97,7 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    * @param neighborType type of neighbor-vertex for sampling
    */
   public RandomVertexNeighborhoodSampling(float sampleSize,
-                                          Neighborhood.NeighborType neighborType) {
+                                          Neighborhood neighborType) {
     this.sampleSize = sampleSize;
     this.randomSeed = 0L;
     this.neighborType = neighborType;
@@ -108,27 +107,25 @@ public class RandomVertexNeighborhoodSampling implements UnaryGraphToGraphOperat
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    String propertyNameForSampled = "sampled";
-
+  public LogicalGraph sample(LogicalGraph graph) {
     DataSet<Tuple2<Vertex, GradoopId>> sampledVerticesWithId = graph.getVertices()
-            .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, propertyNameForSampled))
-            .map(new VertexWithId());
+      .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, PROPERTY_KEY_SAMPLED))
+      .map(new VertexWithId());
 
     DataSet<Tuple3<Edge, GradoopId, GradoopId>> edgeSourceIdTargetId = graph.getEdges()
-            .map(new EdgeWithSourceTarget());
+      .map(new EdgeWithSourceTarget());
 
-    DataSet<Edge> ds = edgeSourceIdTargetId
-            .join(sampledVerticesWithId)
-            .where(1).equalTo(1)
-            .with(new EdgeSourceVertexJoin())
-            .join(sampledVerticesWithId)
-            .where(2).equalTo(1)
-            .with(new EdgeTargetVertexJoin())
-            .filter(new EdgesWithSampledVerticesFilter(propertyNameForSampled, neighborType))
-            .map(new Value0Of3<>());
+    DataSet<Edge> newEdges = edgeSourceIdTargetId
+      .join(sampledVerticesWithId)
+      .where(1).equalTo(1)
+      .with(new EdgeSourceVertexJoin())
+      .join(sampledVerticesWithId)
+      .where(2).equalTo(1)
+      .with(new EdgeTargetVertexJoin())
+      .filter(new EdgesWithSampledVerticesFilter(PROPERTY_KEY_SAMPLED, neighborType))
+      .map(new Value0Of3<>());
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), ds);
+    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), newEdges);
     graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);
 
     return graph;

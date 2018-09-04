@@ -22,6 +22,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
@@ -40,6 +42,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public abstract class ApplyAggregationTest extends AggregationTest {
@@ -362,4 +365,60 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     assertTrue("wrong number of output graph heads", graphHeadCount == 4);
   }
 
+
+  @Test
+  public void testCollectionHasVertexAndEdgeLabelTrue() throws Exception {
+    GraphCollection collection = getSocialNetworkLoader()
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    HasVertexLabel hasPerson = new HasVertexLabel("Person");
+    HasEdgeLabel hasKnows = new HasEdgeLabel("knows");
+
+    collection = collection
+      .apply(new ApplyAggregation(hasKnows))
+      .apply(new ApplyAggregation(hasPerson));
+
+    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+
+    for (EPGMGraphHead graphHead : graphHeads) {
+      // check vertex label
+      assertTrue("Property hasVertexLabel_Person not set",
+        graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
+      assertTrue("Property hasVertexLabel_Person is false, should be true",
+        graphHead.getPropertyValue(hasPerson.getAggregatePropertyKey()).getBoolean());
+      // check edge label
+      assertTrue("Property hasEdgeLabel_knows not set",
+        graphHead.hasProperty(hasKnows.getAggregatePropertyKey()));
+      assertTrue("Property hasEdgeLabel_knows is false, should be true",
+        graphHead.getPropertyValue(hasKnows.getAggregatePropertyKey()).getBoolean());
+    }
+  }
+
+  @Test
+  public void testCollectionHasVertexAndEdgeLabelFalse() throws Exception {
+    GraphCollection collection = getSocialNetworkLoader()
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    HasVertexLabel hasSomeLabel = new HasVertexLabel("someLabel");
+    HasEdgeLabel hasOtherLabel = new HasEdgeLabel("otherLabel");
+
+    collection = collection
+      .apply(new ApplyAggregation(hasSomeLabel))
+      .apply(new ApplyAggregation(hasOtherLabel));
+
+    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+
+    for (EPGMGraphHead graphHead : graphHeads) {
+      // check edge label
+      assertTrue("Property hasEdgeLabel_otherLabel not set",
+        graphHead.hasProperty(hasOtherLabel.getAggregatePropertyKey()));
+      assertFalse("Property hasEdgeLabel_otherLabel is true, should be false",
+        graphHead.getPropertyValue(hasOtherLabel.getAggregatePropertyKey()).getBoolean());
+      // check vertex label
+      assertTrue("Property hasVertexLabel_someLabel not set",
+        graphHead.hasProperty(hasSomeLabel.getAggregatePropertyKey()));
+      assertFalse("Property hasVertexLabel_someLabel is true, should be false",
+        graphHead.getPropertyValue(hasSomeLabel.getAggregatePropertyKey()).getBoolean());
+    }
+  }
 }

@@ -21,8 +21,6 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.RandomVertexNeighborhoodSampling;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 
-import java.security.InvalidParameterException;
-
 /**
  * Runs {@link RandomVertexNeighborhoodSampling} for a given
  * graph and writes the sampled output.
@@ -38,32 +36,20 @@ public class RandomVertexNeighborhoodSamplingRunner extends AbstractRunner imple
    * args[2] - path to output graph
    * args[3] - format of output graph (csv, json, indexed)
    * args[4] - sampling threshold
-   * args[5] - type of neighborhood (input, output, both)
+   * args[5] - type of neighborhood (IN, OUT, BOTH)
    *
    * @param args arguments
    */
   public static void main(String[] args) throws Exception {
-    Neighborhood.NeighborType neighborType;
-    String neighborhood = args[5];
-    if (neighborhood.equals(Neighborhood.NeighborType.Input.toString())) {
-      neighborType = Neighborhood.NeighborType.Input;
-    } else if (neighborhood.equals(Neighborhood.NeighborType.Output.toString())) {
-      neighborType = Neighborhood.NeighborType.Output;
-    } else if (neighborhood.equals(Neighborhood.NeighborType.Both.toString())) {
-      neighborType = Neighborhood.NeighborType.Both;
-    } else {
-      throw new InvalidParameterException();
-    }
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    LogicalGraph sample =
-            new RandomVertexNeighborhoodSampling(Float.parseFloat(args[4]), neighborType)
-                    .execute(graph);
+
+    LogicalGraph sample = graph.callForGraph(
+      new RandomVertexNeighborhoodSampling(
+        Float.parseFloat(args[4]), Neighborhood.valueOf(args[5])));
+
     writeLogicalGraph(sample, args[2], args[3]);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return RandomVertexNeighborhoodSamplingRunner.class.getName();

@@ -391,7 +391,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexLabel() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -452,7 +452,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexLabelAndSingleVertexPropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city : \"Leipzig\", count : 2L})" +
@@ -519,7 +519,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -586,7 +586,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgeLabel() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -650,7 +650,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgeLabelAndSingleVertexPropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city : \"Leipzig\", count : 2L})" +
@@ -721,7 +721,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
   public void testVertexAndEdgeLabelAndSingleEdgePropertyWithAbsentValue() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(p:Person  {count : 6L})" +
@@ -793,8 +793,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph input = loader
-      .getDatabase().getDatabaseGraph();
+    LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
       "(pL:Person {city : \"Leipzig\", count : 2L})" +
@@ -1125,7 +1124,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .setStrategy(getStrategy())
         .build()
         .execute(input);
-    
+
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }

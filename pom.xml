@@ -160,6 +160,11 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${plugin.maven-javadoc.version}</version>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <doclint>none</doclint>
+                            <detectOfflineLinks>false</detectOfflineLinks>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>

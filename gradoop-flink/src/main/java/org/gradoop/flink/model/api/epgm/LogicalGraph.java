@@ -54,7 +54,7 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.sampling.RandomVertexSampling;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -367,8 +367,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph sampleRandomNodes(float sampleSize) {
-    return callForGraph(new RandomVertexSampling(sampleSize));
+  public LogicalGraph sample(SamplingAlgorithm algorithm) {
+    return callForGraph(algorithm);
   }
 
   /**
@@ -438,24 +438,24 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(String propertyKey, DrillFunction function) {
-    return drillUpVertex(null, propertyKey, function);
+  public LogicalGraph rollUpVertex(String propertyKey, DrillFunction function) {
+    return rollUpVertex(null, propertyKey, function);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(
+  public LogicalGraph rollUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function) {
-    return drillUpVertex(vertexLabel, propertyKey, function, null);
+    return rollUpVertex(vertexLabel, propertyKey, function, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpVertex(
+  public LogicalGraph rollUpVertex(
     String vertexLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
@@ -464,8 +464,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillVertex(true);
+    builder.setVertexDrillFunction(function);
 
     if (vertexLabel != null) {
       builder.setLabel(vertexLabel);
@@ -474,30 +473,30 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
 
-    return callForGraph(builder.buildDrillUp());
+    return callForGraph(builder.buildRollUp());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(String propertyKey, DrillFunction function) {
-    return drillUpEdge(null, propertyKey, function);
+  public LogicalGraph rollUpEdge(String propertyKey, DrillFunction function) {
+    return rollUpEdge(null, propertyKey, function);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
-    return drillUpEdge(edgeLabel, propertyKey, function, null);
+  public LogicalGraph rollUpEdge(String edgeLabel, String propertyKey, DrillFunction function) {
+    return rollUpEdge(edgeLabel, propertyKey, function, null);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph drillUpEdge(
+  public LogicalGraph rollUpEdge(
     String edgeLabel, String propertyKey, DrillFunction function, String newPropertyKey) {
 
     Objects.requireNonNull(propertyKey, "missing property key");
@@ -506,8 +505,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillEdge(true);
+    builder.setEdgeDrillFunction(function);
 
     if (edgeLabel != null) {
       builder.setLabel(edgeLabel);
@@ -516,7 +514,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
 
-    return callForGraph(builder.buildDrillUp());
+    return callForGraph(builder.buildRollUp());
   }
 
   /**
@@ -564,8 +562,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillVertex(true);
+    builder.setVertexDrillFunction(function);
 
     if (vertexLabel != null) {
       builder.setLabel(vertexLabel);
@@ -574,7 +571,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
     if (function != null) {
-      builder.setFunction(function);
+      builder.setVertexDrillFunction(function);
     }
 
     return callForGraph(builder.buildDrillDown());
@@ -625,8 +622,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     Drill.DrillBuilder builder = new Drill.DrillBuilder();
 
     builder.setPropertyKey(propertyKey);
-    builder.setFunction(function);
-    builder.drillEdge(true);
+    builder.setEdgeDrillFunction(function);
 
     if (edgeLabel != null) {
       builder.setLabel(edgeLabel);
@@ -635,7 +631,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.setNewPropertyKey(newPropertyKey);
     }
     if (function != null) {
-      builder.setFunction(function);
+      builder.setEdgeDrillFunction(function);
     }
 
     return callForGraph(builder.buildDrillDown());
@@ -764,12 +760,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       .map(new Not());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
   }
 
   /**
