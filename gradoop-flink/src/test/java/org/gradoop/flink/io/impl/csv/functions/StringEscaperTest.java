@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -66,19 +66,49 @@ public class StringEscaperTest {
    */
   @Test
   public void testSplit() {
-    List<String> strings = Arrays.asList("abc;;", "ad,", "|\n\n df", "\\");
-    String[] input = strings.stream()
+    String[] input = Stream.of("", ",abc;;", "ad,", "|\n\n df", "\\c")
       .map(s -> StringEscaper.escape(s, ESCAPED_CHARACTERS))
       .toArray(String[]::new);
 
     String delimiter = ",";
-    assertArrayEquals(input, StringEscaper.split(String.join(delimiter, input), delimiter));
+    String[] output = StringEscaper.split(String.join(delimiter, input), delimiter);
+    assertArrayEquals(input, output);
 
     delimiter = "c;";
-    assertArrayEquals(input, StringEscaper.split(String.join(delimiter, input), delimiter));
+    output = StringEscaper.split(String.join(delimiter, input), delimiter);
+    assertArrayEquals(input, output);
 
     delimiter = "\n\n.;|";
-    assertArrayEquals(input, StringEscaper.split(String.join(delimiter, input), delimiter));
+    output = StringEscaper.split(String.join(delimiter, input), delimiter);
+    assertArrayEquals(input, output);
+  }
+
+  /**
+   * Test splitting an escaped string with limit
+   */
+  @Test
+  public void testSplitWithLimit() {
+    String[] input = Stream.of("", ",abc;;", "ad,", "|\n\n df", "\\c")
+      .map(s -> StringEscaper.escape(s, ESCAPED_CHARACTERS))
+      .toArray(String[]::new);
+
+    String template = "ad\\,%s\\|\\n\\n df%<s\\\\c";
+    String[] expected = {"", "\\,abc\\;\\;", template};
+
+    String delimiter = ",";
+    expected[2] = String.format(template, delimiter);
+    String[] output = StringEscaper.split(String.join(delimiter, input), delimiter, 3);
+    assertArrayEquals(expected, output);
+
+    delimiter = "c;";
+    expected[2] = String.format(template, delimiter);
+    output = StringEscaper.split(String.join(delimiter, input), delimiter, 3);
+    assertArrayEquals(expected, output);
+
+    delimiter = "\n\n.;|";
+    expected[2] = String.format(template, delimiter);
+    output = StringEscaper.split(String.join(delimiter, input), delimiter, 3);
+    assertArrayEquals(expected, output);
   }
 
   /**

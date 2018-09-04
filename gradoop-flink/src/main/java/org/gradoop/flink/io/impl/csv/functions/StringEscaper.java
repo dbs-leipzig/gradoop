@@ -84,6 +84,10 @@ public class StringEscaper {
     return sb.toString();
   }
 
+  public static String[] split(String escapedString, String delimiter) {
+    return split(escapedString, delimiter, 0);
+  }
+
   /**
    * Splits an escaped string while ignoring escaped delimiters.
    *
@@ -92,11 +96,14 @@ public class StringEscaper {
    * @return string array with still escaped strings split by the delimiter
    * @throws IllegalArgumentException if the delimiter contains the escape character
    */
-  public static String[] split(String escapedString, String delimiter)
+  public static String[] split(String escapedString, String delimiter, int limit)
     throws IllegalArgumentException {
     if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) {
       throw new IllegalArgumentException(String.format(
         "Delimiter must not contain the escape character: '%c'", ESCAPE_CHARACTER));
+    }
+    if (limit <= 0) {
+      limit = escapedString.length();
     }
 
     List<String> tokens = new ArrayList<>();
@@ -108,8 +115,12 @@ public class StringEscaper {
       if (!escaped && c == delimiter.charAt(delimiterIndex)) {
         delimiterIndex++;
         if (delimiterIndex == delimiter.length()) {
-          tokens.add(sb.toString());
-          sb.setLength(0);
+          if (tokens.size() < limit - 1) {
+            tokens.add(sb.toString());
+            sb.setLength(0);
+          } else {
+            sb.append(delimiter, 0, delimiterIndex);
+          }
           delimiterIndex = 0;
         }
       } else {
@@ -127,6 +138,7 @@ public class StringEscaper {
         sb.append(c);
       }
     }
+    sb.append(delimiter, 0, delimiterIndex);
     tokens.add(sb.toString());
     return tokens.toArray(new String[0]);
   }
