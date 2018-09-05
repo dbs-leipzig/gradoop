@@ -57,7 +57,7 @@ public class ElementToPropertyMetaData<E extends Element>
     } else {
       throw new Exception("Unsupported element class");
     }
-    reuseTuple.f1 = e.getLabel();
+    reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);
     reuseTuple.f2.clear();
     if (e.getProperties() != null) {
       for (Property property : e.getProperties()) {

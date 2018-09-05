@@ -48,9 +48,10 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
   @Override
   public Vertex map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 3);
+    String label = StringEscaper.unescape(tokens[1]);
     return vertexFactory.initVertex(
       GradoopId.fromString(tokens[0]),
-      tokens[1],
-      parseProperties(CSVConstants.VERTEX_TYPE, tokens[1], tokens[2]));
+      label,
+      parseProperties(CSVConstants.VERTEX_TYPE, label, tokens[2]));
   }
 }

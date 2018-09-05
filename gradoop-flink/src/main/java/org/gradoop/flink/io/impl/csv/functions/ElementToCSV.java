@@ -26,6 +26,9 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.stream.Collectors;
 
 /**
@@ -78,8 +81,47 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
     // Only properties with matching type get returned
     // to prevent writing values with the wrong type metadata
     if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
-      return p.toString();
+      return propertyValueToCsvString(p);
     }
     return EMPTY_STRING;
+  }
+
+  /**
+   * Returns an escaped string suitable for csv
+   *
+   * @param p property value
+   * @return escaped csv string
+   */
+  private String propertyValueToCsvString(PropertyValue p) {
+    if (p.isList()) {
+      List<String> tokens = new ArrayList<>();
+      p.getList().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
+      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+    } else if (p.isSet()) {
+      List<String> tokens = new ArrayList<>();
+      p.getSet().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
+      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+    } else if (p.isMap()) {
+      List<String> tokens = new ArrayList<>();
+      p.getMap().forEach((k, v) -> tokens.add(primitivePropertyValueToCSVString(k) +
+        CSVConstants.MAP_SEPARATOR +
+        primitivePropertyValueToCSVString(v)));
+      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+    } else {
+      return primitivePropertyValueToCSVString(p);
+    }
+  }
+
+  /**
+   * Returns an escaped string of a primitive property value for csv
+   *
+   * @param p property value
+   * @return escaped csv string
+   */
+  private String primitivePropertyValueToCSVString(PropertyValue p) {
+    if (p.getType() == String.class) {
+      return StringEscaper.escape(p.getString(), CSVConstants.ESCAPED_CHARACTERS);
+    }
+    return p.toString();
   }
 }

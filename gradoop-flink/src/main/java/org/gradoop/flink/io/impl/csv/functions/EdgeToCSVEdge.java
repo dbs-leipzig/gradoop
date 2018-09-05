@@ -39,7 +39,7 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
     csvEdge.setId(edge.getId().toString());
     csvEdge.setSourceId(edge.getSourceId().toString());
     csvEdge.setTargetId(edge.getTargetId().toString());
-    csvEdge.setLabel(edge.getLabel());
+    csvEdge.setLabel(StringEscaper.escape(edge.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
     csvEdge.setProperties(getPropertyString(edge, CSVConstants.EDGE_TYPE));
     return csvEdge;
   }

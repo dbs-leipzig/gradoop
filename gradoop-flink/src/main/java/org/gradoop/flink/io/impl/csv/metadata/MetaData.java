@@ -23,6 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.BufferedReader;
@@ -66,7 +67,7 @@ public class MetaData {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);
+          String[] tokens = StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3);
           return Tuple3.of(tokens[0], tokens[1], tokens[2]);
         })
       .returns(new TypeHint<Tuple3<String, String, String>>() { });
@@ -88,7 +89,7 @@ public class MetaData {
 
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {
       return MetaDataParser.create(br.lines()
-        .map(line -> line.split(CSVConstants.TOKEN_DELIMITER, 3))
+        .map(line -> StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))
         .map(tokens -> Tuple3.of(tokens[0], tokens[1], tokens[2]))
         .collect(Collectors.toList()));
     }

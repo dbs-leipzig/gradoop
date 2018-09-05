@@ -47,10 +47,11 @@ public class CSVLineToEdge extends CSVLineToElement<Edge> {
   @Override
   public Edge map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 5);
+    String label = StringEscaper.unescape(tokens[3]);
     return edgeFactory.initEdge(GradoopId.fromString(tokens[0]),
-      tokens[3],
+      label,
       GradoopId.fromString(tokens[1]),
       GradoopId.fromString(tokens[2]),
-      parseProperties(CSVConstants.EDGE_TYPE, tokens[3], tokens[4]));
+      parseProperties(CSVConstants.EDGE_TYPE, label, tokens[4]));
   }
 }

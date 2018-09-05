@@ -304,7 +304,6 @@ public abstract class MultipleFileOutputFormat<IT>
    * @throws IOException - Thrown, if the output could not be opened due to an I/O problem.
    */
   public FSDataOutputStream getAndCreateFileStream(String label) throws IOException {
-
     if (!streams.containsKey(label)) {
       actualFilePath = new Path(
         this.outputFilePath,
@@ -379,5 +378,15 @@ public abstract class MultipleFileOutputFormat<IT>
         LOG.error("Could not remove the incomplete file " + actualFilePath + '.', ex);
       }
     }
+  }
+
+  /**
+   * Clean filename of illegal characters.
+   *
+   * @param filename filename
+   * @return cleaned filename
+   */
+  public static String cleanFilename(String filename) {
+    return filename.replaceAll("[<>:\"/\\\\|?*]", "_");
   }
 }

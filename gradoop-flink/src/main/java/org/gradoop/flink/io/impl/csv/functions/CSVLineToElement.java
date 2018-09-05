@@ -40,10 +40,6 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    */
   private final Properties properties;
   /**
-   * Needed for splitting the input.
-   */
-  private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
-  /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
   private MetaData metaData;
@@ -73,7 +69,8 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * @return parsed properties
    */
   Properties parseProperties(String type, String label, String propertyValueString) {
-    String[] propertyValues = propertyValueString.split(valueDelimiter);
+    String[] propertyValues = StringEscaper
+      .split(propertyValueString, CSVConstants.VALUE_DELIMITER);
     List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(type, label);
     properties.clear();
     for (int i = 0; i < propertyValues.length; i++) {
@@ -95,6 +92,6 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * @return tokens
    */
   public String[] split(String s, int limit) {
-    return s.split(CSVConstants.TOKEN_DELIMITER, limit);
+    return StringEscaper.split(s, CSVConstants.TOKEN_DELIMITER, limit);
   }
 }

@@ -84,7 +84,16 @@ public class StringEscaper {
     return sb.toString();
   }
 
-  public static String[] split(String escapedString, String delimiter) {
+  /**
+   * Splits an escaped string while ignoring escaped delimiters.
+
+   * @param escapedString escaped string to be split
+   * @param delimiter  delimiter string
+   * @return string array with still escaped strings split by the delimiter
+   * @throws IllegalArgumentException if the delimiter contains the escape character
+   */
+  public static String[] split(String escapedString, String delimiter)
+    throws IllegalArgumentException {
     return split(escapedString, delimiter, 0);
   }
 
@@ -93,6 +102,7 @@ public class StringEscaper {
    *
    * @param escapedString escaped string to be split
    * @param delimiter delimiter string
+   * @param limit limits the size of the output
    * @return string array with still escaped strings split by the delimiter
    * @throws IllegalArgumentException if the delimiter contains the escape character
    */
@@ -103,7 +113,7 @@ public class StringEscaper {
         "Delimiter must not contain the escape character: '%c'", ESCAPE_CHARACTER));
     }
     if (limit <= 0) {
-      limit = escapedString.length();
+      limit = escapedString.length() + 1;
     }
 
     List<String> tokens = new ArrayList<>();

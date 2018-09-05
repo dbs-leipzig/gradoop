@@ -20,6 +20,8 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,10 +46,6 @@ public class MetaDataParser {
    */
   private static final String PROPERTY_DELIMITER = ",";
   /**
-   * Used to separate list items
-   */
-  private static final String LIST_DELIMITER = ", ";
-  /**
    * Used to separate property tokens (property-key, property-type)
    */
   private static final String PROPERTY_TOKEN_DELIMITER = ":";
@@ -69,7 +67,7 @@ public class MetaDataParser {
     map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
     map.put(TypeString.DOUBLE.getTypeString(), Double::parseDouble);
     map.put(TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);
-    map.put(TypeString.STRING.getTypeString(), s -> s);
+    map.put(TypeString.STRING.getTypeString(), StringEscaper::unescape);
     map.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);
     map.put(TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);
     map.put(TypeString.MAP.getTypeString(), MetaDataParser::parseMapProperty);
@@ -96,40 +94,44 @@ public class MetaDataParser {
     for (Tuple3<String, String, String> tuple : metaDataStrings) {
       List<PropertyMetaData> propertyMetaDataList;
       if (tuple.f2.length() > 0) {
-        String[] propertyStrings = tuple.f2.split(PROPERTY_DELIMITER);
+        String[] propertyStrings = StringEscaper.split(tuple.f2, PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
-          String[] propertyMetadata = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2);
-          String[] propertyTypeTokens = propertyMetadata[1].split(PROPERTY_TOKEN_DELIMITER);
+          String[] propertyMetadata = StringEscaper.split(propertyString,
+            PROPERTY_TOKEN_DELIMITER, 2);
+          String propertyLabel = StringEscaper.unescape(propertyMetadata[0]);
+          String[] propertyTypeTokens = StringEscaper.split(propertyMetadata[1],
+            PROPERTY_TOKEN_DELIMITER);
           if (propertyTypeTokens.length == 2 &&
             propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
             // it's a list with one additional data type (type of list items)
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
+              propertyLabel, propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
           } else if (propertyTypeTokens.length == 2 &&
             propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
             // it's a set with one additional data type (type of set items)
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getSetValueParser(propertyTypeTokens[1])));
+              propertyLabel, propertyMetadata[1], getSetValueParser(propertyTypeTokens[1])));
           } else if (propertyTypeTokens.length == 3 &&
             propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
             // it's a map with two additional data types (key type + value type)
             propertyMetaDataList.add(
               new PropertyMetaData(
-                propertyMetadata[0],
+                propertyLabel,
                 propertyMetadata[1],
                 getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2])
               )
             );
           } else {
             propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getValueParser(propertyMetadata[1])));
+              propertyLabel, propertyMetadata[1], getValueParser(propertyMetadata[1])));
           }
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
       }
-      metaDataMap.put(new Tuple2<>(tuple.f0, tuple.f1), propertyMetaDataList);
+      metaDataMap.put(new Tuple2<>(tuple.f0, StringEscaper.unescape(tuple.f1)),
+        propertyMetaDataList);
     }
 
     return new MetaData(metaDataMap);
@@ -144,7 +146,9 @@ public class MetaDataParser {
    */
   public static String getPropertyMetaData(Property property) {
     return String.format("%s%s%s",
-      property.getKey(), PROPERTY_TOKEN_DELIMITER, getTypeString(property.getValue()));
+      StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),
+      PROPERTY_TOKEN_DELIMITER,
+      getTypeString(property.getValue()));
   }
 
   /**
@@ -242,8 +246,8 @@ public class MetaDataParser {
    */
   private static Object parseListProperty(String s) {
     // no item type given, so use string as type
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(StringEscaper::unescape)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
   }
@@ -256,8 +260,7 @@ public class MetaDataParser {
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function<String, Object> itemParser) {
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
@@ -274,10 +277,10 @@ public class MetaDataParser {
    */
   private static Object parseMapProperty(String s) {
     // no key type and value type given, so use string as types
-    s = s.replace("{", "").replace("}", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
-      .map(st -> st.split("="))
-      .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
+      .collect(Collectors.toMap(e -> PropertyValue.create(StringEscaper.unescape(e[0])),
+        e -> PropertyValue.create(StringEscaper.unescape(e[1]))));
   }
 
   /**
@@ -294,9 +297,8 @@ public class MetaDataParser {
     Function<String, Object> keyParser,
     Function<String, Object> valueParser
   ) {
-    s = s.replace("{", "").replace("}", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
-      .map(st -> st.split("="))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
       .map(strings -> {
           Object[] objects = new Object[2];
           objects[0] = keyParser.apply(strings[0]);
@@ -316,8 +318,8 @@ public class MetaDataParser {
    */
   private static Object parseSetProperty(String s) {
     // no item type given, so use string as type
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(StringEscaper::unescape)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
@@ -330,8 +332,7 @@ public class MetaDataParser {
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
