@@ -15,6 +15,14 @@
  */
 package org.gradoop.flink.io.impl.csv.indexed;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
@@ -24,6 +32,13 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
@@ -91,6 +106,59 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
       "]");
     checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("single"));
     checkIndexedCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
+  }
+
+  /**
+   * Test IndexedCSVDataSink to properly escape strings and labels. The graph is created manually,
+   * since GDL does not support special characters.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testWriteWithDelimiterCharacters() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    String string1 = "abc;,|:\n=\\def";
+    String string2 = "def;,|:\n=\\ghi";
+
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string2));
+    Set<PropertyValue> set = new HashSet<>(list);
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(string2));
+      put(PropertyValue.create("k"), PropertyValue.create(string1));
+    }};
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(1));
+      put(PropertyValue.create("k"), PropertyValue.create(2));
+    }};
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(1), PropertyValue.create(string2));
+      put(PropertyValue.create(2), PropertyValue.create(string1));
+    }};
+
+    Map<String, Object> data = new HashMap<>();
+    data.put(string1, string2);
+    data.put(string2, 13);
+    data.put("key3", string2);
+    data.put("key4", list);
+    data.put("key5", set);
+    data.put("key6", map1);
+    data.put("key7", map2);
+    data.put("key8", map3);
+
+    Properties props = Properties.createFromMap(data);
+
+    Vertex vertex = new VertexFactory().createVertex(string1, props);
+    DataSet<Vertex> vertices = env.fromElements(vertex);
+
+    DataSet<Edge> edges = env.fromElements(new EdgeFactory()
+      .createEdge(string1, vertex.getId(), vertex.getId(), props));
+
+    LogicalGraph graph = getConfig().getLogicalGraphFactory()
+      .fromDataSets(vertices, edges);
+
+    checkIndexedCSVWrite(tmpPath, graph);
   }
 
   @Test
