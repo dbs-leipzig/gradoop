@@ -4,41 +4,56 @@ package org.gradoop.flink.io.impl.rdbms.connection;
  * Stores database management system parameters
  */
 public class RdbmsConfig {
-	
+
+	/**
+	 * Used database managementsystem
+	 */
+	private String rdbms;
+
 	/**
 	 * Valid jdbc url
 	 */
 	private String url;
-	
+
 	/**
 	 * Username of database management system user
 	 */
 	private String user;
-	
+
 	/**
 	 * Password of database management system user
 	 */
 	private String pw;
-	
+
 	/**
 	 * Valid path to a fitting jdbc driver jar
 	 */
 	private String jdbcDriverPath;
-	
+
 	/**
-	 * Valid and fitting jdbc driver class name 
+	 * Valid and fitting jdbc driver class name
 	 */
 	private String jdbcDriverClassName;
 
 	/**
 	 * Construcotr
-	 * @param url Valid jdbc url
-	 * @param user Username of database management system user
-	 * @param pw Password of database management system user
-	 * @param jdbcDriverPath Valid path to a fitting jdbc driver jar
-	 * @param jdbcDriverClassName Valid and fitting jdbc driver class name
+	 * 
+	 * @param rdbms
+	 *            Database Managementsystem
+	 * @param url
+	 *            Valid jdbc url
+	 * @param user
+	 *            Username of database management system user
+	 * @param pw
+	 *            Password of database management system user
+	 * @param jdbcDriverPath
+	 *            Valid path to a fitting jdbc driver jar
+	 * @param jdbcDriverClassName
+	 *            Valid and fitting jdbc driver class name
 	 */
-	public RdbmsConfig(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName) {
+	public RdbmsConfig(String rdbms, String url, String user, String pw, String jdbcDriverPath,
+			String jdbcDriverClassName) {
+		this.rdbms = rdbms;
 		this.url = url;
 		this.user = user;
 		this.pw = pw;
@@ -46,6 +61,13 @@ public class RdbmsConfig {
 		this.jdbcDriverClassName = jdbcDriverClassName;
 	}
 
+	public String getRdbms() {
+		return rdbms;
+	}
+
+	public void setRdbms(String rdbms) {
+		this.rdbms = rdbms;
+	}
 
 	public String getUrl() {
 		return url;

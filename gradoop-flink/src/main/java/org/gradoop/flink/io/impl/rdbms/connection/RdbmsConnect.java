@@ -34,7 +34,7 @@ public class RdbmsConnect {
 		try {
 			RegisterDriver.register(config);
 			connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
-			System.out.println("Successfully connected to " + config.getUrl().replaceAll(".*/", ""));
+			System.out.println("Successfully connected to database " + config.getUrl().replaceAll(".*/", ""));
 		} catch (SQLException e) {
 			System.err.println("Not possible to establish database connection to " + config.getUrl());
 			e.printStackTrace();

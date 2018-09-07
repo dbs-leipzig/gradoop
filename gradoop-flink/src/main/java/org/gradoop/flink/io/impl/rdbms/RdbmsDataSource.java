@@ -100,16 +100,16 @@ public class RdbmsDataSource implements DataSource {
 			GradoopFlinkConfig flinkConfig) {
 		this.flinkConfig = flinkConfig;
 		this.env = flinkConfig.getExecutionEnvironment();
-		this.rdbmsConfig = new RdbmsConfig(url, user, pw, jdbcDriverPath, jdbcDriverClassName);
+		this.rdbmsConfig = new RdbmsConfig(null, url, user, pw, jdbcDriverPath, jdbcDriverClassName);
 	}
 
 	@Override
 	public LogicalGraph getLogicalGraph() {
 
 		Connection con = RdbmsConnect.connect(rdbmsConfig);
-
 		try {
-
+			rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
+			System.out.println(rdbmsConfig.getRdbms());
 			// creates a metadata representation of the connected relational
 			// database schema
 			MetaDataParser metadataParser = new MetaDataParser(con);
@@ -121,12 +121,12 @@ public class RdbmsDataSource implements DataSource {
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 			
-			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
+//			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
 
 			// creates vertices from rdbms table tuples
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 			
-//			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 
 			// cleans vertices by deleting primary key and foreign key
 			// properties
