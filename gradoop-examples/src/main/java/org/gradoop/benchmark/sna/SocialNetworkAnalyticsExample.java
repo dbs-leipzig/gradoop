@@ -21,7 +21,6 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.benchmark.sna.functions.CountFilter;
-import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
@@ -97,7 +96,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * @throws Exception IO or execution Exception
    */
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, SubgraphBenchmark.class.getName());
+    CommandLine cmd = parseArguments(args, SocialNetworkAnalyticsExample.class.getName());
 
     if (cmd == null) {
       System.exit(1);
@@ -165,7 +164,9 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     INPUT_PATH      = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH     = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH        = cmd.getOptionValue(OPTION_CSV_PATH);
-    STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
+    if (cmd.hasOption(OPTION_STATISTICS_PATH)) {
+      STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
+    }
   }
 
   /**
@@ -189,7 +190,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * @return used construction pattern
    */
   private static String getConstruction() {
-    return "CONSTRUCT (ca)-[new:hasInterest]->(t)";
+    return "(ca)-[new:hasInterest]->(t)";
   }
 
   /**
@@ -207,16 +208,13 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph output directory.");
     }
-    if (!cmd.hasOption(OPTION_STATISTICS_PATH)) {
-      throw new IllegalArgumentException("Define a path to generated statistics.");
-    }
   }
 
   /**
    * Method to create and add lines to a csv-file
    *
    * @param env given ExecutionEnvironment
-   * @throws IOException exeption during file writing
+   * @throws IOException exception during file writing
    */
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 

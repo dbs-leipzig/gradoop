@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  *   |- Person.csv     # contains all vertices with label 'Person'
  *   |- University.csv # contains all vertices with label 'University'
  *   |- knows.csv      # contains all edges with label 'knows'
- *   |- studyAy.csv    # contains all edges with label 'studyAt'
+ *   |- studyAt.csv    # contains all edges with label 'studyAt'
  *   |- metadata.csv   # Meta data for all data contained in the graph
  */
 public class IndexedCSVDataSource extends CSVBase implements DataSource {
