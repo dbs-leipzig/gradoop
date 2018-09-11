@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * vertex,.. => aggregateValue
+ * Applies vertex aggregate functions to the vertices.
  */
 public class AggregateVertices
   implements GroupCombineFunction<Vertex, Map<String, PropertyValue>> {
@@ -34,24 +34,23 @@ public class AggregateVertices
   /**
    * Aggregate functions.
    */
-  private final Set<VertexAggregateFunction> aggFuncs;
+  private final Set<VertexAggregateFunction> aggregateFunctions;
 
   /**
    * Constructor.
    *
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    */
-  public AggregateVertices(Set<VertexAggregateFunction> aggFuncs) {
-    this.aggFuncs = aggFuncs;
+  public AggregateVertices(Set<VertexAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void combine(
-    Iterable<Vertex> vertices, Collector<Map<String, PropertyValue>> out) {
+  public void combine(Iterable<Vertex> vertices, Collector<Map<String, PropertyValue>> out) {
     Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Vertex vertex : vertices) {
-      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggFuncs);
+      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {

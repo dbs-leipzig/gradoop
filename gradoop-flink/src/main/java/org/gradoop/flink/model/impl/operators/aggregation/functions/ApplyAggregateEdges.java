@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Applies edge aggregate functions to edges with the same graph id.
  * (graphId,edge),.. => (graphId,[aggregateKey,aggregateValue]),..
  */
 public class ApplyAggregateEdges implements GroupCombineFunction
@@ -37,7 +38,7 @@ public class ApplyAggregateEdges implements GroupCombineFunction
   /**
    * Aggregate function.
    */
-  private final Set<EdgeAggregateFunction> aggFuncs;
+  private final Set<EdgeAggregateFunction> aggregateFunctions;
   /**
    * Reuse tuple.
    */
@@ -46,10 +47,10 @@ public class ApplyAggregateEdges implements GroupCombineFunction
   /**
    * Constructor.
    *
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    */
-  public ApplyAggregateEdges(Set<EdgeAggregateFunction> aggFuncs) {
-    this.aggFuncs = aggFuncs;
+  public ApplyAggregateEdges(Set<EdgeAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
@@ -60,11 +61,11 @@ public class ApplyAggregateEdges implements GroupCombineFunction
     Tuple2<GradoopId, Edge> graphIdEdge = iterator.next();
 
     Map<String, PropertyValue> aggregate = AggregateUtil.edgeIncrement(new HashMap<>(),
-      graphIdEdge.f1, aggFuncs);
+      graphIdEdge.f1, aggregateFunctions);
 
     while (iterator.hasNext()) {
       Edge edge = iterator.next().f1;
-      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggFuncs);
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {

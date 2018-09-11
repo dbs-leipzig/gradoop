@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * edge,.. => aggregateValue
+ * Applies edge aggregate functions to the edges.
  */
 public class AggregateEdges
   implements GroupCombineFunction<Edge, Map<String, PropertyValue>> {
@@ -37,24 +37,23 @@ public class AggregateEdges
   /**
    * Aggregate functions.
    */
-  private final Set<EdgeAggregateFunction> aggFuncs;
+  private final Set<EdgeAggregateFunction> aggregateFunctions;
 
   /**
    * Constructor.
    *
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    */
-  public AggregateEdges(Set<EdgeAggregateFunction> aggFuncs) {
-    this.aggFuncs = aggFuncs;
+  public AggregateEdges(Set<EdgeAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void combine(
-    Iterable<Edge> edges, Collector<Map<String, PropertyValue>> out) {
+  public void combine(Iterable<Edge> edges, Collector<Map<String, PropertyValue>> out) {
     Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Edge edge : edges) {
-      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggFuncs);
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {

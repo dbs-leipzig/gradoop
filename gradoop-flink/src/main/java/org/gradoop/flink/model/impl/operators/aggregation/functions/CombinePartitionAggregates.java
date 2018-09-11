@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * partitionAggregateValues,.. => globalAggregateValues
+ * Aggregates the aggregate values of different partitions
  */
 public class CombinePartitionAggregates
   implements GroupReduceFunction<Map<String, PropertyValue>, Map<String, PropertyValue>> {

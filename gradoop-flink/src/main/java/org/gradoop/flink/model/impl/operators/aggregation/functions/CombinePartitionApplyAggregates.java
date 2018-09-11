@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * (graphId,partitionAggregateValue),.. => (graphId,globalAggregateValue),..
+ * Aggregates the aggregate values of partitions with the same graph id
  */
 public class CombinePartitionApplyAggregates implements GroupReduceFunction
   <Tuple2<GradoopId, Map<String, PropertyValue>>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
@@ -35,7 +35,7 @@ public class CombinePartitionApplyAggregates implements GroupReduceFunction
   /**
    * Aggregate Functions
    */
-  private final Set<AggregateFunction> aggFuncs;
+  private final Set<AggregateFunction> aggregateFunctions;
 
   /**
    * Constructor.
@@ -43,7 +43,7 @@ public class CombinePartitionApplyAggregates implements GroupReduceFunction
    * @param aggregateFunctions aggregate functions
    */
   public CombinePartitionApplyAggregates(Set<AggregateFunction> aggregateFunctions) {
-    this.aggFuncs = aggregateFunctions;
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
@@ -57,7 +57,7 @@ public class CombinePartitionApplyAggregates implements GroupReduceFunction
     while (iterator.hasNext()) {
       Tuple2<GradoopId, Map<String, PropertyValue>> next = iterator.next();
 
-      for (AggregateFunction aggFunc : aggFuncs) {
+      for (AggregateFunction aggFunc : aggregateFunctions) {
         String propertyKey = aggFunc.getAggregatePropertyKey();
         PropertyValue nextAgg = next.f1.get(propertyKey);
         if (nextAgg != null) {

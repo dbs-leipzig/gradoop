@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Applies vertex aggregate functions to vertices with the same graph id.
  * (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..
  */
 public class ApplyAggregateVertices implements GroupCombineFunction
@@ -40,7 +41,7 @@ public class ApplyAggregateVertices implements GroupCombineFunction
   /**
    * Aggregate functions.
    */
-  private final Set<VertexAggregateFunction> aggFuncs;
+  private final Set<VertexAggregateFunction> aggregateFunctions;
   /**
    * Reuse tuple.
    */
@@ -49,10 +50,10 @@ public class ApplyAggregateVertices implements GroupCombineFunction
   /**
    * Constructor.
    *
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    */
-  public ApplyAggregateVertices(Set<VertexAggregateFunction> aggFuncs) {
-    this.aggFuncs = aggFuncs;
+  public ApplyAggregateVertices(Set<VertexAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
@@ -63,11 +64,11 @@ public class ApplyAggregateVertices implements GroupCombineFunction
     Tuple2<GradoopId, Vertex> graphIdVertex = iterator.next();
 
     Map<String, PropertyValue> aggregate = AggregateUtil.vertexIncrement(new HashMap<>(),
-      graphIdVertex.f1, aggFuncs);
+      graphIdVertex.f1, aggregateFunctions);
 
     while (iterator.hasNext()) {
       Vertex vertex = iterator.next().f1;
-      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggFuncs);
+      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {

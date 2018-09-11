@@ -34,12 +34,12 @@ class AggregateUtil {
    *
    * @param aggregate aggregate map to be incremented
    * @param vertex vertex to increment with
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    * @return incremented aggregate map
    */
-  static Map<String, PropertyValue> vertexIncrement(
-    Map<String, PropertyValue> aggregate, Vertex vertex, Set<VertexAggregateFunction> aggFuncs) {
-    for (VertexAggregateFunction aggFunc : aggFuncs) {
+  static Map<String, PropertyValue> vertexIncrement(Map<String, PropertyValue> aggregate,
+    Vertex vertex, Set<VertexAggregateFunction> aggregateFunctions) {
+    for (VertexAggregateFunction aggFunc : aggregateFunctions) {
       PropertyValue increment = aggFunc.getVertexIncrement(vertex);
       if (increment != null) {
         aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
@@ -54,12 +54,12 @@ class AggregateUtil {
    *
    * @param aggregate aggregate map to be incremented
    * @param edge edge to increment with
-   * @param aggFuncs aggregate functions
+   * @param aggregateFunctions aggregate functions
    * @return incremented aggregate map
    */
-  static Map<String, PropertyValue> edgeIncrement(
-    Map<String, PropertyValue> aggregate, Edge edge, Set<EdgeAggregateFunction> aggFuncs) {
-    for (EdgeAggregateFunction aggFunc : aggFuncs) {
+  static Map<String, PropertyValue> edgeIncrement(Map<String, PropertyValue> aggregate, Edge edge,
+    Set<EdgeAggregateFunction> aggregateFunctions) {
+    for (EdgeAggregateFunction aggFunc : aggregateFunctions) {
       PropertyValue increment = aggFunc.getEdgeIncrement(edge);
       if (increment != null) {
         aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
