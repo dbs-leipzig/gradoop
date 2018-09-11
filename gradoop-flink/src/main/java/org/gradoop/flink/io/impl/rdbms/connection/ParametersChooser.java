@@ -28,8 +28,8 @@ public class ParametersChooser {
 		case "sqlite":
 		case "hsqldb":
 		default:
-			for (int i = 0; i < parameters[0].length; i++) {
-				if (i == parameters[0].length - 1) {
+			for (int i = 0; i < parameters.length; i++) {
+				if (i == parameters.length - 1) {
 					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
 				} else {
 					parameters[i] = new Integer[] { partitionNumber, j };
@@ -40,8 +40,8 @@ public class ParametersChooser {
 		case "derby":
 		case "sqlserver":
 		case "oracle":
-			for (int i = 0; i < parameters[0].length; i++) {
-				if (i == parameters[0].length - 1) {
+			for (int i = 0; i < parameters.length; i++) {
+				if (i == parameters.length - 1) {
 					parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
 				} else {
 					parameters[i] = new Integer[] { j, partitionNumber };
