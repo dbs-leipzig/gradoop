@@ -29,6 +29,7 @@ import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -94,19 +95,19 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    */
   private String propertyValueToCsvString(PropertyValue p) {
     if (p.isList()) {
-      List<String> tokens = new ArrayList<>();
-      p.getList().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
-      return String.format("[%s]", String.join(CSVConstants.LIST_DELIMITER, tokens));
+      return String.format("[%s]", p.getList().stream()
+        .map(this::primitivePropertyValueToCSVString)
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
     } else if (p.isSet()) {
-      List<String> tokens = new ArrayList<>();
-      p.getSet().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
-      return String.format("[%s]", String.join(CSVConstants.LIST_DELIMITER, tokens));
+      return String.format("[%s]", p.getSet().stream()
+        .map(this::primitivePropertyValueToCSVString)
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
     } else if (p.isMap()) {
-      List<String> tokens = new ArrayList<>();
-      p.getMap().forEach((k, v) -> tokens.add(primitivePropertyValueToCSVString(k) +
-        CSVConstants.MAP_SEPARATOR +
-        primitivePropertyValueToCSVString(v)));
-      return String.format("{%s}", String.join(CSVConstants.LIST_DELIMITER, tokens));
+      return String.format("{%s}", p.getMap().entrySet().stream()
+        .map(e -> primitivePropertyValueToCSVString(e.getKey()) +
+          CSVConstants.MAP_SEPARATOR +
+          primitivePropertyValueToCSVString(e.getValue()))
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
     } else {
       return primitivePropertyValueToCSVString(p);
     }
