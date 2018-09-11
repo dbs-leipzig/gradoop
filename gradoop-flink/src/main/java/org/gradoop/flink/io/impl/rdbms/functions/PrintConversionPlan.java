@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.io.BufferedWriter;
@@ -34,10 +50,10 @@ public class PrintConversionPlan {
 		try {
 			PrintWriter pw = new PrintWriter(new File(outputPath));
 
-			pw.println("TABLES TO NODES");
+			pw.println("TABLES TO NODES :" + tablesToNodes.size() );
 			pw.println("---------------\n");
 			for (TableToNode ttn : tablesToNodes) {
-				pw.println("Table: " + ttn.getTableName() + "\n");
+				pw.println("Table: " + ttn.getTableName() + " : " + ttn.getSqlQuery() + "\n");
 				for (NameTypeTuple pk : ttn.getPrimaryKeys()) {
 					pw.println(pk.f0 + " " + pk.f1.getName() + " : pk");
 				}
@@ -49,7 +65,7 @@ public class PrintConversionPlan {
 				}
 				pw.println("\n");
 			}
-			pw.println("\nTABLES TO EDGES");
+			pw.println("\nTABLES TO EDGES :" + tablesToEdges.size());
 			pw.println("-----------------\n");
 			for (TableToEdge tte : tablesToEdges) {
 				pw.println("Starttable: " + tte.getstartTableName());

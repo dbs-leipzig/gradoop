@@ -39,7 +39,6 @@ public class CreateVertices {
 		int counter = 0;
 
 		for (TableToNode table : tablesToNodes) {
-			
 				try {
 					DataSet<Row> dsSQLResult = FlinkConnect.connect(config.getExecutionEnvironment(), rdbmsConfig,
 							table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());

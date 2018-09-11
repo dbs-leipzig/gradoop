@@ -121,21 +121,22 @@ public class RdbmsDataSource implements DataSource {
 			// tables going to convert to edges
 			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 			
-//			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
+			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
 
 			// creates vertices from rdbms table tuples
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 			
-			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
-
+//			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+			
 			// cleans vertices by deleting primary key and foreign key
 			// properties
-			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
+//			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
+			vertices = tempVertices;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
+		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices);
 	}
 
 	@Override

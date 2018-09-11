@@ -119,8 +119,18 @@ public class MetaDataParser {
 				// assigning foreign key name and name of belonging primary
 				// and foreign key table
 				while (rsForeignKeys.next()) {
-					foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
-							rsForeignKeys.getString("PKCOLUMN_NAME"), rsForeignKeys.getString("PKTABLE_NAME")));
+					
+					String refdTableName = rsForeignKeys.getString("PKTABLE_NAME");
+					String refdTableSchem = rsForeignKeys.getString("PKTABLE_SCHEM");
+					
+					if(refdTableSchem == null) {
+						foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
+								rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableName));
+					}else {
+						foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
+								rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableSchem +"."+ refdTableName));
+					}
+					
 					pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
 				}
 
@@ -141,7 +151,8 @@ public class MetaDataParser {
 				// catches unsupported data types
 				if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
-						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR) {
 
 					NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
 							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
@@ -154,7 +165,7 @@ public class MetaDataParser {
 			// flink)
 			int rowCount = 0;
 
-			if (schemName.equals("null") || schemName.equals("public")) {
+			if (schemName.equals("null")) {
 
 				rowCount = TableRowSize.getTableRowSize(con, tableName);
 				tableBase.add(new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));

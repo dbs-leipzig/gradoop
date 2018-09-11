@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.sql.JDBCType;
@@ -6,6 +22,7 @@ import org.apache.flink.api.common.typeinfo.BasicArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.EnumTypeInfo;
 import org.apache.flink.api.java.typeutils.GenericTypeInfo;
 import org.apache.flink.api.java.typeutils.ObjectArrayTypeInfo;
 
@@ -49,10 +66,20 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
 			break;
 		case "TINYINT":
-			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			if(RdbmsConfig.rdbms.equals("mysql") 
+					|| RdbmsConfig.rdbms.equals("postgresql")) {
+				typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			}else {
+				typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
+			}
 			break;
 		case "SMALLINT":
-			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			if(RdbmsConfig.rdbms.equals("mysql") 
+					|| RdbmsConfig.rdbms.equals("postgresql")) {
+				typeInfo = BasicTypeInfo.INT_TYPE_INFO;
+			}else {
+				typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
+			}
 			break;
 		case "INTEGER":
 			typeInfo = BasicTypeInfo.INT_TYPE_INFO;
