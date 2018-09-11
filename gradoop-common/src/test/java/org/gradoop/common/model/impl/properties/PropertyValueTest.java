@@ -94,17 +94,10 @@ public class PropertyValueTest {
 
   @Test
   public void testCreate() throws Exception {
-    // PropertyValue copy
-    PropertyValue p = create(BOOL_VAL_1);
-    PropertyValue copy = create(p);
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-
     // null
-    p = create(null);
+    PropertyValue p = create(null);
     assertTrue(p.isNull());
     assertNull(p.getObject());
-
     // boolean
     p = create(BOOL_VAL_1);
     assertTrue(p.isBoolean());
@@ -165,6 +158,25 @@ public class PropertyValueTest {
     p = create(SET_VAL_f);
     assertTrue(p.isSet());
     assertEquals(SET_VAL_f, p.getSet());
+  }
+
+  /**
+   * Test copying the property value
+   */
+  @Test
+  public void testCopy() {
+    // copy primitive value
+    PropertyValue p = create(BOOL_VAL_1);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+
+    // deep copy complex value
+    p = create(LIST_VAL_a);
+    copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(LIST_VAL_a, copy.getObject());
   }
 
   @Test
