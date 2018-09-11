@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Tests CSVDataSink
+ */
 public class CSVDataSinkTest extends CSVTestBase {
 
   @Rule
@@ -113,8 +116,7 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to properly escape strings and labels. The graph is created manually, since
-   * GDL does not support special characters.
+   * Test CSVDataSink to properly escape strings and labels.
    *
    * @throws Exception on failure
    */
@@ -130,28 +132,26 @@ public class CSVDataSinkTest extends CSVTestBase {
     Set<PropertyValue> set = new HashSet<>(list);
     Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
       put(PropertyValue.create(string1), PropertyValue.create(string2));
-      put(PropertyValue.create("k"), PropertyValue.create(string1));
+      put(PropertyValue.create("key"), PropertyValue.create(string1));
     }};
     Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
       put(PropertyValue.create(string1), PropertyValue.create(1));
-      put(PropertyValue.create("k"), PropertyValue.create(2));
+      put(PropertyValue.create("key"), PropertyValue.create(2));
     }};
     Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
       put(PropertyValue.create(1), PropertyValue.create(string2));
       put(PropertyValue.create(2), PropertyValue.create(string1));
     }};
 
-    Map<String, Object> data = new HashMap<>();
-    data.put(string1, string2);
-    data.put(string2, 13);
-    data.put("key3", string2);
-    data.put("key4", list);
-    data.put("key5", set);
-    data.put("key6", map1);
-    data.put("key7", map2);
-    data.put("key8", map3);
-
-    Properties props = Properties.createFromMap(data);
+    Properties props = Properties.create();
+    props.set(string1, string2);
+    props.set(string2, 13);
+    props.set("key3", string2);
+    props.set("key4", list);
+    props.set("key5", set);
+    props.set("key6", map1);
+    props.set("key7", map2);
+    props.set("key8", map3);
 
     Vertex vertex = new VertexFactory().createVertex(string1, props);
     DataSet<Vertex> vertices = env.fromElements(vertex);
@@ -165,6 +165,11 @@ public class CSVDataSinkTest extends CSVTestBase {
     checkCSVWrite(tmpPath, graph);
   }
 
+  /**
+   * Test CSVDataSink using existing a metadata.csv
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();

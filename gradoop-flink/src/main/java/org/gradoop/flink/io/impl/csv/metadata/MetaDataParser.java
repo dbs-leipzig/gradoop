@@ -97,35 +97,7 @@ public class MetaDataParser {
         String[] propertyStrings = StringEscaper.split(tuple.f2, PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
         for (String propertyString : propertyStrings) {
-          String[] propertyMetadata = StringEscaper.split(propertyString,
-            PROPERTY_TOKEN_DELIMITER, 2);
-          String propertyLabel = StringEscaper.unescape(propertyMetadata[0]);
-          String[] propertyTypeTokens = StringEscaper.split(propertyMetadata[1],
-            PROPERTY_TOKEN_DELIMITER);
-          if (propertyTypeTokens.length == 2 &&
-            propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
-            // it's a list with one additional data type (type of list items)
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyLabel, propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
-          } else if (propertyTypeTokens.length == 2 &&
-            propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
-            // it's a set with one additional data type (type of set items)
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyLabel, propertyMetadata[1], getSetValueParser(propertyTypeTokens[1])));
-          } else if (propertyTypeTokens.length == 3 &&
-            propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
-            // it's a map with two additional data types (key type + value type)
-            propertyMetaDataList.add(
-              new PropertyMetaData(
-                propertyLabel,
-                propertyMetadata[1],
-                getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2])
-              )
-            );
-          } else {
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyLabel, propertyMetadata[1], getValueParser(propertyMetadata[1])));
-          }
+          propertyMetaDataList.add(parsePropertyMetaData(propertyString));
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
@@ -349,6 +321,38 @@ public class MetaDataParser {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");
+    }
+  }
+
+  /**
+   * Parse function to create a PropertyMetaData object from a property string
+   *
+   * @param propertyString property string
+   * @return property metadata
+   */
+  private static PropertyMetaData parsePropertyMetaData(String propertyString) {
+    String[] propertyTokens = StringEscaper.split(propertyString, PROPERTY_TOKEN_DELIMITER, 2);
+    String propertyLabel = StringEscaper.unescape(propertyTokens[0]);
+    String[] propertyTypeTokens = StringEscaper.split(propertyTokens[1],
+      PROPERTY_TOKEN_DELIMITER);
+    if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
+      // it's a list with one additional data type (type of list items)
+      return new PropertyMetaData(propertyLabel, propertyTokens[1],
+        getListValueParser(propertyTypeTokens[1]));
+    } else if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
+      // it's a set with one additional data type (type of set items)
+      return new PropertyMetaData(propertyLabel, propertyTokens[1],
+        getSetValueParser(propertyTypeTokens[1]));
+    } else if (propertyTypeTokens.length == 3 &&
+      propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
+      // it's a map with two additional data types (key type + value type)
+      return new PropertyMetaData(propertyLabel, propertyTokens[1],
+          getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]));
+    } else {
+      return new PropertyMetaData(propertyLabel, propertyTokens[1],
+        getValueParser(propertyTokens[1]));
     }
   }
 

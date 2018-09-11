@@ -137,17 +137,15 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
       put(PropertyValue.create(2), PropertyValue.create(string1));
     }};
 
-    Map<String, Object> data = new HashMap<>();
-    data.put(string1, string2);
-    data.put(string2, 13);
-    data.put("key3", string2);
-    data.put("key4", list);
-    data.put("key5", set);
-    data.put("key6", map1);
-    data.put("key7", map2);
-    data.put("key8", map3);
-
-    Properties props = Properties.createFromMap(data);
+    Properties props = Properties.create();
+    props.set(string1, string2);
+    props.set(string2, 13);
+    props.set("key3", string2);
+    props.set("key4", list);
+    props.set("key5", set);
+    props.set("key6", map1);
+    props.set("key7", map2);
+    props.set("key8", map3);
 
     Vertex vertex = new VertexFactory().createVertex(string1, props);
     DataSet<Vertex> vertices = env.fromElements(vertex);

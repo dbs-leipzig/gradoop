@@ -60,8 +60,8 @@ public class CSVConstants {
    */
   public static final String SIMPLE_FILE = "data.csv";
   /**
-   * Characters to be escaped in strings
+   * Characters to be escaped in csv strings
    */
   public static final Set<Character> ESCAPED_CHARACTERS = ImmutableSet
-    .of(';', ',', '|', ':', '\n', '=');
+    .of('\\', ';', ',', '|', ':', '\n', '=');
 }

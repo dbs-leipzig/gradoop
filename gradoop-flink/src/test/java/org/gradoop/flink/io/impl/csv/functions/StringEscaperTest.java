@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.io.impl.csv.functions;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -32,8 +31,8 @@ public class StringEscaperTest {
   /**
    * Characters to be escaped
    */
-  private static final Set<Character> ESCAPED_CHARACTERS = new HashSet<>(
-    Arrays.asList(';', ',', '|', ':', '\n'));
+  private static final Set<Character> ESCAPED_CHARACTERS = ImmutableSet
+    .of('\\', ';', ',', '|', ':', '\n', '=');
   /**
    * CSV string to be escaped
    */

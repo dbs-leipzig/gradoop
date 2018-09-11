@@ -50,7 +50,6 @@ public class StringEscaper {
    * @return escaped string
    */
   public static String escape(String string, Set<Character> escapedCharacters) {
-    escapedCharacters.add(ESCAPE_CHARACTER);
     StringBuilder sb = new StringBuilder();
     for (char c : string.toCharArray()) {
       if (escapedCharacters.contains(c)) {
@@ -86,7 +85,7 @@ public class StringEscaper {
 
   /**
    * Splits an escaped string while ignoring escaped delimiters.
-
+   *
    * @param escapedString escaped string to be split
    * @param delimiter  delimiter string
    * @return string array with still escaped strings split by the delimiter
