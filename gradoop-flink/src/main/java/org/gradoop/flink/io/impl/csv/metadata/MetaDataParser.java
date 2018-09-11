@@ -213,11 +213,12 @@ public class MetaDataParser {
    * Every PropertyValue has the type "string", because there is no parser for the items given
    * Use {@link #parseListProperty(String, Function)} to specify a parsing function
    *
-   * @param s the string to parse as list, e.g. "[myString1, myString2]"
+   * @param s the string to parse as list, e.g. "[myString1,myString2]"
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s) {
     // no item type given, so use string as type
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(StringEscaper::unescape)
       .map(PropertyValue::create)
@@ -227,11 +228,12 @@ public class MetaDataParser {
   /**
    * Parse function to translate string representation of a List to a list of PropertyValues
    *
-   * @param s the string to parse as list, e.g. "[myString1, myString2]"
+   * @param s the string to parse as list, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the list items
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function<String, Object> itemParser) {
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
@@ -244,11 +246,12 @@ public class MetaDataParser {
    * are no parsers for the keys and values given. Use
    * {@link #parseMapProperty(String, Function, Function)} to specify both parsing functions.
    *
-   * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
+   * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
    * @return the map represented by the argument
    */
   private static Object parseMapProperty(String s) {
     // no key type and value type given, so use string as types
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
       .collect(Collectors.toMap(e -> PropertyValue.create(StringEscaper.unescape(e[0])),
@@ -259,16 +262,14 @@ public class MetaDataParser {
    * Parse function to translate string representation of a Map to a Map with
    * key and value of type PropertyValue
    *
-   * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
+   * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
    * @param keyParser the function to parse the keys
    * @param valueParser the function to parse the values
    * @return the map represented by the argument
    */
-  private static Object parseMapProperty(
-    String s,
-    Function<String, Object> keyParser,
-    Function<String, Object> valueParser
-  ) {
+  private static Object parseMapProperty(String s, Function<String, Object> keyParser,
+    Function<String, Object> valueParser) {
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
       .map(strings -> {
@@ -285,11 +286,12 @@ public class MetaDataParser {
    * Every PropertyValue has the type "string", because there is no parser for the items given
    * Use {@link #parseListProperty(String, Function)} to specify a parsing function
    *
-   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s) {
     // no item type given, so use string as type
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(StringEscaper::unescape)
       .map(PropertyValue::create)
@@ -299,11 +301,12 @@ public class MetaDataParser {
   /**
    * Parse function to translate string representation of a Set to a set of PropertyValues
    *
-   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the set items
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
+    s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)

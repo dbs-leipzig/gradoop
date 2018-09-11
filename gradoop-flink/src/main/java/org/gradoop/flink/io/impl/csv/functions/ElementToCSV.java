@@ -87,7 +87,7 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
   }
 
   /**
-   * Returns an escaped string suitable for csv
+   * Returns an escaped string representation suitable for csv
    *
    * @param p property value
    * @return escaped csv string
@@ -96,24 +96,24 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
     if (p.isList()) {
       List<String> tokens = new ArrayList<>();
       p.getList().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
-      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+      return String.format("[%s]", String.join(CSVConstants.LIST_DELIMITER, tokens));
     } else if (p.isSet()) {
       List<String> tokens = new ArrayList<>();
       p.getSet().forEach(e -> tokens.add(primitivePropertyValueToCSVString(e)));
-      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+      return String.format("[%s]", String.join(CSVConstants.LIST_DELIMITER, tokens));
     } else if (p.isMap()) {
       List<String> tokens = new ArrayList<>();
       p.getMap().forEach((k, v) -> tokens.add(primitivePropertyValueToCSVString(k) +
         CSVConstants.MAP_SEPARATOR +
         primitivePropertyValueToCSVString(v)));
-      return String.join(CSVConstants.LIST_DELIMITER, tokens);
+      return String.format("{%s}", String.join(CSVConstants.LIST_DELIMITER, tokens));
     } else {
       return primitivePropertyValueToCSVString(p);
     }
   }
 
   /**
-   * Returns an escaped string of a primitive property value for csv
+   * Returns an escaped string representation of a primitive property value for csv
    *
    * @param p property value
    * @return escaped csv string
