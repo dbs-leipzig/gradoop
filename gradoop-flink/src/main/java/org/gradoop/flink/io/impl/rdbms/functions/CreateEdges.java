@@ -95,14 +95,14 @@ public class CreateEdges {
 
 				// Represents vertices in relation with foreign key one
 				DataSet<IdKeyTuple> idPkTableOne = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
-						.map(new VertexToIdPkTuple(RdbmsConstants.PK_ID));
+						.map(new VertexToIdPkTuple());
 
 				// Represents vertices in relation with foreign key two
 				DataSet<IdKeyTuple> idPkTableTwo = vertices.filter(new VertexLabelFilter(table.getendTableName()))
-						.map(new VertexToIdPkTuple(RdbmsConstants.PK_ID));
+						.map(new VertexToIdPkTuple());
 
-				DataSet<Edge> dsTupleEdges = fkPropsTable.joinWithHuge(idPkTableOne).where(0).equalTo(1)
-						.map(new Tuple2ToIdFkWithProps()).joinWithHuge(idPkTableTwo).where(1).equalTo(1)
+				DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
+						.map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
 						.map(new Tuple3ToEdge(table.getRelationshipType()));
 
 				if (edges == null) {

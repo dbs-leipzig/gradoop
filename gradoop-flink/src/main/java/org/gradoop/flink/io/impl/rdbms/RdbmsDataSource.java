@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -126,17 +127,17 @@ public class RdbmsDataSource implements DataSource {
 			// creates vertices from rdbms table tuples
 			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 			
-//			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 			
 			// cleans vertices by deleting primary key and foreign key
 			// properties
-//			vertices = CleanVertices.clean(tablesToNodes, tempVertices);
-			vertices = tempVertices;
+			vertices = CleanVertices.clean(flinkConfig, tablesToNodes, tempVertices);
+//			vertices = tempVertices;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices);
+		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices,edges);
 	}
 
 	@Override

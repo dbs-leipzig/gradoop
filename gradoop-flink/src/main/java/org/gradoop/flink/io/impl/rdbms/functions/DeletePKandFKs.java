@@ -18,7 +18,9 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.util.ArrayList;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
@@ -32,13 +34,15 @@ public class DeletePKandFKs extends RichMapFunction<Vertex,Vertex> {
 	 * List of foreign key properties
 	 */
 	ArrayList<String> fkProps;
+	EPGMVertexFactory vertexFactory;
 	
 	/**
 	 * Constructor
 	 * @param fkProps List or foreign key properties
 	 */
-	public DeletePKandFKs(ArrayList<String> fkProps){
+	public DeletePKandFKs(EPGMVertexFactory vertexFactory, ArrayList<String> fkProps){
 		this.fkProps = fkProps;
+		this.vertexFactory = vertexFactory;
 	}
 	
 	@Override
@@ -49,7 +53,6 @@ public class DeletePKandFKs extends RichMapFunction<Vertex,Vertex> {
 				newProps.set(prop);
 			}
 		}
-		v.setProperties(newProps);
-		return v;
+		return (Vertex) vertexFactory.initVertex(v.getId(),v.getLabel(),newProps);
 	}
 }

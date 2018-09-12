@@ -152,7 +152,9 @@ public class MetaDataParser {
 				if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY
-						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR) {
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR						
+						){
 
 					NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
 							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
