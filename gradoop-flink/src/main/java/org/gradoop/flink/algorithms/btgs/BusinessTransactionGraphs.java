@@ -33,8 +33,8 @@ import org.gradoop.flink.algorithms.btgs.functions.NewBtgGraphHead;
 import org.gradoop.flink.algorithms.btgs.functions.SetBtgId;
 import org.gradoop.flink.algorithms.btgs.functions.SetBtgIds;
 import org.gradoop.flink.algorithms.btgs.functions.TargetIdBtgId;
-import org.gradoop.flink.algorithms.btgs.functions.ToGellyVertexWithIdValue;
 import org.gradoop.flink.algorithms.btgs.functions.TransactionalData;
+import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -90,7 +90,7 @@ public class BusinessTransactionGraphs implements
       transGraph.getEdges().map(new ToGellyEdgeWithNullValue());
 
     Graph<GradoopId, GradoopId, NullValue> gellyTransGraph = Graph.fromDataSet(
-      transVertices.map(new ToGellyVertexWithIdValue()),
+      transVertices.map(new VertexToGellyVertexWithGradoopId()),
       transEdges,
       iig.getConfig().getExecutionEnvironment()
     );
