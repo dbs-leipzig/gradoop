@@ -334,8 +334,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     PropertyTransformationFunction graphHeadPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(graphHeadPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(null, propertyKey,
-      graphHeadPropTransformationFunction, null, null, null, false));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      graphHeadPropTransformationFunction, null, null));
   }
 
   /**
@@ -347,8 +347,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     PropertyTransformationFunction vertexPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(vertexPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(null, propertyKey,
-      null, vertexPropTransformationFunction, null, null, false));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      null, vertexPropTransformationFunction, null));
   }
 
   /**
@@ -360,8 +360,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     PropertyTransformationFunction edgePropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(edgePropTransformationFunction);
-    return callForGraph(new PropertyTransformation(null, propertyKey,
-      null, null, edgePropTransformationFunction, null, false));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      null, null, edgePropTransformationFunction));
   }
 
   /**

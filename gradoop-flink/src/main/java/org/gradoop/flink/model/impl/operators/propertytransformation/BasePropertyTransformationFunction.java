@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.propertytransformation;
 
+import java.util.Objects;
+
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -48,14 +50,6 @@ public class BasePropertyTransformationFunction<EL extends Element> implements T
    */
   private String newPropertyKey;
   /**
-   * True, if all elements if a kind (vertex / edge / graphHead) shall be transformed.
-   */
-  private boolean transformAllLabels;
-  /**
-   * True, if the current property key shall be reused.
-   */
-  private boolean keepCurrentPropertyKey;
-  /**
    * True, if the history of a property key shall be kept.
    */
   private boolean keepHistory;
@@ -63,41 +57,37 @@ public class BasePropertyTransformationFunction<EL extends Element> implements T
   /**
    * Valued constructor.
    *
-   * @param label                      label of the element whose property shall be
-   *                                   transformed
    * @param propertyKey                property key
    * @param transformationFunction     transformation function which shall be applied to a
    *                                   property
+   * @param label                      label of the element whose property shall be
+   *                                   transformed
    * @param newPropertyKey             new property key
    * @param keepHistory                flag to enable versioning
    */
-  public BasePropertyTransformationFunction(String label, String propertyKey,
-      PropertyTransformationFunction transformationFunction,
+  public BasePropertyTransformationFunction(String propertyKey,
+      PropertyTransformationFunction transformationFunction, String label,
       String newPropertyKey, boolean keepHistory) {
+    Objects.requireNonNull(propertyKey);
+    Objects.requireNonNull(transformationFunction);
+
     this.label = label;
     this.propertyKey = propertyKey;
     this.transformationFunction = transformationFunction;
     this.newPropertyKey = newPropertyKey;
-    this.transformAllLabels = label == null;
-    this.keepCurrentPropertyKey = newPropertyKey == null;
     this.keepHistory = keepHistory;
   }
 
   @Override
   public EL apply(EL current, EL transformed) {
-    if (transformationFunction == null) {
-      throw new IllegalArgumentException(
-        "You must supply a ProppertyTransformationFunction!");
-    }
-
     // transformed will have the current id and graph ids, but not the label or the properties
     transformed.setLabel(current.getLabel());
     transformed.setProperties(current.getProperties());
     // filters relevant elements
-    if (transformAllLabels || label.equals(current.getLabel())) {
+    if ((label == null) || label.equals(current.getLabel())) {
       if (current.hasProperty(propertyKey)) {
         // save transformed value with the same key
-        if (keepCurrentPropertyKey) {
+        if (newPropertyKey == null) {
           if (keepHistory) {
             // save the original value with the version number in the property key
             transformed.setProperty(

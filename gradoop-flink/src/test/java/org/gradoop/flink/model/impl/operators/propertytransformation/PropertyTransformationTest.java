@@ -15,473 +15,348 @@
  */
 package org.gradoop.flink.model.impl.operators.propertytransformation;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-
+/**
+ * A test for {@link PropertyTransformation}, calling the operator and checking if the result is
+ * correct.
+ */
 public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
-  @Test
-  public void testVertexTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
+  /**
+   * The test graphs used for transformation and comparison.
+   */
+  protected static final String TEST_GRAPH =
+      "g0:A  { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      "g1:B  { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })(:C { a : 42000L, b : 42 })-[:b { a : 42000L, b : 42 }]" +
+      "->(:D { a: 42000L, c : 23 })]" +
+      // full graph transformation
+      "g01:A  { a : 42L, a__1 : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })" +
+      "-[:a { a : 42L, a__1 : 42000L, b : 42 }]->(:B { a: 42L, a__1 : 42000L, c : 23 })]" +
+      // graph head only transformation
+      "g02:A { a : 42L, a__1 : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      "g12:A { a : 42L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      "g22:A { dividedA : 42L, a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      // vertex only transformation
+      "g03:A { a : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42L, a__1 : 42000L, c : 23 })]" +
+      "g13:A { a : 42000L } [(:A { a : 42L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a: 42L, c : 23 })]" +
+      "g23:A { a : 42000L } [(:A { dividedA : 42L, a : 42000L, b : 42 })" +
+      "-[:a { a : 42000L, b : 42 }]->(:B { dividedA: 42L, a : 42000L, c : 23 })]" +
+      "g33:A { a : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
+      "->(:B { a : 42000L, c : 23 })]" +
+      // edge only transformation
+      "g04:A { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42L, a__1 : 42000L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      "g14:A { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42L, b : 42 }]" +
+      "->(:B { a: 42000L, c : 23 })]" +
+      "g24:A { a : 42000L }  [(:A { a : 42000L, b : 42 })" +
+      "-[:a { dividedA : 42L, a : 42000L, b : 42 }]->(:B { a: 42000L, c : 23 })]" +
+      "g34:B  { a : 42000L } [(:A { a : 42000L, b : 42 })" +
+      "-[:a { a : 42L, a__1 : 42000L, b : 42 }]->(:B { a: 42000L, c : 23 })" +
+      "(:C { a : 42000L, b : 42 })-[:b { a : 42000L, b : 42 }]" +
+      "->(:D { a: 42000L, c : 23 })]";
 
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145L,memberCount__1 : 1563145521L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341L,memberCount__1: 451341564L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "memberCount", null, new DivideBy(1000L), null, null, true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testVertexTransformationWithoutHistory() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "memberCount", null, new DivideBy(1000L), null, null, false));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-  
-  @Test
-  public void testVertexTransformationNewPropKey() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",dividedMemCount : 1563145L,memberCount : 1563145521L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",dividedMemCount: 451341L,memberCount: 451341564L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "memberCount", null, new DivideBy(1000L), null, "dividedMemCount", true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testVertexTransformationLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42L,generalAttribute__1 : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42L,generalAttribute__1 : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation("Forum", "generalAttribute", null, new DivideBy(1000L), null, null, true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-  
-  @Test
-  public void testEdgeTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v04)" +
-      "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "generalAttribute", null, null, new DivideBy(1000L), null, true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeTransformationNewPropKey() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-        "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-        "(v01:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-        "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-        "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-        "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-        "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-        "(v02)-[:member {until : 1550000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v00)" +
-        "(v03)-[:member {until : 1550000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v00)" +
-        "(v03)-[:member {until : 1550000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v01)" +
-        "(v04)-[:member {until : 1550000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v01)" +
-        "(v05)-[:member {until : 1550000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v01)" +
-        "(v02)-[:knows {since : 1350000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v03)" +
-        "(v03)-[:knows {since : 1350000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v02)" +
-        "(v03)-[:knows {since : 1350000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v04)" +
-        "(v03)-[:knows {since : 1350000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v05)" +
-        "(v05)-[:knows {since : 1350000000000L,dividedGA : 42L,generalAttribute : 42000L}]->(v04)" +
-        "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "generalAttribute", null, null, new DivideBy(1000L), "dividedGA", true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeTransformationLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected[" +
-        "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-        "(v01:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-        "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-        "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-        "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-        "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-        "(v02)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v00)" +
-        "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v00)" +
-        "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-        "(v04)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-        "(v05)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v01)" +
-        "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-        "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-        "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-        "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-        "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-        "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation("member", "generalAttribute", null, null, new DivideBy(1000L), null, true));
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-  
-  @Test
-  public void testGHTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected:firstLabel{title : \"Graph\",globalMemberCount : 42000L,generalAttribute : 42L,generalAttribute__1 : 42000L}[" +
-        "(v0:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-        "(v1:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-        "(v2:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-        "(v3:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-        "(v4:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-        "(v5:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-        "(v2)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v4)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v5)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v2)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v3)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v2)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v5)" +
-        "(v5)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "generalAttribute", new DivideBy(1000L), null, null, null, true));
-
-    output.print();
-    loader.getLogicalGraphByVariable("expected").print();
-    
-    collectAndAssertTrue(
-      output.equalsByData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testGHTransformationNewPropKey() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    
-    loader.appendToDatabaseFromString("expected:firstLabel{title : \"Graph\",globalMemberCount : 42000L,divided : 42L,generalAttribute : 42000L}[" +
-        "(v0:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-        "(v1:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-        "(v2:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-        "(v3:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-        "(v4:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-        "(v5:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-        "(v2)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v4)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v5)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v2)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v3)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v2)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v5)" +
-        "(v5)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "]");
-
-    LogicalGraph output = input
-      .callForGraph(new PropertyTransformation(null, "generalAttribute", new DivideBy(1000L), null, null, "divided", true));
-    
-    collectAndAssertTrue(
-      output.equalsByData(loader.getLogicalGraphByVariable("expected")));
-  }
-  
+  /**
+   * Executes a property transformation on graphHeads, vertices and edges and checks if the result
+   * is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
   @Test
   public void testAllTransformationFunctions() throws Exception {
-      FlinkAsciiGraphLoader loader = getLoaderFromString( getInput() );
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-      LogicalGraph input = loader.getLogicalGraphByVariable( "input" );
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
 
-      loader.appendToDatabaseFromString(
-          "expected:firstLabel{title : \"Graph\",globalMemberCount : 42000L,generalAttribute : 42L,generalAttribute__1 : 42000L}[" +
-          "(v0:Forum {generalAttribute__1:42000L,memberCount:1563145521L,topic:\"rdf\",generalAttribute:42L})" +
-          "(v1:Forum {generalAttribute__1:42000L,memberCount:451341564L,topic:\"graph\",generalAttribute:42L})" +
-          "(v2:User {birthMillis:500000000000L,generalAttribute__1:42000L,gender:\"male\",generalAttribute:42L})" +
-          "(v3:User {birthMillis:530000000000L,generalAttribute__1:42000L,gender:\"male\",generalAttribute:42L})" +
-          "(v4:User {birthMillis:590000000000L,generalAttribute__1:42000L,gender:\"female\",generalAttribute:42L})" +
-          "(v5:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L})" +
-          "(v2)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v0)" +
-          "(v3)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v0)" +
-          "(v3)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v1)" +
-          "(v4)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v1)" +
-          "(v5)-[:member {until : 1550000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v1)" +
-          "(v2)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v3)" +
-          "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v2)" +
-          "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v4)" +
-          "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v5)" +
-          "(v5)-[:knows {since : 1350000000000L,generalAttribute : 42L,generalAttribute__1 : 42000L}]->(v4)" + "]" );
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a",
+    		new DivideBy(1000L), new DivideBy(1000L), new DivideBy(1000L), null, null, true));
 
-      LogicalGraph output = input.callForGraph( new PropertyTransformation( null, "generalAttribute",
-                  new DivideBy( 1000L ), new DivideBy( 1000L ), new DivideBy( 1000L ), null, true ) );
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
 
-      // WORKAROUND
-      LogicalGraph expectedGraph = loader.getLogicalGraphByVariable( "expected" );
-      DataSet<Vertex> vertexSet = expectedGraph.getVertices();
-      vertexSet = vertexSet.map(new MapFunction<Vertex, Vertex>() {
+  /**
+   * Executes a property transformation on graphHeads and checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testGHTransformation() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-				@Override
-				public Vertex map(Vertex arg0) throws Exception {
-					Vertex v = arg0;
-					v.setProperty("generalAttribute", 42L);
-					v.setProperty("generalAttribute__1", 42000L);
-					return v;
-				}
-			});
-      
-      expectedGraph = getConfig().getLogicalGraphFactory().fromDataSets(
-      		expectedGraph.getGraphHead(),
-          vertexSet,
-          expectedGraph.getEdges()
-        );
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
 
-      collectAndAssertTrue( output.equalsByData( expectedGraph ) );
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a",
+    		new DivideBy(1000L), null, null, null, null, true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation with disabled history on graphHeads and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testGHTransformationWithoutHistory() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a",
+    		new DivideBy(1000L), null, null));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation using a new property key on graphHeads and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testGHTransformationNewPropKey() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g22");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a",
+    		new DivideBy(1000L), null, null, null, "dividedA", true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation on vertices and checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testVertexTransformation() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null,
+    		new DivideBy(1000L), null, null, null, true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation with disabled history on vertices and checks if the result
+   * is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testVertexTransformationWithoutHistory() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null,
+    		new DivideBy(1000L), null));
+    
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation using a new property key on vertices and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testVertexTransformationNewPropKey() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g23");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null,
+    		new DivideBy(1000L), null, null, "dividedA", true));
+    
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation on vertices with a specific label and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testVertexTransformationLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g33");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null,
+    		new DivideBy(1000L), null, "A", null, true));
+    
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation on edges and checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testEdgeTransformation() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
+    		new DivideBy(1000L), null, null, true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation with disabled history on edges and checks if the result
+   * is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testEdgeTransformationWithoutHistory() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
+    		new DivideBy(1000L)));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation using a new property key on edges and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testEdgeTransformationNewPropKey() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g24");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
+    		new DivideBy(1000L), null, "dividedA", true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
+  }
+
+  /**
+   * Executes a property transformation on edges with a specific label and checks if the
+   * result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
+  @Test
+  public void testEdgeTransformationLabelSpecific() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    
+    LogicalGraph original = loader.getLogicalGraphByVariable("g1");
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g34");
+
+    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
+    		new DivideBy(1000L), "a", null, true));
+
+    collectAndAssertTrue(result.equalsByData(expected));
   }
   
+  /**
+   * Executes a property transformation on graphHeads using the {@link LogicalGraph} object and
+   * checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
   @Test
   public void testGHTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
     
-    loader.appendToDatabaseFromString("expected:firstLabel{title : \"Graph\",globalMemberCount : 42000L,generalAttribute : 42L}[" +
-        "(v0:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-        "(v1:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-        "(v2:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-        "(v3:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-        "(v4:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-        "(v5:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-        "(v2)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-        "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v4)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v5)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-        "(v2)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v3)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v2)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v5)" +
-        "(v5)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-        "]");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph output = input.transformGraphHeadProperties("generalAttribute", new DivideBy(1000L));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
 
-    output.print();
-    loader.getLogicalGraphByVariable("expected").print();
-    
-    collectAndAssertTrue(
-      output.equalsByData(loader.getLogicalGraphByVariable("expected")));
+    LogicalGraph result = original.transformGraphHeadProperties("a", new DivideBy(1000L));
+
+    collectAndAssertTrue(result.equalsByData(expected));
   }
-  
+
+  /**
+   * Executes a property transformation on vertices using the {@link LogicalGraph} object and
+   * checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
   @Test
   public void testVertexTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
     
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v04)" +
-      "]");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph output = input.transformVertexProperties("memberCount", new DivideBy(1000L));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
 
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+    LogicalGraph result = original.transformVertexProperties("a", new DivideBy(1000L));
+    
+    collectAndAssertTrue(result.equalsByData(expected));
   }
-  
+
+  /**
+   * Executes a property transformation on edges using the {@link LogicalGraph} object and
+   * checks if the result is correct.
+   *
+   * @throws Exception If the execution fails.
+   */
   @Test
   public void testEdgeTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
     
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-      "(v01:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-      "(v02:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v03:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v04:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v05:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v02)-[:member {until : 1550000000000L,generalAttribute : 42L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L}]->(v00)" +
-      "(v03)-[:member {until : 1550000000000L,generalAttribute : 42L}]->(v01)" +
-      "(v04)-[:member {until : 1550000000000L,generalAttribute : 42L}]->(v01)" +
-      "(v05)-[:member {until : 1550000000000L,generalAttribute : 42L}]->(v01)" +
-      "(v02)-[:knows {since : 1350000000000L,generalAttribute : 42L}]->(v03)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L}]->(v02)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L}]->(v04)" +
-      "(v03)-[:knows {since : 1350000000000L,generalAttribute : 42L}]->(v05)" +
-      "(v05)-[:knows {since : 1350000000000L,generalAttribute : 42L}]->(v04)" +
-      "]");
+    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
-    LogicalGraph output = input.transformEdgeProperties("generalAttribute", new DivideBy(1000L));
+    LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
 
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-  
-  private String getInput() {
-    return "input:firstLabel{title : \"Graph\",globalMemberCount : 42000L,generalAttribute : 42000L}[" +
-      "(v0:Forum {topic : \"rdf\",memberCount : 1563145521L,generalAttribute : 42000L})" +
-      "(v1:Forum {topic : \"graph\",memberCount: 451341564L,generalAttribute : 42000L})" +
-      "(v2:User {gender : \"male\",birthMillis : 500000000000L,generalAttribute : 42000L})" +
-      "(v3:User {gender : \"male\",birthMillis : 530000000000L,generalAttribute : 42000L})" +
-      "(v4:User {gender : \"male\",birthMillis : 560000000000L,generalAttribute : 42000L})" +
-      "(v5:User {gender : \"female\",birthMillis : 590000000000L,generalAttribute : 42000L})" +
-      "(v2)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-      "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v0)" +
-      "(v3)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-      "(v4)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-      "(v5)-[:member {until : 1550000000000L,generalAttribute : 42000L}]->(v1)" +
-      "(v2)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v3)" +
-      "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v2)" +
-      "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-      "(v3)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v5)" +
-      "(v5)-[:knows {since : 1350000000000L,generalAttribute : 42000L}]->(v4)" +
-      "]";
+    LogicalGraph result = original.transformEdgeProperties("a", new DivideBy(1000L));
+
+    collectAndAssertTrue(result.equalsByData(expected));
   }
 }
