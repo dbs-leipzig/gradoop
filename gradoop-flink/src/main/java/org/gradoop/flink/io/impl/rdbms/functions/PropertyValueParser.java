@@ -39,17 +39,18 @@ public class PropertyValueParser {
 
 		if (att == null) {
 			propValue = PropertyValue.NULL_VALUE;
-		}
-		try {
-			if (att.getClass() == Date.class) {
-				propValue = PropertyValue.create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-			} else {
-				propValue = PropertyValue.create(att);
+		} else {
+			try {
+				if (att.getClass() == Date.class) {
+					propValue = PropertyValue
+							.create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+				} else {
+					propValue = PropertyValue.create(att);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-
 		return propValue;
 	}
 }

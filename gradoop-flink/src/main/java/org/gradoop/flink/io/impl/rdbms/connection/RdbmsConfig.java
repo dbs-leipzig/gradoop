@@ -75,7 +75,6 @@ public class RdbmsConfig {
 	public RdbmsConfig(String rdbms, String url, String user, String pw, String jdbcDriverPath,
 			String jdbcDriverClassName) {
 		this.rdbms = rdbms;
-		RdbmsConfig.rdbmsType = RdbmsTypeChooser.choose(rdbms);
 		this.url = url;
 		this.user = user;
 		this.pw = pw;
@@ -97,6 +96,7 @@ public class RdbmsConfig {
 
 	public void setRdbms(String rdbms) {
 		this.rdbms = rdbms;
+		RdbmsConfig.rdbmsType = RdbmsTypeChooser.choose(rdbms);
 	}
 
 	public String getUrl() {

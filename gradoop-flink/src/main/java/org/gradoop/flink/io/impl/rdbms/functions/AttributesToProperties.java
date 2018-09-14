@@ -44,6 +44,7 @@ public class AttributesToProperties {
 			try {
 				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 

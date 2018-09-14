@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.rdbms.functions;
 import java.util.ArrayList;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -48,23 +47,23 @@ public class CreateVertices {
 
 		DataSet<Vertex> vertices = null;
 		VertexFactory vertexFactory = flinkConfig.getVertexFactory();
-		ExecutionEnvironment env = flinkConfig.getExecutionEnvironment();
-		DataSet<TableToNode> dsTablesToNodes = env.fromCollection(tablesToNodes);
 
 		int counter = 0;
 
 		for (TableToNode table : tablesToNodes) {
 			try {
-				DataSet<Row> dsSQLResult = FlinkConnect.connect(env, rdbmsConfig, table.getRowCount(),
-						table.getSqlQuery(), table.getRowTypeInfo());
+				DataSet<Row> dsSQLResult = FlinkConnect.connect(flinkConfig.getExecutionEnvironment(), rdbmsConfig,
+						table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
 				if (vertices == null) {
 					vertices = dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-							.withBroadcastSet(dsTablesToNodes, "tablesToNodes");
+							.withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+									"tablesToNodes");
 				} else {
-					vertices = vertices
-							.union(dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-									.withBroadcastSet(dsTablesToNodes, "tablesToNodes"));
+					vertices = vertices.union(dsSQLResult
+							.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+							.withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+									"tablesToNodes"));
 				}
 
 			} catch (ClassNotFoundException e) {

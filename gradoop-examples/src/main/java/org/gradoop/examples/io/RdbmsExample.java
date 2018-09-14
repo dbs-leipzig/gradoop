@@ -16,17 +16,12 @@
 package org.gradoop.examples.io;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.io.impl.rdbms.RdbmsDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -48,7 +43,6 @@ public class RdbmsExample implements ProgramDescription {
 	 * @param args[4] Valid jdbc driver class name
 	 * @param args[5] Valid path to output directory
 	 */
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 
 		if(args.length != 6){
@@ -76,9 +70,6 @@ public class RdbmsExample implements ProgramDescription {
 
 		// write conversion result to given path with timestamp and db name
 		schema.writeTo(new CSVDataSink(outputPath + "/" + getDateString() + urlParser(url),gfc));
-
-		PrintWriter pr = new PrintWriter(new File(outputPath + "/" + getDateString() + urlParser(url) + "_flinkplan"));
-		pr.write(env.getExecutionPlan());
 		
 		// execute program
 		env.execute();

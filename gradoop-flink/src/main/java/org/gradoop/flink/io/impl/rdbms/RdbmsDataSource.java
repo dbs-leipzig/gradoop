@@ -17,7 +17,6 @@ package org.gradoop.flink.io.impl.rdbms;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.flink.api.java.DataSet;
@@ -30,7 +29,6 @@ import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnect;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeletePkFkProperties;
-import org.gradoop.flink.io.impl.rdbms.functions.PrintConversionPlan;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
@@ -106,31 +104,26 @@ public class RdbmsDataSource implements DataSource {
 
 			metadataParser = new MetaDataParser(con);
 			metadataParser.parse();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
-		// tables going to convert to vertices
-		ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
+			// tables going to convert to vertices
+			ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
 
-		// tables going to convert to edges
-		ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
+			// tables going to convert to edges
+			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
-		PrintConversionPlan.print(tablesToNodes, tablesToEdges, "/home/hr73vexy/00 Work/outputs/conversionplan");
+			// creates vertices from rdbms table tuples
+			tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 
-		// creates vertices from rdbms table tuples
-		tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
-
-		try {
 			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+
+			// cleans vertices by deleting primary key and foreign key
+			// properties
+			vertices = tempVertices.map(new DeletePkFkProperties()).withBroadcastSet(env.fromCollection(tablesToNodes),
+					"tablesToNodes");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// cleans vertices by deleting primary key and foreign key
-		// properties
-		vertices = tempVertices.map(new DeletePkFkProperties()).withBroadcastSet(env.fromCollection(tablesToNodes),
-				"tablesToNodes");
 
 		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}

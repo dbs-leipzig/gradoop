@@ -49,16 +49,11 @@ public class FlinkConnect {
 		int parallelism = env.getParallelism();
 
 		// run jdbc input format with pagination
-		JDBCInputFormat jdbcInput = null;
-
-		jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
-				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
-				.setDBUrl(rdbmsConfig.getUrl())
-				.setUsername(rdbmsConfig.getUser())
-				.setPassword(rdbmsConfig.getPw())
+		JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
+				.setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim").setDBUrl(rdbmsConfig.getUrl())
+				.setUsername(rdbmsConfig.getUser()).setPassword(rdbmsConfig.getPw())
 				.setQuery(sqlQuery + PageinationQueryChooser.choose(rdbmsConfig.getRdbmsType()))
-				.setRowTypeInfo(typeInfo)
-				.setParametersProvider(new GenericParameterValuesProvider(
+				.setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(
 						ParametersChooser.choose(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
 				.finish();
 
