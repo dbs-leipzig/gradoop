@@ -325,9 +325,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     return transform(null, null, edgeTransformationFunction);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph transformGraphHeadProperties(
     String propertyKey,
@@ -338,9 +335,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       graphHeadPropTransformationFunction, null, null));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph transformVertexProperties(
     String propertyKey,
@@ -351,9 +345,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       null, vertexPropTransformationFunction, null));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph transformEdgeProperties(
     String propertyKey,
