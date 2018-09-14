@@ -60,7 +60,7 @@ public class CombineEdgeGroupItems
   public void combine(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<EdgeGroupItem> collector) throws Exception {
     reuseEdgeGroupItem = reduceInternal(edgeGroupItems);
-    resetAggregators(reuseEdgeGroupItem.getLabelGroup().getAggregators());
+    reuseEdgeGroupItem.getLabelGroup().resetAggregators();
     collector.collect(reuseEdgeGroupItem);
   }
 }

@@ -58,16 +58,10 @@ abstract class BuildSuperEdge extends BuildBase {
         firstElement = false;
       }
 
-      if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
-        aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
-      } else {
-        // no need to iterate further
-        break;
-      }
+      edgeGroupItem.getLabelGroup().aggregate(edge.getAggregateValues());
     }
 
-    edgeGroupItem.setAggregateValues(
-      getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
+    edgeGroupItem.setAggregateValues(edgeGroupItem.getLabelGroup().getAggregateValueList());
     return edgeGroupItem;
   }
 }

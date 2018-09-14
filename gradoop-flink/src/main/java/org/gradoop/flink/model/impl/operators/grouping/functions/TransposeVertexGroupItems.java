@@ -100,22 +100,20 @@ public class TransposeVertexGroupItems
       // store the super vertex id created in the previous combiner
       superVertexIds.add(groupItem.getSuperVertexId());
 
-      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-        aggregate(groupItem.getAggregateValues(), vertexLabelGroup.getAggregators());
-      }
+      vertexLabelGroup.aggregate(groupItem.getAggregateValues());
     }
 
     reuseInnerTuple.setId(superVertexId);
     reuseInnerTuple.setIdSet(GradoopIdSet.fromExisting(superVertexIds));
 
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
-      groupPropertyValues, vertexLabelGroup.getAggregators());
+      groupPropertyValues, vertexLabelGroup.getAggregateValueList());
     reuseOuterTuple.f0.setSuperVertexId(superVertexId);
     reuseOuterTuple.f0.setLabelGroup(vertexLabelGroup);
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group
-    resetAggregators(reuseOuterTuple.f0.getLabelGroup().getAggregators());
+    reuseOuterTuple.f0.getLabelGroup().resetAggregators();
     out.collect(reuseOuterTuple);
   }
 }

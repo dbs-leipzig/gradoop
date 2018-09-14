@@ -21,12 +21,14 @@ import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -331,12 +333,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     /**
      * List of all global vertex aggregate functions.
      */
-    private List<PropertyValueAggregator> globalVertexAggregators;
+    private List<VertexAggregateFunction> globalVertexAggregators;
 
     /**
      * List of all global edge aggregate functions.
      */
-    private List<PropertyValueAggregator> globalEdgeAggregators;
+    private List<EdgeAggregateFunction> globalEdgeAggregators;
 
     /**
      * Creates a new grouping builder
@@ -459,7 +461,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addVertexLabelGroup(
       String label,
       List<String> groupingKeys,
-      List<PropertyValueAggregator> aggregators) {
+      List<AggregateFunction> aggregators) {
       return addVertexLabelGroup(label, label, groupingKeys, aggregators);
     }
 
@@ -493,7 +495,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superVertexLabel,
       List<String> groupingKeys,
-      List<PropertyValueAggregator> aggregators) {
+      List<AggregateFunction> aggregators) {
       vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
       return this;
     }
@@ -524,7 +526,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addEdgeLabelGroup(
       String label,
       List<String> groupingKeys,
-      List<PropertyValueAggregator> aggregators) {
+      List<AggregateFunction> aggregators) {
       return addEdgeLabelGroup(label, label, groupingKeys, aggregators);
     }
 
@@ -558,7 +560,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superEdgeLabel,
       List<String> groupingKeys,
-      List<PropertyValueAggregator> aggregators) {
+      List<AggregateFunction> aggregators) {
       edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
       return this;
     }
@@ -592,7 +594,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator vertex aggregator
      * @return this builder
      */
-    public GroupingBuilder addVertexAggregator(PropertyValueAggregator aggregator) {
+    public GroupingBuilder addVertexAggregator(VertexAggregateFunction aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
       defaultVertexLabelGroup.addAggregator(aggregator);
       return this;
@@ -605,7 +607,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator vertex aggregator
      * @return this builder
      */
-    public GroupingBuilder addGlobalVertexAggregator(PropertyValueAggregator aggregator) {
+    public GroupingBuilder addGlobalVertexAggregator(VertexAggregateFunction aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
       globalVertexAggregators.add(aggregator);
       return this;
@@ -617,7 +619,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator edge aggregator
      * @return this builder
      */
-    public GroupingBuilder addGlobalEdgeAggregator(PropertyValueAggregator aggregator) {
+    public GroupingBuilder addGlobalEdgeAggregator(EdgeAggregateFunction aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
       globalEdgeAggregators.add(aggregator);
       return this;
@@ -630,7 +632,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * @param aggregator edge aggregator
      * @return this builder
      */
-    public GroupingBuilder addEdgeAggregator(PropertyValueAggregator aggregator) {
+    public GroupingBuilder addEdgeAggregator(EdgeAggregateFunction aggregator) {
       Objects.requireNonNull(aggregator, "Aggregator must not be null");
       defaultEdgeLabelGroup.addAggregator(aggregator);
       return this;
@@ -650,13 +652,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       // adding the global aggregators to the associated label groups
       for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
-        for (PropertyValueAggregator vertexAggregator : globalVertexAggregators) {
+        for (VertexAggregateFunction vertexAggregator : globalVertexAggregators) {
           vertexLabelGroup.addAggregator(vertexAggregator);
         }
       }
 
       for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
-        for (PropertyValueAggregator edgeAggregator : globalEdgeAggregators) {
+        for (EdgeAggregateFunction edgeAggregator : globalEdgeAggregators) {
           edgeLabelGroup.addAggregator(edgeAggregator);
         }
       }
