@@ -29,57 +29,57 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  * Stores metadata for tuple-to-edge conversation
  */
 public class TableToEdge {
-	
+
 	/**
 	 * Relationship type
 	 */
 	private String relationshipType;
-	
+
 	/**
 	 * Name of relation start table
 	 */
 	private String startTableName;
-	
+
 	/**
 	 * Name of relation end table
 	 */
 	private String endTableName;
-	
+
 	/**
 	 * Name and datatype of relation start attribute
 	 */
 	private NameTypeTuple startAttribute;
-	
+
 	/**
 	 * Name and datatype of relation end attribute
 	 */
 	private NameTypeTuple endAttribute;
-	
+
 	/**
 	 * List of primary key names and belonging datatypes
 	 */
 	private ArrayList<NameTypeTuple> primaryKeys;
-	
+
 	/**
 	 * List of further attribute names and belonging datatypes
 	 */
 	private ArrayList<NameTypeTuple> furtherAttributes;
-	
+
 	/**
 	 * Direction indicator
 	 */
 	private boolean directionIndicator;
-	
+
 	/**
 	 * Number of rows
 	 */
 	private int rowCount;
-	
+
 	/**
 	 * Valid sql query for querying needed relational data
 	 */
 	private String sqlQuery;
-	
+
 	/**
 	 * Rowheader for row data representation of relational data
 	 */
@@ -87,18 +87,28 @@ public class TableToEdge {
 
 	/**
 	 * Conctructor
-	 * @param relationshipType Relationship type
-	 * @param startTableName Name of relation start table
-	 * @param endTableName Name of relation end table
-	 * @param startAttribute Name and type of relation start attribute
-	 * @param endAttribute Name and datatype of relation end attribute
-	 * @param primaryKeys List of primary key names and datatypes
-	 * @param furtherAttributes List of further attribute names and datatypes
-	 * @param directionIndicator Direction indicator
-	 * @param rowCount Number of rows
+	 * 
+	 * @param relationshipType
+	 *            Relationship type
+	 * @param startTableName
+	 *            Name of relation start table
+	 * @param endTableName
+	 *            Name of relation end table
+	 * @param startAttribute
+	 *            Name and type of relation start attribute
+	 * @param endAttribute
+	 *            Name and datatype of relation end attribute
+	 * @param primaryKeys
+	 *            List of primary key names and datatypes
+	 * @param furtherAttributes
+	 *            List of further attribute names and datatypes
+	 * @param directionIndicator
+	 *            Direction indicator
+	 * @param rowCount
+	 *            Number of rows
 	 */
-	public TableToEdge(String relationshipType, String startTableName, String endTableName, NameTypeTuple startAttribute,
-			NameTypeTuple endAttribute, ArrayList<NameTypeTuple> primaryKeys,
+	public TableToEdge(String relationshipType, String startTableName, String endTableName,
+			NameTypeTuple startAttribute, NameTypeTuple endAttribute, ArrayList<NameTypeTuple> primaryKeys,
 			ArrayList<NameTypeTuple> furtherAttributes, boolean directionIndicator, int rowCount) {
 		this.relationshipType = relationshipType;
 		this.startTableName = startTableName;
@@ -118,18 +128,19 @@ public class TableToEdge {
 
 	/**
 	 * Creates a valid type information for belonging sql query
+	 * 
 	 * @return Row type information for belonging sql query
 	 */
 	public RowTypeInfo getRowTypeInfo() {
-		TypeInformation<RowTypeInfo>[] fieldTypes = null;
+		TypeInformation<?>[] fieldTypes = null;
 
-		if(!directionIndicator) {
-			fieldTypes = new TypeInformation[furtherAttributes.size() + 2];
+		if (!directionIndicator) {
+			fieldTypes = new TypeInformation<?>[furtherAttributes.size() + 2];
 			fieldTypes[0] = SQLToBasicTypeMapper.getTypeInfo(startAttribute.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(startAttribute.f0,RdbmsConstants.FK_FIELD,0));
+			rowheader.getRowHeader().add(new RowHeaderTuple(startAttribute.f0, RdbmsConstants.FK_FIELD, 0));
 			fieldTypes[1] = SQLToBasicTypeMapper.getTypeInfo(endAttribute.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0,RdbmsConstants.FK_FIELD,1));
-			
+			rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0, RdbmsConstants.FK_FIELD, 1));
+
 			int i = 2;
 			for (NameTypeTuple att : furtherAttributes) {
 				fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1);

@@ -22,18 +22,15 @@ import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
 /**
- * Creates pairs consisting of gradoop id and primary key name, from vertices
+ * Creates tuples of gradoop id, primary key name from vertices
  */
 public class VertexToIdPkTuple implements MapFunction<Vertex,IdKeyTuple> {
 
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public IdKeyTuple map(Vertex v) throws Exception {
-		String key = "";
-		try{
-			key = v.getProperties().get(RdbmsConstants.PK_ID).toString();
-		}catch(Exception e){
-			System.err.println("Primary Key " + RdbmsConstants.PK_ID + " not found.");
-		}
-		return new IdKeyTuple(v.getId(),key);
+		
+		return new IdKeyTuple(v.getId(),v.getProperties().get(RdbmsConstants.PK_ID).toString());
 	}
 }

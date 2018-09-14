@@ -17,13 +17,13 @@
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
 /**
- * Provides valid sql strings for querying needed relational data
+ * Provides sql queries
  */
 public class SQLQuery {
 
@@ -47,7 +47,7 @@ public class SQLQuery {
 		String sqlQuery = "SELECT ";
 
 		for (NameTypeTuple pk : primaryKeys) {
-			if (RdbmsConfig.rdbms.equals("microsoft sql server")) {
+			if (RdbmsConfig.rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
 				sqlQuery = sqlQuery + "[" + pk.f0 + "]" + ",";
 			} else {
 				sqlQuery = sqlQuery + pk.f0 + ",";
@@ -55,7 +55,7 @@ public class SQLQuery {
 		}
 
 		for (FkTuple fk : foreignKeys) {
-			if (RdbmsConfig.rdbms.equals("microsoft sql server")) {
+			if (RdbmsConfig.rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
 				sqlQuery = sqlQuery + "[" + fk.f0 + "]" + ",";
 			} else {
 				sqlQuery += fk.f0 + ",";
@@ -63,7 +63,7 @@ public class SQLQuery {
 		}
 
 		for (NameTypeTuple att : furtherAttributes) {
-			if (RdbmsConfig.rdbms.equals("microsoft sql server")) {
+			if (RdbmsConfig.rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
 				sqlQuery = sqlQuery + "[" + att.f0 + "]" + ",";
 			} else {
 				sqlQuery += att.f0 + ",";
@@ -90,7 +90,7 @@ public class SQLQuery {
 	public static String getNtoMEdgeTableQuery(String tableName, String startAttribute, String endAttribute,
 			ArrayList<NameTypeTuple> furtherAttributes) {
 
-		if (RdbmsConfig.rdbms.equals("microsoft sql server")) {
+		if (RdbmsConfig.rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
 			startAttribute = "[" + startAttribute + "]";
 			endAttribute = "[" + endAttribute + "]";
 		}
@@ -98,7 +98,7 @@ public class SQLQuery {
 		String sqlQuery = "SELECT " + startAttribute + "," + endAttribute + ",";
 
 		for (NameTypeTuple att : furtherAttributes) {
-			if (RdbmsConfig.rdbms.equals("microsoft sql server")) {
+			if (RdbmsConfig.rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
 				sqlQuery += "[" + att.f0 + "]" + ",";
 			} else {
 				sqlQuery += att.f0 + ",";

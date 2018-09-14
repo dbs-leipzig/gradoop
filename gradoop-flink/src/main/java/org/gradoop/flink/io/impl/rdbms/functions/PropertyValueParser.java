@@ -30,15 +30,15 @@ public class PropertyValueParser {
 	 * Converts jdbc data type to matching EPGM property value if possible
 	 * 
 	 * @param att
-	 *            Attribute to be parsed
-	 * @return Gradoop propety value
+	 *            Database value
+	 * @return Gradoop property value
 	 */
 	public static PropertyValue parse(Object att) {
 
 		PropertyValue propValue = null;
 
 		if (att == null) {
-			propValue = propValue.NULL_VALUE;
+			propValue = PropertyValue.NULL_VALUE;
 		}
 		try {
 			if (att.getClass() == Date.class) {
@@ -47,10 +47,9 @@ public class PropertyValueParser {
 				propValue = PropertyValue.create(att);
 			}
 		} catch (Exception e) {
-			if (att != null) {
-				System.out.println("No gradoop property value type for " + att.getClass() + ". Will parsed as string.");
-			}
+			e.printStackTrace();
 		}
+
 		return propValue;
 	}
 }

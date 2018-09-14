@@ -23,15 +23,18 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Tuple representing a gradoop id, key string pair
  */
 public class IdKeyTuple extends Tuple2<GradoopId, String> {
+	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Gradoop id
 	 */
-	GradoopId id;
+	private GradoopId id;
 	
 	/**
 	 * Key string
 	 */
-	String key;
+	private String key;
 
 	public IdKeyTuple() {
 		

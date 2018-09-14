@@ -19,7 +19,14 @@ import java.sql.JDBCType;
 
 import org.apache.flink.api.java.tuple.Tuple4;
 
-public class FkTuple extends Tuple4<String,JDBCType,String,String>{
+/**
+ * Represents a foreign key f0 : attribute name of referencing foreign key f1 :
+ * jdbc type of referencing foreign key f2 : name of referenced primary key
+ * attribute f3 : name of referenced table
+ */
+public class FkTuple extends Tuple4<String, JDBCType, String, String> {
+
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Foreign key name
@@ -30,7 +37,7 @@ public class FkTuple extends Tuple4<String,JDBCType,String,String>{
 	 * JDBC data type of foreign key name
 	 */
 	private JDBCType type;
-	
+
 	/**
 	 * Column name of referenced table
 	 */
@@ -40,15 +47,20 @@ public class FkTuple extends Tuple4<String,JDBCType,String,String>{
 	 * Name of referenced Table
 	 */
 	private String refdTableName;
-	
-	public FkTuple() {
 
+	public FkTuple() {
 	}
 
 	/**
-	 * Constructor
-	 * @param name Key string
-	 * @param type JDBC data type
+	 * 
+	 * @param fkName
+	 *            Name of referencing foreign key attribute
+	 * @param type
+	 *            Jdbc type of referencing attribute
+	 * @param refdAttName
+	 *            Name of referenced primary key attribute
+	 * @param refdTableName
+	 *            name of referenced table
 	 */
 	public FkTuple(String fkName, JDBCType type, String refdAttName, String refdTableName) {
 		this.fkName = fkName;

@@ -23,13 +23,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Register jdbc driver
+ * Registers jdbc driver
  */
 public class RegisterDriver {
 	
 	/**
 	 * Registers a jdbc driver 
-	 * @param config Valid RDBMS configuration
+	 * @param config Database configuration
 	 */
 	public static void register(RdbmsConfig config) {
 		
@@ -40,7 +40,6 @@ public class RegisterDriver {
 			DriverManager.registerDriver(new DriverShim(driver));
 
 		} catch (SQLException | MalformedURLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			System.err.println("Not possible to establish database connection to DBUrl " + config.getUrl());
 			e.printStackTrace();
 		}
 	}

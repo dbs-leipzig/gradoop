@@ -26,7 +26,13 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
 
+/**
+ * Collects label,gradoop id, foreign key value of vertices
+ */
 public class VerticesToFkTable extends RichFlatMapFunction<TableToEdge, LabelIdKeyTuple> {
+
+	private static final long serialVersionUID = 1L;
+	
 	List<Vertex> vertices;
 
 	@Override

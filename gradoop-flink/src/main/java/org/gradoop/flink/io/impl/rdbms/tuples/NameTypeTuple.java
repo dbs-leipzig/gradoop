@@ -23,25 +23,30 @@ import org.apache.flink.api.java.tuple.Tuple2;
 /**
  * Tuple representing a key string and belonging data type pair
  */
-public class NameTypeTuple extends Tuple2<String,JDBCType>{
-	
+public class NameTypeTuple extends Tuple2<String, JDBCType> {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Key string
 	 */
 	private String name;
-	
+
 	/**
 	 * JDBC data type
 	 */
 	private JDBCType type;
-	
-	public NameTypeTuple() {	
+
+	public NameTypeTuple() {
 	}
-	
+
 	/**
 	 * Constructor
-	 * @param name Key string
-	 * @param type JDBC data type
+	 * 
+	 * @param name
+	 *            Key string
+	 * @param type
+	 *            JDBC data type
 	 */
 	public NameTypeTuple(String name, JDBCType type) {
 		this.name = name;

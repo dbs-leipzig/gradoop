@@ -119,18 +119,18 @@ public class MetaDataParser {
 				// assigning foreign key name and name of belonging primary
 				// and foreign key table
 				while (rsForeignKeys.next()) {
-					
+
 					String refdTableName = rsForeignKeys.getString("PKTABLE_NAME");
 					String refdTableSchem = rsForeignKeys.getString("PKTABLE_SCHEM");
-					
-					if(refdTableSchem == null) {
+
+					if (refdTableSchem == null) {
 						foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
 								rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableName));
-					}else {
+					} else {
 						foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
-								rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableSchem +"."+ refdTableName));
+								rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableSchem + "." + refdTableName));
 					}
-					
+
 					pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
 				}
 
@@ -153,8 +153,7 @@ public class MetaDataParser {
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY
 						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR
-						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR						
-						){
+						&& JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR) {
 
 					NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
 							JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
@@ -180,7 +179,7 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to vertices
+	 * Creates metadata representations of tables going to convert to vertices
 	 * 
 	 * @return ArrayList containing metadata representations of rdbms tables going
 	 *         to convert to vertices
@@ -199,7 +198,7 @@ public class MetaDataParser {
 	}
 
 	/**
-	 * Creates metadata representations of tables, which will be convert to edges
+	 * Creates metadata representations of tables going to convert to edges
 	 * 
 	 * @return ArrayList containing metadata representations of rdbms tables going
 	 *         to convert to edges

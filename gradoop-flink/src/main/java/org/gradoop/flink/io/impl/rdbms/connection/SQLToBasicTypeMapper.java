@@ -18,15 +18,8 @@ package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.sql.JDBCType;
 
-import org.apache.flink.api.common.typeinfo.BasicArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.EnumTypeInfo;
-import org.apache.flink.api.java.typeutils.GenericTypeInfo;
-import org.apache.flink.api.java.typeutils.ObjectArrayTypeInfo;
-
-import com.sun.tools.javac.code.Attribute.Array;
 
 /**
  * JDBC type to BasiTypeInfo Mapper
@@ -37,13 +30,14 @@ public class SQLToBasicTypeMapper {
 	 * Maps jdbc types to flink compatible BasicTypeInfos
 	 * 
 	 * @param jdbcType
-	 *            Valid jdbc type
-	 * @return
+	 *            Jdbc Type of attribute
+	 * @return Flink type information
 	 */
-	public static TypeInformation getTypeInfo(JDBCType jdbcType) {
-		TypeInformation typeInfo = null;
+	public static TypeInformation<?> getTypeInfo(JDBCType jdbcType) {
+		TypeInformation<?> typeInfo = null;
 
 		switch (jdbcType.name()) {
+
 		case "CHAR":
 			typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
 			break;
@@ -66,18 +60,16 @@ public class SQLToBasicTypeMapper {
 			typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
 			break;
 		case "TINYINT":
-			if(RdbmsConfig.rdbms.equals("mysql") 
-					|| RdbmsConfig.rdbms.equals("postgresql")) {
+			if (RdbmsConfig.rdbmsType == 0) {
 				typeInfo = BasicTypeInfo.INT_TYPE_INFO;
-			}else {
+			} else {
 				typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
 			}
 			break;
 		case "SMALLINT":
-			if(RdbmsConfig.rdbms.equals("mysql") 
-					|| RdbmsConfig.rdbms.equals("postgresql")) {
+			if (RdbmsConfig.rdbmsType == 0) {
 				typeInfo = BasicTypeInfo.INT_TYPE_INFO;
-			}else {
+			} else {
 				typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
 			}
 			break;
@@ -137,6 +129,7 @@ public class SQLToBasicTypeMapper {
 		default:
 			typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
 		}
+
 		return typeInfo;
 	}
 }

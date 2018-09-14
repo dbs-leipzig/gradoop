@@ -16,34 +16,31 @@
 
 package org.gradoop.flink.io.impl.rdbms.connection;
 
-import java.util.regex.Pattern;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 
 /**
- * Chooses a fitting pageination prepared statement depending on connected managementsystem
+ * Chooses a fitting pageination prepared statement depending on connected
+ * managementsystem
  *
  */
 public class PageinationQueryChooser {
-	
+
 	/**
-	 * Chooses a fitting pageination prepared statement depending on connected managementsystem
-	 * @param rdbms Name of connected managementsystem
-	 * @return	Valid sql pageination prepared statement
+	 * Chooses a fitting pageination prepared statement depending on connected
+	 * management system
+	 * 
+	 * @param rdbmsType
+	 *            Database identifier of connected database
+	 * @return Valid sql pageination prepared statement
 	 */
-	public static String choose(String rdbms){
+	public static String choose(int rdbmsType) {
 		String pageinationQuery = "";
-		
-		switch(rdbms){
-		case "posrgresql" : 
-		case "mysql" :
-		case "h2" :
-		case "sqlite" :
-		case "hsqldb" : 
-		default:
+
+		switch (rdbmsType) {
+		case RdbmsConstants.MYSQL_TYPE_ID:
 			pageinationQuery = " LIMIT ? OFFSET ?";
 			break;
-		case "derby":
-		case "microsoft sql server":
-		case "oracle":
+		case RdbmsConstants.SQLSERVER_TYPE_ID:
 			pageinationQuery = " ORDER BY (1) OFFSET (?) ROWS FETCH NEXT (?) ROWS ONLY";
 			break;
 		}

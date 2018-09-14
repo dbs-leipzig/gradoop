@@ -22,9 +22,14 @@ package org.gradoop.flink.io.impl.rdbms.connection;
 public class RdbmsConfig {
 
 	/**
-	 * Used database managementsystem
+	 * Used database management system
 	 */
-	public static String rdbms;
+	public String rdbms;
+
+	/**
+	 * Management system identifier
+	 */
+	public static int rdbmsType;
 
 	/**
 	 * Valid jdbc url
@@ -52,14 +57,14 @@ public class RdbmsConfig {
 	private String jdbcDriverClassName;
 
 	/**
-	 * Construcotr
+	 * Constructor
 	 * 
 	 * @param rdbms
-	 *            Database Managementsystem
+	 *            Database management system
 	 * @param url
 	 *            Valid jdbc url
 	 * @param user
-	 *            Username of database management system user
+	 *            User name of database management system user
 	 * @param pw
 	 *            Password of database management system user
 	 * @param jdbcDriverPath
@@ -70,11 +75,20 @@ public class RdbmsConfig {
 	public RdbmsConfig(String rdbms, String url, String user, String pw, String jdbcDriverPath,
 			String jdbcDriverClassName) {
 		this.rdbms = rdbms;
+		RdbmsConfig.rdbmsType = RdbmsTypeChooser.choose(rdbms);
 		this.url = url;
 		this.user = user;
 		this.pw = pw;
 		this.jdbcDriverPath = jdbcDriverPath;
 		this.jdbcDriverClassName = jdbcDriverClassName;
+	}
+
+	public int getRdbmsType() {
+		return rdbmsType;
+	}
+
+	public void setRdbmsType(int rdbmsType) {
+		RdbmsConfig.rdbmsType = rdbmsType;
 	}
 
 	public String getRdbms() {

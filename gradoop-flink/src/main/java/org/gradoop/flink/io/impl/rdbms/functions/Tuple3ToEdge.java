@@ -21,35 +21,41 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 
 /**
  * Creates edges from joined foreign key sets
  */
-public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId,String,Properties>,IdKeyTuple>,Edge> {
+public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple>, Edge> {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Gradoop edge factory
+	 */
+	EdgeFactory edgeFactory;
 	
 	/**
 	 * Name of converted table
 	 */
 	String tableName;
-	
+
 	/**
 	 * Constructor
-	 * @param tableName Name of converted table
+	 * 
+	 * @param tableName
+	 *            Name of converted table
 	 */
-	public Tuple3ToEdge(String tableName){
+	public Tuple3ToEdge(EdgeFactory edgeFactory, String tableName) {
+		this.edgeFactory = edgeFactory;
 		this.tableName = tableName;
 	}
-	
+
 	@Override
 	public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value) throws Exception {
-		Edge e = new Edge();
-		e.setId(GradoopId.get());
-		e.setSourceId(value.f0.f0);
-		e.setTargetId(value.f1.f0);
-		e.setProperties(value.f0.f2);
-		e.setLabel(tableName);
-		return e;
+		
+		return edgeFactory.initEdge(GradoopId.get(),tableName, value.f0.f0, value.f1.f0, value.f0.f2);
 	}
 }

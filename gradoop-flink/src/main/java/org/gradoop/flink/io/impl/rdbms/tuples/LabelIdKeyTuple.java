@@ -20,17 +20,41 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Tuple used to represent primary key respectively foreign key site of foreign key relation
+ * Tuple used to represent primary key respectively foreign key site of foreign
+ * key relation
  *
  */
-public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String>{
+public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Vertex label
+	 */
 	private String label;
+
+	/**
+	 * Vertex id
+	 */
 	private GradoopId id;
+
+	/**
+	 * Attribute value
+	 */
 	private String key;
-	
+
 	public LabelIdKeyTuple() {
 	}
-	
+
+	/**
+	 * 
+	 * @param label
+	 *            Vertex label (foreign key attribute name)
+	 * @param id
+	 *            Vertex id
+	 * @param key
+	 *            Attribute value
+	 */
 	public LabelIdKeyTuple(String label, GradoopId id, String key) {
 		this.label = label;
 		this.f0 = label;

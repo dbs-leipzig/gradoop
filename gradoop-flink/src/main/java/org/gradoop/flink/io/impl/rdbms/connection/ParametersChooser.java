@@ -17,12 +17,28 @@
 package org.gradoop.flink.io.impl.rdbms.connection;
 
 import java.io.Serializable;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 
+/**
+ * Chooses fitting parameters for database pageination
+ */
 public class ParametersChooser {
-	public static Serializable[][] choose(String rdbms, int parallelism, int rowCount) {
+
+	/**
+	 * Chooses fitting parameters for database pageination
+	 * 
+	 * @param rdbmsType
+	 *            Databse identifier of connected database
+	 * @param parallelism
+	 *            Parallelism of flink job
+	 * @param rowCount
+	 *            Count of database tables' rows
+	 * @return 2D array of pageination parameters
+	 */
+	public static Serializable[][] choose(int rdbmsType, int parallelism, int rowCount) {
 		Serializable[][] parameters;
 
-		// splits database data in parts of same
+		// split database table in parts of same size
 		int partitionNumber;
 		int partitionRest;
 
@@ -35,15 +51,12 @@ public class ParametersChooser {
 			partitionRest = rowCount % parallelism;
 			parameters = new Integer[parallelism][2];
 		}
+
 		int j = 0;
 
-		switch (rdbms) {
-		case "posrgresql":
-		case "mysql":
-		case "h2":
-		case "sqlite":
-		case "hsqldb":
-		default:
+		switch (rdbmsType) {
+
+		case RdbmsConstants.MYSQL_TYPE_ID:
 			for (int i = 0; i < parameters.length; i++) {
 				if (i == parameters.length - 1) {
 					parameters[i] = new Integer[] { partitionNumber + partitionRest, j };
@@ -53,9 +66,8 @@ public class ParametersChooser {
 				}
 			}
 			break;
-		case "derby":
-		case "microsoft sql server":
-		case "oracle":
+
+		case RdbmsConstants.SQLSERVER_TYPE_ID:
 			for (int i = 0; i < parameters.length; i++) {
 				if (i == parameters.length - 1) {
 					parameters[i] = new Integer[] { j, partitionNumber + partitionRest };
@@ -66,6 +78,7 @@ public class ParametersChooser {
 			}
 			break;
 		}
+
 		return parameters;
 	}
 }

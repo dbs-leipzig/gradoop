@@ -25,22 +25,24 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  * Rowheader of a row based relational data representation
  */
 public class RowHeader {
-	
+
 	/**
 	 * List of single rowheader tuples
 	 */
 	private ArrayList<RowHeaderTuple> rowHeader;
-	
+
 	/**
 	 * Empty constructor
 	 */
-	public RowHeader(){
+	public RowHeader() {
 		rowHeader = new ArrayList<RowHeaderTuple>();
 	}
 
 	/**
 	 * Constructor
-	 * @param rowHeader List of rowheader tuples
+	 * 
+	 * @param rowHeader
+	 *            List of rowheader tuples
 	 */
 	public RowHeader(ArrayList<RowHeaderTuple> rowHeader) {
 		this.rowHeader = rowHeader;
@@ -48,18 +50,19 @@ public class RowHeader {
 
 	/**
 	 * Collects just rowheader tuples of foreign key attributes
+	 * 
 	 * @return List of rowheader tuples of foreign key attributes
 	 */
-	public ArrayList<RowHeaderTuple> getForeignKeyHeader(){
+	public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
 		ArrayList<RowHeaderTuple> fkHeader = new ArrayList<RowHeaderTuple>();
-		for(RowHeaderTuple rht : this.rowHeader){
-			if(rht.getAttType().equals(RdbmsConstants.FK_FIELD)){
+		for (RowHeaderTuple rht : this.rowHeader) {
+			if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
 				fkHeader.add(rht);
 			}
 		}
 		return fkHeader;
 	}
-	
+
 	public ArrayList<RowHeaderTuple> getRowHeader() {
 		return rowHeader;
 	}

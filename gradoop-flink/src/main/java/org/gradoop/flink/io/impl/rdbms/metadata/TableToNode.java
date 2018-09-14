@@ -68,14 +68,20 @@ public class TableToNode {
 
 	/**
 	 * Constructor
-	 * @param tableName Name of database table
-	 * @param primaryKeys List of primary key names and datatypes
-	 * @param foreignKeys List of foreign key names and datatypes
-	 * @param furtherAttributes List of further attribute names and datatypes
-	 * @param rowCount Number of database rows
+	 * 
+	 * @param tableName
+	 *            Name of database table
+	 * @param primaryKeys
+	 *            List of primary key names and datatypes
+	 * @param foreignKeys
+	 *            List of foreign key names and datatypes
+	 * @param furtherAttributes
+	 *            List of further attribute names and datatypes
+	 * @param rowCount
+	 *            Number of database rows
 	 */
-	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes,
-			int rowCount) {
+	public TableToNode(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys,
+			ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;
@@ -87,32 +93,37 @@ public class TableToNode {
 
 	/**
 	 * Creates a valid type information for belonging sql query
+	 * 
 	 * @return Row type information for belonging sql query
 	 */
-	public RowTypeInfo getRowTypeInfo(){
+	public RowTypeInfo getRowTypeInfo() {
 		int i = 0;
-		TypeInformation[] fieldTypes = new TypeInformation[primaryKeys.size()+foreignKeys.size()+furtherAttributes.size()];
+		TypeInformation<?>[] fieldTypes = new TypeInformation[primaryKeys.size() + foreignKeys.size()
+				+ furtherAttributes.size()];
 
 		try {
-		for(NameTypeTuple pk : primaryKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(pk.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0,RdbmsConstants.PK_FIELD,i));
-			i++;
+			for (NameTypeTuple pk : primaryKeys) {
+				new SQLToBasicTypeMapper();
+				fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(pk.f1);
+				rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0, RdbmsConstants.PK_FIELD, i));
+				i++;
+			}
+			for (FkTuple fk : foreignKeys) {
+				new SQLToBasicTypeMapper();
+				fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(fk.f1);
+				rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0, RdbmsConstants.FK_FIELD, i));
+				i++;
+			}
+			for (NameTypeTuple att : furtherAttributes) {
+				new SQLToBasicTypeMapper();
+				fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1);
+				rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
+				i++;
+			}
+		} catch (Exception e) {
+
 		}
-		for(FkTuple fk : foreignKeys){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(fk.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0,RdbmsConstants.FK_FIELD,i));
-			i++;
-		}
-		for(NameTypeTuple att : furtherAttributes){
-			fieldTypes[i] = new SQLToBasicTypeMapper().getTypeInfo(att.f1);
-			rowheader.getRowHeader().add(new RowHeaderTuple(att.f0,RdbmsConstants.ATTRIBUTE_FIELD,i));
-			i++;
-		}
-		}catch(Exception e) {
-			
-		}
-	
+
 		return new RowTypeInfo(fieldTypes);
 	}
 

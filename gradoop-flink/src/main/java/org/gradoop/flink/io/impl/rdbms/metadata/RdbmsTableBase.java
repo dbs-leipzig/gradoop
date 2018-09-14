@@ -20,30 +20,31 @@ import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
 /**
- * Represents the relational database schema of a table 
+ * Represents the relational database schema of a table
  */
 public class RdbmsTableBase {
-	
+
 	/**
 	 * Name of database table
 	 */
 	private String tableName;
-	
+
 	/**
 	 * List of primary keys of database table
 	 */
 	private ArrayList<NameTypeTuple> primaryKeys;
-	
+
 	/**
 	 * List of foreign key of database table
 	 */
 	private ArrayList<FkTuple> foreignKeys;
-	
+
 	/**
-	 * List of further attributes (no primary, foreign key attributes) of database table
+	 * List of further attributes (no primary, foreign key attributes) of database
+	 * table
 	 */
 	private ArrayList<NameTypeTuple> furtherAttributes;
-	
+
 	/**
 	 * Number of rows of table
 	 */
@@ -51,14 +52,20 @@ public class RdbmsTableBase {
 
 	/**
 	 * Constructor
-	 * @param tableName Name of database table
-	 * @param primaryKeys List of primary keys
-	 * @param foreignKeys List of foreign keys
-	 * @param furtherAttributes List of further attributes
-	 * @param rowCount Number of rows
+	 * 
+	 * @param tableName
+	 *            Name of database table
+	 * @param primaryKeys
+	 *            List of primary keys
+	 * @param foreignKeys
+	 *            List of foreign keys
+	 * @param furtherAttributes
+	 *            List of further attributes
+	 * @param rowCount
+	 *            Number of rows
 	 */
-	public RdbmsTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
-			ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
+	public RdbmsTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys, ArrayList<FkTuple> foreignKeys,
+			ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
 		this.tableName = tableName;
 		this.primaryKeys = primaryKeys;
 		this.foreignKeys = foreignKeys;

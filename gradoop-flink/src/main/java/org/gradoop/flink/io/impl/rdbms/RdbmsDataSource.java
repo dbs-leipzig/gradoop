@@ -15,19 +15,11 @@
  */
 package org.gradoop.flink.io.impl.rdbms;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -35,15 +27,13 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnect;
-import org.gradoop.flink.io.impl.rdbms.functions.CleanVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
+import org.gradoop.flink.io.impl.rdbms.functions.DeletePkFkProperties;
 import org.gradoop.flink.io.impl.rdbms.functions.PrintConversionPlan;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
-import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -108,36 +98,41 @@ public class RdbmsDataSource implements DataSource {
 	public LogicalGraph getLogicalGraph() {
 
 		Connection con = RdbmsConnect.connect(rdbmsConfig);
+		DataSet<Vertex> tempVertices = null;
+		MetaDataParser metadataParser = null;
+
 		try {
 			rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
-			System.out.println(rdbmsConfig.getRdbms());
-			// creates a metadata representation of the connected relational
-			// database schema
-			MetaDataParser metadataParser = new MetaDataParser(con);
+
+			metadataParser = new MetaDataParser(con);
 			metadataParser.parse();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-			// tables going to convert to vertices
-			ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
+		// tables going to convert to vertices
+		ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
 
-			// tables going to convert to edges
-			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
-			
-			PrintConversionPlan.print(tablesToNodes,tablesToEdges,"/home/hr73vexy/00 Work/outputs/conversionplan");
+		// tables going to convert to edges
+		ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
-			// creates vertices from rdbms table tuples
-			DataSet<Vertex> tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
-			
+		PrintConversionPlan.print(tablesToNodes, tablesToEdges, "/home/hr73vexy/00 Work/outputs/conversionplan");
+
+		// creates vertices from rdbms table tuples
+		tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
+
+		try {
 			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
-			
-			// cleans vertices by deleting primary key and foreign key
-			// properties
-			vertices = CleanVertices.clean(flinkConfig, tablesToNodes, tempVertices);
-//			vertices = tempVertices;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices,edges);
+		// cleans vertices by deleting primary key and foreign key
+		// properties
+		vertices = tempVertices.map(new DeletePkFkProperties()).withBroadcastSet(env.fromCollection(tablesToNodes),
+				"tablesToNodes");
+
+		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
 	}
 
 	@Override

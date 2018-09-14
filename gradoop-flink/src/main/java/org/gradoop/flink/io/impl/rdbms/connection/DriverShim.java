@@ -27,10 +27,10 @@ import java.util.logging.Logger;
 /**
  * Generic jdbc driver
  */
-public class DriverShim implements Driver{
+public class DriverShim implements Driver {
 	private Driver driver;
-	
-	public DriverShim (Driver driver){
+
+	public DriverShim(Driver driver) {
 		this.driver = driver;
 	}
 

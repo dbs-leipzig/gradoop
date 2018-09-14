@@ -20,25 +20,29 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Connection to relational datbase
+ * Connection to relational database
  */
 public class RdbmsConnect {
-	
+
 	/**
 	 * Establishes a connection to a relational database via jdbc.
 	 * 
+	 * @param config
+	 *            Configuration of relational database
 	 * @return Valid connection to a relational database
 	 */
 	public static Connection connect(RdbmsConfig config) {
+
 		Connection connection = null;
+
 		try {
 			RegisterDriver.register(config);
 			connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
-			System.out.println("Successfully connected to database " + config.getUrl().replaceAll(".*/", ""));
+
 		} catch (SQLException e) {
-			System.err.println("Not possible to establish database connection to " + config.getUrl());
 			e.printStackTrace();
 		}
+
 		return connection;
 	}
 }
