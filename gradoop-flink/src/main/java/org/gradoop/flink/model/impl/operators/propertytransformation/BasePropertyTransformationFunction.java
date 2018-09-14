@@ -26,7 +26,8 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
  *
  * @param <EL> graph element to be considered by the transformation
  */
-public class BasePropertyTransformationFunction<EL extends Element> implements TransformationFunction<EL> {
+public class BasePropertyTransformationFunction<EL extends Element>
+  implements TransformationFunction<EL> {
 
   /**
    * Separator between the iteration number and the original property key when the property key
@@ -58,10 +59,8 @@ public class BasePropertyTransformationFunction<EL extends Element> implements T
    * Valued constructor.
    *
    * @param propertyKey                property key
-   * @param transformationFunction     transformation function which shall be applied to a
-   *                                   property
-   * @param label                      label of the element whose property shall be
-   *                                   transformed
+   * @param transformationFunction     transformation function which shall be applied to a property
+   * @param label                      label of the element whose property shall be transformed
    * @param newPropertyKey             new property key
    * @param keepHistory                flag to enable versioning
    */
